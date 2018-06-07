@@ -6,7 +6,7 @@ module laya {
     import WebGL = Laya.WebGL;
 
     export class UI_ColorPicker {
-        private skin: string = "../../res/ui/colorPicker.png";
+        private skin: string = "res/ui/colorPicker.png";
 
         constructor() {
             // 不支持WebGL时自动切换至Canvas

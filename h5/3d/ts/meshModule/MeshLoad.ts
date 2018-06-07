@@ -15,7 +15,7 @@ class MeshLoad {
         directionLight.direction = new Laya.Vector3(1, -1, -1);
 
         //加载网格
-        var layaMonkey: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm"))) as Laya.MeshSprite3D;
+        var layaMonkey: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm"))) as Laya.MeshSprite3D;
         layaMonkey.transform.localScale = new Laya.Vector3(0.3, 0.3, 0.3);
         layaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
     }

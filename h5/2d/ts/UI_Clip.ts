@@ -7,9 +7,9 @@ module laya {
     import WebGL = Laya.WebGL;
 
     export class UI_Clip {
-        private buttonSkin: string = "../../res/ui/button-7.png";
-        private clipSkin: string = "../../res/ui/num0-9.png";
-        private bgSkin: string = "../../res/ui/coutDown.png";
+        private buttonSkin: string = "res/ui/button-7.png";
+        private clipSkin: string = "res/ui/num0-9.png";
+        private bgSkin: string = "res/ui/coutDown.png";
 
         private counter: Clip;
         private currFrame: number;

@@ -41,14 +41,14 @@ package cameraModule {
             
             var completeHandler:Handler = Handler.create(this, onComplete);
             
-            Laya.loader.create("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", completeHandler);
+            Laya.loader.create("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", completeHandler);
         }
         
         public function onComplete():void {
             
-            layaMonkey3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
+            layaMonkey3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
             
-            layaMonkey2D = Laya.stage.addChild(new Image("../../../../res/threeDimen/monkey.png")) as Image;
+            layaMonkey2D = Laya.stage.addChild(new Image("res/threeDimen/monkey.png")) as Image;
             
             Laya.timer.frameLoop(1, this, animate);
         }

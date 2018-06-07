@@ -46,7 +46,7 @@ package materialModule {
 			var env:String = 'sp_default';
 			//var env = 'AtticRoom';
 			//var env = 'overcloud';
-			var envinfo:String = '../../../../res/threeDimen/env/' + env + '/envinfo.json';
+			var envinfo:String = 'res/threeDimen/env/' + env + '/envinfo.json';
 			
 			var camera:Camera = new Camera(0, 0.1, 1000);
 			scene.addChild(camera);
@@ -70,8 +70,8 @@ package materialModule {
 				for ( var x:int = 0; x < rnum; x++) {
 					var mtl:PBRMaterial = new PBRMaterial();
 					mtl.use_groundtruth = false;
-					mtl.diffuseTexture = Texture2D.load('../../../../res/threeDimen/pbr/c1.png');
-					mtl.normalTexture = Texture2D.load('../../../../res/threeDimen/pbr/n1.png');
+					mtl.diffuseTexture = Texture2D.load('res/threeDimen/pbr/c1.png');
+					mtl.normalTexture = Texture2D.load('res/threeDimen/pbr/n1.png');
 					mtl.roughness = x / rnum;
 					mtl.metaless =  y / mnum;
 					var sphere:MeshSprite3D = scene.addChild( new MeshSprite3D(new SphereMesh(0.1, 32, 32))) as MeshSprite3D;
@@ -81,8 +81,8 @@ package materialModule {
 			}
 			for ( x = 0; x < rnum; x++) {
 				mtl = new PBRMaterial();
-				mtl.diffuseTexture = Texture2D.load('../../../../res/threeDimen/pbr/gold.png');
-				mtl.normalTexture = Texture2D.load('../../../../res/threeDimen/pbr/n1.png');
+				mtl.diffuseTexture = Texture2D.load('res/threeDimen/pbr/gold.png');
+				mtl.normalTexture = Texture2D.load('res/threeDimen/pbr/n1.png');
 				mtl.roughness = x / rnum;
 				mtl.metaless =  1.0;
 				sphere = scene.addChild( new MeshSprite3D(new SphereMesh(0.1, 32, 32))) as MeshSprite3D;
@@ -91,8 +91,8 @@ package materialModule {
 			}	
 			for ( x = 0; x < rnum; x++) {
 				mtl = new PBRMaterial();
-				mtl.diffuseTexture = Texture2D.load('../../../../res/threeDimen/pbr/copper.png');
-				mtl.normalTexture = Texture2D.load('../../../../res/threeDimen/pbr/n1.png');
+				mtl.diffuseTexture = Texture2D.load('res/threeDimen/pbr/copper.png');
+				mtl.normalTexture = Texture2D.load('res/threeDimen/pbr/n1.png');
 				mtl.roughness = x / rnum;
 				mtl.metaless =  1.0;
 				sphere = scene.addChild( new MeshSprite3D(new SphereMesh(0.1, 32, 32))) as MeshSprite3D;
@@ -101,8 +101,8 @@ package materialModule {
 			}	
 			for ( x = 0; x < rnum; x++) {
 				mtl = new PBRMaterial();
-				mtl.diffuseTexture = Texture2D.load('../../../../res/threeDimen/pbr/c2.png');
-				mtl.normalTexture = Texture2D.load('../../../../res/threeDimen/pbr/n1.png');
+				mtl.diffuseTexture = Texture2D.load('res/threeDimen/pbr/c2.png');
+				mtl.normalTexture = Texture2D.load('res/threeDimen/pbr/n1.png');
 				mtl.roughness = x / rnum;
 				mtl.metaless =  0.0;
 				var sphere1:MeshSprite3D = scene.addChild( new MeshSprite3D(new SphereMesh(0.1, 32, 32))) as MeshSprite3D;

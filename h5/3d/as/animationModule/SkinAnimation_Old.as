@@ -29,11 +29,11 @@ package animationModule
 		private var changeActionButton:Button;
 		private var curStateIndex:int = 0;
 		private var skinAniUrl:Array = [
-			"../../../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@walk-walk.lsani",
-			"../../../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@attack-attack.lsani",
-			"../../../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@left_fall-left_fall.lsani",
-			"../../../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@right_fall-right_fall.lsani",
-			"../../../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@back_fall-back_fall.lsani"
+			"res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@walk-walk.lsani",
+			"res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@attack-attack.lsani",
+			"res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@left_fall-left_fall.lsani",
+			"res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@right_fall-right_fall.lsani",
+			"res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@back_fall-back_fall.lsani"
 		];
 		
 		public function SkinAnimation_Old()
@@ -53,9 +53,9 @@ package animationModule
 			directionLight.direction = new Vector3(0, -0.8, -1);
 			directionLight.color = new Vector3(1, 1, 1);
 			
-			var plane:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/Zombie/old/Plane.lh")) as Sprite3D;
+			var plane:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/Zombie/old/Plane.lh")) as Sprite3D;
 			
-			zombie = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/Zombie/old/Zombie.lh")) as Sprite3D;
+			zombie = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/Zombie/old/Zombie.lh")) as Sprite3D;
 			zombie.once(Event.HIERARCHY_LOADED, this, function():void{
 				zombie.transform.rotation = new Quaternion( -0.7071068, 0, 0, -0.7071068);
 				zombie.transform.position = new Vector3(0.3, 0, 0);
@@ -92,9 +92,9 @@ package animationModule
 		
 		private function loadUI():void {
 			
-			Laya.loader.load(["../../../../res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
 				
-				changeActionButton = Laya.stage.addChild(new Button("../../../../res/threeDimen/ui/button.png", "切换动作")) as Button;
+				changeActionButton = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "切换动作")) as Button;
 				changeActionButton.size(160, 40);
 				changeActionButton.labelBold = true;
 				changeActionButton.labelSize = 30;

@@ -21,4 +21,4 @@ var directionLight = scene.addChild(new Laya.DirectionLight());
 directionLight.direction = new Laya.Vector3(0, -0.8, -1);
 directionLight.color = new Laya.Vector3(0.7, 0.6, 0.6);
 
-var layaMonkey = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+var layaMonkey = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));

@@ -4,7 +4,7 @@ Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
 
 initShader();
 
-var scene = Laya.stage.addChild(Laya.Scene.load("../../res/threeDimen/scene/terrain/terrain.ls"));
+var scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/terrain/terrain.ls"));
 
 var camera = scene.addChild(new Laya.Camera(0, 0.1, 1000));
 camera.transform.rotate(new Laya.Vector3(-38, 180, 0), false, false);
@@ -20,12 +20,12 @@ function setCustomMaterial(spirit3D) {
     if (spirit3D instanceof Laya.MeshSprite3D) {
         var meshSprite3D = spirit3D;
         var customMaterial = new CustomTerrainMaterial();
-        customMaterial.setSplatAlphaTexture(Laya.Texture2D.load("../../res/threeDimen/scene/terrain/terrain/splatalpha 0.png"));
-        customMaterial.setLightMapTexture(Laya.Texture2D.load("../../res/threeDimen/scene/terrain/Assets/Scenes/Level/XunLongShi/Lightmap-0_comp_light.png"));
-        customMaterial.setDiffuseTexture1(Laya.Texture2D.load("../../res/threeDimen/scene/terrain/terrain/ground_01.jpg"));
-        customMaterial.setDiffuseTexture2(Laya.Texture2D.load("../../res/threeDimen/scene/terrain/terrain/ground_02.jpg"));
-        customMaterial.setDiffuseTexture3(Laya.Texture2D.load("../../res/threeDimen/scene/terrain/terrain/ground_03.jpg"));
-        customMaterial.setDiffuseTexture4(Laya.Texture2D.load("../../res/threeDimen/scene/terrain/terrain/ground_04.jpg"));
+        customMaterial.setSplatAlphaTexture(Laya.Texture2D.load("res/threeDimen/scene/terrain/terrain/splatalpha 0.png"));
+        customMaterial.setLightMapTexture(Laya.Texture2D.load("res/threeDimen/scene/terrain/Assets/Scenes/Level/XunLongShi/Lightmap-0_comp_light.png"));
+        customMaterial.setDiffuseTexture1(Laya.Texture2D.load("res/threeDimen/scene/terrain/terrain/ground_01.jpg"));
+        customMaterial.setDiffuseTexture2(Laya.Texture2D.load("res/threeDimen/scene/terrain/terrain/ground_02.jpg"));
+        customMaterial.setDiffuseTexture3(Laya.Texture2D.load("res/threeDimen/scene/terrain/terrain/ground_03.jpg"));
+        customMaterial.setDiffuseTexture4(Laya.Texture2D.load("res/threeDimen/scene/terrain/terrain/ground_04.jpg"));
         customMaterial.setDiffuseScale1(new Laya.Vector2(27.92727, 27.92727));
         customMaterial.setDiffuseScale2(new Laya.Vector2(13.96364, 13.96364));
         customMaterial.setDiffuseScale3(new Laya.Vector2(18.61818, 18.61818));

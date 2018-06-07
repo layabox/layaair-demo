@@ -40,7 +40,7 @@ package shaderModule {
             
             initShader();
             
-            var scene:Scene = Laya.stage.addChild(Scene.load("../../../../res/threeDimen/scene/terrain/terrain.ls")) as Scene;
+            var scene:Scene = Laya.stage.addChild(Scene.load("res/threeDimen/scene/terrain/terrain.ls")) as Scene;
             
             var camera:Camera = scene.addChild(new Camera(0, 0.1, 1000)) as Camera;
             camera.transform.rotate(new Vector3(-38, 180, 0), false, false);
@@ -58,12 +58,12 @@ package shaderModule {
                 
                 var meshSprite3D:MeshSprite3D = spirit3D as MeshSprite3D;
                 var customMaterial:CustomTerrainMaterial = new CustomTerrainMaterial();
-                customMaterial.splatAlphaTexture = Texture2D.load("../../../../res/threeDimen/scene/terrain/terrain/splatalpha 0.png");
-                customMaterial.lightMapTexture = Texture2D.load("../../../../res/threeDimen/scene/terrain/Assets/Scenes/Level/XunLongShi/Lightmap-0_comp_light.png");
-                customMaterial.diffuseTexture1 = Texture2D.load("../../../../res/threeDimen/scene/terrain/terrain/ground_01.jpg");
-                customMaterial.diffuseTexture2 = Texture2D.load("../../../../res/threeDimen/scene/terrain/terrain/ground_02.jpg");
-                customMaterial.diffuseTexture3 = Texture2D.load("../../../../res/threeDimen/scene/terrain/terrain/ground_03.jpg");
-                customMaterial.diffuseTexture4 = Texture2D.load("../../../../res/threeDimen/scene/terrain/terrain/ground_04.jpg");
+                customMaterial.splatAlphaTexture = Texture2D.load("res/threeDimen/scene/terrain/terrain/splatalpha 0.png");
+                customMaterial.lightMapTexture = Texture2D.load("res/threeDimen/scene/terrain/Assets/Scenes/Level/XunLongShi/Lightmap-0_comp_light.png");
+                customMaterial.diffuseTexture1 = Texture2D.load("res/threeDimen/scene/terrain/terrain/ground_01.jpg");
+                customMaterial.diffuseTexture2 = Texture2D.load("res/threeDimen/scene/terrain/terrain/ground_02.jpg");
+                customMaterial.diffuseTexture3 = Texture2D.load("res/threeDimen/scene/terrain/terrain/ground_03.jpg");
+                customMaterial.diffuseTexture4 = Texture2D.load("res/threeDimen/scene/terrain/terrain/ground_04.jpg");
                 customMaterial.setDiffuseScale1(new Vector2(27.92727, 27.92727));
                 customMaterial.setDiffuseScale2(new Vector2(13.96364, 13.96364));
                 customMaterial.setDiffuseScale3(new Vector2(18.61818, 18.61818));

@@ -12,9 +12,9 @@ package  {
 		
 		private var guideSteps:Array = 
 		[
-			{ x: 151, y: 575, radius:150, tip:"../../../../res/guide/help6.png", tipx:200, tipy:250 },
-			{ x: 883, y: 620, radius:100, tip:"../../../../res/guide/help4.png", tipx:730, tipy:380 },
-			{ x: 1128, y: 583, radius:110, tip:"../../../../res/guide/help3.png", tipx:900, tipy:300 }
+			{ x: 151, y: 575, radius:150, tip:"../../res/guide/help6.png", tipx:200, tipy:250 },
+			{ x: 883, y: 620, radius:100, tip:"../../res/guide/help4.png", tipx:730, tipy:380 },
+			{ x: 1128, y: 583, radius:110, tip:"../../res/guide/help3.png", tipx:900, tipy:300 }
 		];
 		private var guideStep:int = 0;
 		private var hitArea:HitArea;
@@ -28,7 +28,7 @@ package  {
 			
 			//绘制一个蓝色方块，不被抠图
 			var gameContainer:Sprite = new Sprite();
-			gameContainer.loadImage("../../../../res/guide/crazy_snowball.png");
+			gameContainer.loadImage("../../res/guide/crazy_snowball.png");
 			Laya.stage.addChild(gameContainer);
 			
 			// 引导所在容器

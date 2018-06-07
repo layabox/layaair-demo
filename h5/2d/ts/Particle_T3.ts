@@ -24,7 +24,6 @@ module laya {
 
             Stat.show();
 
-            URL.basePath += "../../";
             Laya.loader.load("res/particles/particleNew.part", Handler.create(this, this.onAssetsLoaded), null, Loader.JSON);
         }
 

@@ -8,11 +8,11 @@ var camera = scene.addChild(new Laya.Camera(0, 0.1, 100));
 camera.transform.translate(new Laya.Vector3(0, 0.5, 1));
 camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
 
-Laya.loader.create("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, onComplete));
+Laya.loader.create("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, onComplete));
 
 function onComplete() {
 
-    layaMonkey1 = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+    layaMonkey1 = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
     layaMonkey2 = Laya.Sprite3D.instantiate(layaMonkey1, scene, false, new Laya.Vector3(0, 0, 0));
     layaMonkey3 = scene.addChild(Laya.Sprite3D.instantiate(layaMonkey1, null, false, new Laya.Vector3(0.6, 0, 0)));
 

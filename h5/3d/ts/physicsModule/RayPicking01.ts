@@ -29,7 +29,7 @@ class RayPicking01 {
         //平面
         var plane: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(6, 6, 10, 10))) as Laya.MeshSprite3D;
         var planeMat: Laya.StandardMaterial = new Laya.StandardMaterial();
-        planeMat.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/texture/layabox.png");
+        planeMat.diffuseTexture = Laya.Texture2D.load("res/threeDimen/texture/layabox.png");
         planeMat.albedo = new Laya.Vector4(0.9, 0.9, 0.9, 1);
         plane.meshRender.material = planeMat;
         var boxCollider = plane.addComponent(Laya.BoxCollider) as Laya.BoxCollider;
@@ -39,7 +39,7 @@ class RayPicking01 {
         //正方体
         var box: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(0.5, 0.5, 0.5))) as Laya.MeshSprite3D;
         var boxMat: Laya.StandardMaterial = new Laya.StandardMaterial();
-        boxMat.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/texture/layabox.png");
+        boxMat.diffuseTexture = Laya.Texture2D.load("res/threeDimen/texture/layabox.png");
         box.meshRender.material = boxMat;
         box.transform.position = new Laya.Vector3(1.5, 0.25, 0.5);
         box.transform.rotate(new Laya.Vector3(0, 30, 0), false, false);
@@ -50,7 +50,7 @@ class RayPicking01 {
         //球体
         var sphere: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.25))) as Laya.MeshSprite3D;
         var sphereMat: Laya.StandardMaterial = new Laya.StandardMaterial();
-        sphereMat.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/texture/layabox.png");
+        sphereMat.diffuseTexture = Laya.Texture2D.load("res/threeDimen/texture/layabox.png");
         sphere.meshRender.material = sphereMat;
         sphere.transform.position = new Laya.Vector3(0.5, 0.25, 0.5);
         sphere.transform.rotate(new Laya.Vector3(0, 90, 0), false, false);
@@ -62,7 +62,7 @@ class RayPicking01 {
         //圆柱体
         var cylinder: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(new Laya.CylinderMesh(0.25, 1))) as Laya.MeshSprite3D;
         var cylinderMat: Laya.StandardMaterial = new Laya.StandardMaterial();
-        cylinderMat.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/texture/layabox.png");
+        cylinderMat.diffuseTexture = Laya.Texture2D.load("res/threeDimen/texture/layabox.png");
         cylinder.meshRender.material = cylinderMat;
         cylinder.transform.position = new Laya.Vector3(-0.5, 0.5, 0.5);
         cylinder.transform.rotate(new Laya.Vector3(0, -45, 0), false, false);
@@ -73,7 +73,7 @@ class RayPicking01 {
         //胶囊体
         var capsule: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(new Laya.CapsuleMesh(0.25, 1))) as Laya.MeshSprite3D;
         var capsuleMat: Laya.StandardMaterial = new Laya.StandardMaterial();
-        capsuleMat.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/texture/layabox.png");
+        capsuleMat.diffuseTexture = Laya.Texture2D.load("res/threeDimen/texture/layabox.png");
         capsule.meshRender.material = capsuleMat;
         capsule.transform.position = new Laya.Vector3(-1.5, 0.5, 0.5);
         capsule.transform.rotate(new Laya.Vector3(0, -45, 0), false, false);

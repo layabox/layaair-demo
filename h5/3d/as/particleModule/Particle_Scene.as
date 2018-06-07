@@ -20,7 +20,7 @@ package particleModule
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			Stat.show();
 			
-			var scene:Scene = Laya.stage.addChild(Scene.load("../../../../res/threeDimen/scene/particle/Example_01.ls")) as Scene;
+			var scene:Scene = Laya.stage.addChild(Scene.load("res/threeDimen/scene/particle/Example_01.ls")) as Scene;
 			
 			var camera:Camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
 			camera.transform.translate(new Vector3(0, 1, 0));

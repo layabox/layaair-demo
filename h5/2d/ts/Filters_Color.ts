@@ -8,7 +8,7 @@ module laya {
     import WebGL = Laya.WebGL;
 
     export class Filters_Color {
-        private ApePath: string = "../../res/apes/monkey2.png";
+        private ApePath: string = "res/apes/monkey2.png";
 
         private apeTexture: Texture;
 
@@ -79,7 +79,7 @@ module laya {
 
         private createApe(): Sprite {
             var ape: Sprite = new Sprite();
-            ape.loadImage("../../res/apes/monkey2.png");
+            ape.loadImage("res/apes/monkey2.png");
             Laya.stage.addChild(ape);
 
             return ape;

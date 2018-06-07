@@ -25,7 +25,7 @@ module laya {
 
 		private loadFont(): void {
 			var bitmapFont: BitmapFont = new BitmapFont();
-			bitmapFont.loadFont("../../res/bitmapFont/test.fnt", new Handler(this, this.onFontLoaded, [bitmapFont]));
+			bitmapFont.loadFont("res/bitmapFont/test.fnt", new Handler(this, this.onFontLoaded, [bitmapFont]));
 		}
 
 		private onFontLoaded(bitmapFont: BitmapFont): void {

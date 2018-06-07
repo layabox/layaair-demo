@@ -36,10 +36,10 @@ package vrModule
 			directionLight.direction = new Vector3(0, -0.8, -1);
 			directionLight.color = new Vector3(1, 1, 1);
 			
-			var earth:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/staticModel/earth/EarthPlanet.lh")) as Sprite3D;
+			var earth:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/staticModel/earth/EarthPlanet.lh")) as Sprite3D;
 			
 			var skyBox:SkyBox = new SkyBox();
-			skyBox.textureCube = TextureCube.load("../../../../res/threeDimen/skyBox/skyBox3/skyCube.ltc");
+			skyBox.textureCube = TextureCube.load("res/threeDimen/skyBox/skyBox3/skyCube.ltc");
 			vrCamera.sky = skyBox;
 			
 			Laya.timer.frameLoop(1, null, function():void {

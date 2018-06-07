@@ -12,15 +12,15 @@ Laya.Stat.show();
 
 //预加载所有资源
 var resource = [
-    { url: "../../res/threeDimen/scene/ColliderScene/ColliderDemo.ls", clas: Laya.Scene, priority: 1 },
-    { url: "../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1 }
+    { url: "res/threeDimen/scene/ColliderScene/ColliderDemo.ls", clas: Laya.Scene, priority: 1 },
+    { url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1 }
 ];
 
 Laya.loader.create(resource, Laya.Handler.create(this, onLoadFinish));
 
 function onLoadFinish() {
 
-    this.scene = Laya.stage.addChild(Laya.Scene.load("../../res/threeDimen/scene/ColliderScene/ColliderDemo.ls"));
+    this.scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/ColliderScene/ColliderDemo.ls"));
 
     //初始化照相机
     this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
@@ -29,7 +29,7 @@ function onLoadFinish() {
     this.camera.addComponent(CameraMoveScript);
 
     //加载猴子
-    this.layaMonkey = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+    this.layaMonkey = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
     this.layaMonkey.transform.position = new Laya.Vector3(0, 0, 1);
     this.layaMonkey.transform.scale = new Laya.Vector3(8, 8, 8);
 

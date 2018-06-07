@@ -14,9 +14,9 @@ var BoneLinkSprite3D = /** @class */ (function () {
         Laya.Stat.show();
         //预加载所有资源
         var resource = [
-            { url: "../../res/threeDimen/skinModel/Mount/R_kl_H_001.lh", clas: Laya.Sprite3D, priority: 1 },
-            { url: "../../res/threeDimen/skinModel/Mount/R_kl_S_009.lh", clas: Laya.Sprite3D, priority: 1 },
-            { url: "../../res/threeDimen/skinModel/SiPangZi/PanZi.lh", clas: Laya.Sprite3D, priority: 1 }
+            { url: "res/threeDimen/skinModel/Mount/R_kl_H_001.lh", clas: Laya.Sprite3D, priority: 1 },
+            { url: "res/threeDimen/skinModel/Mount/R_kl_S_009.lh", clas: Laya.Sprite3D, priority: 1 },
+            { url: "res/threeDimen/skinModel/SiPangZi/PanZi.lh", clas: Laya.Sprite3D, priority: 1 }
         ];
         Laya.loader.create(resource, Laya.Handler.create(this, this.onLoadFinish));
     }
@@ -32,7 +32,7 @@ var BoneLinkSprite3D = /** @class */ (function () {
         //初始化角色精灵
         var role = scene.addChild(new Laya.Sprite3D());
         //初始化胖子
-        var pangzi = role.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/SiPangZi/PanZi.lh"));
+        var pangzi = role.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/SiPangZi/PanZi.lh"));
         //获取动画组件
         var animator = pangzi.getChildAt(0).getComponentByType(Laya.Animator);
         //获取动画片段
@@ -46,7 +46,7 @@ var BoneLinkSprite3D = /** @class */ (function () {
             this.statue++;
             if (this.statue % 3 == 1) {
                 animator.play("ride", 1);
-                this.dragon1 = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/Mount/R_kl_H_001.lh"));
+                this.dragon1 = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/Mount/R_kl_H_001.lh"));
                 this.dragon1.transform.localScale = this._dragonScale;
                 this.dragonAnimator1 = this.dragon1.getChildAt(0).getComponentByType(Laya.Animator);
                 var totalAnimationClip1 = this.dragonAnimator1.getClip("Take 001");
@@ -64,7 +64,7 @@ var BoneLinkSprite3D = /** @class */ (function () {
                 //骨骼取消关联节点
                 this.dragonAnimator1.unLinkSprite3DToAvatarNode(role);
                 this.dragon1.removeSelf();
-                this.dragon2 = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/Mount/R_kl_S_009.lh"));
+                this.dragon2 = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/Mount/R_kl_S_009.lh"));
                 this.dragon2.transform.localScale = this._dragonScale;
                 this.dragonAnimator2 = this.dragon2.getChildAt(0).getComponentByType(Laya.Animator);
                 var totalAnimationClip2 = this.dragonAnimator2.getClip("Take 001");

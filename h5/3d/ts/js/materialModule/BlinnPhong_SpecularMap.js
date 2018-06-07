@@ -1,7 +1,7 @@
 var BlinnPhong_SpecularMap = /** @class */ (function () {
     function BlinnPhong_SpecularMap() {
         this.rotation = new Laya.Vector3(0, 0.01, 0);
-        this.specularMapUrl = ["../../res/threeDimen/skinModel/dude/Assets/dude/headS.png", "../../res/threeDimen/skinModel/dude/Assets/dude/jacketS.png", "../../res/threeDimen/skinModel/dude/Assets/dude/pantsS.png", "../../res/threeDimen/skinModel/dude/Assets/dude/upBodyS.png"];
+        this.specularMapUrl = ["res/threeDimen/skinModel/dude/Assets/dude/headS.png", "res/threeDimen/skinModel/dude/Assets/dude/jacketS.png", "res/threeDimen/skinModel/dude/Assets/dude/pantsS.png", "res/threeDimen/skinModel/dude/Assets/dude/upBodyS.png"];
         Laya3D.init(0, 0, true);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -15,10 +15,10 @@ var BlinnPhong_SpecularMap = /** @class */ (function () {
         directionLight.direction = new Laya.Vector3(0, -0.8, -1);
         directionLight.color = new Laya.Vector3(1, 1, 1);
         var completeHandler = Laya.Handler.create(this, this.onComplete);
-        Laya.loader.create("../../res/threeDimen/skinModel/dude/dude.lh", completeHandler);
+        Laya.loader.create("res/threeDimen/skinModel/dude/dude.lh", completeHandler);
     }
     BlinnPhong_SpecularMap.prototype.onComplete = function () {
-        var dude1 = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/dude/dude.lh"));
+        var dude1 = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh"));
         dude1.transform.position = new Laya.Vector3(-0.6, 0, 0);
         var dude2 = Laya.Sprite3D.instantiate(dude1, this.scene, false, new Laya.Vector3(0.6, 0, 0));
         var skinnedMeshSprite3d = dude2.getChildAt(0).getChildAt(0);

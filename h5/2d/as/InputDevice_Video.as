@@ -12,18 +12,18 @@ package
 	import laya.utils.Stat;
 	public class InputDevice_Video
 	{
-		private const BackgroundSkin:String = "../../../../res/inputDevice/videoPlayer/background.png";
-		private const TimeLineBoxSkin:String = "../../../../res/inputDevice/videoPlayer/time line-box.png";
-		private const TimeLineSkin:String = "../../../../res/inputDevice/videoPlayer/time line.png";
-		private const ColorTimelineSkin:String = "../../../../res/inputDevice/videoPlayer/color time line.png";
-		private const PauseButtonSkin:String = "../../../../res/inputDevice/videoPlayer/pause button.png";
-		private const PlayButtonSkin:String = "../../../../res/inputDevice/videoPlayer/play button.png";
-		private const NormalSoundControlSkin:String = "../../../../res/inputDevice/videoPlayer/normal sound control.png";
-		private const SoundBgControlSkin:String = "../../../../res/inputDevice/videoPlayer/sound bg.png";
-		private const MuteButtonSkin:String = "../../../../res/inputDevice/videoPlayer/mute.png";
-		private const VolumnLineSkin:String = "../../../../res/inputDevice/videoPlayer/light-blue.png";
-		private const VolumeSliderSkin:String = "../../../../res/inputDevice/videoPlayer/volumeSlider.png";
-		private const PlayHeadSliderSkin:String = "../../../../res/inputDevice/videoPlayer/playHeadSlider.png";
+		private const BackgroundSkin:String = "../../res/inputDevice/videoPlayer/background.png";
+		private const TimeLineBoxSkin:String = "../../res/inputDevice/videoPlayer/time line-box.png";
+		private const TimeLineSkin:String = "../../res/inputDevice/videoPlayer/time line.png";
+		private const ColorTimelineSkin:String = "../../res/inputDevice/videoPlayer/color time line.png";
+		private const PauseButtonSkin:String = "../../res/inputDevice/videoPlayer/pause button.png";
+		private const PlayButtonSkin:String = "../../res/inputDevice/videoPlayer/play button.png";
+		private const NormalSoundControlSkin:String = "../../res/inputDevice/videoPlayer/normal sound control.png";
+		private const SoundBgControlSkin:String = "../../res/inputDevice/videoPlayer/sound bg.png";
+		private const MuteButtonSkin:String = "../../res/inputDevice/videoPlayer/mute.png";
+		private const VolumnLineSkin:String = "../../res/inputDevice/videoPlayer/light-blue.png";
+		private const VolumeSliderSkin:String = "../../res/inputDevice/videoPlayer/volumeSlider.png";
+		private const PlayHeadSliderSkin:String = "../../res/inputDevice/videoPlayer/playHeadSlider.png";
 		
 		private var video:Video;
 		
@@ -278,7 +278,7 @@ package
 			video.on('ended', this, onVideoPlayEnded);
 			
 			// 加载视频源
-			video.load("../../../../res/av/mov_bbb.mp4");
+			video.load("../../res/av/mov_bbb.mp4");
 			
 			Laya.stage.addChild(video);
 		}

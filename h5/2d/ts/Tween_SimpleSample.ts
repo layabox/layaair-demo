@@ -22,11 +22,11 @@ module laya {
         private setup(): void {
             var terminalX: number = 200;
 
-            var characterA: Sprite = this.createCharacter("../../res/cartoonCharacters/1.png");
+            var characterA: Sprite = this.createCharacter("res/cartoonCharacters/1.png");
             characterA.pivot(46.5, 50);
             characterA.y = 100;
 
-            var characterB: Sprite = this.createCharacter("../../res/cartoonCharacters/2.png");
+            var characterB: Sprite = this.createCharacter("res/cartoonCharacters/2.png");
             characterB.pivot(34, 50);
             characterB.y = 250;
 

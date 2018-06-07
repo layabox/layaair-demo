@@ -7,8 +7,8 @@ module laya {
 	import WebGL = Laya.WebGL;
 
 	export class Sprite_SwitchTexture {
-		private texture1: string = "../../res/apes/monkey2.png";
-		private texture2: string = "../../res/apes/monkey3.png";
+		private texture1: string = "res/apes/monkey2.png";
+		private texture2: string = "res/apes/monkey3.png";
 		private flag: boolean = false;
 
 		private ape: Sprite;

@@ -28,7 +28,7 @@ package
 		private function setup():void 
 		{
 			var panel:Panel = new Panel();
-			panel.hScrollBarSkin = "../../../../res/ui/hscroll.png";
+			panel.hScrollBarSkin = "../../res/ui/hscroll.png";
 			panel.hScrollBar.hide = true;
 			panel.size(600, 275);
 			panel.x = (Laya.stage.width - panel.width) / 2;
@@ -38,7 +38,7 @@ package
 			var img:Image;
 			for (var i:int = 0; i < 4; i++) 
 			{
-				img = new Image("../../../../res/ui/dialog (1).png");
+				img = new Image("../../res/ui/dialog (1).png");
 				img.x = i * 250;
 				panel.addChild(img);
 			}

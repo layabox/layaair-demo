@@ -25,7 +25,7 @@ module laya {
         private createApe(): void {
             this.ape = new Sprite();
 
-            this.ape.loadImage("../../res/apes/monkey2.png");
+            this.ape.loadImage("res/apes/monkey2.png");
             Laya.stage.addChild(this.ape);
             this.ape.pivot(55, 72);
             this.ape.x = Laya.stage.width / 2;

@@ -5,7 +5,7 @@ module laya {
     import WebGL = Laya.WebGL;
 
     export class UI_Tab {
-        private skins: Array<string> = ["../../res/ui/tab1.png", "../../res/ui/tab2.png"];
+        private skins: Array<string> = ["res/ui/tab1.png", "res/ui/tab2.png"];
 
         constructor(){
             // 不支持WebGL时自动切换至Canvas

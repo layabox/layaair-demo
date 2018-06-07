@@ -49,7 +49,7 @@ package advancedModule
 			directionLight.direction = new Vector3(0, -0.8, -1);
 			directionLight.color = new Vector3(1, 1, 1);
 			
-			var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
+			var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
 		}
 	}
 }

@@ -16,21 +16,21 @@ var AStarFindPath = /** @class */ (function () {
         this.path = new Array();
         //预加载所有资源
         var resource = [
-            { url: "../../res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene, priority: 1 },
-            { url: "../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1 },
-            { url: "../../res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Laya.Texture2D, priority: 1, params: [true] },
-            { url: "../../res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Laya.Texture2D, priority: 1, params: [true] }
+            { url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene, priority: 1 },
+            { url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1 },
+            { url: "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Laya.Texture2D, priority: 1, params: [true] },
+            { url: "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Laya.Texture2D, priority: 1, params: [true] }
         ];
         Laya.loader.create(resource, Laya.Handler.create(this, this.onLoadFinish));
     }
     AStarFindPath.prototype.onLoadFinish = function () {
         //初始化3D场景
-        this.scene = Laya.stage.addChild(Laya.Scene.load("../../res/threeDimen/scene/TerrainScene/XunLongShi.ls"));
+        this.scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls"));
         //删除原始资源中包含的默认相机
         var camera = this.scene.getChildByName("Scenes").getChildByName("Main Camera");
         camera.removeSelf();
         var skyBox = new Laya.SkyBox();
-        skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox3/skyCube.ltc");
+        skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox3/skyCube.ltc");
         camera.sky = skyBox;
         //根据场景中方块生成路径点
         this.initPath(this.scene);
@@ -38,7 +38,7 @@ var AStarFindPath = /** @class */ (function () {
         var meshSprite3D = this.scene.getChildByName('Scenes').getChildByName('HeightMap');
         //使可行走区域模型隐藏
         meshSprite3D.active = false;
-        var heightMap = Laya.Loader.getRes("../../res/threeDimen/scene/TerrainScene/Assets/HeightMap.png");
+        var heightMap = Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/HeightMap.png");
         //初始化MeshTerrainSprite3D
         this.terrainSprite = Laya.MeshTerrainSprite3D.createFromMeshAndHeightMap(meshSprite3D.meshFilter.sharedMesh, heightMap, 6.574996471405029, 10.000000953674316);
         //更新terrainSprite世界矩阵(为可行走区域世界矩阵)
@@ -46,13 +46,13 @@ var AStarFindPath = /** @class */ (function () {
         //给terrainSprite添加PathFind组件
         var pathFingding = this.terrainSprite.addComponent(Laya.PathFind);
         pathFingding.setting = { allowDiagonal: true, dontCrossCorners: false, heuristic: PathFinding.core.Heuristic.manhattan, weight: 1 };
-        var aStarMap = Laya.Loader.getRes("../../res/threeDimen/scene/TerrainScene/Assets/AStarMap.png");
+        var aStarMap = Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/AStarMap.png");
         pathFingding.grid = PathFinding.core.Grid.createGridFromAStarMap(aStarMap);
         //初始化移动单元
         this.moveSprite3D = this.scene.addChild(new Laya.Sprite3D());
         this.moveSprite3D.transform.position = this.path[0];
         //初始化小猴子
-        this.layaMonkey = this.moveSprite3D.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+        this.layaMonkey = this.moveSprite3D.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
         this.layaMonkey.transform.localScale = new Laya.Vector3(5, 5, 5);
         var animator = this.layaMonkey.getChildAt(0).getComponentByType(Laya.Animator);
         var totalAnimationClip = animator.getClip("Take_001");

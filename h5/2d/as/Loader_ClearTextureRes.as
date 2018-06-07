@@ -16,8 +16,8 @@
 		private var btn:Sprite;
 		private var txt:Text;
 		private var isDestroyed:Boolean = false;
-		private const PathBg:String = "../../../../res/bg2.png";
-		private const PathFly:String = "../../../../res/fighter/fighter.atlas";
+		private const PathBg:String = "../../res/bg2.png";
+		private const PathFly:String = "../../res/fighter/fighter.atlas";
 
 		/**
 		 * Tips:

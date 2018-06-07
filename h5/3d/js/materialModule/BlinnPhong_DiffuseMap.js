@@ -18,7 +18,7 @@ directionLight.direction = new Laya.Vector3(0, -0.8, -1);
 directionLight.color = new Laya.Vector3(1, 1, 1);
 
 var skyBox = new Laya.SkyBox();
-skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox2/skyCube.ltc");
+skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox2/skyCube.ltc");
 camera.sky = skyBox;
 
 var earth1 = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh()));
@@ -28,7 +28,7 @@ var earth2 = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh()));
 earth2.transform.position = new Laya.Vector3(0.6, 0, 0);
 var material = new Laya.BlinnPhongMaterial();
 //漫反射贴图
-material.albedoTexture = Laya.Texture2D.load("../../res/threeDimen/texture/earth.png");
+material.albedoTexture = Laya.Texture2D.load("res/threeDimen/texture/earth.png");
 earth2.meshRender.material = material;
 
 Laya.timer.frameLoop(1, this, function () {

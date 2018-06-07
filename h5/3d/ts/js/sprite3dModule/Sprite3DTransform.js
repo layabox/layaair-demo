@@ -13,10 +13,10 @@ var Sprite3DTransform = /** @class */ (function () {
         this._position = new Laya.Vector3(-0.6, 0, 0);
         this._rotate = new Laya.Vector3(0, 1, 0);
         this._scale = new Laya.Vector3();
-        Laya.loader.create("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, this.onComplete));
+        Laya.loader.create("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, this.onComplete));
     }
     Sprite3DTransform.prototype.onComplete = function () {
-        this.layaMonkey1 = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+        this.layaMonkey1 = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
         this.layaMonkey2 = Laya.Sprite3D.instantiate(this.layaMonkey1, this.scene, false, new Laya.Vector3(0, 0, 0));
         this.layaMonkey3 = this.scene.addChild(Laya.Sprite3D.instantiate(this.layaMonkey1, null, false, new Laya.Vector3(0.6, 0, 0)));
         Laya.timer.frameLoop(1, this, this.animate);

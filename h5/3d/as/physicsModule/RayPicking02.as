@@ -69,7 +69,7 @@ package physicsModule {
             //平面
             var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(new PlaneMesh(6, 6, 10, 10))) as MeshSprite3D;
             var planeMat:StandardMaterial = new StandardMaterial();
-            planeMat.diffuseTexture = Texture2D.load("../../../../res/threeDimen/texture/layabox.png");
+            planeMat.diffuseTexture = Texture2D.load("res/threeDimen/texture/layabox.png");
             planeMat.albedo = new Vector4(0.9, 0.9, 0.9, 1);
             plane.meshRender.material = planeMat;
             var meshCollider:MeshCollider = plane.addComponent(MeshCollider) as MeshCollider;
@@ -105,7 +105,7 @@ package physicsModule {
                 if (_outHitInfo.distance !== -1) {
                     var sphere:MeshSprite3D = scene.addChild(new MeshSprite3D(new SphereMesh(0.25, 16, 16))) as MeshSprite3D;
                     var mat:StandardMaterial = new StandardMaterial();
-                    mat.diffuseTexture = Texture2D.load("../../../../res/threeDimen/texture/layabox.png");
+                    mat.diffuseTexture = Texture2D.load("res/threeDimen/texture/layabox.png");
                     mat.albedo = new Vector4(Math.random(), Math.random(), Math.random(), 1);
                     sphere.meshRender.material = mat;
                     Vector3.add(_outHitInfo.position, _offset, _position);

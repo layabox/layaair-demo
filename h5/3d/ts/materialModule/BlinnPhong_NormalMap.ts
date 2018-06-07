@@ -1,7 +1,7 @@
 class BlinnPhong_NormalMap {
     private scene:Laya.Scene;
     private rotation:Laya.Vector3 = new Laya.Vector3(0, 0.01, 0);
-    private normalMapUrl:any = ["../../res/threeDimen/staticModel/lizardCal/rock_norm.png", "../../res/threeDimen/staticModel/lizardCal/lizard_norm.png", "../../res/threeDimen/staticModel/lizardCal/lizard_norm.png"];
+    private normalMapUrl:any = ["res/threeDimen/staticModel/lizardCal/rock_norm.png", "res/threeDimen/staticModel/lizardCal/lizard_norm.png", "res/threeDimen/staticModel/lizardCal/lizard_norm.png"];
     constructor() {
         Laya3D.init(0, 0, true);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
@@ -18,11 +18,11 @@ class BlinnPhong_NormalMap {
         directionLight.direction = new Laya.Vector3(0, -0.8, -1);
         directionLight.color = new Laya.Vector3(1, 1, 1);
 
-        Laya.loader.create("../../res/threeDimen/staticModel/lizardCal/lizardCaclute.lh", Laya.Handler.create(this, this.onComplete));
+        Laya.loader.create("res/threeDimen/staticModel/lizardCal/lizardCaclute.lh", Laya.Handler.create(this, this.onComplete));
     }
     public onComplete(): void {
 
-        var monster1: Laya.Sprite3D = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/staticModel/lizardCal/lizardCaclute.lh")) as Laya.Sprite3D;
+        var monster1: Laya.Sprite3D = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/staticModel/lizardCal/lizardCaclute.lh")) as Laya.Sprite3D;
         monster1.transform.position = new Laya.Vector3(-0.6, 0, 0);
         monster1.transform.localScale = new Laya.Vector3(0.002, 0.002, 0.002);
 

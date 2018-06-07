@@ -19,12 +19,12 @@ class MultiCamera {
         camera2.addComponent(CameraMoveScript);
         camera2.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
         var skyBox: Laya.SkyBox = new Laya.SkyBox();
-        skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox2/skyCube.ltc");
+        skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox2/skyCube.ltc");
         camera2.sky = skyBox;
 
         var directionLight: Laya.DirectionLight = scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
 
-        var layaMonkey: Laya.Sprite3D = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
+        var layaMonkey: Laya.Sprite3D = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
     }
 }
 new MultiCamera;

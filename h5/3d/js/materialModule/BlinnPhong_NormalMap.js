@@ -1,7 +1,7 @@
 Laya3D.init(0, 0, true);
 
 this.rotation = new Laya.Vector3(0, 0.01, 0);
-this.normalMapUrl = ["../../res/threeDimen/staticModel/lizardCal/rock_norm.png", "../../res/threeDimen/staticModel/lizardCal/lizard_norm.png", "../../res/threeDimen/staticModel/lizardCal/lizard_norm.png"];
+this.normalMapUrl = ["res/threeDimen/staticModel/lizardCal/rock_norm.png", "res/threeDimen/staticModel/lizardCal/lizard_norm.png", "res/threeDimen/staticModel/lizardCal/lizard_norm.png"];
 
 Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
 Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -17,10 +17,10 @@ var directionLight = this.scene.addChild(new Laya.DirectionLight());
 directionLight.direction = new Laya.Vector3(0, -0.8, -1);
 directionLight.color = new Laya.Vector3(1, 1, 1);
 
-Laya.loader.create("../../res/threeDimen/staticModel/lizardCal/lizardCaclute.lh", Laya.Handler.create(this, onComplete));
+Laya.loader.create("res/threeDimen/staticModel/lizardCal/lizardCaclute.lh", Laya.Handler.create(this, onComplete));
 function onComplete() {
 
-    var monster1 = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/staticModel/lizardCal/lizardCaclute.lh"));
+    var monster1 = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/staticModel/lizardCal/lizardCaclute.lh"));
     monster1.transform.position = new Laya.Vector3(-0.6, 0, 0);
     monster1.transform.localScale = new Laya.Vector3(0.002, 0.002, 0.002);
 

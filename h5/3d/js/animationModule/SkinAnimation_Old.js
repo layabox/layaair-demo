@@ -12,9 +12,9 @@ var directionLight = scene.addChild(new Laya.DirectionLight());
 directionLight.direction = new Laya.Vector3(0, -0.8, -1);
 directionLight.color = new Laya.Vector3(0.7, 0.6, 0.6);
 
-var plane = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/Zombie/old/Plane.lh"));
+var plane = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/Zombie/old/Plane.lh"));
 
-var zombie = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/Zombie/old/Zombie.lh"));
+var zombie = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/Zombie/old/Zombie.lh"));
 zombie.once(Laya.Event.HIERARCHY_LOADED, this, function () {
     zombie.transform.rotation = new Laya.Quaternion(-0.7071068, 0, 0, -0.7071068);
     zombie.transform.position = new Laya.Vector3(0.3, 0, 0);
@@ -23,11 +23,11 @@ zombie.once(Laya.Event.HIERARCHY_LOADED, this, function () {
 });
 
 var skinAniUrl = [
-    "../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@walk-walk.lsani",
-    "../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@attack-attack.lsani",
-    "../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@left_fall-left_fall.lsani",
-    "../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@right_fall-right_fall.lsani",
-    "../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@back_fall-back_fall.lsani"
+    "res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@walk-walk.lsani",
+    "res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@attack-attack.lsani",
+    "res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@left_fall-left_fall.lsani",
+    "res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@right_fall-right_fall.lsani",
+    "res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@back_fall-back_fall.lsani"
 ];
 
 //遍历节点,添加SkinAnimation动画组件
@@ -60,9 +60,9 @@ function loadUI() {
 
     var curStateIndex = 0;
 
-    Laya.loader.load(["../../res/threeDimen/ui/button.png"], Laya.Handler.create(null, function () {
+    Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(null, function () {
 
-        changeActionButton = Laya.stage.addChild(new Laya.Button("../../res/threeDimen/ui/button.png", "切换动作"));
+        changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "切换动作"));
         changeActionButton.size(160, 40);
         changeActionButton.labelBold = true;
         changeActionButton.labelSize = 30;

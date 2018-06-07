@@ -27,7 +27,6 @@ package
 
 			Stat.show();
 			
-			URL.basePath += "../../../../";
 			Laya.loader.load("res/particles/RadiusMode.part", Handler.create(this, onAssetsLoaded), null, Loader.JSON);
 		}
 

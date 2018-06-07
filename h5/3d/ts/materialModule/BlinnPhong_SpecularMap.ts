@@ -1,7 +1,7 @@
 class BlinnPhong_SpecularMap {
     private scene:Laya.Scene;
     private rotation:Laya.Vector3 = new Laya.Vector3(0, 0.01, 0);
-    private specularMapUrl:any = ["../../res/threeDimen/skinModel/dude/Assets/dude/headS.png", "../../res/threeDimen/skinModel/dude/Assets/dude/jacketS.png", "../../res/threeDimen/skinModel/dude/Assets/dude/pantsS.png", "../../res/threeDimen/skinModel/dude/Assets/dude/upBodyS.png"];
+    private specularMapUrl:any = ["res/threeDimen/skinModel/dude/Assets/dude/headS.png", "res/threeDimen/skinModel/dude/Assets/dude/jacketS.png", "res/threeDimen/skinModel/dude/Assets/dude/pantsS.png", "res/threeDimen/skinModel/dude/Assets/dude/upBodyS.png"];
     constructor() {
         Laya3D.init(0, 0, true);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
@@ -21,11 +21,11 @@ class BlinnPhong_SpecularMap {
 
         var completeHandler: Laya.Handler = Laya.Handler.create(this, this.onComplete);
 
-        Laya.loader.create("../../res/threeDimen/skinModel/dude/dude.lh", completeHandler);
+        Laya.loader.create("res/threeDimen/skinModel/dude/dude.lh", completeHandler);
     }
     public onComplete(): void {
 
-        var dude1: Laya.Sprite3D = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/dude/dude.lh")) as Laya.Sprite3D;
+        var dude1: Laya.Sprite3D = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh")) as Laya.Sprite3D;
         dude1.transform.position = new Laya.Vector3(-0.6, 0, 0);
 
         var dude2: Laya.Sprite3D = Laya.Sprite3D.instantiate(dude1, this.scene, false, new Laya.Vector3(0.6, 0, 0));

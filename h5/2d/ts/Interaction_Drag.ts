@@ -9,7 +9,7 @@ module laya {
     import WebGL = Laya.WebGL;
 
     export class Interaction_Drag {
-        private ApePath: string = "../../res/apes/monkey2.png";
+        private ApePath: string = "res/apes/monkey2.png";
 
         private ape: Sprite;
         private dragRegion: Rectangle;

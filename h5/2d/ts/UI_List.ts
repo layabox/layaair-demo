@@ -41,11 +41,11 @@ module laya {
             // 设置数据项为对应图片的路径
             var data: Array<string> = [];
             for (var i: number = 0; i < 10; ++i) {
-                data.push("../../res/ui/listskins/1.jpg");
-                data.push("../../res/ui/listskins/2.jpg");
-                data.push("../../res/ui/listskins/3.jpg");
-                data.push("../../res/ui/listskins/4.jpg");
-                data.push("../../res/ui/listskins/5.jpg");
+                data.push("res/ui/listskins/1.jpg");
+                data.push("res/ui/listskins/2.jpg");
+                data.push("res/ui/listskins/3.jpg");
+                data.push("res/ui/listskins/4.jpg");
+                data.push("res/ui/listskins/5.jpg");
             }
             list.array = data;
         }

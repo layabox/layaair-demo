@@ -8,7 +8,7 @@ module laya {
 	import WebGL = Laya.WebGL;
 
 	export class Filters_Glow {
-		private apePath: string = "../../res/apes/monkey2.png";
+		private apePath: string = "res/apes/monkey2.png";
 
 		private ape: Sprite;
 

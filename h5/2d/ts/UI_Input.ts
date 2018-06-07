@@ -21,7 +21,7 @@ module laya {
             Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
             Laya.stage.bgColor = "#232628";
 
-            this.skins = ["../../res/ui/input (1).png", "../../res/ui/input (2).png", "../../res/ui/input (3).png", "../../res/ui/input (4).png"];
+            this.skins = ["res/ui/input (1).png", "res/ui/input (2).png", "res/ui/input (3).png", "res/ui/input (4).png"];
             Laya.loader.load(this.skins, Handler.create(this, this.onLoadComplete));//加载资源。
         }
 

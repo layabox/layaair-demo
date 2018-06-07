@@ -16,9 +16,9 @@ camera2.normalizedViewport = new Laya.Viewport(0.5, 0.0, 0.5, 0.5);
 camera2.addComponent(CameraMoveScript);
 camera2.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
 var skyBox = new Laya.SkyBox();
-skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox2/skyCube.ltc");
+skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox2/skyCube.ltc");
 camera2.sky = skyBox;
 
 var directionLight = scene.addChild(new Laya.DirectionLight());
 
-var layaMonkey = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+var layaMonkey = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));

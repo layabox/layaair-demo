@@ -9,7 +9,7 @@ var camera = scene.addChild(new Laya.Camera(0, 0.1, 100));
 camera.transform.translate(new Laya.Vector3(0, 1, 3));
 camera.clearColor = null;
 
-Laya.loader.create(["../../res/threeDimen/skinModel/NvWu/NvWu-shenminvwu.lm", "../../res/threeDimen/skinModel/CunMinNan/CunMinNan-cunminnan.lm", "../../res/threeDimen/skinModel/XiaoFeiLong/XiaoFeiLong-xiaofeilong.lm", "../../res/threeDimen/skinModel/PangZi/PangZi-doubipangzi.lm"], Laya.Handler.create(this, onComplete));
+Laya.loader.create(["res/threeDimen/skinModel/NvWu/NvWu-shenminvwu.lm", "res/threeDimen/skinModel/CunMinNan/CunMinNan-cunminnan.lm", "res/threeDimen/skinModel/XiaoFeiLong/XiaoFeiLong-xiaofeilong.lm", "res/threeDimen/skinModel/PangZi/PangZi-doubipangzi.lm"], Laya.Handler.create(this, onComplete));
 
 var sprite3d1;
 var sprite3d2;
@@ -20,10 +20,10 @@ var str5 = "旁白 : 秀恩爱，死得快！ (MeshCollider)";
 
 function onComplete(){
     //添加精灵到场景
-    sprite3d1 = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/skinModel/NvWu/NvWu-shenminvwu.lm")));
-    sprite3d2 = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/skinModel/CunMinNan/CunMinNan-cunminnan.lm")));
-    sprite3d3 = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/skinModel/XiaoFeiLong/XiaoFeiLong-xiaofeilong.lm")));
-    sprite3d4 = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/skinModel/PangZi/PangZi-doubipangzi.lm")));
+    sprite3d1 = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/skinModel/NvWu/NvWu-shenminvwu.lm")));
+    sprite3d2 = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/skinModel/CunMinNan/CunMinNan-cunminnan.lm")));
+    sprite3d3 = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/skinModel/XiaoFeiLong/XiaoFeiLong-xiaofeilong.lm")));
+    sprite3d4 = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/skinModel/PangZi/PangZi-doubipangzi.lm")));
 
     sprite3d1.transform.position = new Laya.Vector3(-0.6, 0, -0.2);
     sprite3d2.transform.position = new Laya.Vector3(0.1, 0, 0);

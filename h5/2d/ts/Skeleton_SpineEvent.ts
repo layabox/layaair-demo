@@ -31,7 +31,7 @@ module laya {
 		}
 		public startFun():void
 		{
-			this.mAniPath = "../../res/spine/spineRes6/alien.sk";
+			this.mAniPath = "res/spine/spineRes6/alien.sk";
 			this.mFactory = new Templet();
 			this.mFactory.on(Event.COMPLETE, this, this.parseComplete);
 			this.mFactory.on(Event.ERROR, this, this.onError);

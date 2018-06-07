@@ -66,7 +66,7 @@ package physicsModule {
             //平面
             var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(new PlaneMesh(6, 6, 10, 10))) as MeshSprite3D;
             var planeMat:StandardMaterial = new StandardMaterial();
-            planeMat.diffuseTexture = Texture2D.load("../../../../res/threeDimen/texture/layabox.png");
+            planeMat.diffuseTexture = Texture2D.load("res/threeDimen/texture/layabox.png");
             planeMat.albedo = new Vector4(0.9, 0.9, 0.9, 1);
             plane.meshRender.material = planeMat;
             var boxCollider:BoxCollider = plane.addComponent(BoxCollider) as BoxCollider;
@@ -76,7 +76,7 @@ package physicsModule {
             //正方体
             var box:MeshSprite3D = scene.addChild(new MeshSprite3D(new BoxMesh(0.5, 0.5, 0.5))) as MeshSprite3D;
             var boxMat:StandardMaterial = new StandardMaterial();
-            boxMat.diffuseTexture = Texture2D.load("../../../../res/threeDimen/texture/layabox.png");
+            boxMat.diffuseTexture = Texture2D.load("res/threeDimen/texture/layabox.png");
             box.meshRender.material = boxMat;
             box.transform.position = new Vector3(1.5, 0.25, 0.5);
             box.transform.rotate(new Vector3(0, 30, 0), false, false);
@@ -87,7 +87,7 @@ package physicsModule {
             //球体
             var sphere:MeshSprite3D = scene.addChild(new MeshSprite3D(new SphereMesh(0.25))) as MeshSprite3D;
             var sphereMat:StandardMaterial = new StandardMaterial();
-            sphereMat.diffuseTexture = Texture2D.load("../../../../res/threeDimen/texture/layabox.png");
+            sphereMat.diffuseTexture = Texture2D.load("res/threeDimen/texture/layabox.png");
             sphere.meshRender.material = sphereMat;
             sphere.transform.position = new Vector3(0.5, 0.25, 0.5);
             sphere.transform.rotate(new Vector3(0, 90, 0), false, false);
@@ -99,7 +99,7 @@ package physicsModule {
             //圆柱体
             var cylinder:MeshSprite3D = scene.addChild(new MeshSprite3D(new CylinderMesh(0.25, 1))) as MeshSprite3D;
             var cylinderMat:StandardMaterial = new StandardMaterial();
-            cylinderMat.diffuseTexture = Texture2D.load("../../../../res/threeDimen/texture/layabox.png");
+            cylinderMat.diffuseTexture = Texture2D.load("res/threeDimen/texture/layabox.png");
             cylinder.meshRender.material = cylinderMat;
             cylinder.transform.position = new Vector3(-0.5, 0.5, 0.5);
             cylinder.transform.rotate(new Vector3(0, -45, 0), false, false);
@@ -110,7 +110,7 @@ package physicsModule {
             //胶囊体
             var capsule:MeshSprite3D = scene.addChild(new MeshSprite3D(new CapsuleMesh(0.25, 1))) as MeshSprite3D;
             var capsuleMat:StandardMaterial = new StandardMaterial();
-            capsuleMat.diffuseTexture = Texture2D.load("../../../../res/threeDimen/texture/layabox.png");
+            capsuleMat.diffuseTexture = Texture2D.load("res/threeDimen/texture/layabox.png");
             capsule.meshRender.material = capsuleMat;
             capsule.transform.position = new Vector3(-1.5, 0.5, 0.5);
             capsule.transform.rotate(new Vector3(0, -45, 0), false, false);

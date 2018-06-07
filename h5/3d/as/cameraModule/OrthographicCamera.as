@@ -40,7 +40,7 @@ package cameraModule {
             Laya.stage.screenMode = Stage.SCREEN_NONE;
             Stat.show();
             
-            var dialog:Image = Laya.stage.addChild(new Image("../../../../res/cartoon2/background.jpg")) as Image;
+            var dialog:Image = Laya.stage.addChild(new Image("res/cartoon2/background.jpg")) as Image;
             
             var scene:Scene = Laya.stage.addChild(new Scene()) as Scene;
             
@@ -53,7 +53,7 @@ package cameraModule {
             
             var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
             
-            var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
+            var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
             layaMonkey.once(Event.HIERARCHY_LOADED, this, function():void {
                 
                 layaMonkey.transform.localScale = new Vector3(3, 3, 3);

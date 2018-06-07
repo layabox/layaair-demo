@@ -19,8 +19,8 @@ namespace leo {
         private btn:Sprite;
         private txt:Text;
         private isDestroyed:Boolean = false;
-        private readonly PathBg:string = "../../res/bg2.png";
-        private readonly PathFly:string = "../../res/fighter/fighter.atlas";
+        private readonly PathBg:string = "res/bg2.png";
+        private readonly PathFly:string = "res/fighter/fighter.atlas";
 
         constructor()
         {

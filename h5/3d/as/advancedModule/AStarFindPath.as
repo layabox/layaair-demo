@@ -56,10 +56,10 @@ package advancedModule
 			
 			//预加载所有资源
 			var resource:Array = [
-				{url: "../../../../res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Scene, priority: 1}, 
-				{url: "../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Sprite3D, priority: 1}, 
-				{url: "../../../../res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Texture2D, priority: 1, params: [true]}, 
-				{url: "../../../../res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Texture2D, priority: 1, params: [true]}
+				{url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Scene, priority: 1}, 
+				{url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Sprite3D, priority: 1}, 
+				{url: "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Texture2D, priority: 1, params: [true]}, 
+				{url: "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Texture2D, priority: 1, params: [true]}
 			];
 			
 			Laya.loader.create(resource, Handler.create(this, onLoadFinish));
@@ -68,14 +68,14 @@ package advancedModule
 		private function onLoadFinish():void
 		{
 			//初始化3D场景
-			scene = Laya.stage.addChild(Scene.load("../../../../res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Scene;
+			scene = Laya.stage.addChild(Scene.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Scene;
 			
 			//删除原始资源中包含的默认相机
 			var camera:Camera = scene.getChildByName("Scenes").getChildByName("Main Camera") as Camera;
 			camera.removeSelf();
 			
 			var skyBox:SkyBox = new SkyBox();
-			skyBox.textureCube = TextureCube.load("../../../../res/threeDimen/skyBox/skyBox3/skyCube.ltc");
+			skyBox.textureCube = TextureCube.load("res/threeDimen/skyBox/skyBox3/skyCube.ltc");
 			camera.sky = skyBox;
 			
 			//根据场景中方块生成路径点
@@ -85,7 +85,7 @@ package advancedModule
 			var meshSprite3D:MeshSprite3D = scene.getChildByName('Scenes').getChildByName('HeightMap') as MeshSprite3D;
 			//使可行走区域模型隐藏
 			meshSprite3D.active = false;
-			var heightMap:Texture2D = Loader.getRes("../../../../res/threeDimen/scene/TerrainScene/Assets/HeightMap.png") as Texture2D;
+			var heightMap:Texture2D = Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/HeightMap.png") as Texture2D;
 			//初始化MeshTerrainSprite3D
 			terrainSprite = MeshTerrainSprite3D.createFromMeshAndHeightMap(meshSprite3D.meshFilter.sharedMesh as Mesh, heightMap, 6.574996471405029, 10.000000953674316);
 			//更新terrainSprite世界矩阵(为可行走区域世界矩阵)
@@ -94,7 +94,7 @@ package advancedModule
 			//给terrainSprite添加PathFind组件
 			var pathFingding:PathFind = terrainSprite.addComponent(PathFind) as PathFind;
 			pathFingding.setting = {allowDiagonal: true, dontCrossCorners: false, heuristic: Heuristic.manhattan, weight: 1};
-			var aStarMap:Texture2D = Loader.getRes("../../../../res/threeDimen/scene/TerrainScene/Assets/AStarMap.png") as Texture2D;
+			var aStarMap:Texture2D = Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/AStarMap.png") as Texture2D;
 			pathFingding.grid = Grid.createGridFromAStarMap(aStarMap);
 			
 			//初始化移动单元
@@ -102,7 +102,7 @@ package advancedModule
 			moveSprite3D.transform.position = path[0];
 			
 			//初始化小猴子
-			layaMonkey = moveSprite3D.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
+			layaMonkey = moveSprite3D.addChild(Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
 			layaMonkey.transform.localScale = new Vector3(5, 5, 5);
 			var animator:Animator = layaMonkey.getChildAt(0).getComponentByType(Animator) as Animator;
 			var totalAnimationClip:AnimationClip = animator.getClip("Take_001");

@@ -44,14 +44,14 @@ package lightModule {
 			spotLight.range = 6.0;
 			spotLight.spot = 3.14/4;
             
-            var grid:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/staticModel/grid/plane.lh")) as Sprite3D;
+            var grid:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh")) as Sprite3D;
 			
 			grid.once(Event.HIERARCHY_LOADED, this, function():void{
 				var pl:MeshSprite3D = grid.getChildAt(0) as MeshSprite3D;
 				debugger;
 			});
             
-            var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
+            var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
 			layaMonkey.once(Event.HIERARCHY_LOADED, this, function():void{
 				var aniSprite3d:Sprite3D = layaMonkey.getChildAt(0) as Sprite3D;
 				var animator:Animator = aniSprite3d.getComponentByType(Animator) as Animator;

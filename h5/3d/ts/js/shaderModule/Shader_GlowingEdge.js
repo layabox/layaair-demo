@@ -14,19 +14,19 @@ var Shader_GlowingEdge = /** @class */ (function () {
         var directionLight = scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.direction = new Laya.Vector3(1, -1, 0);
-        var dude = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/dude/dude.lh"));
+        var dude = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh"));
         dude.once(Laya.Event.HIERARCHY_LOADED, this, function () {
             var customMaterial1 = new CustomMaterial();
-            customMaterial1.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/head.png");
+            customMaterial1.diffuseTexture = Laya.Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/head.png");
             customMaterial1.marginalColor = new Laya.Vector3(1, 0.7, 0);
             var customMaterial2 = new CustomMaterial();
-            customMaterial2.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/jacket.png");
+            customMaterial2.diffuseTexture = Laya.Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/jacket.png");
             customMaterial2.marginalColor = new Laya.Vector3(1, 0.7, 0);
             var customMaterial3 = new CustomMaterial();
-            customMaterial3.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/pants.png");
+            customMaterial3.diffuseTexture = Laya.Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/pants.png");
             customMaterial3.marginalColor = new Laya.Vector3(1, 0.7, 0);
             var customMaterial4 = new CustomMaterial();
-            customMaterial4.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/upBody.png");
+            customMaterial4.diffuseTexture = Laya.Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/upBody.png");
             customMaterial4.marginalColor = new Laya.Vector3(1, 0.7, 0);
             var baseMaterials = new Array();
             baseMaterials[0] = customMaterial1;
@@ -38,7 +38,7 @@ var Shader_GlowingEdge = /** @class */ (function () {
         });
         var earth = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.5, 128, 128)));
         var customMaterial = new CustomMaterial();
-        customMaterial.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/texture/earth.png");
+        customMaterial.diffuseTexture = Laya.Texture2D.load("res/threeDimen/texture/earth.png");
         customMaterial.marginalColor = new Laya.Vector3(0.0, 0.3, 1.0);
         earth.meshRender.sharedMaterial = customMaterial;
         Laya.timer.frameLoop(1, this, function () {

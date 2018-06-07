@@ -7,7 +7,7 @@ class OrthographicCamera {
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
 
-        var dialog: Laya.Image = Laya.stage.addChild(new Laya.Image("../../res/cartoon2/background.jpg")) as Laya.Image;
+        var dialog: Laya.Image = Laya.stage.addChild(new Laya.Image("res/cartoon2/background.jpg")) as Laya.Image;
 
         var scene: Laya.Scene = Laya.stage.addChild(new Laya.Scene()) as Laya.Scene;
 
@@ -21,7 +21,7 @@ class OrthographicCamera {
 
         var directionLight: Laya.DirectionLight = scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
 
-        var layaMonkey: Laya.Sprite3D = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
+        var layaMonkey: Laya.Sprite3D = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
         layaMonkey.once(Laya.Event.HIERARCHY_LOADED, this, function (): void {
 
             layaMonkey.transform.localScale = new Laya.Vector3(3, 3, 3);

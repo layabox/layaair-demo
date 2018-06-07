@@ -18,7 +18,7 @@ directionLight.direction = new Laya.Vector3(1, -1, -1);
 //平面
 var plane = scene.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(6, 6, 10, 10)));
 var planeMat = new Laya.StandardMaterial();
-planeMat.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/texture/layabox.png");
+planeMat.diffuseTexture = Laya.Texture2D.load("res/threeDimen/texture/layabox.png");
 planeMat.albedo = new Laya.Vector4(0.9, 0.9, 0.9, 1);
 plane.meshRender.material = planeMat;
 var meshCollider = plane.addComponent(Laya.MeshCollider);
@@ -57,7 +57,7 @@ function checkHit() {
         if (_outHitInfo.distance !== -1) {
             var sphere = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.25, 16, 16)));
             var mat = new Laya.StandardMaterial();
-            mat.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/texture/layabox.png");
+            mat.diffuseTexture = Laya.Texture2D.load("res/threeDimen/texture/layabox.png");
             mat.albedo = new Laya.Vector4(Math.random(), Math.random(), Math.random(), 1);
             sphere.meshRender.material = mat;
             Laya.Vector3.add(_outHitInfo.position, _offset, _position);

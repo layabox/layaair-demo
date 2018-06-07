@@ -57,7 +57,7 @@ module laya {
         private createAnimation(): Animation {
             var frames: Array<string> = [];
             for (var i: number = 1; i <= 25; ++i) {
-                frames.push("../../res/phoenix/phoenix" + this.preFixNumber(i, 4) + ".jpg");
+                frames.push("res/phoenix/phoenix" + this.preFixNumber(i, 4) + ".jpg");
             }
 
             var animation: Animation = new Animation();

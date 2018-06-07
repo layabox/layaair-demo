@@ -22,7 +22,7 @@ package sceneModule {
             Laya.stage.screenMode = Stage.SCREEN_NONE;
             Stat.show();
             
-            var scene:Scene = Laya.stage.addChild(Scene.load("../../../../res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Scene;
+            var scene:Scene = Laya.stage.addChild(Scene.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Scene;
             
 			scene.once(Event.HIERARCHY_LOADED, this, function():void{
 				
@@ -30,7 +30,7 @@ package sceneModule {
 				camera.addComponent(CameraMoveScript);
 				
 				var skyBox:SkyBox = new SkyBox();
-				skyBox.textureCube = TextureCube.load("../../../../res/threeDimen/skyBox/skyBox3/skyCube.ltc");
+				skyBox.textureCube = TextureCube.load("res/threeDimen/skyBox/skyBox3/skyCube.ltc");
 				camera.sky = skyBox;
 				
 				var meshSprite3D:MeshSprite3D = scene.getChildByName('Scenes').getChildByName('HeightMap') as MeshSprite3D;

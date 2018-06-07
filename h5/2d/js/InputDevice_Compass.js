@@ -10,7 +10,7 @@
 	var WebGL        = Laya.WebGL;
 	var Event        = Laya.Event;
 
-	var compassImgPath = "../../res/inputDevice/kd.png";
+	var compassImgPath = "res/inputDevice/kd.png";
 	var compassImg;
 	var degreesText;
 	var directionIndicator;

@@ -5,7 +5,7 @@ class PBRStandardMaterialDemo {
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
 
-        var scene: Laya.Scene = Laya.stage.addChild(Laya.Scene.load("../../res/threeDimen/scene/PBRMaterialScene/Showcase.ls")) as Laya.Scene;
+        var scene: Laya.Scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/PBRMaterialScene/Showcase.ls")) as Laya.Scene;
 
         scene.once(Laya.Event.HIERARCHY_LOADED, this, function (): void {
             var camera: Laya.Camera = scene.getChildByName("Main Camera") as Laya.Camera;
@@ -13,18 +13,18 @@ class PBRStandardMaterialDemo {
             camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
             var skyBox: Laya.SkyBox = new Laya.SkyBox();
             camera.sky = skyBox;
-            skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox1/skyCube.ltc");
+            skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox1/skyCube.ltc");
 
             //实例PBR材质
             var mat: Laya.PBRStandardMaterial = new Laya.PBRStandardMaterial();
             //反射贴图
-            mat.albedoTexture = Laya.Texture2D.load('../../res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_AlbedoTransparency.png');
+            mat.albedoTexture = Laya.Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_AlbedoTransparency.png');
             //法线贴图
-            mat.normalTexture = Laya.Texture2D.load('../../res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_Normal.png');
+            mat.normalTexture = Laya.Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_Normal.png');
             //金属光滑度贴图
-            mat.metallicGlossTexture = Laya.Texture2D.load('../../res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_MetallicSmoothness.png');
+            mat.metallicGlossTexture = Laya.Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_MetallicSmoothness.png');
             //遮挡贴图
-            mat.occlusionTexture = Laya.Texture2D.load('../../res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_Occlusion.png');
+            mat.occlusionTexture = Laya.Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_Occlusion.png');
             //反射颜色
             mat.albedoColor = new Laya.Vector4(1, 1, 1, 1);
             //光滑度缩放系数

@@ -9,7 +9,7 @@
 	var Handler = Laya.Handler;
 	var WebGL = Laya.WebGL;
 
-	var ApePath = "../../res/apes/monkey2.png";
+	var ApePath = "res/apes/monkey2.png";
 
 	var ape, dragRegion;
 

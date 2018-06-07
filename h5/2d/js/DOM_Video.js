@@ -9,7 +9,7 @@ Laya.Browser.document.body.appendChild(videoElement);
 
 // 设置Video元素地样式和属性
 videoElement.style.zInddex = Laya.Render.canvas.style.zIndex + 1;
-videoElement.src = "../../res/av/mov_bbb.mp4";
+videoElement.src = "res/av/mov_bbb.mp4";
 videoElement.controls = true;
 // 阻止IOS视频全屏
 videoElement.setAttribute("webkit-playsinline", true);

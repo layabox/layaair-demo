@@ -17,18 +17,18 @@ module laya {
 	import StringKey =  Laya.StringKey;
 
 	export class InputDevice_Video {
-		private BackgroundSkin:string = "../../res/inputDevice/videoPlayer/background.png";
-		private TimeLineBoxSkin:string = "../../res/inputDevice/videoPlayer/time line-box.png";
-		private TimeLineSkin:string = "../../res/inputDevice/videoPlayer/time line.png";
-		private ColorTimelineSkin:string = "../../res/inputDevice/videoPlayer/color time line.png";
-		private PauseButtonSkin:string = "../../res/inputDevice/videoPlayer/pause button.png";
-		private PlayButtonSkin:string = "../../res/inputDevice/videoPlayer/play button.png";
-		private NormalSoundControlSkin:string = "../../res/inputDevice/videoPlayer/normal sound control.png";
-		private SoundBgControlSkin:string = "../../res/inputDevice/videoPlayer/sound bg.png";
-		private MuteButtonSkin:string = "../../res/inputDevice/videoPlayer/mute.png";
-		private VolumnLineSkin:string = "../../res/inputDevice/videoPlayer/light-blue.png";
-		private VolumeSliderSkin:string = "../../res/inputDevice/videoPlayer/volumeSlider.png";
-		private PlayHeadSliderSkin:string = "../../res/inputDevice/videoPlayer/playHeadSlider.png";
+		private BackgroundSkin:string = "res/inputDevice/videoPlayer/background.png";
+		private TimeLineBoxSkin:string = "res/inputDevice/videoPlayer/time line-box.png";
+		private TimeLineSkin:string = "res/inputDevice/videoPlayer/time line.png";
+		private ColorTimelineSkin:string = "res/inputDevice/videoPlayer/color time line.png";
+		private PauseButtonSkin:string = "res/inputDevice/videoPlayer/pause button.png";
+		private PlayButtonSkin:string = "res/inputDevice/videoPlayer/play button.png";
+		private NormalSoundControlSkin:string = "res/inputDevice/videoPlayer/normal sound control.png";
+		private SoundBgControlSkin:string = "res/inputDevice/videoPlayer/sound bg.png";
+		private MuteButtonSkin:string = "res/inputDevice/videoPlayer/mute.png";
+		private VolumnLineSkin:string = "res/inputDevice/videoPlayer/light-blue.png";
+		private VolumeSliderSkin:string = "res/inputDevice/videoPlayer/volumeSlider.png";
+		private PlayHeadSliderSkin:string = "res/inputDevice/videoPlayer/playHeadSlider.png";
 		
 		private video:Video;
 		
@@ -281,7 +281,7 @@ module laya {
 			this.video.on('ended', this, this.onVideoPlayEnded);
 			
 			// 设置视频源
-			this.video.load("../../res/av/mov_bbb.mp4");
+			this.video.load("res/av/mov_bbb.mp4");
 			
 			Laya.stage.addChild(this.video);
 		}

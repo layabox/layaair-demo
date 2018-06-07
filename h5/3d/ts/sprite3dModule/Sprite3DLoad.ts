@@ -10,7 +10,7 @@ class Sprite3DLoad {
         camera.transform.translate(new Laya.Vector3(0, 0.5, 1));
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
 
-        var layaMonkey = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+        var layaMonkey = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
     }
 }
 new Sprite3DLoad;

@@ -17,18 +17,18 @@
 	var Handler = Laya.Handler;
 	var StringKey = Laya.StringKey;
 
-	var BackgroundSkin = "../../res/inputDevice/videoPlayer/background.png";
-	var TimeLineBoxSkin = "../../res/inputDevice/videoPlayer/time line-box.png";
-	var TimeLineSkin = "../../res/inputDevice/videoPlayer/time line.png";
-	var ColorTimelineSkin = "../../res/inputDevice/videoPlayer/color time line.png";
-	var PauseButtonSkin = "../../res/inputDevice/videoPlayer/pause button.png";
-	var PlayButtonSkin = "../../res/inputDevice/videoPlayer/play button.png";
-	var NormalSoundControlSkin = "../../res/inputDevice/videoPlayer/normal sound control.png";
-	var SoundBgControlSkin = "../../res/inputDevice/videoPlayer/sound bg.png";
-	var MuteButtonSkin = "../../res/inputDevice/videoPlayer/mute.png";
-	var VolumnLineSkin = "../../res/inputDevice/videoPlayer/light-blue.png";
-	var VolumeSliderSkin = "../../res/inputDevice/videoPlayer/volumeSlider.png";
-	var PlayHeadSliderSkin = "../../res/inputDevice/videoPlayer/playHeadSlider.png";
+	var BackgroundSkin = "res/inputDevice/videoPlayer/background.png";
+	var TimeLineBoxSkin = "res/inputDevice/videoPlayer/time line-box.png";
+	var TimeLineSkin = "res/inputDevice/videoPlayer/time line.png";
+	var ColorTimelineSkin = "res/inputDevice/videoPlayer/color time line.png";
+	var PauseButtonSkin = "res/inputDevice/videoPlayer/pause button.png";
+	var PlayButtonSkin = "res/inputDevice/videoPlayer/play button.png";
+	var NormalSoundControlSkin = "res/inputDevice/videoPlayer/normal sound control.png";
+	var SoundBgControlSkin = "res/inputDevice/videoPlayer/sound bg.png";
+	var MuteButtonSkin = "res/inputDevice/videoPlayer/mute.png";
+	var VolumnLineSkin = "res/inputDevice/videoPlayer/light-blue.png";
+	var VolumeSliderSkin = "res/inputDevice/videoPlayer/volumeSlider.png";
+	var PlayHeadSliderSkin = "res/inputDevice/videoPlayer/playHeadSlider.png";
 
 	var video;
 
@@ -283,7 +283,7 @@
 		video.on('ended', this, onVideoPlayEnded);
 
 		// 加载视频源
-		video.load("../../res/av/mov_bbb.mp4");
+		video.load("res/av/mov_bbb.mp4");
 
 		Laya.stage.addChild(video);
 	}

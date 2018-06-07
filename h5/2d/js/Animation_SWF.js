@@ -5,7 +5,7 @@
 	var Browser   = Laya.Browser;
 	var WebGL     = Laya.WebGL;
 
-	var SWFPath = "../../res/swf/dragon.swf";
+	var SWFPath = "res/swf/dragon.swf";
 
 	var MCWidth = 318;
 	var MCHeight = 406;

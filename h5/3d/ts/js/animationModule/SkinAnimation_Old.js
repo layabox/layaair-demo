@@ -2,11 +2,11 @@ var SkinAnimation_Old = /** @class */ (function () {
     function SkinAnimation_Old() {
         this.curStateIndex = 0;
         this.skinAniUrl = [
-            "../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@walk-walk.lsani",
-            "../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@attack-attack.lsani",
-            "../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@left_fall-left_fall.lsani",
-            "../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@right_fall-right_fall.lsani",
-            "../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@back_fall-back_fall.lsani"
+            "res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@walk-walk.lsani",
+            "res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@attack-attack.lsani",
+            "res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@left_fall-left_fall.lsani",
+            "res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@right_fall-right_fall.lsani",
+            "res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@back_fall-back_fall.lsani"
         ];
         Laya3D.init(0, 0, true);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
@@ -19,8 +19,8 @@ var SkinAnimation_Old = /** @class */ (function () {
         var directionLight = scene.addChild(new Laya.DirectionLight());
         directionLight.direction = new Laya.Vector3(0, -0.8, -1);
         directionLight.color = new Laya.Vector3(1, 1, 1);
-        var plane = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/Zombie/old/Plane.lh"));
-        this.zombie = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/Zombie/old/Zombie.lh"));
+        var plane = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/Zombie/old/Plane.lh"));
+        this.zombie = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/Zombie/old/Zombie.lh"));
         this.zombie.once(Laya.Event.HIERARCHY_LOADED, this, function () {
             this.zombie.transform.rotation = new Laya.Quaternion(-0.7071068, 0, 0, -0.7071068);
             this.zombie.transform.position = new Laya.Vector3(0.3, 0, 0);
@@ -51,8 +51,8 @@ var SkinAnimation_Old = /** @class */ (function () {
             this.playSkinAnimation(spirit3D._childs[i], index);
     };
     SkinAnimation_Old.prototype.loadUI = function () {
-        Laya.loader.load(["../../res/threeDimen/ui/button.png"], Laya.Handler.create(this, function () {
-            this.changeActionButton = Laya.stage.addChild(new Laya.Button("../../res/threeDimen/ui/button.png", "切换动作"));
+        Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, function () {
+            this.changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "切换动作"));
             this.changeActionButton.size(160, 40);
             this.changeActionButton.labelBold = true;
             this.changeActionButton.labelSize = 30;

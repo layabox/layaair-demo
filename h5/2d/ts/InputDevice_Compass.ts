@@ -10,7 +10,7 @@ module laya {
 	import Event        = Laya.Event;
 
 	export class InputDevice_Compasss {
-		private compassImgPath:string = "../../res/inputDevice/kd.png";
+		private compassImgPath:string = "res/inputDevice/kd.png";
 		private compassImg:Sprite;
 		private degreesText:Text;
 		private directionIndicator:Sprite;

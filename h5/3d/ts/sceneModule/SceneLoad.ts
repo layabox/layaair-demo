@@ -5,7 +5,7 @@ class SceneLoad {
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
 
-        var scene: Laya.Scene = Laya.stage.addChild(Laya.Scene.load("../../res/threeDimen/scene/Arena/Arena.ls")) as Laya.Scene;
+        var scene: Laya.Scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/Arena/Arena.ls")) as Laya.Scene;
 
         var camera: Laya.Camera = scene.addChild(new Laya.Camera(0, 0.1, 100)) as Laya.Camera;
         camera.transform.translate(new Laya.Vector3(0, 2, 0));
@@ -13,7 +13,7 @@ class SceneLoad {
         camera.addComponent(CameraMoveScript);
 
         var skyBox: Laya.SkyBox = new Laya.SkyBox();
-        skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox2/skyCube.ltc");
+        skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox2/skyCube.ltc");
         camera.sky = skyBox;
     }
 }

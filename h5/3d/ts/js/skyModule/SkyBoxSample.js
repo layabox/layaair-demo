@@ -13,7 +13,7 @@ var SkyBoxSample = /** @class */ (function () {
         //天空盒
         var skyBox = new Laya.SkyBox();
         camera.sky = skyBox;
-        skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox1/skyCube.ltc");
+        skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox1/skyCube.ltc");
     }
     return SkyBoxSample;
 }());

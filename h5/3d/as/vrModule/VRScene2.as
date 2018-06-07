@@ -22,7 +22,7 @@ package vrModule
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			Stat.show();
 			
-			var scene:Scene = Laya.stage.addChild(Scene.load("../../../../res/threeDimen/scene/Arena/Arena.ls")) as Scene;
+			var scene:Scene = Laya.stage.addChild(Scene.load("res/threeDimen/scene/Arena/Arena.ls")) as Scene;
 			
 			//与3d场景的不同是添加了vr相机
 			var vrCamera:VRCamera = scene.addChild(new VRCamera(0.03, 0, 0, 0.1, 100)) as VRCamera;
@@ -31,7 +31,7 @@ package vrModule
 			vrCamera.addComponent(VRCameraMoveScript);
 			
 			var skyBox:SkyBox = new SkyBox();
-			skyBox.textureCube = TextureCube.load("../../../../res/threeDimen/skyBox/skyBox2/skyCube.ltc");
+			skyBox.textureCube = TextureCube.load("res/threeDimen/skyBox/skyBox2/skyCube.ltc");
 			vrCamera.sky = skyBox;
 		}
 	}

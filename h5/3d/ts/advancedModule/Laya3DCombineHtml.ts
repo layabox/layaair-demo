@@ -22,7 +22,7 @@ class Laya3DCombineHtml {
         directionLight.direction = new Laya.Vector3(0, -0.8, -1);
         directionLight.color = new Laya.Vector3(0.7, 0.6, 0.6);
 
-        var layaMonkey: Laya.Sprite3D = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
+        var layaMonkey: Laya.Sprite3D = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
     }
 }
 new Laya3DCombineHtml;

@@ -6,7 +6,7 @@ module laya {
     import WebGL = Laya.WebGL;
 
     export class UI_TextArea {
-        private skin: string = "../../res/ui/textarea.png";
+        private skin: string = "res/ui/textarea.png";
 
         constructor() {
             // 不支持WebGL时自动切换至Canvas

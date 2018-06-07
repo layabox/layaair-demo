@@ -5,7 +5,7 @@ class VRScene2 {
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
 
-        var scene: Laya.Scene = Laya.stage.addChild(Laya.Scene.load("../../res/threeDimen/scene/Arena/Arena.ls")) as Laya.Scene;
+        var scene: Laya.Scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/Arena/Arena.ls")) as Laya.Scene;
 
         //与3d场景的不同是添加了vr相机
         var vrCamera: Laya.VRCamera = scene.addChild(new Laya.VRCamera(0.03, 0, 0, 0.1, 100)) as Laya.VRCamera;
@@ -14,7 +14,7 @@ class VRScene2 {
         vrCamera.addComponent(VRCameraMoveScript);
 
         var skyBox: Laya.SkyBox = new Laya.SkyBox();
-        skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox2/skyCube.ltc");
+        skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox2/skyCube.ltc");
         vrCamera.sky = skyBox;
     }
 }

@@ -42,9 +42,9 @@ package animationModule
 			directionLight.direction = new Vector3(0, -0.8, -1);
 			directionLight.color = new Vector3(1, 1, 1);
 			
-			var plane:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/Zombie/new/Plane.lh")) as Sprite3D;
+			var plane:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/Zombie/new/Plane.lh")) as Sprite3D;
 			
-			var zombie:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/Zombie/new/Zombie.lh")) as Sprite3D;
+			var zombie:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/Zombie/new/Zombie.lh")) as Sprite3D;
 			zombie.once(Event.HIERARCHY_LOADED, this, function():void{
 				//获取Animator动画组件
 				zombieAnimator = (zombie.getChildAt(0) as Sprite3D).getComponentByType(Animator) as Animator;
@@ -55,9 +55,9 @@ package animationModule
 		
 		private function loadUI():void {
 			
-			Laya.loader.load(["../../../../res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
 				
-				changeActionButton = Laya.stage.addChild(new Button("../../../../res/threeDimen/ui/button.png", "切换动作")) as Button;
+				changeActionButton = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "切换动作")) as Button;
 				changeActionButton.size(160, 40);
 				changeActionButton.labelBold = true;
 				changeActionButton.labelSize = 30;
@@ -69,7 +69,7 @@ package animationModule
 					zombieAnimator.play(clipName[++curStateIndex % clipName.length]);
 				});
 				
-				var aaa:Button = Laya.stage.addChild(new Button("../../../../res/threeDimen/ui/button.png", "aaaa")) as Button;
+				var aaa:Button = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "aaaa")) as Button;
 				aaa.on(Event.CLICK, this, function():void{
 					zombieAnimator.stop();
 				});

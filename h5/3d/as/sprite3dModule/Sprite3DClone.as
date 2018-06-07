@@ -38,12 +38,12 @@ package sprite3dModule {
 			camera.transform.translate(new Vector3(0, 0.5, 1));
 			camera.transform.rotate(new Vector3( -15, 0, 0), true, false);
 			
-			Laya.loader.create("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(this, onComplete));
+			Laya.loader.create("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(this, onComplete));
 		}
 		
 		public function onComplete():void {
 			
-			var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
+			var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
 			//克隆sprite3d
 			var layaMonkey_clone1:Sprite3D = Sprite3D.instantiate(layaMonkey, scene, false, new Vector3(0.6, 0, 0));
 			//克隆sprite3d

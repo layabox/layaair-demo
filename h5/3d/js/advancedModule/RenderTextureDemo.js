@@ -2,7 +2,7 @@ Laya3D.init(0, 0, true);
 Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
 Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
 
-var scene = Laya.stage.addChild(Laya.Scene.load("../../res/threeDimen/scene/Arena/Arena.ls"));
+var scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/Arena/Arena.ls"));
 
 var camera = scene.addChild(new Laya.Camera(0, 0.1, 1000));
 camera.transform.translate(new Laya.Vector3(0, 0.5, 1));
@@ -20,13 +20,13 @@ var directionLight = scene.addChild(new Laya.DirectionLight());
 directionLight.color = new Laya.Vector3(0.7, 0.6, 0.6);
 directionLight.direction = new Laya.Vector3(0, -1.0, -1.0);
 
-var layaMonkey = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+var layaMonkey = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
 
-var layaPlane = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/staticModel/LayaPlane/LayaPlane.lh"));
+var layaPlane = scene.addChild(Laya.Sprite3D.load("res/threeDimen/staticModel/LayaPlane/LayaPlane.lh"));
 
 Laya.loader.create([
-    "../../res/threeDimen/scene/Arena/Arena.ls",
-    "../../res/threeDimen/staticModel/LayaPlane/LayaPlane.lh"
+    "res/threeDimen/scene/Arena/Arena.ls",
+    "res/threeDimen/staticModel/LayaPlane/LayaPlane.lh"
 ], Laya.Handler.create(this, onComplete));
 
 function onComplete() {
@@ -34,8 +34,8 @@ function onComplete() {
     setMaterials(scene.getChildByName("scene"));
     layaPlane.transform.localPosition = new Laya.Vector3(0, 0.5, -1);
 
-    Laya.loader.load(["../../res/threeDimen/ui/button.png"], Laya.Handler.create(null, function () {
-        var changeActionButton = Laya.stage.addChild(new Laya.Button("../../res/threeDimen/ui/button.png", "渲染目标"));
+    Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(null, function () {
+        var changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "渲染目标"));
         changeActionButton.size(160, 40);
         changeActionButton.labelBold = true;
         changeActionButton.labelSize = 30;

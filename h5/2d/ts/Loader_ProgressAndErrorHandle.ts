@@ -12,7 +12,7 @@ module laya {
 			// 无加载失败重试
 			Laya.loader.retryNum = 0;
 
-			var urls: Array<string> = ["do not exist", "../../res/fighter/fighter.png", "../../res/legend/map.jpg"];
+			var urls: Array<string> = ["do not exist", "res/fighter/fighter.png", "res/legend/map.jpg"];
 			Laya.loader.load(urls, Handler.create(this, this.onAssetLoaded), Handler.create(this, this.onLoading, null, false), Loader.TEXT);
 
 			// 侦听加载失败

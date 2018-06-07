@@ -46,7 +46,7 @@ package meshModule {
             directionLight.direction = new Vector3(1, -1, -1);
             
 			//加载网格
-            var layaMonkey:MeshSprite3D = scene.addChild(new MeshSprite3D(Mesh.load("../../../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm"))) as MeshSprite3D;
+            var layaMonkey:MeshSprite3D = scene.addChild(new MeshSprite3D(Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm"))) as MeshSprite3D;
             layaMonkey.transform.localScale = new Vector3(0.3, 0.3, 0.3);
             layaMonkey.transform.rotation = new Quaternion(0.7071068, 0, 0, -0.7071067);
         }

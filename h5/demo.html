@@ -1,171 +1,161 @@
 <!DOCTYPE html>
+
 <head>
-<meta charset='utf-8'/>
-<title>www.layabox.com</title>
-<meta name='apple-mobile-web-app-capable' content='yes' />
-<meta name='full-screen' content='true' />
-<meta name='screen-orientation' content='portrait' />
-<meta name='x5-fullscreen' content='true' />
-<meta name='360-fullscreen' content='true' />
-<meta http-equiv='expires' content='0' />
-<meta name='laya' logoimg='logo.png' logobkcolor='#ffffff' screenorientation='landscape' cacheid='fffffffff' />
-<meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<!-- <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=LIhOlvWfdiPYMCsK5wsqlFQD8wW4Bfy6&s=1"></script> -->
+    <meta charset='utf-8' />
+    <title>www.layabox.com</title>
+    <meta name='apple-mobile-web-app-capable' content='yes' />
+    <meta name='full-screen' content='true' />
+    <meta name='screen-orientation' content='portrait' />
+    <meta name='x5-fullscreen' content='true' />
+    <meta name='360-fullscreen' content='true' />
+    <meta http-equiv='expires' content='0' />
+    <meta name='laya' logoimg='logo.png' logobkcolor='#ffffff' screenorientation='landscape' cacheid='fffffffff' />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <!-- <script type="text/javascript" src="https://api.map.baidu.com/api?v=2.0&ak=LIhOlvWfdiPYMCsK5wsqlFQD8wW4Bfy6&s=1"></script> -->
 </head>
+
 <body style="background-color: black;">
-<script>
+    <script>
+        var layaAirLibBasePath = "js/";;
+        var d3CommandLibBasePath = "http://layaair.ldc.layabox.com/demo/master/samples/js/3d/";
+        var d3CustomLibBasePath = "http://layaair.ldc.layabox.com/demo/master/samples/js/3d/advancedStage/";
+        var libs;
+        var manifest, libsMap, pathMap;
+        var theCode;
 
-var layaAirLibBasePath = "js/";;
-var d3CommandLibBasePath = "http://layaair.ldc.layabox.com/demo/master/samples/js/3d/";
-var d3CustomLibBasePath = "http://layaair.ldc.layabox.com/demo/master/samples/js/3d/advancedStage/";
-var libs;
-var manifest, libsMap, pathMap;
-var theCode;
-
-function getQueryString(name) {
-    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
-    var r = window.location.search.substr(1).match(reg);
-    if (r != null) return unescape(r[2]); return null;
-}
-
-function parseToSearchUrl(key) {
-    var keyArr = key.split("&");
-    return "category=" + keyArr[0] + "&group=" + keyArr[1] + "&name=" + keyArr[2];
-}
-
-if(location.search)
-{
-    var search = location.search.substr(1);
-    // var p = search.split('&');
-    var p = [
-        getQueryString("category"),
-        getQueryString("group"),
-        getQueryString("name"),
-        getQueryString("lib")
-    ];
-
-   loadLibs(p[3].split(','), function()
-   {
-        // path
-        var path = p[0] + '/js/';
-        if(p[0] == '2d')
-        {
-            path += p[1] + '_' + p[2] + '.js';
-        }
-        else
-        {
-            path += p[1].toLowerCase() + 'Module' + '/';
-            path += p[2];
-            path += '.js';
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
         }
 
-        // load js file
-        var xmlhttp = new XMLHttpRequest();
-        xmlhttp.open("GET", path, false);
-        xmlhttp.send(null);
+        function parseToSearchUrl(key) {
+            var keyArr = key.split("&");
+            return "category=" + keyArr[0] + "&group=" + keyArr[1] + "&name=" + keyArr[2];
+        }
 
-        var code = convertDemoResPath(xmlhttp.responseText);
-        createScript("source", code);
-   });
-}
+        if (location.search) {
+            var search = location.search.substr(1);
+            // var p = search.split('&');
+            var p = [
+                getQueryString("category"),
+                getQueryString("group"),
+                getQueryString("name"),
+                getQueryString("lib")
+            ];
 
-function showWithCode(code, libs)
-{
-    // fix resource paths
-    theCode = code.replace(/\.\.\/\.\.\//g, '');
-    loadLibs(libs.split(","), appendCode);
-}
+            loadLibs(p[3].split(','), function () {
+                // path
+                var path = p[0] + '/js/';
+                if (p[0] == '2d') {
+                    path += p[1] + '_' + p[2] + '.js';
+                }
+                else {
+                    path += p[1].toLowerCase() + 'Module' + '/';
+                    path += p[2];
+                    path += '.js';
+                }
 
-function appendCode(code)
-{
-    if(!code) code = theCode;
-    var script = document.createElement("script");
-    script.innerHTML = code;
-    document.head.appendChild(script);
-}
+                // load js file
+                var xmlhttp = new XMLHttpRequest();
+                xmlhttp.open("GET", path, false);
+                xmlhttp.send(null);
 
-function loadLibs(libs, onFinish)
-{
-    if(libs.length == 0) 
-    {
-        onFinish();
-        return;
-    }
+                var code = convertDemoResPath(xmlhttp.responseText);
+                createScript("source", code);
+            });
+        }
 
-    var lib = libs.shift();
+        function showWithCode(code, libs) {
+            // fix resource paths
+            theCode = code.replace(/\.\.\/\.\.\//g, '');
+            loadLibs(libs.split(","), appendCode);
+        }
 
-    switch(lib)
-    {
-        /*
-         * 百度地图的异步加载方式，在参数中传入回调，不由script.onload控制。
-         * 由于此处的return导致后续lib不继续加载，所以百度地图必须使最后一个lib
+        function appendCode(code) {
+            if (!code) code = theCode;
+            var script = document.createElement("script");
+            script.innerHTML = code;
+            document.head.appendChild(script);
+        }
+
+        function loadLibs(libs, onFinish) {
+            if (libs.length == 0) {
+                onFinish();
+                return;
+            }
+
+            var lib = libs.shift();
+
+            switch (lib) {
+                /*
+                 * 百度地图的异步加载方式，在参数中传入回调，不由script.onload控制。
+                 * 由于此处的return导致后续lib不继续加载，所以百度地图必须使最后一个lib
+                 */
+                case "BaiduMap":
+                    lib = "https://api.map.baidu.com/api?v=2.0&ak=LIhOlvWfdiPYMCsK5wsqlFQD8wW4Bfy6&s=1&callback=appendCode";
+                    createScript("url", lib);
+                    return;
+                case "protobuf":
+                    lib = "libs/protobuf.min.js";
+                    break;
+                case "matter.js":
+                case "LayaRender.js":
+                    lib = "libs/" + lib;
+                    break;
+                case "UI%20code":
+                case "UI code":
+                    lib = "libs/LayaUISample.max.all.js";
+                    break;
+                case "Tool.js":
+                case "pbrlut.js":
+                case "CameraMoveScript.js":
+                case "VRCameraMoveScript.js":
+                case "ColliderScript.js":
+                case "DrawBoxColliderScript.js":
+                    lib = "3d/js/common/" + lib;
+                    break;
+                case "CustomMaterial.js":
+                case "CustomTerrainMaterial.js":
+                    lib = "3d/js/shaderModule/customMaterials/" + lib;
+                    break;
+                default:
+                    lib = "libs/laya." + lib + ".js";
+                    break;
+            }
+
+            createScript("url", lib).onload = function () {
+                loadLibs(libs, onFinish);
+            }
+        }
+
+        /**
+         * @param  {string} type  source | url, if empty, just create a script tag.
+         * @param  {string} value while type is "source", "value" is source code; while type is "url", "value" is url address.
+         * @return {<script>}     script tag.
          */
-        case "BaiduMap":
-            lib = "https://api.map.baidu.com/api?v=2.0&ak=LIhOlvWfdiPYMCsK5wsqlFQD8wW4Bfy6&s=1&callback=appendCode";
-            createScript("url", lib);
-            return;
-        case "protobuf":
-            lib = "lib/protobuf.min.js";
-            break;
-        case "matter.js":
-        case "LayaRender.js":
-            lib = "lib/" + lib;
-            break;
-        case "UI%20code":
-        case "UI code":
-            lib = "lib/LayaUISample.max.all.js";
-            break;
-        case "Tool.js":
-        case "pbrlut.js":
-        case "CameraMoveScript.js":
-        case "VRCameraMoveScript.js":
-        case "ColliderScript.js":
-        case "DrawBoxColliderScript.js":
-            lib = "3d/js/common/" + lib;
-            break;
-        case "CustomMaterial.js":
-        case "CustomTerrainMaterial.js":
-            lib = "3d/js/shaderModule/customMaterials/" + lib;
-            break;
-        default:
-            lib = "lib/laya." + lib + ".js";
-            break;
-    }
+        function createScript(type, value) {
+            var script = document.createElement("script");
+            document.head.appendChild(script);
 
-    createScript("url", lib).onload = function()
-    {
-        loadLibs(libs, onFinish);
-    }
-}
+            if (!type) return script;
 
-/**
- * @param  {string} type  source | url, if empty, just create a script tag.
- * @param  {string} value while type is "source", "value" is source code; while type is "url", "value" is url address.
- * @return {<script>}     script tag.
- */
-function createScript(type, value)
-{
-    var script = document.createElement("script");
-    document.head.appendChild(script);
+            switch (type) {
+                case "source":
+                    script.innerHTML = value;
+                    break;
+                case "url":
+                    script.src = value;
+                    break;
+            }
+            return script;
+        }
 
-    if(!type) return script;
-
-    switch(type)
-    {
-        case "source":
-            script.innerHTML = value;
-            break;
-        case "url":
-            script.src = value;
-            break;
-    }
-    return script;
-}
-
-function convertDemoResPath(code)
-{
-    return code.replace(/(\.\.\/)+/g, "");
-}
-</script>
+        function convertDemoResPath(code) {
+            return code.replace(/(\.\.\/)+/g, "");
+        }
+    </script>
 </body>
+
 </html>

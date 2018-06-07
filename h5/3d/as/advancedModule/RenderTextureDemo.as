@@ -39,7 +39,7 @@ package advancedModule
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			Stat.show();
 			
-			scene = Laya.stage.addChild(Scene.load("../../../../res/threeDimen/scene/Arena/Arena.ls")) as Scene;
+			scene = Laya.stage.addChild(Scene.load("res/threeDimen/scene/Arena/Arena.ls")) as Scene;
 			
 			var camera:Camera = scene.addChild(new Camera(0, 0.1, 1000)) as Camera;
 			camera.transform.translate(new Vector3(0, 0.5, 1));
@@ -57,13 +57,13 @@ package advancedModule
             directionLight.color = new Vector3(1, 1, 1);
             directionLight.direction = new Vector3(0, -1.0, -1.0);
 			
-			var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
+			var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
 			
-			layaPlane = scene.addChild(Sprite3D.load("../../../../res/threeDimen/staticModel/LayaPlane/LayaPlane.lh")) as Sprite3D;
+			layaPlane = scene.addChild(Sprite3D.load("res/threeDimen/staticModel/LayaPlane/LayaPlane.lh")) as Sprite3D;
 			
             Laya.loader.create([
-				"../../../../res/threeDimen/scene/Arena/Arena.ls",
-				"../../../../res/threeDimen/staticModel/LayaPlane/LayaPlane.lh"
+				"res/threeDimen/scene/Arena/Arena.ls",
+				"res/threeDimen/staticModel/LayaPlane/LayaPlane.lh"
 			], Handler.create(this, onComplete));
 		}
 		
@@ -72,8 +72,8 @@ package advancedModule
 			setMaterials(scene.getChildByName("scene") as Sprite3D);
 			layaPlane.transform.localPosition = new Vector3(0, 0.5, -1);
 			
-            Laya.loader.load(["../../../../res/threeDimen/ui/button.png"], Handler.create(null, function():void {
-                var changeActionButton:Button = Laya.stage.addChild(new Button("../../../../res/threeDimen/ui/button.png", "渲染目标")) as Button;
+            Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+                var changeActionButton:Button = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "渲染目标")) as Button;
                 changeActionButton.size(160, 40);
                 changeActionButton.labelBold = true;
                 changeActionButton.labelSize = 30;

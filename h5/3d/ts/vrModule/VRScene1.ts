@@ -20,10 +20,10 @@ class VRScene1 {
         directionLight.direction = new Laya.Vector3(0, -0.8, -1);
         directionLight.color = new Laya.Vector3(1, 1, 1);
 
-        var earth: Laya.Sprite3D = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/staticModel/earth/EarthPlanet.lh")) as Laya.Sprite3D;
+        var earth: Laya.Sprite3D = scene.addChild(Laya.Sprite3D.load("res/threeDimen/staticModel/earth/EarthPlanet.lh")) as Laya.Sprite3D;
 
         var skyBox: Laya.SkyBox = new Laya.SkyBox();
-        skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox3/skyCube.ltc");
+        skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox3/skyCube.ltc");
         vrCamera.sky = skyBox;
 
         Laya.timer.frameLoop(1, this, function (): void {

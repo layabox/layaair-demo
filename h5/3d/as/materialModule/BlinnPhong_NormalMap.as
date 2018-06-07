@@ -19,7 +19,7 @@ package materialModule
 	{
 		private var scene:Scene;
 		private var rotation:Vector3 = new Vector3(0, 0.01, 0);
-		private var normalMapUrl:Array = ["../../../../res/threeDimen/staticModel/lizardCal/rock_norm.png", "../../../../res/threeDimen/staticModel/lizardCal/lizard_norm.png", "../../../../res/threeDimen/staticModel/lizardCal/lizard_norm.png"];
+		private var normalMapUrl:Array = ["res/threeDimen/staticModel/lizardCal/rock_norm.png", "res/threeDimen/staticModel/lizardCal/lizard_norm.png", "res/threeDimen/staticModel/lizardCal/lizard_norm.png"];
 		
 		public function BlinnPhong_NormalMap()
 		{
@@ -39,12 +39,12 @@ package materialModule
 			directionLight.direction = new Vector3(0, -0.8, -1);
 			directionLight.color = new Vector3(1, 1, 1);
 			
-			Laya.loader.create("../../../../res/threeDimen/staticModel/lizardCal/lizardCaclute.lh", Handler.create(this, onComplete));
+			Laya.loader.create("res/threeDimen/staticModel/lizardCal/lizardCaclute.lh", Handler.create(this, onComplete));
 		}
 		
 		public function onComplete():void {
 			
-			var monster1:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/staticModel/lizardCal/lizardCaclute.lh")) as Sprite3D;
+			var monster1:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/staticModel/lizardCal/lizardCaclute.lh")) as Sprite3D;
 			monster1.transform.position = new Vector3(-0.6, 0, 0);
 			monster1.transform.localScale = new Vector3(0.002, 0.002, 0.002);
 			

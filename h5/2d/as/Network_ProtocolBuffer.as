@@ -11,7 +11,7 @@ package
 		{
 			Laya.init(550, 400);
 			
-			ProtoBuf.load("../../../../res/protobuf/awesome.proto", onAssetsLoaded);
+			ProtoBuf.load("../../res/protobuf/awesome.proto", onAssetsLoaded);
 		}
 		
 		private function onAssetsLoaded(err:*, root:*):void

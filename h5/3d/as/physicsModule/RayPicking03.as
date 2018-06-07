@@ -72,7 +72,7 @@ package physicsModule {
             
             var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(new PlaneMesh(6, 6, 10, 10))) as MeshSprite3D;
             var planeMat:StandardMaterial = new StandardMaterial();
-            planeMat.diffuseTexture = Texture2D.load("../../../../res/threeDimen/texture/layabox.png");
+            planeMat.diffuseTexture = Texture2D.load("res/threeDimen/texture/layabox.png");
             planeMat.albedo = new Vector4(0.9, 0.9, 0.9, 1);
             plane.meshRender.material = planeMat;
             var meshCollider:MeshCollider = plane.addComponent(MeshCollider) as MeshCollider;
@@ -80,7 +80,7 @@ package physicsModule {
             
             box = scene.addChild(new MeshSprite3D(new BoxMesh(0.5, 0.5, 0.5))) as MeshSprite3D;
             var mat:StandardMaterial = new StandardMaterial();
-            mat.diffuseTexture = Texture2D.load("../../../../res/threeDimen/texture/layabox.png");
+            mat.diffuseTexture = Texture2D.load("res/threeDimen/texture/layabox.png");
             box.meshRender.material = mat;
             box.transform.position = _position;
             

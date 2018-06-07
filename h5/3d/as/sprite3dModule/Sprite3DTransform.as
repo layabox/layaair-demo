@@ -50,13 +50,13 @@ package sprite3dModule
 			
 			var completeHandler:Handler = Handler.create(this, onComplete);
 			
-			Laya.loader.create("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", completeHandler);
+			Laya.loader.create("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", completeHandler);
 		}
 		
 		public function onComplete():void
 		{
 			
-			layaMonkey1 = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
+			layaMonkey1 = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
 			layaMonkey2 = Sprite3D.instantiate(layaMonkey1, scene, false, new Vector3(0, 0, 0));
 			layaMonkey3 = scene.addChild(Sprite3D.instantiate(layaMonkey1, null, false, new Vector3(0.6, 0, 0))) as Sprite3D;
 			

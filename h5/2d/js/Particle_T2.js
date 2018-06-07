@@ -1,17 +1,15 @@
-(function()
-{
-	var Stage            = Laya.Stage;
-	var Loader           = Laya.Loader;
-	var Particle2D       = Laya.Particle2D;
-	var Browser          = Laya.Browser;
-	var Handler          = Laya.Handler;
-	var Stat             = Laya.Stat;
-	var WebGL            = Laya.WebGL;
+(function () {
+	var Stage = Laya.Stage;
+	var Loader = Laya.Loader;
+	var Particle2D = Laya.Particle2D;
+	var Browser = Laya.Browser;
+	var Handler = Laya.Handler;
+	var Stat = Laya.Stat;
+	var WebGL = Laya.WebGL;
 
 	var sp;
 
-	(function()
-	{
+	(function () {
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
@@ -23,12 +21,10 @@
 
 		Stat.show();
 
-		Laya.URL.basePath += "../../";
 		Laya.loader.load("res/particles/RadiusMode.part", Handler.create(this, onAssetsLoaded), null, Loader.JSON);
 	})();
 
-	function onAssetsLoaded(settings)
-	{
+	function onAssetsLoaded(settings) {
 		sp = new Particle2D(settings);
 		sp.emitter.start();
 		sp.play();

@@ -27,7 +27,7 @@ package materialModule
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			Stat.show();
 			
-			var scene:Scene = Laya.stage.addChild(Scene.load("../../../../res/threeDimen/scene/PBRMaterialScene/Showcase.ls")) as Scene;
+			var scene:Scene = Laya.stage.addChild(Scene.load("res/threeDimen/scene/PBRMaterialScene/Showcase.ls")) as Scene;
 			
 			scene.once(Event.HIERARCHY_LOADED, this, function():void
 			{
@@ -36,18 +36,18 @@ package materialModule
 				camera.clearFlag = BaseCamera.CLEARFLAG_SKY;
 				var skyBox:SkyBox = new SkyBox();
 				camera.sky = skyBox;
-				skyBox.textureCube = TextureCube.load("../../../../res/threeDimen/skyBox/skyBox1/skyCube.ltc");
+				skyBox.textureCube = TextureCube.load("res/threeDimen/skyBox/skyBox1/skyCube.ltc");
 				
 				//实例PBR材质
 				var mat:PBRStandardMaterial = new PBRStandardMaterial();
 				//反射贴图
-				mat.albedoTexture = Texture2D.load('../../../../res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_AlbedoTransparency.png');
+				mat.albedoTexture = Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_AlbedoTransparency.png');
 				//法线贴图
-				mat.normalTexture = Texture2D.load('../../../../res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_Normal.png');
+				mat.normalTexture = Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_Normal.png');
 				//金属光滑度贴图
-				mat.metallicGlossTexture = Texture2D.load('../../../../res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_MetallicSmoothness.png');
+				mat.metallicGlossTexture = Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_MetallicSmoothness.png');
 				//遮挡贴图
-				mat.occlusionTexture = Texture2D.load('../../../../res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_Occlusion.png');
+				mat.occlusionTexture = Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_Occlusion.png');
 				//反射颜色
 				mat.albedoColor = new Vector4(1, 1, 1, 1);
 				//光滑度缩放系数

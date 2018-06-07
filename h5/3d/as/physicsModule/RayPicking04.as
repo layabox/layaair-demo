@@ -88,7 +88,7 @@ package physicsModule
 			camera.transform.translate(new Vector3(0, 1, 3));
 			camera.clearColor = null;
 			
-			Laya.loader.create(["../../../../res/threeDimen/skinModel/NvWu/NvWu-shenminvwu.lm", "../../../../res/threeDimen/skinModel/CunMinNan/CunMinNan-cunminnan.lm", "../../../../res/threeDimen/skinModel/XiaoFeiLong/XiaoFeiLong-xiaofeilong.lm", "../../../../res/threeDimen/skinModel/PangZi/PangZi-doubipangzi.lm"], Handler.create(this, onComplete));
+			Laya.loader.create(["res/threeDimen/skinModel/NvWu/NvWu-shenminvwu.lm", "res/threeDimen/skinModel/CunMinNan/CunMinNan-cunminnan.lm", "res/threeDimen/skinModel/XiaoFeiLong/XiaoFeiLong-xiaofeilong.lm", "res/threeDimen/skinModel/PangZi/PangZi-doubipangzi.lm"], Handler.create(this, onComplete));
 		
 		}
 		
@@ -96,10 +96,10 @@ package physicsModule
 		{
 			
 			//添加精灵到场景
-			sprite3d1 = scene.addChild(new MeshSprite3D(Mesh.load("../../../../res/threeDimen/skinModel/NvWu/NvWu-shenminvwu.lm"))) as MeshSprite3D;
-			sprite3d2 = scene.addChild(new MeshSprite3D(Mesh.load("../../../../res/threeDimen/skinModel/CunMinNan/CunMinNan-cunminnan.lm"))) as MeshSprite3D;
-			sprite3d3 = scene.addChild(new MeshSprite3D(Mesh.load("../../../../res/threeDimen/skinModel/XiaoFeiLong/XiaoFeiLong-xiaofeilong.lm"))) as MeshSprite3D;
-			sprite3d4 = scene.addChild(new MeshSprite3D(Mesh.load("../../../../res/threeDimen/skinModel/PangZi/PangZi-doubipangzi.lm"))) as MeshSprite3D;
+			sprite3d1 = scene.addChild(new MeshSprite3D(Mesh.load("res/threeDimen/skinModel/NvWu/NvWu-shenminvwu.lm"))) as MeshSprite3D;
+			sprite3d2 = scene.addChild(new MeshSprite3D(Mesh.load("res/threeDimen/skinModel/CunMinNan/CunMinNan-cunminnan.lm"))) as MeshSprite3D;
+			sprite3d3 = scene.addChild(new MeshSprite3D(Mesh.load("res/threeDimen/skinModel/XiaoFeiLong/XiaoFeiLong-xiaofeilong.lm"))) as MeshSprite3D;
+			sprite3d4 = scene.addChild(new MeshSprite3D(Mesh.load("res/threeDimen/skinModel/PangZi/PangZi-doubipangzi.lm"))) as MeshSprite3D;
 			
 			sprite3d1.transform.position = new Vector3(-0.6, 0, -0.2);
 			sprite3d2.transform.position = new Vector3(0.1, 0, 0);

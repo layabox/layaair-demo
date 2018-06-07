@@ -16,7 +16,7 @@ class SkyBoxSample {
         //天空盒
         var skyBox: Laya.SkyBox = new Laya.SkyBox();
         camera.sky = skyBox;
-        skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox1/skyCube.ltc");
+        skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox1/skyCube.ltc");
     }
 }
 new SkyBoxSample;

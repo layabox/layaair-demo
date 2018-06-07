@@ -15,8 +15,8 @@ var DirectionLightDemo = /** @class */ (function () {
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(0.7, 0.6, 0.6);
         directionLight.direction = new Laya.Vector3(0, -1.0, -1.0);
-        var grid = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/staticModel/grid/plane.lh"));
-        var layaMonkey = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+        var grid = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh"));
+        var layaMonkey = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
         layaMonkey.once(Laya.Event.HIERARCHY_LOADED, this, function () {
             var aniSprite3d = layaMonkey.getChildAt(0);
             var animator = aniSprite3d.getComponentByType(Laya.Animator);

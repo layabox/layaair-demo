@@ -28,9 +28,9 @@ class SpotLightDemo {
         spotLight.range = 6.0;
         spotLight.spot = 32;
 
-        var grid: Laya.Sprite3D = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/staticModel/grid/plane.lh")) as Laya.Sprite3D;
+        var grid: Laya.Sprite3D = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh")) as Laya.Sprite3D;
 
-        var layaMonkey: Laya.Sprite3D = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
+        var layaMonkey: Laya.Sprite3D = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
         layaMonkey.once(Laya.Event.HIERARCHY_LOADED, this, function (): void {
             var aniSprite3d: Laya.Sprite3D = layaMonkey.getChildAt(0) as Laya.Sprite3D;
             var animator: Laya.Animator = aniSprite3d.getComponentByType(Laya.Animator) as Laya.Animator;

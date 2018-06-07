@@ -25,7 +25,7 @@
 	})();
 	function startFun()
 	{
-		mAniPath = "../../res/spine/spineRes1/dragon.sk";
+		mAniPath = "res/spine/spineRes1/dragon.sk";
 		mFactory = new Templet();
 		mFactory.on(Event.COMPLETE, this, parseComplete);
 		mFactory.on(Event.ERROR, this, onError);

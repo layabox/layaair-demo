@@ -2,7 +2,7 @@ Laya3D.init(0, 0, true);
 Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
 Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
 
-var scene = Laya.stage.addChild(Laya.Scene.load("../../res/threeDimen/scene/TerrainScene/XunLongShi.ls"));
+var scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls"));
 
 scene.once(Laya.Event.HIERARCHY_LOADED, this, function () {
 
@@ -10,7 +10,7 @@ scene.once(Laya.Event.HIERARCHY_LOADED, this, function () {
 	camera.addComponent(CameraMoveScript);
 				
 	var skyBox = new Laya.SkyBox();
-	skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox3/skyCube.ltc");
+	skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox3/skyCube.ltc");
 	camera.sky = skyBox;
 				
 	var meshSprite3D = scene.getChildByName('Scenes').getChildByName('HeightMap');

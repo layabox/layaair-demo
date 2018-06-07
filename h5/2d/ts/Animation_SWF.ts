@@ -5,7 +5,7 @@ module laya {
 	import WebGL = Laya.WebGL;
 
 	export class Animation_SWF {
-		private SWFPath: string = "../../res/swf/dragon.swf";
+		private SWFPath: string = "res/swf/dragon.swf";
 
 		private MCWidth: number = 318;
 		private MCHeight: number = 406;

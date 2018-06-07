@@ -8,7 +8,7 @@
 	var Handler   = Laya.Handler;
 	var WebGL     = Laya.WebGL;
 
-	var AniConfPath = "../../res/fighter/fighter.json";
+	var AniConfPath = "res/fighter/fighter.json";
 
 	(function()
 	{

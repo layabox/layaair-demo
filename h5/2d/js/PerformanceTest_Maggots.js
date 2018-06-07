@@ -7,7 +7,7 @@
 	var Rectangle = Laya.Rectangle;
 	var WebGL     = Laya.WebGL;
 
-	var texturePath = "../../res/tinyMaggot.png";
+	var texturePath = "res/tinyMaggot.png";
 
 	var padding = 100;
 	var maggotAmount = 5000;

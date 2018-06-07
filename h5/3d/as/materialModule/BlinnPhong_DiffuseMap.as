@@ -43,7 +43,7 @@ package materialModule {
 			directionLight.color = new Vector3(1, 1, 1);
 			
 			var skyBox:SkyBox = new SkyBox();
-			skyBox.textureCube = TextureCube.load("../../../../res/threeDimen/skyBox/skyBox2/skyCube.ltc");
+			skyBox.textureCube = TextureCube.load("res/threeDimen/skyBox/skyBox2/skyCube.ltc");
 			camera.sky = skyBox;
 			
 			var earth1:MeshSprite3D = scene.addChild(new MeshSprite3D(new SphereMesh())) as MeshSprite3D;
@@ -53,7 +53,7 @@ package materialModule {
 			earth2.transform.position = new Vector3( 0.6, 0, 0);
 			var material:BlinnPhongMaterial = new BlinnPhongMaterial();
 			//漫反射贴图
-			material.albedoTexture = Texture2D.load("../../../../res/threeDimen/texture/earth.png");
+			material.albedoTexture = Texture2D.load("res/threeDimen/texture/earth.png");
 			earth2.meshRender.material = material;
 			
 			Laya.timer.frameLoop(1, null, function():void {

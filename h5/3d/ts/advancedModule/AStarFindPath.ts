@@ -24,24 +24,24 @@ class AStarFindPath {
 
         //预加载所有资源
         var resource: any = [
-            { url: "../../res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene, priority: 1 },
-            { url: "../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1 },
-            { url: "../../res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Laya.Texture2D, priority: 1, params: [true] },
-            { url: "../../res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Laya.Texture2D, priority: 1, params: [true] }
+            { url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene, priority: 1 },
+            { url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1 },
+            { url: "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Laya.Texture2D, priority: 1, params: [true] },
+            { url: "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Laya.Texture2D, priority: 1, params: [true] }
         ];
 
         Laya.loader.create(resource, Laya.Handler.create(this, this.onLoadFinish));
     }
     private onLoadFinish(): void {
         //初始化3D场景
-        this.scene = Laya.stage.addChild(Laya.Scene.load("../../res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Laya.Scene;
+        this.scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Laya.Scene;
 
         //删除原始资源中包含的默认相机
         var camera: Laya.Camera = this.scene.getChildByName("Scenes").getChildByName("Main Camera") as Laya.Camera;
         camera.removeSelf();
 
         var skyBox: Laya.SkyBox = new Laya.SkyBox();
-        skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox3/skyCube.ltc");
+        skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox3/skyCube.ltc");
         camera.sky = skyBox;
 
         //根据场景中方块生成路径点
@@ -51,7 +51,7 @@ class AStarFindPath {
         var meshSprite3D: Laya.MeshSprite3D = this.scene.getChildByName('Scenes').getChildByName('HeightMap') as Laya.MeshSprite3D;
         //使可行走区域模型隐藏
         meshSprite3D.active = false;
-        var heightMap: Laya.Texture2D = Laya.Loader.getRes("../../res/threeDimen/scene/TerrainScene/Assets/HeightMap.png") as Laya.Texture2D;
+        var heightMap: Laya.Texture2D = Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/HeightMap.png") as Laya.Texture2D;
         //初始化MeshTerrainSprite3D
         this.terrainSprite = Laya.MeshTerrainSprite3D.createFromMeshAndHeightMap(meshSprite3D.meshFilter.sharedMesh as Laya.Mesh, heightMap, 6.574996471405029, 10.000000953674316);
         //更新terrainSprite世界矩阵(为可行走区域世界矩阵)
@@ -60,7 +60,7 @@ class AStarFindPath {
         //给terrainSprite添加PathFind组件
         var pathFingding: Laya.PathFind = this.terrainSprite.addComponent(Laya.PathFind) as Laya.PathFind;
         pathFingding.setting = { allowDiagonal: true, dontCrossCorners: false, heuristic: PathFinding.core.Heuristic.manhattan, weight: 1 };
-        var aStarMap: Laya.Texture2D = Laya.Loader.getRes("../../res/threeDimen/scene/TerrainScene/Assets/AStarMap.png") as Laya.Texture2D;
+        var aStarMap: Laya.Texture2D = Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/AStarMap.png") as Laya.Texture2D;
         pathFingding.grid = PathFinding.core.Grid.createGridFromAStarMap(aStarMap);
 
         //初始化移动单元
@@ -68,7 +68,7 @@ class AStarFindPath {
         this.moveSprite3D.transform.position = this.path[0];
 
         //初始化小猴子
-        this.layaMonkey = this.moveSprite3D.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
+        this.layaMonkey = this.moveSprite3D.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
         this.layaMonkey.transform.localScale = new Laya.Vector3(5, 5, 5);
         var animator: Laya.Animator = (this.layaMonkey.getChildAt(0) as Laya.Sprite3D).getComponentByType(Laya.Animator) as Laya.Animator;
         var totalAnimationClip: Laya.AnimationClip = animator.getClip("Take_001");

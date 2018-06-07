@@ -11,7 +11,7 @@ module laya {
 
     export class Interaction_Hold {
         private HOLD_TRIGGER_TIME: number = 1000;
-        private apePath: string = "../../res/apes/monkey2.png";
+        private apePath: string = "res/apes/monkey2.png";
 
         //触发hold事件时间为1秒
         private ape: Sprite;

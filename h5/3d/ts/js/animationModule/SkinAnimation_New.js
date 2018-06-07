@@ -14,8 +14,8 @@ var SkinAnimation_New = /** @class */ (function () {
         var directionLight = scene.addChild(new Laya.DirectionLight());
         directionLight.direction = new Laya.Vector3(0, -0.8, -1);
         directionLight.color = new Laya.Vector3(1, 1, 1);
-        var plane = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/Zombie/new/Plane.lh"));
-        var zombie = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/Zombie/new/Zombie.lh"));
+        var plane = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/Zombie/new/Plane.lh"));
+        var zombie = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/Zombie/new/Zombie.lh"));
         zombie.once(Laya.Event.HIERARCHY_LOADED, this, function () {
             //获取Animator动画组件
             this.zombieAnimator = zombie.getChildAt(0).getComponentByType(Laya.Animator);
@@ -23,8 +23,8 @@ var SkinAnimation_New = /** @class */ (function () {
         });
     }
     SkinAnimation_New.prototype.loadUI = function () {
-        Laya.loader.load(["../../res/threeDimen/ui/button.png"], Laya.Handler.create(this, function () {
-            this.changeActionButton = Laya.stage.addChild(new Laya.Button("../../res/threeDimen/ui/button.png", "切换动作"));
+        Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, function () {
+            this.changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "切换动作"));
             this.changeActionButton.size(160, 40);
             this.changeActionButton.labelBold = true;
             this.changeActionButton.labelSize = 30;

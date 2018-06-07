@@ -15,7 +15,7 @@ class Shader_Simple {
         camera.transform.translate(new Laya.Vector3(0, 0.5, 1.5));
         camera.addComponent(CameraMoveScript);
 
-        var layaMonkey: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm"))) as MeshSprite3D;
+        var layaMonkey: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm"))) as MeshSprite3D;
         layaMonkey.transform.localScale = new Laya.Vector3(0.3, 0.3, 0.3);
         layaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
 

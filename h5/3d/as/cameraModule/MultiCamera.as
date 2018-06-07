@@ -39,12 +39,12 @@ package cameraModule {
 			camera2.addComponent(CameraMoveScript);
 			camera2.clearFlag = BaseCamera.CLEARFLAG_SKY;
 			var skyBox:SkyBox = new SkyBox();
-			skyBox.textureCube = TextureCube.load("../../../../res/threeDimen/skyBox/skyBox2/skyCube.ltc");
+			skyBox.textureCube = TextureCube.load("res/threeDimen/skyBox/skyBox2/skyCube.ltc");
 			camera2.sky = skyBox;
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			
-			var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
+			var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
 			
 		}
 	}

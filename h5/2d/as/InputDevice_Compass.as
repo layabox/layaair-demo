@@ -16,7 +16,7 @@ package
 	 */
 	public class InputDevice_Compass
 	{
-		private var compassImgPath:String = "../../../../res/inputDevice/kd.png";
+		private var compassImgPath:String = "../../res/inputDevice/kd.png";
 		private var compassImg:Sprite;
 		private var degreesText:Text;
 		private var directionIndicator:Sprite;

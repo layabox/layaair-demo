@@ -10,7 +10,7 @@ var camera = scene.addChild(new Laya.Camera(0, 0.1, 100));
 camera.transform.translate(new Laya.Vector3(0, 0.5, 1.5));
 camera.addComponent(CameraMoveScript);
 
-var layaMonkey = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
+var layaMonkey = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
 layaMonkey.transform.localScale = new Laya.Vector3(0.3, 0.3, 0.3);
 layaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
 

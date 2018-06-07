@@ -6,7 +6,7 @@ var OrthographicCamera = /** @class */ (function () {
         Laya.stage.scaleMode = Laya.Stage.SCALE_FIXED_HEIGHT;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
-        var dialog = Laya.stage.addChild(new Laya.Image("../../res/cartoon2/background.jpg"));
+        var dialog = Laya.stage.addChild(new Laya.Image("res/cartoon2/background.jpg"));
         var scene = Laya.stage.addChild(new Laya.Scene());
         var camera = scene.addChild(new Laya.Camera(0, 0.1, 1000));
         camera.transform.rotate(new Laya.Vector3(-45, 0, 0), false, false);
@@ -16,7 +16,7 @@ var OrthographicCamera = /** @class */ (function () {
         //正交投影垂直矩阵尺寸
         camera.orthographicVerticalSize = 10;
         var directionLight = scene.addChild(new Laya.DirectionLight());
-        var layaMonkey = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+        var layaMonkey = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
         layaMonkey.once(Laya.Event.HIERARCHY_LOADED, this, function () {
             layaMonkey.transform.localScale = new Laya.Vector3(3, 3, 3);
             //转换2D屏幕坐标系统到3D正交投影下的坐标系统

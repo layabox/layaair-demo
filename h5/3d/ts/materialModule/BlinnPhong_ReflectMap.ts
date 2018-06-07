@@ -17,17 +17,17 @@ class BlinnPhong_ReflectMap {
         directionLight.direction = new Laya.Vector3(0, -0.8, -1);
         directionLight.color = new Laya.Vector3(1, 1, 1);
 
-        var textureCube: Laya.TextureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox1/skyCube.ltc");
+        var textureCube: Laya.TextureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox1/skyCube.ltc");
 
         var skyBox: Laya.SkyBox = new Laya.SkyBox();
         skyBox.textureCube = textureCube;
         camera.sky = skyBox;
 
-        var teapot1: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/staticModel/teapot/teapot-Teapot001.lm"))) as Laya.MeshSprite3D;
+        var teapot1: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/staticModel/teapot/teapot-Teapot001.lm"))) as Laya.MeshSprite3D;
         teapot1.transform.position = new Laya.Vector3(-0.8, 0, 0);
         teapot1.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
 
-        var teapot2: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/staticModel/teapot/teapot-Teapot001.lm"))) as Laya.MeshSprite3D;
+        var teapot2: Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/staticModel/teapot/teapot-Teapot001.lm"))) as Laya.MeshSprite3D;
         teapot2.transform.position = new Laya.Vector3(0.8, 0, 0);
         teapot2.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
         teapot2.meshFilter.sharedMesh.once(Laya.Event.LOADED, null, function (): void {

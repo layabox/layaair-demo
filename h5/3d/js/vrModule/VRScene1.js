@@ -14,10 +14,10 @@ var directionLight = scene.addChild(new Laya.DirectionLight());
 directionLight.direction = new Laya.Vector3(0, -0.8, -1);
 directionLight.color = new Laya.Vector3(1, 1, 1);
 
-var earth = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/staticModel/earth/EarthPlanet.lh"));
+var earth = scene.addChild(Laya.Sprite3D.load("res/threeDimen/staticModel/earth/EarthPlanet.lh"));
 
 var skyBox = new Laya.SkyBox();
-skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox3/skyCube.ltc");
+skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox3/skyCube.ltc");
 vrCamera.sky = skyBox;
 
 var rotation = new Laya.Vector3(0, 0.002, 0);

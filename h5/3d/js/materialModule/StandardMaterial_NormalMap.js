@@ -12,16 +12,16 @@ var directionLight = scene.addChild(new Laya.DirectionLight());
 directionLight.direction = new Laya.Vector3(0, -0.8, -1);
 directionLight.color = new Laya.Vector3(0.7, 0.6, 0.6);
 
-Laya.loader.create("../../res/threeDimen/staticModel/lizardCal/lizardCaclute.lh", Laya.Handler.create(this, onComplete));
+Laya.loader.create("res/threeDimen/staticModel/lizardCal/lizardCaclute.lh", Laya.Handler.create(this, onComplete));
 
 var normalMapUrl = [
-    "../../res/threeDimen/staticModel/lizardCal/rock_norm.png",
-    "../../res/threeDimen/staticModel/lizardCal/lizard_norm.png",
-    "../../res/threeDimen/staticModel/lizardCal/lizard_norm.png"
+    "res/threeDimen/staticModel/lizardCal/rock_norm.png",
+    "res/threeDimen/staticModel/lizardCal/lizard_norm.png",
+    "res/threeDimen/staticModel/lizardCal/lizard_norm.png"
 ];
 function onComplete() {
 
-    var monster1 = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/staticModel/lizardCal/lizardCaclute.lh"));
+    var monster1 = scene.addChild(Laya.Sprite3D.load("res/threeDimen/staticModel/lizardCal/lizardCaclute.lh"));
     monster1.transform.position = new Laya.Vector3(-0.6, 0, 0);
     monster1.transform.localScale = new Laya.Vector3(0.002, 0.002, 0.002);
 

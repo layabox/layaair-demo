@@ -18,7 +18,7 @@ module laya {
 		}
 
 		private setup(): void {
-			var dialog: Image = new Image("../../res/ui/dialog (3).png");
+			var dialog: Image = new Image("res/ui/dialog (3).png");
 			dialog.pos(165, 62.5);
 			Laya.stage.addChild(dialog);
 		}

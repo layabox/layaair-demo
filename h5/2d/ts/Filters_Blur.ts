@@ -7,7 +7,7 @@ module laya {
 	import WebGL = Laya.WebGL;
 
 	export class Filters_Blur {
-		private apePath: string = "../../res/apes/monkey2.png";
+		private apePath: string = "res/apes/monkey2.png";
 
 		constructor() {
 			// 不支持WebGL时自动切换至Canvas

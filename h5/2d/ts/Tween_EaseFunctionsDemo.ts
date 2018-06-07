@@ -37,7 +37,7 @@ module laya {
 
         private createCharacter(): void {
             this.character = new Sprite();
-            this.character.loadImage("../../res/cartoonCharacters/1.png");
+            this.character.loadImage("res/cartoonCharacters/1.png");
             this.character.pos(100, 50);
             Laya.stage.addChild(this.character);
         }

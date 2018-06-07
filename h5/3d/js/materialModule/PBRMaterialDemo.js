@@ -8,8 +8,8 @@ var scene = Laya.stage.addChild(new Laya.Scene());
 var env = 'sp_default';
 //var env = 'AtticRoom';
 //var env = 'overcloud';
-var envinfo = '../../res/threeDimen/env/' + env + '/envinfo.json';
-Laya.loader.load(envinfo, Laya.Handler.create(this, onEnvDescLoaded, [envinfo, '../../res/threeDimen/env/' + env + '/']));
+var envinfo = 'res/threeDimen/env/' + env + '/envinfo.json';
+Laya.loader.load(envinfo, Laya.Handler.create(this, onEnvDescLoaded, [envinfo, 'res/threeDimen/env/' + env + '/']));
 
 function onEnvDescLoaded(envinfo, envpath) {
 
@@ -48,8 +48,8 @@ function addTestSphere() {
         for (var x = 0; x < rnum; x++) {
             var mtl = new Laya.PBRMaterial();
             mtl.use_groundtruth = false;
-            mtl.diffuseTexture = Laya.Texture2D.load('../../res/threeDimen/pbr/c1.png');
-            mtl.normalTexture = Laya.Texture2D.load('../../res/threeDimen/pbr/n1.png');
+            mtl.diffuseTexture = Laya.Texture2D.load('res/threeDimen/pbr/c1.png');
+            mtl.normalTexture = Laya.Texture2D.load('res/threeDimen/pbr/n1.png');
             mtl.roughness = x / rnum;
             mtl.metaless = y / mnum;
             var sphere = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.1, 32, 32)));
@@ -60,8 +60,8 @@ function addTestSphere() {
     for (x = 0; x < rnum; x++) {
         mtl = new Laya.PBRMaterial();
         mtl.use_groundtruth = false;
-        mtl.diffuseTexture = Laya.Texture2D.load('../../res/threeDimen/pbr/gold.png');
-        mtl.normalTexture = Laya.Texture2D.load('../../res/threeDimen/pbr/n1.png');
+        mtl.diffuseTexture = Laya.Texture2D.load('res/threeDimen/pbr/gold.png');
+        mtl.normalTexture = Laya.Texture2D.load('res/threeDimen/pbr/n1.png');
         mtl.roughness = x / rnum;
         mtl.metaless = 1.0;
         sphere = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.1, 32, 32)));
@@ -70,8 +70,8 @@ function addTestSphere() {
     }
     for (x = 0; x < rnum; x++) {
         mtl = new Laya.PBRMaterial();
-        mtl.diffuseTexture = Laya.Texture2D.load('../../res/threeDimen/pbr/copper.png');
-        mtl.normalTexture = Laya.Texture2D.load('../../res/threeDimen/pbr/n1.png');
+        mtl.diffuseTexture = Laya.Texture2D.load('res/threeDimen/pbr/copper.png');
+        mtl.normalTexture = Laya.Texture2D.load('res/threeDimen/pbr/n1.png');
         mtl.roughness = x / rnum;
         mtl.metaless = 1.0;
         sphere = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.1, 32, 32)));
@@ -80,8 +80,8 @@ function addTestSphere() {
     }
     for (x = 0; x < rnum; x++) {
         mtl = new Laya.PBRMaterial();
-        mtl.diffuseTexture = Laya.Texture2D.load('../../res/threeDimen/pbr/c2.png');
-        mtl.normalTexture = Laya.Texture2D.load('../../res/threeDimen/pbr/n1.png');
+        mtl.diffuseTexture = Laya.Texture2D.load('res/threeDimen/pbr/c2.png');
+        mtl.normalTexture = Laya.Texture2D.load('res/threeDimen/pbr/n1.png');
         mtl.roughness = x / rnum;
         mtl.metaless = 0.0;
         var sphere1 = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.1, 32, 32)));

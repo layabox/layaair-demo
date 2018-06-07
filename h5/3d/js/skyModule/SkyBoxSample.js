@@ -13,4 +13,4 @@ camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
 //天空盒
 var skyBox = new Laya.SkyBox();
 camera.sky = skyBox;
-skyBox.textureCube = Laya.TextureCube.load("../../res/threeDimen/skyBox/skyBox1/skyCube.ltc");
+skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox1/skyCube.ltc");

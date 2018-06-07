@@ -16,8 +16,8 @@ var leo;
     var GameMain = /** @class */ (function () {
         function GameMain() {
             this.isDestroyed = false;
-            this.PathBg = "../../res/bg2.png";
-            this.PathFly = "../../res/fighter/fighter.atlas";
+            this.PathBg = "res/bg2.png";
+            this.PathFly = "res/fighter/fighter.atlas";
             //初始化引擎
             Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
             Laya.stage.alignV = Stage.ALIGN_MIDDLE;

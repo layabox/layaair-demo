@@ -22,7 +22,7 @@
 	function setup()
 	{
 		var panel = new Panel();
-		panel.hScrollBarSkin = "../../res/ui/hscroll.png";
+		panel.hScrollBarSkin = "res/ui/hscroll.png";
 		panel.hScrollBar.hide = true;
 		panel.size(600, 275);
 		panel.x = (Laya.stage.width - panel.width) / 2;
@@ -32,7 +32,7 @@
 		var img;
 		for (var i = 0; i < 4; i++)
 		{
-			img = new Image("../../res/ui/dialog (1).png");
+			img = new Image("res/ui/dialog (1).png");
 			img.x = i * 250;
 			panel.addChild(img);
 		}

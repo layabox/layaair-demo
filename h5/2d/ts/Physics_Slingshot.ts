@@ -46,7 +46,7 @@ module laya
 			this.engine = Matter.Engine.create({enableSleeping: true});
 			Matter.Engine.run(this.engine);
 			
-			var render = this.LayaRender.create({engine: this.engine, width: 800, height: 600, options: {background: '../../res/physics/img/background.png', wireframes: false}});
+			var render = this.LayaRender.create({engine: this.engine, width: 800, height: 600, options: {background: 'res/physics/img/background.png', wireframes: false}});
 			this.LayaRender.run(render);
 			
 			this.mouseConstraint = Matter.MouseConstraint.create(this.engine, {constraint: {angularStiffness: 0.1, stiffness: 2}, element: Render.canvas});
@@ -56,11 +56,11 @@ module laya
 		
 		private initWorld():void
 		{
-			var ground:any = Matter.Bodies.rectangle(395, 600, 815, 50, {isStatic: true, render: {visible: false}}), rockOptions:any = {density: 0.004, render: {sprite: {texture: '../../res/physics/img/rock.png', xOffset: 23.5, yOffset: 23.5}}}, rock:any = Matter.Bodies.polygon(170, 450, 8, 20, rockOptions), anchor:any = {x: 170, y: 450}, elastic:any = Matter.Constraint.create({pointA: anchor, bodyB: rock, stiffness: 0.05, render: {lineWidth: 5, strokeStyle: '#dfa417'}});
+			var ground:any = Matter.Bodies.rectangle(395, 600, 815, 50, {isStatic: true, render: {visible: false}}), rockOptions:any = {density: 0.004, render: {sprite: {texture: 'res/physics/img/rock.png', xOffset: 23.5, yOffset: 23.5}}}, rock:any = Matter.Bodies.polygon(170, 450, 8, 20, rockOptions), anchor:any = {x: 170, y: 450}, elastic:any = Matter.Constraint.create({pointA: anchor, bodyB: rock, stiffness: 0.05, render: {lineWidth: 5, strokeStyle: '#dfa417'}});
 			
 			var pyramid:any = Matter.Composites.pyramid(500, 300, 9, 10, 0, 0, function(x, y, column):any
 			{
-				var texture:any = column % 2 === 0 ? '../../res/physics/img/block.png' : '../../res/physics/img/block-2.png';
+				var texture:any = column % 2 === 0 ? 'res/physics/img/block.png' : 'res/physics/img/block-2.png';
 				return Matter.Bodies.rectangle(x, y, 25, 40, {render: {sprite: {texture: texture, xOffset: 20.5, yOffset: 28}}});
 			});
 			
@@ -68,7 +68,7 @@ module laya
 			
 			var pyramid2:any = Matter.Composites.pyramid(550, 0, 5, 10, 0, 0, function(x, y, column):any
 			{
-				var texture:any = column % 2 === 0 ? '../../res/physics/img/block.png' : '../../res/physics/img/block-2.png';
+				var texture:any = column % 2 === 0 ? 'res/physics/img/block.png' : 'res/physics/img/block-2.png';
 				return Matter.Bodies.rectangle(x, y, 25, 40, {render: {sprite: {texture: texture, xOffset: 20.5, yOffset: 28}}});
 			});
 			

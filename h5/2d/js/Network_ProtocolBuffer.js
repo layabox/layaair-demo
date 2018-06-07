@@ -8,7 +8,7 @@
 
 	Laya.init(550, 400);
 
-	ProtoBuf.load("../../res/protobuf/awesome.proto", onAssetsLoaded);
+	ProtoBuf.load("res/protobuf/awesome.proto", onAssetsLoaded);
 
 	function onAssetsLoaded(err, root)
 	{

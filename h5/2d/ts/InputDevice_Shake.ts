@@ -24,7 +24,7 @@ module laya {
 		private showShakePic():void 
 		{
 			var shakePic:Sprite = new Sprite();
-			shakePic.loadImage("../../res/inputDevice/shake.png");
+			shakePic.loadImage("res/inputDevice/shake.png");
 			Laya.stage.addChild(shakePic);
 		}
 		

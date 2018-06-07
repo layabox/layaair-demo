@@ -12,4 +12,4 @@ camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
 
 var skyDome = new Laya.SkyDome();
 camera.sky = skyDome;
-skyDome.texture = Laya.Texture2D.load("../../res/threeDimen/env/sp_default/env.png");
+skyDome.texture = Laya.Texture2D.load("res/threeDimen/env/sp_default/env.png");

@@ -43,9 +43,9 @@ package animationModule
 			
 			//预加载所有资源
 			var resource:Array = [
-				{url: "../../../../res/threeDimen/skinModel/Mount/R_kl_H_001.lh", clas: Sprite3D, priority: 1}, 
-				{url: "../../../../res/threeDimen/skinModel/Mount/R_kl_S_009.lh", clas: Sprite3D, priority: 1}, 
-				{url: "../../../../res/threeDimen/skinModel/SiPangZi/PanZi.lh", clas: Sprite3D, priority: 1}
+				{url: "res/threeDimen/skinModel/Mount/R_kl_H_001.lh", clas: Sprite3D, priority: 1}, 
+				{url: "res/threeDimen/skinModel/Mount/R_kl_S_009.lh", clas: Sprite3D, priority: 1}, 
+				{url: "res/threeDimen/skinModel/SiPangZi/PanZi.lh", clas: Sprite3D, priority: 1}
 			];
 			
 			Laya.loader.create(resource, Handler.create(this, onLoadFinish));
@@ -67,7 +67,7 @@ package animationModule
 			var role:Sprite3D = scene.addChild(new Sprite3D()) as Sprite3D;
 			
 			//初始化胖子
-			var pangzi:Sprite3D = role.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/SiPangZi/PanZi.lh")) as Sprite3D;
+			var pangzi:Sprite3D = role.addChild(Sprite3D.load("res/threeDimen/skinModel/SiPangZi/PanZi.lh")) as Sprite3D;
 			//获取动画组件
 			var animator:Animator = pangzi.getChildAt(0).getComponentByType(Animator) as Animator;
 			//获取动画片段
@@ -85,7 +85,7 @@ package animationModule
 					
 					animator.play("ride", 1);
 					
-					dragon1 = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/Mount/R_kl_H_001.lh")) as Sprite3D;
+					dragon1 = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/Mount/R_kl_H_001.lh")) as Sprite3D;
 					dragon1.transform.localScale = _dragonScale;
 					dragonAnimator1 = dragon1.getChildAt(0).getComponentByType(Animator) as Animator;
 					var totalAnimationClip1:AnimationClip = dragonAnimator1.getClip("Take 001");
@@ -106,7 +106,7 @@ package animationModule
 					dragonAnimator1.unLinkSprite3DToAvatarNode(role);
 					dragon1.removeSelf();
 					
-					dragon2 = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/Mount/R_kl_S_009.lh")) as Sprite3D;
+					dragon2 = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/Mount/R_kl_S_009.lh")) as Sprite3D;
 					dragon2.transform.localScale = _dragonScale;
 					dragonAnimator2 = dragon2.getChildAt(0).getComponentByType(Animator) as Animator;
 					var totalAnimationClip2:AnimationClip = dragonAnimator2.getClip("Take 001");

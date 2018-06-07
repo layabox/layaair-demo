@@ -66,8 +66,8 @@ package physicsModule {
 			
 			//预加载所有资源
 			var resource:Array = [
-				{url: "../../../../res/threeDimen/scene/ColliderScene/ColliderDemo.ls", clas: Scene, priority: 1}, 
-				{url: "../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Sprite3D, priority: 1}
+				{url: "res/threeDimen/scene/ColliderScene/ColliderDemo.ls", clas: Scene, priority: 1}, 
+				{url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Sprite3D, priority: 1}
 			];
 			
 			Laya.loader.create(resource, Handler.create(this, onLoadFinish));
@@ -75,7 +75,7 @@ package physicsModule {
 		
 		public function onLoadFinish():void{
 			
-			scene = Laya.stage.addChild(Scene.load("../../../../res/threeDimen/scene/ColliderScene/ColliderDemo.ls")) as Scene;
+			scene = Laya.stage.addChild(Scene.load("res/threeDimen/scene/ColliderScene/ColliderDemo.ls")) as Scene;
 			
             //初始化照相机
             camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
@@ -84,7 +84,7 @@ package physicsModule {
             camera.addComponent(CameraMoveScript);
 			
 			//加载猴子
-			layaMonkey = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
+			layaMonkey = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
 			layaMonkey.transform.position = new Vector3(0, 0, 1);
 			layaMonkey.transform.scale = new Vector3(8, 8, 8);
 			

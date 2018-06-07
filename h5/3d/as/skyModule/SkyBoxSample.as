@@ -35,7 +35,7 @@ package skyModule {
 			//天空盒
 			var skyBox:SkyBox = new SkyBox();
 			camera.sky = skyBox;
-			skyBox.textureCube = TextureCube.load("../../../../res/threeDimen/skyBox/skyBox1/skyCube.ltc");
+			skyBox.textureCube = TextureCube.load("res/threeDimen/skyBox/skyBox1/skyCube.ltc");
 			
 		}
 	}

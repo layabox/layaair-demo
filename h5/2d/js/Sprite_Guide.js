@@ -15,7 +15,7 @@
 			x: 151,
 			y: 575,
 			radius: 150,
-			tip: "../../res/guide/help6.png",
+			tip: "res/guide/help6.png",
 			tipx: 200,
 			tipy: 250
 		},
@@ -23,7 +23,7 @@
 			x: 883,
 			y: 620,
 			radius: 100,
-			tip: "../../res/guide/help4.png",
+			tip: "res/guide/help4.png",
 			tipx: 730,
 			tipy: 380
 		},
@@ -31,7 +31,7 @@
 			x: 1128,
 			y: 583,
 			radius: 110,
-			tip: "../../res/guide/help3.png",
+			tip: "res/guide/help3.png",
 			tipx: 900,
 			tipy: 300
 		}];
@@ -47,7 +47,7 @@
 
 		//绘制一个蓝色方块，不被抠图
 		var gameContainer = new Sprite();
-		gameContainer.loadImage("../../res/guide/crazy_snowball.png");
+		gameContainer.loadImage("res/guide/crazy_snowball.png");
 		Laya.stage.addChild(gameContainer);
 
 		// 引导所在容器

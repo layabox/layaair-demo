@@ -5,7 +5,7 @@ module laya {
     import WebGL = Laya.WebGL;
 
     export class UI_ComboBox {
-        private skin: string = "../../res/ui/combobox.png";
+        private skin: string = "res/ui/combobox.png";
 
         constructor() {
             // 不支持WebGL时自动切换至Canvas

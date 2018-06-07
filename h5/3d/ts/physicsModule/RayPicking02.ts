@@ -30,7 +30,7 @@ class RayPicking02 {
         //平面
         var plane: Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(6, 6, 10, 10))) as Laya.MeshSprite3D;
         var planeMat: Laya.StandardMaterial = new Laya.StandardMaterial();
-        planeMat.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/texture/layabox.png");
+        planeMat.diffuseTexture = Laya.Texture2D.load("res/threeDimen/texture/layabox.png");
         planeMat.albedo = new Laya.Vector4(0.9, 0.9, 0.9, 1);
         plane.meshRender.material = planeMat;
         var meshCollider = plane.addComponent(Laya.MeshCollider) as Laya.MeshCollider;
@@ -65,7 +65,7 @@ class RayPicking02 {
             if (this._outHitInfo.distance !== -1) {
                 var sphere: Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.25, 16, 16))) as Laya.MeshSprite3D;
                 var mat: Laya.StandardMaterial = new Laya.StandardMaterial();
-                mat.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/texture/layabox.png");
+                mat.diffuseTexture = Laya.Texture2D.load("res/threeDimen/texture/layabox.png");
                 mat.albedo = new Laya.Vector4(Math.random(), Math.random(), Math.random(), 1);
                 sphere.meshRender.material = mat;
                 Laya.Vector3.add(this._outHitInfo.position, this._offset, this._position);

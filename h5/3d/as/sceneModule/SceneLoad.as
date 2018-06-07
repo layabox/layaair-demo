@@ -21,7 +21,7 @@ package sceneModule
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			Stat.show();
 			
-			var scene:Scene = Laya.stage.addChild(Scene.load("../../../../res/threeDimen/scene/Arena/Arena.ls")) as Scene;
+			var scene:Scene = Laya.stage.addChild(Scene.load("res/threeDimen/scene/Arena/Arena.ls")) as Scene;
 			
 			var camera:Camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
 			camera.transform.translate(new Vector3(0, 2, 0));
@@ -29,7 +29,7 @@ package sceneModule
 			camera.addComponent(CameraMoveScript);
 			
 			var skyBox:SkyBox = new SkyBox();
-			skyBox.textureCube = TextureCube.load("../../../../res/threeDimen/skyBox/skyBox2/skyCube.ltc");
+			skyBox.textureCube = TextureCube.load("res/threeDimen/skyBox/skyBox2/skyCube.ltc");
 			camera.sky = skyBox;
 		}
 	}

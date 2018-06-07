@@ -9,7 +9,7 @@ Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
 var pos = new Laya.Vector3(310,500,0);
 var _translate = new Laya.Vector3(0, 0, 0);
 
-var dialog = Laya.stage.addChild(new Laya.Image("../../res/cartoon2/background.jpg"));
+var dialog = Laya.stage.addChild(new Laya.Image("res/cartoon2/background.jpg"));
 
 var scene = Laya.stage.addChild(new Laya.Scene());
 
@@ -22,7 +22,7 @@ camera.orthographicVerticalSize = 10;
 
 var directionLight = scene.addChild(new Laya.DirectionLight());
 
-var layaMonkey = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+var layaMonkey = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
 layaMonkey.once(Laya.Event.HIERARCHY_LOADED, this, function () {
 
     layaMonkey.transform.localScale = new Laya.Vector3(3, 3, 3);

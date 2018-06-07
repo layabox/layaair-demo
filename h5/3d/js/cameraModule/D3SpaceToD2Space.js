@@ -10,13 +10,13 @@ camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
 
 var directionLight = scene.addChild(new Laya.DirectionLight());
 
-Laya.loader.create("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, onComplete));
+Laya.loader.create("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, onComplete));
 
 function onComplete() {
 
-    layaMonkey3D = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+    layaMonkey3D = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
 
-    layaMonkey2D = Laya.stage.addChild(new Laya.Image("../../res/threeDimen/monkey.png"));
+    layaMonkey2D = Laya.stage.addChild(new Laya.Image("res/threeDimen/monkey.png"));
 
     Laya.timer.frameLoop(1, this, animate);
 }

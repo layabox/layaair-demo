@@ -55,8 +55,8 @@ package advancedModule {
 			directionLight.shadowPCFType = 3;
             
             Laya.loader.create([
-				"../../../../res/threeDimen/staticModel/grid/plane.lh", 
-				"../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"
+				"res/threeDimen/staticModel/grid/plane.lh", 
+				"res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"
 			], Handler.create(this, onComplete));
             
             Laya.timer.frameLoop(1, null, function():void {
@@ -69,19 +69,19 @@ package advancedModule {
         
         private function onComplete():void {
             
-            var grid:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/staticModel/grid/plane.lh")) as Sprite3D;
+            var grid:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh")) as Sprite3D;
 			//地面接收阴影
 			(grid.getChildAt(0) as MeshSprite3D).meshRender.receiveShadow = true;
 			
-			var staticLayaMonkey:MeshSprite3D = scene.addChild(new MeshSprite3D(Mesh.load("../../../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm"))) as MeshSprite3D;
-			staticLayaMonkey.meshRender.material = StandardMaterial.load("../../../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
+			var staticLayaMonkey:MeshSprite3D = scene.addChild(new MeshSprite3D(Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm"))) as MeshSprite3D;
+			staticLayaMonkey.meshRender.material = StandardMaterial.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
 			staticLayaMonkey.transform.position = new Vector3(0, 0, -0.5);
             staticLayaMonkey.transform.localScale = new Vector3(0.3, 0.3, 0.3);
             staticLayaMonkey.transform.rotation = new Quaternion(0.7071068, 0, 0, -0.7071067);
 			//产生阴影
 			staticLayaMonkey.meshRender.castShadow = true;
             
-            var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
+            var layaMonkey:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
 			//产生阴影
 			(layaMonkey.getChildAt(0).getChildAt(0) as SkinnedMeshSprite3D).skinnedMeshRender.castShadow = true;
 			

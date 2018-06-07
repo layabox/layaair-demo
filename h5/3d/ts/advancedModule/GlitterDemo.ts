@@ -22,7 +22,7 @@ class GlitterDemo {
         this.glitter = scene.addChild(new Laya.Glitter()) as Laya.Glitter;
         var glitterTemplet: Laya.GlitterTemplet = this.glitter.templet;
         var glitterMaterial: Laya.GlitterMaterial = this.glitter.glitterRender.sharedMaterial as Laya.GlitterMaterial;
-        glitterMaterial.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/layabox.png");
+        glitterMaterial.diffuseTexture = Laya.Texture2D.load("res/threeDimen/layabox.png");
         glitterMaterial.albedo = new Laya.Vector4(1.3, 1.3, 1.3, 1);
         glitterTemplet.lifeTime = 1.3;
         glitterTemplet.minSegmentDistance = 0.1;

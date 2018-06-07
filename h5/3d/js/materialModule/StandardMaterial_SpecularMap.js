@@ -12,21 +12,21 @@ var directionLight = scene.addChild(new Laya.DirectionLight());
 directionLight.direction = new Laya.Vector3(0, -0.8, -1);
 directionLight.color = new Laya.Vector3(0.7, 0.6, 0.6);
 
-Laya.loader.create("../../res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, onComplete));
+Laya.loader.create("res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, onComplete));
 
 function onComplete() {
 
-    var dude1 = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/dude/dude.lh"));
+    var dude1 = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh"));
     dude1.transform.position = new Laya.Vector3(-0.6, 0, 0);
 
     var dude2 = Laya.Sprite3D.instantiate(dude1, scene, false, new Laya.Vector3(0.6, 0, 0));
     var skinnedMeshSprite3d = dude2.getChildAt(0).getChildAt(0);
 
     var specularMapUrl = [
-        "../../res/threeDimen/skinModel/dude/Assets/dude/headS.png",
-        "../../res/threeDimen/skinModel/dude/Assets/dude/jacketS.png",
-        "../../res/threeDimen/skinModel/dude/Assets/dude/pantsS.png",
-        "../../res/threeDimen/skinModel/dude/Assets/dude/upBodyS.png"
+        "res/threeDimen/skinModel/dude/Assets/dude/headS.png",
+        "res/threeDimen/skinModel/dude/Assets/dude/jacketS.png",
+        "res/threeDimen/skinModel/dude/Assets/dude/pantsS.png",
+        "res/threeDimen/skinModel/dude/Assets/dude/upBodyS.png"
     ];
 
     for (var i = 0; i < skinnedMeshSprite3d.skinnedMeshRender.materials.length; i++) {

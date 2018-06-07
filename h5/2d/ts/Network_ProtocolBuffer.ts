@@ -12,7 +12,7 @@ module laya
 		{
 			Laya.init(550, 400);
 			
-			this.ProtoBuf.load("../../res/protobuf/user.proto", this.onAssetsLoaded);
+			this.ProtoBuf.load("res/protobuf/user.proto", this.onAssetsLoaded);
 		}
 		
 		private onAssetsLoaded(err:any, root:any):void

@@ -23,7 +23,7 @@ package materialModule {
         
         private var scene:Scene;
         private var rotation:Vector3 = new Vector3(0, 0.01, 0);
-        private var specularMapUrl:Array = ["../../../../res/threeDimen/skinModel/dude/Assets/dude/headS.png", "../../../../res/threeDimen/skinModel/dude/Assets/dude/jacketS.png", "../../../../res/threeDimen/skinModel/dude/Assets/dude/pantsS.png", "../../../../res/threeDimen/skinModel/dude/Assets/dude/upBodyS.png"];
+        private var specularMapUrl:Array = ["res/threeDimen/skinModel/dude/Assets/dude/headS.png", "res/threeDimen/skinModel/dude/Assets/dude/jacketS.png", "res/threeDimen/skinModel/dude/Assets/dude/pantsS.png", "res/threeDimen/skinModel/dude/Assets/dude/upBodyS.png"];
         
         public function BlinnPhong_SpecularMap() {
             Laya3D.init(0, 0, true);
@@ -44,12 +44,12 @@ package materialModule {
             
             var completeHandler:Handler = Handler.create(this, onComplete);
             
-            Laya.loader.create("../../../../res/threeDimen/skinModel/dude/dude.lh", completeHandler);
+            Laya.loader.create("res/threeDimen/skinModel/dude/dude.lh", completeHandler);
         }
         
         public function onComplete():void {
             
-            var dude1:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/dude/dude.lh")) as Sprite3D;
+            var dude1:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh")) as Sprite3D;
             dude1.transform.position = new Vector3(-0.6, 0, 0);
             
             var dude2:Sprite3D = Sprite3D.instantiate(dude1, scene, false, new Vector3(0.6, 0, 0));

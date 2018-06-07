@@ -57,10 +57,10 @@ class RayPicking04 {
         this.camera.clearColor = null;
 
         Laya.loader.create([
-            "../../res/threeDimen/skinModel/NvWu/NvWu-shenminvwu.lm", 
-            "../../res/threeDimen/skinModel/CunMinNan/CunMinNan-cunminnan.lm", 
-            "../../res/threeDimen/skinModel/XiaoFeiLong/XiaoFeiLong-xiaofeilong.lm", 
-            "../../res/threeDimen/skinModel/PangZi/PangZi-doubipangzi.lm"
+            "res/threeDimen/skinModel/NvWu/NvWu-shenminvwu.lm", 
+            "res/threeDimen/skinModel/CunMinNan/CunMinNan-cunminnan.lm", 
+            "res/threeDimen/skinModel/XiaoFeiLong/XiaoFeiLong-xiaofeilong.lm", 
+            "res/threeDimen/skinModel/PangZi/PangZi-doubipangzi.lm"
         ], Laya.Handler.create(this, this.onComplete));
         
     }
@@ -68,10 +68,10 @@ class RayPicking04 {
     private onComplete():void{
 
         //添加精灵到场景
-        this.sprite3d1 = this.scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/skinModel/NvWu/NvWu-shenminvwu.lm"))) as Laya.MeshSprite3D;
-        this.sprite3d2 = this.scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/skinModel/CunMinNan/CunMinNan-cunminnan.lm"))) as Laya.MeshSprite3D;
-        this.sprite3d3 = this.scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/skinModel/XiaoFeiLong/XiaoFeiLong-xiaofeilong.lm"))) as Laya.MeshSprite3D;
-        this.sprite3d4 = this.scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/skinModel/PangZi/PangZi-doubipangzi.lm"))) as Laya.MeshSprite3D;
+        this.sprite3d1 = this.scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/skinModel/NvWu/NvWu-shenminvwu.lm"))) as Laya.MeshSprite3D;
+        this.sprite3d2 = this.scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/skinModel/CunMinNan/CunMinNan-cunminnan.lm"))) as Laya.MeshSprite3D;
+        this.sprite3d3 = this.scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/skinModel/XiaoFeiLong/XiaoFeiLong-xiaofeilong.lm"))) as Laya.MeshSprite3D;
+        this.sprite3d4 = this.scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/skinModel/PangZi/PangZi-doubipangzi.lm"))) as Laya.MeshSprite3D;
 
         this.sprite3d1.transform.position = new Laya.Vector3(-0.6, 0, -0.2);
         this.sprite3d2.transform.position = new Laya.Vector3(0.1, 0, 0);

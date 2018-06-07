@@ -49,24 +49,24 @@ package shaderModule {
             directionLight.color = new Vector3(1, 1, 1);
             directionLight.direction = new Vector3(1, -1, 0);
             
-            var dude:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/skinModel/dude/dude.lh")) as Sprite3D;
+            var dude:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh")) as Sprite3D;
             
             dude.once(Event.HIERARCHY_LOADED, this, function():void {
                 
                 var customMaterial1:CustomMaterial = new CustomMaterial();
-                customMaterial1.diffuseTexture = Texture2D.load("../../../../res/threeDimen/skinModel/dude/Assets/dude/head.png");
+                customMaterial1.diffuseTexture = Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/head.png");
                 customMaterial1.marginalColor = new Vector3(1, 0.7, 0);
                 
                 var customMaterial2:CustomMaterial = new CustomMaterial();
-                customMaterial2.diffuseTexture = Texture2D.load("../../../../res/threeDimen/skinModel/dude/Assets/dude/jacket.png");
+                customMaterial2.diffuseTexture = Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/jacket.png");
                 customMaterial2.marginalColor = new Vector3(1, 0.7, 0);
                 
                 var customMaterial3:CustomMaterial = new CustomMaterial();
-                customMaterial3.diffuseTexture = Texture2D.load("../../../../res/threeDimen/skinModel/dude/Assets/dude/pants.png");
+                customMaterial3.diffuseTexture = Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/pants.png");
                 customMaterial3.marginalColor = new Vector3(1, 0.7, 0);
                 
                 var customMaterial4:CustomMaterial = new CustomMaterial();
-                customMaterial4.diffuseTexture = Texture2D.load("../../../../res/threeDimen/skinModel/dude/Assets/dude/upBody.png");
+                customMaterial4.diffuseTexture = Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/upBody.png");
                 customMaterial4.marginalColor = new Vector3(1, 0.7, 0);
                 
                 var baseMaterials:Vector.<BaseMaterial> = new Vector.<BaseMaterial>();
@@ -82,7 +82,7 @@ package shaderModule {
             var earth:MeshSprite3D = scene.addChild(new MeshSprite3D(new SphereMesh(0.5, 128, 128))) as MeshSprite3D;
             
             var customMaterial:CustomMaterial = new CustomMaterial();
-            customMaterial.diffuseTexture = Texture2D.load("../../../../res/threeDimen/texture/earth.png");
+            customMaterial.diffuseTexture = Texture2D.load("res/threeDimen/texture/earth.png");
             customMaterial.marginalColor = new Vector3(0.0, 0.3, 1.0);
             earth.meshRender.sharedMaterial = customMaterial;
             

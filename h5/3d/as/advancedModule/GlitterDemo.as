@@ -38,7 +38,7 @@ package advancedModule {
 			glitter = scene.addChild(new Glitter()) as Glitter;
 			var glitterTemplet:GlitterTemplet = glitter.templet;
 			var glitterMaterial:GlitterMaterial = glitter.glitterRender.sharedMaterial as GlitterMaterial;
-			glitterMaterial.diffuseTexture = Texture2D.load("../../../../res/threeDimen/layabox.png");
+			glitterMaterial.diffuseTexture = Texture2D.load("res/threeDimen/layabox.png");
 			glitterMaterial.albedo = new Vector4(1.3, 1.3, 1.3, 1);
 			glitterTemplet.lifeTime = 1.3;
 			glitterTemplet.minSegmentDistance = 0.1;

@@ -25,8 +25,8 @@ var RealTimeShadow = (function () {
         //模糊等级,越大越高,更耗性能
         directionLight.shadowPCFType = 3;
         Laya.loader.create([
-            "../../res/threeDimen/staticModel/grid/plane.lh",
-            "../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"
+            "res/threeDimen/staticModel/grid/plane.lh",
+            "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"
         ], Laya.Handler.create(this, this.onComplete));
         Laya.timer.frameLoop(1, this, function () {
             Laya.Quaternion.createFromYawPitchRoll(0.025, 0, 0, this._quaternion);
@@ -36,17 +36,17 @@ var RealTimeShadow = (function () {
         });
     }
     RealTimeShadow.prototype.onComplete = function () {
-        var grid = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/staticModel/grid/plane.lh"));
+        var grid = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh"));
         //地面接收阴影
         grid.getChildAt(0).meshRender.receiveShadow = true;
-        var staticLayaMonkey = this.scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
-        staticLayaMonkey.meshRender.material = Laya.StandardMaterial.load("../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
+        var staticLayaMonkey = this.scene.addChild(new Laya.MeshSprite3D(Laya.Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
+        staticLayaMonkey.meshRender.material = Laya.StandardMaterial.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
         staticLayaMonkey.transform.position = new Laya.Vector3(0, 0, -0.5);
         staticLayaMonkey.transform.localScale = new Laya.Vector3(0.3, 0.3, 0.3);
         staticLayaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
         //产生阴影
         staticLayaMonkey.meshRender.castShadow = true;
-        var layaMonkey = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+        var layaMonkey = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
         //产生阴影
         layaMonkey.getChildAt(0).getChildAt(0).skinnedMeshRender.castShadow = true;
         var mat = layaMonkey.getChildAt(0).getChildAt(0).skinnedMeshRender.material;

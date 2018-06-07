@@ -26,7 +26,7 @@ package particleModule
 			camera.transform.translate(new Vector3(0, 2, 4));
 			camera.transform.rotate(new Vector3( -15, 0, 0), true, false);
 			
-			var particleSprite3D:Sprite3D = scene.addChild(Sprite3D.load("../../../../res/threeDimen/particle/ETF_Burning_Ground.lh")) as Sprite3D;
+			var particleSprite3D:Sprite3D = scene.addChild(Sprite3D.load("res/threeDimen/particle/ETF_Burning_Ground.lh")) as Sprite3D;
 		}
 		
 	}

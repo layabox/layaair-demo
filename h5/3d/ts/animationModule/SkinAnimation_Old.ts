@@ -3,11 +3,11 @@ class SkinAnimation_Old {
 	private changeActionButton: Laya.Button;
 	private curStateIndex: number = 0;
 	private skinAniUrl: Array<any> = [
-		"../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@walk-walk.lsani",
-		"../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@attack-attack.lsani",
-		"../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@left_fall-left_fall.lsani",
-		"../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@right_fall-right_fall.lsani",
-		"../../res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@back_fall-back_fall.lsani"
+		"res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@walk-walk.lsani",
+		"res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@attack-attack.lsani",
+		"res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@left_fall-left_fall.lsani",
+		"res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@right_fall-right_fall.lsani",
+		"res/threeDimen/skinModel/Zombie/old/Assets/Zombie/Model/z@back_fall-back_fall.lsani"
 	];
 	constructor() {
 		Laya3D.init(0, 0, true);
@@ -25,9 +25,9 @@ class SkinAnimation_Old {
 		directionLight.direction = new Laya.Vector3(0, -0.8, -1);
 		directionLight.color = new Laya.Vector3(1, 1, 1);
 
-		var plane: Laya.Sprite3D = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/Zombie/old/Plane.lh")) as Laya.Sprite3D;
+		var plane: Laya.Sprite3D = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/Zombie/old/Plane.lh")) as Laya.Sprite3D;
 
-		this.zombie = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/Zombie/old/Zombie.lh")) as Laya.Sprite3D;
+		this.zombie = scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/Zombie/old/Zombie.lh")) as Laya.Sprite3D;
 		this.zombie.once(Laya.Event.HIERARCHY_LOADED, this, function (): void {
 			this.zombie.transform.rotation = new Laya.Quaternion(-0.7071068, 0, 0, -0.7071068);
 			this.zombie.transform.position = new Laya.Vector3(0.3, 0, 0);
@@ -63,9 +63,9 @@ class SkinAnimation_Old {
 
 	private loadUI(): void {
 
-		Laya.loader.load(["../../res/threeDimen/ui/button.png"], Laya.Handler.create(this, function (): void {
+		Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, function (): void {
 
-			this.changeActionButton = Laya.stage.addChild(new Laya.Button("../../res/threeDimen/ui/button.png", "切换动作")) as Laya.Button;
+			this.changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "切换动作")) as Laya.Button;
 			this.changeActionButton.size(160, 40);
 			this.changeActionButton.labelBold = true;
 			this.changeActionButton.labelSize = 30;

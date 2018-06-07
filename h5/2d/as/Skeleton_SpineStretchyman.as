@@ -29,7 +29,7 @@ package {
 		
 		public function startFun():void
 		{
-			mAniPath = "../../../../res/spine/spineRes4/stretchyman.sk";
+			mAniPath = "../../res/spine/spineRes4/stretchyman.sk";
 			mFactory = new Templet();
 			mFactory.on(Event.COMPLETE, this, parseComplete);
 			mFactory.on(Event.ERROR, this, onError);

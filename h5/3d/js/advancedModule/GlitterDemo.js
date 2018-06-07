@@ -11,7 +11,7 @@ camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
 var glitter = scene.addChild(new Laya.Glitter());
 var glitterTemplet = glitter.templet;
 var glitterMaterial = glitter.glitterRender.sharedMaterial;
-glitterMaterial.diffuseTexture = Laya.Texture2D.load("../../res/threeDimen/layabox.png");
+glitterMaterial.diffuseTexture = Laya.Texture2D.load("res/threeDimen/layabox.png");
 glitterMaterial.albedo = new Laya.Vector4(1.3, 1.3, 1.3, 1);
 glitterTemplet.lifeTime = 1.3;
 glitterTemplet.minSegmentDistance = 0.1;

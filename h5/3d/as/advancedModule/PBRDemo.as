@@ -19,7 +19,7 @@ package advancedModule
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			Stat.show();
 			
-			var scene:Scene = Laya.stage.addChild(Scene.load("../../../../res/threeDimen/scene/PBRScene/Demo.ls")) as Scene;
+			var scene:Scene = Laya.stage.addChild(Scene.load("res/threeDimen/scene/PBRScene/Demo.ls")) as Scene;
 			
 			scene.once(Event.HIERARCHY_LOADED, this, function():void
 			{

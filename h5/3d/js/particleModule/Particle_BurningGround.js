@@ -8,4 +8,4 @@ var camera = scene.addChild(new Laya.Camera(0, 0.1, 100));
 camera.transform.translate(new Laya.Vector3(0, 2, 4));
 camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
 
-var particleSprite3D = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/particle/ETF_Burning_Ground.lh"));
+var particleSprite3D = scene.addChild(Laya.Sprite3D.load("res/threeDimen/particle/ETF_Burning_Ground.lh"));

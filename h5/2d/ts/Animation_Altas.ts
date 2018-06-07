@@ -8,7 +8,7 @@ module laya
 	import WebGL = Laya.WebGL;
 
 	export class Animation_Altas {
-		private AniConfPath: string = "../../res/fighter/fighter.json";
+		private AniConfPath: string = "res/fighter/fighter.json";
 
 		constructor() {
 			// 不支持eWebGL时自动切换至Canvas

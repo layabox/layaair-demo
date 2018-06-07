@@ -34,7 +34,7 @@ package skyModule
 			
 			var skyDome:SkyDome = new SkyDome();
 			camera.sky = skyDome;
-			skyDome.texture = Texture2D.load("../../../../res/threeDimen/env/sp_default/env.png");
+			skyDome.texture = Texture2D.load("res/threeDimen/env/sp_default/env.png");
 		}
 	}
 }

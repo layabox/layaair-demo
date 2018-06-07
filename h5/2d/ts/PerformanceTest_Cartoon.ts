@@ -21,7 +21,7 @@ module laya {
 
             Stat.show();
 
-            Laya.loader.load("../../res/cartoonCharacters/cartoonCharactors.json", Handler.create(this, this.createCharacters), null, Loader.ATLAS);
+            Laya.loader.load("res/cartoonCharacters/cartoonCharactors.json", Handler.create(this, this.createCharacters), null, Loader.ATLAS);
         }
 
         private createCharacters(): void {

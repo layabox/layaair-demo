@@ -20,8 +20,8 @@ var SpotLightDemo = /** @class */ (function () {
         spotLight.attenuation = new Laya.Vector3(0.0, 0.0, 0.8);
         spotLight.range = 6.0;
         spotLight.spot = 32;
-        var grid = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/staticModel/grid/plane.lh"));
-        var layaMonkey = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+        var grid = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh"));
+        var layaMonkey = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
         layaMonkey.once(Laya.Event.HIERARCHY_LOADED, this, function () {
             var aniSprite3d = layaMonkey.getChildAt(0);
             var animator = aniSprite3d.getComponentByType(Laya.Animator);
