@@ -75,7 +75,7 @@ $(document).ready(function()
 		if(!isChinese)
 			location.search = "language=en&category=2d&group=Sprite&name=DisplayImage";
 		else
-			location.search = "category=2d&group=Sprite&name=DisplayImage";
+			location.search = "language=ch&category=2d&group=Sprite&name=DisplayImage";
 	} else {
 		var tmpLang = getQueryString("language");
 
