@@ -71,7 +71,8 @@ $(document).ready(function()
 	var isOldVersion = false;
 	if (!location.search)
 	{
-		if(window.overseas == "2ad3a2ae3de46790d168e044c19be03d")
+		var isChinese = navigator.language.indexOf('zh') !== -1;
+		if(!isChinese)
 			location.search = "language=en&category=2d&group=Sprite&name=DisplayImage";
 		else
 			location.search = "category=2d&group=Sprite&name=DisplayImage";

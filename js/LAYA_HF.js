@@ -433,8 +433,8 @@ function laya_nav(laya) {
                             "en": "Chinese"
                         },
                         "url": {
-                            "zh": laya_http + "ldc.layabox.com/" + laya_zh,
-                            "en": laya_http + "ldc.layabox.com/" + laya_zh
+                            "zh": location.href.replace(/language=(en|ch)/, 'language=ch'),
+                            "en": location.href.replace(/language=(en|ch)/, 'language=ch')
                         },
                         "visual": {
                             "zh": 1,
@@ -448,12 +448,12 @@ function laya_nav(laya) {
                             "en": "English"
                         },
                         "url": {
-                            "zh": laya_http + "ldc.layabox.com/" + laya_en,
-                            "en": laya_http + "ldc.layabox.com/" + laya_en
+                            "zh": location.href.replace(/language=(en|ch)/, 'language=en'),
+                            "en": location.href.replace(/language=(en|ch)/, 'language=en')
                         },
                         "visual": {
-                            "zh": 0,
-                            "en": 0
+                            "zh": 1,
+                            "en": 1
                         },
                         "blank": "0"
                     }
