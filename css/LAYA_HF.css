@@ -1,0 +1,374 @@
+/*滚动条样式*/
+/*ie*/
+body {
+    scrollbar-track-color: white;
+    scrollbar-arrow-color: #1A1A1A;
+    scrollbar-shadow-color: #1A1A1A;
+    scrollbar-face-color: #1A1A1A;
+    -ms-scrollbar-track-color: white;
+    -ms-scrollbar-arrow-color: #1A1A1A;
+    -ms-scrollbar-shadow-color: #1A1A1A;
+    -ms-scrollbar-face-color: #1A1A1A;
+}
+
+/*webkit*/
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+    background-color: white;
+}
+
+::-webkit-scrollbar-track {
+    border-radius: 0;
+}
+
+::-webkit-scrollbar-thumb {
+    border-radius: 0;
+    background-color: #1A1A1A;
+}
+
+/*主要样式*/
+a:link {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:active {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:visited {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:hover {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+a:visited:hover {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#laya_nav a:link,
+#laya_head a:link,
+#laya_foot a:link,
+#laya_nav a:active,
+#laya_head a:active,
+#laya_foot a:active,
+#laya_nav a:visited,
+#laya_head a:visited,
+#laya_foot a:visited,
+#laya_nav a:hover,
+#laya_head a:hover,
+#laya_foot a:hover,
+#laya_nav a:visited:hover,
+#laya_head a:visited:hover,
+#laya_foot a:visited:hover {
+    color: white;
+}
+
+/*总体样式*/
+
+html {
+    min-width: 320px;
+}
+
+body {
+    font-family: "Arial", "Microsoft YaHei", "微软雅黑", "黑体", "宋体", sans-serif;
+    font-size: 14px;
+    min-width: 320px;
+    -webkit-overflow-scrolling: touch;
+}
+
+p {
+    cursor: default;
+}
+
+p a,
+a p {
+    cursor: pointer;
+}
+
+/*Nav*/
+
+#laya_nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    margin: 0;
+    height: 68px;
+    border-radius: 0;
+    min-width: 310px;
+    background-color: #1A1A1A;
+    background-image: none;
+    border: none;
+}
+
+#laya_nav .navbar-collapse {
+    background-color: #1A1A1A;
+}
+
+#laya_nav .navbar-brand {
+    padding: 16px;
+    height: auto;
+}
+
+#laya_nav .navbar-brand img {
+    margin: 0;
+}
+
+#laya_nav #laya_nav_collapse {
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+@media screen and (min-width: 768px) {
+    #laya_nav #laya_nav_collapse {
+        height: 68px !important;
+        /*overflow-x: auto !important;*/
+    }
+}
+
+#laya_nav .navbar-nav {
+    position: relative;
+    margin: 0;
+}
+
+#laya_nav .dropdown-menu {
+    background-color: #1A1A1A;
+    border: none;
+}
+
+#laya_nav .nav li {
+    /*overflow: hidden;*/
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+#laya_nav .nav a {
+    line-height: 38px;
+    text-shadow: 0 0 6px black;
+}
+
+#laya_nav .nav li:hover,
+#laya_nav .nav li a:hover {
+    background-color: #3B3E43;
+    background-image: none;
+}
+
+#laya_nav .navbar-toggle {
+    margin-top: 15px;
+    margin-right: 15px;
+    margin-bottom: 15px;
+}
+
+@media only screen and (min-width: 767px) and (max-width: 959px) {
+    #laya_nav.layaair_nav .navbar-nav a {
+        padding: 15px 6px 15px 5px;
+    }
+}
+
+@media only screen and (min-width: 991px) {
+    #laya_nav.layabox_nav .navbar-nav {
+        margin-left: 50px;
+    }
+}
+
+@media only screen and (max-width: 991px) {
+    #laya_nav .container {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    #laya_nav #laya_nav_collapse {
+        overflow: auto;
+        max-height: 450px;
+    }
+}
+
+/*Body*/
+#laya_content {
+    width: 100%;
+    height: auto;
+    margin: 80px auto 0 auto;
+}
+
+/*Footer*/
+
+#laya_foot {
+    position: fixed;
+    top: auto;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: auto;
+    min-width: 310px;
+    min-height: 170px;
+    padding: 30px 0;
+    background-color: #3B3E43;
+    border-top: 1px solid #4F5257;
+}
+
+#laya_foot .container {
+    position: relative;
+}
+
+#laya_foot p {
+    color: #a2a2a2;
+    margin: 0;
+    font-size: 14px;
+}
+
+#laya_foot a p:hover {
+    color: white;
+}
+
+#laya_foot .foot_div_1,
+#laya_foot .foot_div_2,
+#laya_foot .foot_div_3,
+#laya_foot .foot_div_4 {
+    float: left;
+    min-height: 30px;
+    line-height: 30px;
+}
+
+#laya_foot .foot_div_1 a,
+#laya_foot .foot_div_2 p,
+#laya_foot .foot_div_3 p,
+#laya_foot .foot_div_4 p {
+    float: left;
+    margin-right: 30px;
+}
+
+#laya_foot .foot_div_3 {
+    margin-top: 6px;
+}
+
+#laya_foot .foot_div_4 {
+    width: 100%;
+}
+
+#laya_foot .foot_div_4 a p,
+#laya_foot .foot_div_4 p,
+#laya_foot .foot_div_4 span {
+    color: #707480;
+}
+
+#laya_foot .foot_div_4 p {
+    margin: 0;
+}
+
+#laya_foot .foot_div_4 a p {
+    margin: 0 15px;
+}
+
+#laya_foot .foot_div_4 a p:hover {
+    color: white;
+}
+
+#laya_foot .wx {
+    position: absolute;
+    right: 5px;
+    width: 100px;
+    height: 120px;
+    text-align: center;
+}
+
+#laya_foot .wx img {
+    width: 100px;
+    height: 100px;
+}
+
+#laya_foot .wx p {
+    width: 100px;
+    height: 20px;
+    line-height: 15px;
+    padding-top: 10px;
+    text-align: center;
+}
+
+#laya_foot .foot_div_4 .friendship {
+    margin-right: 15px;
+}
+
+@media only screen and (min-width: 991px) and (max-width: 1200px) {
+    #laya_foot .foot_div_2 p {
+        margin-right: 5px;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    #laya_foot .wx {
+        display: none;
+    }
+
+    #laya_foot .foot_div_4 .pline {
+        margin-right: 15px;
+    }
+
+    #laya_foot .foot_div_4 .friendship {
+        margin-right: 33px;
+    }
+
+    #laya_foot .foot_div_4 a p {
+        margin-left: 0;
+    }
+}
+
+@media only screen and (max-width: 490px) {
+    #laya_foot .footerline {
+        display: none;
+    }
+}
+
+/*Cooperation*/
+
+.cooperation {
+    position: relative;
+    width: 100%;
+    min-height: 420px;
+    background-color: #3B3E43;
+    border-bottom: 1px solid #282828;
+    padding: 50px 0;
+}
+
+.cooperation .title {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+    text-align: center;
+    color: white;
+    font-size: 40px;
+    margin-bottom: 10px;
+}
+
+.cooperation .ranking {
+    position: relative;
+    width: 100%;
+    min-height: 30px;
+    line-height: 30px;
+    color: white;
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.cooperation .col-lg-2 {
+    height: 80px;
+    text-align: center;
+}
+
+.cooperation .col-lg-2 img {
+    max-width: 150px;
+    width: 100%;
+}
