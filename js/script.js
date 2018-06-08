@@ -8,6 +8,7 @@ $(document).ready(function()
 	var code_loaded;
 	var demo_loaded;
 	var lang = 'js';
+	var g_lang = 'js';
 
 	////////////////////////////
 	// initialize code editer //
@@ -36,6 +37,7 @@ $(document).ready(function()
 	$("#execButton").click(execCode);
 	$("#resetButton").click(resetCode);
 	$("#openInNewTabButton").click(openInNewTab);
+	$("#showGithubCodeButton").click(showGithubCode);
 
 	///////////////////////////////////////////////////////
 	// read manifest.json, and fill the list on the left //
@@ -65,7 +67,7 @@ $(document).ready(function()
 
 	function parseToSearchUrl(key) {
 		var keyArr = key.split("&");
-		return "category=" + keyArr[0] + "&group=" + keyArr[1] + "&name=" + keyArr[2];
+		return "language=" + (language ? language : 'ch') + "&category=" + keyArr[0] + "&group=" + keyArr[1] + "&name=" + keyArr[2];
 	}
 
 	var isOldVersion = false;
@@ -111,6 +113,7 @@ $(document).ready(function()
 		execButton.lastElementChild.innerText = "Execute";
 		resetButton.lastElementChild.innerText = "Reset";
 		refLibs.previousElementSibling.innerText = "References: ";
+		showGithubCodeButton.lastElementChild.innerText = 'SourceCode';
 	}
 
 	ReadFile(manifest, 'json', function(content)
@@ -136,6 +139,18 @@ $(document).ready(function()
 
 		$('#collapse' + demoArr[1]).collapse('show');
 		$('#collapse' + demoArr[1] + " a[demo='" + demo + "']").parent().addClass("active");
+	}, function() {
+		// 如果不是本地打开，return
+		if (location.protocol.indexOf('file') == -1) {
+			return;
+		}
+		// 获取本地资源出错
+		// 可能得情况: 1) 没有使用本地服务器 2)直接打开并别没有关闭浏览器的安全限制
+		if (language == 'en') {
+			alert('Please turn off browser security restrictions or use local server access!');
+		} else {
+			alert('请关闭浏览器的安全限制或使用本地服务器访问！');
+		}
 	});
 
 	function addCategory(category, type)
@@ -205,24 +220,24 @@ $(document).ready(function()
 		caseTitle.innerText = languagePack[demo_full_name];
 		document.title = languagePack[demo_full_name];
 
-		LoadCode(demo_full_name, lang, OnCodeLoaded);
-
-		if (lang != "js")
+		LoadCode(demo_full_name, g_lang, OnCodeLoaded);
+		
+		if (g_lang != "js")
 		{
 			LoadCode(demo_full_name, "js", function(code)
 			{
-				var temp = lang;
-				lang = "js";
+				var temp = g_lang;
+				g_lang = "js";
 				OnCodeLoaded(code);
-				lang = temp;
+				g_lang = temp;
 			});
 		}
 	}
 
 	function OnCodeLoaded(code)
 	{
-		SetEditorValue(lang, code);
-		if (lang == "js")
+		SetEditorValue(g_lang, code);
+		if (g_lang == "js")
 		{
 			// 使第一次undo失效，否则会undo到空文档
 			setTimeout(function()
@@ -278,12 +293,44 @@ $(document).ready(function()
 
 	function resetCode(e)
 	{
-		if (lang != "js")
+		if (g_lang != "js")
 			return;
 
 		SetEditorValue('js', origin_js_code);
 		code_loaded = true;
 		demo_frame.src = demo_frame.src;
+	}
+
+	function showGithubCode() {
+		// 显示github代码
+		let search = window.location.search;
+		let 
+			category = search.match(/category=(.+?)&/)[1],
+			group = search.match(/group=(.+?)&/)[1],
+			name = search.match(/name=(.+?)$/)[1];
+		// let fileName = group + '_' + name + '.' + g_lang;
+		// var filePath = category + '/' + g_lang + '/' + fileName;
+		var filePath = getFilePath(category, group, name);
+		let githubLink = 'https://github.com/layabox/layaair-demo/tree/master/' + filePath;
+		window.open(githubLink);
+	}
+
+	/**
+	 * 获取该分类下源码路径
+	 * @param {*} category 
+	 * @param {*} group 
+	 * @param {*} name 
+	 */
+	function getFilePath(category, group, name) {
+		var path = 'h5/' + category + '/' + g_lang + '/';
+		if (category == '2d') {
+			path += group + '_' + name + '.' + g_lang;
+		} else {
+			path += group.toLowerCase() + 'Module' + '/';
+			path += name;
+			path += '.' + g_lang;
+		}
+		return path;
 	}
 
 	function openInNewTab()
@@ -317,7 +364,7 @@ $(document).ready(function()
 
 	function execCode()
 	{
-		if (lang != "js")
+		if (g_lang != "js")
 			return;
 
 		code_loaded = true;
@@ -347,7 +394,7 @@ $(document).ready(function()
 	$("#myTabs>li>a").on("show.bs.tab", function(e)
 	{
 		var lang = $(e.target).attr("aria-controls");
-		lang = lang;
+		g_lang = lang;
 
 		LoadCode(demo, lang, function(code)
 		{
@@ -355,12 +402,12 @@ $(document).ready(function()
 		});
 
 		if (lang == "js")
-			$(".code-control-btn-group button").removeClass("disabled");
+			$(".code-control-btn-group [type=button]").removeClass("disabled");
 		else
-			$(".code-control-btn-group button").addClass("disabled");
+			$(".code-control-btn-group [type=button]").addClass("disabled");
 	});
 
-	function ReadFile(url, dataType, callback)
+	function ReadFile(url, dataType, callback, errorFunc)
 	{
 		$.ajax(url,
 		{
@@ -369,6 +416,7 @@ $(document).ready(function()
 			error: function()
 			{
 				console.log(arguments);
+				errorFunc instanceof Function && errorFunc();
 			}
 		});
 	}
