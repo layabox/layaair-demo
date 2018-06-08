@@ -14,6 +14,15 @@
     <title>
         LAYA_DEMO
     </title>
+    <script type="text/javascript">
+    if (!location.search) {
+        var isChinese = navigator.language.indexOf('zh') !== -1;
+        if(!isChinese)
+            location.search = "language=en&category=2d&group=Sprite&name=DisplayImage";
+        else
+            location.search = "language=ch&category=2d&group=Sprite&name=DisplayImage";
+    }
+    </script>
 
     <!--CSS-->
     <link rel="shortcut icon" href="https://official.layabox.com/public/img/favicon.ico"/>

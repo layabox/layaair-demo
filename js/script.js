@@ -71,29 +71,29 @@ $(document).ready(function()
 	}
 
 	var isOldVersion = false;
-	if (!location.search)
-	{
-		var isChinese = navigator.language.indexOf('zh') !== -1;
-		if(!isChinese)
-			location.search = "language=en&category=2d&group=Sprite&name=DisplayImage";
-		else
-			location.search = "language=ch&category=2d&group=Sprite&name=DisplayImage";
-	} else {
-		var tmpLang = getQueryString("language");
+	// if (!location.search)
+	// {
+		// var isChinese = navigator.language.indexOf('zh') !== -1;
+		// if(!isChinese)
+		// 	location.search = "language=en&category=2d&group=Sprite&name=DisplayImage";
+		// else
+		// 	location.search = "language=ch&category=2d&group=Sprite&name=DisplayImage";
+	// } else {
+	var tmpLang = getQueryString("language");
 
-		var searchSplitArr = location.search.split("language=");
-		isOldVersion = (-1 === searchSplitArr[searchSplitArr.length - 1].indexOf("="));
-		if (isOldVersion) {
-			var searchSplitAndArr = location.search.substr(1).split("&");
-			if (tmpLang){
-				searchSplitAndArr.shift();
-			}
-			var searchSplitStr = searchSplitAndArr.join("&");
-			var parsedStr = parseToSearchUrl(searchSplitStr);
-			var parsedSearchUrl = tmpLang ? ("language=" + tmpLang + "&" + parsedStr) : parsedStr;
-			location.search = parsedSearchUrl;
+	var searchSplitArr = location.search.split("language=");
+	isOldVersion = (-1 === searchSplitArr[searchSplitArr.length - 1].indexOf("="));
+	if (isOldVersion) {
+		var searchSplitAndArr = location.search.substr(1).split("&");
+		if (tmpLang){
+			searchSplitAndArr.shift();
 		}
+		var searchSplitStr = searchSplitAndArr.join("&");
+		var parsedStr = parseToSearchUrl(searchSplitStr);
+		var parsedSearchUrl = tmpLang ? ("language=" + tmpLang + "&" + parsedStr) : parsedStr;
+		location.search = parsedSearchUrl;
 	}
+	// }
 	demoArr = [
 		getQueryString("language"),
 		getQueryString("category"),

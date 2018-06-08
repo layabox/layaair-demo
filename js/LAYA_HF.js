@@ -229,8 +229,8 @@ function laya_nav(laya) {
                     "en": "Example"
                 },
                 "url": {
-                    "zh": laya_http + "layaair.ldc.layabox.com/demo/?" + lang_andparam + "2d&Sprite&DisplayImage",
-                    "en": laya_http + "layaair.ldc.layabox.com/demo/?" + lang_andparam + "2d&Sprite&DisplayImage"
+                    "zh": laya_http + "layaair.ldc.layabox.com/demo/",
+                    "en": laya_http + "layaair.ldc.layabox.com/demo/"
                 },
                 "visual": {
                     "zh": 1,
