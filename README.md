@@ -1,8 +1,10 @@
-# LayaAir Demo
+# LayaAir 离线Demo
 
 目前只支持中文和英文语言
 
 打开index页面，会根据操作系统自动识别语言版本
+
+# LayaAir Offline Demo
 
 Currently only supports Chinese and English languages
 
