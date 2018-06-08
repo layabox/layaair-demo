@@ -1,14 +1,33 @@
 # LayaAir 离线Demo
 
-目前只支持中文和英文语言
+目前支持中文和英文语言
 
-打开index页面，会根据操作系统自动识别语言版本
+
+
+> **如何使用**
+
+可以使用anywhere(需要node环境)，建立本地服务器，预览index.html
+
+```java
+anywhere
+```
+
+
 
 # LayaAir Offline Demo
 
-Currently only supports Chinese and English languages
+Supports Chinese and English languages
 
-Open the index page and automatically recognize the language version according to the operating system
+
+
+> **How to use**
+>
+
+You can use "anywhere" to build a local server，and preview index.html
+
+```java
+anywhere
+```
 
 
 
