@@ -212,7 +212,7 @@ function laya_nav(laya) {
             {
                 "title": {
                     "zh": "首页",
-                    "en": "Home Page"
+                    "en": "Home"
                 },
                 "url": {
                     "zh": laya_http + "ldc.layabox.com/" + lang_param,
@@ -226,7 +226,7 @@ function laya_nav(laya) {
             }, {
                 "title": {
                     "zh": "引擎示例",
-                    "en": "Engine Example"
+                    "en": "Example"
                 },
                 "url": {
                     "zh": laya_http + "layaair.ldc.layabox.com/demo/?" + lang_andparam + "2d&Sprite&DisplayImage",
@@ -240,7 +240,7 @@ function laya_nav(laya) {
             }, {
                 "title": {
                     "zh": "技术文档",
-                    "en": "Technical Doc"
+                    "en": "Doc"
                 },
                 "url": {
                     "zh": laya_http + "ldc.layabox.com/doc/" + lang_param,
@@ -268,7 +268,7 @@ function laya_nav(laya) {
             }, {
                 "title": {
                     "zh": "腾讯课堂教学",
-                    "en": "Tencent Classroom"
+                    "en": "Classroom"
                 },
                 "url": {
                     "zh": "http://layabox.ke.qq.com/",
@@ -326,7 +326,7 @@ function laya_nav(laya) {
             }, {
                 "title": {
                     "zh": "引擎下载",
-                    "en": "Engine Download"
+                    "en": "Download"
                 },
                 "url": {
                     "zh": "#",
