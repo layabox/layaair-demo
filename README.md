@@ -7,7 +7,9 @@ Supports Chinese and English languages
 > **How to use**
 >
 
-You can use "anywhere" to build a local server，and preview index.html
+Online preview web site:https://layaair.ldc.layabox.com/demo/
+
+You can also use anywhere (node environment) to build local servers and preview index.html.
 
 ```java
 anywhere
@@ -25,7 +27,9 @@ anywhere
 
 > **如何使用**
 
-可以使用anywhere(需要node环境)，建立本地服务器，预览index.html
+线上预览网址：https://layaair.ldc.layabox.com/demo/
+
+也可以使用anywhere(需要node环境)，建立本地服务器，预览index.html。
 
 ```java
 anywhere
