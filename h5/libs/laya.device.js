@@ -6,6 +6,7 @@
 	var Handler=laya.utils.Handler,Rectangle=laya.maths.Rectangle,Render=laya.renders.Render,Sprite=laya.display.Sprite;
 	var Stage=laya.display.Stage,Texture=laya.resource.Texture,Utils=laya.utils.Utils,WebGL=laya.webgl.WebGL;
 	var WebGLContext=laya.webgl.WebGLContext;
+	//file:///E:/git/layaair-master/plugins/device/src/laya/device/geolocation/Geolocation.as=======199.999297/199.999297
 /**
 *使用前可用<code>supported</code>查看浏览器支持。
 */
@@ -57,6 +58,7 @@ var Geolocation=(function(){
 })()
 
 
+	//file:///E:/git/layaair-master/plugins/device/src/laya/device/geolocation/GeolocationInfo.as=======199.999296/199.999296
 //class laya.device.geolocation.GeolocationInfo
 var GeolocationInfo=(function(){
 	function GeolocationInfo(){
@@ -107,6 +109,7 @@ var GeolocationInfo=(function(){
 })()
 
 
+	//file:///E:/git/layaair-master/plugins/device/src/laya/device/media/Media.as=======199.999294/199.999294
 /**
 *Media用于捕捉摄像头和麦克风。可以捕捉任意之一，或者同时捕捉两者。<code>getCamera</code>前可以使用<code>supported()</code>检查当前浏览器是否支持。
 *<b>NOTE:</b>
@@ -138,6 +141,7 @@ var Media=(function(){
 })()
 
 
+	//file:///E:/git/layaair-master/plugins/device/src/laya/device/motion/AccelerationInfo.as=======199.999291/199.999291
 /**
 *加速度x/y/z的单位均为m/s²。
 *在硬件（陀螺仪）不支持的情况下，alpha、beta和gamma值为null。
@@ -166,6 +170,7 @@ var AccelerationInfo=(function(){
 })()
 
 
+	//file:///E:/git/layaair-master/plugins/device/src/laya/device/motion/RotationInfo.as=======199.999288/199.999288
 /**
 *保存旋转信息的类。请勿修改本类的属性。
 *@author Survivor
@@ -205,6 +210,7 @@ var RotationInfo=(function(){
 })()
 
 
+	//file:///E:/git/layaair-master/plugins/device/src/laya/device/motion/Accelerator.as=======98.999279/98.999279
 /**
 *Accelerator.instance获取唯一的Accelerator引用，请勿调用构造函数。
 *
@@ -270,7 +276,7 @@ var Accelerator=(function(_super){
 		Accelerator.rotationRate.alpha=e.rotationRate.gamma *-1;
 		Accelerator.rotationRate.beta=e.rotationRate.alpha *-1;
 		Accelerator.rotationRate.gamma=e.rotationRate.beta;
-		if (Browser.onAndriod){
+		if (Browser.onAndroid){
 			if (Accelerator.onChrome){
 				Accelerator.rotationRate.alpha *=180 / Math.PI;
 				Accelerator.rotationRate.beta *=180 / Math.PI;
@@ -334,6 +340,7 @@ var Accelerator=(function(_super){
 })(EventDispatcher)
 
 
+	//file:///E:/git/layaair-master/plugins/device/src/laya/device/motion/Gyroscope.as=======98.999278/98.999278
 /**
 *使用Gyroscope.instance获取唯一的Gyroscope引用，请勿调用构造函数。
 *
@@ -403,6 +410,7 @@ var Gyroscope=(function(_super){
 })(EventDispatcher)
 
 
+	//file:///E:/git/layaair-master/plugins/device/src/laya/device/Shake.as=======98.999276/98.999276
 /**
 *Shake只能在支持此操作的设备上有效。
 *
@@ -482,6 +490,7 @@ var Shake=(function(_super){
 })(EventDispatcher)
 
 
+	//file:///E:/git/layaair-master/plugins/device/src/laya/device/media/Video.as=======96.999263/96.999263
 /**
 *<code>Video</code>将视频显示到Canvas上。<code>Video</code>可能不会在所有浏览器有效。
 *<p>关于Video支持的所有事件参见：<i>http://www.w3school.com.cn/tags/html_ref_audio_video_dom.asp</i>。</p>
@@ -866,6 +875,7 @@ var Video=(function(_super){
 })(Sprite)
 
 
+	//file:///E:/git/layaair-master/plugins/device/src/laya/device/media/HtmlVideo.as=======96.999091/96.999091
 /**
 *@private
 */
@@ -873,9 +883,10 @@ var Video=(function(_super){
 var HtmlVideo=(function(_super){
 	function HtmlVideo(){
 		this.video=null;
+		this._source=null;
 		HtmlVideo.__super.call(this);
-		this._w=1;
-		this._h=1;
+		this._width=1;
+		this._height=1;
 		this.createDomElement();
 	}
 
@@ -914,6 +925,10 @@ var HtmlVideo=(function(_super){
 		return this.video;
 	}
 
+	__proto._getSource=function(){
+		return this._source;
+	}
+
 	HtmlVideo.create=function(){
 		return new HtmlVideo();
 	}
@@ -922,6 +937,7 @@ var HtmlVideo=(function(_super){
 })(Bitmap)
 
 
+	//file:///E:/git/layaair-master/plugins/device/src/laya/device/media/WebGLVideo.as=======95.998383/95.998383
 /**
 *@private
 */
@@ -936,18 +952,16 @@ var WebGLVideo=(function(_super){
 			return;
 		this.gl=WebGL.mainContext;
 		this._source=this.gl.createTexture();
-		this.preTarget=WebGLContext.curBindTexTarget;
-		this.preTexture=WebGLContext.curBindTexValue;
 		WebGLContext.bindTexture(this.gl,/*laya.webgl.WebGLContext.TEXTURE_2D*/0x0DE1,this._source);
 		this.gl.texParameteri(/*laya.webgl.WebGLContext.TEXTURE_2D*/0x0DE1,/*laya.webgl.WebGLContext.TEXTURE_WRAP_S*/0x2802,/*laya.webgl.WebGLContext.CLAMP_TO_EDGE*/0x812F);
 		this.gl.texParameteri(/*laya.webgl.WebGLContext.TEXTURE_2D*/0x0DE1,/*laya.webgl.WebGLContext.TEXTURE_WRAP_T*/0x2803,/*laya.webgl.WebGLContext.CLAMP_TO_EDGE*/0x812F);
 		this.gl.texParameteri(/*laya.webgl.WebGLContext.TEXTURE_2D*/0x0DE1,/*laya.webgl.WebGLContext.TEXTURE_MAG_FILTER*/0x2800,/*laya.webgl.WebGLContext.LINEAR*/0x2601);
 		this.gl.texParameteri(/*laya.webgl.WebGLContext.TEXTURE_2D*/0x0DE1,/*laya.webgl.WebGLContext.TEXTURE_MIN_FILTER*/0x2801,/*laya.webgl.WebGLContext.LINEAR*/0x2601);
-		(this.preTarget && this.preTexture)&& (WebGLContext.bindTexture(this.gl,this.preTarget,this.preTexture));
 	}
 
 	__class(WebGLVideo,'laya.device.media.WebGLVideo',_super);
 	var __proto=WebGLVideo.prototype;
+	//(preTarget && preTexture)&& (WebGLContext.bindTexture(gl,preTarget,preTexture));
 	__proto.updateTexture=function(){
 		if(Browser.onIPhone)
 			return;
@@ -961,14 +975,3 @@ var WebGLVideo=(function(_super){
 
 	Laya.__init([Media]);
 })(window,document,Laya);
-
-if (typeof define === 'function' && define.amd){
-	define('laya.core', ['require', "exports"], function(require, exports) {
-        'use strict';
-        Object.defineProperty(exports, '__esModule', { value: true });
-        for (var i in Laya) {
-			var o = Laya[i];
-            o && o.__isclass && (exports[i] = o);
-        }
-    });
-}

@@ -203,15 +203,6 @@
 			]
 		},
 		{
-			"prefix": "Physics",
-			"tr_zhCN": "物理引擎",
-			"manifest": [
-				["Cloth", "布", "Demo来自matter.js官方。演示使用LayaAir渲染matter.js", "core,webgl,matter.js,LayaRender.js"],
-				["NewtonsCradle", "牛顿摆", "Demo来自matter.js官方。演示使用LayaAir渲染matter.js", "core,webgl,matter.js,LayaRender.js"],
-				["Slingshot", "Slingshot", "Demo来自matter.js官方。演示使用LayaAir渲染matter.js", "core,webgl,matter.js,LayaRender.js"]
-			]
-		},
-		{
 			"prefix": "DOM",
 			"tr_zhCN": "DOM元素",
 			"manifest": [
