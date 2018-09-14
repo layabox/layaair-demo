@@ -7,7 +7,7 @@ window.layalib(function(window,document,Laya){
 	var HTMLImage=laya.resource.HTMLImage,Handler=laya.utils.Handler,Input=laya.display.Input,Loader=laya.net.Loader;
 	var LocalStorage=laya.net.LocalStorage,Matrix=laya.maths.Matrix,Render=laya.renders.Render,RunDriver=laya.utils.RunDriver;
 	var SoundChannel=laya.media.SoundChannel,SoundManager=laya.media.SoundManager,URL=laya.net.URL,Utils=laya.utils.Utils;
-	//file:///E:/git/layaair-master/plugins/wx/src/laya/wx/mini/MiniAdpter.as=======199.999284/199.999284
+	//file:///E:/LayaAirMaster/plugins/wx/src/laya/wx/mini/MiniAdpter.as=======199.999284/199.999284
 //class laya.wx.mini.MiniAdpter
 var MiniAdpter=(function(){
 	function MiniAdpter(){}
@@ -213,7 +213,7 @@ var MiniAdpter=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/plugins/wx/src/laya/wx/mini/MiniFileMgr.as=======199.999283/199.999283
+	//file:///E:/LayaAirMaster/plugins/wx/src/laya/wx/mini/MiniFileMgr.as=======199.999283/199.999283
 /**@private **/
 //class laya.wx.mini.MiniFileMgr
 var MiniFileMgr=(function(){
@@ -525,7 +525,7 @@ var MiniFileMgr=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/plugins/wx/src/laya/wx/mini/MiniImage.as=======199.999282/199.999282
+	//file:///E:/LayaAirMaster/plugins/wx/src/laya/wx/mini/MiniImage.as=======199.999282/199.999282
 /**@private **/
 //class laya.wx.mini.MiniImage
 var MiniImage=(function(){
@@ -652,7 +652,7 @@ var MiniImage=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/plugins/wx/src/laya/wx/mini/MiniInput.as=======199.999281/199.999281
+	//file:///E:/LayaAirMaster/plugins/wx/src/laya/wx/mini/MiniInput.as=======199.999281/199.999281
 /**@private **/
 //class laya.wx.mini.MiniInput
 var MiniInput=(function(){
@@ -744,7 +744,7 @@ var MiniInput=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/plugins/wx/src/laya/wx/mini/MiniLocalStorage.as=======199.999279/199.999279
+	//file:///E:/LayaAirMaster/plugins/wx/src/laya/wx/mini/MiniLocalStorage.as=======199.999279/199.999279
 /**@private **/
 //class laya.wx.mini.MiniLocalStorage
 var MiniLocalStorage=(function(){
@@ -795,7 +795,7 @@ var MiniLocalStorage=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/plugins/wx/src/laya/wx/mini/MiniLocation.as=======199.999278/199.999278
+	//file:///E:/LayaAirMaster/plugins/wx/src/laya/wx/mini/MiniLocation.as=======199.999278/199.999278
 /**@private **/
 //class laya.wx.mini.MiniLocation
 var MiniLocation=(function(){
@@ -877,7 +877,7 @@ var MiniLocation=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/plugins/wx/src/laya/wx/mini/MiniAccelerator.as=======98.999274/98.999274
+	//file:///E:/LayaAirMaster/plugins/wx/src/laya/wx/mini/MiniAccelerator.as=======98.999274/98.999274
 /**@private **/
 //class laya.wx.mini.MiniAccelerator extends laya.events.EventDispatcher
 var MiniAccelerator=(function(_super){
@@ -952,7 +952,7 @@ var MiniAccelerator=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/plugins/wx/src/laya/wx/mini/MiniLoader.as=======98.999269/98.999269
+	//file:///E:/LayaAirMaster/plugins/wx/src/laya/wx/mini/MiniLoader.as=======98.999269/98.999269
 /**@private **/
 //class laya.wx.mini.MiniLoader extends laya.events.EventDispatcher
 var MiniLoader=(function(_super){
@@ -1051,7 +1051,7 @@ var MiniLoader=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/plugins/wx/src/laya/wx/mini/MiniSound.as=======98.999266/98.999266
+	//file:///E:/LayaAirMaster/plugins/wx/src/laya/wx/mini/MiniSound.as=======98.999266/98.999266
 /**@private **/
 //class laya.wx.mini.MiniSound extends laya.events.EventDispatcher
 var MiniSound=(function(_super){
@@ -1226,7 +1226,7 @@ var MiniSound=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/plugins/wx/src/laya/wx/mini/MiniSoundChannel.as=======97.999191/97.999191
+	//file:///E:/LayaAirMaster/plugins/wx/src/laya/wx/mini/MiniSoundChannel.as=======97.999191/97.999191
 /**@private **/
 //class laya.wx.mini.MiniSoundChannel extends laya.media.SoundChannel
 var MiniSoundChannel=(function(_super){

@@ -3,7 +3,7 @@
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
 
 	var Component=laya.components.Component,MeshTerrainSprite3D=laya.d3.core.MeshTerrainSprite3D,Sprite3D=laya.d3.core.Sprite3D;
-	//file:///E:/git/layaair-master/d3Plugin/src/laya/d3/component/PathFind.as=======98.999283/98.999283
+	//file:///E:/LayaAirMaster/d3Plugin/src/laya/d3/component/PathFind.as=======98.999283/98.999283
 /**
 *<code>PathFinding</code> 类用于创建寻路。
 */

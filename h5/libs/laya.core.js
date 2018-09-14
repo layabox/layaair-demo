@@ -211,27 +211,27 @@ var Laya=window.Laya=(function(window,document){
 
 (function(window,document,Laya){
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
-	//file:///E:/git/layaair-master/core/src/laya/runtime/IMarket.as=======1100000100.000049/1100000100.000049
+	//file:///E:/LayaAirMaster/core/src/laya/runtime/IMarket.as=======1100000100.000049/1100000100.000049
 Laya.interface('laya.runtime.IMarket');
-	//file:///E:/git/layaair-master/core/src/laya/filters/IFilter.as=======1100000100.000048/1100000100.000048
+	//file:///E:/LayaAirMaster/core/src/laya/filters/IFilter.as=======1100000100.000048/1100000100.000048
 Laya.interface('laya.filters.IFilter');
-	//file:///E:/git/layaair-master/core/src/laya/resource/IDispose.as=======1100000100.000040/1100000100.000040
+	//file:///E:/LayaAirMaster/core/src/laya/resource/IDispose.as=======1100000100.000040/1100000100.000040
 Laya.interface('laya.resource.IDispose');
-	//file:///E:/git/layaair-master/core/src/laya/runtime/IPlatform.as=======1100000100.000039/1100000100.000039
+	//file:///E:/LayaAirMaster/core/src/laya/runtime/IPlatform.as=======1100000100.000039/1100000100.000039
 Laya.interface('laya.runtime.IPlatform');
-	//file:///E:/git/layaair-master/core/src/laya/resource/IDestroy.as=======1100000100.000039/1100000100.000039
+	//file:///E:/LayaAirMaster/core/src/laya/resource/IDestroy.as=======1100000100.000039/1100000100.000039
 Laya.interface('laya.resource.IDestroy');
-	//file:///E:/git/layaair-master/core/src/laya/runtime/ICPlatformClass.as=======1100000100.000025/1100000100.000025
+	//file:///E:/LayaAirMaster/core/src/laya/runtime/ICPlatformClass.as=======1100000100.000025/1100000100.000025
 Laya.interface('laya.runtime.ICPlatformClass');
-	//file:///E:/git/layaair-master/core/src/laya/resource/ICreateResource.as=======1100000100.000023/1100000100.000023
+	//file:///E:/LayaAirMaster/core/src/laya/resource/ICreateResource.as=======1100000100.000023/1100000100.000023
 Laya.interface('laya.resource.ICreateResource');
-	//file:///E:/git/layaair-master/core/src/laya/runtime/IConchRenderObject.as=======1100000100.000021/1100000100.000021
+	//file:///E:/LayaAirMaster/core/src/laya/runtime/IConchRenderObject.as=======1100000100.000021/1100000100.000021
 Laya.interface('laya.runtime.IConchRenderObject');
-	//file:///E:/git/layaair-master/core/src/laya/resource/ISingletonElement.as=======1100000100.000020/1100000100.000020
+	//file:///E:/LayaAirMaster/core/src/laya/resource/ISingletonElement.as=======1100000100.000020/1100000100.000020
 Laya.interface('laya.resource.ISingletonElement');
-	//file:///E:/git/layaair-master/core/src/laya/runtime/IPlatformClass.as=======1100000000.000026/1100000000.000026
+	//file:///E:/LayaAirMaster/core/src/laya/runtime/IPlatformClass.as=======1100000000.000026/1100000000.000026
 Laya.interface('laya.runtime.IPlatformClass','laya.runtime.IPlatform');
-	//file:///E:/git/layaair-master/core/src/Laya.as=======1000199.999852/1000199.999852
+	//file:///E:/LayaAirMaster/core/src/Laya.as=======1000199.999852/1000199.999852
 /**
 *<code>Laya</code> 是全局对象的引用入口集。
 *Laya类引用了一些常用的全局对象，比如Laya.stage：舞台，Laya.timer：时间管理器，Laya.loader：加载管理器，使用时注意大小写。
@@ -366,7 +366,7 @@ var ___Laya=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/renders/LayaGLQuickRunner.as=======199.999907/10199.999907
+	//file:///E:/LayaAirMaster/core/src/laya/renders/LayaGLQuickRunner.as=======199.999907/10199.999907
 /**
 *@private
 *快速节点命令执行器
@@ -514,7 +514,7 @@ var LayaGLQuickRunner=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/ColorUtils.as=======199.999881/10199.999881
+	//file:///E:/LayaAirMaster/core/src/laya/utils/ColorUtils.as=======199.999881/10199.999881
 /**
 *@private
 *<code>ColorUtils</code> 是一个颜色值处理类。
@@ -609,7 +609,7 @@ var ColorUtils=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/Config.as=======199.999998/199.999998
+	//file:///E:/LayaAirMaster/core/src/Config.as=======199.999998/199.999998
 /**
 *Config 用于配置一些全局参数。如需更改，请在初始化引擎之前设置。
 */
@@ -631,7 +631,7 @@ var Config=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/components/Component.as=======199.999997/199.999997
+	//file:///E:/LayaAirMaster/core/src/laya/components/Component.as=======199.999997/199.999997
 /**
 *<code>Component</code> 类用于创建组件的基类。
 */
@@ -827,7 +827,7 @@ var Component=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/components/Prefab.as=======199.999996/199.999996
+	//file:///E:/LayaAirMaster/core/src/laya/components/Prefab.as=======199.999996/199.999996
 /**
 *模板，预制件
 */
@@ -852,7 +852,7 @@ var Prefab=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/Const.as=======199.999994/199.999994
+	//file:///E:/LayaAirMaster/core/src/laya/Const.as=======199.999994/199.999994
 /**
 *@private
 *静态常量集合
@@ -873,7 +873,7 @@ var Const=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/events/EventDispatcher.as=======199.999989/199.999989
+	//file:///E:/LayaAirMaster/core/src/laya/events/EventDispatcher.as=======199.999989/199.999989
 /**
 *<code>EventDispatcher</code> 类是可调度事件的所有类的基类。
 */
@@ -1090,7 +1090,7 @@ var EventDispatcher=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/Handler.as=======199.999987/199.999987
+	//file:///E:/LayaAirMaster/core/src/laya/utils/Handler.as=======199.999987/199.999987
 /**
 *<p><code>Handler</code> 是事件处理器类。</p>
 *<p>推荐使用 Handler.create()方法从对象池创建，减少对象创建消耗。创建的 Handler 对象不再使用后，可以使用 Handler.recover()将其回收到对象池，回收后不要再使用此对象，否则会导致不可预料的错误。</p>
@@ -1191,7 +1191,7 @@ var Handler=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/BitmapFont.as=======199.999986/199.999986
+	//file:///E:/LayaAirMaster/core/src/laya/display/BitmapFont.as=======199.999986/199.999986
 /**
 *<code>BitmapFont</code> 是位图字体类，用于定义位图字体信息。
 *字体制作及使用方法，请参考文章
@@ -1413,7 +1413,7 @@ var BitmapFont=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/AlphaCmd.as=======199.999985/199.999985
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/AlphaCmd.as=======199.999985/199.999985
 /**
 *透明命令
 */
@@ -1452,7 +1452,7 @@ var AlphaCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/ClipRectCmd.as=======199.999984/199.999984
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/ClipRectCmd.as=======199.999984/199.999984
 /**
 *裁剪命令
 */
@@ -1497,7 +1497,7 @@ var ClipRectCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawCanvasCmd.as=======199.999983/199.999983
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawCanvasCmd.as=======199.999983/199.999983
 /**
 *绘制Canvas贴图
 */
@@ -1541,7 +1541,7 @@ var DrawCanvasCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawCircleCmd.as=======199.999982/199.999982
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawCircleCmd.as=======199.999982/199.999982
 /**
 *绘制圆形
 */
@@ -1594,7 +1594,7 @@ var DrawCircleCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawCurvesCmd.as=======199.999981/199.999981
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawCurvesCmd.as=======199.999981/199.999981
 /**
 *绘制曲线
 */
@@ -1643,7 +1643,7 @@ var DrawCurvesCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawImageCmd.as=======199.999980/199.999980
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawImageCmd.as=======199.999980/199.999980
 /**
 *绘制图片
 */
@@ -1693,7 +1693,7 @@ var DrawImageCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawLineCmd.as=======199.999979/199.999979
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawLineCmd.as=======199.999979/199.999979
 /**
 *绘制单条曲线
 */
@@ -1744,7 +1744,7 @@ var DrawLineCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawLinesCmd.as=======199.999978/199.999978
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawLinesCmd.as=======199.999978/199.999978
 /**
 *绘制连续曲线
 */
@@ -1795,7 +1795,7 @@ var DrawLinesCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawParticleCmd.as=======199.999977/199.999977
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawParticleCmd.as=======199.999977/199.999977
 /**
 *绘制圆形
 */
@@ -1835,7 +1835,7 @@ var DrawParticleCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawPathCmd.as=======199.999976/199.999976
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawPathCmd.as=======199.999976/199.999976
 /**
 *根据路径绘制矢量图形
 */
@@ -1885,7 +1885,7 @@ var DrawPathCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawPieCmd.as=======199.999975/199.999975
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawPieCmd.as=======199.999975/199.999975
 /**
 *绘制扇形
 */
@@ -1954,7 +1954,7 @@ var DrawPieCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawPolyCmd.as=======199.999974/199.999974
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawPolyCmd.as=======199.999974/199.999974
 /**
 *绘制多边形
 */
@@ -2010,7 +2010,7 @@ var DrawPolyCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawRectCmd.as=======199.999973/199.999973
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawRectCmd.as=======199.999973/199.999973
 /**
 *绘制矩形
 */
@@ -2063,7 +2063,7 @@ var DrawRectCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawTextureCmd.as=======199.999972/199.999972
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawTextureCmd.as=======199.999972/199.999972
 /**
 *绘制单个贴图
 */
@@ -2122,7 +2122,7 @@ var DrawTextureCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawTexturesCmd.as=======199.999971/199.999971
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawTexturesCmd.as=======199.999971/199.999971
 /**
 *根据坐标集合绘制多个贴图
 */
@@ -2167,7 +2167,7 @@ var DrawTexturesCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/DrawTrianglesCmd.as=======199.999970/199.999970
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/DrawTrianglesCmd.as=======199.999970/199.999970
 /**
 *绘制三角形命令
 */
@@ -2234,7 +2234,7 @@ var DrawTrianglesCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/FillBorderTextCmd.as=======199.999969/199.999969
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/FillBorderTextCmd.as=======199.999969/199.999969
 /**
 *绘制文本边框
 */
@@ -2287,7 +2287,7 @@ var FillBorderTextCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/FillBorderWordsCmd.as=======199.999968/199.999968
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/FillBorderWordsCmd.as=======199.999968/199.999968
 /**
 *绘制边框
 */
@@ -2339,7 +2339,7 @@ var FillBorderWordsCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/FillTextCmd.as=======199.999967/199.999967
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/FillTextCmd.as=======199.999967/199.999967
 /**
 *绘制文字
 */
@@ -2443,7 +2443,7 @@ var FillTextCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/FillTextureCmd.as=======199.999966/199.999966
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/FillTextureCmd.as=======199.999966/199.999966
 /**
 *填充贴图
 */
@@ -2499,7 +2499,7 @@ var FillTextureCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/FillWordsCmd.as=======199.999965/199.999965
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/FillWordsCmd.as=======199.999965/199.999965
 /**
 *填充文字命令
 */
@@ -2547,7 +2547,7 @@ var FillWordsCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/RestoreCmd.as=======199.999964/199.999964
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/RestoreCmd.as=======199.999964/199.999964
 /**
 *恢复命令，和save配套使用
 */
@@ -2582,7 +2582,7 @@ var RestoreCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/RotateCmd.as=======199.999963/199.999963
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/RotateCmd.as=======199.999963/199.999963
 /**
 *旋转命令
 */
@@ -2625,7 +2625,7 @@ var RotateCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/SaveCmd.as=======199.999962/199.999962
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/SaveCmd.as=======199.999962/199.999962
 /**
 *存储命令，和restore配套使用
 */
@@ -2660,7 +2660,7 @@ var SaveCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/ScaleCmd.as=======199.999961/199.999961
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/ScaleCmd.as=======199.999961/199.999961
 /**
 *缩放命令
 */
@@ -2705,7 +2705,7 @@ var ScaleCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/StrokeTextCmd.as=======199.999960/199.999960
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/StrokeTextCmd.as=======199.999960/199.999960
 /**
 *绘制描边文字
 */
@@ -2756,7 +2756,7 @@ var StrokeTextCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/TransformCmd.as=======199.999959/199.999959
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/TransformCmd.as=======199.999959/199.999959
 /**
 *矩阵命令
 */
@@ -2800,7 +2800,7 @@ var TransformCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/cmd/TranslateCmd.as=======199.999958/199.999958
+	//file:///E:/LayaAirMaster/core/src/laya/display/cmd/TranslateCmd.as=======199.999958/199.999958
 /**
 *位移命令
 */
@@ -2841,7 +2841,7 @@ var TranslateCmd=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/css/BoundsStyle.as=======199.999957/199.999957
+	//file:///E:/LayaAirMaster/core/src/laya/display/css/BoundsStyle.as=======199.999957/199.999957
 /**
 *@private
 *Graphic bounds数据类
@@ -2886,7 +2886,7 @@ var BoundsStyle=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/css/CacheStyle.as=======199.999956/199.999956
+	//file:///E:/LayaAirMaster/core/src/laya/display/css/CacheStyle.as=======199.999956/199.999956
 /**
 *@private
 *存储cache相关
@@ -3066,7 +3066,7 @@ var CacheStyle=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/css/SpriteStyle.as=======199.999955/199.999955
+	//file:///E:/LayaAirMaster/core/src/laya/display/css/SpriteStyle.as=======199.999955/199.999955
 /**
 *@private
 *元素样式
@@ -3127,7 +3127,7 @@ var SpriteStyle=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/Graphics.as=======199.999951/199.999951
+	//file:///E:/LayaAirMaster/core/src/laya/display/Graphics.as=======199.999951/199.999951
 /**
 *<code>Graphics</code> 类用于创建绘图显示对象。Graphics可以同时绘制多个位图或者矢量图，还可以结合save，restore，transform，scale，rotate，translate，alpha等指令对绘图效果进行变化。
 *Graphics以命令流方式存储，可以通过cmds属性访问所有命令流。Graphics是比Sprite更轻量级的对象，合理使用能提高应用性能(比如把大量的节点绘图改为一个节点的Graphics命令集合，能减少大量节点创建消耗)。
@@ -3860,7 +3860,7 @@ var Graphics=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/GraphicsBounds.as=======199.999950/199.999950
+	//file:///E:/LayaAirMaster/core/src/laya/display/GraphicsBounds.as=======199.999950/199.999950
 /**
 *@private
 *Graphic bounds数据类
@@ -4162,7 +4162,7 @@ var GraphicsBounds=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/SpriteConst.as=======199.999946/199.999946
+	//file:///E:/LayaAirMaster/core/src/laya/display/SpriteConst.as=======199.999946/199.999946
 /**
 *@private
 */
@@ -4243,7 +4243,7 @@ var SpriteConst=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/events/Event.as=======199.999944/199.999944
+	//file:///E:/LayaAirMaster/core/src/laya/events/Event.as=======199.999944/199.999944
 /**
 *<code>Event</code> 是事件类型的集合。一般当发生事件时，<code>Event</code> 对象将作为参数传递给事件侦听器。
 */
@@ -4423,7 +4423,7 @@ var Event=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/events/Keyboard.as=======199.999943/199.999943
+	//file:///E:/LayaAirMaster/core/src/laya/events/Keyboard.as=======199.999943/199.999943
 /**
 *<code>Keyboard</code> 类的属性是一些常数，这些常数表示控制游戏时最常用的键。
 */
@@ -4534,7 +4534,7 @@ var Keyboard=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/events/KeyBoardManager.as=======199.999942/199.999942
+	//file:///E:/LayaAirMaster/core/src/laya/events/KeyBoardManager.as=======199.999942/199.999942
 /**
 *<p><code>KeyBoardManager</code> 是键盘事件管理类。该类从浏览器中接收键盘事件，并派发该事件。</p>
 *<p>派发事件时若 Stage.focus 为空则只从 Stage 上派发该事件，否则将从 Stage.focus 对象开始一直冒泡派发该事件。所以在 Laya.stage 上监听键盘事件一定能够收到，如果在其他地方监听，则必须处在Stage.focus的冒泡链上才能收到该事件。</p>
@@ -4585,7 +4585,7 @@ var KeyBoardManager=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/events/KeyLocation.as=======199.999941/199.999941
+	//file:///E:/LayaAirMaster/core/src/laya/events/KeyLocation.as=======199.999941/199.999941
 /**
 *<p><code>KeyLocation</code> 类包含表示在键盘或类似键盘的输入设备上按键位置的常量。</p>
 *<p><code>KeyLocation</code> 常数用在键盘事件对象的 <code>keyLocation </code>属性中。</p>
@@ -4602,7 +4602,7 @@ var KeyLocation=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/events/MouseManager.as=======199.999940/199.999940
+	//file:///E:/LayaAirMaster/core/src/laya/events/MouseManager.as=======199.999940/199.999940
 /**
 *<p><code>MouseManager</code> 是鼠标、触摸交互管理器。</p>
 *<p>鼠标事件流包括捕获阶段、目标阶段、冒泡阶段。<br/>
@@ -4917,7 +4917,7 @@ var MouseManager=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/events/TouchManager.as=======199.999939/199.999939
+	//file:///E:/LayaAirMaster/core/src/laya/events/TouchManager.as=======199.999939/199.999939
 /**
 *@private
 *Touch事件管理类，处理多点触控下的鼠标事件
@@ -5245,7 +5245,7 @@ var TouchManager=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/filters/Filter.as=======199.999937/199.999937
+	//file:///E:/LayaAirMaster/core/src/laya/filters/Filter.as=======199.999937/199.999937
 /**
 *<code>Filter</code> 是滤镜基类。
 */
@@ -5272,7 +5272,7 @@ var Filter=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/filters/ColorFilterAction.as=======199.999936/199.999936
+	//file:///E:/LayaAirMaster/core/src/laya/filters/ColorFilterAction.as=======199.999936/199.999936
 /**
 *@private
 *<code>ColorFilterAction</code> 是一个颜色滤镜应用类。
@@ -5326,7 +5326,7 @@ var ColorFilterAction=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/maths/Bezier.as=======199.999934/199.999934
+	//file:///E:/LayaAirMaster/core/src/laya/maths/Bezier.as=======199.999934/199.999934
 /**
 *@private
 *计算贝塞尔曲线的工具类。
@@ -5428,7 +5428,7 @@ var Bezier=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/maths/GrahamScan.as=======199.999933/199.999933
+	//file:///E:/LayaAirMaster/core/src/laya/maths/GrahamScan.as=======199.999933/199.999933
 /**
 *@private
 *凸包算法。
@@ -5551,7 +5551,7 @@ var GrahamScan=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/maths/MathUtil.as=======199.999932/199.999932
+	//file:///E:/LayaAirMaster/core/src/laya/maths/MathUtil.as=======199.999932/199.999932
 /**
 *@private
 *<code>MathUtil</code> 是一个数据处理工具类。
@@ -5658,7 +5658,7 @@ var MathUtil=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/maths/Matrix.as=======199.999931/199.999931
+	//file:///E:/LayaAirMaster/core/src/laya/maths/Matrix.as=======199.999931/199.999931
 /**
 *<p> <code>Matrix</code> 类表示一个转换矩阵，它确定如何将点从一个坐标空间映射到另一个坐标空间。</p>
 *<p>您可以对一个显示对象执行不同的图形转换，方法是设置 Matrix 对象的属性，将该 Matrix 对象应用于 Transform 对象的 matrix 属性，然后应用该 Transform 对象作为显示对象的 transform 属性。这些转换函数包括平移（x 和 y 重新定位）、旋转、缩放和倾斜。</p>
@@ -6057,7 +6057,7 @@ var Matrix=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/maths/Point.as=======199.999930/199.999930
+	//file:///E:/LayaAirMaster/core/src/laya/maths/Point.as=======199.999930/199.999930
 /**
 *<code>Point</code> 对象表示二维坐标系统中的某个位置，其中 x 表示水平轴，y 表示垂直轴。
 */
@@ -6148,7 +6148,7 @@ var Point=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/maths/Rectangle.as=======199.999929/199.999929
+	//file:///E:/LayaAirMaster/core/src/laya/maths/Rectangle.as=======199.999929/199.999929
 /**
 *<p><code>Rectangle</code> 对象是按其位置（由它左上角的点 (x,y)确定）以及宽度和高度定义的区域。</p>
 *<p>Rectangle 类的 x、y、width 和 height 属性相互独立；更改一个属性的值不会影响其他属性。</p>
@@ -6392,7 +6392,7 @@ var Rectangle=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/media/SoundManager.as=======199.999924/199.999924
+	//file:///E:/LayaAirMaster/core/src/laya/media/SoundManager.as=======199.999924/199.999924
 /**
 *<code>SoundManager</code> 是一个声音管理类。提供了对背景音乐、音效的播放控制方法。
 *引擎默认有两套声音方案：WebAudio和H5Audio
@@ -6709,7 +6709,7 @@ var SoundManager=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/net/AtlasInfoManager.as=======199.999920/199.999920
+	//file:///E:/LayaAirMaster/core/src/laya/net/AtlasInfoManager.as=======199.999920/199.999920
 /**
 *@private
 */
@@ -6747,7 +6747,7 @@ var AtlasInfoManager=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/net/LocalStorage.as=======199.999915/199.999915
+	//file:///E:/LayaAirMaster/core/src/laya/net/LocalStorage.as=======199.999915/199.999915
 /**
 *<p> <code>LocalStorage</code> 类用于没有时间限制的数据存储。</p>
 */
@@ -6837,7 +6837,7 @@ var LocalStorage=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/net/ResourceVersion.as=======199.999913/199.999913
+	//file:///E:/LayaAirMaster/core/src/laya/net/ResourceVersion.as=======199.999913/199.999913
 /**
 *<p>资源版本的生成由layacmd或IDE完成，使用 <code>ResourceVersion</code> 简化使用过程。</p>
 *<p>调用 <code>enable</code> 启用资源版本管理。</p>
@@ -6877,7 +6877,7 @@ var ResourceVersion=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/net/TTFLoader.as=======199.999910/199.999910
+	//file:///E:/LayaAirMaster/core/src/laya/net/TTFLoader.as=======199.999910/199.999910
 /**
 *@private
 */
@@ -7011,7 +7011,7 @@ var TTFLoader=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/net/URL.as=======199.999909/199.999909
+	//file:///E:/LayaAirMaster/core/src/laya/net/URL.as=======199.999909/199.999909
 /**
 *<p><code>URL</code> 提供URL格式化，URL版本管理的类。</p>
 *<p>引擎加载资源的时候，会自动调用formatURL函数格式化URL路径</p>
@@ -7095,7 +7095,7 @@ var URL=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/renders/Render.as=======199.999906/199.999906
+	//file:///E:/LayaAirMaster/core/src/laya/renders/Render.as=======199.999906/199.999906
 /**
 *@private
 *<code>Render</code> 是渲染管理类。它是一个单例，可以使用 Laya.render 访问。
@@ -7155,7 +7155,7 @@ var Render=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/renders/RenderSprite.as=======199.999905/199.999905
+	//file:///E:/LayaAirMaster/core/src/laya/renders/RenderSprite.as=======199.999905/199.999905
 /**
 *@private
 *精灵渲染器
@@ -7462,7 +7462,7 @@ var RenderSprite=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/resource/Context.as=======199.999902/199.999902
+	//file:///E:/LayaAirMaster/core/src/laya/resource/Context.as=======199.999902/199.999902
 /**
 *@private
 *Context扩展类
@@ -7929,7 +7929,7 @@ var Context=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/resource/ResourceManager.as=======199.999895/199.999895
+	//file:///E:/LayaAirMaster/core/src/laya/resource/ResourceManager.as=======199.999895/199.999895
 /**
 *@private
 *<code>ResourceManager</code> 是资源管理类。它用于资源的载入、获取、销毁。
@@ -8116,7 +8116,7 @@ var ResourceManager=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/system/System.as=======199.999888/199.999888
+	//file:///E:/LayaAirMaster/core/src/laya/system/System.as=======199.999888/199.999888
 /**
 *@private
 */
@@ -8135,7 +8135,7 @@ var System=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/Browser.as=======199.999887/199.999887
+	//file:///E:/LayaAirMaster/core/src/laya/utils/Browser.as=======199.999887/199.999887
 /**
 *<code>Browser</code> 是浏览器代理类。封装浏览器及原生 js 提供的一些功能。
 */
@@ -8317,7 +8317,7 @@ var Browser=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/Byte.as=======199.999886/199.999886
+	//file:///E:/LayaAirMaster/core/src/laya/utils/Byte.as=======199.999886/199.999886
 /**
 *<p> <code>Byte</code> 类提供用于优化读取、写入以及处理二进制数据的方法和属性。</p>
 *<p> <code>Byte</code> 类适用于需要在字节层访问数据的高级开发人员。</p>
@@ -8981,7 +8981,7 @@ var Byte=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/CacheManger.as=======199.999885/199.999885
+	//file:///E:/LayaAirMaster/core/src/laya/utils/CacheManger.as=======199.999885/199.999885
 /**
 *@private
 *对象缓存统一管理类
@@ -9047,7 +9047,7 @@ var CacheManger=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/CallLater.as=======199.999884/199.999884
+	//file:///E:/LayaAirMaster/core/src/laya/utils/CallLater.as=======199.999884/199.999884
 /**
 *@private
 */
@@ -9163,7 +9163,7 @@ var CallLater=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/ClassUtils.as=======199.999882/199.999882
+	//file:///E:/LayaAirMaster/core/src/laya/utils/ClassUtils.as=======199.999882/199.999882
 /**
 *<code>ClassUtils</code> 是一个类工具类。
 */
@@ -9411,7 +9411,7 @@ var ClassUtils=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/Dragging.as=======199.999880/199.999880
+	//file:///E:/LayaAirMaster/core/src/laya/utils/Dragging.as=======199.999880/199.999880
 /**
 *@private
 *<code>Dragging</code> 类是触摸滑动控件。
@@ -9661,7 +9661,7 @@ var Dragging=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/Ease.as=======199.999879/199.999879
+	//file:///E:/LayaAirMaster/core/src/laya/utils/Ease.as=======199.999879/199.999879
 /**
 *<code>Ease</code> 类定义了缓动函数，以便实现 <code>Tween</code> 动画的缓动效果。
 */
@@ -9871,7 +9871,7 @@ var Ease=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/FontInfo.as=======199.999878/199.999878
+	//file:///E:/LayaAirMaster/core/src/laya/utils/FontInfo.as=======199.999878/199.999878
 //class laya.utils.FontInfo
 var FontInfo=(function(){
 	function FontInfo(font){
@@ -9944,7 +9944,7 @@ var FontInfo=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/HitArea.as=======199.999875/199.999875
+	//file:///E:/LayaAirMaster/core/src/laya/utils/HitArea.as=======199.999875/199.999875
 /**
 *鼠标点击区域，可以设置绘制一系列矢量图作为点击区域和非点击区域（目前只支持圆形，矩形，多边形）
 *
@@ -10069,7 +10069,7 @@ var HitArea=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/HTMLChar.as=======199.999874/199.999874
+	//file:///E:/LayaAirMaster/core/src/laya/utils/HTMLChar.as=======199.999874/199.999874
 /**
 *@private
 *<code>HTMLChar</code> 是一个 HTML 字符类。
@@ -10152,7 +10152,7 @@ var HTMLChar=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/Log.as=======199.999873/199.999873
+	//file:///E:/LayaAirMaster/core/src/laya/utils/Log.as=======199.999873/199.999873
 /**
 *<code>Log</code> 类用于在界面内显示日志记录信息。
 *注意：在加速器内不可使用
@@ -10212,7 +10212,7 @@ var Log=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/Mouse.as=======199.999872/199.999872
+	//file:///E:/LayaAirMaster/core/src/laya/utils/Mouse.as=======199.999872/199.999872
 /**
 *<code>Mouse</code> 类用于控制鼠标光标样式。
 */
@@ -10261,7 +10261,7 @@ var Mouse=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/PerfData.as=======199.999871/199.999871
+	//file:///E:/LayaAirMaster/core/src/laya/utils/PerfData.as=======199.999871/199.999871
 //class laya.utils.PerfData
 var PerfData=(function(){
 	function PerfData(id,color,name,scale){
@@ -10289,7 +10289,7 @@ var PerfData=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/Pool.as=======199.999869/199.999869
+	//file:///E:/LayaAirMaster/core/src/laya/utils/Pool.as=======199.999869/199.999869
 /**
 *<p> <code>Pool</code> 是对象池类，用于对象的存储、重复使用。</p>
 *<p>合理使用对象池，可以有效减少对象创建的开销，避免频繁的垃圾回收，从而优化游戏流畅度。</p>
@@ -10365,7 +10365,7 @@ var Pool=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/PoolCache.as=======199.999868/199.999868
+	//file:///E:/LayaAirMaster/core/src/laya/utils/PoolCache.as=======199.999868/199.999868
 /**
 *@private
 *基于个数的对象缓存管理器
@@ -10420,7 +10420,7 @@ var PoolCache=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/RunDriver.as=======199.999867/199.999867
+	//file:///E:/LayaAirMaster/core/src/laya/utils/RunDriver.as=======199.999867/199.999867
 /**
 *@private
 */
@@ -10498,7 +10498,7 @@ var RunDriver=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/SceneUtils.as=======199.999866/199.999866
+	//file:///E:/LayaAirMaster/core/src/laya/utils/SceneUtils.as=======199.999866/199.999866
 /**
 *@private 场景辅助类
 */
@@ -10844,7 +10844,7 @@ var SceneUtils=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/Stat.as=======199.999863/199.999863
+	//file:///E:/LayaAirMaster/core/src/laya/utils/Stat.as=======199.999863/199.999863
 /**
 *<p> <code>Stat</code> 是一个性能统计面板，可以实时更新相关的性能参数。</p>
 *<p>参与统计的性能参数如下（所有参数都是每大约1秒进行更新）：<br/>
@@ -11116,7 +11116,7 @@ var Stat=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/StringKey.as=======199.999862/199.999862
+	//file:///E:/LayaAirMaster/core/src/laya/utils/StringKey.as=======199.999862/199.999862
 /**
 *@private
 *<code>StringKey</code> 类用于存取字符串对应的数字。
@@ -11155,7 +11155,7 @@ var StringKey=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/Timer.as=======199.999859/199.999859
+	//file:///E:/LayaAirMaster/core/src/laya/utils/Timer.as=======199.999859/199.999859
 /**
 *<code>Timer</code> 是时钟管理类。它是一个单例，不要手动实例化此类，应该通过 Laya.timer 访问。
 */
@@ -11481,7 +11481,7 @@ var Timer=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/Tween.as=======199.999857/199.999857
+	//file:///E:/LayaAirMaster/core/src/laya/utils/Tween.as=======199.999857/199.999857
 /**
 *<code>Tween</code> 是一个缓动类。使用此类能够实现对目标对象属性的渐变。
 */
@@ -11809,7 +11809,7 @@ var Tween=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/Utils.as=======199.999856/199.999856
+	//file:///E:/LayaAirMaster/core/src/laya/utils/Utils.as=======199.999856/199.999856
 /**
 *<code>Utils</code> 是工具类。
 */
@@ -12037,7 +12037,7 @@ var Utils=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/VectorGraphManager.as=======199.999855/199.999855
+	//file:///E:/LayaAirMaster/core/src/laya/utils/VectorGraphManager.as=======199.999855/199.999855
 /**
 *@private
 *TODO:
@@ -12171,7 +12171,7 @@ var VectorGraphManager=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/WeakObject.as=======199.999854/199.999854
+	//file:///E:/LayaAirMaster/core/src/laya/utils/WeakObject.as=======199.999854/199.999854
 /**
 *封装弱引用WeakMap
 *如果支持WeakMap，则使用WeakMap，如果不支持，则用Object代替
@@ -12276,7 +12276,7 @@ var WeakObject=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/WordText.as=======199.999853/199.999853
+	//file:///E:/LayaAirMaster/core/src/laya/utils/WordText.as=======199.999853/199.999853
 /**
 *@private
 */
@@ -12339,7 +12339,7 @@ var WordText=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/core/src/laya/components/Script.as=======98.999992/98.999992
+	//file:///E:/LayaAirMaster/core/src/laya/components/Script.as=======98.999992/98.999992
 /**
 *<code>Script</code> 类用于创建脚本的父类，该类为抽象类，不允许实例。
 *组件的生命周期
@@ -12590,7 +12590,7 @@ var Script=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/Node.as=======98.999979/98.999979
+	//file:///E:/LayaAirMaster/core/src/laya/display/Node.as=======98.999979/98.999979
 /**
 *<code>Node</code> 类是可放在显示列表中的所有对象的基类。该显示列表管理 Laya 运行时中显示的所有对象。使用 Node 类排列显示列表中的显示对象。Node 对象可以有子显示对象。
 */
@@ -13414,7 +13414,7 @@ var Node=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/media/h5audio/AudioSound.as=======98.999917/98.999917
+	//file:///E:/LayaAirMaster/core/src/laya/media/h5audio/AudioSound.as=======98.999917/98.999917
 /**
 *@private
 *使用Audio标签播放声音
@@ -13588,7 +13588,7 @@ var AudioSound=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/media/SoundChannel.as=======98.999915/98.999915
+	//file:///E:/LayaAirMaster/core/src/laya/media/SoundChannel.as=======98.999915/98.999915
 /**
 *<p> <code>SoundChannel</code> 用来控制程序中的声音。每个声音均分配给一个声道，而且应用程序可以具有混合在一起的多个声道。</p>
 *<p> <code>SoundChannel</code> 类包含控制声音的播放、暂停、停止、音量的方法，以及获取声音的播放状态、总时间、当前播放时间、总循环次数、播放地址等信息的方法。</p>
@@ -13672,7 +13672,7 @@ var SoundChannel=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/media/Sound.as=======98.999914/98.999914
+	//file:///E:/LayaAirMaster/core/src/laya/media/Sound.as=======98.999914/98.999914
 /**
 *<code>Sound</code> 类是用来播放控制声音的类。
 *引擎默认有两套声音方案，优先使用WebAudio播放声音，如果WebAudio不可用，则用H5Audio播放，H5Audio在部分机器上有兼容问题（比如不能混音，播放有延迟等）。
@@ -13717,7 +13717,7 @@ var Sound=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/media/webaudio/WebAudioSound.as=======98.999911/98.999911
+	//file:///E:/LayaAirMaster/core/src/laya/media/webaudio/WebAudioSound.as=======98.999911/98.999911
 /**
 *@private
 *web audio api方式播放声音
@@ -13940,7 +13940,7 @@ var WebAudioSound=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/css/TextStyle.as=======98.999909/98.999909
+	//file:///E:/LayaAirMaster/core/src/laya/display/css/TextStyle.as=======98.999909/98.999909
 /**
 *文本的样式类
 */
@@ -14048,7 +14048,7 @@ var TextStyle=(function(_super){
 })(SpriteStyle)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/net/HttpRequest.as=======98.999908/98.999908
+	//file:///E:/LayaAirMaster/core/src/laya/net/HttpRequest.as=======98.999908/98.999908
 /**
 *<p> <code>HttpRequest</code> 通过封装 HTML <code>XMLHttpRequest</code> 对象提供了对 HTTP 协议的完全的访问，包括做出 POST 和 HEAD 请求以及普通的 GET 请求的能力。 <code>HttpRequest</code> 只提供以异步的形式返回 Web 服务器的响应，并且能够以文本或者二进制的形式返回内容。</p>
 *<p><b>注意：</b>建议每次请求都使用新的 <code>HttpRequest</code> 对象，因为每次调用该对象的send方法时，都会清空之前设置的数据，并重置 HTTP 请求的状态，这会导致之前还未返回响应的请求被重置，从而得不到之前请求的响应结果。
@@ -14211,7 +14211,7 @@ var HttpRequest=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/net/Loader.as=======98.999907/98.999907
+	//file:///E:/LayaAirMaster/core/src/laya/net/Loader.as=======98.999907/98.999907
 /**
 *<code>Loader</code> 类可用来加载文本、JSON、XML、二进制、图像等资源。
 */
@@ -14688,7 +14688,7 @@ var Loader=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/net/LoaderManager.as=======98.999906/98.999906
+	//file:///E:/LayaAirMaster/core/src/laya/net/LoaderManager.as=======98.999906/98.999906
 /**
 *<p> <code>LoaderManager</code> 类用于用于批量加载资源。此类是单例，不要手动实例化此类，请通过Laya.loader访问。</p>
 *<p>全部队列加载完成，会派发 Event.COMPLETE 事件；如果队列中任意一个加载失败，会派发 Event.ERROR 事件，事件回调参数值为加载出错的资源地址。</p>
@@ -15237,7 +15237,7 @@ var LoaderManager=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/net/SceneLoader.as=======98.999901/98.999901
+	//file:///E:/LayaAirMaster/core/src/laya/net/SceneLoader.as=======98.999901/98.999901
 /**
 *@private
 *场景资源加载器
@@ -15342,7 +15342,7 @@ var SceneLoader=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/net/Socket.as=======98.999900/98.999900
+	//file:///E:/LayaAirMaster/core/src/laya/net/Socket.as=======98.999900/98.999900
 /**
 *<p> <code>Socket</code> 封装了 HTML5 WebSocket ，允许服务器端与客户端进行全双工（full-duplex）的实时通信，并且允许跨域通信。在建立连接后，服务器和 Browser/Client Agent 都能主动的向对方发送或接收文本和二进制数据。</p>
 *<p>要使用 <code>Socket</code> 类的方法，请先使用构造函数 <code>new Socket</code> 创建一个 <code>Socket</code> 对象。 <code>Socket</code> 以异步方式传输和接收数据。</p>
@@ -15577,7 +15577,7 @@ var Socket=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/net/WorkerLoader.as=======98.999897/98.999897
+	//file:///E:/LayaAirMaster/core/src/laya/net/WorkerLoader.as=======98.999897/98.999897
 /**
 *@private
 *Worker Image加载器
@@ -15718,7 +15718,7 @@ var WorkerLoader=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/resource/Resource.as=======98.999892/98.999892
+	//file:///E:/LayaAirMaster/core/src/laya/resource/Resource.as=======98.999892/98.999892
 /**
 *@private
 *<code>Resource</code> 资源存取类。
@@ -16023,7 +16023,7 @@ var Resource=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/resource/Texture.as=======98.999883/98.999883
+	//file:///E:/LayaAirMaster/core/src/laya/resource/Texture.as=======98.999883/98.999883
 /**
 *<code>Texture</code> 是一个纹理处理类。
 */
@@ -16354,7 +16354,7 @@ var Texture=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/filters/ColorFilter.as=======98.999875/98.999875
+	//file:///E:/LayaAirMaster/core/src/laya/filters/ColorFilter.as=======98.999875/98.999875
 /**
 *<p><code>ColorFilter</code> 是颜色滤镜。使用 ColorFilter 类可以将 4 x 5 矩阵转换应用于输入图像上的每个像素的 RGBA 颜色和 Alpha 值，以生成具有一组新的 RGBA 颜色和 Alpha 值的结果。该类允许饱和度更改、色相旋转、亮度转 Alpha 以及各种其他效果。您可以将滤镜应用于任何显示对象（即，从 Sprite 类继承的对象）。</p>
 *<p>注意：对于 RGBA 值，最高有效字节代表红色通道值，其后的有效字节分别代表绿色、蓝色和 Alpha 通道值。</p>
@@ -16580,7 +16580,7 @@ var ColorFilter=(function(_super){
 })(Filter)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/TimeLine.as=======98.999850/98.999850
+	//file:///E:/LayaAirMaster/core/src/laya/utils/TimeLine.as=======98.999850/98.999850
 /**
 *<code>TimeLine</code> 是一个用来创建时间轴动画的类。
 */
@@ -17023,7 +17023,7 @@ var TimeLine=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/Sprite.as=======97.999970/97.999970
+	//file:///E:/LayaAirMaster/core/src/laya/display/Sprite.as=======97.999970/97.999970
 /**
 *<p> <code>Sprite</code> 是基本的显示图形的显示列表节点。 <code>Sprite</code> 默认没有宽高，默认不接受鼠标事件。通过 <code>graphics</code> 可以绘制图片或者矢量图，支持旋转，缩放，位移等操作。<code>Sprite</code>同时也是容器类，可用来添加多个子节点。</p>
 *<p>注意： <code>Sprite</code> 默认没有宽高，可以通过<code>getBounds</code>函数获取；也可手动设置宽高；还可以设置<code>autoSize=true</code>，然后再获取宽高。<code>Sprite</code>的宽高一般用于进行碰撞检测和排版，并不影响显示图像大小，如果需要更改显示图像大小，请使用 <code>scaleX</code> ， <code>scaleY</code> ， <code>scale</code>。</p>
@@ -18498,7 +18498,7 @@ var Sprite=(function(_super){
 })(Node)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/media/h5audio/AudioSoundChannel.as=======97.999842/97.999842
+	//file:///E:/LayaAirMaster/core/src/laya/media/h5audio/AudioSoundChannel.as=======97.999842/97.999842
 /**
 *@private
 *audio标签播放声音的音轨控制
@@ -18651,7 +18651,7 @@ var AudioSoundChannel=(function(_super){
 })(SoundChannel)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/media/webaudio/WebAudioSoundChannel.as=======97.999836/97.999836
+	//file:///E:/LayaAirMaster/core/src/laya/media/webaudio/WebAudioSoundChannel.as=======97.999836/97.999836
 /**
 *@private
 *web audio api方式播放声音的音轨控制
@@ -18851,7 +18851,7 @@ var WebAudioSoundChannel=(function(_super){
 })(SoundChannel)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/resource/Bitmap.as=======97.999796/97.999796
+	//file:///E:/LayaAirMaster/core/src/laya/resource/Bitmap.as=======97.999796/97.999796
 /**
 *@private
 *<code>Bitmap</code> 图片资源类。
@@ -18893,7 +18893,7 @@ var Bitmap=(function(_super){
 })(Resource)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/AnimationBase.as=======96.999962/96.999962
+	//file:///E:/LayaAirMaster/core/src/laya/display/AnimationBase.as=======96.999962/96.999962
 /**
 *<p>动画基类，提供了基础的动画播放控制方法和帧标签事件相关功能。</p>
 *<p>可以继承此类，但不要直接实例化此类，因为有些方法需要由子类实现。</p>
@@ -19145,7 +19145,7 @@ var AnimationBase=(function(_super){
 })(Sprite)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/Text.as=======96.999918/96.999918
+	//file:///E:/LayaAirMaster/core/src/laya/display/Text.as=======96.999918/96.999918
 /**
 *<p> <code>Text</code> 类用于创建显示对象以显示文本。</p>
 *<p>
@@ -20091,7 +20091,7 @@ var Text=(function(_super){
 })(Sprite)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/Scene.as=======96.999917/96.999917
+	//file:///E:/LayaAirMaster/core/src/laya/display/Scene.as=======96.999917/96.999917
 /**
 *场景类，负责场景创建，加载，销毁等功能
 *场景被从节点移除后，并不会被自动垃圾机制回收，如果想回收，请调用destroy接口，可以通过unDestroyedScenes属性查看还未被销毁的场景列表
@@ -20363,7 +20363,7 @@ var Scene=(function(_super){
 })(Sprite)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/Stage.as=======96.999915/96.999915
+	//file:///E:/LayaAirMaster/core/src/laya/display/Stage.as=======96.999915/96.999915
 /**
 *<p> <code>Stage</code> 是舞台类，显示列表的根节点，所有显示对象都在舞台上显示。通过 Laya.stage 单例访问。</p>
 *<p>Stage提供几种适配模式，不同的适配模式会产生不同的画布大小，画布越大，渲染压力越大，所以要选择合适的适配方案。</p>
@@ -20998,7 +20998,7 @@ var Stage=(function(_super){
 })(Sprite)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/media/SoundNode.as=======96.999893/96.999893
+	//file:///E:/LayaAirMaster/core/src/laya/media/SoundNode.as=======96.999893/96.999893
 /**
 *@private
 */
@@ -21122,7 +21122,7 @@ var SoundNode=(function(_super){
 })(Sprite)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/PerfHUD.as=======96.999840/96.999840
+	//file:///E:/LayaAirMaster/core/src/laya/utils/PerfHUD.as=======96.999840/96.999840
 //class laya.utils.PerfHUD extends laya.display.Sprite
 var PerfHUD=(function(_super){
 	function PerfHUD(){
@@ -21247,7 +21247,7 @@ var PerfHUD=(function(_super){
 })(Sprite)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/resource/HTMLCanvas.as=======96.999697/96.999697
+	//file:///E:/LayaAirMaster/core/src/laya/resource/HTMLCanvas.as=======96.999697/96.999697
 /**
 *<code>HTMLCanvas</code> 是 Html Canvas 的代理类，封装了 Canvas 的属性和方法。
 */
@@ -21355,7 +21355,7 @@ var HTMLCanvas=(function(_super){
 })(Bitmap)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/resource/HTMLImage.as=======96.999696/96.999696
+	//file:///E:/LayaAirMaster/core/src/laya/resource/HTMLImage.as=======96.999696/96.999696
 /**
 *@private
 *<p> <code>HTMLImage</code> 用于创建 HTML Image 元素。</p>
@@ -21404,7 +21404,7 @@ var HTMLImage=(function(_super){
 })(Bitmap)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/Animation.as=======95.999955/95.999955
+	//file:///E:/LayaAirMaster/core/src/laya/display/Animation.as=======95.999955/95.999955
 /**
 *<p> <code>Animation</code> 是Graphics动画类。实现了基于Graphics的动画创建、播放、控制接口。</p>
 *<p>本类使用了动画模版缓存池，它以一定的内存开销来节省CPU开销，当相同的动画模版被多次使用时，相比于每次都创建新的动画模版，使用动画模版缓存池，只需创建一次，缓存之后多次复用，从而节省了动画模版创建的开销。</p>
@@ -21772,7 +21772,7 @@ var Animation=(function(_super){
 })(AnimationBase)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/FrameAnimation.as=======95.999914/95.999914
+	//file:///E:/LayaAirMaster/core/src/laya/display/FrameAnimation.as=======95.999914/95.999914
 /**
 *节点关键帧动画播放类。解析播放IDE内制作的节点动画。
 */
@@ -22011,7 +22011,7 @@ var FrameAnimation=(function(_super){
 })(AnimationBase)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/Input.as=======95.999867/95.999867
+	//file:///E:/LayaAirMaster/core/src/laya/display/Input.as=======95.999867/95.999867
 /**
 *<p><code>Input</code> 类用于创建显示对象以显示和输入文本。</p>
 *<p>Input 类封装了原生的文本输入框，由于不同浏览器的差异，会导致此对象的默认文本的位置与用户点击输入时的文本的位置有少许的偏差。</p>
@@ -22455,7 +22455,7 @@ var Input=(function(_super){
 })(Text)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/display/EffectAnimation.as=======94.999867/94.999867
+	//file:///E:/LayaAirMaster/core/src/laya/display/EffectAnimation.as=======94.999867/94.999867
 /**
 *<p> 动效模板。用于为指定目标对象添加动画效果。每个动效有唯一的目标对象，而同一个对象可以添加多个动效。 当一个动效开始播放时，其他动效会自动停止播放。</p>
 *<p> 可以通过LayaAir IDE创建。 </p>
@@ -22649,7 +22649,7 @@ var EffectAnimation=(function(_super){
 })(FrameAnimation)
 
 
-	//file:///E:/git/layaair-master/core/src/laya/utils/GraphicAnimation.as=======94.999791/94.999791
+	//file:///E:/LayaAirMaster/core/src/laya/utils/GraphicAnimation.as=======94.999791/94.999791
 /**
 *Graphics动画解析器
 *@private
@@ -23077,7 +23077,7 @@ var GraphicAnimation=(function(_super){
 
 (function(window,document,Laya){
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
-	//file:///E:/git/layaair-master/publish/LayaAirPublish/publibs/publish/src/LayaMain.as=======199.999999/199.999999
+	//file:///E:/LayaAirMaster/publish/LayaAirPublish/publibs/publish/src/LayaMain.as=======199.999999/199.999999
 //class LayaMain
 var LayaMain=(function(){
 	/*[COMPILER OPTIONS:normal]*/

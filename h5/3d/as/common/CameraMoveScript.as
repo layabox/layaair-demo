@@ -1,11 +1,8 @@
 package common {
-	import laya.d3.component.Script;
+	import laya.d3.component.Script3D;
 	import laya.d3.core.BaseCamera;
 	import laya.d3.core.Camera;
-	import laya.d3.core.Sprite3D;
-	import laya.d3.core.render.RenderState;
-	import laya.d3.core.scene.Scene;
-	import laya.d3.core.scene.Scene;
+	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Quaternion;
 	import laya.d3.math.Vector3;
 	import laya.events.Event;
@@ -15,8 +12,10 @@ package common {
 	 * ...
 	 * @author
 	 */
-	public class CameraMoveScript extends Script {
+	public class CameraMoveScript extends Script3D {
 		
+		/** @private */
+		protected var _tempVector3:Vector3 = new Vector3();
 		protected var lastMouseX:Number;
 		protected var lastMouseY:Number;
 		protected var yawPitchRoll:Vector3 = new Vector3();
@@ -27,23 +26,29 @@ package common {
 		protected var isMouseDown:Boolean;
 		protected var rotaionSpeed:Number = 0.00006;
 		protected var camera:BaseCamera;
-		protected var scene:Scene;
+		protected var scene:Scene3D;
 		
 		public function CameraMoveScript() {
 		
 		}
 		
-		override public function _initialize(owner:Sprite3D):void {
-			super._initialize(owner);
-			Laya.stage.on(Event.MOUSE_DOWN, this, mouseDown);
-			Laya.stage.on(Event.MOUSE_UP, this, mouseUp);
-			Laya.stage.on(Event.MOUSE_OUT, this, mouseOut);
+		override public function _onAdded():void {
+			Laya.stage.on(Event.RIGHT_MOUSE_DOWN, this, mouseDown);
+			Laya.stage.on(Event.RIGHT_MOUSE_UP, this, mouseUp);
+			//Laya.stage.on(Event.RIGHT_MOUSE_OUT, this, mouseOut);
 			camera = owner as Camera;
 		}
 		
-		override public function _update(state:RenderState):void {
-			super._update(state);
-			updateCamera(state.elapsedTime);
+		override protected function _onDestroy():void {
+			super._onDestroy();
+			Laya.stage.off(Event.RIGHT_MOUSE_DOWN, this, mouseDown);
+			Laya.stage.off(Event.RIGHT_MOUSE_UP, this, mouseUp);
+			//Laya.stage.off(Event.RIGHT_MOUSE_OUT, this, mouseOut);
+		}
+		
+		override public function onUpdate():void {
+			super.onUpdate();
+			updateCamera(Laya.timer.delta);
 		}
 		
 		protected function mouseDown(e:Event):void {
@@ -62,25 +67,53 @@ package common {
 			isMouseDown = false;
 		}
 		
+		/**
+		 * 向前移动。
+		 * @param distance 移动距离。
+		 */
+		public function moveForward(distance:Number):void {
+			_tempVector3.elements[0] = _tempVector3.elements[1] = 0;
+			_tempVector3.elements[2] = distance;
+			camera.transform.translate(_tempVector3);
+		}
+		
+		/**
+		 * 向右移动。
+		 * @param distance 移动距离。
+		 */
+		public function moveRight(distance:Number):void {
+			_tempVector3.elements[1] = _tempVector3.elements[2] = 0;
+			_tempVector3.elements[0] = distance;
+			camera.transform.translate(_tempVector3);
+		}
+		
+		/**
+		 * 向上移动。
+		 * @param distance 移动距离。
+		 */
+		public function moveVertical(distance:Number):void {
+			_tempVector3.elements[0] = _tempVector3.elements[2] = 0;
+			_tempVector3.elements[1] = distance;
+			camera.transform.translate(_tempVector3, false);
+		}
+		
 		protected function updateCamera(elapsedTime:Number):void {
-			if (!isNaN(lastMouseX) && !isNaN(lastMouseY)) {
-				var scene:Scene = owner.scene;
-				KeyBoardManager.hasKeyDown(87) && camera.moveForward(-0.005 * elapsedTime);//W
-				KeyBoardManager.hasKeyDown(83) && camera.moveForward(0.005 * elapsedTime);//S
-				KeyBoardManager.hasKeyDown(65) && camera.moveRight(-0.005 * elapsedTime);//A
-				KeyBoardManager.hasKeyDown(68) && camera.moveRight(0.005 * elapsedTime);//D
-				KeyBoardManager.hasKeyDown(81) && camera.moveVertical(0.005 * elapsedTime);//Q
-				KeyBoardManager.hasKeyDown(69) && camera.moveVertical(-0.005 * elapsedTime);//E
+			if (!isNaN(lastMouseX) && !isNaN(lastMouseY) && isMouseDown) {
+				var scene:Scene3D = owner.scene;
+				KeyBoardManager.hasKeyDown(87) && moveForward(-0.01 * elapsedTime);//W
+				KeyBoardManager.hasKeyDown(83) && moveForward(0.01 * elapsedTime);//S
+				KeyBoardManager.hasKeyDown(65) && moveRight(-0.01 * elapsedTime);//A
+				KeyBoardManager.hasKeyDown(68) && moveRight(0.01 * elapsedTime);//D
+				KeyBoardManager.hasKeyDown(81) && moveVertical(0.01 * elapsedTime);//Q
+				KeyBoardManager.hasKeyDown(69) && moveVertical(-0.01 * elapsedTime);//E
 				
-				if (isMouseDown) {
-					var offsetX:Number = Laya.stage.mouseX - lastMouseX;
-					var offsetY:Number = Laya.stage.mouseY - lastMouseY;
-					
-					var yprElem:Float32Array = yawPitchRoll.elements;
-					yprElem[0] -= offsetX * rotaionSpeed * elapsedTime;
-					yprElem[1] -= offsetY * rotaionSpeed * elapsedTime;
-					updateRotation();
-				}
+				var offsetX:Number = Laya.stage.mouseX - lastMouseX;
+				var offsetY:Number = Laya.stage.mouseY - lastMouseY;
+				
+				var yprElem:Float32Array = yawPitchRoll.elements;
+				yprElem[0] -= offsetX * rotaionSpeed * elapsedTime;
+				yprElem[1] -= offsetY * rotaionSpeed * elapsedTime;
+				updateRotation();
 			}
 			lastMouseX = Laya.stage.mouseX;
 			lastMouseY = Laya.stage.mouseY;
@@ -90,8 +123,8 @@ package common {
 			var yprElem:Float32Array = yawPitchRoll.elements;
 			if (Math.abs(yprElem[1]) < 1.50) {
 				Quaternion.createFromYawPitchRoll(yprElem[0], yprElem[1], yprElem[2], tempRotationZ);
-				 tempRotationZ.cloneTo(camera.transform.localRotation);
-				 camera.transform.localRotation = camera.transform.localRotation;
+				tempRotationZ.cloneTo(camera.transform.localRotation);
+				camera.transform.localRotation = camera.transform.localRotation;
 			}
 		}
 	

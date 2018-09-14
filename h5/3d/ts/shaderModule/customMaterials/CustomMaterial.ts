@@ -10,7 +10,7 @@ class CustomMaterial extends Laya.BaseMaterial {
      *  漫反射贴图。
      */
     public get diffuseTexture(): Laya.BaseTexture {
-        return this._getTexture(CustomMaterial.DIFFUSETEXTURE);
+        return this._shaderValues.getTexture(CustomMaterial.DIFFUSETEXTURE);
     }
 
     /**
@@ -18,7 +18,7 @@ class CustomMaterial extends Laya.BaseMaterial {
      * 漫反射贴图。
      */
     public set diffuseTexture(value: Laya.BaseTexture) {
-        this._setTexture(CustomMaterial.DIFFUSETEXTURE, value);
+        this._shaderValues.setTexture(CustomMaterial.DIFFUSETEXTURE,value);
     }
 
     /**
@@ -26,6 +26,6 @@ class CustomMaterial extends Laya.BaseMaterial {
      * 边缘光照颜色。
      */
     public set marginalColor(value: Laya.Vector3) {
-        this._setColor(CustomMaterial.MARGINALCOLOR, value);
+        this._shaderValues.setVector(CustomMaterial.MARGINALCOLOR, value);
     }
 }

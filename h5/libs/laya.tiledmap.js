@@ -5,7 +5,7 @@
 	var Browser=laya.utils.Browser,Context=laya.resource.Context,HTMLCanvas=laya.resource.HTMLCanvas,Handler=laya.utils.Handler;
 	var Loader=laya.net.Loader,Point=laya.maths.Point,Rectangle=laya.maths.Rectangle,Render=laya.renders.Render;
 	var Sprite=laya.display.Sprite,Texture=laya.resource.Texture;
-	//file:///E:/git/layaair-master/plugins/tiledmap/src/laya/map/TiledMap.as=======199.999777/199.999777
+	//file:///E:/LayaAirMaster/plugins/tiledmap/src/laya/map/TiledMap.as=======199.999777/199.999777
 /**
 *tiledMap是整个地图的核心
 *地图以层级来划分地图（例如：地表层，植被层，建筑层）
@@ -1404,7 +1404,7 @@ var TiledMap=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/plugins/tiledmap/src/laya/map/TileTexSet.as=======199.999773/199.999773
+	//file:///E:/LayaAirMaster/plugins/tiledmap/src/laya/map/TileTexSet.as=======199.999773/199.999773
 /**
 *此类是子纹理类，也包括同类动画的管理
 *TiledMap会把纹理分割成无数子纹理，也可以把其中的某块子纹理替换成一个动画序列
@@ -1559,7 +1559,7 @@ var TileTexSet=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/plugins/tiledmap/src/laya/map/GridSprite.as=======96.999750/96.999750
+	//file:///E:/LayaAirMaster/plugins/tiledmap/src/laya/map/GridSprite.as=======96.999750/96.999750
 /**
 *地图的每层都会分块渲染处理
 *本类就是地图的块数据
@@ -1691,7 +1691,7 @@ var GridSprite=(function(_super){
 })(Sprite)
 
 
-	//file:///E:/git/layaair-master/plugins/tiledmap/src/laya/map/MapLayer.as=======96.999749/96.999749
+	//file:///E:/LayaAirMaster/plugins/tiledmap/src/laya/map/MapLayer.as=======96.999749/96.999749
 /**
 *地图支持多层渲染（例如，地表层，植被层，建筑层等）
 *本类就是层级类
@@ -2097,7 +2097,7 @@ var MapLayer=(function(_super){
 })(Sprite)
 
 
-	//file:///E:/git/layaair-master/plugins/tiledmap/src/laya/map/TileAniSprite.as=======96.999748/96.999748
+	//file:///E:/LayaAirMaster/plugins/tiledmap/src/laya/map/TileAniSprite.as=======96.999748/96.999748
 /**
 *TildMap的动画显示对象（一个动画（TileTexSet），可以绑定多个动画显示对象（TileAniSprite））
 *@author ...

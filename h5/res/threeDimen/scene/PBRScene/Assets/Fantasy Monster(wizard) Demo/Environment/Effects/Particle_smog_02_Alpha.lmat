@@ -1,6 +1,7 @@
 {
 	"version":"LAYAMATERIAL:01",
 	"props":{
+		"type":"Laya.ShurikenParticleMaterial",
 		"name":"Particle_smog_02_Alpha",
 		"cull":0,
 		"blend":1,
@@ -8,21 +9,43 @@
 		"dstBlend":771,
 		"alphaTest":false,
 		"depthWrite":false,
-		"renderQueue":2,
+		"depthTest":515,
+		"renderQueue":3000,
 		"textures":[
 			{
-				"name":"diffuseTexture",
-				"path":"particle_smog_02.png"
+				"name":"texture",
+				"path":"particle_smog_02.png",
+				"constructParams":[
+					128,
+					128,
+					1,
+					false
+				],
+				"propertyParams":{
+					"filterMode":1,
+					"wrapModeU":1,
+					"wrapModeV":1,
+					"anisoLevel":1
+				}
 			}
 		],
 		"vectors":[
 			{
-				"name":"tintColor",
+				"name":"tilingOffset",
+				"value":[
+					1,
+					1,
+					0,
+					0
+				]
+			},
+			{
+				"name":"color",
 				"value":[
 					0.5,
 					0.5,
 					0.5,
-					0.5
+					0.5019608
 				]
 			}
 		],

@@ -1539,7 +1539,7 @@ box2d.b2Vec2.s_t1))}}}};box2d.b2TensorDampingController.prototype.Step.s_damping
 	var Browser=laya.utils.Browser,ClassUtils=laya.utils.ClassUtils,Component=laya.components.Component;
 	var Context=laya.resource.Context,Event=laya.events.Event,EventDispatcher=laya.events.EventDispatcher,Point=laya.maths.Point;
 	var Render=laya.renders.Render,Sprite=laya.display.Sprite,Utils=laya.utils.Utils;
-	//file:///E:/git/layaair-master/physics/src/laya/physics/ColliderBase.as=======98.999271/98.999271
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/ColliderBase.as=======98.999271/98.999271
 /**
 *碰撞体基类
 */
@@ -1592,7 +1592,7 @@ var ColliderBase=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/joint/DistanceJoint.as=======98.999268/98.999268
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/DistanceJoint.as=======98.999268/98.999268
 /**
 *距离关节：两个物体上面各自有一点，两点之间的距离固定不变
 */
@@ -1658,7 +1658,7 @@ var DistanceJoint=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/joint/GearJoint.as=======98.999267/98.999267
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/GearJoint.as=======98.999267/98.999267
 /**
 *齿轮关节：用来模拟两个齿轮间的约束关系，齿轮旋转时，产生的动量有两种输出方式，一种是齿轮本身的角速度，另一种是齿轮表面的线速度
 */
@@ -1710,7 +1710,7 @@ var GearJoint=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/joint/MotorJoint.as=======98.999266/98.999266
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/MotorJoint.as=======98.999266/98.999266
 /**
 *距离关节：两个物体上面各自有一点，两点之间的距离固定不变
 */
@@ -1773,7 +1773,7 @@ var MotorJoint=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/joint/MouseJoint.as=======98.999265/98.999265
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/MouseJoint.as=======98.999265/98.999265
 /**
 *鼠标关节：鼠标关节用于通过鼠标来操控物体。它试图将物体拖向当前鼠标光标的位置。而在旋转方面就没有限制。
 */
@@ -1844,7 +1844,7 @@ var MouseJoint=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/joint/PrismaticJoint.as=======98.999264/98.999264
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/PrismaticJoint.as=======98.999264/98.999264
 /**
 *平移关节：移动关节允许两个物体沿指定轴相对移动，它会阻止相对旋转
 */
@@ -1916,7 +1916,7 @@ var PrismaticJoint=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/joint/PulleyJoint.as=======98.999263/98.999263
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/PulleyJoint.as=======98.999263/98.999263
 /**
 *滑轮关节：它将两个物体接地(ground)并彼此连接，当一个物体上升，另一个物体就会下降
 */
@@ -1982,7 +1982,7 @@ var PulleyJoint=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/joint/RevoluteJoint.as=======98.999262/98.999262
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/RevoluteJoint.as=======98.999262/98.999262
 /**
 *旋转关节强制两个物体共享一个锚点，两个物体相对旋转
 */
@@ -2052,7 +2052,7 @@ var RevoluteJoint=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/joint/RopeJoint.as=======98.999261/98.999261
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/RopeJoint.as=======98.999261/98.999261
 /**
 *绳索关节：限制了两个点之间的最大距离。它能够阻止连接的物体之间的拉伸，即使在很大的负载下
 */
@@ -2110,7 +2110,7 @@ var RopeJoint=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/joint/WeldJoint.as=======98.999260/98.999260
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/WeldJoint.as=======98.999260/98.999260
 /**
 *焊接关节：焊接关节的用途是使两个物体不能相对运动，受到关节的限制，两个刚体的相对位置和角度都保持不变，看上去像一个整体
 */
@@ -2168,7 +2168,7 @@ var WeldJoint=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/joint/WheelJoint.as=======98.999259/98.999259
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/WheelJoint.as=======98.999259/98.999259
 /**
 *轮子关节：围绕节点旋转，包含弹性属性，使得刚体在节点位置发生弹性偏移
 */
@@ -2237,7 +2237,7 @@ var WheelJoint=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/RigidBody.as=======98.999254/98.999254
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/RigidBody.as=======98.999254/98.999254
 /**
 *2D刚体
 */
@@ -2587,7 +2587,7 @@ var RigidBody=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/Physics.as=======98.999250/98.999250
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/Physics.as=======98.999250/98.999250
 /**
 *2D物理引擎，使用Box2d驱动
 */
@@ -2800,7 +2800,7 @@ var Physics=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/BoxCollider.as=======97.998546/97.998546
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/BoxCollider.as=======97.998546/97.998546
 /**
 *2D矩形碰撞体
 */
@@ -2834,7 +2834,7 @@ var BoxCollider=(function(_super){
 })(ColliderBase)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/ChainCollider.as=======97.998544/97.998544
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/ChainCollider.as=======97.998544/97.998544
 /**
 *2D圆形碰撞体
 */
@@ -2875,7 +2875,7 @@ var ChainCollider=(function(_super){
 })(ColliderBase)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/CircleCollider.as=======97.998543/97.998543
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/CircleCollider.as=======97.998543/97.998543
 /**
 *2D圆形碰撞体
 */
@@ -2908,7 +2908,7 @@ var CircleCollider=(function(_super){
 })(ColliderBase)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/PolygonCollider.as=======97.998529/97.998529
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/PolygonCollider.as=======97.998529/97.998529
 /**
 *2D多边形碰撞体
 */
@@ -2948,7 +2948,7 @@ var PolygonCollider=(function(_super){
 })(ColliderBase)
 
 
-	//file:///E:/git/layaair-master/physics/src/laya/physics/PhysicsDebugDraw.as=======96.999229/96.999229
+	//file:///E:/LayaAirMaster/physics/src/laya/physics/PhysicsDebugDraw.as=======96.999229/96.999229
 /**
 *box2d物理辅助线，调用PhysicsDebugDraw.enable()开启
 */

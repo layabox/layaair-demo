@@ -4,7 +4,7 @@ var RenderTextureDemo = (function () {
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
-        this.scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/Arena/Arena.ls"));
+        this.scene = Laya.stage.addChild(Laya.Scene.load("../../res/threeDimen/scene/Arena/Arena.ls"));
         var camera = this.scene.addChild(new Laya.Camera(0, 0.1, 1000));
         camera.transform.translate(new Laya.Vector3(0, 0.5, 1));
         camera.transform.rotate(new Laya.Vector3(-10, 0, 0), true, false);
@@ -20,18 +20,18 @@ var RenderTextureDemo = (function () {
         directionLight.specularColor = new Laya.Vector3(1.0, 1.0, 1.0);
         directionLight.diffuseColor = new Laya.Vector3(1, 1, 1);
         directionLight.direction = new Laya.Vector3(0, -1.0, -1.0);
-        var layaMonkey = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
-        this.layaPlane = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/staticModel/LayaPlane/LayaPlane.lh"));
+        var layaMonkey = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+        this.layaPlane = this.scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/staticModel/LayaPlane/LayaPlane.lh"));
         Laya.loader.create([
-            "res/threeDimen/scene/Arena/Arena.ls",
-            "res/threeDimen/staticModel/LayaPlane/LayaPlane.lh"
+            "../../res/threeDimen/scene/Arena/Arena.ls",
+            "../../res/threeDimen/staticModel/LayaPlane/LayaPlane.lh"
         ], Laya.Handler.create(this, this.onComplete));
     }
     RenderTextureDemo.prototype.onComplete = function () {
         this.setMaterials(this.scene.getChildByName("scene"));
         this.layaPlane.transform.localPosition = new Laya.Vector3(0, 0.5, -1);
-        Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, function () {
-            var changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "渲染目标"));
+        Laya.loader.load(["../../res/threeDimen/ui/button.png"], Laya.Handler.create(this, function () {
+            var changeActionButton = Laya.stage.addChild(new Laya.Button("../../res/threeDimen/ui/button.png", "渲染目标"));
             changeActionButton.size(160, 40);
             changeActionButton.labelBold = true;
             changeActionButton.labelSize = 30;
