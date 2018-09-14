@@ -1,6 +1,7 @@
 {
 	"scripts":[
 	   "libs/bytebuffer.js",
+	   "libs/protobuf.js",
 	   "libs/laya.core.js",
 	   "libs/laya.webgl.js",
 	   "libs/laya.filter.js",
