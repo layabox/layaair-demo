@@ -1,27 +1,25 @@
 class TerrainScene {
     constructor() {
-        Laya3D.init(0, 0, true);
+        Laya.Shader3D.debugMode = true;
+        Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
-
-        var scene: Laya.Scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Laya.Scene;
-
-        scene.once(Laya.Event.HIERARCHY_LOADED, this, function (): void {
-
-            var camera:Laya.Camera = scene.getChildByName("Scenes").getChildByName("Main Camera") as Laya.Camera;
+        
+    	Laya.Scene3D.load("../../res/threeDimen/scene/TerrainScene/XunLongShi.ls", Laya.Handler.create(null, function(scene:Laya.Scene3D):void {
+            Laya.stage.addChild(scene);
+            var camera:Laya.Camera = scene.getChildByName("Main Camera") as Laya.Camera;
+            camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
             camera.addComponent(CameraMoveScript);
-                
-            var skyBox:Laya.SkyBox = new Laya.SkyBox();
-            skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox3/skyCube.ltc");
-            camera.sky = skyBox;
-                
-            var meshSprite3D:Laya.MeshSprite3D = scene.getChildByName('Scenes').getChildByName('HeightMap') as Laya.MeshSprite3D;
-            meshSprite3D.active = false;
-                
-            var meshSprite3D1:Laya.MeshSprite3D = scene.getChildByName('Scenes').getChildByName('Area') as Laya.MeshSprite3D;
-            meshSprite3D1.active = false;
-        });
+            
+            Laya.BaseMaterial.load("../../res/threeDimen/skyBox/skyBox3/skyBox3.lmat", Laya.Handler.create(null, function(mat:Laya.BaseMaterial):void {
+                camera.skyboxMaterial = mat;
+            }));
+            
+            (scene.getChildByName('Scenes').getChildByName('HeightMap') as Laya.MeshSprite3D).active = false;
+            (scene.getChildByName('Scenes').getChildByName('Area') as Laya.MeshSprite3D).active = false;
+        }))
     }
+    
 }
 new TerrainScene;

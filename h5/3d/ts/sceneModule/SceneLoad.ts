@@ -1,20 +1,15 @@
 class SceneLoad {
     constructor() {
-        Laya3D.init(0, 0, true);
+        Laya3D.init(0, 0);
+        Laya.Stat.show();
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
-        Laya.Stat.show();
-
-        var scene: Laya.Scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/Arena/Arena.ls")) as Laya.Scene;
-
-        var camera: Laya.Camera = scene.addChild(new Laya.Camera(0, 0.1, 100)) as Laya.Camera;
-        camera.transform.translate(new Laya.Vector3(0, 2, 0));
-        camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
-        camera.addComponent(CameraMoveScript);
-
-        var skyBox: Laya.SkyBox = new Laya.SkyBox();
-        skyBox.textureCube = Laya.TextureCube.load("res/threeDimen/skyBox/skyBox2/skyCube.ltc");
-        camera.sky = skyBox;
+        
+        Laya.Scene3D.load("../../res/threeDimen/scene/HydropowerScene/main_scene.ls", Laya.Handler.create(null, function(scene:Laya.Scene3D):void {
+            Laya.stage.addChild(scene) as Laya.Scene3D;
+            var camera:Laya.Camera = scene.getChildByName("Main Camera") as Laya.Camera;
+            camera.addComponent(CameraMoveScript);
+        }))
     }
 }
 new SceneLoad;

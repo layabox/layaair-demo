@@ -1,0 +1,17 @@
+{
+	"scripts":[
+	   "libs/bytebuffer.js",
+	   "libs/protobuf.js",
+	   "libs/laya.core.js",
+	   "libs/laya.webgl.js",
+	   "libs/laya.filter.js",
+	   "libs/laya.particle.js",
+	   "libs/laya.ani.js",
+	   "libs/laya.ui.js",
+	   "libs/laya.html.js",
+	   "libs/laya.tiledmap.js",
+	   "libs/laya.device.js",
+	   "conchInit.js"
+	   ],
+	"screenOrientation":"sensor_landscape"
+}

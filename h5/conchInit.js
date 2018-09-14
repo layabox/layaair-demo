@@ -1,4 +1,12 @@
-﻿var list=[
+﻿function GetQueryString(name){
+	var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)");
+	var r = window.location.search.substr(1).match(reg);
+	if(r!=null)return  unescape(r[2]); return null;
+}
+
+var id = GetQueryString("id") || 0;
+
+var list = [
 	"Animation_Altas",
 	"Animation_SWF",
 	"BlendMode_Lighter",
@@ -6,6 +14,14 @@
 	"Filters_Blur",
 	"Filters_Color",
 	"Filters_Glow",
+	"HitTest_Point",
+	"HitTest_Rectangular",
+	"InputDevice_Compass",
+	"InputDevice_GluttonousSnake",
+	"InputDevice_Map",
+	"InputDevice_Media",
+	"InputDevice_Shake",
+	"InputDevice_Video",
 	"Interaction_CustomEvent",
 	"Interaction_Drag",
 	"Interaction_FixInteractiveRegion",
@@ -27,13 +43,20 @@
 	"Particle_T1",
 	"Particle_T2",
 	"Particle_T3",
+	"PerformanceTest_Cartoon2",
 	"PerformanceTest_Cartoon",
-	"PerformanceTest_Legend",
 	"PerformanceTest_Maggots",
 	"PerformanceTest_Skeleton",
-	"Physics_Cloth",
-	"Physics_NewtonsCradle",
-	"Physics_Slingshot",
+	"PIXI_Example_04",
+	"PIXI_Example_05",
+	"PIXI_Example_21",
+	"PIXI_Example_23",
+	"Skeleton_ChangeSkin",
+	"Skeleton_MultiTexture",
+	"Skeleton_SpineEvent",
+	"Skeleton_SpineIkMesh",
+	"Skeleton_SpineStretchyman",
+	"Skeleton_SpineVine",
 	"SmartScale_Align_Contral",
 	"SmartScale_Landscape",
 	"SmartScale_Portrait",
@@ -48,6 +71,7 @@
 	"Sprite_DisplayImage",
 	"Sprite_DrawPath",
 	"Sprite_DrawShapes",
+	"Sprite_Guide",
 	"Sprite_MagnifyingGlass",
 	"Sprite_NodeControl",
 	"Sprite_Pivot",
@@ -95,26 +119,10 @@
 	"UI_Tab",
 	"UI_TextArea",
 	"UI_Tree",
-	"InputDevice_Map",
-	"InputDevice_Media",
-	"InputDevice_Shake",
-	"InputDevice_Video",
-	"PerformanceTest_Cartoon2",
-	"PIXI_Example_04",
-	"PIXI_Example_05",
-	"PIXI_Example_21",
-	"PIXI_Example_23",
-	"Skeleton_ChangeSkin",
-	"Skeleton_MultiTexture",
-	"Skeleton_SpineEvent",
-	"Skeleton_SpineIkMesh",
-	"Skeleton_SpineStretchyman",
-	"Skeleton_SpineVine",
-	"Sprite_Guide"
+	"UI_Panel",
  ];
 
- 
- var url="samples/"+list[id]+".js";
+ var url="2d/js/"+list[id]+".js";
  var xhr = new XMLHttpRequest();
  xhr.open('GET',url,true);
  xhr.setRequestHeader("Content-Type","application/x-www-form-urlencoded"); 
@@ -123,6 +131,7 @@
  }
 //if(window.conch)
 //PerfShow(true);
+
  xhr.onload=function(e){
     
      window._mouselist=[];
@@ -144,26 +153,24 @@
 		  return false;
 		}
 	 }
-	 window.conch&&conch.showLoadingView(false);
+	 // window.conch&&conch.showLoadingView(false);
      window.eval(xhr.responseText);
 	 var mousetype=('ontouchstart' in window)?"touchstart":"mousedown";
-	 function jiba()
+
+	
+
+	 function loadNewPage()
 	 {
-	  type++;
-		 if(type>2)
-		 {
-		    id++;
-			type=0;
-		 }
+		id++
 		var pre=location.protocol+"//"+location.host+location.pathname;
-		 var url=pre+"?id="+id+"&type="+type;
-		 console.log(">>>>>>>@@@@@@@@@@@@@@@="+url);
-	     window.location.href=url;
+		var url=pre+"?id="+id;
+		console.log(">>>>>>>@@@@@@@@@@@@@@@="+url);
+	    window.location.href=url;
 	 }
 	 document.addEventListener(mousetype,function(e){
 	   if(addMouse(Date.now()))
 	   {
-	    jiba();
+			loadNewPage();
 	   }
 	 
 	 });
@@ -173,7 +180,7 @@
     switch (e.keyCode) {
 
         case 82:
-            jiba();
+            loadNewPage();
             break;
     }
 });

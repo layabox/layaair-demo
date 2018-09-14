@@ -1,0 +1,25 @@
+{
+	"scripts": [
+		"libs/laya.core.js",
+		"libs/laya.physics3D.js",
+		"libs/laya.webgl.js",
+		"libs/laya.filter.js",
+		"libs/laya.particle.js",
+		"libs/laya.ani.js",
+		"libs/laya.ui.js",
+		"libs/laya.html.js",
+		"libs/laya.tiledmap.js",
+		"libs/laya.d3.js",
+		"libs/laya.d3Plugin.js",
+		"libs/laya.pathfinding.js",
+		"3d/js/common/CameraMoveScript.js",
+		"3d/js/common/VRCameraMoveScript.js",
+		"3d/js/common/Tool.js",
+		"3d/js/common/TriggerCollisionScript.js",
+		"3d/js/shaderModule/customMaterials/CustomMaterial.js",
+		"3d/js/shaderModule/customMaterials/CustomTerrainMaterial.js",
+		"res/threeDimen/pbrlut.js",
+		"conchInit3d.js"
+	],
+	"screenOrientation": "sensor_landscape"
+}
