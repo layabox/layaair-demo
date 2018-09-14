@@ -28,10 +28,9 @@ var types=[
  var type=GetQueryString("type")||0;
   window.ConchRenderType=types[type];
   </script>
-    <script type="text/javascript" src="libs/bytebuffer.js"></script>
-    <script type="text/javascript" src="libs/protobuf.js"></script>
     <!-- libraries -->
-    <script src="libs/laya.core.js"></script>
+	<script src="libs/laya.core.js"></script>
+    <script src="libs/laya.physics3D.js"></script>
     <script src="libs/laya.webgl.js"></script>
     <script src="libs/laya.filter.js"></script>
     <script src="libs/laya.particle.js"></script>
@@ -39,9 +38,17 @@ var types=[
     <script src="libs/laya.ui.js"></script>
     <script src="libs/laya.html.js"></script>
     <script src="libs/laya.tiledmap.js"></script>
-    <script src="libs/laya.device.js"></script>
-	<script src="conchInit.js"></script>
-
+    <script src="libs/laya.d3.js"></script>
+    <script src="libs/laya.d3Plugin.js"></script>
+    <script src="libs/laya.pathfinding.js"></script>
+    <script src="3d/js/common/CameraMoveScript.js"></script>
+    <script src="3d/js/common/VRCameraMoveScript.js"></script>
+    <script src="3d/js/common/Tool.js"></script>
+    <script src="3d/js/common/TriggerCollisionScript.js"></script>
+    <script src="3d/js/shaderModule/customMaterials/CustomMaterial.js"></script>
+    <script src="3d/js/shaderModule/customMaterials/CustomTerrainMaterial.js"></script>
+    <script src='res/threeDimen/pbrlut.js' loader='laya'></script>
+	<script src="conchInit3d.js"></script>
     <!-- demos -->
   
     </body>

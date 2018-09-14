@@ -7,7 +7,7 @@
 	var Loader=laya.net.Loader,MathUtil=laya.maths.MathUtil,Matrix=laya.maths.Matrix,Node=laya.display.Node,Rectangle=laya.maths.Rectangle;
 	var Render=laya.renders.Render,Resource=laya.resource.Resource,RunDriver=laya.utils.RunDriver,Sprite=laya.display.Sprite;
 	var Stat=laya.utils.Stat,Texture=laya.resource.Texture,Timer=laya.utils.Timer,URL=laya.net.URL,Utils=laya.utils.Utils;
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/AnimationContent.as=======199.999851/199.999851
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationContent.as=======199.999851/199.999851
 /**
 *@private
 *@author ...
@@ -27,7 +27,7 @@ var AnimationContent=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/AnimationNodeContent.as=======199.999850/199.999850
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationNodeContent.as=======199.999850/199.999850
 /**
 *@private
 *@author ...
@@ -54,7 +54,7 @@ var AnimationNodeContent=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/AnimationParser01.as=======199.999849/199.999849
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationParser01.as=======199.999849/199.999849
 /**
 *@private
 */
@@ -171,7 +171,7 @@ var AnimationParser01=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/AnimationParser02.as=======199.999848/199.999848
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationParser02.as=======199.999848/199.999848
 /**
 *@private
 */
@@ -294,7 +294,7 @@ var AnimationParser02=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/AnimationState.as=======199.999846/199.999846
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationState.as=======199.999846/199.999846
 /**
 *@private
 */
@@ -309,7 +309,7 @@ var AnimationState=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/Bone.as=======199.999844/199.999844
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/Bone.as=======199.999844/199.999844
 /**
 *@private
 */
@@ -497,7 +497,7 @@ var Bone=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/BoneSlot.as=======199.999843/199.999843
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/BoneSlot.as=======199.999843/199.999843
 /**
 *@private
 */
@@ -955,7 +955,7 @@ var BoneSlot=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/canvasmesh/MeshData.as=======199.999842/199.999842
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/canvasmesh/MeshData.as=======199.999842/199.999842
 /**
 *@private
 */
@@ -1003,7 +1003,7 @@ var MeshData=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/DeformAniData.as=======199.999840/199.999840
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/DeformAniData.as=======199.999840/199.999840
 /**
 *@private
 */
@@ -1019,7 +1019,7 @@ var DeformAniData=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/DeformSlotData.as=======199.999839/199.999839
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/DeformSlotData.as=======199.999839/199.999839
 /**
 *@private
 */
@@ -1034,7 +1034,7 @@ var DeformSlotData=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/DeformSlotDisplayData.as=======199.999838/199.999838
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/DeformSlotDisplayData.as=======199.999838/199.999838
 /**
 *@private
 */
@@ -1124,7 +1124,7 @@ var DeformSlotDisplayData=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/DrawOrderData.as=======199.999837/199.999837
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/DrawOrderData.as=======199.999837/199.999837
 /**
 *@private
 */
@@ -1140,7 +1140,7 @@ var DrawOrderData=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/EventData.as=======199.999836/199.999836
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/EventData.as=======199.999836/199.999836
 /**
 *@private
 */
@@ -1159,7 +1159,7 @@ var EventData=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/IkConstraint.as=======199.999835/199.999835
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/IkConstraint.as=======199.999835/199.999835
 /**
 *@private
 */
@@ -1478,7 +1478,7 @@ var IkConstraint=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/IkConstraintData.as=======199.999834/199.999834
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/IkConstraintData.as=======199.999834/199.999834
 /**
 *@private
 */
@@ -1500,7 +1500,7 @@ var IkConstraintData=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/PathConstraint.as=======199.999833/199.999833
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/PathConstraint.as=======199.999833/199.999833
 /**
 *@private
 *路径作用器
@@ -2006,7 +2006,7 @@ var PathConstraint=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/PathConstraintData.as=======199.999832/199.999832
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/PathConstraintData.as=======199.999832/199.999832
 /**
 *@private
 */
@@ -2031,7 +2031,7 @@ var PathConstraintData=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/SkinData.as=======199.999830/199.999830
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/SkinData.as=======199.999830/199.999830
 /**
 *@private
 */
@@ -2047,7 +2047,7 @@ var SkinData=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/SkinSlotDisplayData.as=======199.999829/199.999829
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/SkinSlotDisplayData.as=======199.999829/199.999829
 /**
 *@private
 */
@@ -2107,7 +2107,7 @@ var SkinSlotDisplayData=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/SlotData.as=======199.999828/199.999828
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/SlotData.as=======199.999828/199.999828
 /**
 *@private
 */
@@ -2135,7 +2135,7 @@ var SlotData=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/TfConstraint.as=======199.999826/199.999826
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/TfConstraint.as=======199.999826/199.999826
 /**
 *@private
 */
@@ -2225,7 +2225,7 @@ var TfConstraint=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/TfConstraintData.as=======199.999825/199.999825
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/TfConstraintData.as=======199.999825/199.999825
 //TODO:coverage
 //class laya.ani.bone.TfConstraintData
 var TfConstraintData=(function(){
@@ -2250,7 +2250,7 @@ var TfConstraintData=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/Transform.as=======199.999824/199.999824
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/Transform.as=======199.999824/199.999824
 /**
 *@private
 */
@@ -2329,7 +2329,7 @@ var Transform=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/UVTools.as=======199.999823/199.999823
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/UVTools.as=======199.999823/199.999823
 /**
 *用于UV转换的工具类
 *@private
@@ -2384,7 +2384,7 @@ var UVTools=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/KeyFramesContent.as=======199.999821/199.999821
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/KeyFramesContent.as=======199.999821/199.999821
 /**
 *@private
 *@author ...
@@ -2408,7 +2408,7 @@ var KeyFramesContent=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/math/BezierLerp.as=======199.999820/199.999820
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/math/BezierLerp.as=======199.999820/199.999820
 /**
 *@private
 *...
@@ -2457,7 +2457,7 @@ var BezierLerp=(function(){
 })()
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/AnimationPlayer.as=======98.999836/98.999836
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationPlayer.as=======98.999836/98.999836
 /**
 *<code>AnimationPlayer</code> 类用于动画播放器。
 */
@@ -2919,7 +2919,7 @@ var AnimationPlayer=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/GraphicsAni.as=======98.999773/98.999773
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/GraphicsAni.as=======98.999773/98.999773
 /**
 *@private
 */
@@ -2951,7 +2951,7 @@ var GraphicsAni=(function(_super){
 })(Graphics)
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/canvasmesh/SkinMeshForGraphic.as=======98.999683/98.999683
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/canvasmesh/SkinMeshForGraphic.as=======98.999683/98.999683
 /**
 *...
 *@author ww
@@ -2990,7 +2990,7 @@ var SkinMeshForGraphic=(function(_super){
 })(MeshData)
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/AnimationTemplet.as=======97.999737/97.999737
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationTemplet.as=======97.999737/97.999737
 /**
 *<code>AnimationTemplet</code> 类用于动画模板资源。
 */
@@ -3295,7 +3295,7 @@ var AnimationTemplet=(function(_super){
 })(Resource)
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/Skeleton.as=======96.999801/96.999801
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/Skeleton.as=======96.999801/96.999801
 /**
 *骨骼动画由<code>Templet</code>，<code>AnimationPlayer</code>，<code>Skeleton</code>三部分组成。
 */
@@ -4309,7 +4309,7 @@ var Skeleton=(function(_super){
 })(Sprite)
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/swf/MovieClip.as=======96.999789/96.999789
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/swf/MovieClip.as=======96.999789/96.999789
 /**
 *<p> <code>MovieClip</code> 用于播放经过工具处理后的 swf 动画。</p>
 */
@@ -4454,7 +4454,7 @@ var MovieClip=(function(_super){
 			}
 			this._playIndex=0;
 		}
-		this._$3__parse(this._playIndex);
+		this._parseFrame(this._playIndex);
 		if (this._labels && this._labels[this._playIndex])this.event(/*laya.events.Event.LABEL*/"label",this._labels[this._playIndex]);
 		if (this._endFrame!=-1&&this._endFrame==this._playIndex){
 			this._endFrame=-1;
@@ -4533,7 +4533,7 @@ var MovieClip=(function(_super){
 		(frameIndex===void 0)&& (frameIndex=-1);
 		if (frameIndex !=-1){
 			if (this._curIndex > frameIndex)this._reset();
-			this._$3__parse(frameIndex);
+			this._parseFrame(frameIndex);
 		}
 	}
 
@@ -4546,7 +4546,7 @@ var MovieClip=(function(_super){
 	}
 
 	//TODO:coverage
-	__proto._$3__parse=function(frameIndex){
+	__proto._parseFrame=function(frameIndex){
 		var curChild=this;
 		var mc,sp,key=0,type=0,tPos=0,ttype=0,ifAdd=false;
 		var _idOfSprite=this._idOfSprite,_data=this._data,eStr;
@@ -4706,7 +4706,7 @@ var MovieClip=(function(_super){
 		var preState=this._playing;
 		this._playing=false;
 		this._curIndex=0;
-		while (!this._ended)this._$3__parse(++this._curIndex);
+		while (!this._ended)this._parseFrame(++this._curIndex);
 		this._playing=preState;
 	}
 
@@ -4771,7 +4771,7 @@ var MovieClip=(function(_super){
 })(Sprite)
 
 
-	//file:///E:/LayaAirMaster/ani/src/laya/ani/bone/Templet.as=======96.999564/96.999564
+	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/Templet.as=======96.999564/96.999564
 /**
 *动画模板类
 */

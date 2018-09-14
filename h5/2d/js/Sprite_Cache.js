@@ -1,4 +1,4 @@
-(function()
+﻿(function()
 {
 	var Sprite = Laya.Sprite;
 	var Stage  = Laya.Stage;
@@ -43,7 +43,7 @@
 		}
 
 		//缓存为静态图像
-		textBox.cacheAsBitmap = true;
+		textBox.cacheAs = "bitmap";
 
 		Laya.stage.addChild(textBox);
 	}

@@ -1,4 +1,4 @@
-package
+﻿package
 {
 	import laya.display.Sprite;
 	import laya.display.Stage;
@@ -45,7 +45,7 @@ package
 			}
 			
 			//缓存为静态图像
-			textBox.cacheAsBitmap = true;
+			textBox.cacheAs = "bitmap";
 			
 			Laya.stage.addChild(textBox);
 		}
