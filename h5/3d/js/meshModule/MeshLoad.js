@@ -24,7 +24,7 @@
             var planeLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(1000));
             Tool.linearModel(plane, planeLineSprite3D, Laya.Color.GRAY);
             Laya.timer.frameLoop(1, this, function () {
-                Tool.linearModel(layaMonkey, layaMonkeyLineSprite3D, Laya.Color.GREEN);
+                layaMonkeyLineSprite3D.transform.rotate(rotation, false);
                 layaMonkey.transform.rotate(this.rotation, false);
             });
             this.lineSprite3D.active = false;
