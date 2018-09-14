@@ -77,7 +77,7 @@ function addBox() {
     
         Laya.stage.on(Laya.Event.MOUSE_DOWN, this, this.onMouseDown);
         Laya.stage.on(Laya.Event.MOUSE_UP, this, this.onMouseUp);
-        Laya.stage.on(Laya.Event.MOUSE_OUT, this, onmouseout);
+        Laya.stage.on(Laya.Event.MOUSE_OUT, this, this.onMouseOut);
     };
    function onMouseDown() {
         this.posX = this.point.elements[0] = Laya.MouseManager.instance.mouseX;
