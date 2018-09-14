@@ -10,15 +10,15 @@
 	var RenderTexture2D=laya.webgl.resource.RenderTexture2D,Resource=laya.resource.Resource,RunDriver=laya.utils.RunDriver;
 	var Script=laya.components.Script,Shader=laya.webgl.shader.Shader,ShaderCompile=laya.webgl.utils.ShaderCompile;
 	var Sprite=laya.display.Sprite,SpriteConst=laya.display.SpriteConst,Stat=laya.utils.Stat,SubmitKey=laya.webgl.submit.SubmitKey;
-	var Texture2D=laya.webgl.resource.Texture2D,Timer=laya.utils.Timer,URL=laya.net.URL,Utils=laya.utils.Utils;
-	var WebGL=laya.webgl.WebGL,WebGLContext=laya.webgl.WebGLContext,WebGLContext2D=laya.webgl.canvas.WebGLContext2D;
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/IClone.as=======1100000100.000058/1100000100.000058
+	var Texture2D=laya.webgl.resource.Texture2D,Timer=laya.utils.Timer,URL=laya.net.URL,WebGL=laya.webgl.WebGL;
+	var WebGLContext=laya.webgl.WebGLContext,WebGLContext2D=laya.webgl.canvas.WebGLContext2D;
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/IClone.as=======1100000100.000058/1100000100.000058
 Laya.interface('laya.d3.core.IClone');
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/IVertex.as=======1100000100.000034/1100000100.000034
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/IVertex.as=======1100000100.000034/1100000100.000034
 Laya.interface('laya.d3.graphics.IVertex');
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/scene/ITreeNode.as=======1100000100.000026/1100000100.000026
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/scene/ITreeNode.as=======1100000100.000026/1100000100.000026
 Laya.interface('laya.d3.core.scene.ITreeNode');
-	//file:///E:/git/layaair-master/d3/src/Config3D.as=======199.999626/199.999626
+	//file:///D:/gittest/gittestnew/d3/src/Config3D.as=======199.999626/199.999626
 /**
 *<code>Config3D</code> 类用于创建3D初始化配置。
 */
@@ -72,7 +72,7 @@ var Config3D=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/animation/AnimationClipParser03.as=======199.999624/199.999624
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/animation/AnimationClipParser03.as=======199.999624/199.999624
 /**
 *@private
 */
@@ -255,7 +255,7 @@ var AnimationClipParser03=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/animation/AnimationEvent.as=======199.999623/199.999623
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/animation/AnimationEvent.as=======199.999623/199.999623
 /**
 *<code>AnimationEvent</code> 类用于实现动画事件。
 */
@@ -275,7 +275,7 @@ var AnimationEvent=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/animation/AnimationNode.as=======199.999622/199.999622
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/animation/AnimationNode.as=======199.999622/199.999622
 /**
 *<code>BoneNode</code> 类用于实现骨骼节点。
 */
@@ -426,7 +426,7 @@ var AnimationNode=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/animation/AnimatorStateScript.as=======199.999620/199.999620
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/animation/AnimatorStateScript.as=======199.999620/199.999620
 /**
 *<code>AnimatorStateScript</code> 类用于动画状态脚本的父类,该类为抽象类,不允许实例。
 */
@@ -454,7 +454,7 @@ var AnimatorStateScript=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/animation/KeyframeNode.as=======199.999619/199.999619
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/animation/KeyframeNode.as=======199.999619/199.999619
 /**
 *@private
 */
@@ -586,7 +586,7 @@ var KeyframeNode=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/animation/KeyframeNodeList.as=======199.999618/199.999618
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/animation/KeyframeNodeList.as=======199.999618/199.999618
 /**
 *<code>KeyframeNodeList</code> 类用于创建KeyframeNode节点队列。
 */
@@ -634,7 +634,7 @@ var KeyframeNodeList=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/component/SingletonList.as=======199.999616/199.999616
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/component/SingletonList.as=======199.999616/199.999616
 /**
 *<code>SingletonList</code> 类用于实现单例队列。
 */
@@ -674,7 +674,7 @@ var SingletonList=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/component/AnimatorControllerLayer.as=======199.999614/199.999614
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/component/AnimatorControllerLayer.as=======199.999614/199.999614
 /**
 *<code>AnimatorControllerLayer</code> 类用于创建动画控制器层。
 */
@@ -786,7 +786,7 @@ var AnimatorControllerLayer=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/component/AnimatorPlayState.as=======199.999613/199.999613
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/component/AnimatorPlayState.as=======199.999613/199.999613
 /**
 *<code>AnimatorPlayState</code> 类用于创建动画播放状态信息。
 */
@@ -851,7 +851,7 @@ var AnimatorPlayState=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/component/AnimatorState.as=======199.999612/199.999612
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/component/AnimatorState.as=======199.999612/199.999612
 /**
 *<code>AnimatorState</code> 类用于创建动作状态。
 */
@@ -983,7 +983,7 @@ var AnimatorState=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/component/KeyframeNodeOwner.as=======199.999611/199.999611
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/component/KeyframeNodeOwner.as=======199.999611/199.999611
 /**
 *@private
 *<code>KeyframeNodeOwner</code> 类用于保存帧节点的拥有者信息。
@@ -1069,7 +1069,7 @@ var KeyframeNodeOwner=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/BufferState.as=======199.999605/199.999605
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/BufferState.as=======199.999605/199.999605
 /**
 *@private
 *<code>BufferState</code> 类用于实现渲染所需的Buffer状态集合。
@@ -1157,7 +1157,7 @@ var BufferState=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/Keyframe.as=======199.999602/199.999602
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/Keyframe.as=======199.999602/199.999602
 /**
 *<code>KeyFrame</code> 类用于创建关键帧实例。
 */
@@ -1194,7 +1194,7 @@ var Keyframe=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/GeometryElement.as=======199.999600/199.999600
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/GeometryElement.as=======199.999600/199.999600
 /**
 *@private
 *<code>GeometryElement</code> 类用于实现几何体元素。
@@ -1256,7 +1256,7 @@ var GeometryElement=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/Gradient.as=======199.999599/199.999599
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/Gradient.as=======199.999599/199.999599
 /**
 *<code>Gradient</code> 类用于创建颜色渐变。
 */
@@ -1433,7 +1433,7 @@ var Gradient=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/GradientMode.as=======199.999598/199.999598
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/GradientMode.as=======199.999598/199.999598
 /**
 *...
 *@author ...
@@ -1448,7 +1448,7 @@ var GradientMode=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/HeightMap.as=======199.999597/199.999597
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/HeightMap.as=======199.999597/199.999597
 /**
 *<code>HeightMap</code> 类用于实现高度图数据。
 */
@@ -1625,7 +1625,7 @@ var HeightMap=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/Layer.as=======199.999595/199.999595
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/Layer.as=======199.999595/199.999595
 /**
 *@private
 *<code>Layer</code> 类用于实现层。
@@ -1659,7 +1659,7 @@ var Layer=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/material/RenderState.as=======199.999583/199.999583
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/material/RenderState.as=======199.999583/199.999583
 /**
 *<code>RenderState</code> 类用于控制渲染状态。
 */
@@ -1847,7 +1847,7 @@ var RenderState=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/MeshFilter.as=======199.999578/199.999578
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/MeshFilter.as=======199.999578/199.999578
 /**
 *<code>MeshFilter</code> 类用于创建网格过滤器。
 */
@@ -1952,7 +1952,7 @@ var MeshFilter=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/Burst.as=======199.999572/199.999572
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/Burst.as=======199.999572/199.999572
 /**
 *<code>Burst</code> 类用于粒子的爆裂描述。
 */
@@ -2022,7 +2022,7 @@ var Burst=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/ColorOverLifetime.as=======199.999571/199.999571
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/ColorOverLifetime.as=======199.999571/199.999571
 /**
 *<code>ColorOverLifetime</code> 类用于粒子的生命周期颜色。
 */
@@ -2084,7 +2084,7 @@ var ColorOverLifetime=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/Emission.as=======199.999570/199.999570
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/Emission.as=======199.999570/199.999570
 /**
 *<code>Emission</code> 类用于粒子发射器。
 */
@@ -2229,7 +2229,7 @@ var Emission=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/FrameOverTime.as=======199.999569/199.999569
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/FrameOverTime.as=======199.999569/199.999569
 /**
 *<code>FrameOverTime</code> 类用于创建时间帧。
 */
@@ -2363,7 +2363,7 @@ var FrameOverTime=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/GradientAngularVelocity.as=======199.999568/199.999568
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/GradientAngularVelocity.as=======199.999568/199.999568
 /**
 *<code>GradientRotation</code> 类用于创建渐变角速度。
 */
@@ -2701,7 +2701,7 @@ var GradientAngularVelocity=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/GradientColor.as=======199.999567/199.999567
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/GradientColor.as=======199.999567/199.999567
 /**
 *<code>GradientColor</code> 类用于创建渐变颜色。
 */
@@ -2835,7 +2835,7 @@ var GradientColor=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/GradientDataInt.as=======199.999566/199.999566
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/GradientDataInt.as=======199.999566/199.999566
 /**
 *<code>GradientDataInt</code> 类用于创建整形渐变。
 */
@@ -2903,7 +2903,7 @@ var GradientDataInt=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/GradientDataNumber.as=======199.999565/199.999565
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/GradientDataNumber.as=======199.999565/199.999565
 /**
 *<code>GradientDataNumber</code> 类用于创建浮点渐变。
 */
@@ -3001,7 +3001,7 @@ var GradientDataNumber=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/GradientDataVector2.as=======199.999564/199.999564
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/GradientDataVector2.as=======199.999564/199.999564
 /**
 *<code>GradientDataVector2</code> 类用于创建二维向量渐变。
 */
@@ -3070,7 +3070,7 @@ var GradientDataVector2=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/GradientSize.as=======199.999563/199.999563
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/GradientSize.as=======199.999563/199.999563
 /**
 *<code>GradientSize</code> 类用于创建渐变尺寸。
 */
@@ -3390,7 +3390,7 @@ var GradientSize=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/GradientVelocity.as=======199.999562/199.999562
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/GradientVelocity.as=======199.999562/199.999562
 /**
 *<code>GradientVelocity</code> 类用于创建渐变速度。
 */
@@ -3584,7 +3584,7 @@ var GradientVelocity=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/RotationOverLifetime.as=======199.999561/199.999561
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/RotationOverLifetime.as=======199.999561/199.999561
 /**
 *<code>RotationOverLifetime</code> 类用于粒子的生命周期旋转。
 */
@@ -3659,7 +3659,7 @@ var RotationOverLifetime=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/shape/BaseShape.as=======199.999560/199.999560
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/shape/BaseShape.as=======199.999560/199.999560
 /**
 *<code>BaseShape</code> 类用于粒子形状。
 */
@@ -3754,7 +3754,7 @@ var BaseShape=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/shape/ShapeUtils.as=======199.999555/199.999555
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/shape/ShapeUtils.as=======199.999555/199.999555
 /**
 *...
 *@author ...
@@ -3855,7 +3855,7 @@ var ShapeUtils=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/SizeOverLifetime.as=======199.999553/199.999553
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/SizeOverLifetime.as=======199.999553/199.999553
 /**
 *<code>SizeOverLifetime</code> 类用于粒子的生命周期尺寸。
 */
@@ -3924,7 +3924,7 @@ var SizeOverLifetime=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/StartFrame.as=======199.999552/199.999552
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/StartFrame.as=======199.999552/199.999552
 /**
 *<code>StartFrame</code> 类用于创建开始帧。
 */
@@ -4013,7 +4013,7 @@ var StartFrame=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/TextureSheetAnimation.as=======199.999551/199.999551
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/TextureSheetAnimation.as=======199.999551/199.999551
 /**
 *<code>TextureSheetAnimation</code> 类用于创建粒子帧动画。
 */
@@ -4120,7 +4120,7 @@ var TextureSheetAnimation=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/VelocityOverLifetime.as=======199.999550/199.999550
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/VelocityOverLifetime.as=======199.999550/199.999550
 /**
 *<code>VelocityOverLifetime</code> 类用于粒子的生命周期速度。
 */
@@ -4187,7 +4187,7 @@ var VelocityOverLifetime=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/ShurikenParticleData.as=======199.999548/199.999548
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/ShurikenParticleData.as=======199.999548/199.999548
 /**
 *@private
 */
@@ -4550,7 +4550,7 @@ var ShurikenParticleData=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/pixelLine/PixelLineData.as=======199.999544/199.999544
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/pixelLine/PixelLineData.as=======199.999544/199.999544
 /**
 *<code>PixelLineData</code> 类用于表示线数据。
 */
@@ -4580,7 +4580,7 @@ var PixelLineData=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/pixelLine/PixelLineVertex.as=======199.999539/199.999539
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/pixelLine/PixelLineVertex.as=======199.999539/199.999539
 /**
 *...
 *@author
@@ -4607,7 +4607,7 @@ var PixelLineVertex=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/render/RenderContext3D.as=======199.999538/199.999538
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/render/RenderContext3D.as=======199.999538/199.999538
 /**
 *<code>RenderContext3D</code> 类用于实现渲染状态。
 */
@@ -4646,7 +4646,7 @@ var RenderContext3D=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/render/RenderElement.as=======199.999537/199.999537
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/render/RenderElement.as=======199.999537/199.999537
 /**
 *@private
 *<code>RenderElement</code> 类用于实现渲染元素。
@@ -4712,7 +4712,7 @@ var RenderElement=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/render/RenderQueue.as=======199.999536/199.999536
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/render/RenderQueue.as=======199.999536/199.999536
 /**
 *@private
 *<code>RenderQuene</code> 类用于实现渲染队列。
@@ -4872,7 +4872,7 @@ var RenderQueue=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/scene/OctreeNode.as=======199.999533/199.999533
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/scene/OctreeNode.as=======199.999533/199.999533
 //class laya.d3.core.scene.OctreeNode
 var OctreeNode=(function(){
 	function OctreeNode(scene,currentDepth){
@@ -5043,7 +5043,7 @@ var OctreeNode=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/scene/SceneManager.as=======199.999531/199.999531
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/scene/SceneManager.as=======199.999531/199.999531
 /**
 *...
 *@author ...
@@ -5056,7 +5056,7 @@ var SceneManager=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/TextureMode.as=======199.999528/199.999528
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/TextureMode.as=======199.999528/199.999528
 /**
 *...
 *@author ...
@@ -5071,7 +5071,7 @@ var TextureMode=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/trail/VertexTrail.as=======199.999522/199.999522
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/trail/VertexTrail.as=======199.999522/199.999522
 /**
 *<code>VertexTrail</code> 类用于创建拖尾顶点结构。
 */
@@ -5110,7 +5110,7 @@ var VertexTrail=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/DynamicBatchManager.as=======199.999519/199.999519
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/DynamicBatchManager.as=======199.999519/199.999519
 /**
 *@private
 *<code>DynamicBatchManager</code> 类用于管理动态批处理。
@@ -5154,7 +5154,7 @@ var DynamicBatchManager=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/FrustumCulling.as=======199.999518/199.999518
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/FrustumCulling.as=======199.999518/199.999518
 /**
 *@private
 *<code>FrustumCulling</code> 类用于裁剪。
@@ -5269,7 +5269,7 @@ var FrustumCulling=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/StaticBatchManager.as=======199.999513/199.999513
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/StaticBatchManager.as=======199.999513/199.999513
 /**
 *<code>StaticBatchManager</code> 类用于静态批处理管理的父类。
 */
@@ -5412,7 +5412,7 @@ var StaticBatchManager=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/MeshRenderStaticBatchOwner.as=======199.999512/199.999512
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/MeshRenderStaticBatchOwner.as=======199.999512/199.999512
 /**
 *创建一个 <code>MeshRenderStaticBatchOwner</code> 实例。
 */
@@ -5453,7 +5453,7 @@ var MeshRenderStaticBatchOwner=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexMesh.as=======199.999509/199.999509
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexMesh.as=======199.999509/199.999509
 /**
 *...
 *@author ...
@@ -5482,7 +5482,7 @@ var VertexMesh=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionTerrain.as=======199.999482/199.999482
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionTerrain.as=======199.999482/199.999482
 /**
 *<code>VertexPositionTerrain</code> 类用于创建位置、法线、纹理1、纹理2顶点结构。
 */
@@ -5541,7 +5541,7 @@ var VertexPositionTerrain=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionTexture0.as=======199.999481/199.999481
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionTexture0.as=======199.999481/199.999481
 /**
 *<code>VertexPositionNormalTexture</code> 类用于创建位置、纹理顶点结构。
 */
@@ -5582,7 +5582,7 @@ var VertexPositionTexture0=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexShuriKenParticle.as=======199.999480/199.999480
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexShuriKenParticle.as=======199.999480/199.999480
 /**
 *...
 *@author ...
@@ -5617,7 +5617,7 @@ var VertexShuriKenParticle=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/VertexDeclaration.as=======199.999476/199.999476
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/VertexDeclaration.as=======199.999476/199.999476
 /**
 *@private
 *<code>VertexDeclaration</code> 类用于生成顶点声明。
@@ -5724,7 +5724,7 @@ var VertexDeclaration=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/VertexElement.as=======199.999475/199.999475
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/VertexElement.as=======199.999475/199.999475
 /**
 *<code>VertexElement</code> 类用于创建顶点结构分配。
 */
@@ -5744,7 +5744,7 @@ var VertexElement=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/VertexElementFormat.as=======199.999474/199.999474
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/VertexElementFormat.as=======199.999474/199.999474
 /**
 *...
 *@author ...
@@ -5769,7 +5769,7 @@ var VertexElementFormat=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/Input3D.as=======199.999473/199.999473
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/Input3D.as=======199.999473/199.999473
 /**
 *<code>Input3D</code> 类用于实现3D输入。
 */
@@ -6081,7 +6081,7 @@ var Input3D=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/loaders/LoadModelV04.as=======199.999472/199.999472
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/loaders/LoadModelV04.as=======199.999472/199.999472
 /**
 *@private
 *<code>LoadModel</code> 类用于模型加载。
@@ -6293,7 +6293,7 @@ var LoadModelV04=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/loaders/MeshReader.as=======199.999471/199.999471
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/loaders/MeshReader.as=======199.999471/199.999471
 /**
 *...
 *@author ...
@@ -6321,7 +6321,7 @@ var MeshReader=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/BaseVector.as=======199.999470/199.999470
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/BaseVector.as=======199.999470/199.999470
 /**
 *<code>BaseVector</code> 抽象类，类用于向量的父类。
 */
@@ -6337,7 +6337,7 @@ var BaseVector=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/BoundBox.as=======199.999469/199.999469
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/BoundBox.as=======199.999469/199.999469
 /**
 *<code>BoundBox</code> 类用于创建包围盒。
 */
@@ -6432,7 +6432,7 @@ var BoundBox=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/BoundFrustum.as=======199.999468/199.999468
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/BoundFrustum.as=======199.999468/199.999468
 /**
 *<code>BoundFrustum</code> 类用于创建锥截体。
 */
@@ -6811,7 +6811,7 @@ var BoundFrustum=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/BoundSphere.as=======199.999467/199.999467
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/BoundSphere.as=======199.999467/199.999467
 /**
 *<code>BoundSphere</code> 类用于创建包围球。
 */
@@ -6916,7 +6916,7 @@ var BoundSphere=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/CollisionUtils.as=======199.999466/199.999466
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/CollisionUtils.as=======199.999466/199.999466
 /**
 *<code>Collision</code> 类用于检测碰撞。
 */
@@ -7706,7 +7706,7 @@ var CollisionUtils=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/Color.as=======199.999465/199.999465
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/Color.as=======199.999465/199.999465
 /**
 *<code>Color</code> 类用于创建颜色实例。
 */
@@ -7816,7 +7816,7 @@ var Color=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/ContainmentType.as=======199.999464/199.999464
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/ContainmentType.as=======199.999464/199.999464
 /**
 *<code>ContainmentType</code> 类用于定义空间物体位置关系。
 */
@@ -7831,7 +7831,7 @@ var ContainmentType=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/MathUtils3D.as=======199.999463/199.999463
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/MathUtils3D.as=======199.999463/199.999463
 /**
 *<code>MathUtils</code> 类用于创建数学工具。
 */
@@ -7865,7 +7865,7 @@ var MathUtils3D=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/Matrix3x3.as=======199.999462/199.999462
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/Matrix3x3.as=======199.999462/199.999462
 /**
 *<code>Matrix3x3</code> 类用于创建3x3矩阵。
 */
@@ -8171,7 +8171,7 @@ var Matrix3x3=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/Matrix4x4.as=======199.999461/199.999461
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/Matrix4x4.as=======199.999461/199.999461
 /**
 *<code>Matrix4x4</code> 类用于创建4x4矩阵。
 */
@@ -8841,7 +8841,7 @@ var Matrix4x4=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/OrientedBoundBox.as=======199.999460/199.999460
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/OrientedBoundBox.as=======199.999460/199.999460
 /**
 *<code>OrientedBoundBox</code> 类用于创建OBB包围盒。
 */
@@ -9440,7 +9440,7 @@ var OrientedBoundBox=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/Plane.as=======199.999459/199.999459
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/Plane.as=======199.999459/199.999459
 /**
 *<code>Plane</code> 类用于创建平面。
 */
@@ -9509,7 +9509,7 @@ var Plane=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/Quaternion.as=======199.999458/199.999458
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/Quaternion.as=======199.999458/199.999458
 /**
 *<code>Quaternion</code> 类用于创建四元数。
 */
@@ -10066,7 +10066,7 @@ var Quaternion=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/Rand.as=======199.999457/199.999457
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/Rand.as=======199.999457/199.999457
 /**
 *<code>Rand</code> 类用于通过32位无符号整型随机种子创建随机数。
 */
@@ -10142,7 +10142,7 @@ var Rand=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/RandX.as=======199.999456/199.999456
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/RandX.as=======199.999456/199.999456
 /**
 *<code>Rand</code> 类用于通过128位整型种子创建随机数,算法来自:https://github.com/AndreasMadsen/xorshift。
 */
@@ -10235,7 +10235,7 @@ var RandX=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/Ray.as=======199.999455/199.999455
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/Ray.as=======199.999455/199.999455
 /**
 *<code>Ray</code> 类用于创建射线。
 */
@@ -10255,7 +10255,7 @@ var Ray=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/Viewport.as=======199.999451/199.999451
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/Viewport.as=======199.999451/199.999451
 /**
 *<code>Viewport</code> 类用于创建视口。
 */
@@ -10351,7 +10351,7 @@ var Viewport=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/MouseTouch.as=======199.999450/199.999450
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/MouseTouch.as=======199.999450/199.999450
 /**
 *@private
 */
@@ -10375,7 +10375,7 @@ var MouseTouch=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/Collision.as=======199.999447/199.999447
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/Collision.as=======199.999447/199.999447
 /**
 *<code>Collision</code> 类用于创建物理碰撞信息。
 */
@@ -10411,7 +10411,7 @@ var Collision=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/CollisionTool.as=======199.999446/199.999446
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/CollisionTool.as=======199.999446/199.999446
 /**
 *<code>CollisionMap</code> 类用于实现碰撞组合实例图。
 */
@@ -10534,7 +10534,7 @@ var CollisionTool=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/Constraint3D.as=======199.999445/199.999445
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/Constraint3D.as=======199.999445/199.999445
 /**
 *...
 *@author ...
@@ -10557,7 +10557,7 @@ var Constraint3D=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/constraints/Point2PointConstraint.as=======199.999443/199.999443
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/constraints/Point2PointConstraint.as=======199.999443/199.999443
 /**
 *<code>Point2PointConstraint</code> 类用于创建物理组件的父类。
 */
@@ -10610,7 +10610,7 @@ var Point2PointConstraint=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/ContactPoint.as=======199.999442/199.999442
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/ContactPoint.as=======199.999442/199.999442
 /**
 *<code>ContactPoint</code> 类用于创建物理碰撞信息。
 */
@@ -10638,7 +10638,7 @@ var ContactPoint=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/HitResult.as=======199.999441/199.999441
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/HitResult.as=======199.999441/199.999441
 /**
 *<code>HitResult</code> 类用于实现射线检测或形状扫描的结果。
 */
@@ -10660,7 +10660,7 @@ var HitResult=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/PhysicsSettings.as=======199.999438/199.999438
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/PhysicsSettings.as=======199.999438/199.999438
 /**
 *<code>PhysicsSettings</code> 类用于创建物理配置信息。
 */
@@ -10680,7 +10680,7 @@ var PhysicsSettings=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/PhysicsSimulation.as=======199.999437/199.999437
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/PhysicsSimulation.as=======199.999437/199.999437
 /**
 *<code>Simulation</code> 类用于创建物理模拟器。
 */
@@ -11457,7 +11457,7 @@ var PhysicsSimulation=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/shape/ColliderShape.as=======199.999434/199.999434
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/shape/ColliderShape.as=======199.999434/199.999434
 /**
 *<code>PhysicsColliderShape</code> 类用于创建形状碰撞器的父类，该类为抽象类。
 */
@@ -11590,6 +11590,11 @@ var ColliderShape=(function(){
 			case "CapsuleColliderShape":
 				colliderShape=shapeData.radius && shapeData.height ? new CapsuleColliderShape(shapeData.radius,shapeData.height):new CapsuleColliderShape();
 				break ;
+			case "MeshColliderShape":;
+				var meshCollider=new MeshColliderShape();
+				shapeData.mesh && (meshCollider.mesh=Loader.getRes(shapeData.mesh));
+				colliderShape=meshCollider;
+				break ;
 			default :
 				throw "unknown shape type.";
 			}
@@ -11641,7 +11646,7 @@ var ColliderShape=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/shape/HeightfieldColliderShape.as=======199.999429/199.999429
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/shape/HeightfieldColliderShape.as=======199.999429/199.999429
 /**
 *...
 *@author ...
@@ -11654,7 +11659,7 @@ var HeightfieldColliderShape=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/SkyBox.as=======199.999414/199.999414
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/SkyBox.as=======199.999414/199.999414
 /**
 *@private
 *<code>SkyBox</code> 类用于创建天空盒。
@@ -11714,7 +11719,7 @@ var SkyBox=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/TextureGenerator.as=======199.999409/199.999409
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/TextureGenerator.as=======199.999409/199.999409
 /**
 *...
 *@author
@@ -11778,7 +11783,7 @@ var TextureGenerator=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/shader/DefineDatas.as=======199.999408/199.999408
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/shader/DefineDatas.as=======199.999408/199.999408
 /**
 *<code>DefineDatas</code> 类用于创建宏定义数据。
 */
@@ -11840,7 +11845,7 @@ var DefineDatas=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/shader/Shader3D.as=======199.999407/199.999407
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/shader/Shader3D.as=======199.999407/199.999407
 /**
 *@private
 *<code>Shader3D</code> 类用于创建Shader3D。
@@ -11962,7 +11967,7 @@ var Shader3D=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/shader/ShaderData.as=======199.999406/199.999406
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/shader/ShaderData.as=======199.999406/199.999406
 /**
 *@private
 */
@@ -12488,7 +12493,7 @@ var ShaderData=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/shader/ShaderDefines.as=======199.999405/199.999405
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/shader/ShaderDefines.as=======199.999405/199.999405
 /**
 *@private
 */
@@ -12523,7 +12528,7 @@ var ShaderDefines=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/shader/ShaderInit3D.as=======199.999404/199.999404
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/shader/ShaderInit3D.as=======199.999404/199.999404
 /**
 *@private
 *<code>ShaderInit</code> 类用于初始化内置Shader。
@@ -13078,7 +13083,7 @@ var ShaderInit3D=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/shader/ShaderUniforms.as=======199.999401/199.999401
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/shader/ShaderUniforms.as=======199.999401/199.999401
 /**
 *@private
 */
@@ -13114,7 +13119,7 @@ var ShaderUniforms=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/shader/ShaderVariable.as=======199.999400/199.999400
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/shader/ShaderVariable.as=======199.999400/199.999400
 /**
 *@private
 *<code>shaderVariable</code> 类用于保存shader变量上传相关信息。
@@ -13148,7 +13153,7 @@ var ShaderVariable=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/shadowMap/ParallelSplitShadowMap.as=======199.999399/199.999399
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/shadowMap/ParallelSplitShadowMap.as=======199.999399/199.999399
 /**
 *...
 *@author ...
@@ -13653,7 +13658,7 @@ var ParallelSplitShadowMap=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/terrain/TerrainLeaf.as=======199.999394/199.999394
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/terrain/TerrainLeaf.as=======199.999394/199.999394
 /**
 *<code>TerrainLeaf</code> Terrain的叶子节点
 */
@@ -14131,7 +14136,7 @@ var TerrainLeaf=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/terrain/unit/ChunkInfo.as=======199.999391/199.999391
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/terrain/unit/ChunkInfo.as=======199.999391/199.999391
 /**
 *<code>DetailTextureInfo</code> 类用于描述地形细节纹理。
 */
@@ -14149,7 +14154,7 @@ var ChunkInfo=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/terrain/unit/DetailTextureInfo.as=======199.999390/199.999390
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/terrain/unit/DetailTextureInfo.as=======199.999390/199.999390
 /**
 *<code>DetailTextureInfo</code> 类用于描述地形细节纹理。
 */
@@ -14168,7 +14173,7 @@ var DetailTextureInfo=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/terrain/unit/MaterialInfo.as=======199.999389/199.999389
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/terrain/unit/MaterialInfo.as=======199.999389/199.999389
 /**
 *<code>MaterialInfo</code> 类用于描述地形材质信息。
 */
@@ -14186,7 +14191,7 @@ var MaterialInfo=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/Touch.as=======199.999388/199.999388
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/Touch.as=======199.999388/199.999388
 /**
 *<code>Touch</code> 类用于实现触摸描述。
 */
@@ -14237,7 +14242,7 @@ var Touch=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/utils/Physics3DUtils.as=======199.999387/199.999387
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/utils/Physics3DUtils.as=======199.999387/199.999387
 /**
 *<code>Physics</code> 类用于简单物理检测。
 */
@@ -14277,7 +14282,7 @@ var Physics3DUtils=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/utils/Picker.as=======199.999386/199.999386
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/utils/Picker.as=======199.999386/199.999386
 /**
 *<code>Picker</code> 类用于创建拾取。
 */
@@ -14362,7 +14367,7 @@ var Picker=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/utils/Size.as=======199.999385/199.999385
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/utils/Size.as=======199.999385/199.999385
 //class laya.d3.utils.Size
 var Size=(function(){
 	function Size(width,height){
@@ -14394,7 +14399,7 @@ var Size=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/utils/Utils3D.as=======199.999384/199.999384
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/utils/Utils3D.as=======199.999384/199.999384
 /**
 *<code>Utils3D</code> 类用于创建3D工具。
 */
@@ -15071,7 +15076,7 @@ var Utils3D=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/Laya3D.as=======199.999383/199.999383
+	//file:///D:/gittest/gittestnew/d3/src/Laya3D.as=======199.999383/199.999383
 /**
 *<code>Laya3D</code> 类用于初始化3D设置。
 */
@@ -15182,6 +15187,7 @@ var Laya3D=(function(){
 
 	Laya3D.enableNative3D=function(){
 		if (Render.isConchApp){
+			/*__JS__ */LayaGL=window.LayaGLContext;
 			var shaderData=ShaderData;
 			var shader3D=ShaderInstance;
 			var skinnedMeshRender=SkinnedMeshRenderer;
@@ -15333,6 +15339,18 @@ var Laya3D=(function(){
 							}else {
 							for (i=0,n=clipPaths.length;i < n;i++)
 							clipPaths[i]=Laya3D._addHierarchyInnerUrls(fourthLelUrls,subUrls,urlVersion,hierarchyBasePath,clipPaths[i],"ANIMATIONCLIP");
+						}
+						break ;
+					case "PhysicsCollider":
+					case "Rigidbody3D":
+					case "CharacterController":;
+						var shapes=component.shapes;
+						for (i=0;i < shapes.length;i++){
+							var shape=shapes[i];
+							if (shape.type==="MeshColliderShape"){
+								var mesh=shape.mesh;
+								(mesh)&& (shape.mesh=Laya3D._addHierarchyInnerUrls(firstLevelUrls,subUrls,urlVersion,hierarchyBasePath,mesh,/*CLASS CONST:Laya3D.MESH*/"MESH"));
+							}
 						}
 						break ;
 					}
@@ -15627,7 +15645,7 @@ var Laya3D=(function(){
 })()
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/component/Animator.as=======98.999612/98.999612
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/component/Animator.as=======98.999612/98.999612
 /**
 *<code>Animator</code> 类用于创建动画组件。
 */
@@ -16960,7 +16978,7 @@ var Animator=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/animation/AnimationTransform3D.as=======98.999610/98.999610
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/animation/AnimationTransform3D.as=======98.999610/98.999610
 /**
 *<code>AnimationTransform3D</code> 类用于实现3D变换。
 */
@@ -17156,7 +17174,7 @@ var AnimationTransform3D=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/component/Script3D.as=======98.999607/98.999607
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/component/Script3D.as=======98.999607/98.999607
 /**
 *<code>Script3D</code> 类用于创建脚本的父类,该类为抽象类,不允许实例。
 */
@@ -17407,7 +17425,7 @@ var Script3D=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/render/BaseRender.as=======98.999565/98.999565
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/render/BaseRender.as=======98.999565/98.999565
 /**
 *<code>Render</code> 类用于渲染器的父类，抽象类不允许实例。
 */
@@ -17893,7 +17911,7 @@ var BaseRender=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/trail/TrailFilter.as=======98.999516/98.999516
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/trail/TrailFilter.as=======98.999516/98.999516
 /**
 *<code>TrailFilter</code> 类用于创建拖尾过滤器。
 */
@@ -18162,7 +18180,7 @@ var TrailFilter=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/Transform3D.as=======98.999510/98.999510
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/Transform3D.as=======98.999510/98.999510
 /**
 *<code>Transform3D</code> 类用于实现3D变换。
 */
@@ -18949,7 +18967,7 @@ var Transform3D=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/TransformUV.as=======98.999509/98.999509
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/TransformUV.as=======98.999509/98.999509
 /**
 *<code>TransformUV</code> 类用于实现UV变换。
 */
@@ -19068,7 +19086,7 @@ var TransformUV=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/PhysicsComponent.as=======98.999445/98.999445
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/PhysicsComponent.as=======98.999445/98.999445
 /**
 *<code>PhysicsComponent</code> 类用于创建物理组件的父类。
 */
@@ -19570,7 +19588,7 @@ var PhysicsComponent=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/constraints/ConstraintComponent.as=======98.999441/98.999441
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/constraints/ConstraintComponent.as=======98.999441/98.999441
 /**
 *<code>ConstraintComponent</code> 类用于创建约束的父类。
 */
@@ -19656,7 +19674,7 @@ var ConstraintComponent=(function(_super){
 })(Component)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/CastShadowList.as=======98.999233/98.999233
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/CastShadowList.as=======98.999233/98.999233
 /**
 *<code>CastShadowList</code> 类用于实现产生阴影者队列。
 */
@@ -19694,7 +19712,7 @@ var CastShadowList=(function(_super){
 })(SingletonList)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/component/SimpleSingletonList.as=======98.999225/98.999225
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/component/SimpleSingletonList.as=======98.999225/98.999225
 /**
 *<code>SimpleSingletonList</code> 类用于实现单例队列。
 */
@@ -19732,7 +19750,7 @@ var SimpleSingletonList=(function(_super){
 })(SingletonList)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/FloatArrayKeyframe.as=======98.999205/98.999205
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/FloatArrayKeyframe.as=======98.999205/98.999205
 /**
 *<code>KeyFrame</code> 类用于创建浮点数组关键帧实例。
 */
@@ -19763,7 +19781,7 @@ var FloatArrayKeyframe=(function(_super){
 })(Keyframe)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/FloatKeyframe.as=======98.999203/98.999203
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/FloatKeyframe.as=======98.999203/98.999203
 /**
 *<code>FloatKeyFrame</code> 类用于创建浮点关键帧实例。
 */
@@ -19793,7 +19811,7 @@ var FloatKeyframe=(function(_super){
 })(Keyframe)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/ShurikenParticleSystem.as=======98.999145/98.999145
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/ShurikenParticleSystem.as=======98.999145/98.999145
 /**
 *<code>ShurikenParticleSystem</code> 类用于创建3D粒子数据模板。
 */
@@ -21657,7 +21675,7 @@ var ShurikenParticleSystem=(function(_super){
 })(GeometryElement)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/pixelLine/PixelLineFilter.as=======98.999143/98.999143
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/pixelLine/PixelLineFilter.as=======98.999143/98.999143
 /**
 *<code>PixelLineFilter</code> 类用于线过滤器。
 */
@@ -21809,7 +21827,7 @@ var PixelLineFilter=(function(_super){
 })(GeometryElement)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/trail/TrailRenderElement.as=======98.999125/98.999125
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/trail/TrailRenderElement.as=======98.999125/98.999125
 /**
 *<code>TrailRenderElement</code> 类用于创建拖尾渲染单元。
 */
@@ -22139,7 +22157,7 @@ var TrailRenderElement=(function(_super){
 })(GeometryElement)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/shape/BoxShape.as=======98.999119/98.999119
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/shape/BoxShape.as=======98.999119/98.999119
 /**
 *<code>BoxShape</code> 类用于创建球形粒子形状。
 */
@@ -22235,7 +22253,7 @@ var BoxShape=(function(_super){
 })(BaseShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/shape/CircleShape.as=======98.999118/98.999118
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/shape/CircleShape.as=======98.999118/98.999118
 /**
 *<code>CircleShape</code> 类用于创建环形粒子形状。
 */
@@ -22335,7 +22353,7 @@ var CircleShape=(function(_super){
 })(BaseShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/shape/ConeShape.as=======98.999117/98.999117
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/shape/ConeShape.as=======98.999117/98.999117
 /**
 *<code>ConeShape</code> 类用于创建锥形粒子形状。
 */
@@ -22550,7 +22568,7 @@ var ConeShape=(function(_super){
 })(BaseShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/shape/HemisphereShape.as=======98.999116/98.999116
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/shape/HemisphereShape.as=======98.999116/98.999116
 /**
 *<code>HemisphereShape</code> 类用于创建半球形粒子形状。
 */
@@ -22639,7 +22657,7 @@ var HemisphereShape=(function(_super){
 })(BaseShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/module/shape/SphereShape.as=======98.999114/98.999114
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/module/shape/SphereShape.as=======98.999114/98.999114
 /**
 *<code>SphereShape</code> 类用于创建球形粒子形状。
 */
@@ -22723,7 +22741,7 @@ var SphereShape=(function(_super){
 })(BaseShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/SubMeshDynamicBatch.as=======98.999111/98.999111
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/SubMeshDynamicBatch.as=======98.999111/98.999111
 /**
 *@private
 *<code>SubMeshDynamicBatch</code> 类用于网格动态合并。
@@ -22934,7 +22952,7 @@ var SubMeshDynamicBatch=(function(_super){
 })(GeometryElement)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/SubMeshStaticBatch.as=======98.999110/98.999110
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/SubMeshStaticBatch.as=======98.999110/98.999110
 /**
 *@private
 *<code>SubMeshStaticBatch</code> 类用于网格静态合并。
@@ -23205,7 +23223,7 @@ var SubMeshStaticBatch=(function(_super){
 })(GeometryElement)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/render/SubMeshRenderElement.as=======98.999072/98.999072
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/render/SubMeshRenderElement.as=======98.999072/98.999072
 /**
 *@private
 */
@@ -23498,7 +23516,7 @@ var SubMeshRenderElement=(function(_super){
 })(RenderElement)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/shader/ShaderPass.as=======98.999035/98.999035
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/shader/ShaderPass.as=======98.999035/98.999035
 /**
 *<code>ShaderPass</code> 类用于实现ShaderPass。
 */
@@ -23638,7 +23656,7 @@ var ShaderPass=(function(_super){
 })(ShaderCompile)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/MeshRenderDynamicBatchManager.as=======98.999034/98.999034
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/MeshRenderDynamicBatchManager.as=======98.999034/98.999034
 /**
 *@private
 *<code>MeshSprite3DDynamicBatchManager</code> 类用于网格精灵动态批处理管理。
@@ -23721,7 +23739,7 @@ var MeshRenderDynamicBatchManager=(function(_super){
 })(DynamicBatchManager)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/MeshRenderStaticBatchManager.as=======98.999027/98.999027
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/MeshRenderStaticBatchManager.as=======98.999027/98.999027
 /**
 *@private
 *<code>MeshSprite3DStaticBatchManager</code> 类用于网格精灵静态批处理管理。
@@ -23876,7 +23894,7 @@ var MeshRenderStaticBatchManager=(function(_super){
 })(StaticBatchManager)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPosition.as=======98.999017/98.999017
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPosition.as=======98.999017/98.999017
 //class laya.d3.graphics.Vertex.VertexPosition extends laya.d3.graphics.Vertex.VertexMesh
 var VertexPosition=(function(_super){
 	function VertexPosition(position){
@@ -23908,7 +23926,7 @@ var VertexPosition=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormal.as=======98.999016/98.999016
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormal.as=======98.999016/98.999016
 //class laya.d3.graphics.Vertex.VertexPositionNormal extends laya.d3.graphics.Vertex.VertexMesh
 var VertexPositionNormal=(function(_super){
 	function VertexPositionNormal(position,normal){
@@ -23947,7 +23965,7 @@ var VertexPositionNormal=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/primitiveGeometry.as=======98.999016/98.999016
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/primitiveGeometry.as=======98.999016/98.999016
 /**
 *@private
 *<code>primitiveGeometry</code> 类用于实现简单几何体。
@@ -23978,7 +23996,7 @@ var primitiveGeometry=(function(_super){
 })(GeometryElement)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColor.as=======98.999015/98.999015
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColor.as=======98.999015/98.999015
 /**
 *<code>VertexPositionNormalColor</code> 类用于创建位置、法线、颜色顶点结构。
 */
@@ -24026,7 +24044,7 @@ var VertexPositionNormalColor=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorSkin.as=======98.999014/98.999014
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorSkin.as=======98.999014/98.999014
 /**
 *<code>VertexPositionNormalColorSkin</code> 类用于创建位置、法线、颜色、骨骼索引、骨骼权重顶点结构。
 */
@@ -24088,7 +24106,7 @@ var VertexPositionNormalColorSkin=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorSkinSTangent.as=======98.999013/98.999013
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorSkinSTangent.as=======98.999013/98.999013
 /**
 *<code>VertexPositionNormalColorSkin</code> 类用于创建位置、法线、颜色、骨骼索引、骨骼权重顶点结构。
 */
@@ -24157,7 +24175,62 @@ var VertexPositionNormalColorSkinSTangent=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/SubMesh.as=======98.999012/98.999012
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorSTangent.as=======98.999012/98.999012
+/**
+*<code>VertexPositionNormalColorTangent</code> 类用于创建位置、法线、颜色、切线顶点结构。
+*/
+//class laya.d3.graphics.Vertex.VertexPositionNormalColorSTangent extends laya.d3.graphics.Vertex.VertexMesh
+var VertexPositionNormalColorSTangent=(function(_super){
+	function VertexPositionNormalColorSTangent(position,normal,color,tangent){
+		this._position=null;
+		this._normal=null;
+		this._color=null;
+		this._tangent=null;
+		VertexPositionNormalColorSTangent.__super.call(this);
+		this._position=position;
+		this._normal=normal;
+		this._color=color;
+		this._tangent=tangent;
+	}
+
+	__class(VertexPositionNormalColorSTangent,'laya.d3.graphics.Vertex.VertexPositionNormalColorSTangent',_super);
+	var __proto=VertexPositionNormalColorSTangent.prototype;
+	__getset(0,__proto,'tangent',function(){
+		return this._tangent;
+	});
+
+	__getset(0,__proto,'normal',function(){
+		return this._normal;
+	});
+
+	__getset(0,__proto,'position',function(){
+		return this._position;
+	});
+
+	__getset(0,__proto,'color',function(){
+		return this._color;
+	});
+
+	__getset(0,__proto,'vertexDeclaration',function(){
+		return VertexPositionNormalColorSTangent._vertexDeclaration;
+	});
+
+	__getset(1,VertexPositionNormalColorSTangent,'vertexDeclaration',function(){
+		return VertexPositionNormalColorSTangent._vertexDeclaration;
+	},laya.d3.graphics.Vertex.VertexMesh._$SET_vertexDeclaration);
+
+	__static(VertexPositionNormalColorSTangent,
+	['_vertexDeclaration',function(){return this._vertexDeclaration=new VertexDeclaration(56,[
+		new VertexElement(0,/*laya.d3.graphics.VertexElementFormat.Vector3*/"vector3",/*laya.d3.graphics.Vertex.VertexMesh.MESH_POSITION0*/0),
+		new VertexElement(12,/*laya.d3.graphics.VertexElementFormat.Vector3*/"vector3",/*laya.d3.graphics.Vertex.VertexMesh.MESH_NORMAL0*/3),
+		new VertexElement(24,/*laya.d3.graphics.VertexElementFormat.Vector4*/"vector4",/*laya.d3.graphics.Vertex.VertexMesh.MESH_COLOR0*/1),
+		new VertexElement(40,/*laya.d3.graphics.VertexElementFormat.Vector4*/"vector4",/*laya.d3.graphics.Vertex.VertexMesh.MESH_TANGENT0*/5)]);}
+	]);
+	return VertexPositionNormalColorSTangent;
+})(VertexMesh)
+
+
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/SubMesh.as=======98.999012/98.999012
 /**
 *<code>SubMesh</code> 类用于创建子网格数据模板。
 */
@@ -24242,62 +24315,7 @@ var SubMesh=(function(_super){
 })(GeometryElement)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorSTangent.as=======98.999012/98.999012
-/**
-*<code>VertexPositionNormalColorTangent</code> 类用于创建位置、法线、颜色、切线顶点结构。
-*/
-//class laya.d3.graphics.Vertex.VertexPositionNormalColorSTangent extends laya.d3.graphics.Vertex.VertexMesh
-var VertexPositionNormalColorSTangent=(function(_super){
-	function VertexPositionNormalColorSTangent(position,normal,color,tangent){
-		this._position=null;
-		this._normal=null;
-		this._color=null;
-		this._tangent=null;
-		VertexPositionNormalColorSTangent.__super.call(this);
-		this._position=position;
-		this._normal=normal;
-		this._color=color;
-		this._tangent=tangent;
-	}
-
-	__class(VertexPositionNormalColorSTangent,'laya.d3.graphics.Vertex.VertexPositionNormalColorSTangent',_super);
-	var __proto=VertexPositionNormalColorSTangent.prototype;
-	__getset(0,__proto,'tangent',function(){
-		return this._tangent;
-	});
-
-	__getset(0,__proto,'normal',function(){
-		return this._normal;
-	});
-
-	__getset(0,__proto,'position',function(){
-		return this._position;
-	});
-
-	__getset(0,__proto,'color',function(){
-		return this._color;
-	});
-
-	__getset(0,__proto,'vertexDeclaration',function(){
-		return VertexPositionNormalColorSTangent._vertexDeclaration;
-	});
-
-	__getset(1,VertexPositionNormalColorSTangent,'vertexDeclaration',function(){
-		return VertexPositionNormalColorSTangent._vertexDeclaration;
-	},laya.d3.graphics.Vertex.VertexMesh._$SET_vertexDeclaration);
-
-	__static(VertexPositionNormalColorSTangent,
-	['_vertexDeclaration',function(){return this._vertexDeclaration=new VertexDeclaration(56,[
-		new VertexElement(0,/*laya.d3.graphics.VertexElementFormat.Vector3*/"vector3",/*laya.d3.graphics.Vertex.VertexMesh.MESH_POSITION0*/0),
-		new VertexElement(12,/*laya.d3.graphics.VertexElementFormat.Vector3*/"vector3",/*laya.d3.graphics.Vertex.VertexMesh.MESH_NORMAL0*/3),
-		new VertexElement(24,/*laya.d3.graphics.VertexElementFormat.Vector4*/"vector4",/*laya.d3.graphics.Vertex.VertexMesh.MESH_COLOR0*/1),
-		new VertexElement(40,/*laya.d3.graphics.VertexElementFormat.Vector4*/"vector4",/*laya.d3.graphics.Vertex.VertexMesh.MESH_TANGENT0*/5)]);}
-	]);
-	return VertexPositionNormalColorSTangent;
-})(VertexMesh)
-
-
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTexture.as=======98.999011/98.999011
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTexture.as=======98.999011/98.999011
 /**
 *<code>VertexPositionNormalColorTexture</code> 类用于创建位置、法线、颜色、纹理顶点结构。
 */
@@ -24352,7 +24370,7 @@ var VertexPositionNormalColorTexture=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTexture0Texture1.as=======98.999010/98.999010
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTexture0Texture1.as=======98.999010/98.999010
 /**
 *<code>VertexPositionNormalColorTexture</code> 类用于创建位置、法线、颜色、纹理顶点结构。
 */
@@ -24414,7 +24432,7 @@ var VertexPositionNormalColorTexture0Texture1=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTexture0Texture1Skin.as=======98.999009/98.999009
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTexture0Texture1Skin.as=======98.999009/98.999009
 /**
 *<code>VertexPositionNormalColorTextureSkin</code> 类用于创建位置、法线、颜色、纹理、骨骼索引、骨骼权重顶点结构。
 */
@@ -24490,7 +24508,7 @@ var VertexPositionNormalColorTexture0Texture1Skin=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTexture0Texture1SkinSTangent.as=======98.999008/98.999008
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTexture0Texture1SkinSTangent.as=======98.999008/98.999008
 /**
 *<code>VertexPositionNormalTextureSkin</code> 类用于创建位置、法线、纹理、骨骼索引、骨骼权重顶点结构。
 */
@@ -24573,7 +24591,7 @@ var VertexPositionNormalColorTexture0Texture1SkinSTangent=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTexture0Texture1STangent.as=======98.999007/98.999007
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTexture0Texture1STangent.as=======98.999007/98.999007
 /**
 *<code>VertexPositionNormalColorTextureTangent</code> 类用于创建位置、法线、颜色、纹理、切线顶点结构。
 */
@@ -24642,7 +24660,7 @@ var VertexPositionNormalColorTexture0Texture1STangent=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTextureSkin.as=======98.999006/98.999006
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTextureSkin.as=======98.999006/98.999006
 /**
 *<code>VertexPositionNormalColorTextureSkin</code> 类用于创建位置、法线、颜色、纹理、骨骼索引、骨骼权重顶点结构。
 */
@@ -24711,7 +24729,7 @@ var VertexPositionNormalColorTextureSkin=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTextureSkinSTangent.as=======98.999005/98.999005
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTextureSkinSTangent.as=======98.999005/98.999005
 /**
 *<code>VertexPositionNormalTextureSkin</code> 类用于创建位置、法线、纹理、骨骼索引、骨骼权重顶点结构。
 */
@@ -24787,7 +24805,7 @@ var VertexPositionNormalColorTextureSkinSTangent=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTextureSTangent.as=======98.999004/98.999004
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalColorTextureSTangent.as=======98.999004/98.999004
 /**
 *<code>VertexPositionNormalColorTextureTangent</code> 类用于创建位置、法线、颜色、纹理、切线顶点结构。
 */
@@ -24849,7 +24867,7 @@ var VertexPositionNormalColorTextureSTangent=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalSTangent.as=======98.999003/98.999003
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalSTangent.as=======98.999003/98.999003
 //class laya.d3.graphics.Vertex.VertexPositionNormalSTangent extends laya.d3.graphics.Vertex.VertexMesh
 var VertexPositionNormalSTangent=(function(_super){
 	function VertexPositionNormalSTangent(position,normal,tangent){
@@ -24895,7 +24913,7 @@ var VertexPositionNormalSTangent=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTexture.as=======98.999002/98.999002
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTexture.as=======98.999002/98.999002
 /**
 *<code>VertexPositionNormalTexture</code> 类用于创建位置、法线、纹理顶点结构。
 */
@@ -24943,7 +24961,7 @@ var VertexPositionNormalTexture=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTexture0Texture1.as=======98.999001/98.999001
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTexture0Texture1.as=======98.999001/98.999001
 /**
 *<code>VertexPositionNormalTexture</code> 类用于创建位置、法线、纹理顶点结构。
 */
@@ -24998,7 +25016,7 @@ var VertexPositionNormalTexture0Texture1=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTexture0Texture1Skin.as=======98.999000/98.999000
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTexture0Texture1Skin.as=======98.999000/98.999000
 /**
 *<code>VertexPositionNormalColorTextureSkin</code> 类用于创建位置、法线、颜色、纹理、骨骼索引、骨骼权重顶点结构。
 */
@@ -25067,7 +25085,7 @@ var VertexPositionNormalTexture0Texture1Skin=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTexture0Texture1SkinSTangent.as=======98.998999/98.998999
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTexture0Texture1SkinSTangent.as=======98.998999/98.998999
 /**
 *<code>VertexPositionNormalTextureSkin</code> 类用于创建位置、法线、纹理、骨骼索引、骨骼权重顶点结构。
 */
@@ -25143,7 +25161,7 @@ var VertexPositionNormalTexture0Texture1SkinSTangent=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTexture0Texture1STangent.as=======98.998998/98.998998
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTexture0Texture1STangent.as=======98.998998/98.998998
 /**
 *<code>VertexPositionNormalTextureTangent</code> 类用于创建位置、法线、纹理、切线顶点结构。
 */
@@ -25205,7 +25223,7 @@ var VertexPositionNormalTexture0Texture1STangent=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTextureSkin.as=======98.998997/98.998997
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTextureSkin.as=======98.998997/98.998997
 /**
 *<code>VertexPositionNormalColorTextureSkin</code> 类用于创建位置、法线、颜色、纹理、骨骼索引、骨骼权重顶点结构。
 */
@@ -25267,76 +25285,7 @@ var VertexPositionNormalTextureSkin=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTextureSkinSTangent.as=======98.998996/98.998996
-/**
-*<code>VertexPositionNormalTextureSkin</code> 类用于创建位置、法线、纹理、骨骼索引、骨骼权重顶点结构。
-*/
-//class laya.d3.graphics.Vertex.VertexPositionNormalTextureSkinSTangent extends laya.d3.graphics.Vertex.VertexMesh
-var VertexPositionNormalTextureSkinSTangent=(function(_super){
-	function VertexPositionNormalTextureSkinSTangent(position,normal,textureCoordinate,tangent,blendIndex,blendWeight){
-		this._position=null;
-		this._normal=null;
-		this._textureCoordinate=null;
-		this._blendIndex=null;
-		this._blendWeight=null;
-		this._tangent=null;
-		VertexPositionNormalTextureSkinSTangent.__super.call(this);
-		this._position=position;
-		this._normal=normal;
-		this._textureCoordinate=textureCoordinate;
-		this._tangent=tangent;
-		this._blendIndex=blendIndex;
-		this._blendWeight=blendWeight;
-	}
-
-	__class(VertexPositionNormalTextureSkinSTangent,'laya.d3.graphics.Vertex.VertexPositionNormalTextureSkinSTangent',_super);
-	var __proto=VertexPositionNormalTextureSkinSTangent.prototype;
-	__getset(0,__proto,'tangent',function(){
-		return this._tangent;
-	});
-
-	__getset(0,__proto,'textureCoordinate',function(){
-		return this._textureCoordinate;
-	});
-
-	__getset(0,__proto,'normal',function(){
-		return this._normal;
-	});
-
-	__getset(0,__proto,'position',function(){
-		return this._position;
-	});
-
-	__getset(0,__proto,'blendIndex',function(){
-		return this._blendIndex;
-	});
-
-	__getset(0,__proto,'blendWeight',function(){
-		return this._blendWeight;
-	});
-
-	__getset(0,__proto,'vertexDeclaration',function(){
-		return VertexPositionNormalTextureSkinSTangent._vertexDeclaration;
-	});
-
-	__getset(1,VertexPositionNormalTextureSkinSTangent,'vertexDeclaration',function(){
-		return VertexPositionNormalTextureSkinSTangent._vertexDeclaration;
-	},laya.d3.graphics.Vertex.VertexMesh._$SET_vertexDeclaration);
-
-	__static(VertexPositionNormalTextureSkinSTangent,
-	['_vertexDeclaration',function(){return this._vertexDeclaration=new VertexDeclaration(80,[
-		new VertexElement(0,/*laya.d3.graphics.VertexElementFormat.Vector3*/"vector3",/*laya.d3.graphics.Vertex.VertexMesh.MESH_POSITION0*/0),
-		new VertexElement(12,/*laya.d3.graphics.VertexElementFormat.Vector3*/"vector3",/*laya.d3.graphics.Vertex.VertexMesh.MESH_NORMAL0*/3),
-		new VertexElement(24,/*laya.d3.graphics.VertexElementFormat.Vector2*/"vector2",/*laya.d3.graphics.Vertex.VertexMesh.MESH_TEXTURECOORDINATE0*/2),
-		new VertexElement(32,/*laya.d3.graphics.VertexElementFormat.Vector4*/"vector4",/*laya.d3.graphics.Vertex.VertexMesh.MESH_BLENDWEIGHT0*/7),
-		new VertexElement(48,/*laya.d3.graphics.VertexElementFormat.Vector4*/"vector4",/*laya.d3.graphics.Vertex.VertexMesh.MESH_BLENDINDICES0*/6),
-		new VertexElement(64,/*laya.d3.graphics.VertexElementFormat.Vector4*/"vector4",/*laya.d3.graphics.Vertex.VertexMesh.MESH_TANGENT0*/5)]);}
-	]);
-	return VertexPositionNormalTextureSkinSTangent;
-})(VertexMesh)
-
-
-	//file:///E:/git/layaair-master/d3/src/laya/d3/terrain/TerrainFilter.as=======98.998996/98.998996
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/terrain/TerrainFilter.as=======98.998996/98.998996
 /**
 *<code>TerrainFilter</code> 类用于创建TerrainFilter过滤器。
 */
@@ -25588,7 +25537,76 @@ var TerrainFilter=(function(_super){
 })(GeometryElement)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTextureSTangent.as=======98.998995/98.998995
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTextureSkinSTangent.as=======98.998996/98.998996
+/**
+*<code>VertexPositionNormalTextureSkin</code> 类用于创建位置、法线、纹理、骨骼索引、骨骼权重顶点结构。
+*/
+//class laya.d3.graphics.Vertex.VertexPositionNormalTextureSkinSTangent extends laya.d3.graphics.Vertex.VertexMesh
+var VertexPositionNormalTextureSkinSTangent=(function(_super){
+	function VertexPositionNormalTextureSkinSTangent(position,normal,textureCoordinate,tangent,blendIndex,blendWeight){
+		this._position=null;
+		this._normal=null;
+		this._textureCoordinate=null;
+		this._blendIndex=null;
+		this._blendWeight=null;
+		this._tangent=null;
+		VertexPositionNormalTextureSkinSTangent.__super.call(this);
+		this._position=position;
+		this._normal=normal;
+		this._textureCoordinate=textureCoordinate;
+		this._tangent=tangent;
+		this._blendIndex=blendIndex;
+		this._blendWeight=blendWeight;
+	}
+
+	__class(VertexPositionNormalTextureSkinSTangent,'laya.d3.graphics.Vertex.VertexPositionNormalTextureSkinSTangent',_super);
+	var __proto=VertexPositionNormalTextureSkinSTangent.prototype;
+	__getset(0,__proto,'tangent',function(){
+		return this._tangent;
+	});
+
+	__getset(0,__proto,'textureCoordinate',function(){
+		return this._textureCoordinate;
+	});
+
+	__getset(0,__proto,'normal',function(){
+		return this._normal;
+	});
+
+	__getset(0,__proto,'position',function(){
+		return this._position;
+	});
+
+	__getset(0,__proto,'blendIndex',function(){
+		return this._blendIndex;
+	});
+
+	__getset(0,__proto,'blendWeight',function(){
+		return this._blendWeight;
+	});
+
+	__getset(0,__proto,'vertexDeclaration',function(){
+		return VertexPositionNormalTextureSkinSTangent._vertexDeclaration;
+	});
+
+	__getset(1,VertexPositionNormalTextureSkinSTangent,'vertexDeclaration',function(){
+		return VertexPositionNormalTextureSkinSTangent._vertexDeclaration;
+	},laya.d3.graphics.Vertex.VertexMesh._$SET_vertexDeclaration);
+
+	__static(VertexPositionNormalTextureSkinSTangent,
+	['_vertexDeclaration',function(){return this._vertexDeclaration=new VertexDeclaration(80,[
+		new VertexElement(0,/*laya.d3.graphics.VertexElementFormat.Vector3*/"vector3",/*laya.d3.graphics.Vertex.VertexMesh.MESH_POSITION0*/0),
+		new VertexElement(12,/*laya.d3.graphics.VertexElementFormat.Vector3*/"vector3",/*laya.d3.graphics.Vertex.VertexMesh.MESH_NORMAL0*/3),
+		new VertexElement(24,/*laya.d3.graphics.VertexElementFormat.Vector2*/"vector2",/*laya.d3.graphics.Vertex.VertexMesh.MESH_TEXTURECOORDINATE0*/2),
+		new VertexElement(32,/*laya.d3.graphics.VertexElementFormat.Vector4*/"vector4",/*laya.d3.graphics.Vertex.VertexMesh.MESH_BLENDWEIGHT0*/7),
+		new VertexElement(48,/*laya.d3.graphics.VertexElementFormat.Vector4*/"vector4",/*laya.d3.graphics.Vertex.VertexMesh.MESH_BLENDINDICES0*/6),
+		new VertexElement(64,/*laya.d3.graphics.VertexElementFormat.Vector4*/"vector4",/*laya.d3.graphics.Vertex.VertexMesh.MESH_TANGENT0*/5)]);}
+	]);
+	return VertexPositionNormalTextureSkinSTangent;
+})(VertexMesh)
+
+
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNormalTextureSTangent.as=======98.998995/98.998995
 /**
 *<code>VertexPositionNormalTextureTangent</code> 类用于创建位置、法线、纹理、切线顶点结构。
 */
@@ -25643,7 +25661,7 @@ var VertexPositionNormalTextureSTangent=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNTBTexture.as=======98.998994/98.998994
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNTBTexture.as=======98.998994/98.998994
 /**
 *<code>VertexPositionNormalTexture</code> 类用于创建位置、法线、纹理顶点结构。
 */
@@ -25693,7 +25711,7 @@ var VertexPositionNTBTexture=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNTBTexture0Texture1Skin.as=======98.998993/98.998993
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNTBTexture0Texture1Skin.as=======98.998993/98.998993
 /**
 *<code>VertexPositionNormalTextureSkin</code> 类用于创建位置、法线、纹理、骨骼索引、骨骼权重顶点结构。
 */
@@ -25772,7 +25790,7 @@ var VertexPositionNTBTexture0Texture1Skin=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexPositionNTBTextureSkin.as=======98.998992/98.998992
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexPositionNTBTextureSkin.as=======98.998992/98.998992
 /**
 *<code>VertexPositionNormalTexture</code> 类用于创建位置、法线、纹理顶点结构。
 */
@@ -25824,7 +25842,7 @@ var VertexPositionNTBTextureSkin=(function(_super){
 })(VertexMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexShurikenParticleBillboard.as=======98.998959/98.998959
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexShurikenParticleBillboard.as=======98.998959/98.998959
 /**
 *<code>VertexShurikenParticle</code> 类用于创建粒子顶点结构。
 */
@@ -25960,7 +25978,7 @@ var VertexShurikenParticleBillboard=(function(_super){
 })(VertexShuriKenParticle)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/Vertex/VertexShurikenParticleMesh.as=======98.998958/98.998958
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/Vertex/VertexShurikenParticleMesh.as=======98.998958/98.998958
 /**
 *<code>VertexShurikenParticle</code> 类用于创建粒子顶点结构。
 */
@@ -26098,7 +26116,7 @@ var VertexShurikenParticleMesh=(function(_super){
 })(VertexShuriKenParticle)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/Vector2.as=======98.998924/98.998924
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/Vector2.as=======98.998924/98.998924
 /**
 *<code>Vector2</code> 类用于创建二维向量。
 */
@@ -26221,7 +26239,7 @@ var Vector2=(function(_super){
 })(BaseVector)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/Vector3.as=======98.998923/98.998923
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/Vector3.as=======98.998923/98.998923
 /**
 *<code>Vector3</code> 类用于创建三维向量。
 */
@@ -26566,7 +26584,7 @@ var Vector3=(function(_super){
 })(BaseVector)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/math/Vector4.as=======98.998922/98.998922
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/math/Vector4.as=======98.998922/98.998922
 /**
 *<code>Vector4</code> 类用于创建四维向量。
 */
@@ -26871,7 +26889,7 @@ var Vector4=(function(_super){
 })(BaseVector)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/shape/BoxColliderShape.as=======98.998869/98.998869
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/shape/BoxColliderShape.as=======98.998869/98.998869
 /**
 *<code>BoxColliderShape</code> 类用于创建盒子形状碰撞器。
 */
@@ -26926,7 +26944,7 @@ var BoxColliderShape=(function(_super){
 })(ColliderShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/shape/CapsuleColliderShape.as=======98.998867/98.998867
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/shape/CapsuleColliderShape.as=======98.998867/98.998867
 /**
 *<code>CapsuleColliderShape</code> 类用于创建胶囊形状碰撞器。
 */
@@ -27018,7 +27036,7 @@ var CapsuleColliderShape=(function(_super){
 })(ColliderShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/shape/CompoundColliderShape.as=======98.998866/98.998866
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/shape/CompoundColliderShape.as=======98.998866/98.998866
 /**
 *<code>CompoundColliderShape</code> 类用于创建盒子形状碰撞器。
 */
@@ -27129,7 +27147,7 @@ var CompoundColliderShape=(function(_super){
 })(ColliderShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/shape/ConeColliderShape.as=======98.998865/98.998865
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/shape/ConeColliderShape.as=======98.998865/98.998865
 /**
 *<code>ConeColliderShape</code> 类用于创建圆柱碰撞器。
 */
@@ -27192,7 +27210,7 @@ var ConeColliderShape=(function(_super){
 })(ColliderShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/shape/CylinderColliderShape.as=======98.998864/98.998864
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/shape/CylinderColliderShape.as=======98.998864/98.998864
 /**
 *<code>CylinderColliderShape</code> 类用于创建圆柱碰撞器。
 */
@@ -27261,7 +27279,7 @@ var CylinderColliderShape=(function(_super){
 })(ColliderShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/shape/MeshColliderShape.as=======98.998862/98.998862
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/shape/MeshColliderShape.as=======98.998862/98.998862
 /**
 *<code>MeshColliderShape</code> 类用于创建网格碰撞器。
 */
@@ -27344,7 +27362,7 @@ var MeshColliderShape=(function(_super){
 })(ColliderShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/shape/SphereColliderShape.as=======98.998861/98.998861
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/shape/SphereColliderShape.as=======98.998861/98.998861
 /**
 *<code>SphereColliderShape</code> 类用于创建球形碰撞器。
 */
@@ -27373,7 +27391,7 @@ var SphereColliderShape=(function(_super){
 })(ColliderShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/shape/StaticPlaneColliderShape.as=======98.998860/98.998860
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/shape/StaticPlaneColliderShape.as=======98.998860/98.998860
 /**
 *<code>StaticPlaneColliderShape</code> 类用于创建静态平面碰撞器。
 */
@@ -27400,7 +27418,7 @@ var StaticPlaneColliderShape=(function(_super){
 })(ColliderShape)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/Sprite3D.as=======97.999585/97.999585
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/Sprite3D.as=======97.999585/97.999585
 /**
 *<code>Sprite3D</code> 类用于实现3D精灵。
 */
@@ -27738,7 +27756,7 @@ var Sprite3D=(function(_super){
 })(Node)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/animation/AnimationClip.as=======97.999517/97.999517
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/animation/AnimationClip.as=======97.999517/97.999517
 /**
 *<code>AnimationClip</code> 类用于动画片段资源。
 */
@@ -27989,7 +28007,7 @@ var AnimationClip=(function(_super){
 })(Resource)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/Avatar.as=======97.999500/97.999500
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/Avatar.as=======97.999500/97.999500
 /**
 *<code>Avatar</code> 类用于创建Avatar。
 */
@@ -28138,7 +28156,7 @@ var Avatar=(function(_super){
 })(Resource)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/material/BaseMaterial.as=======97.999482/97.999482
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/material/BaseMaterial.as=======97.999482/97.999482
 /**
 *<code>BaseMaterial</code> 类用于创建材质,抽象类,不允许实例。
 */
@@ -28460,7 +28478,7 @@ var BaseMaterial=(function(_super){
 })(Resource)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/BaseMesh.as=======97.999316/97.999316
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/BaseMesh.as=======97.999316/97.999316
 /**
 *<code>BaseMesh</code> 类用于创建网格,抽象类,不允许实例。
 */
@@ -28545,7 +28563,7 @@ var BaseMesh=(function(_super){
 })(Resource)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/shader/ShaderInstance.as=======97.999295/97.999295
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/shader/ShaderInstance.as=======97.999295/97.999295
 /**
 *@private
 *<code>ShaderInstance</code> 类用于实现ShaderInstance。
@@ -29083,7 +29101,7 @@ var ShaderInstance=(function(_super){
 })(Resource)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/terrain/TerrainHeightData.as=======97.999287/97.999287
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/terrain/TerrainHeightData.as=======97.999287/97.999287
 /**
 *<code>TerrainHeightData</code> 类用于描述地形高度信息。
 */
@@ -29128,7 +29146,7 @@ var TerrainHeightData=(function(_super){
 })(Resource)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/terrain/TerrainRes.as=======97.999284/97.999284
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/terrain/TerrainRes.as=======97.999284/97.999284
 /**
 *<code>TerrainRes</code> 类用于描述地形信息。
 */
@@ -29259,7 +29277,7 @@ var TerrainRes=(function(_super){
 })(Resource)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/MeshRenderer.as=======97.999142/97.999142
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/MeshRenderer.as=======97.999142/97.999142
 /**
 *<code>MeshRender</code> 类用于网格渲染器。
 */
@@ -29392,7 +29410,7 @@ var MeshRenderer=(function(_super){
 })(BaseRender)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/ShurikenParticleRenderer.as=======97.999111/97.999111
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/ShurikenParticleRenderer.as=======97.999111/97.999111
 /**
 *<code>ShurikenParticleRender</code> 类用于创建3D粒子渲染器。
 */
@@ -29627,7 +29645,7 @@ var ShurikenParticleRenderer=(function(_super){
 })(BaseRender)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/pixelLine/PixelLineRenderer.as=======97.999106/97.999106
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/pixelLine/PixelLineRenderer.as=======97.999106/97.999106
 /**
 *<code>PixelLineRenderer</code> 类用于线渲染器。
 */
@@ -29688,7 +29706,7 @@ var PixelLineRenderer=(function(_super){
 })(BaseRender)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/trail/TrailRenderer.as=======97.999089/97.999089
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/trail/TrailRenderer.as=======97.999089/97.999089
 /**
 *<code>TrailRenderer</code> 类用于创建拖尾渲染器。
 */
@@ -29760,7 +29778,7 @@ var TrailRenderer=(function(_super){
 })(BaseRender)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/terrain/TerrainRender.as=======97.998958/97.998958
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/terrain/TerrainRender.as=======97.998958/97.998958
 /**
 *<code>MeshRender</code> 类用于网格渲染器。
 */
@@ -29860,7 +29878,7 @@ var TerrainRender=(function(_super){
 })(BaseRender)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/CharacterController.as=======97.998894/97.998894
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/CharacterController.as=======97.998894/97.998894
 /**
 *<code>CharacterController</code> 类用于创建角色控制器。
 */
@@ -30115,7 +30133,7 @@ var CharacterController=(function(_super){
 })(PhysicsComponent)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/PhysicsTriggerComponent.as=======97.998884/97.998884
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/PhysicsTriggerComponent.as=======97.998884/97.998884
 /**
 *<code>PhysicsTriggerComponent</code> 类用于创建物理触发器组件。
 */
@@ -30162,7 +30180,7 @@ var PhysicsTriggerComponent=(function(_super){
 })(PhysicsComponent)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/scene/Scene3D.as=======96.999502/96.999502
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/scene/Scene3D.as=======96.999502/96.999502
 /**
 *<code>Scene3D</code> 类用于实现场景。
 */
@@ -30510,7 +30528,10 @@ var Scene3D=(function(_super){
 		var vpY=camera._canvasHeight-viewport.y-vpHeight;
 		gl.viewport(vpX,vpY,vpWidth,vpHeight);
 		var flag=/*laya.webgl.WebGLContext.DEPTH_BUFFER_BIT*/0x00000100;
-		switch (camera.clearFlag){
+		var clearFlag=camera.clearFlag;
+		if (clearFlag===/*laya.d3.core.BaseCamera.CLEARFLAG_SKY*/1 && !(camera.skyboxMaterial || this._skyboxMaterial))
+			clearFlag=/*laya.d3.core.BaseCamera.CLEARFLAG_SOLIDCOLOR*/0;
+		switch (clearFlag){
 			case /*laya.d3.core.BaseCamera.CLEARFLAG_SOLIDCOLOR*/0:;
 				var clearColor=camera.clearColor;
 				if (clearColor){
@@ -31114,7 +31135,7 @@ var Scene3D=(function(_super){
 })(Sprite)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/BaseCamera.as=======96.999192/96.999192
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/BaseCamera.as=======96.999192/96.999192
 /**
 *<code>BaseCamera</code> 类用于创建摄像机的父类。
 */
@@ -31451,7 +31472,7 @@ var BaseCamera=(function(_super){
 })(Sprite3D)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/light/LightSprite.as=======96.999178/96.999178
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/light/LightSprite.as=======96.999178/96.999178
 /**
 *<code>LightSprite</code> 类用于创建灯光的父类。
 */
@@ -31656,7 +31677,7 @@ var LightSprite=(function(_super){
 })(Sprite3D)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/RenderableSprite3D.as=======96.999159/96.999159
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/RenderableSprite3D.as=======96.999159/96.999159
 /**
 *<code>RenderableSprite3D</code> 类用于可渲染3D精灵的父类，抽象类不允许实例。
 */
@@ -31765,7 +31786,7 @@ var RenderableSprite3D=(function(_super){
 })(Sprite3D)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/material/BlinnPhongMaterial.as=======96.999071/96.999071
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/material/BlinnPhongMaterial.as=======96.999071/96.999071
 /**
 *<code>BlinnPhongMaterial</code> 类用于实现Blinn-Phong材质。
 */
@@ -32401,7 +32422,7 @@ var BlinnPhongMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/material/EffectMaterial.as=======96.999070/96.999070
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/material/EffectMaterial.as=======96.999070/96.999070
 /**
 *...
 *@author wzy
@@ -32748,7 +32769,7 @@ var EffectMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/material/ExtendTerrainMaterial.as=======96.999069/96.999069
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/material/ExtendTerrainMaterial.as=======96.999069/96.999069
 /**
 *...
 *@author ...
@@ -32989,7 +33010,7 @@ var ExtendTerrainMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/material/PBRMaterial.as=======96.999068/96.999068
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/material/PBRMaterial.as=======96.999068/96.999068
 //class laya.d3.core.material.PBRMaterial extends laya.d3.core.material.BaseMaterial
 var PBRMaterial=(function(_super){
 	function PBRMaterial(){
@@ -33252,7 +33273,7 @@ var PBRMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/material/PBRSpecularMaterial.as=======96.999067/96.999067
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/material/PBRSpecularMaterial.as=======96.999067/96.999067
 /**
 *<code>PBRSpecularMaterial</code> 类用于实现PBR(Specular)材质。
 */
@@ -34163,7 +34184,7 @@ var PBRSpecularMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/material/PBRStandardMaterial.as=======96.999066/96.999066
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/material/PBRStandardMaterial.as=======96.999066/96.999066
 /**
 *<code>PBRStandardMaterial</code> 类用于实现PBR(Standard)材质。
 */
@@ -35042,7 +35063,7 @@ var PBRStandardMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/material/SkyBoxMaterial.as=======96.999064/96.999064
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/material/SkyBoxMaterial.as=======96.999064/96.999064
 /**
 *<code>SkyBoxMaterial</code> 类用于实现SkyBoxMaterial材质。
 */
@@ -35123,7 +35144,7 @@ var SkyBoxMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/material/TerrainMaterial.as=======96.999063/96.999063
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/material/TerrainMaterial.as=======96.999063/96.999063
 /**
 *...
 *@author ...
@@ -35368,7 +35389,7 @@ var TerrainMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/material/UnlitMaterial.as=======96.999062/96.999062
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/material/UnlitMaterial.as=======96.999062/96.999062
 /**
 *<code>UnlitMaterial</code> 类用于实现不受光照影响的材质。
 */
@@ -35787,7 +35808,7 @@ var UnlitMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/material/WaterPrimaryMaterial.as=======96.999061/96.999061
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/material/WaterPrimaryMaterial.as=======96.999061/96.999061
 /**
 *...
 *@author
@@ -35901,7 +35922,7 @@ var WaterPrimaryMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/IndexBuffer3D.as=======96.999054/96.999054
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/IndexBuffer3D.as=======96.999054/96.999054
 /**
 *<code>IndexBuffer3D</code> 类用于创建索引缓冲。
 */
@@ -36070,7 +36091,7 @@ var IndexBuffer3D=(function(_super){
 })(Buffer)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/ShurikenParticleMaterial.as=======96.999029/96.999029
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/ShurikenParticleMaterial.as=======96.999029/96.999029
 /**
 *<code>ShurikenParticleMaterial</code> 类用于实现粒子材质。
 */
@@ -36419,7 +36440,7 @@ var ShurikenParticleMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/pixelLine/PixelLineMaterial.as=======96.999024/96.999024
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/pixelLine/PixelLineMaterial.as=======96.999024/96.999024
 /**
 *...
 *@author
@@ -36457,7 +36478,7 @@ var PixelLineMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/graphics/VertexBuffer3D.as=======96.999014/96.999014
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/graphics/VertexBuffer3D.as=======96.999014/96.999014
 /**
 *<code>VertexBuffer3D</code> 类用于创建顶点缓冲。
 */
@@ -36590,7 +36611,7 @@ var VertexBuffer3D=(function(_super){
 })(Buffer)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/trail/TrailMaterial.as=======96.999008/96.999008
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/trail/TrailMaterial.as=======96.999008/96.999008
 /**
 *<code>ShurikenParticleMaterial</code> 类用于实现拖尾材质。
 */
@@ -36936,7 +36957,7 @@ var TrailMaterial=(function(_super){
 })(BaseMaterial)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/terrain/Terrain.as=======96.998983/96.998983
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/terrain/Terrain.as=======96.998983/96.998983
 /**
 *<code>Terrain</code> 类用于创建地块。
 */
@@ -37109,7 +37130,7 @@ var Terrain=(function(_super){
 })(Sprite3D)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/PrimitiveMesh.as=======96.998738/96.998738
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/PrimitiveMesh.as=======96.998738/96.998738
 /**
 *<code>PrimitiveMesh</code> 类用于创建简单网格。
 */
@@ -37197,7 +37218,7 @@ var PrimitiveMesh=(function(_super){
 })(BaseMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/Mesh.as=======96.998734/96.998734
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/Mesh.as=======96.998734/96.998734
 /**
 *<code>Mesh</code> 类用于创建文件网格数据模板。
 */
@@ -37352,7 +37373,7 @@ var Mesh=(function(_super){
 })(BaseMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/SkinnedMeshRenderer.as=======96.998672/96.998672
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/SkinnedMeshRenderer.as=======96.998672/96.998672
 /**
 *<code>SkinMeshRenderer</code> 类用于蒙皮渲染器。
 */
@@ -37644,7 +37665,7 @@ var SkinnedMeshRenderer=(function(_super){
 })(MeshRenderer)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/PhysicsCollider.as=======96.998324/96.998324
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/PhysicsCollider.as=======96.998324/96.998324
 /**
 *<code>PhysicsCollider</code> 类用于创建物理碰撞器。
 */
@@ -37721,7 +37742,7 @@ var PhysicsCollider=(function(_super){
 })(PhysicsTriggerComponent)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/physics/Rigidbody3D.as=======96.998320/96.998320
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/physics/Rigidbody3D.as=======96.998320/96.998320
 /**
 *<code>Rigidbody3D</code> 类用于创建刚体碰撞器。
 */
@@ -38229,7 +38250,7 @@ var Rigidbody3D=(function(_super){
 })(PhysicsTriggerComponent)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/DataTexture2D.as=======95.998899/95.998899
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/DataTexture2D.as=======95.998899/95.998899
 //class laya.d3.resource.DataTexture2D extends laya.webgl.resource.BaseTexture
 var DataTexture2D=(function(_super){
 	function DataTexture2D(){
@@ -38367,7 +38388,7 @@ var DataTexture2D=(function(_super){
 })(BaseTexture)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/RenderTexture.as=======95.998885/95.998885
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/RenderTexture.as=======95.998885/95.998885
 /**
 //*<code>RenderTexture</code> 类用于创建渲染目标。
 */
@@ -38531,7 +38552,7 @@ var RenderTexture=(function(_super){
 })(BaseTexture)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/TextureCube.as=======95.998884/95.998884
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/TextureCube.as=======95.998884/95.998884
 /**
 *<code>TextureCube</code> 类用于生成立方体纹理。
 */
@@ -38676,7 +38697,7 @@ var TextureCube=(function(_super){
 })(BaseTexture)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/Camera.as=======95.998796/95.998796
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/Camera.as=======95.998796/95.998796
 /**
 *<code>Camera</code> 类用于创建摄像机。
 */
@@ -39036,7 +39057,7 @@ var Camera=(function(_super){
 })(BaseCamera)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/light/DirectionLight.as=======95.998772/95.998772
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/light/DirectionLight.as=======95.998772/95.998772
 /**
 *<code>DirectionLight</code> 类用于创建平行光。
 */
@@ -39124,7 +39145,7 @@ var DirectionLight=(function(_super){
 })(LightSprite)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/light/PointLight.as=======95.998770/95.998770
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/light/PointLight.as=======95.998770/95.998770
 /**
 *<code>PointLight</code> 类用于创建点光。
 */
@@ -39212,7 +39233,7 @@ var PointLight=(function(_super){
 })(LightSprite)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/light/SpotLight.as=======95.998769/95.998769
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/light/SpotLight.as=======95.998769/95.998769
 /**
 *<code>SpotLight</code> 类用于创建聚光。
 */
@@ -39316,7 +39337,7 @@ var SpotLight=(function(_super){
 })(LightSprite)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/MeshSprite3D.as=======95.998734/95.998734
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/MeshSprite3D.as=======95.998734/95.998734
 /**
 *<code>MeshSprite3D</code> 类用于创建网格。
 */
@@ -39428,7 +39449,7 @@ var MeshSprite3D=(function(_super){
 })(RenderableSprite3D)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/particleShuriKen/ShuriKenParticle3D.as=======95.998708/95.998708
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/particleShuriKen/ShuriKenParticle3D.as=======95.998708/95.998708
 /**
 *<code>ShuriKenParticle3D</code> 3D粒子。
 */
@@ -40102,7 +40123,7 @@ var ShuriKenParticle3D=(function(_super){
 })(RenderableSprite3D)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/pixelLine/PixelLineSprite3D.as=======95.998699/95.998699
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/pixelLine/PixelLineSprite3D.as=======95.998699/95.998699
 /**
 *<code>PixelLineSprite3D</code> 类用于像素线渲染精灵。
 */
@@ -40237,7 +40258,7 @@ var PixelLineSprite3D=(function(_super){
 })(RenderableSprite3D)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/SkinnedMeshSprite3D.as=======95.998688/95.998688
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/SkinnedMeshSprite3D.as=======95.998688/95.998688
 /**
 *<code>SkinnedMeshSprite3D</code> 类用于创建网格。
 */
@@ -40376,7 +40397,7 @@ var SkinnedMeshSprite3D=(function(_super){
 })(RenderableSprite3D)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/trail/TrailSprite3D.as=======95.998682/95.998682
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/trail/TrailSprite3D.as=======95.998682/95.998682
 /**
 *<code>TrailSprite3D</code> 类用于创建拖尾渲染精灵。
 */
@@ -40527,7 +40548,7 @@ var TrailSprite3D=(function(_super){
 })(RenderableSprite3D)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/terrain/TerrainChunk.as=======95.998556/95.998556
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/terrain/TerrainChunk.as=======95.998556/95.998556
 /**
 *<code>TerrainChunk</code> 类用于创建地块。
 */
@@ -40611,7 +40632,7 @@ var TerrainChunk=(function(_super){
 })(RenderableSprite3D)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/BoxMesh.as=======95.998161/95.998161
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/BoxMesh.as=======95.998161/95.998161
 /**
 *<code>Sphere</code> 类用于创建方体。
 */
@@ -40721,7 +40742,7 @@ var BoxMesh=(function(_super){
 })(PrimitiveMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/CapsuleMesh.as=======95.998159/95.998159
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/CapsuleMesh.as=======95.998159/95.998159
 /**
 *<code>CapsuleMesh</code> 类用于创建胶囊体。
 */
@@ -40927,7 +40948,7 @@ var CapsuleMesh=(function(_super){
 })(PrimitiveMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/ConeMesh.as=======95.998158/95.998158
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/ConeMesh.as=======95.998158/95.998158
 /**
 *<code>ConeMesh</code> 类用于创建圆锥体。
 */
@@ -41117,7 +41138,7 @@ var ConeMesh=(function(_super){
 })(PrimitiveMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/CylinderMesh.as=======95.998157/95.998157
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/CylinderMesh.as=======95.998157/95.998157
 /**
 *<code>CylinderMesh</code> 类用于创建圆柱体。
 */
@@ -41314,7 +41335,7 @@ var CylinderMesh=(function(_super){
 })(PrimitiveMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/PlaneMesh.as=======95.998155/95.998155
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/PlaneMesh.as=======95.998155/95.998155
 /**
 *<code>QuadMesh</code> 类用于创建平面。
 */
@@ -41460,7 +41481,7 @@ var PlaneMesh=(function(_super){
 })(PrimitiveMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/QuadMesh.as=======95.998153/95.998153
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/QuadMesh.as=======95.998153/95.998153
 /**
 *<code>QuadMesh</code> 类用于创建四边形。
 */
@@ -41538,7 +41559,7 @@ var QuadMesh=(function(_super){
 })(PrimitiveMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/resource/models/SphereMesh.as=======95.998151/95.998151
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/resource/models/SphereMesh.as=======95.998151/95.998151
 /**
 *<code>Sphere</code> 类用于创建球体。
 */
@@ -41665,7 +41686,7 @@ var SphereMesh=(function(_super){
 })(PrimitiveMesh)
 
 
-	//file:///E:/git/layaair-master/d3/src/laya/d3/core/MeshTerrainSprite3D.as=======94.998307/94.998307
+	//file:///D:/gittest/gittestnew/d3/src/laya/d3/core/MeshTerrainSprite3D.as=======94.998307/94.998307
 /**
 *<code>TerrainMeshSprite3D</code> 类用于创建网格。
 */
