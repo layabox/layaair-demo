@@ -9,10 +9,10 @@ varying vec2 v_Texcoord;
 varying vec3 v_Normal;
 
 #ifdef BONE
-attribute vec4 a_BoneIndices;
-attribute vec4 a_BoneWeights;
-const int c_MaxBoneCount = 24;
-uniform mat4 u_Bones[c_MaxBoneCount];
+	attribute vec4 a_BoneIndices;
+	attribute vec4 a_BoneWeights;
+	const int c_MaxBoneCount = 24;
+	uniform mat4 u_Bones[c_MaxBoneCount];
 #endif
 
 #if defined(DIRECTIONLIGHT)

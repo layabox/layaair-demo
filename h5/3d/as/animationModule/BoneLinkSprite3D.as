@@ -1,15 +1,19 @@
 package animationModule
 {
 	import common.CameraMoveScript;
-	import laya.d3.animation.AnimationClip;
 	import laya.d3.component.Animator;
+	import laya.d3.component.AnimatorState;
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;
-	import laya.d3.core.scene.Scene;
+	import laya.d3.core.light.DirectionLight;
+	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Quaternion;
 	import laya.d3.math.Vector3;
 	import laya.display.Stage;
 	import laya.events.Event;
+	import laya.net.Loader;
+	import laya.ui.Button;
+	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
 	
@@ -19,20 +23,27 @@ package animationModule
 	 */
 	public class BoneLinkSprite3D
 	{
-		private var statue:int = 0;
+		private var scene:Scene3D; 
+		private var role:Sprite3D; 
+		private var pangzi:Sprite3D; 
 		private var dragon1:Sprite3D;
 		private var dragon2:Sprite3D;
+		private var aniSprte3D1:Sprite3D;
+		private var aniSprte3D2:Sprite3D;
+		private var animator:Animator;
 		private var dragonAnimator1:Animator;
 		private var dragonAnimator2:Animator;
 		private var _dragonScale:Vector3 = new Vector3(1.5, 1.5, 1.5);
 		private var _rotation:Quaternion = new Quaternion( -0.5, -0.5, 0.5, -0.5);
 		private var _position:Vector3 = new Vector3( -0.2, 0.0, 0.0);
 		private var _scale:Vector3 = new Vector3( 0.75, 0.75, 0.75);
+		private var changeActionButton:Button;
+		private var curStateIndex:int = 0;
 		
 		public function BoneLinkSprite3D()
 		{
 			//初始化引擎
-			Laya3D.init(0, 0, true);
+			Laya3D.init(0, 0);
 			
 			//适配模式
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
@@ -43,9 +54,9 @@ package animationModule
 			
 			//预加载所有资源
 			var resource:Array = [
-				{url: "res/threeDimen/skinModel/Mount/R_kl_H_001.lh", clas: Sprite3D, priority: 1}, 
-				{url: "res/threeDimen/skinModel/Mount/R_kl_S_009.lh", clas: Sprite3D, priority: 1}, 
-				{url: "res/threeDimen/skinModel/SiPangZi/PanZi.lh", clas: Sprite3D, priority: 1}
+				{url: "../../../../res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", type: Laya3D.HIERARCHY, priority: 1}, 
+				{url: "../../../../res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh", type: Laya3D.HIERARCHY, priority: 1}, 
+				{url: "../../../../res/threeDimen/skinModel/BoneLinkScene/PangZi.lh", type: Laya3D.HIERARCHY, priority: 1}
 			];
 			
 			Laya.loader.create(resource, Handler.create(this, onLoadFinish));
@@ -54,8 +65,8 @@ package animationModule
 		private function onLoadFinish():void
 		{
 			//初始化场景
-			var scene:Scene = Laya.stage.addChild(new Scene()) as Scene;
-			scene.ambientColor = new Vector3(1, 1, 1);
+			scene = Laya.stage.addChild(new Scene3D()) as Scene3D;
+			scene.ambientColor = new Vector3(0.5, 0.5, 0.5);
 			
 			//初始化相机
 			var camera:Camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
@@ -63,71 +74,131 @@ package animationModule
 			camera.transform.rotate(new Vector3( -15, 0, 0), true, false);
 			camera.addComponent(CameraMoveScript);
 			
+			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
+			directionLight.transform.worldMatrix.setForward(new Vector3(-1.0, -1.0, -1.0));
+			
 			//初始化角色精灵
-			var role:Sprite3D = scene.addChild(new Sprite3D()) as Sprite3D;
+			role = scene.addChild(new Sprite3D()) as Sprite3D;
 			
 			//初始化胖子
-			var pangzi:Sprite3D = role.addChild(Sprite3D.load("res/threeDimen/skinModel/SiPangZi/PanZi.lh")) as Sprite3D;
+			pangzi = role.addChild(Loader.getRes("../../../../res/threeDimen/skinModel/BoneLinkScene/PangZi.lh")) as Sprite3D;
 			//获取动画组件
-			var animator:Animator = pangzi.getChildAt(0).getComponentByType(Animator) as Animator;
-			//获取动画片段
-			var totalAnimationClip:AnimationClip = animator.getClip("Take 001");
-			//新增动画片段
-			animator.addClip(totalAnimationClip, "hello", 296, 346);
-			animator.addClip(totalAnimationClip, "ride", 3, 33);
-			//播放动画
-			animator.play("hello", 1);
+			animator = pangzi.getChildAt(0).getComponent(Animator) as Animator;
 			
-			Laya.stage.on(Event.MOUSE_UP, this, function():void{
+			var state1:AnimatorState = new AnimatorState();
+			state1.name = "hello";
+			state1.clipStart = 296 / 581;
+			state1.clipEnd = 346 / 581;
+			state1.clip = animator.getDefaultState().clip;
+			state1.clip.islooping = true;
+			animator.addState(state1);
+			animator.play("hello");
+			
+			var state2:AnimatorState = new AnimatorState();
+			state2.name = "ride";
+			state2.clipStart = 3 / 581;
+			state2.clipEnd = 33 / 581;
+			state2.clip = animator.getDefaultState().clip;
+			state2.clip.islooping = true;
+			animator.addState(state2);
+			
+			dragon1 = Loader.getRes("../../../../res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh");
+			dragon1.transform.localScale = _dragonScale;
+			aniSprte3D1 = dragon1.getChildAt(0) as Sprite3D;
+			dragonAnimator1 = aniSprte3D1.getComponent(Animator) as Animator;
+			
+			var state3:AnimatorState = new AnimatorState();
+			state3.name = "run";
+			state3.clipStart = 50 / 644;
+			state3.clipEnd = 65 / 644;
+			state3.clip = dragonAnimator1.getDefaultState().clip;
+			state3.clip.islooping = true;
+			dragonAnimator1.addState(state3);
+			
+			dragon2 = Loader.getRes("../../../../res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh");
+			dragon2.transform.localScale = _dragonScale;
+			aniSprte3D2 = dragon2.getChildAt(0) as Sprite3D;
+			dragonAnimator2 = aniSprte3D2.getComponent(Animator) as Animator;
+			
+			var state4:AnimatorState = new AnimatorState();
+			state4.name = "run";
+			state4.clipStart = 50 / 550;
+			state4.clipEnd = 65 / 550;
+			state4.clip = dragonAnimator2.getDefaultState().clip;
+			state4.clip.islooping = true;
+			dragonAnimator2.addState(state4);
+			
+			loadUI();
+		}
+		
+		private function loadUI():void {
+			
+			Laya.loader.load(["../../../../res/threeDimen/ui/button.png"], Handler.create(null, function():void {
 				
-				statue ++;
-				if (statue % 3 == 1){
+				changeActionButton = Laya.stage.addChild(new Button("../../../../res/threeDimen/ui/button.png", "乘骑坐骑")) as Button;
+				changeActionButton.size(160, 40);
+				changeActionButton.labelBold = true;
+				changeActionButton.labelSize = 30;
+				changeActionButton.sizeGrid = "4,4,4,4";
+				changeActionButton.scale(Browser.pixelRatio, Browser.pixelRatio);
+				changeActionButton.pos(Laya.stage.width / 2 - changeActionButton.width * Browser.pixelRatio / 2, Laya.stage.height - 100 * Browser.pixelRatio);
+				
+				changeActionButton.on(Event.CLICK, this, function():void{
 					
-					animator.play("ride", 1);
-					
-					dragon1 = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/Mount/R_kl_H_001.lh")) as Sprite3D;
-					dragon1.transform.localScale = _dragonScale;
-					dragonAnimator1 = dragon1.getChildAt(0).getComponentByType(Animator) as Animator;
-					var totalAnimationClip1:AnimationClip = dragonAnimator1.getClip("Take 001");
-					totalAnimationClip1.islooping = true;
-					dragonAnimator1.addClip(totalAnimationClip1, "run", 50, 65);
-					dragonAnimator1.play("run", 1);
-					//骨骼关联节点
-					dragonAnimator1.linkSprite3DToAvatarNode("point", role);
-					
-					pangzi.transform.localRotation = _rotation;
-					pangzi.transform.localPosition = _position;
-					pangzi.transform.localScale = _scale;
-				}
-				else if (statue % 3 == 2){
-					
-					animator.play("ride", 1);
-					//骨骼取消关联节点
-					dragonAnimator1.unLinkSprite3DToAvatarNode(role);
-					dragon1.removeSelf();
-					
-					dragon2 = scene.addChild(Sprite3D.load("res/threeDimen/skinModel/Mount/R_kl_S_009.lh")) as Sprite3D;
-					dragon2.transform.localScale = _dragonScale;
-					dragonAnimator2 = dragon2.getChildAt(0).getComponentByType(Animator) as Animator;
-					var totalAnimationClip2:AnimationClip = dragonAnimator2.getClip("Take 001");
-					totalAnimationClip2.islooping = true;
-					dragonAnimator2.addClip(totalAnimationClip2, "run", 50, 65);
-					dragonAnimator2.play("run", 1);
-					//骨骼关联节点
-					dragonAnimator2.linkSprite3DToAvatarNode("point", role);
-					
-					pangzi.transform.localRotation = _rotation;
-					pangzi.transform.localPosition = _position;
-					pangzi.transform.localScale = _scale;
-				}
-				else{
-					
-					animator.play("hello", 1);
-					//骨骼取消关联节点
-					dragonAnimator2.unLinkSprite3DToAvatarNode(role);
-					dragon2.removeSelf();
-				}
-			});
+					curStateIndex++;
+					if (curStateIndex % 3 == 1){
+						
+						changeActionButton.label = "切换坐骑";
+						
+						scene.addChild(dragon1);
+						aniSprte3D1.addChild(role);
+						
+						//骨骼关联节点
+						dragonAnimator1.linkSprite3DToAvatarNode("point", role);
+						
+						animator.play("ride");
+						dragonAnimator1.play("run");
+						
+						pangzi.transform.localRotation = _rotation;
+						pangzi.transform.localPosition = _position;
+						pangzi.transform.localScale = _scale;
+					}
+					else if (curStateIndex % 3 == 2){
+						
+						changeActionButton.label = "卸下坐骑";
+						
+						//骨骼取消关联节点
+						dragonAnimator1.unLinkSprite3DToAvatarNode(role);
+						aniSprte3D1.removeChild(role);
+						dragon1.removeSelf();
+						
+						scene.addChild(dragon2);
+						aniSprte3D2.addChild(role);
+						//骨骼关联节点
+						dragonAnimator2.linkSprite3DToAvatarNode("point", role);
+						
+						animator.play("ride");
+						dragonAnimator2.play("run");
+						
+						pangzi.transform.localRotation = _rotation;
+						pangzi.transform.localPosition = _position;
+						pangzi.transform.localScale = _scale;
+					}
+					else{
+						
+						changeActionButton.label = "乘骑坐骑";
+						
+						//骨骼取消关联节点
+						dragonAnimator2.unLinkSprite3DToAvatarNode(role);
+						aniSprte3D2.removeChild(role);
+						dragon2.removeSelf();
+						
+						scene.addChild(role);
+						animator.play("hello");
+					}
+				});
+				
+			}));
 		}
 	}
 }

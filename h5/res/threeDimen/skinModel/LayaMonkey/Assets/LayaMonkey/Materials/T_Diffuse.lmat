@@ -1,84 +1,66 @@
 {
 	"version":"LAYAMATERIAL:01",
 	"props":{
-		"shaderName":"SIMPLE",
+		"type":"Laya.BlinnPhongMaterial",
+		"name":"T_Diffuse",
 		"cull":2,
 		"blend":0,
 		"srcBlend":1,
 		"dstBlend":0,
 		"alphaTest":false,
+		"alphaTestValue":0.5,
 		"depthWrite":true,
-		"renderQueue":1,
+		"depthTest":515,
+		"renderQueue":2000,
+		"albedoIntensity":1,
+		"enableLighting":true,
+		"shininess":0.078125,
 		"textures":[
 			{
-				"name":"diffuseTexture",
-				"path":"../T_Diffuse.png"
-			},
-			{
-				"name":"normalTexture",
-				"path":""
-			},
-			{
-				"name":"specularTexture",
-				"path":""
-			},
-			{
-				"name":"emissiveTexture",
-				"path":""
+				"name":"albedoTexture",
+				"path":"../diffuse.png",
+				"constructParams":[
+					512,
+					512,
+					0,
+					true
+				],
+				"propertyParams":{
+					"filterMode":1,
+					"wrapModeU":0,
+					"wrapModeV":0,
+					"anisoLevel":1
+				}
 			}
 		],
 		"vectors":[
 			{
-				"name":"ambientColor",
-				"value":[
-					0.6,
-					0.6,
-					0.6
-				]
-			},
-			{
-				"name":"tintColor",
+				"name":"tilingOffset",
 				"value":[
 					1,
 					1,
-					1,
-					1
-				]
-			},
-			{
-				"name":"albedo",
-				"value":[
-					1,
-					1,
-					1,
-					1
-				]
-			},
-			{
-				"name":"diffuseColor",
-				"value":[
-					1,
-					1,
-					1
+					0,
+					0
 				]
 			},
 			{
 				"name":"specularColor",
 				"value":[
-					1,
-					1,
-					1,
-					32
+					0.5,
+					0.5,
+					0.5
 				]
 			},
 			{
-				"name":"emissionColor",
+				"name":"albedoColor",
 				"value":[
-					0,
-					0,
-					0
+					1,
+					1,
+					1,
+					1
 				]
 			}
-		]
+		],
+		"defines":[]
 	}
 }

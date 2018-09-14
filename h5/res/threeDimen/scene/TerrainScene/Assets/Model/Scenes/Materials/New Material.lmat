@@ -1,73 +1,50 @@
 {
-	"version":"LAYAMATERIAL:01",
+	"version":"LAYAMATERIAL:02",
 	"props":{
+		"type":"Laya.BlinnPhongMaterial",
 		"name":"New Material",
-		"cull":2,
-		"blend":0,
-		"srcBlend":1,
-		"dstBlend":0,
-		"alphaTest":false,
-		"depthWrite":true,
-		"renderQueue":1,
-		"textures":[
+		"renderStates":[
 			{
-				"name":"diffuseTexture",
-				"path":""
-			},
-			{
-				"name":"normalTexture",
-				"path":""
-			},
-			{
-				"name":"specularTexture",
-				"path":""
-			},
-			{
-				"name":"emissiveTexture",
-				"path":""
+				"cull":2,
+				"blend":0,
+				"srcBlend":1,
+				"dstBlend":0,
+				"depthWrite":true,
+				"depthTest":515
 			}
 		],
+		"alphaTest":false,
+		"alphaTestValue":0.5,
+		"renderQueue":2000,
+		"albedoIntensity":1,
+		"enableLighting":true,
+		"shininess":0.078125,
+		"textures":[],
 		"vectors":[
 			{
-				"name":"ambientColor",
+				"name":"tilingOffset",
 				"value":[
-					0,
+					1,
+					1,
 					0,
 					0
-				]
-			},
-			{
-				"name":"albedo",
-				"value":[
-					1,
-					1,
-					1,
-					1
-				]
-			},
-			{
-				"name":"diffuseColor",
-				"value":[
-					1,
-					1,
-					1
 				]
 			},
 			{
 				"name":"specularColor",
 				"value":[
-					1,
-					1,
-					1,
-					8
+					0.5,
+					0.5,
+					0.5
 				]
 			},
 			{
-				"name":"emissionColor",
+				"name":"albedoColor",
 				"value":[
-					0,
-					0,
-					0
+					1,
+					1,
+					1,
+					1
 				]
 			}
 		],

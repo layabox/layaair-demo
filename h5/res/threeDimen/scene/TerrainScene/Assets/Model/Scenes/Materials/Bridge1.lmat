@@ -1,21 +1,40 @@
 {
-	"version":"LAYAMATERIAL:01",
+	"version":"LAYAMATERIAL:02",
 	"props":{
+		"type":"Laya.BlinnPhongMaterial",
 		"name":"Bridge1",
-		"cull":2,
-		"blend":0,
-		"srcBlend":1,
-		"dstBlend":0,
+		"renderStates":[
+			{
+				"cull":2,
+				"blend":0,
+				"srcBlend":1,
+				"dstBlend":0,
+				"depthWrite":true,
+				"depthTest":515
+			}
+		],
 		"alphaTest":false,
 		"alphaTestValue":0.5,
-		"depthWrite":true,
-		"depthTest":513,
-		"renderQueue":1,
+		"renderQueue":2000,
+		"albedoIntensity":1,
+		"enableLighting":true,
 		"shininess":0.078125,
 		"textures":[
 			{
 				"name":"albedoTexture",
-				"path":"../Textures/Bridge1.jpg"
+				"path":"../Textures/Bridge1.jpg",
+				"constructParams":[
+					256,
+					256,
+					0,
+					true
+				],
+				"propertyParams":{
+					"filterMode":1,
+					"wrapModeU":0,
+					"wrapModeV":0,
+					"anisoLevel":1
+				}
 			}
 		],
 		"vectors":[
@@ -29,20 +48,20 @@
 				]
 			},
 			{
+				"name":"specularColor",
+				"value":[
+					0.5,
+					0.5,
+					0.5
+				]
+			},
+			{
 				"name":"albedoColor",
 				"value":[
 					1,
 					1,
 					1,
 					1
-				]
-			},
-			{
-				"name":"specularColor",
-				"value":[
-					0.5,
-					0.5,
-					0.5
 				]
 			}
 		],

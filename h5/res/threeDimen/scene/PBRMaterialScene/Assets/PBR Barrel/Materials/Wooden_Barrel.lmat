@@ -1,6 +1,7 @@
 {
 	"version":"LAYAMATERIAL:01",
 	"props":{
+		"type":"Laya.PBRStandardMaterial",
 		"name":"Wooden_Barrel",
 		"cull":2,
 		"blend":0,

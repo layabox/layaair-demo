@@ -1,7 +1,7 @@
 package shaderModule.customMaterials {
 	import laya.d3.core.material.BaseMaterial;
 	import laya.d3.math.Vector3;
-	import laya.d3.resource.BaseTexture;
+	import laya.webgl.resource.BaseTexture;
 	
 	/**
 	 * ...
@@ -16,7 +16,7 @@ package shaderModule.customMaterials {
 		 * @return 漫反射贴图。
 		 */
 		public function get diffuseTexture():BaseTexture {
-			return _getTexture(DIFFUSETEXTURE);
+			return _shaderValues.getTexture(DIFFUSETEXTURE);
 		}
 		
 		/**
@@ -24,7 +24,7 @@ package shaderModule.customMaterials {
 		 * @param value 漫反射贴图。
 		 */
 		public function set diffuseTexture(value:BaseTexture):void {
-			_setTexture(DIFFUSETEXTURE, value);
+			_shaderValues.setTexture(DIFFUSETEXTURE, value);
 		}
 		
 		/**
@@ -32,11 +32,11 @@ package shaderModule.customMaterials {
 		 * @param value 边缘光照颜色。
 		 */
 		public function set marginalColor(value:Vector3):void {
-			_setColor(MARGINALCOLOR, value);
+			_shaderValues.setVector(MARGINALCOLOR, value);
 		}
 		
 		public function CustomMaterial() {
-			super();
+			super(2);
 			setShaderName("CustomShader");
 		}
 	}

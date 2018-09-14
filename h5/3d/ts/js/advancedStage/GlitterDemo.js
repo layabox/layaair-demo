@@ -1,3 +1,4 @@
+alert('fff');
 var GlitterDemo = (function () {
     function GlitterDemo() {
         this.scaleDelta = 0;

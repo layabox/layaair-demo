@@ -4,7 +4,8 @@ package shaderModule.customMaterials
 	import laya.d3.math.Vector2;
 	import laya.d3.math.Vector3;
 	import laya.d3.math.Vector4;
-	import laya.d3.resource.BaseTexture;
+	import laya.d3.shader.ShaderDefines;
+	import laya.webgl.resource.BaseTexture;
 	/**
 	 * ...
 	 * @author 
@@ -13,22 +14,16 @@ package shaderModule.customMaterials
 	{
 		
 		public static var SPLATALPHATEXTURE:int = 0;
-		public static var NORMALTEXTURE:int = 1;
-		public static var LIGHTMAPTEXTURE:int = 2;
-		public static var DIFFUSETEXTURE1:int = 3;
-		public static var DIFFUSETEXTURE2:int = 4;
-		public static var DIFFUSETEXTURE3:int = 5;
-		public static var DIFFUSETEXTURE4:int = 6;
-		public static var DIFFUSETEXTURE5:int = 7;
-		public static var DIFFUSESCALE1:int = 8;
-		public static var DIFFUSESCALE2:int = 9;
-		public static var DIFFUSESCALE3:int = 10;
-		public static var DIFFUSESCALE4:int = 11;
-		public static var DIFFUSESCALE5:int = 12;
-		public static var MATERIALAMBIENT:int = 13;
-		public static var MATERIALDIFFUSE:int = 14;
-		public static var MATERIALSPECULAR:int = 15;
-		public static var LIGHTMAPSCALEOFFSET:int = 16;
+		public static var DIFFUSETEXTURE1:int = 1;
+		public static var DIFFUSETEXTURE2:int = 2;
+		public static var DIFFUSETEXTURE3:int = 3;
+		public static var DIFFUSETEXTURE4:int = 4;
+		public static var DIFFUSETEXTURE5:int = 5;
+		public static var DIFFUSESCALE1:int = 6;
+		public static var DIFFUSESCALE2:int = 7;
+		public static var DIFFUSESCALE3:int = 8;
+		public static var DIFFUSESCALE4:int = 9;
+		public static var DIFFUSESCALE5:int = 10;
 		
 		/**自定义地形材质细节宏定义。*/
 		public static var SHADERDEFINE_DETAIL_NUM1:int;
@@ -36,14 +31,28 @@ package shaderModule.customMaterials
 		public static var SHADERDEFINE_DETAIL_NUM3:int;
 		public static var SHADERDEFINE_DETAIL_NUM4:int;
 		public static var SHADERDEFINE_DETAIL_NUM5:int;
-		public static var SHADERDEFINE_LIGHTMAP:int;
+		
+		/**@private */
+		public static var shaderDefines:ShaderDefines = new ShaderDefines(BaseMaterial.shaderDefines);
+		
+		/**
+		 * @private
+		 */
+		public static function __init__():void {
+			
+			SHADERDEFINE_DETAIL_NUM1 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM1");
+            SHADERDEFINE_DETAIL_NUM2 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM2");
+            SHADERDEFINE_DETAIL_NUM3 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM3");
+            SHADERDEFINE_DETAIL_NUM4 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM4");
+            SHADERDEFINE_DETAIL_NUM5 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM5");
+		}
 		
 		/**
 		 * 获取splatAlpha贴图。
 		 * @return splatAlpha贴图。
 		 */
 		public function get splatAlphaTexture():BaseTexture {
-			return _getTexture(SPLATALPHATEXTURE);
+			return _shaderValues.getTexture(SPLATALPHATEXTURE);
 		}
 		
 		/**
@@ -51,40 +60,7 @@ package shaderModule.customMaterials
 		 * @param value splatAlpha贴图。
 		 */
 		public function set splatAlphaTexture(value:BaseTexture):void {
-			_setTexture(SPLATALPHATEXTURE, value);
-		}
-		
-		/**
-		 * 获取normal贴图。
-		 * @return normal贴图。
-		 */
-		public function get normalTexture():BaseTexture {
-			return _getTexture(NORMALTEXTURE);
-		}
-		
-		/**
-		 * 设置normal贴图。
-		 * @param value normal贴图。
-		 */
-		public function set normalTexture(value:BaseTexture):void {
-			_setTexture(NORMALTEXTURE, value);
-		}
-		
-		/**
-		 * 获取lightMap贴图。
-		 * @return lightMap贴图。
-		 */
-		public function get lightMapTexture():BaseTexture {
-			return _getTexture(LIGHTMAPTEXTURE);
-		}
-		
-		/**
-		 * 设置lightMap贴图。
-		 * @param value lightMap贴图。
-		 */
-		public function set lightMapTexture(value:BaseTexture):void {
-			_setTexture(LIGHTMAPTEXTURE, value);
-			_addShaderDefine(CustomTerrainMaterial.SHADERDEFINE_LIGHTMAP);
+			_shaderValues.setTexture(SPLATALPHATEXTURE, value);
 		}
 		
 		/**
@@ -92,7 +68,7 @@ package shaderModule.customMaterials
 		 * @return 第一层贴图。
 		 */
 		public function get diffuseTexture1():BaseTexture {
-			return _getTexture(DIFFUSETEXTURE1);
+			return _shaderValues.getTexture(DIFFUSETEXTURE1);
 		}
 		
 		/**
@@ -100,7 +76,7 @@ package shaderModule.customMaterials
 		 * @param value 第一层贴图。
 		 */
 		public function set diffuseTexture1(value:BaseTexture):void {
-			_setTexture(DIFFUSETEXTURE1, value);
+			_shaderValues.setTexture(DIFFUSETEXTURE1, value);
 			_setDetailNum(1);
 		}
 		
@@ -109,7 +85,7 @@ package shaderModule.customMaterials
 		 * @return 第二层贴图。
 		 */
 		public function get diffuseTexture2():BaseTexture {
-			return _getTexture(DIFFUSETEXTURE2);
+			return _shaderValues.getTexture(DIFFUSETEXTURE2);
 		}
 		
 		/**
@@ -117,7 +93,7 @@ package shaderModule.customMaterials
 		 * @param value 第二层贴图。
 		 */
 		public function set diffuseTexture2(value:BaseTexture):void {
-			_setTexture(DIFFUSETEXTURE2, value);
+			_shaderValues.setTexture(DIFFUSETEXTURE2, value);
 			_setDetailNum(2);
 		}
 		
@@ -126,7 +102,7 @@ package shaderModule.customMaterials
 		 * @return 第三层贴图。
 		 */
 		public function get diffuseTexture3():BaseTexture {
-			return _getTexture(DIFFUSETEXTURE3);
+			return _shaderValues.getTexture(DIFFUSETEXTURE3);
 		}
 		
 		/**
@@ -134,7 +110,7 @@ package shaderModule.customMaterials
 		 * @param value 第三层贴图。
 		 */
 		public function set diffuseTexture3(value:BaseTexture):void {
-			_setTexture(DIFFUSETEXTURE3, value);
+			_shaderValues.setTexture(DIFFUSETEXTURE3, value);
 			_setDetailNum(3);
 		}
 		
@@ -143,7 +119,7 @@ package shaderModule.customMaterials
 		 * @return 第四层贴图。
 		 */
 		public function get diffuseTexture4():BaseTexture {
-			return _getTexture(DIFFUSETEXTURE4);
+			return _shaderValues.getTexture(DIFFUSETEXTURE4);
 		}
 		
 		/**
@@ -151,7 +127,7 @@ package shaderModule.customMaterials
 		 * @param value 第四层贴图。
 		 */
 		public function set diffuseTexture4(value:BaseTexture):void {
-			_setTexture(DIFFUSETEXTURE4, value);
+			_shaderValues.setTexture(DIFFUSETEXTURE4, value);
 			_setDetailNum(4);
 		}
 		
@@ -160,7 +136,7 @@ package shaderModule.customMaterials
 		 * @return 第五层贴图。
 		 */
 		public function get diffuseTexture5():BaseTexture {
-			return _getTexture(DIFFUSETEXTURE5);
+			return _shaderValues.getTexture(DIFFUSETEXTURE5);
 		}
 		
 		/**
@@ -168,101 +144,72 @@ package shaderModule.customMaterials
 		 * @param value 第五层贴图。
 		 */
 		public function set diffuseTexture5(value:BaseTexture):void {
-			_setTexture(DIFFUSETEXTURE5, value);
+			_shaderValues.setTexture(DIFFUSETEXTURE5, value);
 			_setDetailNum(5);
 		}
 		
 		public function setDiffuseScale1(scale1:Vector2):void {
-			_setVector2(DIFFUSESCALE1, scale1);
+			_shaderValues.setVector(DIFFUSESCALE1, scale1);
 		}
 		
 		public function setDiffuseScale2(scale2:Vector2):void {
-			_setVector2(DIFFUSESCALE2, scale2);
+			_shaderValues.setVector(DIFFUSESCALE2, scale2);
 		}
 		
 		public function setDiffuseScale3(scale3:Vector2):void {
-			_setVector2(DIFFUSESCALE3, scale3);
+			_shaderValues.setVector(DIFFUSESCALE3, scale3);
 		}
 		
 		public function setDiffuseScale4(scale4:Vector2):void {
-			_setVector2(DIFFUSESCALE4, scale4);
+			_shaderValues.setVector(DIFFUSESCALE4, scale4);
 		}
 		
 		public function setDiffuseScale5(scale5:Vector2):void {
-			_setVector2(DIFFUSESCALE5, scale5);
-		}
-		
-		public function setLightmapScaleOffset(scaleOffset:Vector4):void {
-			_setColor(LIGHTMAPSCALEOFFSET, scaleOffset);
+			_shaderValues.setVector(DIFFUSESCALE5, scale5);
 		}
 		
 		private function _setDetailNum(value:int):void {
 			switch (value) {
 			case 1: 
-				_addShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM1);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM2);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM3);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM4);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM5);
+				_defineDatas.add(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM1);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM2);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM3);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM4);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM5);
 				break;
 			case 2: 
-				_addShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM2);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM1);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM3);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM4);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM5);
+				_defineDatas.add(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM2);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM1);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM3);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM4);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM5);
 				break;
 			case 3: 
-				_addShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM3);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM1);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM2);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM4);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM5);
+				_defineDatas.add(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM3);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM1);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM2);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM4);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM5);
 				break;
 			case 4: 
-				_addShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM4);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM1);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM2);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM3);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM5);
+				_defineDatas.add(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM4);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM1);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM2);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM3);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM5);
 				break;
 			case 5: 
-				_addShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM5);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM1);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM2);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM3);
-				_removeShaderDefine(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM4);
+				_defineDatas.add(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM5);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM1);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM2);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM3);
+				_defineDatas.remove(CustomTerrainMaterial.SHADERDEFINE_DETAIL_NUM4);
 				break;
 			}
 		}
 		
-		public function get ambientColor():Vector3 {
-			return _getColor(MATERIALAMBIENT);
-		}
-		
-		public function set ambientColor(value:Vector3):void {
-			_setColor(MATERIALAMBIENT, value);
-		}
-		
-		public function get diffuseColor():Vector3 {
-			return _getColor(MATERIALDIFFUSE);
-		}
-		
-		public function set diffuseColor(value:Vector3):void {
-			_setColor(MATERIALDIFFUSE, value);
-		}
-		
-		public function get specularColor():Vector4 {
-			return _getColor(MATERIALSPECULAR);
-		}
-		
-		public function set specularColor(value:Vector4):void {
-			_setColor(MATERIALSPECULAR, value);
-		}
-		
-		
 		public function CustomTerrainMaterial() {
-			super();
+			super(11);
 			setShaderName("CustomTerrainShader");
 		}
 		

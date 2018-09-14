@@ -1,35 +1,36 @@
 var RenderTextureDemo = /** @class */ (function () {
     function RenderTextureDemo() {
-        Laya3D.init(0, 0, true);
+        Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
-        this.scene = Laya.stage.addChild(Laya.Scene.load("res/threeDimen/scene/Arena/Arena.ls"));
-        var camera = this.scene.addChild(new Laya.Camera(0, 0.1, 1000));
-        camera.transform.translate(new Laya.Vector3(0, 0.5, 1));
-        camera.transform.rotate(new Laya.Vector3(-10, 0, 0), true, false);
-        camera.addComponent(CameraMoveScript);
-        this.renderTargetCamera = this.scene.addChild(new Laya.Camera(0, 0.1, 1000));
-        this.renderTargetCamera.transform.translate(new Laya.Vector3(0, 0.5, 1));
-        this.renderTargetCamera.transform.rotate(new Laya.Vector3(-10, 0, 0), true, false);
-        this.renderTargetCamera.renderTarget = new Laya.RenderTexture(2048, 2048);
-        this.renderTargetCamera.renderingOrder = -1;
-        this.renderTargetCamera.addComponent(CameraMoveScript);
-        var directionLight = this.scene.addChild(new Laya.DirectionLight());
-        directionLight.color = new Laya.Vector3(0.7, 0.6, 0.6);
-        directionLight.direction = new Laya.Vector3(0, -1.0, -1.0);
-        var layaMonkey = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
-        this.layaPlane = this.scene.addChild(Laya.Sprite3D.load("res/threeDimen/staticModel/LayaPlane/LayaPlane.lh"));
+        //添加场景
         Laya.loader.create([
-            "res/threeDimen/scene/Arena/Arena.ls",
-            "res/threeDimen/staticModel/LayaPlane/LayaPlane.lh"
+            "../../res/threeDimen/scene/CourtyardScene/Courtyard.ls"
         ], Laya.Handler.create(this, this.onComplete));
     }
     RenderTextureDemo.prototype.onComplete = function () {
-        this.setMaterials(this.scene.getChildByName("scene"));
-        this.layaPlane.transform.localPosition = new Laya.Vector3(0, 0.5, -1);
-        Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, function () {
-            var changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "渲染目标"));
+        var scene = Laya.stage.addChild(Laya.Loader.getRes("../../res/threeDimen/scene/CourtyardScene/Courtyard.ls"));
+        //添加摄像机，并渲染天空盒
+        var camera = scene.addChild(new Laya.Camera(0, 0.1, 1000));
+        camera.transform.translate(new Laya.Vector3(57, 2.5, 58));
+        camera.transform.rotate(new Laya.Vector3(-10, 150, 0), true, false);
+        camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
+        camera.addComponent(CameraMoveScript);
+        var renderTargetCamera = scene.addChild(new Laya.Camera(0, 0.1, 1000));
+        renderTargetCamera.transform.translate(new Laya.Vector3(57, 2.5, 58));
+        renderTargetCamera.transform.rotate(new Laya.Vector3(-10, 150, 0), true, false);
+        //设置质量
+        renderTargetCamera.renderTarget = new Laya.RenderTexture(2048, 2048);
+        //渲染顺序
+        renderTargetCamera.renderingOrder = -1;
+        //添加移动脚本
+        renderTargetCamera.addComponent(CameraMoveScript);
+        //得到场景中的要渲染的板 
+        var renderTargetObj = scene.getChildAt(0).getChildByName("RenderTarget");
+        //添加按钮
+        Laya.loader.load(["../../res/threeDimen/ui/button.png"], Laya.Handler.create(null, function () {
+            var changeActionButton = Laya.stage.addChild(new Laya.Button("../../res/threeDimen/ui/button.png", "渲染目标"));
             changeActionButton.size(160, 40);
             changeActionButton.labelBold = true;
             changeActionButton.labelSize = 30;
@@ -37,20 +38,10 @@ var RenderTextureDemo = /** @class */ (function () {
             changeActionButton.scale(Laya.Browser.pixelRatio, Laya.Browser.pixelRatio);
             changeActionButton.pos(Laya.stage.width / 2 - changeActionButton.width * Laya.Browser.pixelRatio / 2, Laya.stage.height - 100 * Laya.Browser.pixelRatio);
             changeActionButton.on(Laya.Event.CLICK, this, function () {
-                this.layaPlane.getChildAt(0).meshRender.material.diffuseTexture = this.renderTargetCamera.renderTarget;
+                //按下后渲染到板上
+                renderTargetObj.meshRenderer.material.albedoTexture = renderTargetCamera.renderTarget;
             });
         }));
-    };
-    RenderTextureDemo.prototype.setMaterials = function (spirit3D) {
-        if (spirit3D instanceof Laya.MeshSprite3D) {
-            var meshSprite = spirit3D;
-            for (var i = 0; i < meshSprite.meshRender.sharedMaterials.length; i++) {
-                var mat = meshSprite.meshRender.sharedMaterials[i];
-                mat.disableLight();
-            }
-        }
-        for (var i = 0; i < spirit3D._childs.length; i++)
-            this.setMaterials(spirit3D._childs[i]);
     };
     return RenderTextureDemo;
 }());
