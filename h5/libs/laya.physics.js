@@ -1539,7 +1539,7 @@ box2d.b2Vec2.s_t1))}}}};box2d.b2TensorDampingController.prototype.Step.s_damping
 	var Browser=laya.utils.Browser,ClassUtils=laya.utils.ClassUtils,Component=laya.components.Component;
 	var Context=laya.resource.Context,Event=laya.events.Event,EventDispatcher=laya.events.EventDispatcher,Point=laya.maths.Point;
 	var Render=laya.renders.Render,Sprite=laya.display.Sprite,Utils=laya.utils.Utils;
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/ColliderBase.as=======98.999271/98.999271
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/ColliderBase.as=======98.999271/98.999271
 /**
 *碰撞体基类
 */
@@ -1547,76 +1547,174 @@ box2d.b2Vec2.s_t1))}}}};box2d.b2TensorDampingController.prototype.Step.s_damping
 var ColliderBase=(function(_super){
 	function ColliderBase(){
 		/**是否是传感器，传感器能够触发碰撞事件，但不会产生碰撞反应*/
-		this.isSensor=false;
+		this._isSensor=false;
 		/**密度值，值可以为零或者是正数，建议使用相似的密度，这样做可以改善堆叠稳定性，默认值为10*/
-		this.density=10;
+		this._density=10;
 		/**摩擦力，取值范围0-1，值越大，摩擦越大，默认值为0.2*/
-		this.friction=0.2;
+		this._friction=0.2;
 		/**弹性系数，取值范围0-1，值越大，弹性越大，默认值为0*/
-		this.restitution=0;
-		/**刚体引用*/
-		this.body=null;
+		this._restitution=0;
 		/**标签*/
 		this.label=null;
 		/**@private b2Shape对象*/
 		this._shape=null;
 		/**@private b2FixtureDef对象 */
-		this._fixture=null;
+		this._def=null;
+		/**[只读]b2Fixture对象 */
+		this.fixture=null;
+		/**[只读]刚体引用*/
+		this.rigidBody=null;
 		ColliderBase.__super.call(this);
 	}
 
 	__class(ColliderBase,'laya.physics.ColliderBase',_super);
 	var __proto=ColliderBase.prototype;
-	/**@private 获取原始碰撞体*/
-	__proto.getShape=function(){
-		if (!this._fixture){
-			var fd=new window.box2d.b2FixtureDef();
-			fd.density=this.density;
-			fd.friction=this.friction;
-			fd.isSensor=this.isSensor;
-			fd.restitution=this.restitution;
-			fd.userData=this.label;
-			fd.shape=this._shape;
-			this._fixture=fd;
+	/**@private 获取碰撞体信息*/
+	__proto.getDef=function(){
+		if (!this._def){
+			var def=new window.box2d.b2FixtureDef();
+			def.density=this.density;
+			def.friction=this.friction;
+			def.isSensor=this.isSensor;
+			def.restitution=this.restitution;
+			def.shape=this._shape;
+			this._def=def;
 		}
-		return this._fixture;
+		return this._def;
+	}
+
+	__proto._onEnable=function(){
+		this.rigidBody || Laya.systemTimer.callLater(this,this._checkRigidBody);
+	}
+
+	__proto._checkRigidBody=function(){
+		if (!this.rigidBody){
+			var comp=this.owner.getComponent(RigidBody);
+			if (comp){
+				this.rigidBody=comp;
+				this.refresh();
+			}
+		}
 	}
 
 	__proto._onDestroy=function(){
-		this.body=null;
-		this._shape=null;
-		this._fixture=null;
+		if (this.rigidBody){
+			if (this.fixture){
+				if (this.fixture.GetBody()==this.rigidBody.body){
+					this.rigidBody.body.DestroyFixture(this.fixture);
+				}
+				this.fixture.Destroy();
+				this.fixture=null;
+			}
+			this.rigidBody=null;
+			this._shape=null;
+			this._def=null;
+		}
 	}
+
+	/**
+	*@private
+	*碰撞体参数发生变化后，刷新物理世界碰撞信息
+	*/
+	__proto.refresh=function(){
+		if (this.enabled && this.rigidBody){
+			var body=this.rigidBody.body;
+			if (this.fixture){
+				if (this.fixture.GetBody()==this.rigidBody.body){
+					this.rigidBody.body.DestroyFixture(this.fixture);
+				}
+				this.fixture.Destroy();
+				this.fixture=null;
+			};
+			var def=this.getDef();
+			def.filter.groupIndex=this.rigidBody.group;
+			def.filter.categoryBits=this.rigidBody.category;
+			def.filter.maskBits=this.rigidBody.mask;
+			this.fixture=body.CreateFixture(def);
+			this.fixture.collider=this;
+		}
+	}
+
+	/**摩擦力，取值范围0-1，值越大，摩擦越大，默认值为0.2*/
+	__getset(0,__proto,'friction',function(){
+		return this._friction;
+		},function(value){
+		this._friction=value;
+		if (this._def){
+			this._def.friction=value;
+			this.refresh();
+		}
+	});
+
+	/**密度值，值可以为零或者是正数，建议使用相似的密度，这样做可以改善堆叠稳定性，默认值为10*/
+	__getset(0,__proto,'density',function(){
+		return this._density;
+		},function(value){
+		this._density=value;
+		if (this._def){
+			this._def.density=value;
+			this.refresh();
+		}
+	});
+
+	/**是否是传感器，传感器能够触发碰撞事件，但不会产生碰撞反应*/
+	__getset(0,__proto,'isSensor',function(){
+		return this._isSensor;
+		},function(value){
+		this._isSensor=value;
+		if (this._def){
+			this._def.isSensor=value;
+			this.refresh();
+		}
+	});
+
+	/**弹性系数，取值范围0-1，值越大，弹性越大，默认值为0*/
+	__getset(0,__proto,'restitution',function(){
+		return this._restitution;
+		},function(value){
+		this._restitution=value;
+		if (this._def){
+			this._def.restitution=value;
+			this.refresh();
+		}
+	});
+
+	/**
+	*获取是否为单实例组件。
+	*/
+	__getset(0,__proto,'isSingleton',function(){
+		return false;
+	});
 
 	return ColliderBase;
 })(Component)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/DistanceJoint.as=======98.999268/98.999268
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/DistanceJoint.as=======98.999268/98.999268
 /**
 *距离关节：两个物体上面各自有一点，两点之间的距离固定不变
 */
 //class laya.physics.joint.DistanceJoint extends laya.components.Component
 var DistanceJoint=(function(_super){
 	function DistanceJoint(){
-		/**关节的自身刚体*/
+		/**[首次设置有效]关节的自身刚体*/
 		this.selfBody=null;
-		/**关节的连接刚体*/
+		/**[首次设置有效]关节的连接刚体，可不设置，默认为左上角空刚体*/
 		this.otherBody=null;
-		/**自身刚体链接点，是相对于自身刚体的左上角位置偏移*/
+		/**[首次设置有效]自身刚体链接点，是相对于自身刚体的左上角位置偏移*/
 		this.selfAnchor=[0,0];
-		/**链接刚体链接点，是相对于otherBody的左上角位置偏移*/
+		/**[首次设置有效]链接刚体链接点，是相对于otherBody的左上角位置偏移*/
 		this.otherAnchor=[0,0];
-		/**约束的目标静止长度*/
-		this.length=0;
-		/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
-		this.frequency=0;
-		/**刚体在回归到节点过程中受到的阻尼，建议取值0~1*/
-		this.damping=0;
-		/**两个刚体是否可以发生碰撞，默认为false*/
+		/**[首次设置有效]两个刚体是否可以发生碰撞，默认为false*/
 		this.collideConnected=false;
-		/**原生关节对象*/
+		/**[只读]原生关节对象*/
 		this.joint=null;
+		/**约束的目标静止长度*/
+		this._length=0;
+		/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
+		this._frequency=0;
+		/**刚体在回归到节点过程中受到的阻尼，建议取值0~1*/
+		this._damping=0;
 		DistanceJoint.__super.call(this);
 	}
 
@@ -1631,20 +1729,20 @@ var DistanceJoint=(function(_super){
 	}
 
 	__proto._createJoint=function(){
-		if (!this.joint){
-			if (!this.otherBody)throw "otherBody can not be empty";this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+		if (!this.joint){this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+			if (!this.selfBody)throw "selfBody can not be empty";
 			var box2d=window.box2d;
 			var def=new box2d.b2DistanceJointDef();
-			def.bodyA=this.otherBody.getBody();
+			def.bodyA=this.otherBody ? this.otherBody.getBody():Physics.I._emptyBody;
 			def.bodyB=this.selfBody.getBody();
 			def.localAnchorA.Set(this.otherAnchor[0] / Physics.PIXEL_RATIO,this.otherAnchor[1] / Physics.PIXEL_RATIO);
 			def.localAnchorB.Set(this.selfAnchor[0] / Physics.PIXEL_RATIO,this.selfAnchor[1] / Physics.PIXEL_RATIO);
-			def.frequencyHz=this.frequency;
-			def.dampingRatio=this.damping;
+			def.frequencyHz=this._frequency;
+			def.dampingRatio=this._damping;
 			def.collideConnected=this.collideConnected;
 			var p1=def.bodyA.GetWorldPoint(def.localAnchorA,new box2d.b2Vec2());
 			var p2=def.bodyB.GetWorldPoint(def.localAnchorB,new box2d.b2Vec2());
-			def.length=this.length / Physics.PIXEL_RATIO || box2d.b2Vec2.SubVV(p2,p1,new box2d.b2Vec2()).Length();
+			def.length=this._length / Physics.PIXEL_RATIO || box2d.b2Vec2.SubVV(p2,p1,new box2d.b2Vec2()).Length();
 			this.joint=Physics.I._createJoint(def);
 		}
 	}
@@ -1654,25 +1752,49 @@ var DistanceJoint=(function(_super){
 		this.joint=null;
 	}
 
+	/**刚体在回归到节点过程中受到的阻尼，建议取值0~1*/
+	__getset(0,__proto,'damping',function(){
+		return this._damping;
+		},function(value){
+		this._damping=value;
+		if (this.joint)this.joint.SetDampingRatio(value);
+	});
+
+	/**约束的目标静止长度*/
+	__getset(0,__proto,'length',function(){
+		return this._length;
+		},function(value){
+		this._length=value;
+		if (this.joint)this.joint.SetLength(value / Physics.PIXEL_RATIO);
+	});
+
+	/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
+	__getset(0,__proto,'frequency',function(){
+		return this._frequency;
+		},function(value){
+		this._frequency=value;
+		if (this.joint)this.joint.SetFrequency(value);
+	});
+
 	return DistanceJoint;
 })(Component)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/GearJoint.as=======98.999267/98.999267
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/GearJoint.as=======98.999267/98.999267
 /**
 *齿轮关节：用来模拟两个齿轮间的约束关系，齿轮旋转时，产生的动量有两种输出方式，一种是齿轮本身的角速度，另一种是齿轮表面的线速度
 */
 //class laya.physics.joint.GearJoint extends laya.components.Component
 var GearJoint=(function(_super){
 	function GearJoint(){
-		/**要绑定的第1个关节，类型可以是RevoluteJoint或者PrismaticJoint*/
+		/**[首次设置有效]要绑定的第1个关节，类型可以是RevoluteJoint或者PrismaticJoint*/
 		this.joint1=null;
-		/**要绑定的第2个关节，类型可以是RevoluteJoint或者PrismaticJoint*/
+		/**[首次设置有效]要绑定的第2个关节，类型可以是RevoluteJoint或者PrismaticJoint*/
 		this.joint2=null;
-		/**两个齿轮角速度比例，默认1*/
-		this.ratio=1;
-		/**原生关节对象*/
+		/**[只读]原生关节对象*/
 		this.joint=null;
+		/**两个齿轮角速度比例，默认1*/
+		this._ratio=1;
 		GearJoint.__super.call(this);
 	}
 
@@ -1696,7 +1818,7 @@ var GearJoint=(function(_super){
 			def.bodyB=this.joint2.owner.getComponent(RigidBody).getBody();
 			def.joint1=this.joint1.joint;
 			def.joint2=this.joint2.joint;
-			def.ratio=this.ratio;
+			def.ratio=this._ratio;
 			this.joint=Physics.I._createJoint(def);
 		}
 	}
@@ -1706,35 +1828,43 @@ var GearJoint=(function(_super){
 		this.joint=null;
 	}
 
+	/**两个齿轮角速度比例，默认1*/
+	__getset(0,__proto,'ratio',function(){
+		return this._ratio;
+		},function(value){
+		this._ratio=value;
+		if (this.joint)this.joint.SetRatio(value);
+	});
+
 	return GearJoint;
 })(Component)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/MotorJoint.as=======98.999266/98.999266
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/MotorJoint.as=======98.999266/98.999266
 /**
 *距离关节：两个物体上面各自有一点，两点之间的距离固定不变
 */
 //class laya.physics.joint.MotorJoint extends laya.components.Component
 var MotorJoint=(function(_super){
 	function MotorJoint(){
-		/**关节的自身刚体*/
+		/**[首次设置有效]关节的自身刚体*/
 		this.selfBody=null;
-		/**关节的连接刚体*/
+		/**[首次设置有效]关节的连接刚体*/
 		this.otherBody=null;
-		/**基于otherBody坐标位置的偏移量，也是selfBody的目标位置*/
-		this.linearOffset=[0,0];
-		/**基于otherBody的角度偏移量，也是selfBody的目标角度*/
-		this.angularOffset=0;
-		/**当selfBody偏离目标位置时，为使其恢复到目标位置，马达关节所施加的最大作用力*/
-		this.maxForce=1000;
-		/**当selfBody角度与目标角度不同时，为使其达到目标角度，马达关节施加的最大扭力*/
-		this.maxTorque=1000;
-		/**selfBody向目标位置移动时的缓动因子，取值0~1，值越大速度越快*/
-		this.correctionFactor=0.3;
-		/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
+		/**[首次设置有效]弹簧系统的震动频率，可以视为弹簧的弹性系数*/
 		this.collideConnected=false;
-		/**原生关节对象*/
+		/**[只读]原生关节对象*/
 		this.joint=null;
+		/**基于otherBody坐标位置的偏移量，也是selfBody的目标位置*/
+		this._linearOffset=[0,0];
+		/**基于otherBody的角度偏移量，也是selfBody的目标角度*/
+		this._angularOffset=0;
+		/**当selfBody偏离目标位置时，为使其恢复到目标位置，马达关节所施加的最大作用力*/
+		this._maxForce=1000;
+		/**当selfBody角度与目标角度不同时，为使其达到目标角度，马达关节施加的最大扭力*/
+		this._maxTorque=1000;
+		/**selfBody向目标位置移动时的缓动因子，取值0~1，值越大速度越快*/
+		this._correctionFactor=0.3;
 		MotorJoint.__super.call(this);
 	}
 
@@ -1751,14 +1881,15 @@ var MotorJoint=(function(_super){
 	__proto._createJoint=function(){
 		if (!this.joint){
 			if (!this.otherBody)throw "otherBody can not be empty";this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+			if (!this.selfBody)throw "selfBody can not be empty";
 			var box2d=window.box2d;
 			var def=new box2d.b2MotorJointDef();
 			def.Initialize(this.otherBody.getBody(),this.selfBody.getBody());
-			def.linearOffset=new box2d.b2Vec2(this.linearOffset[0] / Physics.PIXEL_RATIO,this.linearOffset[1] / Physics.PIXEL_RATIO);
-			def.angularOffset=this.angularOffset;
-			def.maxForce=this.maxForce;
-			def.maxTorque=this.maxTorque;
-			def.correctionFactor=this.correctionFactor;
+			def.linearOffset=new box2d.b2Vec2(this._linearOffset[0] / Physics.PIXEL_RATIO,this._linearOffset[1] / Physics.PIXEL_RATIO);
+			def.angularOffset=this._angularOffset;
+			def.maxForce=this._maxForce;
+			def.maxTorque=this._maxTorque;
+			def.correctionFactor=this._correctionFactor;
 			def.collideConnected=this.collideConnected;
 			this.joint=Physics.I._createJoint(def);
 		}
@@ -1769,29 +1900,69 @@ var MotorJoint=(function(_super){
 		this.joint=null;
 	}
 
+	/**基于otherBody坐标位置的偏移量，也是selfBody的目标位置*/
+	__getset(0,__proto,'linearOffset',function(){
+		return this._linearOffset;
+		},function(value){
+		this._linearOffset=value;
+		if (this.joint)this.joint.SetLinearOffset(new window.box2d.b2Vec2(value[0] / Physics.PIXEL_RATIO,value[1] / Physics.PIXEL_RATIO));
+	});
+
+	/**基于otherBody的角度偏移量，也是selfBody的目标角度*/
+	__getset(0,__proto,'angularOffset',function(){
+		return this._angularOffset;
+		},function(value){
+		this._angularOffset=value;
+		if (this.joint)this.joint.SetAngularOffset(value);
+	});
+
+	/**当selfBody偏离目标位置时，为使其恢复到目标位置，马达关节所施加的最大作用力*/
+	__getset(0,__proto,'maxForce',function(){
+		return this._maxForce;
+		},function(value){
+		this._maxForce=value;
+		if (this.joint)this.joint.SetMaxForce(value);
+	});
+
+	/**当selfBody角度与目标角度不同时，为使其达到目标角度，马达关节施加的最大扭力*/
+	__getset(0,__proto,'maxTorque',function(){
+		return this._maxTorque;
+		},function(value){
+		this._maxTorque=value;
+		if (this.joint)this.joint.SetMaxTorque(value);
+	});
+
+	/**selfBody向目标位置移动时的缓动因子，取值0~1，值越大速度越快*/
+	__getset(0,__proto,'correctionFactor',function(){
+		return this._correctionFactor;
+		},function(value){
+		this._correctionFactor=value;
+		if (this.joint)this.joint.SetCorrectionFactor(value);
+	});
+
 	return MotorJoint;
 })(Component)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/MouseJoint.as=======98.999265/98.999265
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/MouseJoint.as=======98.999265/98.999265
 /**
 *鼠标关节：鼠标关节用于通过鼠标来操控物体。它试图将物体拖向当前鼠标光标的位置。而在旋转方面就没有限制。
 */
 //class laya.physics.joint.MouseJoint extends laya.components.Component
 var MouseJoint=(function(_super){
 	function MouseJoint(){
-		/**关节的自身刚体*/
+		/**[首次设置有效]关节的自身刚体*/
 		this.selfBody=null;
-		/**关节的链接点，是相对于自身刚体的左上角位置偏移*/
+		/**[首次设置有效]关节的链接点，是相对于自身刚体的左上角位置偏移*/
 		this.anchor=[0,0];
-		/**鼠标关节在拖曳刚体bodyB时施加的最大作用力*/
-		this.maxForce=10000;
-		/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
-		this.frequency=5;
-		/**刚体在回归到节点过程中受到的阻尼，取值0~1*/
-		this.damping=0.7;
-		/**原生关节对象*/
+		/**[只读]原生关节对象*/
 		this.joint=null;
+		/**鼠标关节在拖曳刚体bodyB时施加的最大作用力*/
+		this._maxForce=10000;
+		/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
+		this._frequency=5;
+		/**刚体在回归到节点过程中受到的阻尼，取值0~1*/
+		this._damping=0.7;
 		MouseJoint.__super.call(this);
 	}
 
@@ -1809,17 +1980,17 @@ var MouseJoint=(function(_super){
 
 	__proto._createJoint=function(){
 		if (!this.joint){this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+			if (!this.selfBody)throw "selfBody can not be empty";
 			var box2d=window.box2d;
 			var def=new box2d.b2MouseJointDef();
 			var anchorPos=(this.selfBody.owner).localToGlobal(Point.TEMP.setTo(this.anchor[0],this.anchor[1]),false,Physics.I.worldRoot);
 			var anchorVec=new box2d.b2Vec2(anchorPos.x / Physics.PIXEL_RATIO,anchorPos.y / Physics.PIXEL_RATIO);
-			def.bodyA=Physics.I._createBody(new box2d.b2BodyDef());
+			def.bodyA=Physics.I._emptyBody;
 			def.bodyB=this.selfBody.getBody();
 			def.target=anchorVec;
-			def.frequencyHz=this.frequency;
-			def.frequencyHz=this.frequency;
-			def.damping=this.damping;
-			def.maxForce=this.maxForce;
+			def.frequencyHz=this._frequency;
+			def.damping=this._damping;
+			def.maxForce=this._maxForce;
 			this.joint=Physics.I._createJoint(def);
 		}
 	}
@@ -1840,41 +2011,65 @@ var MouseJoint=(function(_super){
 		}
 	}
 
+	/**鼠标关节在拖曳刚体bodyB时施加的最大作用力*/
+	__getset(0,__proto,'maxForce',function(){
+		return this._maxForce;
+		},function(value){
+		this._maxForce=value;
+		if (this.joint)this.joint.SetMaxForce(value);
+	});
+
+	/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
+	__getset(0,__proto,'frequency',function(){
+		return this._frequency;
+		},function(value){
+		this._frequency=value;
+		if (this.joint)this.joint.SetFrequency(value);
+	});
+
+	/**刚体在回归到节点过程中受到的阻尼，取值0~1*/
+	__getset(0,__proto,'damping',function(){
+		return this._damping;
+		},function(value){
+		this._damping=value;
+		if (this.joint)this.joint.SetDampingRatio(value);
+	});
+
 	return MouseJoint;
 })(Component)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/PrismaticJoint.as=======98.999264/98.999264
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/PrismaticJoint.as=======98.999264/98.999264
 /**
 *平移关节：移动关节允许两个物体沿指定轴相对移动，它会阻止相对旋转
 */
 //class laya.physics.joint.PrismaticJoint extends laya.components.Component
 var PrismaticJoint=(function(_super){
 	function PrismaticJoint(){
-		/**关节的自身刚体*/
+		/**[首次设置有效]关节的自身刚体*/
 		this.selfBody=null;
-		/**关节的连接刚体*/
+		/**[首次设置有效]关节的连接刚体，可不设置，默认为左上角空刚体*/
 		this.otherBody=null;
-		/**关节的控制点，是相对于自身刚体的左上角位置偏移*/
+		/**[首次设置有效]关节的控制点，是相对于自身刚体的左上角位置偏移*/
 		this.anchor=[0,0];
-		/**一个向量值，描述运动方向，比如1,0是沿X轴向右*/
+		/**[首次设置有效]一个向量值，描述运动方向，比如1,0是沿X轴向右*/
 		this.axis=[1,0];
-		/**两个刚体是否可以发生碰撞，默认为false*/
+		/**[首次设置有效]两个刚体是否可以发生碰撞，默认为false*/
 		this.collideConnected=false;
-		/**是否开启马达，开启马达可使目标刚体运动*/
-		this.enableMotor=false;
-		/**启用马达后，在axis坐标轴上移动可以达到的最大速度*/
-		this.motorSpeed=0;
-		/**启用马达后，可以施加的最大作用力*/
-		this.maxMotorForce=10000;
-		/**是否对刚体的移动范围加以约束*/
-		this.enableLimit=false;
-		/**启用约束后，刚体移动范围的下限，是距离anchor的偏移量*/
-		this.lowerTranslation=0;
-		/**启用约束后，刚体移动范围的上限，是距离anchor的偏移量*/
-		this.upperTranslation=0;
-		/**原生关节对象*/
+		/**[只读]原生关节对象*/
 		this.joint=null;
+		/**是否开启马达，开启马达可使目标刚体运动*/
+		this._enableMotor=false;
+		/**启用马达后，在axis坐标轴上移动可以达到的最大速度*/
+		this._motorSpeed=0;
+		/**启用马达后，可以施加的最大作用力*/
+		this._maxMotorForce=10000;
+		/**是否对刚体的移动范围加以约束*/
+		this._enableLimit=false;
+		/**启用约束后，刚体移动范围的下限，是距离anchor的偏移量*/
+		this._lowerTranslation=0;
+		/**启用约束后，刚体移动范围的上限，是距离anchor的偏移量*/
+		this._upperTranslation=0;
 		PrismaticJoint.__super.call(this);
 	}
 
@@ -1889,19 +2084,19 @@ var PrismaticJoint=(function(_super){
 	}
 
 	__proto._createJoint=function(){
-		if (!this.joint){
-			if (!this.otherBody)throw "otherBody can not be empty";this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+		if (!this.joint){this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+			if (!this.selfBody)throw "selfBody can not be empty";
 			var box2d=window.box2d;
 			var def=new box2d.b2PrismaticJointDef();
 			var anchorPos=(this.selfBody.owner).localToGlobal(Point.TEMP.setTo(this.anchor[0],this.anchor[1]),false,Physics.I.worldRoot);
 			var anchorVec=new box2d.b2Vec2(anchorPos.x / Physics.PIXEL_RATIO,anchorPos.y / Physics.PIXEL_RATIO);
-			def.Initialize(this.otherBody.getBody(),this.selfBody.getBody(),anchorVec,new box2d.b2Vec2(this.axis[0],this.axis[1]));
-			def.enableMotor=this.enableMotor;
-			def.motorSpeed=this.motorSpeed;
-			def.maxMotorForce=this.maxMotorForce;
-			def.enableLimit=this.enableLimit;
-			def.lowerTranslation=this.lowerTranslation / Physics.PIXEL_RATIO;
-			def.upperTranslation=this.upperTranslation / Physics.PIXEL_RATIO;
+			def.Initialize(this.otherBody ? this.otherBody.getBody():Physics.I._emptyBody,this.selfBody.getBody(),anchorVec,new box2d.b2Vec2(this.axis[0],this.axis[1]));
+			def.enableMotor=this._enableMotor;
+			def.motorSpeed=this._motorSpeed;
+			def.maxMotorForce=this._maxMotorForce;
+			def.enableLimit=this._enableLimit;
+			def.lowerTranslation=this._lowerTranslation / Physics.PIXEL_RATIO;
+			def.upperTranslation=this._upperTranslation / Physics.PIXEL_RATIO;
 			def.collideConnected=this.collideConnected;
 			this.joint=Physics.I._createJoint(def);
 		}
@@ -1912,34 +2107,82 @@ var PrismaticJoint=(function(_super){
 		this.joint=null;
 	}
 
+	/**是否开启马达，开启马达可使目标刚体运动*/
+	__getset(0,__proto,'enableMotor',function(){
+		return this._enableMotor;
+		},function(value){
+		this._enableMotor=value;
+		if (this.joint)this.joint.EnableMotor(value);
+	});
+
+	/**启用约束后，刚体移动范围的下限，是距离anchor的偏移量*/
+	__getset(0,__proto,'lowerTranslation',function(){
+		return this._lowerTranslation;
+		},function(value){
+		this._lowerTranslation=value;
+		if (this.joint)this.joint.SetLimits(value,this._upperTranslation);
+	});
+
+	/**是否对刚体的移动范围加以约束*/
+	__getset(0,__proto,'enableLimit',function(){
+		return this._enableLimit;
+		},function(value){
+		this._enableLimit=value;
+		if (this.joint)this.joint.EnableLimit(value);
+	});
+
+	/**启用马达后，可以施加的最大作用力*/
+	__getset(0,__proto,'maxMotorForce',function(){
+		return this._maxMotorForce;
+		},function(value){
+		this._maxMotorForce=value;
+		if (this.joint)this.joint.SetMaxMotorForce(value);
+	});
+
+	/**启用马达后，在axis坐标轴上移动可以达到的最大速度*/
+	__getset(0,__proto,'motorSpeed',function(){
+		return this._motorSpeed;
+		},function(value){
+		this._motorSpeed=value;
+		if (this.joint)this.joint.SetMotorSpeed(value);
+	});
+
+	/**启用约束后，刚体移动范围的上限，是距离anchor的偏移量*/
+	__getset(0,__proto,'upperTranslation',function(){
+		return this._upperTranslation;
+		},function(value){
+		this._upperTranslation=value;
+		if (this.joint)this.joint.SetLimits(this._lowerTranslation,value);
+	});
+
 	return PrismaticJoint;
 })(Component)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/PulleyJoint.as=======98.999263/98.999263
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/PulleyJoint.as=======98.999263/98.999263
 /**
 *滑轮关节：它将两个物体接地(ground)并彼此连接，当一个物体上升，另一个物体就会下降
 */
 //class laya.physics.joint.PulleyJoint extends laya.components.Component
 var PulleyJoint=(function(_super){
 	function PulleyJoint(){
-		/**关节的自身刚体*/
+		/**[首次设置有效]关节的自身刚体*/
 		this.selfBody=null;
-		/**关节的连接刚体*/
+		/**[首次设置有效]关节的连接刚体*/
 		this.otherBody=null;
-		/**自身刚体链接点，是相对于自身刚体的左上角位置偏移*/
+		/**[首次设置有效]自身刚体链接点，是相对于自身刚体的左上角位置偏移*/
 		this.selfAnchor=[0,0];
-		/**链接刚体链接点，是相对于otherBody的左上角位置偏移*/
+		/**[首次设置有效]链接刚体链接点，是相对于otherBody的左上角位置偏移*/
 		this.otherAnchor=[0,0];
-		/**滑轮上与节点selfAnchor相连接的节点，是相对于自身刚体的左上角位置偏移*/
+		/**[首次设置有效]滑轮上与节点selfAnchor相连接的节点，是相对于自身刚体的左上角位置偏移*/
 		this.selfGroundPoint=[0,0];
-		/**滑轮上与节点otherAnchor相连接的节点，是相对于otherBody的左上角位置偏移*/
+		/**[首次设置有效]滑轮上与节点otherAnchor相连接的节点，是相对于otherBody的左上角位置偏移*/
 		this.otherGroundPoint=[0,0];
-		/**两刚体移动距离比率*/
+		/**[首次设置有效]两刚体移动距离比率*/
 		this.ratio=1.5;
-		/**两个刚体是否可以发生碰撞，默认为false*/
+		/**[首次设置有效]两个刚体是否可以发生碰撞，默认为false*/
 		this.collideConnected=false;
-		/**原生关节对象*/
+		/**[只读]原生关节对象*/
 		this.joint=null;
 		PulleyJoint.__super.call(this);
 	}
@@ -1957,6 +2200,7 @@ var PulleyJoint=(function(_super){
 	__proto._createJoint=function(){
 		if (!this.joint){
 			if (!this.otherBody)throw "otherBody can not be empty";this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+			if (!this.selfBody)throw "selfBody can not be empty";
 			var box2d=window.box2d;
 			var def=new box2d.b2PulleyJointDef();
 			var posA=(this.otherBody.owner).localToGlobal(Point.TEMP.setTo(this.otherAnchor[0],this.otherAnchor[1]),false,Physics.I.worldRoot);
@@ -1982,35 +2226,35 @@ var PulleyJoint=(function(_super){
 })(Component)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/RevoluteJoint.as=======98.999262/98.999262
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/RevoluteJoint.as=======98.999262/98.999262
 /**
 *旋转关节强制两个物体共享一个锚点，两个物体相对旋转
 */
 //class laya.physics.joint.RevoluteJoint extends laya.components.Component
 var RevoluteJoint=(function(_super){
 	function RevoluteJoint(){
-		/**关节的自身刚体*/
+		/**[首次设置有效]关节的自身刚体*/
 		this.selfBody=null;
-		/**关节的连接刚体*/
+		/**[首次设置有效]关节的连接刚体，可不设置*/
 		this.otherBody=null;
-		/**关节的链接点，是相对于自身刚体的左上角位置偏移*/
+		/**[首次设置有效]关节的链接点，是相对于自身刚体的左上角位置偏移*/
 		this.anchor=[0,0];
-		/**两个刚体是否可以发生碰撞，默认为false*/
+		/**[首次设置有效]两个刚体是否可以发生碰撞，默认为false*/
 		this.collideConnected=false;
-		/**是否开启马达，开启马达可使目标刚体运动*/
-		this.enableMotor=false;
-		/**启用马达后，可以达到的最大旋转速度*/
-		this.motorSpeed=0;
-		/**启用马达后，可以施加的最大扭距，如果最大扭矩太小，会导致不旋转*/
-		this.maxMotorTorque=10000;
-		/**是否对刚体的旋转范围加以约束*/
-		this.enableLimit=false;
-		/**启用约束后，刚体旋转范围的下限弧度*/
-		this.lowerAngle=0;
-		/**启用约束后，刚体旋转范围的上限弧度*/
-		this.upperAngle=0;
-		/**原生关节对象*/
+		/**[只读]原生关节对象*/
 		this.joint=null;
+		/**是否开启马达，开启马达可使目标刚体运动*/
+		this._enableMotor=false;
+		/**启用马达后，可以达到的最大旋转速度*/
+		this._motorSpeed=0;
+		/**启用马达后，可以施加的最大扭距，如果最大扭矩太小，会导致不旋转*/
+		this._maxMotorTorque=10000;
+		/**是否对刚体的旋转范围加以约束*/
+		this._enableLimit=false;
+		/**启用约束后，刚体旋转范围的下限弧度*/
+		this._lowerAngle=0;
+		/**启用约束后，刚体旋转范围的上限弧度*/
+		this._upperAngle=0;
 		RevoluteJoint.__super.call(this);
 	}
 
@@ -2025,19 +2269,19 @@ var RevoluteJoint=(function(_super){
 	}
 
 	__proto._createJoint=function(){
-		if (!this.joint){
-			if (!this.otherBody)throw "otherBody can not be empty";this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+		if (!this.joint){this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+			if (!this.selfBody)throw "selfBody can not be empty";
 			var box2d=window.box2d;
 			var def=new box2d.b2RevoluteJointDef();
 			var anchorPos=(this.selfBody.owner).localToGlobal(Point.TEMP.setTo(this.anchor[0],this.anchor[1]),false,Physics.I.worldRoot);
 			var anchorVec=new box2d.b2Vec2(anchorPos.x / Physics.PIXEL_RATIO,anchorPos.y / Physics.PIXEL_RATIO);
-			def.Initialize(this.otherBody.getBody(),this.selfBody.getBody(),anchorVec);
-			def.enableMotor=this.enableMotor;
-			def.motorSpeed=this.motorSpeed;
-			def.maxMotorTorque=this.maxMotorTorque;
-			def.enableLimit=this.enableLimit;
-			def.lowerAngle=this.lowerAngle;
-			def.upperAngle=this.upperAngle;
+			def.Initialize(this.otherBody ? this.otherBody.getBody():Physics.I._emptyBody,this.selfBody.getBody(),anchorVec);
+			def.enableMotor=this._enableMotor;
+			def.motorSpeed=this._motorSpeed;
+			def.maxMotorTorque=this._maxMotorTorque;
+			def.enableLimit=this._enableLimit;
+			def.lowerAngle=this._lowerAngle;
+			def.upperAngle=this._upperAngle;
 			def.collideConnected=this.collideConnected;
 			this.joint=Physics.I._createJoint(def);
 		}
@@ -2048,31 +2292,79 @@ var RevoluteJoint=(function(_super){
 		this.joint=null;
 	}
 
+	/**是否开启马达，开启马达可使目标刚体运动*/
+	__getset(0,__proto,'enableMotor',function(){
+		return this._enableMotor;
+		},function(value){
+		this._enableMotor=value;
+		if (this.joint)this.joint.EnableMotor(value);
+	});
+
+	/**是否对刚体的旋转范围加以约束*/
+	__getset(0,__proto,'enableLimit',function(){
+		return this._enableLimit;
+		},function(value){
+		this._enableLimit=value;
+		if (this.joint)this.joint.EnableLimit(value);
+	});
+
+	/**启用马达后，可以达到的最大旋转速度*/
+	__getset(0,__proto,'motorSpeed',function(){
+		return this._motorSpeed;
+		},function(value){
+		this._motorSpeed=value;
+		if (this.joint)this.joint.SetMotorSpeed(value);
+	});
+
+	/**启用马达后，可以施加的最大扭距，如果最大扭矩太小，会导致不旋转*/
+	__getset(0,__proto,'maxMotorTorque',function(){
+		return this._maxMotorTorque;
+		},function(value){
+		this._maxMotorTorque=value;
+		if (this.joint)this.joint.SetMaxMotorTorque(value);
+	});
+
+	/**启用约束后，刚体旋转范围的下限弧度*/
+	__getset(0,__proto,'lowerAngle',function(){
+		return this._lowerAngle;
+		},function(value){
+		this._lowerAngle=value;
+		if (this.joint)this.joint.SetLimits(value,this._upperAngle);
+	});
+
+	/**启用约束后，刚体旋转范围的上限弧度*/
+	__getset(0,__proto,'upperAngle',function(){
+		return this._upperAngle;
+		},function(value){
+		this._upperAngle=value;
+		if (this.joint)this.joint.SetLimits(this._lowerAngle,value);
+	});
+
 	return RevoluteJoint;
 })(Component)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/RopeJoint.as=======98.999261/98.999261
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/RopeJoint.as=======98.999261/98.999261
 /**
 *绳索关节：限制了两个点之间的最大距离。它能够阻止连接的物体之间的拉伸，即使在很大的负载下
 */
 //class laya.physics.joint.RopeJoint extends laya.components.Component
 var RopeJoint=(function(_super){
 	function RopeJoint(){
-		/**关节的自身刚体*/
+		/**[首次设置有效]关节的自身刚体*/
 		this.selfBody=null;
-		/**关节的连接刚体*/
+		/**[首次设置有效]关节的连接刚体，可不设置，默认为左上角空刚体*/
 		this.otherBody=null;
-		/**自身刚体链接点，是相对于自身刚体的左上角位置偏移*/
+		/**[首次设置有效]自身刚体链接点，是相对于自身刚体的左上角位置偏移*/
 		this.selfAnchor=[0,0];
-		/**链接刚体链接点，是相对于otherBody的左上角位置偏移*/
+		/**[首次设置有效]链接刚体链接点，是相对于otherBody的左上角位置偏移*/
 		this.otherAnchor=[0,0];
-		/**selfAnchor和otherAnchor之间的最大距离*/
-		this.maxLength=1;
-		/**两个刚体是否可以发生碰撞，默认为false*/
+		/**[首次设置有效]两个刚体是否可以发生碰撞，默认为false*/
 		this.collideConnected=false;
-		/**原生关节对象*/
+		/**[只读]原生关节对象*/
 		this.joint=null;
+		/**selfAnchor和otherAnchor之间的最大距离*/
+		this._maxLength=1;
 		RopeJoint.__super.call(this);
 	}
 
@@ -2087,15 +2379,15 @@ var RopeJoint=(function(_super){
 	}
 
 	__proto._createJoint=function(){
-		if (!this.joint){
-			if (!this.otherBody)throw "otherBody can not be empty";this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+		if (!this.joint){this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+			if (!this.selfBody)throw "selfBody can not be empty";
 			var box2d=window.box2d;
 			var def=new box2d.b2RopeJointDef();
-			def.bodyA=this.otherBody.getBody();
+			def.bodyA=this.otherBody ? this.otherBody.getBody():Physics.I._emptyBody;
 			def.bodyB=this.selfBody.getBody();
 			def.localAnchorA.Set(this.otherAnchor[0] / Physics.PIXEL_RATIO,this.otherAnchor[1] / Physics.PIXEL_RATIO);
 			def.localAnchorB.Set(this.selfAnchor[0] / Physics.PIXEL_RATIO,this.selfAnchor[1] / Physics.PIXEL_RATIO);
-			def.maxLength=this.maxLength / Physics.PIXEL_RATIO;
+			def.maxLength=this._maxLength / Physics.PIXEL_RATIO;
 			def.collideConnected=this.collideConnected;
 			this.joint=Physics.I._createJoint(def);
 		}
@@ -2106,31 +2398,39 @@ var RopeJoint=(function(_super){
 		this.joint=null;
 	}
 
+	/**selfAnchor和otherAnchor之间的最大距离*/
+	__getset(0,__proto,'maxLength',function(){
+		return this._maxLength;
+		},function(value){
+		this._maxLength=value;
+		if (this.joint)this.joint.SetMaxLength(value / Physics.PIXEL_RATIO);
+	});
+
 	return RopeJoint;
 })(Component)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/WeldJoint.as=======98.999260/98.999260
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/WeldJoint.as=======98.999260/98.999260
 /**
 *焊接关节：焊接关节的用途是使两个物体不能相对运动，受到关节的限制，两个刚体的相对位置和角度都保持不变，看上去像一个整体
 */
 //class laya.physics.joint.WeldJoint extends laya.components.Component
 var WeldJoint=(function(_super){
 	function WeldJoint(){
-		/**关节的自身刚体*/
+		/**[首次设置有效]关节的自身刚体*/
 		this.selfBody=null;
-		/**关节的连接刚体*/
+		/**[首次设置有效]关节的连接刚体*/
 		this.otherBody=null;
-		/**关节的链接点，是相对于自身刚体的左上角位置偏移*/
+		/**[首次设置有效]关节的链接点，是相对于自身刚体的左上角位置偏移*/
 		this.anchor=[0,0];
-		/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
-		this.frequency=5;
-		/**刚体在回归到节点过程中受到的阻尼，取值0~1*/
-		this.damping=0.7;
-		/**两个刚体是否可以发生碰撞，默认为false*/
+		/**[首次设置有效]两个刚体是否可以发生碰撞，默认为false*/
 		this.collideConnected=false;
-		/**原生关节对象*/
+		/**[只读]原生关节对象*/
 		this.joint=null;
+		/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
+		this._frequency=5;
+		/**刚体在回归到节点过程中受到的阻尼，取值0~1*/
+		this._damping=0.7;
 		WeldJoint.__super.call(this);
 	}
 
@@ -2147,13 +2447,14 @@ var WeldJoint=(function(_super){
 	__proto._createJoint=function(){
 		if (!this.joint){
 			if (!this.otherBody)throw "otherBody can not be empty";this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+			if (!this.selfBody)throw "selfBody can not be empty";
 			var box2d=window.box2d;
 			var def=new box2d.b2WeldJointDef();
 			var anchorPos=(this.selfBody.owner).localToGlobal(Point.TEMP.setTo(this.anchor[0],this.anchor[1]),false,Physics.I.worldRoot);
 			var anchorVec=new box2d.b2Vec2(anchorPos.x / Physics.PIXEL_RATIO,anchorPos.y / Physics.PIXEL_RATIO);
 			def.Initialize(this.otherBody.getBody(),this.selfBody.getBody(),anchorVec);
-			def.frequencyHz=this.frequency;
-			def.dampingRatio=this.damping;
+			def.frequencyHz=this._frequency;
+			def.dampingRatio=this._damping;
 			def.collideConnected=this.collideConnected;
 			this.joint=Physics.I._createJoint(def);
 		}
@@ -2164,39 +2465,55 @@ var WeldJoint=(function(_super){
 		this.joint=null;
 	}
 
+	/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
+	__getset(0,__proto,'frequency',function(){
+		return this._frequency;
+		},function(value){
+		this._frequency=value;
+		if (this.joint)this.joint.SetFrequency(value);
+	});
+
+	/**刚体在回归到节点过程中受到的阻尼，建议取值0~1*/
+	__getset(0,__proto,'damping',function(){
+		return this._damping;
+		},function(value){
+		this._damping=value;
+		if (this.joint)this.joint.SetDampingRatio(value);
+	});
+
 	return WeldJoint;
 })(Component)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/joint/WheelJoint.as=======98.999259/98.999259
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/WheelJoint.as=======98.999259/98.999259
 /**
 *轮子关节：围绕节点旋转，包含弹性属性，使得刚体在节点位置发生弹性偏移
 */
 //class laya.physics.joint.WheelJoint extends laya.components.Component
 var WheelJoint=(function(_super){
 	function WheelJoint(){
-		/**关节的自身刚体*/
+		/**[首次设置有效]关节的自身刚体*/
 		this.selfBody=null;
-		/**关节的连接刚体*/
+		/**[首次设置有效]关节的连接刚体*/
 		this.otherBody=null;
-		/**关节的链接点，是相对于自身刚体的左上角位置偏移*/
+		/**[首次设置有效]关节的链接点，是相对于自身刚体的左上角位置偏移*/
 		this.anchor=[0,0];
-		/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
-		this.frequency=5;
-		/**刚体在回归到节点过程中受到的阻尼，取值0~1*/
-		this.damping=0.7;
-		/**两个刚体是否可以发生碰撞，默认为false*/
+		/**[首次设置有效]两个刚体是否可以发生碰撞，默认为false*/
 		this.collideConnected=false;
-		/**一个向量值，描述运动方向，比如1,0是沿X轴向右*/
-		this.axis=[1,0];
-		/**是否开启马达，开启马达可使目标刚体运动*/
-		this.enableMotor=false;
-		/**启用马达后，可以达到的最大旋转速度*/
-		this.motorSpeed=0;
-		/**启用马达后，可以施加的最大扭距，如果最大扭矩太小，会导致不旋转*/
-		this.maxMotorTorque=10000;
-		/**原生关节对象*/
+		/**[只读]原生关节对象*/
 		this.joint=null;
+		/**[首次设置有效]一个向量值，描述运动方向，比如1,0是沿X轴向右*/
+		this.axis=[1,0];
+		/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
+		this._frequency=5;
+		/**刚体在回归到节点过程中受到的阻尼，取值0~1*/
+		this._damping=0.7;
+		/**是否开启马达，开启马达可使目标刚体运动*/
+		this._enableMotor=false;
+		/**启用马达后，可以达到的最大旋转速度*/
+		this._motorSpeed=0;
+		/**启用马达后，可以施加的最大扭距，如果最大扭矩太小，会导致不旋转*/
+		this._maxMotorTorque=10000;
 		WheelJoint.__super.call(this);
 	}
 
@@ -2213,16 +2530,17 @@ var WheelJoint=(function(_super){
 	__proto._createJoint=function(){
 		if (!this.joint){
 			if (!this.otherBody)throw "otherBody can not be empty";this.selfBody=this.selfBody|| this.owner.getComponent(RigidBody);
+			if (!this.selfBody)throw "selfBody can not be empty";
 			var box2d=window.box2d;
 			var def=new box2d.b2WheelJointDef();
 			var anchorPos=(this.selfBody.owner).localToGlobal(Point.TEMP.setTo(this.anchor[0],this.anchor[1]),false,Physics.I.worldRoot);
 			var anchorVec=new box2d.b2Vec2(anchorPos.x / Physics.PIXEL_RATIO,anchorPos.y / Physics.PIXEL_RATIO);
 			def.Initialize(this.otherBody.getBody(),this.selfBody.getBody(),anchorVec,new box2d.b2Vec2(this.axis[0],this.axis[1]));
-			def.enableMotor=this.enableMotor;
-			def.motorSpeed=this.motorSpeed;
-			def.maxMotorTorque=this.maxMotorTorque;
-			def.frequencyHz=this.frequency;
-			def.dampingRatio=this.damping;
+			def.enableMotor=this._enableMotor;
+			def.motorSpeed=this._motorSpeed;
+			def.maxMotorTorque=this._maxMotorTorque;
+			def.frequencyHz=this._frequency;
+			def.dampingRatio=this._damping;
 			def.collideConnected=this.collideConnected;
 			this.joint=Physics.I._createJoint(def);
 		}
@@ -2233,11 +2551,51 @@ var WheelJoint=(function(_super){
 		this.joint=null;
 	}
 
+	/**弹簧系统的震动频率，可以视为弹簧的弹性系数*/
+	__getset(0,__proto,'frequency',function(){
+		return this._frequency;
+		},function(value){
+		this._frequency=value;
+		if (this.joint)this.joint.SetSpringFrequencyHz(value);
+	});
+
+	/**启用马达后，可以达到的最大旋转速度*/
+	__getset(0,__proto,'motorSpeed',function(){
+		return this._motorSpeed;
+		},function(value){
+		this._motorSpeed=value;
+		if (this.joint)this.joint.SetMotorSpeed(value);
+	});
+
+	/**刚体在回归到节点过程中受到的阻尼，取值0~1*/
+	__getset(0,__proto,'damping',function(){
+		return this._damping;
+		},function(value){
+		this._damping=value;
+		if (this.joint)this.joint.SetSpringDampingRatio(value);
+	});
+
+	/**是否开启马达，开启马达可使目标刚体运动*/
+	__getset(0,__proto,'enableMotor',function(){
+		return this._enableMotor;
+		},function(value){
+		this._enableMotor=value;
+		if (this.joint)this.joint.EnableMotor(value);
+	});
+
+	/**启用马达后，可以施加的最大扭距，如果最大扭矩太小，会导致不旋转*/
+	__getset(0,__proto,'maxMotorTorque',function(){
+		return this._maxMotorTorque;
+		},function(value){
+		this._maxMotorTorque=value;
+		if (this.joint)this.joint.SetMaxMotorTorque(value);
+	});
+
 	return WheelJoint;
 })(Component)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/RigidBody.as=======98.999254/98.999254
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/RigidBody.as=======98.999254/98.999254
 /**
 *2D刚体
 */
@@ -2275,7 +2633,6 @@ var RigidBody=(function(_super){
 		*2.如果group值不相等，则使用规则3
 		*3.每个刚体都有一个category类别，此属性接收位字段，范围为[1,2^31]范围内的2的幂
 		*每个刚体也都有一个mask类别，指定与其碰撞的类别值之和（值是所有category按位AND的值）
-		*使用category/mask规则，如果(categoryA & maskB)!==0和(categoryB & maskA)!==0，那么AB都会进行碰撞，否则碰撞
 		*/
 		this.group=0;
 		/**[只读]碰撞类别，使用2的幂次方值指定，有32种不同的碰撞类别可用*/
@@ -2295,37 +2652,29 @@ var RigidBody=(function(_super){
 		if (this.body)return;
 		var sp=this.owner;
 		var box2d=window.box2d;
-		var bd=new box2d.b2BodyDef();
-		var point=(this.owner).localToGlobal(Point.TEMP.setTo(0,0));
-		bd.position.Set(point.x / Physics.PIXEL_RATIO,point.y / Physics.PIXEL_RATIO);
-		bd.angle=Utils.toRadian(sp.rotation);
-		bd.allowSleep=this._allowSleep;
-		bd.angularDamping=this._angularDamping;
-		bd.angularVelocity=this._angularVelocity;
-		bd.bullet=this._bullet;
-		bd.fixedRotation=!this._allowRotation;
-		bd.gravityScale=this._gravityScale;
-		bd.linearDamping=this._linearDamping;
+		var def=new box2d.b2BodyDef();
+		var point=(this.owner).localToGlobal(Point.TEMP.setTo(0,0),false,Physics.I.worldRoot);
+		def.position.Set(point.x / Physics.PIXEL_RATIO,point.y / Physics.PIXEL_RATIO);
+		def.angle=Utils.toRadian(sp.rotation);
+		def.allowSleep=this._allowSleep;
+		def.angularDamping=this._angularDamping;
+		def.angularVelocity=this._angularVelocity;
+		def.bullet=this._bullet;
+		def.fixedRotation=!this._allowRotation;
+		def.gravityScale=this._gravityScale;
+		def.linearDamping=this._linearDamping;
 		var arr=this._linearVelocity;
 		if (arr[0] !=0 || arr[1] !=0){
-			bd.linearVelocity=new box2d.b2Vec2(arr[0],arr[1]);
+			def.linearVelocity=new box2d.b2Vec2(arr[0],arr[1]);
 		}
-		bd.type=box2d.b2BodyType["b2_"+this._type+"Body"];
-		bd.userData=this.label;
-		this.body=Physics.I._createBody(bd);
+		def.type=box2d.b2BodyType["b2_"+this._type+"Body"];
+		this.body=Physics.I._createBody(def);
 		var comps=this.owner.getComponents(ColliderBase);
 		if (comps){
 			for (var i=0,n=comps.length;i < n;i++){
 				var collider=comps[i];
-				if (collider.enabled){
-					var shape=collider.getShape();
-					shape.filter.groupIndex=this.group;
-					shape.filter.categoryBits=this.category;
-					shape.filter.maskBits=this.mask;
-					var ft=this.body.CreateFixture(shape);
-					ft.collider=collider;
-					collider.body=this;
-				}
+				collider.rigidBody=this;
+				collider.refresh();
 			}
 		}
 	}
@@ -2385,14 +2734,14 @@ var RigidBody=(function(_super){
 	__proto._sysNodeToPhysic=function(){
 		var sp=(this.owner);
 		this.body.SetAngle(Utils.toRadian(sp.rotation));
-		var p=sp.localToGlobal(Point.TEMP.setTo(0,0));
+		var p=sp.localToGlobal(Point.TEMP.setTo(0,0),false,Physics.I.worldRoot);
 		this.body.SetPositionXY(p.x / Physics.PIXEL_RATIO,p.y / Physics.PIXEL_RATIO);
 	}
 
 	/**@private 同步节点坐标到物理世界*/
 	__proto._sysPosToPhysic=function(){
 		var sp=(this.owner);
-		var p=sp.localToGlobal(Point.TEMP.setTo(0,0));
+		var p=sp.localToGlobal(Point.TEMP.setTo(0,0),false,Physics.I.worldRoot);
 		this.body.SetPositionXY(p.x / Physics.PIXEL_RATIO,p.y / Physics.PIXEL_RATIO);
 	}
 
@@ -2587,7 +2936,7 @@ var RigidBody=(function(_super){
 })(Component)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/Physics.as=======98.999250/98.999250
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/Physics.as=======98.999250/98.999250
 /**
 *2D物理引擎，使用Box2d驱动
 */
@@ -2597,16 +2946,18 @@ var Physics=(function(_super){
 	function Physics(){
 		/**[只读]物理世界引用，更多属性请参考官网 */
 		this.world=null;
-		/**@private 是否已经激活*/
-		this._enabled=false;
-		/**@private 根容器*/
-		this._worldRoot=null;
-		/**@private */
-		this._eventList=[];
 		/**旋转迭代次数，增大数字会提高精度，但是会降低性能*/
 		this.velocityIterations=8;
 		/**位置迭代次数，增大数字会提高精度，但是会降低性能*/
 		this.positionIterations=3;
+		/**@private 是否已经激活*/
+		this._enabled=false;
+		/**@private 根容器*/
+		this._worldRoot=null;
+		/**@private 空的body节点，给一些不需要节点的关节使用*/
+		this._emptyBody=null;
+		/**@private */
+		this._eventList=[];
 		Physics.__super.call(this);
 		this.box2d=window.box2d;
 		ClassUtils.regShortClassName([BoxCollider,ChainCollider,CircleCollider,PolygonCollider,RigidBody,DistanceJoint,GearJoint,MotorJoint,MouseJoint,PrismaticJoint,PulleyJoint,RevoluteJoint,RopeJoint,WeldJoint,WheelJoint]);
@@ -2635,6 +2986,7 @@ var Physics=(function(_super){
 			this.world.SetContactListener(new ContactListener());
 			this.allowSleeping=options.allowSleeping==null ? true :options.allowSleeping;
 			if (!options.customUpdate)Laya.physicsTimer.frameLoop(1,this,this._update);
+			this._emptyBody=this._createBody(new window.box2d.b2BodyDef());
 		}
 	}
 
@@ -2753,14 +3105,15 @@ var Physics=(function(_super){
 		return this.world.GetBodyCount();
 	});
 
-	/**物理世界根容器，将根据此容器作为物理世界坐标世界，进行坐标变换，默认值为stage*/
+	/**物理世界根容器，将根据此容器作为物理世界坐标世界，进行坐标变换，默认值为stage
+	*设置特定容器后，就可整体位移物理对象，保持物理世界不变*/
 	__getset(0,__proto,'worldRoot',function(){
 		return this._worldRoot || Laya.stage;
 		},function(value){
 		this._worldRoot=value;
 		if (value){
-			var point=value.localToGlobal(Point.TEMP.setTo(0,0));
-			this.world.ShiftOrigin({x:point.x,y:point.y});
+			var p=value.localToGlobal(Point.TEMP.setTo(0,0));
+			this.world.ShiftOrigin({x:p.x / Physics.PIXEL_RATIO,y:p.y / Physics.PIXEL_RATIO});
 		}
 	});
 
@@ -2773,8 +3126,8 @@ var Physics=(function(_super){
 		Physics.I.start(options);
 	}
 
-	Physics._I=null;
 	Physics.PIXEL_RATIO=50;
+	Physics._I=null;
 	Physics.__init$=function(){
 		//class ContactListener
 		ContactListener=(function(){
@@ -2800,7 +3153,7 @@ var Physics=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/BoxCollider.as=======97.998546/97.998546
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/BoxCollider.as=======97.998546/97.998546
 /**
 *2D矩形碰撞体
 */
@@ -2808,33 +3161,72 @@ var Physics=(function(_super){
 var BoxCollider=(function(_super){
 	function BoxCollider(){
 		/**相对节点的x轴偏移*/
-		this.x=0;
+		this._x=0;
 		/**相对节点的y轴偏移*/
-		this.y=0;
+		this._y=0;
 		/**矩形宽度*/
-		this.width=100;
+		this._width=100;
 		/**矩形高度*/
-		this.height=100;
+		this._height=100;
 		BoxCollider.__super.call(this);
 	}
 
 	__class(BoxCollider,'laya.physics.BoxCollider',_super);
 	var __proto=BoxCollider.prototype;
-	__proto.getShape=function(){
+	__proto.getDef=function(){
 		if (!this._shape){
-			if (this.width <=0 || this.height <=0)throw "BoxCollider size cannot be less than 0";
 			this._shape=new window.box2d.b2PolygonShape();
-			this._shape.SetAsBox(this.width / 2 / Physics.PIXEL_RATIO,this.height / 2 / Physics.PIXEL_RATIO,new window.box2d.b2Vec2((this.width / 2+this.x)/ Physics.PIXEL_RATIO,(this.height / 2+this.y)/ Physics.PIXEL_RATIO));
+			this._setShape(false);
 		}
 		this.label=(this.label || "BoxCollider");
-		return _super.prototype.getShape.call(this);
+		return _super.prototype.getDef.call(this);
 	}
+
+	__proto._setShape=function(re){
+		(re===void 0)&& (re=true);
+		this._shape.SetAsBox(this._width / 2 / Physics.PIXEL_RATIO,this._height / 2 / Physics.PIXEL_RATIO,new window.box2d.b2Vec2((this._width / 2+this._x)/ Physics.PIXEL_RATIO,(this._height / 2+this._y)/ Physics.PIXEL_RATIO));
+		if (re)this.refresh();
+	}
+
+	/**矩形宽度*/
+	__getset(0,__proto,'width',function(){
+		return this._width;
+		},function(value){
+		if (value <=0)throw "BoxCollider size cannot be less than 0";
+		this._width=value;
+		if (this._shape)this._setShape();
+	});
+
+	/**相对节点的x轴偏移*/
+	__getset(0,__proto,'x',function(){
+		return this._x;
+		},function(value){
+		this._x=value;
+		if (this._shape)this._setShape();
+	});
+
+	/**相对节点的y轴偏移*/
+	__getset(0,__proto,'y',function(){
+		return this._y;
+		},function(value){
+		this._y=value;
+		if (this._shape)this._setShape();
+	});
+
+	/**矩形高度*/
+	__getset(0,__proto,'height',function(){
+		return this._height;
+		},function(value){
+		if (value <=0)throw "BoxCollider size cannot be less than 0";
+		this._height=value;
+		if (this._shape)this._setShape();
+	});
 
 	return BoxCollider;
 })(ColliderBase)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/ChainCollider.as=======97.998544/97.998544
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/ChainCollider.as=======97.998544/97.998544
 /**
 *2D圆形碰撞体
 */
@@ -2842,40 +3234,78 @@ var BoxCollider=(function(_super){
 var ChainCollider=(function(_super){
 	function ChainCollider(){
 		/**相对节点的x轴偏移*/
-		this.x=0;
+		this._x=0;
 		/**相对节点的y轴偏移*/
-		this.y=0;
+		this._y=0;
 		/**用逗号隔开的点的集合，格式：x,y,x,y ...*/
-		this.points="0,0,100,0";
+		this._points="0,0,100,0";
 		/**是否是闭环，注意不要有自相交的链接形状，它可能不能正常工作*/
-		this.loop=false;
+		this._loop=false;
 		ChainCollider.__super.call(this);
 	}
 
 	__class(ChainCollider,'laya.physics.ChainCollider',_super);
 	var __proto=ChainCollider.prototype;
-	__proto.getShape=function(){
+	__proto.getDef=function(){
 		if (!this._shape){
-			if (!this.points)throw "ChainCollider points cannot be empty";
-			var arr=this.points.split(",");
-			var len=arr.length;
-			if (len % 2==1)throw "PolygonCollider points lenth must a multiplier of 2";
-			var ps=[];
-			for (var i=0,n=len;i < n;i+=2){
-				ps.push(new window.box2d.b2Vec2((this.x+parseInt(arr[i]))/ Physics.PIXEL_RATIO,(this.y+parseInt(arr[i+1]))/ Physics.PIXEL_RATIO));
-			}
 			this._shape=new window.box2d.b2ChainShape();
-			this.loop ? this._shape.CreateLoop(ps,len / 2):this._shape.CreateChain(ps,len / 2);
+			this._setShape(false);
 		}
 		this.label=(this.label || "ChainCollider");
-		return _super.prototype.getShape.call(this);
+		return _super.prototype.getDef.call(this);
 	}
+
+	__proto._setShape=function(re){
+		(re===void 0)&& (re=true);
+		var arr=this._points.split(",");
+		var len=arr.length;
+		if (len % 2==1)throw "ChainCollider points lenth must a multiplier of 2";
+		var ps=[];
+		for (var i=0,n=len;i < n;i+=2){
+			ps.push(new window.box2d.b2Vec2((this._x+parseInt(arr[i]))/ Physics.PIXEL_RATIO,(this._y+parseInt(arr[i+1]))/ Physics.PIXEL_RATIO));
+		}
+		this._loop ? this._shape.CreateLoop(ps,len / 2):this._shape.CreateChain(ps,len / 2);
+		if (re)this.refresh();
+	}
+
+	/**相对节点的x轴偏移*/
+	__getset(0,__proto,'x',function(){
+		return this._x;
+		},function(value){
+		this._x=value;
+		if (this._shape)this._setShape();
+	});
+
+	/**相对节点的y轴偏移*/
+	__getset(0,__proto,'y',function(){
+		return this._y;
+		},function(value){
+		this._y=value;
+		if (this._shape)this._setShape();
+	});
+
+	/**用逗号隔开的点的集合，格式：x,y,x,y ...*/
+	__getset(0,__proto,'points',function(){
+		return this._points;
+		},function(value){
+		if (!value)throw "ChainCollider points cannot be empty";
+		this._points=value;
+		if (this._shape)this._setShape();
+	});
+
+	/**是否是闭环，注意不要有自相交的链接形状，它可能不能正常工作*/
+	__getset(0,__proto,'loop',function(){
+		return this._loop;
+		},function(value){
+		this._loop=value;
+		if (this._shape)this._setShape();
+	});
 
 	return ChainCollider;
 })(ColliderBase)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/CircleCollider.as=======97.998543/97.998543
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/CircleCollider.as=======97.998543/97.998543
 /**
 *2D圆形碰撞体
 */
@@ -2883,73 +3313,135 @@ var ChainCollider=(function(_super){
 var CircleCollider=(function(_super){
 	function CircleCollider(){
 		/**相对节点的x轴偏移*/
-		this.x=0;
+		this._x=0;
 		/**相对节点的y轴偏移*/
-		this.y=0;
+		this._y=0;
 		/**圆形半径，必须为正数*/
-		this.radius=50;
+		this._radius=50;
 		CircleCollider.__super.call(this);
 	}
 
 	__class(CircleCollider,'laya.physics.CircleCollider',_super);
 	var __proto=CircleCollider.prototype;
-	__proto.getShape=function(){
+	__proto.getDef=function(){
 		if (!this._shape){
-			if (this.radius <=0)throw "CircleCollider radius cannot be less than 0";
 			this._shape=new window.box2d.b2CircleShape();
-			this._shape.m_radius=this.radius / Physics.PIXEL_RATIO;
-			this._shape.m_p.Set((this.radius+this.x)/ Physics.PIXEL_RATIO,(this.radius+this.y)/ Physics.PIXEL_RATIO);
+			this._setShape(false);
 		}
 		this.label=(this.label || "CircleCollider");
-		return _super.prototype.getShape.call(this);
+		return _super.prototype.getDef.call(this);
 	}
+
+	__proto._setShape=function(re){
+		(re===void 0)&& (re=true);
+		this._shape.m_radius=this._radius / Physics.PIXEL_RATIO;
+		this._shape.m_p.Set((this._radius+this._x)/ Physics.PIXEL_RATIO,(this._radius+this._y)/ Physics.PIXEL_RATIO);
+		if (re)this.refresh();
+	}
+
+	/**相对节点的x轴偏移*/
+	__getset(0,__proto,'x',function(){
+		return this._x;
+		},function(value){
+		this._x=value;
+		if (this._shape)this._setShape();
+	});
+
+	/**相对节点的y轴偏移*/
+	__getset(0,__proto,'y',function(){
+		return this._y;
+		},function(value){
+		this._y=value;
+		if (this._shape)this._setShape();
+	});
+
+	/**圆形半径，必须为正数*/
+	__getset(0,__proto,'radius',function(){
+		return this._radius;
+		},function(value){
+		if (value <=0)throw "CircleCollider radius cannot be less than 0";
+		this._radius=value;
+		if (this._shape)this._setShape();
+	});
 
 	return CircleCollider;
 })(ColliderBase)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/PolygonCollider.as=======97.998529/97.998529
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/PolygonCollider.as=======97.998529/97.998529
 /**
-*2D多边形碰撞体
+*2D多边形碰撞体，暂时不支持凹多边形，如果是凹多边形，先手动拆分为多个凸多边形
+*节点个数最多是b2_maxPolygonVertices，这数值默认是8，所以点的数量不建议超过8个
 */
 //class laya.physics.PolygonCollider extends laya.physics.ColliderBase
 var PolygonCollider=(function(_super){
 	function PolygonCollider(){
 		/**相对节点的x轴偏移*/
-		this.x=0;
+		this._x=0;
 		/**相对节点的y轴偏移*/
-		this.y=0;
+		this._y=0;
 		/**用逗号隔开的点的集合，格式：x,y,x,y ...*/
-		this.points="50,0,100,100,0,100";
+		this._points="50,0,100,100,0,100";
 		PolygonCollider.__super.call(this);
 	}
 
 	__class(PolygonCollider,'laya.physics.PolygonCollider',_super);
 	var __proto=PolygonCollider.prototype;
-	__proto.getShape=function(){
+	__proto.getDef=function(){
 		if (!this._shape){
-			if (!this.points)throw "PolygonCollider points cannot be empty";
-			var arr=this.points.split(",");
-			var len=arr.length;
-			if (len < 6)throw "PolygonCollider points must be greater than 3";
-			if (len % 2==1)throw "PolygonCollider points lenth must a multiplier of 2";
-			var ps=[];
-			for (var i=0,n=len;i < n;i+=2){
-				ps.push(new window.box2d.b2Vec2(arr[i] / Physics.PIXEL_RATIO,arr[i+1] / Physics.PIXEL_RATIO));
-			}
 			this._shape=new window.box2d.b2PolygonShape();
-			this._shape.Set(ps,len / 2);
+			this._setShape(false);
 		}
 		this.label=(this.label || "PolygonCollider");
-		return _super.prototype.getShape.call(this);
+		return _super.prototype.getDef.call(this);
 	}
+
+	__proto._setShape=function(re){
+		(re===void 0)&& (re=true);
+		var arr=this._points.split(",");
+		var len=arr.length;
+		if (len < 6)throw "PolygonCollider points must be greater than 3";
+		if (len % 2==1)throw "PolygonCollider points lenth must a multiplier of 2";
+		var ps=[];
+		for (var i=0,n=len;i < n;i+=2){
+			ps.push(new window.box2d.b2Vec2((this._x+arr[i])/ Physics.PIXEL_RATIO,(this._y+arr[i+1])/ Physics.PIXEL_RATIO));
+		}
+		this._shape.Set(ps,len / 2);
+		if (re)this.refresh();
+	}
+
+	/**相对节点的x轴偏移*/
+	__getset(0,__proto,'x',function(){
+		return this._x;
+		},function(value){
+		this._x=value;
+		if (this._shape)this._setShape();
+	});
+
+	/**相对节点的y轴偏移*/
+	__getset(0,__proto,'y',function(){
+		return this._y;
+		},function(value){
+		this._y=value;
+		if (this._shape)this._setShape();
+	});
+
+	/**用逗号隔开的点的集合，格式：x,y,x,y ...*/
+	__getset(0,__proto,'points',function(){
+		return this._points;
+		},function(value){
+		if (!value)throw "PolygonCollider points cannot be empty";
+		this._points=value;
+		if (this._shape)this._setShape();
+	});
 
 	return PolygonCollider;
 })(ColliderBase)
 
 
-	//file:///E:/LayaAirMaster/physics/src/laya/physics/PhysicsDebugDraw.as=======96.999229/96.999229
+	//file:///D:/gittest/gittestnew/physics/src/laya/physics/PhysicsDebugDraw.as=======96.999229/96.999229
 /**
+*@private webgl+非fixed模式有bug
 *box2d物理辅助线，调用PhysicsDebugDraw.enable()开启
 */
 //class laya.physics.PhysicsDebugDraw extends laya.display.Sprite
