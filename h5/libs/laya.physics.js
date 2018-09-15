@@ -3404,7 +3404,7 @@ var PolygonCollider=(function(_super){
 		if (len % 2==1)throw "PolygonCollider points lenth must a multiplier of 2";
 		var ps=[];
 		for (var i=0,n=len;i < n;i+=2){
-			ps.push(new window.box2d.b2Vec2((this._x+arr[i])/ Physics.PIXEL_RATIO,(this._y+arr[i+1])/ Physics.PIXEL_RATIO));
+			ps.push(new window.box2d.b2Vec2((this._x+parseInt(arr[i]))/ Physics.PIXEL_RATIO,(this._y+parseInt(arr[i+1]))/ Physics.PIXEL_RATIO));
 		}
 		this._shape.Set(ps,len / 2);
 		if (re)this.refresh();
