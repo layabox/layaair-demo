@@ -13,7 +13,7 @@
         this.camera.clearColor = new Laya.Vector4(0.5, 0.5, 0.5, 1.0);
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
-        directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1, -1, -1));
+        directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1, -1, 1));
         var plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(13, 13, 10, 10)));
         var planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
