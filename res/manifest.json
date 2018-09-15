@@ -311,9 +311,9 @@
 			"prefix": "animation",
 			"tr_zhCN": "动画",
       "manifest": [
-        [ "AnimationLayerBlend", "动画过渡和混合", "", "core,webgl,ui,ani,d3" ],
-        [ "BoneLinkSprite3D", "蒙皮动画挂点", "", "core,webgl,ui,ani,d3" ],
-        [ "SkinAnimationSample", "蒙皮动画", "", "core,webgl,ui,ani,d3" ]
+        [ "AnimationLayerBlend", "动画过渡和混合", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+        [ "BoneLinkSprite3D", "蒙皮动画挂点", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+        [ "SkinAnimationSample", "蒙皮动画", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ]
       ]
 		},
 		{
@@ -356,7 +356,6 @@
 			"prefix": "advanced",
 			"tr_zhCN": "高级应用",
       "manifest": [
-        [ "GlitterDemo", "闪光", "", "core,webgl,ani,d3" ],
         [ "Laya3DCombineHtml", "Laya3D与网页混合", "", "core,webgl,ani,d3" ],
         [ "RealTimeShadow", "实时阴影", "", "core,webgl,ani,d3" ],
         [ "RenderTextureDemo", "渲染纹理", "", "core,webgl,ui,ani,d3,CameraMoveScript.js" ],
