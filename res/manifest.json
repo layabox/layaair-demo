@@ -245,21 +245,21 @@
 			]
 		}],
 		"3d": [
-		{
-			"prefix": "Sprite3D",
-			"tr_zhCN": "Sprite3D",
-			"manifest": [
-				["Sprite3DLoad", "Sprite3D加载", "", "core,webgl,ani,d3"],
-				["Sprite3DClone", "Sprite3D克隆", "", "core,webgl,ani,d3"],
-				["Sprite3DTransform", "Sprite3D变换", "", "core,webgl,ani,d3"]
-			]
-		},
+      {
+        "prefix": "sprite3d",
+        "tr_zhCN": "sprite3d",
+        "manifest": [
+          [ "Sprite3DLoad", "Sprite3D加载", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+          [ "Sprite3DClone", "Sprite3D克隆", "", "core,webgl,ani,d3" ],
+          [ "Sprite3DTransform", "Sprite3D变换", "", "core,webgl,ani,d3" ]
+        ]
+      },
 		{
 			"prefix": "mesh",
 			"tr_zhCN": "Mesh网格",
 			"manifest": [
 				["MeshLoad", "网格加载", "", "core,webgl,ui,ani,d3,Tool.js"],
-				["CustomMesh", "自定义网格", "", "core,webgl,ui,ani,d3,Tool.js"]
+        [ "CustomMesh", "自定义网格", "", "core,webgl,ui,ani,d3,Tool.js,CameraMoveScript.js" ]
 			]
 		},
 		{
@@ -268,20 +268,18 @@
 			"manifest": [
 				["DirectionLightDemo", "方向光", "", "core,webgl,ani,d3,CameraMoveScript.js"],
 				["PointLightDemo", "点光", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-				["SpotLightDemo", "聚光", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+        [ "SpotLightDemo", "聚光", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
 			]
 		},
 		{
 			"prefix": "material",
 			"tr_zhCN": "材质",
 			"manifest": [
-				["BlinnPhongMaterialLoad", "BlinnPhong材质加载", "", "core,webgl,ani,d3"],
-				["BlinnPhong_DiffuseMap", "BlinnPhong-漫反射贴图", "", "core,webgl,ani,d3"],
-				["BlinnPhong_NormalMap", "BlinnPhong-法线贴图", "", "core,webgl,ani,d3"],
-				["BlinnPhong_ReflectMap", "BlinnPhong-反射贴图", "", "core,webgl,ani,d3"],
+        [ "BlinnPhongMaterialLoad", "BlinnPhong材质加载", "", "core,webgl,ani,d3" ],
+        [ "BlinnPhong_DiffuseMap", "BlinnPhong-漫反射贴图", "", "core,webgl,ani,d3" ],
+        [ "BlinnPhong_NormalMap", "BlinnPhong-法线贴图", "", "core,webgl,ani,d3" ],
 				["BlinnPhong_SpecularMap", "BlinnPhong-高光贴图", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-				["PBRMaterialDemo", "物理基础渲染材质", "", "core,webgl,ani,d3,CameraMoveScript.js,pbrlut.js"],
-				["PBRStandardMaterialDemo", "PBRStandard材质", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+        [ "PBRStandardMaterialDemo", "PBRStandard材质", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
 			]
 		},
 		{
@@ -310,40 +308,40 @@
 			]
 		},
 		{
-			"prefix": "vr",
-			"tr_zhCN": "VR场景",
-			"manifest": [
-				["VRScene1", "VR地球", "", "core,webgl,ani,d3,VRCameraMoveScript.js"],
-				["VRScene2", "VR场景", "", "core,webgl,ani,d3,VRCameraMoveScript.js"]
-			]
-		},
-		{
 			"prefix": "animation",
 			"tr_zhCN": "动画",
-			"manifest": [
-				["SkinAnimation_Old", "旧版骨骼动画", "", "core,webgl,ui,ani,d3"],
-				["SkinAnimation_New", "新版骨骼动画", "", "core,webgl,ui,ani,d3"]
-			]
+      "manifest": [
+        [ "AnimationLayerBlend", "动画过渡和混合", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+        [ "BoneLinkSprite3D", "蒙皮动画挂点", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+        [ "SkinAnimationSample", "蒙皮动画", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ]
+      ]
 		},
 		{
 			"prefix": "particle",
 			"tr_zhCN": "粒子系统",
 			"manifest": [
-				["Particle_EternalLight", "永恒之光", "", "core,webgl,ani,d3"],
-				["Particle_BurningGround", "燃烧大地", "", "core,webgl,ani,d3"],
-				["Particle_Scene", "场景与粒子", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+        [ "Particle_EternalLight", "永恒之光", "", "core,webgl,ani,d3" ],
+        [ "Particle_BurningGround", "燃烧大地", "", "core,webgl,ani,d3" ],
+        [ "Particle_Scene", "场景与粒子", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
 			]
 		},
 		{
 			"prefix": "physics",
-			"tr_zhCN": "射线检测",
-			"manifest": [
-				["RayPicking01", "选取物体", "", "core,webgl,ui,ani,d3"],
-				["RayPicking02", "放置物体", "", "core,webgl,ui,ani,d3"],
-				["RayPicking03", "点击行走", "", "core,webgl,ui,ani,d3"],
-				["RayPicking04", "射线检测", "", "core,webgl,ui,ani,d3"],
-				["ColiderDemo", "碰撞器混合", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,ColliderScript.js,DrawBoxColliderScript.js"]
-			]
+			"tr_zhCN": "物理系统",
+      "manifest": [
+        [ "PhysicsWorld_BaseCollider", "基础碰撞器", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+        [ "PhysicsWorld_BuildingBlocks", "选取物体", "", "core,webgl,ui,ani,d3,physics3D" ],
+        [ "PhysicsWorld_Character", "角色碰撞器", "", "core,webgl,ui,ani,d3,physics3D" ],
+        [ "PhysicsWorld_CollisionFiflter", "碰撞器过滤器", "", "core,webgl,ui,ani,d3,physics3D" ],
+        [ "PhysicsWorld_CompoundCollider", "碰撞器混合", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+        [ "PhysicsWorld_ContinueCollisionDetection", "连续碰撞检测", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+        [ "PhysicsWorld_Kinematic", "刚体碰撞", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+        [ "PhysicsWorld_MeshCollider", "网格碰撞器", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+        [ "PhysicsWorld_RayShapeCast", "射线检测", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+        [ "PhysicsWorld_TriggerAndCollisionEvent", "触发和碰撞事件", "","core,webgl,ui,ani,d3,CameraMoveScript.js,TriggerCollisionScript.js,physics3D" ]
+
+
+      ]
 		},
 		{
 			"prefix": "shader",
@@ -351,21 +349,22 @@
 			"manifest": [
 				["Shader_Simple", "简单shader", "", "core,webgl,ani,d3,CameraMoveScript.js,CustomMaterial.js"],
 				["Shader_GlowingEdge", "边缘光照shader", "", "core,webgl,ani,d3,CustomMaterial.js,CameraMoveScript.js"],
-				["Shader_Terrain", "地形shader", "", "core,webgl,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js"],
-				["ShaderPrecompile", "shader预编译", "", "core,webgl,ani,d3"]
+				["Shader_Terrain", "地形shader", "", "core,webgl,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js"]
 			]
 		},
 		{
 			"prefix": "advanced",
 			"tr_zhCN": "高级应用",
-			"manifest": [
-				["GlitterDemo", "闪光", "", "core,webgl,ani,d3"],
-				["Laya3DCombineHtml", "Laya3D与网页混合", "", "core,webgl,ani,d3"],
-				["RealTimeShadow", "实时阴影", "", "core,webgl,ani,d3"],
-				["RenderTextureDemo", "渲染纹理", "", "core,webgl,ui,ani,d3,CameraMoveScript.js"],
-				["AStarFindPath", "寻路导航", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js"],
-				["PBRDemo", "基于物理渲染", "", "core,webgl,ani,d3,CameraMoveScript.js"]
-			]
+      "manifest": [
+        [ "Laya3DCombineHtml", "Laya3D与网页混合", "", "core,webgl,ani,d3" ],
+        [ "RealTimeShadow", "实时阴影", "", "core,webgl,ani,d3" ],
+        [ "RenderTextureDemo", "渲染纹理", "", "core,webgl,ui,ani,d3,CameraMoveScript.js" ],
+        [ "AStarFindPath", "寻路导航", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
+        [ "PBRDemo", "基于物理渲染", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+        [ "ScriptSample", "脚本组件", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+        [ "TouchScriptSample", "触碰检测", "", "core,webgl,ani,d3,CameraMoveScript.js,physics3D" ]
+
+      ]
 		}]
 	}
 }

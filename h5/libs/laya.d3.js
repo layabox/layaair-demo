@@ -11585,15 +11585,21 @@ var ColliderShape=(function(){
 				colliderShape=sizeData ? new BoxColliderShape(sizeData[0],sizeData[1],sizeData[2]):new BoxColliderShape();
 				break ;
 			case "SphereColliderShape":
-				colliderShape=shapeData.radius ? new SphereColliderShape(shapeData.radius):new SphereColliderShape();
+				colliderShape=new SphereColliderShape(shapeData.radius);
 				break ;
 			case "CapsuleColliderShape":
-				colliderShape=shapeData.radius && shapeData.height ? new CapsuleColliderShape(shapeData.radius,shapeData.height):new CapsuleColliderShape();
+				colliderShape=new CapsuleColliderShape(shapeData.radius,shapeData.height,shapeData.orientation);
 				break ;
 			case "MeshColliderShape":;
 				var meshCollider=new MeshColliderShape();
 				shapeData.mesh && (meshCollider.mesh=Loader.getRes(shapeData.mesh));
 				colliderShape=meshCollider;
+				break ;
+			case "ConeColliderShape":
+				colliderShape=new ConeColliderShape(shapeData.radius,shapeData.height,shapeData.orientation);
+				break ;
+			case "CylinderColliderShape":
+				colliderShape=new CylinderColliderShape(shapeData.radius,shapeData.height,shapeData.orientation);
 				break ;
 			default :
 				throw "unknown shape type.";

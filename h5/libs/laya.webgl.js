@@ -10150,6 +10150,7 @@ var WebGL=(function(){
 			(LayaGLRunner).uploadShaderUniforms=LayaGLRunner.uploadShaderUniformsForNative;
 			var stage=Stage;
 			stage.prototype.repaint=stage.prototype.repaintForNative;
+			stage.prototype.render=stage.prototype.renderToNative;
 			if (Render.isConchApp){
 				/*__JS__ */CommandEncoder=window.GLCommandEncoder;
 				/*__JS__ */LayaGL=window.LayaGLContext;
