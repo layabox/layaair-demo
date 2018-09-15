@@ -40,7 +40,7 @@ var CameraMoveScript = /** @class */ (function (_super) {
         _super.prototype.onUpdate.call(this, state);
         //每帧调用的函数，传入参数每帧的时间值
         this.updateCamera(Laya.timer.delta);
-        console.log(this.isMouseDown);
+     
     };
     CameraMoveScript.prototype.mouseDown = function (e) {
         //获得鼠标的旋转值
@@ -50,7 +50,7 @@ var CameraMoveScript = /** @class */ (function (_super) {
         this.lastMouseY = Laya.stage.mouseY;
         //设置bool值
         this.isMouseDown = true;
-        console.log(this.isMouseDown);
+     
     };
     CameraMoveScript.prototype.mouseUp = function (e) {
         //设置bool值
