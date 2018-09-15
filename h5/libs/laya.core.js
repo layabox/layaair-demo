@@ -3146,7 +3146,9 @@ var Graphics=(function(){
 		//this._vectorgraphArray=null;
 		/**@private */
 		//this._graphicBounds=null;
+		/**@private */
 		//this._commandEncoder=null;
+		/**@private */
 		this.autoDestroy=false;
 		this._render=this._renderEmpty;
 		this._createData();
@@ -3154,8 +3156,11 @@ var Graphics=(function(){
 
 	__class(Graphics,'laya.display.Graphics');
 	var __proto=Graphics.prototype;
+	/**@private */
 	__proto._createData=function(){}
+	/**@private */
 	__proto._clearData=function(){}
+	/**@private */
 	__proto._destroyData=function(){}
 	/**
 	*<p>销毁此对象。</p>
@@ -3260,12 +3265,12 @@ var Graphics=(function(){
 	}
 
 	/**
-	*
-	*@param tex
-	*@param x
-	*@param y
-	*@param width
-	*@param height
+	*绘制单独图片
+	*@param texture 纹理。
+	*@param x （可选）X轴偏移量。
+	*@param y （可选）Y轴偏移量。
+	*@param width （可选）宽度。
+	*@param height （可选）高度。
 	*/
 	__proto.drawImage=function(texture,x,y,width,height){
 		(x===void 0)&& (x=0);
@@ -3300,8 +3305,8 @@ var Graphics=(function(){
 	}
 
 	/**
-	*绘制纹理。
-	*@param tex 纹理。
+	*绘制纹理，相比drawImage功能更强大，性能会差一些
+	*@param texture 纹理。
 	*@param x （可选）X轴偏移量。
 	*@param y （可选）Y轴偏移量。
 	*@param width （可选）宽度。
@@ -3359,7 +3364,7 @@ var Graphics=(function(){
 
 	/**
 	*批量绘制同样纹理。
-	*@param tex 纹理。
+	*@param texture 纹理。
 	*@param pos 绘制次数和坐标。
 	*/
 	__proto.drawTextures=function(texture,pos){
@@ -3387,7 +3392,7 @@ var Graphics=(function(){
 
 	/**
 	*用texture填充。
-	*@param tex 纹理。
+	*@param texture 纹理。
 	*@param x X轴偏移量。
 	*@param y Y轴偏移量。
 	*@param width （可选）宽度。
@@ -3610,6 +3615,7 @@ var Graphics=(function(){
 		}
 	}
 
+	/**@private */
 	__proto._setTextCmdColor=function(cmdO,color){
 		var cmdID=cmdO.cmdID;
 		switch (cmdID){
@@ -5687,7 +5693,7 @@ var Matrix=(function(){
 		(tx===void 0)&& (tx=0);
 		(ty===void 0)&& (ty=0);
 		(nums===void 0)&& (nums=0);
-		if (Matrix._createFun!=null){
+		if (Matrix._createFun !=null){
 			/*__JS__ */return Matrix._createFun(a,b,c,d,tx,ty,nums);
 		}
 		this.a=a;
@@ -12614,7 +12620,7 @@ var Node=(function(_super){
 		this.name="";
 		/**[只读]是否已经销毁。对象销毁后不能再使用。*/
 		this.destroyed=false;
-		//TODO?
+		/**@private */
 		this._conchData=null;
 		/**@private */
 		this._components=null;
@@ -12627,6 +12633,7 @@ var Node=(function(_super){
 
 	__class(Node,'laya.display.Node',_super);
 	var __proto=Node.prototype;
+	/**@private */
 	__proto.createGLBuffer=function(){}
 	/**@private */
 	__proto._setBit=function(type,value){
@@ -12937,6 +12944,7 @@ var Node=(function(_super){
 		return null;
 	}
 
+	/**@private */
 	__proto._setParent=function(value){
 		if (this._parent!==value){
 			if (value){
@@ -13277,7 +13285,7 @@ var Node=(function(_super){
 	}
 
 	/**
-	*克隆。
+	*@private 克隆。
 	*@param destObject 克隆源。
 	*/
 	__proto._cloneTo=function(destObject){
@@ -16115,13 +16123,11 @@ var Texture=(function(_super){
 	*/
 	__proto._onLoaded=function(complete,context){
 		if (!context){
-		}else
-		if (context==this){}
-			else if ((context instanceof laya.resource.Texture )){
+			}else if (context==this){
+			}else if ((context instanceof laya.resource.Texture )){
 			var tex=context;
 			Texture._create(context,0,0,tex.width,tex.height,0,0,tex.sourceWidth,tex.sourceHeight,this);
-		}
-		else {
+			}else {
 			this.bitmap=context;
 			this.sourceWidth=this._w=context.width;
 			this.sourceHeight=this._h=context.height;
@@ -16179,11 +16185,9 @@ var Texture=(function(_super){
 	__proto.getPixels=function(x,y,width,height){
 		if (Render.isWebGL){
 			return RunDriver.getTexturePixels(this,x,y,width,height);
-		}
-		else if (Render.isConchApp){
+			}else if (Render.isConchApp){
 			return this._nativeObj.getImageData(0,0,width,height);
-		}
-		else {
+			}else {
 			Browser.canvas.size(width,height);
 			Browser.canvas.clear();
 			Browser.context.drawImage(this,-x,-y,this.width,this.height,0,0);
@@ -16312,8 +16316,7 @@ var Texture=(function(_super){
 		if (outTexture){
 			tex=outTexture;
 			tex.setTo(bitmap,null,sourceWidth || width,sourceHeight || height);
-		}
-		else {
+			}else {
 			tex=new Texture(bitmap,null,sourceWidth || width,sourceHeight || height)
 		}
 		tex.width=width;
@@ -16337,8 +16340,7 @@ var Texture=(function(_super){
 			tex.width /=bitmapScale;
 			tex.height /=bitmapScale;
 			tex.scaleRate=bitmapScale;
-		}
-		else {
+			}else {
 			tex.scaleRate=1;
 		}
 		return tex;
@@ -17277,7 +17279,9 @@ var Sprite=(function(_super){
 		return this._boundStyle;
 	}
 
+	/**@private */
 	__proto._setCustomRender=function(){}
+	/**@private */
 	__proto._setCacheAs=function(value){}
 	/**
 	*更新_cnavas相关的状态
@@ -17312,10 +17316,12 @@ var Sprite=(function(_super){
 		return this._repaint;
 	}
 
+	/**@private */
 	__proto._setX=function(value){
 		this._x=value;
 	}
 
+	/**@private */
 	__proto._setY=function(value){
 		this._y=value;
 	}
@@ -17472,26 +17478,32 @@ var Sprite=(function(_super){
 		this._style=value;
 	}
 
+	/**@private */
 	__proto._setScaleX=function(value){
 		this._style.scaleX=value;
 	}
 
+	/**@private */
 	__proto._setScaleY=function(value){
 		this._style.scaleY=value;
 	}
 
+	/**@private */
 	__proto._setRotation=function(value){
 		this._style.rotation=value;
 	}
 
+	/**@private */
 	__proto._setSkewX=function(value){
 		this._style.skewX=value;
 	}
 
+	/**@private */
 	__proto._setSkewY=function(value){
 		this._style.skewY=value;
 	}
 
+	/**@private */
 	__proto._createTransform=function(){
 		return Matrix.create();
 	}
@@ -17523,25 +17535,31 @@ var Sprite=(function(_super){
 		return m;
 	}
 
+	/**@private */
 	__proto._setTransform=function(value){}
+	/**@private */
 	__proto._setPivotX=function(value){
 		var style=this.getStyle();
 		style.pivotX=value;
 	}
 
+	/**@private */
 	__proto._getPivotX=function(){
 		return this._style.pivotX;
 	}
 
+	/**@private */
 	__proto._setPivotY=function(value){
 		var style=this.getStyle();
 		style.pivotY=value;
 	}
 
+	/**@private */
 	__proto._getPivotY=function(){
 		return this._style.pivotY;
 	}
 
+	/**@private */
 	__proto._setAlpha=function(value){
 		if (this._style.alpha!==value){
 			var style=this.getStyle();
@@ -17553,13 +17571,18 @@ var Sprite=(function(_super){
 		}
 	}
 
+	/**@private */
 	__proto._getAlpha=function(){
 		return this._style.alpha;
 	}
 
+	/**@private */
 	__proto._setBlendMode=function(value){}
+	/**@private */
 	__proto._setGraphics=function(value){}
+	/**@private */
 	__proto._setGraphicsCallBack=function(){}
+	/**@private */
 	__proto._setScrollRect=function(value){}
 	/**
 	*<p>设置坐标位置。相当于分别设置x和y属性。</p>
@@ -17716,6 +17739,7 @@ var Sprite=(function(_super){
 		}
 	}
 
+	/**@private */
 	__proto._setColorFilter=function(value){}
 	/**
 	*@private
@@ -17888,6 +17912,7 @@ var Sprite=(function(_super){
 		}
 	}
 
+	/**@private */
 	__proto._setParent=function(value){
 		_super.prototype._setParent.call(this,value);
 		if (value && this._getBit(/*laya.Const.HAS_MOUSE*/0x40)){
@@ -17960,6 +17985,7 @@ var Sprite=(function(_super){
 		}
 	}
 
+	/**@private */
 	__proto._setMask=function(value){}
 	/**
 	*开始拖动此对象。
@@ -18019,8 +18045,11 @@ var Sprite=(function(_super){
 		return this.globalToLocal(Point.TEMP.setTo(Laya.stage.mouseX,Laya.stage.mouseY));
 	}
 
+	/**@private */
 	__proto._setTexture=function(value){}
+	/**@private */
 	__proto._setRenderType=function(type){}
+	/**@private */
 	__proto._setTranformChange=function(){
 		this._tfChanged=true;
 		this._renderType |=/*laya.display.SpriteConst.TRANSFORM*/0x02
@@ -18028,7 +18057,9 @@ var Sprite=(function(_super){
 		this.parentRepaint(/*laya.display.SpriteConst.REPAINT_CACHE*/0x02);
 	}
 
+	/**@private */
 	__proto._setBgStyleColor=function(x,y,width,height,fillColor){}
+	/**@private */
 	__proto._setBorderStyleColor=function(x,y,width,height,fillColor,borderWidth){}
 	/**
 	*设置是否开启自定义渲染，只有开启自定义渲染，才能使用customRender函数渲染。
@@ -23120,7 +23151,7 @@ var GraphicAnimation=(function(_super){
 })(FrameAnimation)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,GraphicAnimation,SceneUtils,Timer,CallLater,LocalStorage,TimeLine]);
+	Laya.__init([EventDispatcher,LoaderManager,GraphicAnimation,SceneUtils,Timer,CallLater,LocalStorage,TimeLine]);
 })(window,document,Laya);
 
 (function(window,document,Laya){
