@@ -20753,6 +20753,37 @@ var Stage=(function(_super){
 		Laya.timer._update();
 	}
 
+	__proto.renderToNative=function(context,x,y){
+		this._renderCount++;
+		Stat.loopCount++;
+		if (!this._visible){
+			if (this._renderCount % 5===0){
+				CallLater.I._update();
+				Stat.loopCount++;
+				Laya.systemTimer._update();
+				Laya.startTimer._update();
+				Laya.physicsTimer._update();
+				Laya.updateTimer._update();
+				Laya.lateTimer._update();
+				Laya.timer._update();
+			}
+			return;
+		}
+		CallLater.I._update();
+		Laya.systemTimer._update();
+		Laya.startTimer._update();
+		Laya.physicsTimer._update();
+		Laya.updateTimer._update();
+		Laya.lateTimer._update();
+		Laya.timer._update();
+		if (this.renderingEnabled){
+			RunDriver.clear(this._bgColor);
+			_super.prototype.render.call(this,context,x,y);
+			Stat._show && Stat._sp && Stat._sp.render(context,x,y);
+			context.gl.commit();
+		}
+	}
+
 	/**@private */
 	__proto._requestFullscreen=function(){
 		var element=Browser.document.documentElement;
