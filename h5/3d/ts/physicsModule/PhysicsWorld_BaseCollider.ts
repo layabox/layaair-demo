@@ -122,8 +122,8 @@ class PhysicsWorld_BaseCollider
             mat3.albedoTexture = tex;
         }));
         
-        var raidius:Number = Math.random() * 0.2 + 0.2;
-        var height:Number = Math.random() * 0.5 + 0.8;
+        var raidius:number = Math.random() * 0.2 + 0.2;
+        var height:number = Math.random() * 0.5 + 0.8;
         var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.CapsuleMesh(raidius, height))) as Laya.MeshSprite3D;
         capsule.meshRenderer.material = mat3;
         capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
