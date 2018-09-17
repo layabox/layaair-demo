@@ -22,7 +22,7 @@ var TestPageUI=(function(_super){
 		var __proto__=TestPageUI.prototype;
 		__proto__.createChildren=function(){
 		    
-			laya.ui.Component.prototype.createChildren.call(this);
+			laya.ui.UIComponent.prototype.createChildren.call(this);
 			this.createView(TestPageUI.uiView);
 		}
 
