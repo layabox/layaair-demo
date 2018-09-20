@@ -211,27 +211,16 @@ var Laya=window.Laya=(function(window,document){
 
 (function(window,document,Laya){
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
-	//file:///D:/gittest/gittestnew/core/src/laya/runtime/IMarket.as=======1100000100.000049/1100000100.000049
 Laya.interface('laya.runtime.IMarket');
-	//file:///D:/gittest/gittestnew/core/src/laya/filters/IFilter.as=======1100000100.000048/1100000100.000048
 Laya.interface('laya.filters.IFilter');
-	//file:///D:/gittest/gittestnew/core/src/laya/resource/IDispose.as=======1100000100.000040/1100000100.000040
 Laya.interface('laya.resource.IDispose');
-	//file:///D:/gittest/gittestnew/core/src/laya/runtime/IPlatform.as=======1100000100.000039/1100000100.000039
 Laya.interface('laya.runtime.IPlatform');
-	//file:///D:/gittest/gittestnew/core/src/laya/resource/IDestroy.as=======1100000100.000039/1100000100.000039
 Laya.interface('laya.resource.IDestroy');
-	//file:///D:/gittest/gittestnew/core/src/laya/runtime/ICPlatformClass.as=======1100000100.000025/1100000100.000025
 Laya.interface('laya.runtime.ICPlatformClass');
-	//file:///D:/gittest/gittestnew/core/src/laya/resource/ICreateResource.as=======1100000100.000023/1100000100.000023
 Laya.interface('laya.resource.ICreateResource');
-	//file:///D:/gittest/gittestnew/core/src/laya/runtime/IConchRenderObject.as=======1100000100.000021/1100000100.000021
 Laya.interface('laya.runtime.IConchRenderObject');
-	//file:///D:/gittest/gittestnew/core/src/laya/resource/ISingletonElement.as=======1100000100.000020/1100000100.000020
 Laya.interface('laya.resource.ISingletonElement');
-	//file:///D:/gittest/gittestnew/core/src/laya/runtime/IPlatformClass.as=======1100000000.000026/1100000000.000026
 Laya.interface('laya.runtime.IPlatformClass','laya.runtime.IPlatform');
-	//file:///D:/gittest/gittestnew/core/src/Laya.as=======1000199.999852/1000199.999852
 /**
 *<code>Laya</code> 是全局对象的引用入口集。
 *Laya类引用了一些常用的全局对象，比如Laya.stage：舞台，Laya.timer：时间管理器，Laya.loader：加载管理器，使用时注意大小写。
@@ -355,7 +344,7 @@ var ___Laya=(function(){
 	Laya.lateTimer=null;
 	Laya.timer=null;
 	Laya.loader=null;
-	Laya.version="2.0.0beta1";
+	Laya.version="2.0.0beta2";
 	Laya.render=null;
 	Laya._currentStage=null;
 	Laya._isinit=false;
@@ -366,7 +355,6 @@ var ___Laya=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/renders/LayaGLQuickRunner.as=======199.999907/10199.999907
 /**
 *@private
 *快速节点命令执行器
@@ -514,7 +502,6 @@ var LayaGLQuickRunner=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/ColorUtils.as=======199.999881/10199.999881
 /**
 *@private
 *<code>ColorUtils</code> 是一个颜色值处理类。
@@ -539,7 +526,7 @@ var ColorUtils=(function(){
 		var i=0,len=0;
 		var color=0;
 		if ((typeof value=='string')){
-			if ((value).indexOf("rgba(")>=0){
+			if ((value).indexOf("rgba(")>=0||(value).indexOf("rgb(")>=0){
 				var tStr=value;
 				var beginI=0,endI=0;
 				beginI=tStr.indexOf("(");
@@ -549,8 +536,15 @@ var ColorUtils=(function(){
 				len=this.arrColor.length;
 				for (i=0;i < len;i++){
 					this.arrColor[i]=parseFloat(this.arrColor[i]);
+					if (i < 3){
+						this.arrColor[i]=Math.round(this.arrColor[i]);
+					}
 				}
-				color=((this.arrColor[0] *256+this.arrColor[1])*256+this.arrColor[2])*256+Math.round(this.arrColor[3] *255);
+				if (this.arrColor.length==4){
+					color=((this.arrColor[0] *256+this.arrColor[1])*256+this.arrColor[2])*256+Math.round(this.arrColor[3] *255);
+					}else{
+					color=((this.arrColor[0] *256+this.arrColor[1])*256+this.arrColor[2]);
+				}
 				this.strColor=value;
 				}else{
 				this.strColor=value;
@@ -609,7 +603,6 @@ var ColorUtils=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/Config.as=======199.999998/199.999998
 /**
 *Config 用于配置一些全局参数。如需更改，请在初始化引擎之前设置。
 */
@@ -626,12 +619,10 @@ var Config=(function(){
 	Config.webGL2D_MeshAllocMaxMem=true;
 	Config.is2DPixelArtGame=false;
 	Config.useWebGL2=false;
-	Config.showCanvasMark=false;
 	return Config;
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/components/Component.as=======199.999997/199.999997
 /**
 *<code>Component</code> 类用于创建组件的基类。
 */
@@ -827,7 +818,6 @@ var Component=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/components/Prefab.as=======199.999996/199.999996
 /**
 *模板，预制件
 */
@@ -852,7 +842,6 @@ var Prefab=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/Const.as=======199.999994/199.999994
 /**
 *@private
 *静态常量集合
@@ -873,7 +862,6 @@ var Const=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/events/EventDispatcher.as=======199.999989/199.999989
 /**
 *<code>EventDispatcher</code> 类是可调度事件的所有类的基类。
 */
@@ -1090,7 +1078,6 @@ var EventDispatcher=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/Handler.as=======199.999987/199.999987
 /**
 *<p><code>Handler</code> 是事件处理器类。</p>
 *<p>推荐使用 Handler.create()方法从对象池创建，减少对象创建消耗。创建的 Handler 对象不再使用后，可以使用 Handler.recover()将其回收到对象池，回收后不要再使用此对象，否则会导致不可预料的错误。</p>
@@ -1191,7 +1178,6 @@ var Handler=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/BitmapFont.as=======199.999986/199.999986
 /**
 *<code>BitmapFont</code> 是位图字体类，用于定义位图字体信息。
 *字体制作及使用方法，请参考文章
@@ -1413,13 +1399,15 @@ var BitmapFont=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/AlphaCmd.as=======199.999985/199.999985
 /**
 *透明命令
 */
 //class laya.display.cmd.AlphaCmd
 var AlphaCmd=(function(){
 	function AlphaCmd(){
+		/**
+		*透明度
+		*/
 		//this.alpha=NaN;
 	}
 
@@ -1437,6 +1425,7 @@ var AlphaCmd=(function(){
 		context.alpha(this.alpha);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "Alpha";
 	});
@@ -1452,16 +1441,27 @@ var AlphaCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/ClipRectCmd.as=======199.999984/199.999984
 /**
 *裁剪命令
 */
 //class laya.display.cmd.ClipRectCmd
 var ClipRectCmd=(function(){
 	function ClipRectCmd(){
+		/**
+		*X 轴偏移量。
+		*/
 		//this.x=NaN;
+		/**
+		*Y 轴偏移量。
+		*/
 		//this.y=NaN;
+		/**
+		*宽度。
+		*/
 		//this.width=NaN;
+		/**
+		*高度。
+		*/
 		//this.height=NaN;
 	}
 
@@ -1479,6 +1479,7 @@ var ClipRectCmd=(function(){
 		context.clipRect(this.x+gx,this.y+gy,this.width,this.height);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "ClipRect";
 	});
@@ -1497,9 +1498,9 @@ var ClipRectCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawCanvasCmd.as=======199.999983/199.999983
 /**
 *绘制Canvas贴图
+*@private
 */
 //class laya.display.cmd.DrawCanvasCmd
 var DrawCanvasCmd=(function(){
@@ -1507,11 +1508,25 @@ var DrawCanvasCmd=(function(){
 		this._graphicsCmdEncoder=null;
 		this._index=0;
 		this._paramData=null;
+		/**
+		*绘图数据
+		*/
 		this.texture=null;
-		/*RenderTexture2D*/
+		/**
+		*绘制区域起始位置x
+		*/
 		this.x=NaN;
+		/**
+		*绘制区域起始位置y
+		*/
 		this.y=NaN;
+		/**
+		*绘制区域宽
+		*/
 		this.width=NaN;
+		/**
+		*绘制区域高
+		*/
 		this.height=NaN;
 	}
 
@@ -1525,6 +1540,7 @@ var DrawCanvasCmd=(function(){
 		Pool.recover("DrawCanvasCmd",this);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawCanvasCmd";
 	});
@@ -1541,19 +1557,37 @@ var DrawCanvasCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawCircleCmd.as=======199.999982/199.999982
 /**
 *绘制圆形
 */
 //class laya.display.cmd.DrawCircleCmd
 var DrawCircleCmd=(function(){
 	function DrawCircleCmd(){
+		/**
+		*圆点X 轴位置。
+		*/
 		//this.x=NaN;
+		/**
+		*圆点Y 轴位置。
+		*/
 		//this.y=NaN;
+		/**
+		*半径。
+		*/
 		//this.radius=NaN;
+		/**
+		*填充颜色，或者填充绘图的渐变对象。
+		*/
 		//this.fillColor=null;
+		/**
+		*（可选）边框颜色，或者填充绘图的渐变对象。
+		*/
 		//this.lineColor=null;
+		/**
+		*（可选）边框宽度。
+		*/
 		//this.lineWidth=NaN;
+		/**@private */
 		//this.vid=0;
 	}
 
@@ -1573,6 +1607,7 @@ var DrawCircleCmd=(function(){
 		context._drawCircle(this.x+gx,this.y+gy,this.radius,this.fillColor,this.lineColor,this.lineWidth,this.vid);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawCircle";
 	});
@@ -1594,17 +1629,31 @@ var DrawCircleCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawCurvesCmd.as=======199.999981/199.999981
 /**
 *绘制曲线
 */
 //class laya.display.cmd.DrawCurvesCmd
 var DrawCurvesCmd=(function(){
 	function DrawCurvesCmd(){
+		/**
+		*开始绘制的 X 轴位置。
+		*/
 		//this.x=NaN;
+		/**
+		*开始绘制的 Y 轴位置。
+		*/
 		//this.y=NaN;
+		/**
+		*线段的点集合，格式[controlX,controlY,anchorX,anchorY...]。
+		*/
 		//this.points=null;
+		/**
+		*线段颜色，或者填充绘图的渐变对象。
+		*/
 		//this.lineColor=null;
+		/**
+		*（可选）线段宽度。
+		*/
 		//this.lineWidth=NaN;
 	}
 
@@ -1624,6 +1673,7 @@ var DrawCurvesCmd=(function(){
 		context.drawCurves(this.x+gx,this.y+gy,this.points,this.lineColor,this.lineWidth);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawCurves";
 	});
@@ -1643,17 +1693,31 @@ var DrawCurvesCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawImageCmd.as=======199.999980/199.999980
 /**
 *绘制图片
 */
 //class laya.display.cmd.DrawImageCmd
 var DrawImageCmd=(function(){
 	function DrawImageCmd(){
+		/**
+		*纹理。
+		*/
 		//this.texture=null;
+		/**
+		*（可选）X轴偏移量。
+		*/
 		//this.x=NaN;
+		/**
+		*（可选）Y轴偏移量。
+		*/
 		//this.y=NaN;
+		/**
+		*（可选）宽度。
+		*/
 		//this.width=NaN;
+		/**
+		*（可选）高度。
+		*/
 		//this.height=NaN;
 	}
 
@@ -1673,6 +1737,7 @@ var DrawImageCmd=(function(){
 		context.drawTexture(this.texture,this.x+gx,this.y+gy,this.width,this.height);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawImage";
 	});
@@ -1693,19 +1758,37 @@ var DrawImageCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawLineCmd.as=======199.999979/199.999979
 /**
 *绘制单条曲线
 */
 //class laya.display.cmd.DrawLineCmd
 var DrawLineCmd=(function(){
 	function DrawLineCmd(){
+		/**
+		*X轴开始位置。
+		*/
 		//this.fromX=NaN;
+		/**
+		*Y轴开始位置。
+		*/
 		//this.fromY=NaN;
+		/**
+		*X轴结束位置。
+		*/
 		//this.toX=NaN;
+		/**
+		*Y轴结束位置。
+		*/
 		//this.toY=NaN;
+		/**
+		*颜色。
+		*/
 		//this.lineColor=null;
+		/**
+		*（可选）线条宽度。
+		*/
 		//this.lineWidth=NaN;
+		/**@private */
 		//this.vid=0;
 	}
 
@@ -1723,6 +1806,7 @@ var DrawLineCmd=(function(){
 		context._drawLine(gx,gy,this.fromX,this.fromY,this.toX,this.toY,this.lineColor,this.lineWidth,this.vid);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawLine";
 	});
@@ -1744,18 +1828,33 @@ var DrawLineCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawLinesCmd.as=======199.999978/199.999978
 /**
 *绘制连续曲线
 */
 //class laya.display.cmd.DrawLinesCmd
 var DrawLinesCmd=(function(){
 	function DrawLinesCmd(){
+		/**
+		*开始绘制的X轴位置。
+		*/
 		//this.x=NaN;
+		/**
+		*开始绘制的Y轴位置。
+		*/
 		//this.y=NaN;
+		/**
+		*线段的点集合。格式:[x1,y1,x2,y2,x3,y3...]。
+		*/
 		//this.points=null;
+		/**
+		*线段颜色，或者填充绘图的渐变对象。
+		*/
 		//this.lineColor=null;
+		/**
+		*（可选）线段宽度。
+		*/
 		//this.lineWidth=NaN;
+		/**@private */
 		//this.vid=0;
 	}
 
@@ -1775,6 +1874,7 @@ var DrawLinesCmd=(function(){
 		context._drawLines(this.x+gx,this.y+gy,this.points,this.lineColor,this.lineWidth,this.vid);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawLines";
 	});
@@ -1795,9 +1895,9 @@ var DrawLinesCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawParticleCmd.as=======199.999977/199.999977
 /**
-*绘制圆形
+*绘制粒子
+*@private
 */
 //class laya.display.cmd.DrawParticleCmd
 var DrawParticleCmd=(function(){
@@ -1820,6 +1920,7 @@ var DrawParticleCmd=(function(){
 		context.drawParticle(gx,gy,this._templ);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawParticleCmd";
 	});
@@ -1835,17 +1936,31 @@ var DrawParticleCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawPathCmd.as=======199.999976/199.999976
 /**
 *根据路径绘制矢量图形
 */
 //class laya.display.cmd.DrawPathCmd
 var DrawPathCmd=(function(){
 	function DrawPathCmd(){
+		/**
+		*开始绘制的 X 轴位置。
+		*/
 		//this.x=NaN;
+		/**
+		*开始绘制的 Y 轴位置。
+		*/
 		//this.y=NaN;
+		/**
+		*路径集合，路径支持以下格式：[["moveTo",x,y],["lineTo",x,y],["arcTo",x1,y1,x2,y2,r],["closePath"]]。
+		*/
 		//this.paths=null;
+		/**
+		*（可选）刷子定义，支持以下设置{fillStyle:"#FF0000"}。
+		*/
 		//this.brush=null;
+		/**
+		*（可选）画笔定义，支持以下设置{strokeStyle,lineWidth,lineJoin:"bevel|round|miter",lineCap:"butt|round|square",miterLimit}。
+		*/
 		//this.pen=null;
 	}
 
@@ -1866,6 +1981,7 @@ var DrawPathCmd=(function(){
 		context._drawPath(this.x+gx,this.y+gy,this.paths,this.brush,this.pen);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawPath";
 	});
@@ -1885,21 +2001,39 @@ var DrawPathCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawPieCmd.as=======199.999975/199.999975
 /**
 *绘制扇形
 */
 //class laya.display.cmd.DrawPieCmd
 var DrawPieCmd=(function(){
 	function DrawPieCmd(){
+		/**
+		*开始绘制的 X 轴位置。
+		*/
 		//this.x=NaN;
+		/**
+		*开始绘制的 Y 轴位置。
+		*/
 		//this.y=NaN;
+		/**
+		*扇形半径。
+		*/
 		//this.radius=NaN;
 		//this._startAngle=NaN;
 		//this._endAngle=NaN;
+		/**
+		*填充颜色，或者填充绘图的渐变对象。
+		*/
 		//this.fillColor=null;
+		/**
+		*（可选）边框颜色，或者填充绘图的渐变对象。
+		*/
 		//this.lineColor=null;
+		/**
+		*（可选）边框宽度。
+		*/
 		//this.lineWidth=NaN;
+		/**@private */
 		//this.vid=0;
 	}
 
@@ -1919,16 +2053,23 @@ var DrawPieCmd=(function(){
 		context._drawPie(this.x+gx,this.y+gy,this.radius,this._startAngle,this._endAngle,this.fillColor,this.lineColor,this.lineWidth,this.vid);
 	}
 
+	/**
+	*开始角度。
+	*/
 	__getset(0,__proto,'startAngle',function(){
 		return this._startAngle *180 / Math.PI;
 		},function(value){
 		this._startAngle=value *Math.PI / 180;
 	});
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawPie";
 	});
 
+	/**
+	*结束角度。
+	*/
 	__getset(0,__proto,'endAngle',function(){
 		return this._endAngle *180 / Math.PI;
 		},function(value){
@@ -1954,20 +2095,39 @@ var DrawPieCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawPolyCmd.as=======199.999974/199.999974
 /**
 *绘制多边形
 */
 //class laya.display.cmd.DrawPolyCmd
 var DrawPolyCmd=(function(){
 	function DrawPolyCmd(){
+		/**
+		*开始绘制的 X 轴位置。
+		*/
 		//this.x=NaN;
+		/**
+		*开始绘制的 Y 轴位置。
+		*/
 		//this.y=NaN;
+		/**
+		*多边形的点集合。
+		*/
 		//this.points=null;
+		/**
+		*填充颜色，或者填充绘图的渐变对象。
+		*/
 		//this.fillColor=null;
+		/**
+		*（可选）边框颜色，或者填充绘图的渐变对象。
+		*/
 		//this.lineColor=null;
+		/**
+		*可选）边框宽度。
+		*/
 		//this.lineWidth=NaN;
+		/**@private */
 		//this.isConvexPolygon=false;
+		/**@private */
 		//this.vid=0;
 	}
 
@@ -1988,6 +2148,7 @@ var DrawPolyCmd=(function(){
 		context._drawPoly(this.x+gx,this.y+gy,this.points,this.fillColor,this.lineColor,this.lineWidth,this.isConvexPolygon,this.vid);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawPoly";
 	});
@@ -2010,19 +2171,39 @@ var DrawPolyCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawRectCmd.as=======199.999973/199.999973
 /**
 *绘制矩形
 */
 //class laya.display.cmd.DrawRectCmd
 var DrawRectCmd=(function(){
 	function DrawRectCmd(){
+		/**
+		*开始绘制的 X 轴位置。
+		*/
 		//this.x=NaN;
+		/**
+		*开始绘制的 Y 轴位置。
+		*/
 		//this.y=NaN;
+		/**
+		*矩形宽度。
+		*/
 		//this.width=NaN;
+		/**
+		*矩形高度。
+		*/
 		//this.height=NaN;
+		/**
+		*填充颜色，或者填充绘图的渐变对象。
+		*/
 		//this.fillColor=null;
+		/**
+		*（可选）边框颜色，或者填充绘图的渐变对象。
+		*/
 		//this.lineColor=null;
+		/**
+		*（可选）边框宽度。
+		*/
 		//this.lineWidth=NaN;
 	}
 
@@ -2042,6 +2223,7 @@ var DrawRectCmd=(function(){
 		context.drawRect(this.x+gx,this.y+gy,this.width,this.height,this.fillColor,this.lineColor,this.lineWidth);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawRect";
 	});
@@ -2063,21 +2245,47 @@ var DrawRectCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawTextureCmd.as=======199.999972/199.999972
 /**
 *绘制单个贴图
 */
 //class laya.display.cmd.DrawTextureCmd
 var DrawTextureCmd=(function(){
 	function DrawTextureCmd(){
+		/**
+		*纹理。
+		*/
 		//this.texture=null;
+		/**
+		*（可选）X轴偏移量。
+		*/
 		//this.x=NaN;
+		/**
+		*（可选）Y轴偏移量。
+		*/
 		//this.y=NaN;
+		/**
+		*（可选）宽度。
+		*/
 		//this.width=NaN;
+		/**
+		*（可选）高度。
+		*/
 		//this.height=NaN;
+		/**
+		*（可选）矩阵信息。
+		*/
 		//this.matrix=null;
+		/**
+		*（可选）透明度。
+		*/
 		//this.alpha=NaN;
+		/**
+		*（可选）颜色滤镜。
+		*/
 		//this.color=null;
+		/**
+		*（可选）混合模式。
+		*/
 		//this.blendMode=null;
 	}
 
@@ -2098,6 +2306,7 @@ var DrawTextureCmd=(function(){
 		context.drawTextureWithTransform(this.texture,this.x,this.y,this.width,this.height,this.matrix,gx,gy,this.alpha,this.blendMode);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawTexture";
 	});
@@ -2122,14 +2331,19 @@ var DrawTextureCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawTexturesCmd.as=======199.999971/199.999971
 /**
 *根据坐标集合绘制多个贴图
 */
 //class laya.display.cmd.DrawTexturesCmd
 var DrawTexturesCmd=(function(){
 	function DrawTexturesCmd(){
+		/**
+		*纹理。
+		*/
 		//this.texture=null;
+		/**
+		*绘制次数和坐标。
+		*/
 		//this.pos=null;
 	}
 
@@ -2150,6 +2364,7 @@ var DrawTexturesCmd=(function(){
 		context.drawTextures(this.texture,this.pos,gx,gy);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawTextures";
 	});
@@ -2167,23 +2382,51 @@ var DrawTexturesCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/DrawTrianglesCmd.as=======199.999970/199.999970
 /**
 *绘制三角形命令
 */
 //class laya.display.cmd.DrawTrianglesCmd
 var DrawTrianglesCmd=(function(){
 	function DrawTrianglesCmd(){
+		/**
+		*纹理。
+		*/
 		//this.texture=null;
+		/**
+		*X轴偏移量。
+		*/
 		//this.x=NaN;
+		/**
+		*Y轴偏移量。
+		*/
 		//this.y=NaN;
+		/**
+		*顶点数组。
+		*/
 		//this.vertices=null;
+		/**
+		*UV数据。
+		*/
 		//this.uvs=null;
+		/**
+		*顶点索引。
+		*/
 		//this.indices=null;
+		/**
+		*缩放矩阵。
+		*/
 		//this.matrix=null;
+		/**
+		*alpha
+		*/
 		//this.alpha=NaN;
-		//public var color:String;
+		/**
+		*blend模式
+		*/
 		//this.blendMode=null;
+		/**
+		*颜色变换
+		*/
 		//this.color=null;
 	}
 
@@ -2206,6 +2449,7 @@ var DrawTrianglesCmd=(function(){
 		context.drawTriangles(this.texture,this.x+gx,this.y+gy,this.vertices,this.uvs,this.indices,this.matrix,this.alpha,this.color,this.blendMode);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "DrawTriangles";
 	});
@@ -2234,20 +2478,43 @@ var DrawTrianglesCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/FillBorderTextCmd.as=======199.999969/199.999969
 /**
 *绘制文本边框
 */
 //class laya.display.cmd.FillBorderTextCmd
 var FillBorderTextCmd=(function(){
 	function FillBorderTextCmd(){
+		/**
+		*在画布上输出的文本。
+		*/
 		//this.text=null;
+		/**
+		*开始绘制文本的 x 坐标位置（相对于画布）。
+		*/
 		//this.x=NaN;
+		/**
+		*开始绘制文本的 y 坐标位置（相对于画布）。
+		*/
 		//this.y=NaN;
+		/**
+		*定义字体和字号，比如"20px Arial"。
+		*/
 		//this.font=null;
+		/**
+		*定义文本颜色，比如"#ff0000"。
+		*/
 		//this.fillColor=null;
+		/**
+		*定义镶边文本颜色。
+		*/
 		//this.borderColor=null;
+		/**
+		*镶边线条宽度。
+		*/
 		//this.lineWidth=NaN;
+		/**
+		*文本对齐方式，可选值："left"，"center"，"right"。
+		*/
 		//this.textAlign=null;
 	}
 
@@ -2265,6 +2532,7 @@ var FillBorderTextCmd=(function(){
 		context.fillBorderText(this.text,this.x+gx,this.y+gy,this.font,this.fillColor,this.borderColor,this.lineWidth,this.textAlign);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "FillBorderText";
 	});
@@ -2287,19 +2555,40 @@ var FillBorderTextCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/FillBorderWordsCmd.as=======199.999968/199.999968
 /**
 *绘制边框
+*@private
 */
 //class laya.display.cmd.FillBorderWordsCmd
 var FillBorderWordsCmd=(function(){
 	function FillBorderWordsCmd(){
+		/**
+		*文字数组
+		*/
 		//this.words=null;
+		/**
+		*开始绘制文本的 x 坐标位置（相对于画布）。
+		*/
 		//this.x=NaN;
+		/**
+		*开始绘制文本的 y 坐标位置（相对于画布）。
+		*/
 		//this.y=NaN;
+		/**
+		*定义字体和字号，比如"20px Arial"。
+		*/
 		//this.font=null;
+		/**
+		*定义文本颜色，比如"#ff0000"。
+		*/
 		//this.fillColor=null;
+		/**
+		*定义镶边文本颜色。
+		*/
 		//this.borderColor=null;
+		/**
+		*镶边线条宽度。
+		*/
 		//this.lineWidth=0;
 	}
 
@@ -2318,6 +2607,7 @@ var FillBorderWordsCmd=(function(){
 		context.fillBorderWords(this.words,this.x+gx,this.y+gy,this.font,this.fillColor,this.borderColor,this.lineWidth);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "FillBorderWords";
 	});
@@ -2339,7 +2629,6 @@ var FillBorderWordsCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/FillTextCmd.as=======199.999967/199.999967
 /**
 *绘制文字
 */
@@ -2347,8 +2636,15 @@ var FillBorderWordsCmd=(function(){
 var FillTextCmd=(function(){
 	function FillTextCmd(){
 		//this._text=null;
+		/**@private */
 		this._textIsWorldText=false;
+		/**
+		*开始绘制文本的 x 坐标位置（相对于画布）。
+		*/
 		//this.x=NaN;
+		/**
+		*开始绘制文本的 y 坐标位置（相对于画布）。
+		*/
 		//this.y=NaN;
 		//this._font=null;
 		//this._color=null;
@@ -2376,6 +2672,9 @@ var FillTextCmd=(function(){
 		context.drawText(this._text,this.x+gx,this.y+gy,this._font,this._color,this._textAlign);
 	}
 
+	/**
+	*在画布上输出的文本。
+	*/
 	__getset(0,__proto,'text',function(){
 		return this._text;
 		},function(value){
@@ -2384,10 +2683,14 @@ var FillTextCmd=(function(){
 		this._textIsWorldText && (this._text).cleanCache();
 	});
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "FillText";
 	});
 
+	/**
+	*定义文本颜色，比如"#ff0000"。
+	*/
 	__getset(0,__proto,'color',function(){
 		return this._color;
 		},function(value){
@@ -2396,6 +2699,9 @@ var FillTextCmd=(function(){
 		this._textIsWorldText && (this._text).cleanCache();
 	});
 
+	/**
+	*定义字号和字体，比如"20px Arial"。
+	*/
 	__getset(0,__proto,'font',function(){
 		return this._font;
 		},function(value){
@@ -2406,6 +2712,9 @@ var FillTextCmd=(function(){
 		this._textIsWorldText && (this._text).cleanCache();
 	});
 
+	/**
+	*文本对齐方式，可选值："left"，"center"，"right"。
+	*/
 	__getset(0,__proto,'textAlign',function(){
 		return this._textAlign;
 		},function(value){
@@ -2443,20 +2752,41 @@ var FillTextCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/FillTextureCmd.as=======199.999966/199.999966
 /**
 *填充贴图
 */
 //class laya.display.cmd.FillTextureCmd
 var FillTextureCmd=(function(){
 	function FillTextureCmd(){
+		/**
+		*纹理。
+		*/
 		//this.texture=null;
+		/**
+		*X轴偏移量。
+		*/
 		//this.x=NaN;
+		/**
+		*Y轴偏移量。
+		*/
 		//this.y=NaN;
+		/**
+		*（可选）宽度。
+		*/
 		//this.width=NaN;
+		/**
+		*（可选）高度。
+		*/
 		//this.height=NaN;
+		/**
+		*（可选）填充类型 repeat|repeat-x|repeat-y|no-repeat
+		*/
 		//this.type=null;
+		/**
+		*（可选）贴图纹理偏移
+		*/
 		//this.offset=null;
+		/**@private */
 		//this.other=null;
 	}
 
@@ -2477,6 +2807,7 @@ var FillTextureCmd=(function(){
 		context.fillTexture(this.texture,this.x+gx,this.y+gy,this.width,this.height,this.type,this.offset,this.other);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "FillTexture";
 	});
@@ -2499,17 +2830,32 @@ var FillTextureCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/FillWordsCmd.as=======199.999965/199.999965
 /**
 *填充文字命令
+*@private
 */
 //class laya.display.cmd.FillWordsCmd
 var FillWordsCmd=(function(){
 	function FillWordsCmd(){
+		/**
+		*文字数组
+		*/
 		//this.words=null;
+		/**
+		*开始绘制文本的 x 坐标位置（相对于画布）。
+		*/
 		//this.x=NaN;
+		/**
+		*开始绘制文本的 y 坐标位置（相对于画布）。
+		*/
 		//this.y=NaN;
+		/**
+		*定义字体和字号，比如"20px Arial"。
+		*/
 		//this.font=null;
+		/**
+		*定义文本颜色，比如"#ff0000"。
+		*/
 		//this.color=null;
 	}
 
@@ -2528,6 +2874,7 @@ var FillWordsCmd=(function(){
 		context.fillWords(this.words,this.x+gx,this.y+gy,this.font,this.color);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "FillWords";
 	});
@@ -2547,7 +2894,6 @@ var FillWordsCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/RestoreCmd.as=======199.999964/199.999964
 /**
 *恢复命令，和save配套使用
 */
@@ -2568,6 +2914,7 @@ var RestoreCmd=(function(){
 		context.restore();
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "Restore";
 	});
@@ -2582,15 +2929,23 @@ var RestoreCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/RotateCmd.as=======199.999963/199.999963
 /**
 *旋转命令
 */
 //class laya.display.cmd.RotateCmd
 var RotateCmd=(function(){
 	function RotateCmd(){
+		/**
+		*旋转角度，以弧度计。
+		*/
 		//this.angle=NaN;
+		/**
+		*（可选）水平方向轴心点坐标。
+		*/
 		//this.pivotX=NaN;
+		/**
+		*（可选）垂直方向轴心点坐标。
+		*/
 		//this.pivotY=NaN;
 	}
 
@@ -2608,6 +2963,7 @@ var RotateCmd=(function(){
 		context._rotate(this.angle,this.pivotX+gx,this.pivotY+gy);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "Rotate";
 	});
@@ -2625,7 +2981,6 @@ var RotateCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/SaveCmd.as=======199.999962/199.999962
 /**
 *存储命令，和restore配套使用
 */
@@ -2646,6 +3001,7 @@ var SaveCmd=(function(){
 		context.save();
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "Save";
 	});
@@ -2660,16 +3016,27 @@ var SaveCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/ScaleCmd.as=======199.999961/199.999961
 /**
 *缩放命令
 */
 //class laya.display.cmd.ScaleCmd
 var ScaleCmd=(function(){
 	function ScaleCmd(){
+		/**
+		*水平方向缩放值。
+		*/
 		//this.scaleX=NaN;
+		/**
+		*垂直方向缩放值。
+		*/
 		//this.scaleY=NaN;
+		/**
+		*（可选）水平方向轴心点坐标。
+		*/
 		//this.pivotX=NaN;
+		/**
+		*（可选）垂直方向轴心点坐标。
+		*/
 		//this.pivotY=NaN;
 	}
 
@@ -2687,6 +3054,7 @@ var ScaleCmd=(function(){
 		context._scale(this.scaleX,this.scaleY,this.pivotX+gx,this.pivotY+gy);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "Scale";
 	});
@@ -2705,19 +3073,39 @@ var ScaleCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/StrokeTextCmd.as=======199.999960/199.999960
 /**
 *绘制描边文字
 */
 //class laya.display.cmd.StrokeTextCmd
 var StrokeTextCmd=(function(){
 	function StrokeTextCmd(){
+		/**
+		*在画布上输出的文本。
+		*/
 		//this.text=null;
+		/**
+		*开始绘制文本的 x 坐标位置（相对于画布）。
+		*/
 		//this.x=NaN;
+		/**
+		*开始绘制文本的 y 坐标位置（相对于画布）。
+		*/
 		//this.y=NaN;
+		/**
+		*定义字体和字号，比如"20px Arial"。
+		*/
 		//this.font=null;
+		/**
+		*定义文本颜色，比如"#ff0000"。
+		*/
 		//this.color=null;
+		/**
+		*线条宽度。
+		*/
 		//this.lineWidth=NaN;
+		/**
+		*文本对齐方式，可选值："left"，"center"，"right"。
+		*/
 		//this.textAlign=null;
 	}
 
@@ -2735,6 +3123,7 @@ var StrokeTextCmd=(function(){
 		context.strokeWord(this.text,this.x+gx,this.y+gy,this.font,this.color,this.lineWidth,this.textAlign);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "StrokeText";
 	});
@@ -2756,15 +3145,23 @@ var StrokeTextCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/TransformCmd.as=======199.999959/199.999959
 /**
 *矩阵命令
 */
 //class laya.display.cmd.TransformCmd
 var TransformCmd=(function(){
 	function TransformCmd(){
+		/**
+		*矩阵。
+		*/
 		//this.matrix=null;
+		/**
+		*（可选）水平方向轴心点坐标。
+		*/
 		//this.pivotX=NaN;
+		/**
+		*（可选）垂直方向轴心点坐标。
+		*/
 		//this.pivotY=NaN;
 	}
 
@@ -2783,6 +3180,7 @@ var TransformCmd=(function(){
 		context._transform(this.matrix,this.pivotX+gx,this.pivotY+gy);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "Transform";
 	});
@@ -2800,14 +3198,19 @@ var TransformCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/cmd/TranslateCmd.as=======199.999958/199.999958
 /**
 *位移命令
 */
 //class laya.display.cmd.TranslateCmd
 var TranslateCmd=(function(){
 	function TranslateCmd(){
+		/**
+		*添加到水平坐标（x）上的值。
+		*/
 		//this.tx=NaN;
+		/**
+		*添加到垂直坐标（y）上的值。
+		*/
 		//this.ty=NaN;
 	}
 
@@ -2825,6 +3228,7 @@ var TranslateCmd=(function(){
 		context.translate(this.tx,this.ty);
 	}
 
+	/**@private */
 	__getset(0,__proto,'cmdID',function(){
 		return "Translate";
 	});
@@ -2841,7 +3245,6 @@ var TranslateCmd=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/css/BoundsStyle.as=======199.999957/199.999957
 /**
 *@private
 *Graphic bounds数据类
@@ -2886,7 +3289,6 @@ var BoundsStyle=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/css/CacheStyle.as=======199.999956/199.999956
 /**
 *@private
 *存储cache相关
@@ -3014,12 +3416,18 @@ var CacheStyle=(function(){
 		var tRec;
 		if (!bWebGL || tCacheType==="bitmap"){
 			tRec=sprite.getSelfBounds();
+			if (!Render.isConchApp){
+				tRec.width=tRec.width+16*2;
+				tRec.height=tRec.height+16*2;
+			}
+			else{
+				tRec.width=tRec.x+tRec.width+16*2;
+				tRec.height=tRec.x+tRec.height+16*2;
+			}
 			tRec.x=tRec.x-sprite.pivotX;
 			tRec.y=tRec.y-sprite.pivotY;
 			tRec.x=tRec.x-16;
 			tRec.y=tRec.y-16;
-			tRec.width=tRec.width+16*2;
-			tRec.height=tRec.height+16*2;
 			tRec.x=Math.floor(tRec.x+x)-x;
 			tRec.y=Math.floor(tRec.y+y)-y;
 			tRec.width=Math.floor(tRec.width);
@@ -3066,7 +3474,6 @@ var CacheStyle=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/css/SpriteStyle.as=======199.999955/199.999955
 /**
 *@private
 *元素样式
@@ -3127,7 +3534,6 @@ var SpriteStyle=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/Graphics.as=======199.999951/199.999951
 /**
 *<code>Graphics</code> 类用于创建绘图显示对象。Graphics可以同时绘制多个位图或者矢量图，还可以结合save，restore，transform，scale，rotate，translate，alpha等指令对绘图效果进行变化。
 *Graphics以命令流方式存储，可以通过cmds属性访问所有命令流。Graphics是比Sprite更轻量级的对象，合理使用能提高应用性能(比如把大量的节点绘图改为一个节点的Graphics命令集合，能减少大量节点创建消耗)。
@@ -3146,8 +3552,6 @@ var Graphics=(function(){
 		//this._vectorgraphArray=null;
 		/**@private */
 		//this._graphicBounds=null;
-		/**@private */
-		//this._commandEncoder=null;
 		/**@private */
 		this.autoDestroy=false;
 		this._render=this._renderEmpty;
@@ -3707,7 +4111,7 @@ var Graphics=(function(){
 			if (this._vectorgraphArray==null)this._vectorgraphArray=[];
 			this._vectorgraphArray.push(tId);
 		};
-		var offset=lineWidth % 2===0 ? 0 :0.5;
+		var offset=(lineWidth < 1 || lineWidth % 2===0)? 0 :0.5;
 		return this._saveToCmd(Render._context._drawLine,DrawLineCmd.create.call(this,fromX+offset,fromY+offset,toX+offset,toY+offset,lineColor,lineWidth,tId));
 	}
 
@@ -3728,7 +4132,7 @@ var Graphics=(function(){
 			if (this._vectorgraphArray==null)this._vectorgraphArray=[];
 			this._vectorgraphArray.push(tId);
 		};
-		var offset=lineWidth % 2===0 ? 0 :0.5;
+		var offset=(lineWidth < 1 || lineWidth % 2===0)? 0 :0.5;
 		return this._saveToCmd(Render._context._drawLines,DrawLinesCmd.create.call(this,x+offset,y+offset,points,lineColor,lineWidth,tId));
 	}
 
@@ -3757,7 +4161,7 @@ var Graphics=(function(){
 	*/
 	__proto.drawRect=function(x,y,width,height,fillColor,lineColor,lineWidth){
 		(lineWidth===void 0)&& (lineWidth=1);
-		var offset=lineColor ? lineWidth / 2 :0;
+		var offset=(lineWidth >=1 && lineColor)? lineWidth / 2 :0;
 		var lineOffset=lineColor ? lineWidth :0;
 		return this._saveToCmd(Render._context.drawRect,DrawRectCmd.create.call(this,x+offset,y+offset,width-lineOffset,height-lineOffset,fillColor,lineColor,lineWidth));
 	}
@@ -3773,7 +4177,7 @@ var Graphics=(function(){
 	*/
 	__proto.drawCircle=function(x,y,radius,fillColor,lineColor,lineWidth){
 		(lineWidth===void 0)&& (lineWidth=1);
-		var offset=lineColor ? lineWidth / 2 :0;
+		var offset=(lineWidth >=1 && lineColor)? lineWidth / 2 :0;
 		var tId=0;
 		if (Render.isWebGL){
 			tId=VectorGraphManager.getInstance().getId();
@@ -3796,7 +4200,7 @@ var Graphics=(function(){
 	*/
 	__proto.drawPie=function(x,y,radius,startAngle,endAngle,fillColor,lineColor,lineWidth){
 		(lineWidth===void 0)&& (lineWidth=1);
-		var offset=lineColor ? lineWidth / 2 :0;
+		var offset=(lineWidth >=1 && lineColor)? lineWidth / 2 :0;
 		var lineOffset=lineColor ? lineWidth :0;
 		var tId=0;
 		if (Render.isWebGL){
@@ -3830,7 +4234,7 @@ var Graphics=(function(){
 				tIsConvexPolygon=true;
 			}
 		};
-		var offset=lineColor ? (lineWidth % 2===0 ? 0 :0.5):0;
+		var offset=(lineWidth >=1 && lineColor)? (lineWidth % 2===0 ? 0 :0.5):0;
 		return this._saveToCmd(Render._context._drawPoly,DrawPolyCmd.create.call(this,x+offset,y+offset,points,fillColor,lineColor,lineWidth,tIsConvexPolygon,tId));
 	}
 
@@ -3866,7 +4270,6 @@ var Graphics=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/GraphicsBounds.as=======199.999950/199.999950
 /**
 *@private
 *Graphic bounds数据类
@@ -4168,7 +4571,6 @@ var GraphicsBounds=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/SpriteConst.as=======199.999946/199.999946
 /**
 *@private
 */
@@ -4249,7 +4651,6 @@ var SpriteConst=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/events/Event.as=======199.999944/199.999944
 /**
 *<code>Event</code> 是事件类型的集合。一般当发生事件时，<code>Event</code> 对象将作为参数传递给事件侦听器。
 */
@@ -4429,7 +4830,6 @@ var Event=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/events/Keyboard.as=======199.999943/199.999943
 /**
 *<code>Keyboard</code> 类的属性是一些常数，这些常数表示控制游戏时最常用的键。
 */
@@ -4540,7 +4940,6 @@ var Keyboard=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/events/KeyBoardManager.as=======199.999942/199.999942
 /**
 *<p><code>KeyBoardManager</code> 是键盘事件管理类。该类从浏览器中接收键盘事件，并派发该事件。</p>
 *<p>派发事件时若 Stage.focus 为空则只从 Stage 上派发该事件，否则将从 Stage.focus 对象开始一直冒泡派发该事件。所以在 Laya.stage 上监听键盘事件一定能够收到，如果在其他地方监听，则必须处在Stage.focus的冒泡链上才能收到该事件。</p>
@@ -4591,7 +4990,6 @@ var KeyBoardManager=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/events/KeyLocation.as=======199.999941/199.999941
 /**
 *<p><code>KeyLocation</code> 类包含表示在键盘或类似键盘的输入设备上按键位置的常量。</p>
 *<p><code>KeyLocation</code> 常数用在键盘事件对象的 <code>keyLocation </code>属性中。</p>
@@ -4608,7 +5006,6 @@ var KeyLocation=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/events/MouseManager.as=======199.999940/199.999940
 /**
 *<p><code>MouseManager</code> 是鼠标、触摸交互管理器。</p>
 *<p>鼠标事件流包括捕获阶段、目标阶段、冒泡阶段。<br/>
@@ -4923,7 +5320,6 @@ var MouseManager=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/events/TouchManager.as=======199.999939/199.999939
 /**
 *@private
 *Touch事件管理类，处理多点触控下的鼠标事件
@@ -5251,7 +5647,6 @@ var TouchManager=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/filters/Filter.as=======199.999937/199.999937
 /**
 *<code>Filter</code> 是滤镜基类。
 */
@@ -5278,7 +5673,6 @@ var Filter=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/filters/ColorFilterAction.as=======199.999936/199.999936
 /**
 *@private
 *<code>ColorFilterAction</code> 是一个颜色滤镜应用类。
@@ -5332,7 +5726,6 @@ var ColorFilterAction=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/maths/Bezier.as=======199.999934/199.999934
 /**
 *@private
 *计算贝塞尔曲线的工具类。
@@ -5434,7 +5827,6 @@ var Bezier=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/maths/GrahamScan.as=======199.999933/199.999933
 /**
 *@private
 *凸包算法。
@@ -5557,7 +5949,6 @@ var GrahamScan=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/maths/MathUtil.as=======199.999932/199.999932
 /**
 *@private
 *<code>MathUtil</code> 是一个数据处理工具类。
@@ -5664,7 +6055,6 @@ var MathUtil=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/maths/Matrix.as=======199.999931/199.999931
 /**
 *<p> <code>Matrix</code> 类表示一个转换矩阵，它确定如何将点从一个坐标空间映射到另一个坐标空间。</p>
 *<p>您可以对一个显示对象执行不同的图形转换，方法是设置 Matrix 对象的属性，将该 Matrix 对象应用于 Transform 对象的 matrix 属性，然后应用该 Transform 对象作为显示对象的 transform 属性。这些转换函数包括平移（x 和 y 重新定位）、旋转、缩放和倾斜。</p>
@@ -6063,7 +6453,6 @@ var Matrix=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/maths/Point.as=======199.999930/199.999930
 /**
 *<code>Point</code> 对象表示二维坐标系统中的某个位置，其中 x 表示水平轴，y 表示垂直轴。
 */
@@ -6154,7 +6543,6 @@ var Point=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/maths/Rectangle.as=======199.999929/199.999929
 /**
 *<p><code>Rectangle</code> 对象是按其位置（由它左上角的点 (x,y)确定）以及宽度和高度定义的区域。</p>
 *<p>Rectangle 类的 x、y、width 和 height 属性相互独立；更改一个属性的值不会影响其他属性。</p>
@@ -6398,7 +6786,6 @@ var Rectangle=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/media/SoundManager.as=======199.999924/199.999924
 /**
 *<code>SoundManager</code> 是一个声音管理类。提供了对背景音乐、音效的播放控制方法。
 *引擎默认有两套声音方案：WebAudio和H5Audio
@@ -6516,6 +6903,32 @@ var SoundManager=(function(){
 			if (SoundManager._channels[i]==channel){
 				SoundManager._channels.splice(i,1);
 			}
+		}
+	}
+
+	SoundManager.disposeSoundLater=function(url){
+		SoundManager._lastSoundUsedTimeDic[url]=Browser.now();
+		if (!SoundManager._isCheckingDispose){
+			SoundManager._isCheckingDispose=true;
+			Laya.timer.loop(5000,null,SoundManager._checkDisposeSound);
+		}
+	}
+
+	SoundManager._checkDisposeSound=function(){
+		var key;
+		var tTime=Browser.now();
+		var hasCheck=false;
+		for (key in SoundManager._lastSoundUsedTimeDic){
+			if (tTime-SoundManager._lastSoundUsedTimeDic[key]>30000){
+				delete SoundManager._lastSoundUsedTimeDic[key];
+				SoundManager.disposeSoundIfNotUsed(key);
+				}else{
+				hasCheck=true;
+			}
+		}
+		if (!hasCheck){
+			SoundManager._isCheckingDispose=false;
+			Laya.timer.clear(null,SoundManager._checkDisposeSound);
 		}
 	}
 
@@ -6710,12 +7123,13 @@ var SoundManager=(function(){
 	SoundManager._isActive=true;
 	SoundManager._soundClass=null;
 	SoundManager._musicClass=null;
+	SoundManager._lastSoundUsedTimeDic={};
+	SoundManager._isCheckingDispose=false;
 	SoundManager.autoReleaseSound=true;
 	return SoundManager;
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/net/AtlasInfoManager.as=======199.999920/199.999920
 /**
 *@private
 */
@@ -6753,7 +7167,6 @@ var AtlasInfoManager=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/net/LocalStorage.as=======199.999915/199.999915
 /**
 *<p> <code>LocalStorage</code> 类用于没有时间限制的数据存储。</p>
 */
@@ -6843,7 +7256,6 @@ var LocalStorage=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/net/ResourceVersion.as=======199.999913/199.999913
 /**
 *<p>资源版本的生成由layacmd或IDE完成，使用 <code>ResourceVersion</code> 简化使用过程。</p>
 *<p>调用 <code>enable</code> 启用资源版本管理。</p>
@@ -6883,7 +7295,6 @@ var ResourceVersion=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/net/TTFLoader.as=======199.999910/199.999910
 /**
 *@private
 */
@@ -7017,7 +7428,6 @@ var TTFLoader=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/net/URL.as=======199.999909/199.999909
 /**
 *<p><code>URL</code> 提供URL格式化，URL版本管理的类。</p>
 *<p>引擎加载资源的时候，会自动调用formatURL函数格式化URL路径</p>
@@ -7056,7 +7466,7 @@ var URL=(function(){
 		if (url.indexOf(":")> 0)return url;
 		var char1=url.charAt(0);
 		if (char1==="."){
-			return URL._formatRelativePath (URL.basePath+url);
+			return URL._formatRelativePath(URL.basePath+url);
 			}else if (char1==='~'){
 			return URL.rootPath+url.substring(1);
 			}else if (char1==="d"){
@@ -7088,7 +7498,20 @@ var URL=(function(){
 		return ofs > 0 ? url.substr(ofs+1):url;
 	}
 
+	URL.getAdptedFilePath=function(url){
+		if (!URL.exportSceneToJson || !url)return url;
+		var i=0,len=0;
+		len=URL._adpteTypeList.length;
+		var tArr;
+		for (i=0;i < len;i++){
+			tArr=URL._adpteTypeList[i];
+			url=url.replace(tArr[0],tArr[1]);
+		}
+		return url;
+	}
+
 	URL.version={};
+	URL.exportSceneToJson=false;
 	URL.basePath="";
 	URL.rootPath="";
 	URL.customFormat=function(url){
@@ -7097,11 +7520,13 @@ var URL=(function(){
 		return url;
 	}
 
+	__static(URL,
+	['_adpteTypeList',function(){return this._adpteTypeList=[[".scene3d",".json"],[".scene",".json"],[".taa",".json"],[".prefab",".json"]];}
+	]);
 	return URL;
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/renders/Render.as=======199.999906/199.999906
 /**
 *@private
 *<code>Render</code> 是渲染管理类。它是一个单例，可以使用 Laya.render 访问。
@@ -7161,7 +7586,6 @@ var Render=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/renders/RenderSprite.as=======199.999905/199.999905
 /**
 *@private
 *精灵渲染器
@@ -7468,7 +7892,6 @@ var RenderSprite=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/resource/Context.as=======199.999902/199.999902
 /**
 *@private
 *Context扩展类
@@ -7935,7 +8358,6 @@ var Context=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/resource/ResourceManager.as=======199.999895/199.999895
 /**
 *@private
 *<code>ResourceManager</code> 是资源管理类。它用于资源的载入、获取、销毁。
@@ -8122,7 +8544,6 @@ var ResourceManager=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/system/System.as=======199.999888/199.999888
 /**
 *@private
 */
@@ -8141,7 +8562,6 @@ var System=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/Browser.as=======199.999887/199.999887
 /**
 *<code>Browser</code> 是浏览器代理类。封装浏览器及原生 js 提供的一些功能。
 */
@@ -8272,6 +8692,18 @@ var Browser=(function(){
 		style.background="#000000";
 		Browser.canvas=new HTMLCanvas(true);
 		Browser.context=Browser.canvas.getContext('2d');
+		var tmpCanv=new HTMLCanvas(true);
+		var names=["webgl","experimental-webgl","webkit-3d","moz-webgl"];
+		var gl=null;
+		for (i=0;i < names.length;i++){
+			try {
+				gl=tmpCanv.source.getContext(names[i]);
+			}catch (e){}
+			if (gl){
+				Browser._supportWebGL=true;
+				break ;
+			}
+		}
 		return win;
 	}
 
@@ -8319,11 +8751,11 @@ var Browser=(function(){
 	Browser._document=null;
 	Browser._container=null;
 	Browser._pixelRatio=-1;
+	Browser._supportWebGL=false;
 	return Browser;
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/Byte.as=======199.999886/199.999886
 /**
 *<p> <code>Byte</code> 类提供用于优化读取、写入以及处理二进制数据的方法和属性。</p>
 *<p> <code>Byte</code> 类适用于需要在字节层访问数据的高级开发人员。</p>
@@ -8987,7 +9419,6 @@ var Byte=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/CacheManger.as=======199.999885/199.999885
 /**
 *@private
 *对象缓存统一管理类
@@ -9053,7 +9484,6 @@ var CacheManger=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/CallLater.as=======199.999884/199.999884
 /**
 *@private
 */
@@ -9170,7 +9600,6 @@ var CallLater=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/ClassUtils.as=======199.999882/199.999882
 /**
 *<code>ClassUtils</code> 是一个类工具类。
 */
@@ -9418,7 +9847,6 @@ var ClassUtils=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/Dragging.as=======199.999880/199.999880
 /**
 *@private
 *<code>Dragging</code> 类是触摸滑动控件。
@@ -9668,7 +10096,6 @@ var Dragging=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/Ease.as=======199.999879/199.999879
 /**
 *<code>Ease</code> 类定义了缓动函数，以便实现 <code>Tween</code> 动画的缓动效果。
 */
@@ -9878,7 +10305,6 @@ var Ease=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/FontInfo.as=======199.999878/199.999878
 //class laya.utils.FontInfo
 var FontInfo=(function(){
 	function FontInfo(font){
@@ -9951,7 +10377,6 @@ var FontInfo=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/HitArea.as=======199.999875/199.999875
 /**
 *鼠标点击区域，可以设置绘制一系列矢量图作为点击区域和非点击区域（目前只支持圆形，矩形，多边形）
 *
@@ -10076,7 +10501,6 @@ var HitArea=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/HTMLChar.as=======199.999874/199.999874
 /**
 *@private
 *<code>HTMLChar</code> 是一个 HTML 字符类。
@@ -10159,7 +10583,6 @@ var HTMLChar=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/Log.as=======199.999873/199.999873
 /**
 *<code>Log</code> 类用于在界面内显示日志记录信息。
 *注意：在加速器内不可使用
@@ -10219,7 +10642,6 @@ var Log=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/Mouse.as=======199.999872/199.999872
 /**
 *<code>Mouse</code> 类用于控制鼠标光标样式。
 */
@@ -10268,7 +10690,6 @@ var Mouse=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/PerfData.as=======199.999871/199.999871
 //class laya.utils.PerfData
 var PerfData=(function(){
 	function PerfData(id,color,name,scale){
@@ -10296,7 +10717,6 @@ var PerfData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/Pool.as=======199.999869/199.999869
 /**
 *<p> <code>Pool</code> 是对象池类，用于对象的存储、重复使用。</p>
 *<p>合理使用对象池，可以有效减少对象创建的开销，避免频繁的垃圾回收，从而优化游戏流畅度。</p>
@@ -10372,7 +10792,6 @@ var Pool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/PoolCache.as=======199.999868/199.999868
 /**
 *@private
 *基于个数的对象缓存管理器
@@ -10427,7 +10846,6 @@ var PoolCache=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/RunDriver.as=======199.999867/199.999867
 /**
 *@private
 */
@@ -10505,7 +10923,6 @@ var RunDriver=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/SceneUtils.as=======199.999866/199.999866
 /**
 *@private 场景辅助类
 */
@@ -10851,7 +11268,6 @@ var SceneUtils=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/Stat.as=======199.999863/199.999863
 /**
 *<p> <code>Stat</code> 是一个性能统计面板，可以实时更新相关的性能参数。</p>
 *<p>参与统计的性能参数如下（所有参数都是每大约1秒进行更新）：<br/>
@@ -11123,7 +11539,6 @@ var Stat=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/StringKey.as=======199.999862/199.999862
 /**
 *@private
 *<code>StringKey</code> 类用于存取字符串对应的数字。
@@ -11162,7 +11577,6 @@ var StringKey=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/Timer.as=======199.999859/199.999859
 /**
 *<code>Timer</code> 是时钟管理类。它是一个单例，不要手动实例化此类，应该通过 Laya.timer 访问。
 */
@@ -11488,7 +11902,6 @@ var Timer=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/Tween.as=======199.999857/199.999857
 /**
 *<code>Tween</code> 是一个缓动类。使用此类能够实现对目标对象属性的渐变。
 */
@@ -11816,7 +12229,6 @@ var Tween=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/Utils.as=======199.999856/199.999856
 /**
 *<code>Utils</code> 是工具类。
 */
@@ -12044,7 +12456,6 @@ var Utils=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/VectorGraphManager.as=======199.999855/199.999855
 /**
 *@private
 *TODO:
@@ -12178,7 +12589,6 @@ var VectorGraphManager=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/WeakObject.as=======199.999854/199.999854
 /**
 *封装弱引用WeakMap
 *如果支持WeakMap，则使用WeakMap，如果不支持，则用Object代替
@@ -12283,7 +12693,6 @@ var WeakObject=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/WordText.as=======199.999853/199.999853
 /**
 *@private
 */
@@ -12346,7 +12755,6 @@ var WordText=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/components/Script.as=======98.999992/98.999992
 /**
 *<code>Script</code> 类用于创建脚本的父类，该类为抽象类，不允许实例。
 *组件的生命周期
@@ -12605,7 +13013,6 @@ var Script=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/Node.as=======98.999979/98.999979
 /**
 *<code>Node</code> 类是可放在显示列表中的所有对象的基类。该显示列表管理 Laya 运行时中显示的所有对象。使用 Node 类排列显示列表中的显示对象。Node 对象可以有子显示对象。
 */
@@ -13429,7 +13836,6 @@ var Node=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/media/h5audio/AudioSound.as=======98.999917/98.999917
 /**
 *@private
 *使用Audio标签播放声音
@@ -13603,7 +14009,6 @@ var AudioSound=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/media/SoundChannel.as=======98.999915/98.999915
 /**
 *<p> <code>SoundChannel</code> 用来控制程序中的声音。每个声音均分配给一个声道，而且应用程序可以具有混合在一起的多个声道。</p>
 *<p> <code>SoundChannel</code> 类包含控制声音的播放、暂停、停止、音量的方法，以及获取声音的播放状态、总时间、当前播放时间、总循环次数、播放地址等信息的方法。</p>
@@ -13687,7 +14092,6 @@ var SoundChannel=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/media/Sound.as=======98.999914/98.999914
 /**
 *<code>Sound</code> 类是用来播放控制声音的类。
 *引擎默认有两套声音方案，优先使用WebAudio播放声音，如果WebAudio不可用，则用H5Audio播放，H5Audio在部分机器上有兼容问题（比如不能混音，播放有延迟等）。
@@ -13732,7 +14136,6 @@ var Sound=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/media/webaudio/WebAudioSound.as=======98.999911/98.999911
 /**
 *@private
 *web audio api方式播放声音
@@ -13955,7 +14358,6 @@ var WebAudioSound=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/css/TextStyle.as=======98.999909/98.999909
 /**
 *文本的样式类
 */
@@ -14063,7 +14465,6 @@ var TextStyle=(function(_super){
 })(SpriteStyle)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/net/HttpRequest.as=======98.999908/98.999908
 /**
 *<p> <code>HttpRequest</code> 通过封装 HTML <code>XMLHttpRequest</code> 对象提供了对 HTTP 协议的完全的访问，包括做出 POST 和 HEAD 请求以及普通的 GET 请求的能力。 <code>HttpRequest</code> 只提供以异步的形式返回 Web 服务器的响应，并且能够以文本或者二进制的形式返回内容。</p>
 *<p><b>注意：</b>建议每次请求都使用新的 <code>HttpRequest</code> 对象，因为每次调用该对象的send方法时，都会清空之前设置的数据，并重置 HTTP 请求的状态，这会导致之前还未返回响应的请求被重置，从而得不到之前请求的响应结果。</p>
@@ -14075,6 +14476,8 @@ var HttpRequest=(function(_super){
 		this._responseType=null;
 		/**@private */
 		this._data=null;
+		/**@private */
+		this._url=null;
 		HttpRequest.__super.call(this);
 		this._http=new Browser.window.XMLHttpRequest();
 	}
@@ -14094,8 +14497,10 @@ var HttpRequest=(function(_super){
 		(responseType===void 0)&& (responseType="text");
 		this._responseType=responseType;
 		this._data=null;
+		this._url=url;
 		var _this=this;
 		var http=this._http;
+		url=URL.getAdptedFilePath(url);
 		http.open(method,url,true);
 		if (headers){
 			for (var i=0;i < headers.length;i++){
@@ -14207,7 +14612,7 @@ var HttpRequest=(function(_super){
 
 	/**请求的地址。*/
 	__getset(0,__proto,'url',function(){
-		return this._http.responseURL;
+		return this._url;
 	});
 
 	/**
@@ -14226,7 +14631,6 @@ var HttpRequest=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/net/Loader.as=======98.999907/98.999907
 /**
 *<code>Loader</code> 类可用来加载文本、JSON、XML、二进制、图像等资源。
 */
@@ -14712,7 +15116,6 @@ var Loader=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/net/LoaderManager.as=======98.999906/98.999906
 /**
 *<p> <code>LoaderManager</code> 类用于用于批量加载资源。此类是单例，不要手动实例化此类，请通过Laya.loader访问。</p>
 *<p>全部队列加载完成，会派发 Event.COMPLETE 事件；如果队列中任意一个加载失败，会派发 Event.ERROR 事件，事件回调参数值为加载出错的资源地址。</p>
@@ -14839,10 +15242,11 @@ var LoaderManager=(function(_super){
 		var item=this.getRes(url);
 		if (!item){
 			var extension=Utils.getFileExtension(url);
-			var creatItem=LoaderManager.createMap[extension];
-			(type)|| (type=creatItem[0]);
-			if (!type)
-				throw "LoaderManager:unknown type.";
+			(type)|| (type=LoaderManager.createMap[extension]? LoaderManager.createMap[extension][0]:null);
+			if (!type){
+				this.load(url,complete,progress,type,priority,cache);
+				return;
+			};
 			var parserMap=Loader.parserMap;
 			if (!parserMap[type]){
 				this.load(url,complete,progress,type,priority,cache);
@@ -15261,7 +15665,6 @@ var LoaderManager=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/net/SceneLoader.as=======98.999901/98.999901
 /**
 *@private
 *场景资源加载器
@@ -15287,22 +15690,29 @@ var SceneLoader=(function(_super){
 		this.totalCount=0;
 	}
 
-	__proto.load=function(url){
+	__proto.load=function(url,is3D,ifCheck){
+		(is3D===void 0)&& (is3D=false);
+		(ifCheck===void 0)&& (ifCheck=true);
 		if ((url instanceof Array)){
 			var i=0,len=0;
 			len=url.length;
 			for (i=0;i < len;i++){
-				this._addToLoadList(url[i]);
+				this._addToLoadList(url[i],is3D);
 			}
 			}else {
-			this._addToLoadList(url);
+			this._addToLoadList(url,is3D);
 		}
-		this._checkNext();
+		if(ifCheck)
+			this._checkNext();
 	}
 
-	__proto._addToLoadList=function(url){
+	__proto._addToLoadList=function(url,is3D){
+		(is3D===void 0)&& (is3D=false);
 		if (this._toLoadList.indexOf(url)>=0)return;
 		if (Loader.getRes(url))return;
+		if (is3D){
+			this._toLoadList.push({url:url});
+		}else
 		this._toLoadList.push(url);
 		this.totalCount++;
 	}
@@ -15312,14 +15722,24 @@ var SceneLoader=(function(_super){
 			if (this._toLoadList.length==0){
 				this.event(/*laya.events.Event.COMPLETE*/"complete");
 				return;
+			};
+			var tItem;
+			tItem=this._toLoadList.pop();
+			if ((typeof tItem=='string')){
+				this.loadOne(tItem);
+				}else{
+				this.loadOne(tItem.url,true);
 			}
-			this.loadOne(this._toLoadList.pop());
 		}
 	}
 
-	__proto.loadOne=function(url){
+	__proto.loadOne=function(url,is3D){
+		(is3D===void 0)&& (is3D=false);
 		this._curUrl=url;
 		var type=Utils.getFileExtension(this._curUrl);
+		if (is3D){
+			Laya.loader.create(url,this._completeHandler);
+		}else
 		if (SceneLoader.LoadableExtensions[type]){
 			Laya.loader.load(url,this._completeHandler,null,SceneLoader.LoadableExtensions[type]);
 			}else if (url !=AtlasInfoManager.getFileLoadPath(url)|| SceneLoader.No3dLoadTypes[type] || !LoaderManager.createMap[type]){
@@ -15342,9 +15762,13 @@ var SceneLoader=(function(_super){
 			if (dataO&&((dataO instanceof laya.components.Prefab ))){
 				dataO=dataO.json;
 			}
-			if (dataO && dataO.loadList){
-				this.load(dataO.loadList);
-				return;
+			if (dataO){
+				if (dataO.loadList){
+					this.load(dataO.loadList,false,false);
+				}
+				if (dataO.loadList3D){
+					this.load(dataO.loadList3D,true,false);
+				}
 			}
 		}
 		this._checkNext();
@@ -15366,7 +15790,6 @@ var SceneLoader=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/net/Socket.as=======98.999900/98.999900
 /**
 *<p> <code>Socket</code> 封装了 HTML5 WebSocket ，允许服务器端与客户端进行全双工（full-duplex）的实时通信，并且允许跨域通信。在建立连接后，服务器和 Browser/Client Agent 都能主动的向对方发送或接收文本和二进制数据。</p>
 *<p>要使用 <code>Socket</code> 类的方法，请先使用构造函数 <code>new Socket</code> 创建一个 <code>Socket</code> 对象。 <code>Socket</code> 以异步方式传输和接收数据。</p>
@@ -15601,7 +16024,6 @@ var Socket=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/net/WorkerLoader.as=======98.999897/98.999897
 /**
 *@private
 *Worker Image加载器
@@ -15742,7 +16164,6 @@ var WorkerLoader=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/resource/Resource.as=======98.999892/98.999892
 /**
 *@private
 *<code>Resource</code> 资源存取类。
@@ -16047,7 +16468,6 @@ var Resource=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/resource/Texture.as=======98.999883/98.999883
 /**
 *<code>Texture</code> 是一个纹理处理类。
 */
@@ -16372,7 +16792,6 @@ var Texture=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/filters/ColorFilter.as=======98.999875/98.999875
 /**
 *<p><code>ColorFilter</code> 是颜色滤镜。使用 ColorFilter 类可以将 4 x 5 矩阵转换应用于输入图像上的每个像素的 RGBA 颜色和 Alpha 值，以生成具有一组新的 RGBA 颜色和 Alpha 值的结果。该类允许饱和度更改、色相旋转、亮度转 Alpha 以及各种其他效果。您可以将滤镜应用于任何显示对象（即，从 Sprite 类继承的对象）。</p>
 *<p>注意：对于 RGBA 值，最高有效字节代表红色通道值，其后的有效字节分别代表绿色、蓝色和 Alpha 通道值。</p>
@@ -16598,7 +17017,6 @@ var ColorFilter=(function(_super){
 })(Filter)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/TimeLine.as=======98.999850/98.999850
 /**
 *<code>TimeLine</code> 是一个用来创建时间轴动画的类。
 */
@@ -17041,7 +17459,6 @@ var TimeLine=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/Sprite.as=======97.999970/97.999970
 /**
 *<p> <code>Sprite</code> 是基本的显示图形的显示列表节点。 <code>Sprite</code> 默认没有宽高，默认不接受鼠标事件。通过 <code>graphics</code> 可以绘制图片或者矢量图，支持旋转，缩放，位移等操作。<code>Sprite</code>同时也是容器类，可用来添加多个子节点。</p>
 *<p>注意： <code>Sprite</code> 默认没有宽高，可以通过<code>getBounds</code>函数获取；也可手动设置宽高；还可以设置<code>autoSize=true</code>，然后再获取宽高。<code>Sprite</code>的宽高一般用于进行碰撞检测和排版，并不影响显示图像大小，如果需要更改显示图像大小，请使用 <code>scaleX</code> ， <code>scaleY</code> ， <code>scale</code>。</p>
@@ -17209,14 +17626,6 @@ var Sprite=(function(_super){
 		this._boundStyle=null;
 		/**@private */
 		this._graphics=null;
-		/**@private */
-		this._customRenderCmd=null;
-		/**@private */
-		this._customCmds=null;
-		/**@private */
-		this._drawCanvasParamData=null;
-		/**@private */
-		this._callbackFuncObj=null;
 		/**
 		*<p>鼠标事件与此对象的碰撞检测是否可穿透。碰撞检测发生在鼠标事件的捕获阶段，此阶段引擎会从stage开始递归检测stage及其子对象，直到找到命中的目标对象或者未命中任何对象。</p>
 		*<p>穿透表示鼠标事件发生的位置处于本对象绘图区域内时，才算命中，而与对象宽高和值为Rectangle对象的hitArea属性无关。如果sprite.hitArea值是HitArea对象，表示显式声明了此对象的鼠标事件响应区域，而忽略对象的宽高、mouseThrough属性。</p>
@@ -17241,9 +17650,6 @@ var Sprite=(function(_super){
 		this._repaint=/*laya.display.SpriteConst.REPAINT_NONE*/0;
 		this._style=SpriteStyle.EMPTY;
 		this._cacheStyle=CacheStyle.EMPTY;
-		if (Render.isConchApp){
-			this._customCmds=[];
-		}
 	}
 
 	__class(Sprite,'laya.display.Sprite',_super);
@@ -18545,7 +18951,6 @@ var Sprite=(function(_super){
 })(Node)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/media/h5audio/AudioSoundChannel.as=======97.999842/97.999842
 /**
 *@private
 *audio标签播放声音的音轨控制
@@ -18698,7 +19103,6 @@ var AudioSoundChannel=(function(_super){
 })(SoundChannel)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/media/webaudio/WebAudioSoundChannel.as=======97.999836/97.999836
 /**
 *@private
 *web audio api方式播放声音的音轨控制
@@ -18834,8 +19238,8 @@ var WebAudioSoundChannel=(function(_super){
 		this.isStopped=true;
 		SoundManager.removeChannel(this);
 		this.completeHandler=null;
-		if(SoundManager.autoReleaseSound)
-			Laya.systemTimer.once(5000,null,SoundManager.disposeSoundIfNotUsed,[this.url],false);
+		if (SoundManager.autoReleaseSound)
+			SoundManager.disposeSoundLater(this.url);
 	}
 
 	__proto.pause=function(){
@@ -18847,8 +19251,8 @@ var WebAudioSoundChannel=(function(_super){
 			this.gain.disconnect();
 		this.isStopped=true;
 		SoundManager.removeChannel(this);
-		if(SoundManager.autoReleaseSound)
-			Laya.systemTimer.once(5000,null,SoundManager.disposeSoundIfNotUsed,[this.url],false);
+		if (SoundManager.autoReleaseSound)
+			SoundManager.disposeSoundLater(this.url);
 	}
 
 	__proto.resume=function(){
@@ -18898,7 +19302,6 @@ var WebAudioSoundChannel=(function(_super){
 })(SoundChannel)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/resource/Bitmap.as=======97.999796/97.999796
 /**
 *@private
 *<code>Bitmap</code> 图片资源类。
@@ -18940,7 +19343,6 @@ var Bitmap=(function(_super){
 })(Resource)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/AnimationBase.as=======96.999962/96.999962
 /**
 *<p>动画基类，提供了基础的动画播放控制方法和帧标签事件相关功能。</p>
 *<p>可以继承此类，但不要直接实例化此类，因为有些方法需要由子类实现。</p>
@@ -19192,7 +19594,6 @@ var AnimationBase=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/Text.as=======96.999918/96.999918
 /**
 *<p> <code>Text</code> 类用于创建显示对象以显示文本。</p>
 *<p>
@@ -20138,7 +20539,6 @@ var Text=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/Scene.as=======96.999917/96.999917
 /**
 *场景类，负责场景创建，加载，销毁等功能
 *场景被从节点移除后，并不会被自动垃圾机制回收，如果想回收，请调用destroy接口，可以通过unDestroyedScenes属性查看还未被销毁的场景列表
@@ -20411,7 +20811,6 @@ var Scene=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/Stage.as=======96.999915/96.999915
 /**
 *<p> <code>Stage</code> 是舞台类，显示列表的根节点，所有显示对象都在舞台上显示。通过 Laya.stage 单例访问。</p>
 *<p>Stage提供几种适配模式，不同的适配模式会产生不同的画布大小，画布越大，渲染压力越大，所以要选择合适的适配方案。</p>
@@ -21077,7 +21476,6 @@ var Stage=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/media/SoundNode.as=======96.999893/96.999893
 /**
 *@private
 */
@@ -21201,7 +21599,6 @@ var SoundNode=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/PerfHUD.as=======96.999840/96.999840
 //class laya.utils.PerfHUD extends laya.display.Sprite
 var PerfHUD=(function(_super){
 	function PerfHUD(){
@@ -21326,7 +21723,6 @@ var PerfHUD=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/resource/HTMLCanvas.as=======96.999697/96.999697
 /**
 *<code>HTMLCanvas</code> 是 Html Canvas 的代理类，封装了 Canvas 的属性和方法。
 */
@@ -21434,7 +21830,6 @@ var HTMLCanvas=(function(_super){
 })(Bitmap)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/resource/HTMLImage.as=======96.999696/96.999696
 /**
 *@private
 *<p> <code>HTMLImage</code> 用于创建 HTML Image 元素。</p>
@@ -21483,7 +21878,6 @@ var HTMLImage=(function(_super){
 })(Bitmap)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/Animation.as=======95.999955/95.999955
 /**
 *<p> <code>Animation</code> 是Graphics动画类。实现了基于Graphics的动画创建、播放、控制接口。</p>
 *<p>本类使用了动画模版缓存池，它以一定的内存开销来节省CPU开销，当相同的动画模版被多次使用时，相比于每次都创建新的动画模版，使用动画模版缓存池，只需创建一次，缓存之后多次复用，从而节省了动画模版创建的开销。</p>
@@ -21851,7 +22245,6 @@ var Animation=(function(_super){
 })(AnimationBase)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/FrameAnimation.as=======95.999914/95.999914
 /**
 *节点关键帧动画播放类。解析播放IDE内制作的节点动画。
 */
@@ -22090,7 +22483,6 @@ var FrameAnimation=(function(_super){
 })(AnimationBase)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/Input.as=======95.999867/95.999867
 /**
 *<p><code>Input</code> 类用于创建显示对象以显示和输入文本。</p>
 *<p>Input 类封装了原生的文本输入框，由于不同浏览器的差异，会导致此对象的默认文本的位置与用户点击输入时的文本的位置有少许的偏差。</p>
@@ -22250,6 +22642,7 @@ var Input=(function(_super){
 		Laya.stage.off(/*laya.events.Event.KEY_DOWN*/"keydown",this,this._onKeyDown);
 		Laya.stage.focus=null;
 		this.event(/*laya.events.Event.BLUR*/"blur");
+		this.event(/*laya.events.Event.CHANGE*/"change");
 		if (Render.isConchApp)this.nativeInput.blur();
 		Browser.onPC && Laya.systemTimer.clear(this,this._syncInputTransform);
 	}
@@ -22534,7 +22927,6 @@ var Input=(function(_super){
 })(Text)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/display/EffectAnimation.as=======94.999867/94.999867
 /**
 *<p> 动效模板。用于为指定目标对象添加动画效果。每个动效有唯一的目标对象，而同一个对象可以添加多个动效。 当一个动效开始播放时，其他动效会自动停止播放。</p>
 *<p> 可以通过LayaAir IDE创建。 </p>
@@ -22728,7 +23120,6 @@ var EffectAnimation=(function(_super){
 })(FrameAnimation)
 
 
-	//file:///D:/gittest/gittestnew/core/src/laya/utils/GraphicAnimation.as=======94.999791/94.999791
 /**
 *Graphics动画解析器
 *@private
@@ -23156,7 +23547,6 @@ var GraphicAnimation=(function(_super){
 
 (function(window,document,Laya){
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
-	//file:///D:/gittest/gittestnew/publish/LayaAirPublish/publibs/publish/src/LayaMain.as=======199.999999/199.999999
 //class LayaMain
 var LayaMain=(function(){
 	/*[COMPILER OPTIONS:normal]*/

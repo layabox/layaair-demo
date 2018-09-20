@@ -8,15 +8,10 @@
 	var Rectangle=laya.maths.Rectangle,Render=laya.renders.Render,Scene=laya.display.Scene,SceneUtils=laya.utils.SceneUtils;
 	var Sprite=laya.display.Sprite,Text=laya.display.Text,Texture=laya.resource.Texture,Tween=laya.utils.Tween;
 	var Utils=laya.utils.Utils,WeakObject=laya.utils.WeakObject;
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/IBox.as=======1100000100.000142/1100000100.000142
 Laya.interface('laya.ui.IBox');
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/IItem.as=======1100000100.000119/1100000100.000119
 Laya.interface('laya.ui.IItem');
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/ISelect.as=======1100000100.000087/1100000100.000087
 Laya.interface('laya.ui.ISelect');
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/IRender.as=======1100000100.000087/1100000100.000087
 Laya.interface('laya.ui.IRender');
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Styles.as=======199.999742/199.999742
 /**
 *<code>Styles</code> 定义了组件常用的样式属性。
 */
@@ -35,7 +30,6 @@ var Styles=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/UIUtils.as=======199.999735/199.999735
 /**
 *<code>UIUtils</code> 是文本工具集。
 */
@@ -113,7 +107,6 @@ var UIUtils=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ui/src/UIConfig.as=======199.999729/199.999729
 /**全局配置*/
 //class UIConfig
 var UIConfig=(function(){
@@ -129,7 +122,6 @@ var UIConfig=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Widget.as=======98.999727/98.999727
 /**
 *相对布局插件
 */
@@ -301,7 +293,6 @@ var Widget=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/AutoBitmap.as=======98.999723/98.999723
 /**
 *<code>AutoBitmap</code> 类是用于表示位图图像或绘制图形的显示对象。
 *<p>封装了位置，宽高及九宫格的处理，供UI组件使用。</p>
@@ -496,7 +487,6 @@ var AutoBitmap=(function(_super){
 })(Graphics)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/UIEvent.as=======98.999680/98.999680
 /**
 *<code>UIEvent</code> 类用来定义UI组件类的事件类型。
 */
@@ -513,7 +503,6 @@ var UIEvent=(function(_super){
 })(Event)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/UIComponent.as=======96.999740/96.999740
 /**
 *<code>Component</code> 是ui控件类的基类。
 *<p>生命周期：preinitialize > createChildren > initialize > 组件构造函数</p>
@@ -862,7 +851,6 @@ var UIComponent=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/DialogManager.as=======96.999732/96.999732
 /**
 *<code>DialogManager</code> 对话框管理容器，所有的对话框都在该容器内，并且受管理器管理。
 *任意对话框打开和关闭，都会出发管理类的open和close事件
@@ -1059,7 +1047,6 @@ var DialogManager=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/View.as=======95.999680/95.999680
 /**
 *<code>View</code> 是一个视图类，2.0开始，更改继承至Scene类，相对于Scene，增加相对布局功能。
 */
@@ -1238,7 +1225,6 @@ var View=(function(_super){
 })(Scene)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Box.as=======95.999511/95.999511
 /**
 *<code>Box</code> 类是一个控件容器类。
 */
@@ -1265,7 +1251,6 @@ var Box=(function(_super){
 })(UIComponent)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Button.as=======95.999509/95.999509
 /**
 *<code>Button</code> 组件用来表示常用的多态按钮。 <code>Button</code> 组件可显示文本标签、图标或同时显示两者。 *
 *<p>可以是单态，两态和三态，默认三态(up,over,down)。</p>
@@ -1881,7 +1866,6 @@ var Button=(function(_super){
 })(UIComponent)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Clip.as=======95.999507/95.999507
 /**
 *<p> <code>Clip</code> 类是位图切片动画。</p>
 *<p> <code>Clip</code> 可将一张图片，按横向分割数量 <code>clipX</code> 、竖向分割数量 <code>clipY</code> ，
@@ -2337,7 +2321,6 @@ var Clip=(function(_super){
 })(UIComponent)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/ColorPicker.as=======95.999506/95.999506
 /**
 *<code>ColorPicker</code> 组件将显示包含多个颜色样本的列表，用户可以从中选择颜色。
 *
@@ -2746,7 +2729,6 @@ var ColorPicker=(function(_super){
 })(UIComponent)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/ComboBox.as=======95.999505/95.999505
 /**
 *<code>ComboBox</code> 组件包含一个下拉列表，用户可以从该列表中选择单个值。
 *
@@ -3290,7 +3272,6 @@ var ComboBox=(function(_super){
 })(UIComponent)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/ScrollBar.as=======95.999497/95.999497
 /**
 *<code>ScrollBar</code> 组件是一个滚动条组件。
 *<p>当数据太多以至于显示区域无法容纳时，最终用户可以使用 <code>ScrollBar</code> 组件控制所显示的数据部分。</p>
@@ -3819,7 +3800,6 @@ var ScrollBar=(function(_super){
 })(UIComponent)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Slider.as=======95.999495/95.999495
 /**
 *使用 <code>Slider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
 *<p>滑块的当前值由滑块端点（对应于滑块的最小值和最大值）之间滑块的相对位置确定。</p>
@@ -4203,7 +4183,6 @@ var Slider=(function(_super){
 })(UIComponent)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Image.as=======95.999492/95.999492
 /**
 *<code>Image</code> 类是用于表示位图图像或绘制图形的显示对象。
 *Image和Clip组件是唯一支持异步加载的两个组件，比如img.skin="abc/xxx.png"，其他UI组件均不支持异步加载。
@@ -4414,7 +4393,6 @@ var Image=(function(_super){
 })(UIComponent)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Label.as=======95.999489/95.999489
 /**
 *<p> <code>Label</code> 类用于创建显示对象以显示文本。</p>
 *
@@ -4796,7 +4774,6 @@ var Label=(function(_super){
 })(UIComponent)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/ProgressBar.as=======95.999486/95.999486
 /**
 *<code>ProgressBar</code> 组件显示内容的加载进度。
 *@example <caption>以下示例代码，创建了一个新的 <code>ProgressBar</code> 实例，设置了它的皮肤、位置、宽高、网格等信息，并添加到舞台上。</caption>
@@ -5052,7 +5029,6 @@ var ProgressBar=(function(_super){
 })(UIComponent)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/TipManager.as=======95.999478/95.999478
 /**鼠标提示管理类*/
 //class laya.ui.TipManager extends laya.ui.UIComponent
 var TipManager=(function(_super){
@@ -5187,7 +5163,6 @@ var TipManager=(function(_super){
 })(UIComponent)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Dialog.as=======94.999444/94.999444
 /**
 *<code>Dialog</code> 组件是一个弹出对话框，实现对话框弹出，拖动，模式窗口功能。
 *可以通过UIConfig设置弹出框背景透明度，模式窗口点击边缘是否关闭等
@@ -5519,7 +5494,6 @@ var Dialog=(function(_super){
 })(View)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/CheckBox.as=======94.999277/94.999277
 /**
 *<code>CheckBox</code> 组件显示一个小方框，该方框内可以有选中标记。
 *<code>CheckBox</code> 组件还可以显示可选的文本标签，默认该标签位于 CheckBox 右侧。
@@ -5636,7 +5610,6 @@ var CheckBox=(function(_super){
 })(Button)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/LayoutBox.as=======94.999270/94.999270
 /**
 *<code>LayoutBox</code> 是一个布局容器类。
 */
@@ -5726,7 +5699,6 @@ var LayoutBox=(function(_super){
 })(Box)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/FontClip.as=======94.999268/94.999268
 /**
 *字体切片，简化版的位图字体，只需设置一个切片图片和文字内容即可使用，效果同位图字体
 *使用方式：设置位图字体皮肤skin，设置皮肤对应的字体内容sheet（如果多行，可以使用空格换行），示例：
@@ -5923,7 +5895,6 @@ var FontClip=(function(_super){
 })(Clip)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/List.as=======94.999259/94.999259
 /**
 *<code>List</code> 控件可显示项目列表。默认为垂直方向列表。可通过UI编辑器自定义列表。
 *
@@ -6861,7 +6832,6 @@ var List=(function(_super){
 })(Box)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Panel.as=======94.999258/94.999258
 /**
 *<code>Panel</code> 是一个面板容器类。
 */
@@ -7182,7 +7152,6 @@ var Panel=(function(_super){
 })(Box)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/HScrollBar.as=======94.999255/94.999255
 /**
 *使用 <code>HScrollBar</code> （水平 <code>ScrollBar</code> ）控件，可以在因数据太多而不能在显示区域完全显示时控制显示的数据部分。
 *@example <caption>以下示例代码，创建了一个 <code>HScrollBar</code> 实例。</caption>
@@ -7274,69 +7243,6 @@ var HScrollBar=(function(_super){
 })(ScrollBar)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Radio.as=======94.999254/94.999254
-/**
-*<code>Radio</code> 控件使用户可在一组互相排斥的选择中做出一种选择。
-*用户一次只能选择 <code>Radio</code> 组中的一个成员。选择未选中的组成员将取消选择该组中当前所选的 <code>Radio</code> 控件。
-*@see laya.ui.RadioGroup
-*/
-//class laya.ui.Radio extends laya.ui.Button
-var Radio=(function(_super){
-	function Radio(skin,label){
-		/**@private */
-		this._value=null;
-		(label===void 0)&& (label="");
-		Radio.__super.call(this,skin,label);
-	}
-
-	__class(Radio,'laya.ui.Radio',_super);
-	var __proto=Radio.prototype;
-	/**@inheritDoc */
-	__proto.destroy=function(destroyChild){
-		(destroyChild===void 0)&& (destroyChild=true);
-		_super.prototype.destroy.call(this,destroyChild);
-		this._value=null;
-	}
-
-	/**@inheritDoc */
-	__proto.preinitialize=function(){
-		laya.ui.UIComponent.prototype.preinitialize.call(this);
-		this.toggle=false;
-		this._autoSize=false;
-	}
-
-	/**@inheritDoc */
-	__proto.initialize=function(){
-		_super.prototype.initialize.call(this);
-		this.createText();
-		this._text.align="left";
-		this._text.valign="top";
-		this._text.width=0;
-		this.on(/*laya.events.Event.CLICK*/"click",this,this.onClick);
-	}
-
-	/**
-	*@private
-	*对象的<code>Event.CLICK</code>事件侦听处理函数。
-	*/
-	__proto.onClick=function(e){
-		this.selected=true;
-	}
-
-	/**
-	*获取或设置 <code>Radio</code> 关联的可选用户定义值。
-	*/
-	__getset(0,__proto,'value',function(){
-		return this._value !=null ? this._value :this.label;
-		},function(obj){
-		this._value=obj;
-	});
-
-	return Radio;
-})(Button)
-
-
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/UIGroup.as=======94.999254/94.999254
 /**
 *<code>Group</code> 是一个可以自动布局的项集合控件。
 *<p> <code>Group</code> 的默认项对象为 <code>Button</code> 类实例。
@@ -7790,7 +7696,67 @@ var UIGroup=(function(_super){
 })(Box)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/HSlider.as=======94.999251/94.999251
+/**
+*<code>Radio</code> 控件使用户可在一组互相排斥的选择中做出一种选择。
+*用户一次只能选择 <code>Radio</code> 组中的一个成员。选择未选中的组成员将取消选择该组中当前所选的 <code>Radio</code> 控件。
+*@see laya.ui.RadioGroup
+*/
+//class laya.ui.Radio extends laya.ui.Button
+var Radio=(function(_super){
+	function Radio(skin,label){
+		/**@private */
+		this._value=null;
+		(label===void 0)&& (label="");
+		Radio.__super.call(this,skin,label);
+	}
+
+	__class(Radio,'laya.ui.Radio',_super);
+	var __proto=Radio.prototype;
+	/**@inheritDoc */
+	__proto.destroy=function(destroyChild){
+		(destroyChild===void 0)&& (destroyChild=true);
+		_super.prototype.destroy.call(this,destroyChild);
+		this._value=null;
+	}
+
+	/**@inheritDoc */
+	__proto.preinitialize=function(){
+		laya.ui.UIComponent.prototype.preinitialize.call(this);
+		this.toggle=false;
+		this._autoSize=false;
+	}
+
+	/**@inheritDoc */
+	__proto.initialize=function(){
+		_super.prototype.initialize.call(this);
+		this.createText();
+		this._text.align="left";
+		this._text.valign="top";
+		this._text.width=0;
+		this.on(/*laya.events.Event.CLICK*/"click",this,this.onClick);
+	}
+
+	/**
+	*@private
+	*对象的<code>Event.CLICK</code>事件侦听处理函数。
+	*/
+	__proto.onClick=function(e){
+		this.selected=true;
+	}
+
+	/**
+	*获取或设置 <code>Radio</code> 关联的可选用户定义值。
+	*/
+	__getset(0,__proto,'value',function(){
+		return this._value !=null ? this._value :this.label;
+		},function(obj){
+		this._value=obj;
+	});
+
+	return Radio;
+})(Button)
+
+
 /**
 *使用 <code>HSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
 *<p> <code>HSlider</code> 控件采用水平方向。滑块轨道从左向右扩展，而标签位于轨道的顶部或底部。</p>
@@ -7896,7 +7862,6 @@ var HSlider=(function(_super){
 })(Slider)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Tree.as=======94.999248/94.999248
 /**
 *<code>Tree</code> 控件使用户可以查看排列为可扩展树的层次结构数据。
 *
@@ -8511,7 +8476,6 @@ var Tree=(function(_super){
 })(Box)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/ViewStack.as=======94.999244/94.999244
 /**
 *<code>ViewStack</code> 类用于视图堆栈类，用于视图的显示等设置处理。
 */
@@ -8655,7 +8619,6 @@ var ViewStack=(function(_super){
 })(Box)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/VScrollBar.as=======94.999229/94.999229
 /**
 *
 *使用 <code>VScrollBar</code> （垂直 <code>ScrollBar</code> ）控件，可以在因数据太多而不能在显示区域完全显示时控制显示的数据部分。
@@ -8741,7 +8704,6 @@ var VScrollBar=(function(_super){
 })(ScrollBar)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/TextInput.as=======94.999228/94.999228
 /**
 *<code>TextInput</code> 类用于创建显示对象以显示和输入文本。
 *
@@ -9049,7 +9011,6 @@ var TextInput=(function(_super){
 })(Label)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/VSlider.as=======94.999226/94.999226
 /**
 *使用 <code>VSlider</code> 控件，用户可以通过在滑块轨道的终点之间移动滑块来选择值。
 *<p> <code>VSlider</code> 控件采用垂直方向。滑块轨道从下往上扩展，而标签位于轨道的左右两侧。</p>
@@ -9148,7 +9109,6 @@ var VSlider=(function(_super){
 })(Slider)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/HBox.as=======93.999030/93.999030
 /**
 *<code>HBox</code> 是一个水平布局容器类。
 */
@@ -9209,7 +9169,6 @@ var HBox=(function(_super){
 })(LayoutBox)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/VBox.as=======93.999004/93.999004
 /**
 *<code>VBox</code> 是一个垂直布局容器类。
 */
@@ -9265,7 +9224,6 @@ var VBox=(function(_super){
 })(LayoutBox)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/RadioGroup.as=======93.998998/93.998998
 /**
 *<code>RadioGroup</code> 控件定义一组 <code>Radio</code> 控件，这些控件相互排斥；
 *因此，用户每次只能选择一个 <code>Radio</code> 控件。
@@ -9357,7 +9315,6 @@ var RadioGroup=(function(_super){
 })(UIGroup)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/Tab.as=======93.998995/93.998995
 /**
 *<code>Tab</code> 组件用来定义选项卡按钮组。 *
 *@internal <p>属性：<code>selectedIndex</code> 的默认值为-1。</p>
@@ -9450,7 +9407,6 @@ var Tab=(function(_super){
 })(UIGroup)
 
 
-	//file:///D:/gittest/gittestnew/ui/src/laya/ui/TextArea.as=======93.998968/93.998968
 /**
 *<code>TextArea</code> 类用于创建显示对象以显示和输入文本。
 *@example <caption>以下示例代码，创建了一个 <code>TextArea</code> 实例。</caption>
@@ -9538,10 +9494,15 @@ var TextArea=(function(_super){
 		this._hScrollBar=null;
 		(text===void 0)&& (text="");
 		TextArea.__super.call(this,text);
+		this.on(/*laya.events.Event.CHANGE*/"change",this,this._onTextChange);
 	}
 
 	__class(TextArea,'laya.ui.TextArea',_super);
 	var __proto=TextArea.prototype;
+	__proto._onTextChange=function(){
+		this.callLater(this.changeScroll);
+	}
+
 	__proto.destroy=function(destroyChild){
 		(destroyChild===void 0)&& (destroyChild=true);
 		_super.prototype.destroy.call(this,destroyChild);

@@ -2,7 +2,7 @@
 (function(window,document,Laya){
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
 
-	var Browser=laya.utils.Browser,CacheStyle=laya.display.css.CacheStyle,Config=Laya.Config,Context=laya.resource.Context;
+	var Browser=laya.utils.Browser,CacheStyle=laya.display.css.CacheStyle,Context=laya.resource.Context;
 	var Event=laya.events.Event,EventDispatcher=laya.events.EventDispatcher,GrahamScan=laya.maths.GrahamScan;
 	var Graphics=laya.display.Graphics,HTMLCanvas=laya.resource.HTMLCanvas,Handler=laya.utils.Handler,HitArea=laya.utils.HitArea;
 	var Input=laya.display.Input,Loader=laya.net.Loader,LoaderManager=laya.net.LoaderManager,LocalStorage=laya.net.LocalStorage;
@@ -10,7 +10,6 @@
 	var Rectangle=laya.maths.Rectangle,Render=laya.renders.Render,RenderSprite=laya.renders.RenderSprite,Resource=laya.resource.Resource;
 	var ResourceManager=laya.resource.ResourceManager,Sprite=laya.display.Sprite,Stage=laya.display.Stage,Stat=laya.utils.Stat;
 	var Text=laya.display.Text,Texture=laya.resource.Texture,Timer=laya.utils.Timer,Utils=laya.utils.Utils;
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/data/Base64AtlasManager.as=======199.999382/199.999382
 //class laya.debug.data.Base64AtlasManager
 var Base64AtlasManager=(function(){
 	function Base64AtlasManager(){}
@@ -26,7 +25,6 @@ var Base64AtlasManager=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/DebugPanel.as=======199.999381/199.999381
 /**
 *...
 *@author ww
@@ -522,7 +520,6 @@ var DebugPanel=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/DebugTool.as=======199.999380/199.999380
 /**
 *
 *@author ww
@@ -1181,7 +1178,6 @@ var DebugTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/divui/DivScripts.as=======199.999379/199.999379
 /**
 *...
 *@author ww
@@ -1201,7 +1197,6 @@ var DivScripts=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/AtlasTools.as=======199.999378/199.999378
 /**
 *tianpeng
 *@author
@@ -1275,7 +1270,6 @@ var AtlasTools=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/Base64Atlas.as=======199.999377/199.999377
 /**
 *...
 *@author ww
@@ -1333,7 +1327,6 @@ var Base64Atlas=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/Base64ImageTool.as=======199.999376/199.999376
 /**
 *...
 *@author ww
@@ -1370,7 +1363,6 @@ var Base64ImageTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/Base64Tool.as=======199.999375/199.999375
 /**
 *base64编码解码类
 *@author ww
@@ -1460,7 +1452,6 @@ var Base64Tool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/ByteEx.as=======199.999374/199.999374
 /**
 *<p> <code>Byte</code> 类提供用于优化读取、写入以及处理二进制数据的方法和属性。</p>
 *<p> <code>Byte</code> 类适用于需要在字节层访问数据的高级开发人员。</p>
@@ -2162,7 +2153,6 @@ var ByteEx=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/CacheAnalyser.as=======199.999373/199.999373
 /**
 *...
 *@author ww
@@ -2217,7 +2207,6 @@ var CacheAnalyser=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/CallLaterTool.as=======199.999372/199.999372
 /**
 *
 *@author ww
@@ -2285,7 +2274,6 @@ var CallLaterTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/CanvasTools.as=======199.999371/199.999371
 /**
 *...
 *@author ww
@@ -2461,7 +2449,6 @@ var CanvasTools=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/ClassTool.as=======199.999370/199.999370
 /**
 *
 *@author ww
@@ -2568,7 +2555,6 @@ var ClassTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/ClickSelectTool.as=======199.999369/199.999369
 /**
 *...
 *@author ww
@@ -2648,7 +2634,6 @@ var ClickSelectTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/ColorTool.as=======199.999368/199.999368
 /**
 *...
 *@author ww
@@ -2767,7 +2752,6 @@ var ColorTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/CommonTools.as=======199.999367/199.999367
 /**
 *
 *@author ww
@@ -2839,7 +2823,6 @@ var CommonTools=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/CountTool.as=======199.999361/199.999361
 /**
 *
 *@author ww
@@ -2925,7 +2908,6 @@ var CountTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/DebugConsts.as=======199.999360/199.999360
 /**
 *...
 *@author ww
@@ -2943,7 +2925,6 @@ var DebugConsts=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/DebugExport.as=======199.999359/199.999359
 /**
 *
 *@author ww
@@ -2975,7 +2956,6 @@ var DebugExport=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/DebugTxt.as=======199.999358/199.999358
 /**
 *...
 *@author ww
@@ -3041,7 +3021,6 @@ var DebugTxt=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/DifferTool.as=======199.999355/199.999355
 /**
 *本类用于显示对象值变化过程
 *@author ww
@@ -3091,7 +3070,6 @@ var DifferTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/DisController.as=======199.999354/199.999354
 /**
 *
 *@author ww
@@ -3167,7 +3145,6 @@ var DisController=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/DisControlTool.as=======199.999353/199.999353
 /**
 *
 *@author ww
@@ -3463,7 +3440,6 @@ var DisControlTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/DisEditor.as=======199.999352/199.999352
 /**
 *
 *@author ww
@@ -3519,7 +3495,6 @@ var DisEditor=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/DisplayHook.as=======199.999351/199.999351
 /**
 *调试拾取显示对象类
 *@author ww
@@ -3691,7 +3666,6 @@ var DisplayHook=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/DisPool.as=======199.999350/199.999350
 /**
 *简单的显示对象对象池
 *从父容器上移除时即被视为可被重用
@@ -3728,7 +3702,6 @@ var DisPool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/DTrace.as=======199.999348/199.999348
 /**
 *
 *@author ww
@@ -3775,7 +3748,6 @@ var DTrace=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/enginehook/ClassCreateHook.as=======199.999347/199.999347
 /**
 *...
 *@author ww
@@ -3829,7 +3801,6 @@ var ClassCreateHook=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/enginehook/FunctionTimeHook.as=======199.999346/199.999346
 /**
 *...
 *@author ww
@@ -3881,7 +3852,6 @@ var FunctionTimeHook=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/enginehook/RenderSpriteHook.as=======199.999344/199.999344
 /**
 *...
 *@author ww
@@ -3913,8 +3883,6 @@ var RenderSpriteHook=(function(){
 		var preTime;
 		preTime=Browser.now();
 		RenderSpriteHook._oldCanvas.call(this,sprite,context,x,y);
-		if (Config.showCanvasMark){
-		}
 		if (_repaint){
 			CacheAnalyser.I.reCacheCanvas(sprite,Browser.now()-preTime);
 			}else{
@@ -3949,7 +3917,6 @@ var RenderSpriteHook=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/enginehook/SpriteRenderHook.as=======199.999343/199.999343
 /**
 *...
 *@author ww
@@ -4012,7 +3979,6 @@ var SpriteRenderHook=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/exp/Observer.as=======199.999342/199.999342
 /**
 *本类调用原生observe接口，仅支持部分浏览器，chrome有效
 *变化输出为异步方式,所以无法跟踪到是什么函数导致变化
@@ -4045,7 +4011,6 @@ var Observer=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/exp/Watch.as=======199.999341/199.999341
 /**
 *本类调用原生watch接口，仅火狐有效
 *@author ww
@@ -4069,7 +4034,6 @@ var Watch=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/FilterTool.as=======199.999340/199.999340
 /**
 *
 *@author ww
@@ -4103,7 +4067,6 @@ var FilterTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/GetSetProfile.as=======199.999339/199.999339
 /**
 *...
 *@author ww
@@ -4408,7 +4371,6 @@ var GetSetProfile=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/hook/FunHook.as=======199.999338/199.999338
 /**
 *本类用于在对象的函数上挂钩子
 *@author ww
@@ -4529,7 +4491,6 @@ var FunHook=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/hook/VarHook.as=======199.999337/199.999337
 /**
 *本类用于监控对象 set get 函数的调用
 *@author ww
@@ -4609,7 +4570,6 @@ var VarHook=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/IDTools.as=======199.999336/199.999336
 /**
 *
 *@author ww
@@ -4670,7 +4630,6 @@ var IDTools=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/JsonTool.as=======199.999335/199.999335
 /**
 *
 *@author ww
@@ -4821,7 +4780,6 @@ return JsonTool;
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/JSTools.as=======199.999334/199.999334
 /**
 *本类用于操作html对象
 *@author ww
@@ -4954,7 +4912,6 @@ var JSTools=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/layout/Layouter.as=======199.999333/199.999333
 /**
 *布局工具类,目前只支持水平方向布局
 *@author ww
@@ -5047,7 +5004,6 @@ var Layouter=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/layout/LayoutFuns.as=======199.999332/199.999332
 /**
 *...
 *@author ww
@@ -5365,7 +5321,6 @@ var LayoutFuns=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/LayoutTools.as=======199.999331/199.999331
 /**
 *
 *@author ww
@@ -5435,7 +5390,6 @@ var LayoutTools=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/MathTools.as=======199.999330/199.999330
 /**
 *...
 *@author ww
@@ -5482,7 +5436,6 @@ var MathTools=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/MouseEventAnalyser.as=======199.999329/199.999329
 /**
 *...
 *@author ww
@@ -5679,7 +5632,6 @@ var MouseEventAnalyser=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/ObjectTools.as=======199.999327/199.999327
 /**
 *本类提供obj相关的一些操作
 *@author ww
@@ -6082,7 +6034,6 @@ var ObjectTools=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/ObjTimeCountTool.as=======199.999326/199.999326
 /**
 *...
 *@author ww
@@ -6152,7 +6103,6 @@ var ObjTimeCountTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/RecInfo.as=======199.999325/199.999325
 /**
 *
 *@author ww
@@ -6243,7 +6193,6 @@ var RecInfo=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/RenderAnalyser.as=======199.999324/199.999324
 /**
 *...
 *@author ww
@@ -6329,7 +6278,6 @@ var RenderAnalyser=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/resizer/DisResizer.as=======199.999322/199.999322
 /**
 *本类用于调整对象的宽高以及坐标
 *@author ww
@@ -6510,7 +6458,6 @@ var DisResizer=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/resizer/SimpleResizer.as=======199.999321/199.999321
 /**
 *...
 *@author ww
@@ -6565,7 +6512,6 @@ var SimpleResizer=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/ResTools.as=======199.999320/199.999320
 /**
 *...
 *@author ww
@@ -6638,7 +6584,6 @@ var ResTools=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/RunProfile.as=======199.999319/199.999319
 /**
 *类实例创建分析工具
 *@author ww
@@ -6709,7 +6654,6 @@ var RunProfile=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/SingleTool.as=======199.999318/199.999318
 /**
 *
 *@author ww
@@ -6758,7 +6702,6 @@ var SingleTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/StringTool.as=======199.999317/199.999317
 /**
 *一些字符串操作函数
 *@author ww
@@ -7300,7 +7243,6 @@ var StringTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/TimerControlTool.as=======199.999316/199.999316
 /**
 *全局时间速率控制类
 *@author ww
@@ -7347,7 +7289,6 @@ var TimerControlTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/TimeTool.as=======199.999315/199.999315
 /**
 *...
 *@author ww
@@ -7395,7 +7336,6 @@ var TimeTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/TouchDebugTools.as=======199.999314/199.999314
 /**
 *...
 *@author ww
@@ -7423,7 +7363,6 @@ var TouchDebugTools=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/TraceTool.as=======199.999313/199.999313
 /**
 *
 *@author ww
@@ -7603,7 +7542,6 @@ var TraceTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/UVTools.as=======199.999312/199.999312
 /**
 *...
 *@author ww
@@ -7644,7 +7582,6 @@ var UVTools$1=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/ValueChanger.as=======199.999311/199.999311
 /**
 *
 *@author ww
@@ -7715,7 +7652,6 @@ var ValueChanger=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/VisibleAnalyser.as=======199.999310/199.999310
 /**
 *...
 *@author ww
@@ -7877,7 +7813,6 @@ var VisibleAnalyser=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/WalkTools.as=======199.999309/199.999309
 /**
 *
 *@author ww
@@ -7935,7 +7870,6 @@ var WalkTools=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/Watcher.as=======199.999308/199.999308
 /**
 *本类用于监控对象值变化
 *@author ww
@@ -7990,7 +7924,6 @@ var Watcher=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/XML2Object.as=======199.999307/199.999307
 /**
 *XML转Object类
 *@author ww
@@ -8090,7 +8023,6 @@ var XML2Object=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/XML2ObjectNodejs.as=======199.999306/199.999306
 /**
 *XML转Object类
 *@author ww
@@ -8191,7 +8123,6 @@ var XML2ObjectNodejs=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/view/nodeInfo/NodeConsts.as=======199.999304/199.999304
 /**
 *...
 *@author ww
@@ -8206,7 +8137,6 @@ var NodeConsts=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/view/nodeInfo/NodeUtils.as=======199.999301/199.999301
 /**
 *...
 *@author ww
@@ -8558,7 +8488,6 @@ var NodeUtils=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/view/StyleConsts.as=======199.999298/199.999298
 /**
 *...
 *@author ww
@@ -8578,7 +8507,6 @@ var StyleConsts=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/Notice.as=======98.999317/98.999317
 /**
 *本类用于模块间消息传递
 *@author ww
@@ -8611,7 +8539,6 @@ var Notice=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/enginehook/LoaderHook.as=======97.999251/97.999251
 /**
 *...
 *@author ww
@@ -8687,7 +8614,6 @@ var LoaderHook=(function(_super){
 })(LoaderManager)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/comps/Arrow.as=======96.999336/96.999336
 /**
 *
 *@author ww
@@ -8716,7 +8642,6 @@ var Arrow=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/comps/ArrowLine.as=======96.999335/96.999335
 /**
 *
 *@author ww
@@ -8817,7 +8742,6 @@ var ArrowLine=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/comps/AutoSizeRec.as=======96.999334/96.999334
 /**
 *...
 *@author ww
@@ -8876,7 +8800,6 @@ var AutoSizeRec=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/comps/Axis.as=======96.999333/96.999333
 /**
 *
 *@author ww
@@ -9008,7 +8931,6 @@ var Axis=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/comps/Rect.as=======96.999332/96.999332
 /**
 *
 *@author ww
@@ -9043,7 +8965,6 @@ var Rect=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/DragBox.as=======96.999319/96.999319
 //class laya.debug.tools.DragBox extends laya.display.Sprite
 var DragBox=(function(_super){
 	function DragBox(type){
@@ -9266,7 +9187,6 @@ var DragBox=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/resizer/AutoFillRec.as=======96.999293/96.999293
 /**
 *自动根据大小填充自己全部区域的显示对象
 *@author ww
@@ -9316,7 +9236,6 @@ var AutoFillRec=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/view/nodeInfo/DebugInfoLayer.as=======96.999275/96.999275
 /**
 *...
 *@author ww
@@ -9376,7 +9295,6 @@ var DebugInfoLayer=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/view/nodeInfo/NodeInfoPanel.as=======96.999273/96.999273
 /**
 *...
 *@author ww
@@ -9501,7 +9419,6 @@ var NodeInfoPanel=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/view/nodeInfo/NodeInfosItem.as=======96.999272/96.999272
 /**
 *...
 *@author ww
@@ -9747,7 +9664,6 @@ var NodeInfosItem=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/view/nodeInfo/recinfos/NodeRecInfo.as=======96.999270/96.999270
 /**
 *...
 *@author ww
@@ -9807,7 +9723,6 @@ var NodeRecInfo=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/debugUI/DButton.as=======95.999275/95.999275
 /**
 *
 *@author ww
@@ -9829,7 +9744,6 @@ var DButton=(function(_super){
 })(Text)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/view/nodeInfo/recinfos/ReCacheRecInfo.as=======95.998569/95.998569
 /**
 *...
 *@author ww
@@ -9891,7 +9805,6 @@ var ReCacheRecInfo=(function(_super){
 })(NodeRecInfo)
 
 
-	//file:///D:/gittest/gittestnew/plugins/debugtool/src/laya/debug/tools/debugUI/DInput.as=======94.999223/94.999223
 /**
 *...
 *@author ww

@@ -7,7 +7,6 @@
 	var Loader=laya.net.Loader,MathUtil=laya.maths.MathUtil,Matrix=laya.maths.Matrix,Node=laya.display.Node,Rectangle=laya.maths.Rectangle;
 	var Render=laya.renders.Render,Resource=laya.resource.Resource,RunDriver=laya.utils.RunDriver,Sprite=laya.display.Sprite;
 	var Stat=laya.utils.Stat,Texture=laya.resource.Texture,Timer=laya.utils.Timer,URL=laya.net.URL,Utils=laya.utils.Utils;
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationContent.as=======199.999851/199.999851
 /**
 *@private
 *@author ...
@@ -27,7 +26,6 @@ var AnimationContent=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationNodeContent.as=======199.999850/199.999850
 /**
 *@private
 *@author ...
@@ -54,7 +52,6 @@ var AnimationNodeContent=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationParser01.as=======199.999849/199.999849
 /**
 *@private
 */
@@ -171,7 +168,6 @@ var AnimationParser01=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationParser02.as=======199.999848/199.999848
 /**
 *@private
 */
@@ -294,7 +290,6 @@ var AnimationParser02=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationState.as=======199.999846/199.999846
 /**
 *@private
 */
@@ -309,7 +304,6 @@ var AnimationState=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/Bone.as=======199.999844/199.999844
 /**
 *@private
 */
@@ -497,7 +491,6 @@ var Bone=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/BoneSlot.as=======199.999843/199.999843
 /**
 *@private
 */
@@ -955,7 +948,6 @@ var BoneSlot=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/canvasmesh/MeshData.as=======199.999842/199.999842
 /**
 *@private
 */
@@ -1003,7 +995,6 @@ var MeshData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/DeformAniData.as=======199.999840/199.999840
 /**
 *@private
 */
@@ -1019,7 +1010,6 @@ var DeformAniData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/DeformSlotData.as=======199.999839/199.999839
 /**
 *@private
 */
@@ -1034,7 +1024,6 @@ var DeformSlotData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/DeformSlotDisplayData.as=======199.999838/199.999838
 /**
 *@private
 */
@@ -1124,7 +1113,6 @@ var DeformSlotDisplayData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/DrawOrderData.as=======199.999837/199.999837
 /**
 *@private
 */
@@ -1140,7 +1128,6 @@ var DrawOrderData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/EventData.as=======199.999836/199.999836
 /**
 *@private
 */
@@ -1159,7 +1146,6 @@ var EventData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/IkConstraint.as=======199.999835/199.999835
 /**
 *@private
 */
@@ -1478,7 +1464,6 @@ var IkConstraint=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/IkConstraintData.as=======199.999834/199.999834
 /**
 *@private
 */
@@ -1500,7 +1485,6 @@ var IkConstraintData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/PathConstraint.as=======199.999833/199.999833
 /**
 *@private
 *路径作用器
@@ -2006,7 +1990,6 @@ var PathConstraint=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/PathConstraintData.as=======199.999832/199.999832
 /**
 *@private
 */
@@ -2031,7 +2014,6 @@ var PathConstraintData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/SkinData.as=======199.999830/199.999830
 /**
 *@private
 */
@@ -2047,7 +2029,6 @@ var SkinData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/SkinSlotDisplayData.as=======199.999829/199.999829
 /**
 *@private
 */
@@ -2107,7 +2088,6 @@ var SkinSlotDisplayData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/SlotData.as=======199.999828/199.999828
 /**
 *@private
 */
@@ -2135,7 +2115,6 @@ var SlotData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/TfConstraint.as=======199.999826/199.999826
 /**
 *@private
 */
@@ -2225,7 +2204,6 @@ var TfConstraint=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/TfConstraintData.as=======199.999825/199.999825
 //TODO:coverage
 //class laya.ani.bone.TfConstraintData
 var TfConstraintData=(function(){
@@ -2250,7 +2228,6 @@ var TfConstraintData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/Transform.as=======199.999824/199.999824
 /**
 *@private
 */
@@ -2329,7 +2306,6 @@ var Transform=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/UVTools.as=======199.999823/199.999823
 /**
 *用于UV转换的工具类
 *@private
@@ -2384,7 +2360,6 @@ var UVTools=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/KeyFramesContent.as=======199.999821/199.999821
 /**
 *@private
 *@author ...
@@ -2408,7 +2383,6 @@ var KeyFramesContent=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/math/BezierLerp.as=======199.999820/199.999820
 /**
 *@private
 *...
@@ -2457,7 +2431,6 @@ var BezierLerp=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationPlayer.as=======98.999836/98.999836
 /**
 *<code>AnimationPlayer</code> 类用于动画播放器。
 */
@@ -2919,7 +2892,6 @@ var AnimationPlayer=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/GraphicsAni.as=======98.999773/98.999773
 /**
 *@private
 */
@@ -2951,7 +2923,6 @@ var GraphicsAni=(function(_super){
 })(Graphics)
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/canvasmesh/SkinMeshForGraphic.as=======98.999683/98.999683
 /**
 *...
 *@author ww
@@ -2990,8 +2961,8 @@ var SkinMeshForGraphic=(function(_super){
 })(MeshData)
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/AnimationTemplet.as=======97.999737/97.999737
 /**
+*@private
 *<code>AnimationTemplet</code> 类用于动画模板资源。
 */
 //class laya.ani.AnimationTemplet extends laya.resource.Resource
@@ -3295,7 +3266,6 @@ var AnimationTemplet=(function(_super){
 })(Resource)
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/Skeleton.as=======96.999801/96.999801
 /**
 *骨骼动画由<code>Templet</code>，<code>AnimationPlayer</code>，<code>Skeleton</code>三部分组成。
 */
@@ -4309,7 +4279,6 @@ var Skeleton=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/swf/MovieClip.as=======96.999789/96.999789
 /**
 *<p> <code>MovieClip</code> 用于播放经过工具处理后的 swf 动画。</p>
 */
@@ -4771,7 +4740,6 @@ var MovieClip=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/ani/src/laya/ani/bone/Templet.as=======96.999564/96.999564
 /**
 *动画模板类
 */

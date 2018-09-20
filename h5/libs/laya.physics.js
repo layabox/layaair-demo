@@ -1531,15 +1531,13 @@ goog.exportProperty(box2d.b2TensorDampingController.prototype,"maxTimestep",box2
 box2d.b2TensorDampingController.prototype.Step=function(a){a=a.dt;if(!(a<=box2d.b2_epsilon)){a>this.maxTimestep&&0<this.maxTimestep&&(a=this.maxTimestep);for(var b=this.m_bodyList;b;b=b.nextBody){var c=b.body;if(c.IsAwake()){var d=c.GetWorldVector(box2d.b2Mul_M22_V2(this.T,c.GetLocalVector(c.GetLinearVelocity(),box2d.b2Vec2.s_t0),box2d.b2Vec2.s_t1),box2d.b2TensorDampingController.prototype.Step.s_damping);c.SetLinearVelocity(box2d.b2Add_V2_V2(c.GetLinearVelocity(),box2d.b2Mul_S_V2(a,d,box2d.b2Vec2.s_t0),
 box2d.b2Vec2.s_t1))}}}};box2d.b2TensorDampingController.prototype.Step.s_damping=new box2d.b2Vec2;box2d.b2TensorDampingController.prototype.SetAxisAligned=function(a,b){this.T.ex.x=-a;this.T.ex.y=0;this.T.ey.x=0;this.T.ey.y=-b;this.maxTimestep=0<a||0<b?1/box2d.b2Max(a,b):0};
 
-//# sourceMappingURL=../../../Box2D/Build/Box2D/box2d.map.json
-
+box2d.b2Vec2.SubVV=function(a, b, out) { out.x = a.x - b.x; out.y = a.y - b.y; return out; };
 (function(window,document,Laya){
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
 
 	var Browser=laya.utils.Browser,ClassUtils=laya.utils.ClassUtils,Component=laya.components.Component;
-	var Context=laya.resource.Context,Event=laya.events.Event,EventDispatcher=laya.events.EventDispatcher,Point=laya.maths.Point;
-	var Render=laya.renders.Render,Sprite=laya.display.Sprite,Utils=laya.utils.Utils;
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/ColliderBase.as=======98.999271/98.999271
+	var Context=laya.resource.Context,Event=laya.events.Event,EventDispatcher=laya.events.EventDispatcher,Graphics=laya.display.Graphics;
+	var Point=laya.maths.Point,Sprite=laya.display.Sprite,Utils=laya.utils.Utils;
 /**
 *碰撞体基类
 */
@@ -1690,7 +1688,6 @@ var ColliderBase=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/DistanceJoint.as=======98.999268/98.999268
 /**
 *距离关节：两个物体上面各自有一点，两点之间的距离固定不变
 */
@@ -1780,7 +1777,6 @@ var DistanceJoint=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/GearJoint.as=======98.999267/98.999267
 /**
 *齿轮关节：用来模拟两个齿轮间的约束关系，齿轮旋转时，产生的动量有两种输出方式，一种是齿轮本身的角速度，另一种是齿轮表面的线速度
 */
@@ -1840,9 +1836,8 @@ var GearJoint=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/MotorJoint.as=======98.999266/98.999266
 /**
-*距离关节：两个物体上面各自有一点，两点之间的距离固定不变
+*马达关节：用来限制两个刚体，使其相对位置和角度保持不变
 */
 //class laya.physics.joint.MotorJoint extends laya.components.Component
 var MotorJoint=(function(_super){
@@ -1944,7 +1939,6 @@ var MotorJoint=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/MouseJoint.as=======98.999265/98.999265
 /**
 *鼠标关节：鼠标关节用于通过鼠标来操控物体。它试图将物体拖向当前鼠标光标的位置。而在旋转方面就没有限制。
 */
@@ -2039,7 +2033,6 @@ var MouseJoint=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/PrismaticJoint.as=======98.999264/98.999264
 /**
 *平移关节：移动关节允许两个物体沿指定轴相对移动，它会阻止相对旋转
 */
@@ -2159,7 +2152,6 @@ var PrismaticJoint=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/PulleyJoint.as=======98.999263/98.999263
 /**
 *滑轮关节：它将两个物体接地(ground)并彼此连接，当一个物体上升，另一个物体就会下降
 */
@@ -2226,7 +2218,6 @@ var PulleyJoint=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/RevoluteJoint.as=======98.999262/98.999262
 /**
 *旋转关节强制两个物体共享一个锚点，两个物体相对旋转
 */
@@ -2344,7 +2335,6 @@ var RevoluteJoint=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/RopeJoint.as=======98.999261/98.999261
 /**
 *绳索关节：限制了两个点之间的最大距离。它能够阻止连接的物体之间的拉伸，即使在很大的负载下
 */
@@ -2410,7 +2400,6 @@ var RopeJoint=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/WeldJoint.as=======98.999260/98.999260
 /**
 *焊接关节：焊接关节的用途是使两个物体不能相对运动，受到关节的限制，两个刚体的相对位置和角度都保持不变，看上去像一个整体
 */
@@ -2485,7 +2474,6 @@ var WeldJoint=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/joint/WheelJoint.as=======98.999259/98.999259
 /**
 *轮子关节：围绕节点旋转，包含弹性属性，使得刚体在节点位置发生弹性偏移
 */
@@ -2595,9 +2583,15 @@ var WheelJoint=(function(_super){
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/RigidBody.as=======98.999254/98.999254
 /**
-*2D刚体
+*2D刚体，显示对象通过RigidBody和物理世界进行绑定，保持物理和显示对象之间的位置同步
+*物理世界的位置变化会自动同步到显示对象，显示对象本身的位移，旋转（父对象位移无效）也会自动同步到物理世界
+*由于引擎限制，暂时不支持以下情形：
+*1.不支持绑定节点缩放
+*2.不支持绑定节点的父节点缩放和旋转
+*3.不支持实时控制父对象位移，IDE内父对象位移是可以的
+*如果想整体位移物理世界，可以Physics.I.worldRoot=场景，然后移动场景即可
+*可以通过IDE-"项目设置" 开启物理辅助线显示，或者通过代码PhysicsDebugDraw.enable();
 */
 //class laya.physics.RigidBody extends laya.components.Component
 var RigidBody=(function(_super){
@@ -2615,8 +2609,8 @@ var RigidBody=(function(_super){
 		this._angularVelocity=0;
 		/**旋转速度阻尼系数，范围可以在0到无穷大之间，0表示没有阻尼，无穷大表示满阻尼，通常阻尼的值应该在0到0.1之间*/
 		this._angularDamping=0;
-		/**线性运动速度，比如10,10*/
-		this._linearVelocity=[0,0];
+		/**线性运动速度，比如{x:10,y:10}*/
+		this._linearVelocity={x:0,y:0};
 		/**线性速度阻尼系数，范围可以在0到无穷大之间，0表示没有阻尼，无穷大表示满阻尼，通常阻尼的值应该在0到0.1之间*/
 		this._linearDamping=0;
 		/**是否高速移动的物体，设置为true，可以防止高速穿透*/
@@ -2663,9 +2657,9 @@ var RigidBody=(function(_super){
 		def.fixedRotation=!this._allowRotation;
 		def.gravityScale=this._gravityScale;
 		def.linearDamping=this._linearDamping;
-		var arr=this._linearVelocity;
-		if (arr[0] !=0 || arr[1] !=0){
-			def.linearVelocity=new box2d.b2Vec2(arr[0],arr[1]);
+		var obj=this._linearVelocity;
+		if (obj && obj.x !=0 || obj.y !=0){
+			def.linearVelocity=new box2d.b2Vec2(obj.x,obj.y);
 		}
 		def.type=box2d.b2BodyType["b2_"+this._type+"Body"];
 		this.body=Physics.I._createBody(def);
@@ -2843,11 +2837,25 @@ var RigidBody=(function(_super){
 	}
 
 	/**
-	*质心的相对节点0,0点的位置偏移
+	*获得质心的相对节点0,0点的位置偏移
 	*/
 	__proto.getCenter=function(){
 		if (!this.body)this._onAwake();
-		return this.body.GetLocalCenter();
+		var p=this.body.GetLocalCenter();
+		p.x=p.x *Physics.PIXEL_RATIO;
+		p.y=p.y *Physics.PIXEL_RATIO;
+		return p;
+	}
+
+	/**
+	*获得质心的世界坐标，相对于Physics.I.worldRoot节点
+	*/
+	__proto.getWorldCenter=function(){
+		if (!this.body)this._onAwake();
+		var p=this.body.GetWorldCenter();
+		p.x=p.x *Physics.PIXEL_RATIO;
+		p.y=p.y *Physics.PIXEL_RATIO;
+		return p;
 	}
 
 	/**是否允许休眠，允许休眠能提高性能*/
@@ -2920,23 +2928,26 @@ var RigidBody=(function(_super){
 		if (this.body)this.body.SetAngularVelocity(value);
 	});
 
-	/**线性运动速度，比如[10,10]*/
+	/**线性运动速度，比如{x:5,y:5}*/
 	__getset(0,__proto,'linearVelocity',function(){
 		if (this.body){
 			var vec=this.body.GetLinearVelocity();
-			return [vec.x,vec.y];
+			return {x:vec.x,y:vec.y};
 		}
 		return this._linearVelocity;
 		},function(value){
+		if (!value)return;
+		if ((value instanceof Array)){
+			value={x:value[0],y:value[1]};
+		}
 		this._linearVelocity=value;
-		if (this.body)this.body.SetLinearVelocity(new window.box2d.b2Vec2(value[0],value[1]));
+		if (this.body)this.body.SetLinearVelocity(new window.box2d.b2Vec2(value.x,value.y));
 	});
 
 	return RigidBody;
 })(Component)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/Physics.as=======98.999250/98.999250
 /**
 *2D物理引擎，使用Box2d驱动
 */
@@ -2960,7 +2971,7 @@ var Physics=(function(_super){
 		this._eventList=[];
 		Physics.__super.call(this);
 		this.box2d=window.box2d;
-		ClassUtils.regShortClassName([BoxCollider,ChainCollider,CircleCollider,PolygonCollider,RigidBody,DistanceJoint,GearJoint,MotorJoint,MouseJoint,PrismaticJoint,PulleyJoint,RevoluteJoint,RopeJoint,WeldJoint,WheelJoint]);
+		ClassUtils.regShortClassName([BoxCollider,ChainCollider,CircleCollider,PolygonCollider,RigidBody,DistanceJoint,GearJoint,MotorJoint,MouseJoint,PrismaticJoint,PulleyJoint,RevoluteJoint,RopeJoint,WeldJoint,WheelJoint,PhysicsDebugDraw]);
 	}
 
 	__class(Physics,'laya.physics.Physics',_super);
@@ -3002,10 +3013,19 @@ var Physics=(function(_super){
 	}
 
 	__proto._sendEvent=function(type,contact){
+		var _$this=this;
 		var colliderA=contact.GetFixtureA().collider;
 		var colliderB=contact.GetFixtureB().collider;
 		var ownerA=colliderA.owner;
 		var ownerB=colliderB.owner;
+		contact.getHitInfo=function (){
+			var manifold=new _$this.box2d.b2WorldManifold();
+			this.GetWorldManifold(manifold);
+			var p=manifold.points[0];
+			p.x *=laya.physics.Physics.PIXEL_RATIO;
+			p.y *=laya.physics.Physics.PIXEL_RATIO;
+			return manifold;
+		}
 		if (ownerA){
 			var args=[colliderB,colliderA,contact];
 			if (type===0){
@@ -3129,6 +3149,7 @@ var Physics=(function(_super){
 	Physics.PIXEL_RATIO=50;
 	Physics._I=null;
 	Physics.__init$=function(){
+		/**@private */
 		//class ContactListener
 		ContactListener=(function(){
 			function ContactListener(){}
@@ -3153,7 +3174,6 @@ var Physics=(function(_super){
 })(EventDispatcher)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/BoxCollider.as=======97.998546/97.998546
 /**
 *2D矩形碰撞体
 */
@@ -3226,9 +3246,8 @@ var BoxCollider=(function(_super){
 })(ColliderBase)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/ChainCollider.as=======97.998544/97.998544
 /**
-*2D圆形碰撞体
+*2D线形碰撞体
 */
 //class laya.physics.ChainCollider extends laya.physics.ColliderBase
 var ChainCollider=(function(_super){
@@ -3305,7 +3324,6 @@ var ChainCollider=(function(_super){
 })(ColliderBase)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/CircleCollider.as=======97.998543/97.998543
 /**
 *2D圆形碰撞体
 */
@@ -3368,10 +3386,9 @@ var CircleCollider=(function(_super){
 })(ColliderBase)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/PolygonCollider.as=======97.998529/97.998529
 /**
 *2D多边形碰撞体，暂时不支持凹多边形，如果是凹多边形，先手动拆分为多个凸多边形
-*节点个数最多是b2_maxPolygonVertices，这数值默认是8，所以点的数量不建议超过8个
+*节点个数最多是b2_maxPolygonVertices，这数值默认是8，所以点的数量不建议超过8个，也不能小于3个
 */
 //class laya.physics.PolygonCollider extends laya.physics.ColliderBase
 var PolygonCollider=(function(_super){
@@ -3439,270 +3456,188 @@ var PolygonCollider=(function(_super){
 })(ColliderBase)
 
 
-	//file:///D:/gittest/gittestnew/physics/src/laya/physics/PhysicsDebugDraw.as=======96.999229/96.999229
 /**
-*@private webgl+非fixed模式有bug
-*box2d物理辅助线，调用PhysicsDebugDraw.enable()开启
+*物理辅助线，调用PhysicsDebugDraw.enable()开启，或者通过IDE设置打开
 */
 //class laya.physics.PhysicsDebugDraw extends laya.display.Sprite
 var PhysicsDebugDraw=(function(_super){
 	function PhysicsDebugDraw(){
+		/**@private */
 		this.m_drawFlags=99;
+		/**@private */
 		this.world=null;
-		this.m_ctx=null;
-		this.g_camera=null;
+		/**@private */
+		this._camera=null;
+		/**@private */
+		this._mG=null;
+		/**@private */
+		this._textSp=null;
+		/**@private */
+		this._textG=null;
+		/**@private */
+		this.lineWidth=NaN;
 		PhysicsDebugDraw.__super.call(this);
-		this.customRenderEnable=true;
 		if (!PhysicsDebugDraw._inited){
 			PhysicsDebugDraw._inited=true;
 			PhysicsDebugDraw.init();
 		}
-		this.g_camera={};
-		this.g_camera.m_center=new PhysicsDebugDraw.box2d.b2Vec2(0,0);
-		this.g_camera.m_extent=25;
-		this.g_camera.m_zoom=1;
-		this.g_camera.m_width=1280;
-		this.g_camera.m_height=800;
-		if (Render.isWebGL){
-			this.initInitCanvas();
-		}
+		this._camera={};
+		this._camera.m_center=new PhysicsDebugDraw.box2d.b2Vec2(0,0);
+		this._camera.m_extent=25;
+		this._camera.m_zoom=1;
+		this._camera.m_width=1280;
+		this._camera.m_height=800;
+		this._mG=new Graphics();
+		this.graphics=this._mG;
+		this._textSp=new Sprite();
+		this._textG=this._textSp.graphics;
+		this.addChild(this._textSp);
 	}
 
 	__class(PhysicsDebugDraw,'laya.physics.PhysicsDebugDraw',_super);
 	var __proto=PhysicsDebugDraw.prototype;
-	__proto.initInitCanvas=function(){
-		if (!PhysicsDebugDraw.canvas){
-			PhysicsDebugDraw.canvas=Browser.window.document.createElement("canvas");
-			this.m_ctx=PhysicsDebugDraw.canvas.getContext("2d");
-			PhysicsDebugDraw.canvas.width=Laya.stage.width;
-			PhysicsDebugDraw.canvas.height=Laya.stage.height;
-			var style;
-			style=PhysicsDebugDraw.canvas.style;
-			style.position="absolute";
-			style.pointerEvents="none";
-			style.left="0px";
-			style.top="0px";
-			style["z-index"]=999999;
-			Browser.window.document.body.appendChild(PhysicsDebugDraw.canvas);
-		}
+	/**@private */
+	__proto.render=function(ctx,x,y){
+		this._renderToGraphic();
+		_super.prototype.render.call(this,ctx,x,y);
 	}
 
-	__proto.customRender=function(context,x,y){
-		_super.prototype.customRender.call(this,context,x,y);
-		if (!Render.isWebGL){
-			this.m_ctx=context.ctx || context;
-			}else {
-			PhysicsDebugDraw.canvas.width=PhysicsDebugDraw.canvas.width;
-		}
+	/**@private */
+	__proto._renderToGraphic=function(){
 		if (this.world){
-			this.m_ctx.save();
-			this.m_ctx.scale(Physics.PIXEL_RATIO,Physics.PIXEL_RATIO);
-			this.m_ctx.lineWidth /=Physics.PIXEL_RATIO;
+			this._textG.clear();
+			this._mG.clear();
+			this._mG.save();
+			this._mG.scale(Physics.PIXEL_RATIO,Physics.PIXEL_RATIO);
+			this.lineWidth=1 / Physics.PIXEL_RATIO;
 			this.world.DrawDebugData();
-			this.m_ctx.restore();
+			this._mG.restore();
 		}
 	}
 
+	/**@private */
 	__proto.SetFlags=function(flags){
 		this.m_drawFlags=flags;
 	}
 
+	/**@private */
 	__proto.GetFlags=function(){
 		return this.m_drawFlags;
 	}
 
+	/**@private */
 	__proto.AppendFlags=function(flags){
 		this.m_drawFlags |=flags;
 	}
 
+	/**@private */
 	__proto.ClearFlags=function(flags){
 		this.m_drawFlags &=~flags;
 	}
 
+	/**@private */
 	__proto.PushTransform=function(xf){
-		var ctx=this.m_ctx;
-		if (ctx){
-			ctx.save();
-			ctx.translate(xf.p.x,xf.p.y);
-			ctx.rotate(xf.q.GetAngle());
-		}
+		this._mG.save();
+		this._mG.translate(xf.p.x,xf.p.y);
+		this._mG.rotate(xf.q.GetAngle());
 	}
 
+	/**@private */
 	__proto.PopTransform=function(xf){
-		var ctx=this.m_ctx;
-		if (ctx){
-			ctx.restore();
-		}
+		this._mG.restore();
 	}
 
+	/**@private */
 	__proto.DrawPolygon=function(vertices,vertexCount,color){
-		var ctx=this.m_ctx;
-		if (ctx){
-			ctx.beginPath();
-			ctx.moveTo(vertices[0].x,vertices[0].y);
-			for (var i=1;i < vertexCount;i++){
-				ctx.lineTo(vertices[i].x,vertices[i].y);
-			}
-			ctx.closePath();
-			ctx.strokeStyle=color.MakeStyleString(1);
-			ctx.stroke();
+		var i=0,len=0;
+		len=vertices.length;
+		var points;
+		points=[];
+		for (i=0;i < vertexCount;i++){
+			points.push(vertices[i].x,vertices[i].y);
 		}
+		this._mG.drawPoly(0,0,points,null,color.MakeStyleString(1),this.lineWidth);
 	}
 
+	/**@private */
 	__proto.DrawSolidPolygon=function(vertices,vertexCount,color){
-		var ctx=this.m_ctx;
-		if (ctx){
-			ctx.beginPath();
-			ctx.moveTo(vertices[0].x,vertices[0].y);
-			for (var i=1;i < vertexCount;i++){
-				ctx.lineTo(vertices[i].x,vertices[i].y);
-			}
-			ctx.closePath();
-			ctx.fillStyle=color.MakeStyleString(0.5);
-			ctx.fill();
-			ctx.strokeStyle=color.MakeStyleString(1);
-			ctx.stroke();
+		var i=0,len=0;
+		len=vertices.length;
+		var points;
+		points=[];
+		for (i=0;i < vertexCount;i++){
+			points.push(vertices[i].x,vertices[i].y);
 		}
+		this._mG.drawPoly(0,0,points,color.MakeStyleString(0.5),color.MakeStyleString(1),this.lineWidth);
 	}
 
+	/**@private */
 	__proto.DrawCircle=function(center,radius,color){
-		var ctx=this.m_ctx;
-		if (ctx){
-			ctx.beginPath();
-			ctx.arc(center.x,center.y,radius,0,PhysicsDebugDraw.box2d.b2_pi *2,true);
-			ctx.strokeStyle=color.MakeStyleString(1);
-			ctx.stroke();
-		}
+		this._mG.drawCircle(center.x,center.y,radius,null,color.MakeStyleString(1),this.lineWidth);
 	}
 
+	/**@private */
 	__proto.DrawSolidCircle=function(center,radius,axis,color){
-		var ctx=this.m_ctx;
-		if (ctx){
-			var cx=center.x;
-			var cy=center.y;
-			ctx.beginPath();
-			ctx.arc(cx,cy,radius,0,PhysicsDebugDraw.box2d.b2_pi *2,true);
-			ctx.moveTo(cx,cy);
-			ctx.lineTo((cx+axis.x *radius),(cy+axis.y *radius));
-			ctx.fillStyle=color.MakeStyleString(0.5);
-			ctx.fill();
-			ctx.strokeStyle=color.MakeStyleString(1);
-			ctx.stroke();
-		}
+		var cx=center.x;
+		var cy=center.y;
+		this._mG.drawCircle(cx,cy,radius,color.MakeStyleString(0.5),color.MakeStyleString(1),this.lineWidth);
+		this._mG.drawLine(cx,cy,(cx+axis.x *radius),(cy+axis.y *radius),color.MakeStyleString(1),this.lineWidth);
 	}
 
-	// #if B2_ENABLE_PARTICLE
+	/**@private */
 	__proto.DrawParticles=function(centers,radius,colors,count){
-		var ctx=this.m_ctx;
-		if (ctx){
-			if (colors!==null){
-				for (var i=0;i < count;++i){
-					var center=centers[i];
-					var color=colors[i];
-					ctx.fillStyle=color.MakeStyleString();
-					ctx.beginPath();
-					ctx.arc(center.x,center.y,radius,0,PhysicsDebugDraw.box2d.b2_pi *2,true);
-					ctx.fill();
-				}
-				}else {
-				ctx.fillStyle="rgba(255,255,255,0.5)";
-				for (i=0;i < count;++i){
-					center=centers[i];
-					ctx.beginPath();
-					ctx.arc(center.x,center.y,radius,0,PhysicsDebugDraw.box2d.b2_pi *2,true);
-					ctx.fill();
-				}
+		if (colors!==null){
+			for (var i=0;i < count;++i){
+				var center=centers[i];
+				var color=colors[i];
+				this._mG.drawCircle(center.x,center.y,radius,color.MakeStyleString(),null,this.lineWidth);
+			}
+			}else {
+			for (i=0;i < count;++i){
+				center=centers[i];
+				this._mG.drawCircle(center.x,center.y,radius,"#ffff00",null,this.lineWidth);
 			}
 		}
 	}
 
-	// #endif
+	/**@private */
 	__proto.DrawSegment=function(p1,p2,color){
-		var ctx=this.m_ctx;
-		if (ctx){
-			ctx.beginPath();
-			ctx.moveTo(p1.x,p1.y);
-			ctx.lineTo(p2.x,p2.y);
-			ctx.strokeStyle=color.MakeStyleString(1);
-			ctx.stroke();
-		}
+		this._mG.drawLine(p1.x,p1.y,p2.x,p2.y,color.MakeStyleString(1),this.lineWidth);
 	}
 
+	/**@private */
 	__proto.DrawTransform=function(xf){
-		var ctx=this.m_ctx;
-		if (ctx){
-			this.PushTransform(xf);
-			ctx.beginPath();
-			ctx.moveTo(0,0);
-			ctx.lineTo(1,0);
-			ctx.strokeStyle=PhysicsDebugDraw.box2d.b2Color.RED.MakeStyleString(1);
-			ctx.stroke();
-			ctx.beginPath();
-			ctx.moveTo(0,0);
-			ctx.lineTo(0,1);
-			ctx.strokeStyle=PhysicsDebugDraw.box2d.b2Color.GREEN.MakeStyleString(1);
-			ctx.stroke();
-			this.PopTransform(xf);
-		}
+		this.PushTransform(xf);
+		this._mG.drawLine(0,0,1,0,PhysicsDebugDraw.box2d.b2Color.RED.MakeStyleString(1),this.lineWidth);
+		this._mG.drawLine(0,0,0,1,PhysicsDebugDraw.box2d.b2Color.GREEN.MakeStyleString(1),this.lineWidth);
+		this.PopTransform(xf);
 	}
 
+	/**@private */
 	__proto.DrawPoint=function(p,size,color){
-		var ctx=this.m_ctx;
-		if (ctx){
-			ctx.fillStyle=color.MakeStyleString();
-			size *=this.g_camera.m_zoom;
-			size /=this.g_camera.m_extent;
-			var hsize=size / 2;
-			ctx.fillRect(p.x-hsize,p.y-hsize,size,size);
-		}
+		size *=this._camera.m_zoom;
+		size /=this._camera.m_extent;
+		var hsize=size / 2;
+		this._mG.drawRect(p.x-hsize,p.y-hsize,size,size,color.MakeStyleString(),null);
 	}
 
+	/**@private */
 	__proto.DrawString=function(x,y,message){
-		var ctx=this.m_ctx;
-		if (ctx){
-			ctx.save();
-			ctx.setTransform(1,0,0,1,0,0);
-			ctx.font="15px DroidSans";
-			var color=PhysicsDebugDraw.DrawString_s_color;
-			ctx.fillStyle=color.MakeStyleString();
-			ctx.fillText(message,x,y);
-			ctx.restore();
-		}
+		this._textG.fillText(message,x,y,"15px DroidSans",PhysicsDebugDraw.DrawString_s_color.MakeStyleString(),"left");
 	}
 
+	/**@private */
 	__proto.DrawStringWorld=function(x,y,message){
-		var ctx=this.m_ctx;
-		if (ctx){
-			var p=PhysicsDebugDraw.DrawStringWorld_s_p.Set(x,y);
-			var vt=this.g_camera.m_center;
-			PhysicsDebugDraw.box2d.b2Vec2.SubVV(p,vt,p);
-			var vs=this.g_camera.m_zoom;
-			PhysicsDebugDraw.box2d.b2Vec2.MulSV(1 / vs,p,p);
-			var cs=0.5 *this.g_camera.m_height / this.g_camera.m_extent;
-			PhysicsDebugDraw.box2d.b2Vec2.MulSV(cs,p,p);
-			p.y *=-1;
-			var cc=PhysicsDebugDraw.DrawStringWorld_s_cc.Set(0.5 *ctx.canvas.width,0.5 *ctx.canvas.height);
-			PhysicsDebugDraw.box2d.b2Vec2.AddVV(p,cc,p);
-			ctx.save();
-			ctx.setTransform(1,0,0,1,0,0);
-			ctx.font="15px DroidSans";
-			var color=PhysicsDebugDraw.DrawStringWorld_s_color;
-			ctx.fillStyle=color.MakeStyleString();
-			ctx.fillText(message,p.x,p.y);
-			ctx.restore();
-		}
+		this.DrawString(x,y,message);
 	}
 
+	/**@private */
 	__proto.DrawAABB=function(aabb,color){
-		var ctx=this.m_ctx;
-		if (ctx){
-			ctx.strokeStyle=color.MakeStyleString();
-			var x=aabb.lowerBound.x;
-			var y=aabb.lowerBound.y;
-			var w=aabb.upperBound.x-aabb.lowerBound.x;
-			var h=aabb.upperBound.y-aabb.lowerBound.y;
-			ctx.strokeRect(x,y,w,h);
-		}
+		var x=aabb.lowerBound.x;
+		var y=aabb.lowerBound.y;
+		var w=aabb.upperBound.x-aabb.lowerBound.x;
+		var h=aabb.upperBound.y-aabb.lowerBound.y;
+		this._mG.drawRect(x,y,w,h,null,color.MakeStyleString(),this.lineWidth);
 	}
 
 	PhysicsDebugDraw.init=function(){
@@ -3713,15 +3648,18 @@ var PhysicsDebugDraw=(function(_super){
 		PhysicsDebugDraw.DrawStringWorld_s_color=new PhysicsDebugDraw.box2d.b2Color(0.5,0.9,0.5);
 	}
 
-	PhysicsDebugDraw.enable=function(){
+	PhysicsDebugDraw.enable=function(flags){
+		(flags===void 0)&& (flags=99);
 		if (!PhysicsDebugDraw.I){
 			var debug=new PhysicsDebugDraw();
 			debug.world=Physics.I.world;
 			debug.world.SetDebugDraw(debug);
 			debug.zOrder=1000;
+			debug.m_drawFlags=flags;
 			Laya.stage.addChild(debug);
 			PhysicsDebugDraw.I=debug;
 		}
+		return debug;
 	}
 
 	PhysicsDebugDraw.box2d=null;
@@ -3729,7 +3667,7 @@ var PhysicsDebugDraw=(function(_super){
 	PhysicsDebugDraw.DrawStringWorld_s_p=null;
 	PhysicsDebugDraw.DrawStringWorld_s_cc=null;
 	PhysicsDebugDraw.DrawStringWorld_s_color=null;
-	PhysicsDebugDraw.canvas=null;
+	PhysicsDebugDraw._canvas=null;
 	PhysicsDebugDraw._inited=false;
 	PhysicsDebugDraw.I=null;
 	return PhysicsDebugDraw;

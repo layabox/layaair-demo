@@ -15,11 +15,8 @@
 	var Stage=laya.display.Stage,Stat=laya.utils.Stat,StringKey=laya.utils.StringKey,System=laya.system.System;
 	var Text=laya.display.Text,Texture=laya.resource.Texture,TransformCmd=laya.display.cmd.TransformCmd,TranslateCmd=laya.display.cmd.TranslateCmd;
 	var VectorGraphManager=laya.utils.VectorGraphManager,WordText=laya.utils.WordText;
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/submit/ISubmit.as=======1100000100.000031/1100000100.000031
 Laya.interface('laya.webgl.submit.ISubmit');
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/canvas/save/ISaveData.as=======1100000100.000020/1100000100.000020
 Laya.interface('laya.webgl.canvas.save.ISaveData');
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/canvas/save/SaveBase.as=======199.999685/200.999685
 //class laya.webgl.canvas.save.SaveBase
 var SaveBase=(function(){
 	function SaveBase(){
@@ -82,7 +79,6 @@ var SaveBase=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shader/d2/value/Value2D.as=======199.999781/199.999781
 //class laya.webgl.shader.d2.value.Value2D
 var Value2D=(function(){
 	function Value2D(mainID,subID){
@@ -210,7 +206,6 @@ var Value2D=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/AlphaCmdNative.as=======199.999728/199.999728
 /**
 *...
 *@author ww
@@ -267,7 +262,6 @@ var AlphaCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/ClipRectCmdNative.as=======199.999727/199.999727
 //class laya.layagl.cmdNative.ClipRectCmdNative
 var ClipRectCmdNative=(function(){
 	function ClipRectCmdNative(){
@@ -329,7 +323,6 @@ var ClipRectCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawCanvasCmdNative.as=======199.999726/199.999726
 /**
 *...
 *@author ww
@@ -496,7 +489,6 @@ var DrawCanvasCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawCircleCmdNative.as=======199.999725/199.999725
 /**
 *...
 *@author ww
@@ -1037,7 +1029,6 @@ var DrawCircleCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawCurvesCmdNative.as=======199.999724/199.999724
 /**
 *...
 *@author ww
@@ -1279,7 +1270,6 @@ var DrawCurvesCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawImageCmdNative.as=======199.999723/199.999723
 /**
 *...
 *@author ww
@@ -1428,7 +1418,6 @@ var DrawImageCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawLineCmdNative.as=======199.999722/199.999722
 /**
 *...
 *@author ww
@@ -1674,7 +1663,6 @@ var DrawLineCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawLinesCmdNative.as=======199.999721/199.999721
 /**
 *...
 *@author ww
@@ -1902,7 +1890,6 @@ var DrawLinesCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawParticleCmdNative.as=======199.999720/199.999720
 //class laya.layagl.cmdNative.DrawParticleCmdNative
 var DrawParticleCmdNative=(function(){
 	function DrawParticleCmdNative(){
@@ -2091,7 +2078,6 @@ var DrawParticleCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawPathCmdNative.as=======199.999719/199.999719
 /**
 *...
 *@author ww
@@ -2536,7 +2522,6 @@ var DrawPathCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawPieCmdNative.as=======199.999718/199.999718
 /**
 *...
 *@author ww
@@ -3040,7 +3025,6 @@ var DrawPieCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawPolyCmdNative.as=======199.999717/199.999717
 /**
 *...
 *@author ww
@@ -3479,7 +3463,6 @@ var DrawPolyCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawRectCmdNative.as=======199.999716/199.999716
 /**
 *...
 *@author ww
@@ -3801,7 +3784,6 @@ var DrawRectCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawTextureCmdNative.as=======199.999715/199.999715
 /**
 *...
 *@author ww
@@ -4086,7 +4068,6 @@ var DrawTextureCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawTexturesCmdNative.as=======199.999714/199.999714
 /**
 *...
 *@author ww
@@ -4269,7 +4250,6 @@ var DrawTexturesCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/DrawTrianglesCmdNative.as=======199.999713/199.999713
 /**
 *...
 *@author ww
@@ -4629,7 +4609,6 @@ var DrawTrianglesCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/FillBorderTextCmdNative.as=======199.999712/199.999712
 //class laya.layagl.cmdNative.FillBorderTextCmdNative
 var FillBorderTextCmdNative=(function(){
 	function FillBorderTextCmdNative(){
@@ -4790,7 +4769,6 @@ var FillBorderTextCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/FillBorderWordsCmdNative.as=======199.999711/199.999711
 /**
 *填充文字命令
 */
@@ -4892,7 +4870,6 @@ var FillBorderWordsCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/FillTextCmdNative.as=======199.999710/199.999710
 //class laya.layagl.cmdNative.FillTextCmdNative
 var FillTextCmdNative=(function(){
 	function FillTextCmdNative(){
@@ -5049,7 +5026,6 @@ var FillTextCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/FillWordsCmdNative.as=======199.999709/199.999709
 /**
 *填充文字命令
 */
@@ -5147,7 +5123,6 @@ var FillWordsCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/RestoreCmdNative.as=======199.999708/199.999708
 /**
 *...
 *@author ww
@@ -5184,7 +5159,6 @@ var RestoreCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/RotateCmdNative.as=======199.999707/199.999707
 /**
 *...
 *@author ww
@@ -5249,7 +5223,6 @@ var RotateCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/SaveCmdNative.as=======199.999706/199.999706
 /**
 *...
 *@author ww
@@ -5286,7 +5259,6 @@ var SaveCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/ScaleCmdNative.as=======199.999705/199.999705
 /**
 *...
 *@author ww
@@ -5359,7 +5331,6 @@ var ScaleCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/TransformCmdNative.as=======199.999704/199.999704
 /**
 *...
 *@author ww
@@ -5430,7 +5401,6 @@ var TransformCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/cmdNative/TranslateCmdNative.as=======199.999703/199.999703
 /**
 *...
 *@author ww
@@ -5487,7 +5457,6 @@ var TranslateCmdNative=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/CommandEncoder.as=======199.999702/199.999702
 /**
 *@private
 *CommandEncoder
@@ -5536,7 +5505,6 @@ var CommandEncoder=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/ConchCmdReplace.as=======199.999701/199.999701
 /**
 *...
 *@author ww
@@ -5560,7 +5528,6 @@ var ConchCmdReplace=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/ConchGraphicsAdpt.as=======199.999700/199.999700
 /**
 *...
 *@author ww
@@ -5611,7 +5578,6 @@ var ConchGraphicsAdpt=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/LayaGL.as=======199.999697/199.999697
 /**
 *@private
 *封装GL命令
@@ -5677,7 +5643,6 @@ var LayaGL=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/LayaGLRenderingContext.as=======199.999696/199.999696
 /**
 *@private
 *封装GL命令
@@ -5814,7 +5779,6 @@ var LayaGLRenderingContext=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/LayaGLRunner.as=======199.999695/199.999695
 /**
 *@private
 *普通命令执行器
@@ -5859,7 +5823,6 @@ var LayaGLRunner=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/LayaGLTemplate.as=======199.999694/199.999694
 /**
 *@private
 *命令模板，用来优化合并命令执行
@@ -5970,7 +5933,6 @@ var LayaGLTemplate=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/LayaNative2D.as=======199.999693/199.999693
 /**
 *...
 *@author James
@@ -6089,7 +6051,6 @@ var LayaNative2D=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/MatrixConch.as=======199.999692/199.999692
 /**
 *<p> <code>Matrix</code> 类表示一个转换矩阵，它确定如何将点从一个坐标空间映射到另一个坐标空间。</p>
 *<p>您可以对一个显示对象执行不同的图形转换，方法是设置 Matrix 对象的属性，将该 Matrix 对象应用于 Transform 对象的 matrix 属性，然后应用该 Transform 对象作为显示对象的 transform 属性。这些转换函数包括平移（x 和 y 重新定位）、旋转、缩放和倾斜。</p>
@@ -6554,7 +6515,6 @@ var MatrixConch=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/QuickTestTool.as=======199.999691/199.999691
 /**
 *...
 *@author ww
@@ -6675,7 +6635,6 @@ var QuickTestTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/canvas/BlendMode.as=======199.999690/199.999690
 //class laya.webgl.canvas.BlendMode
 var BlendMode=(function(){
 	function BlendMode(){}
@@ -6759,7 +6718,6 @@ var BlendMode=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/canvas/DrawStyle.as=======199.999689/199.999689
 //class laya.webgl.canvas.DrawStyle
 var DrawStyle=(function(){
 	function DrawStyle(value){
@@ -6807,7 +6765,6 @@ var DrawStyle=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/canvas/Path.as=======199.999688/199.999688
 //class laya.webgl.canvas.Path
 var Path=(function(){
 	var renderPath;
@@ -6880,7 +6837,6 @@ var Path=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/canvas/save/SaveClipRect.as=======199.999684/199.999684
 //class laya.webgl.canvas.save.SaveClipRect
 var SaveClipRect=(function(){
 	function SaveClipRect(){
@@ -6917,7 +6873,6 @@ var SaveClipRect=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/canvas/save/SaveMark.as=======199.999683/199.999683
 //class laya.webgl.canvas.save.SaveMark
 var SaveMark=(function(){
 	function SaveMark(){
@@ -6952,7 +6907,6 @@ var SaveMark=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/canvas/save/SaveTransform.as=======199.999682/199.999682
 //class laya.webgl.canvas.save.SaveTransform
 var SaveTransform=(function(){
 	function SaveTransform(){
@@ -6986,7 +6940,6 @@ var SaveTransform=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/canvas/save/SaveTranslate.as=======199.999681/199.999681
 //class laya.webgl.canvas.save.SaveTranslate
 var SaveTranslate=(function(){
 	function SaveTranslate(){
@@ -7015,7 +6968,6 @@ var SaveTranslate=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/resource/CharBook.as=======199.999677/199.999677
 /**
 *key:font
 *下面是各种大小的page
@@ -7573,7 +7525,6 @@ var CharBook=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/resource/CharInternalTexture.as=======199.999675/199.999675
 /**
 *由于drawTextureM需要一个Texture对象，又不想真的弄一个，所以，做个假的，只封装必须成员
 */
@@ -7599,7 +7550,6 @@ var CharInternalTexture=(function(){
 
 
 ;
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/resource/CharPages.as=======199.999674/199.999674
 /**
 *管理若干张CharPageTexture
 *里面的字体属于相同字体，相同大小
@@ -7842,7 +7792,6 @@ var CharPages=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/resource/CharRenderInfo.as=======199.999672/199.999672
 /**
 *TODO如果占用内存较大,这个结构有很多成员可以临时计算
 */
@@ -7886,7 +7835,6 @@ var CharRenderInfo=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/resource/ICharRender.as=======199.999670/199.999670
 //class laya.webgl.resource.ICharRender
 var ICharRender=(function(){
 	function ICharRender(){}
@@ -7909,7 +7857,6 @@ var ICharRender=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/resource/WebGLRTMgr.as=======199.999666/199.999666
 /**
 *WebGLRTMgr 管理WebGLRenderTarget的创建和回收
 */
@@ -7952,7 +7899,6 @@ var WebGLRTMgr=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shader/d2/Shader2D.as=======199.999665/199.999665
 //class laya.webgl.shader.d2.Shader2D
 var Shader2D=(function(){
 	function Shader2D(){
@@ -7993,7 +7939,6 @@ var Shader2D=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shader/ShaderDefinesBase.as=======199.999662/199.999662
 //class laya.webgl.shader.ShaderDefinesBase
 var ShaderDefinesBase=(function(){
 	function ShaderDefinesBase(name2int,int2name,int2nameMap){
@@ -8083,7 +8028,6 @@ var ShaderDefinesBase=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shader/d2/skinAnishader/SkinMeshBuffer.as=======199.999661/199.999661
 //class laya.webgl.shader.d2.skinAnishader.SkinMeshBuffer
 var SkinMeshBuffer=(function(){
 	function SkinMeshBuffer(){
@@ -8115,7 +8059,6 @@ var SkinMeshBuffer=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shader/ShaderValue.as=======199.999657/199.999657
 //class laya.webgl.shader.ShaderValue
 var ShaderValue=(function(){
 	function ShaderValue(){}
@@ -8124,12 +8067,11 @@ var ShaderValue=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shapes/BasePoly.as=======199.999656/199.999656
 //class laya.webgl.shapes.BasePoly
 var BasePoly=(function(){
 	function BasePoly(){}
 	__class(BasePoly,'laya.webgl.shapes.BasePoly');
-	BasePoly.createLine2=function(p,indices,lineWidth,indexBase,outVertex,loop){
+	BasePoly.createLine2=function(p,indices,lineWidth,indexBase,outVertex,loop,mat){
 		if (p.length < 4)return null;
 		var points=BasePoly.tempData.length>(p.length+2)?BasePoly.tempData:new Array(p.length+2);
 		points[0]=p[0];points[1]=p[1];
@@ -8160,6 +8102,11 @@ var BasePoly=(function(){
 		dist=Math.sqrt(perpx *perpx+perpy *perpy);
 		perpx=perpx / dist *w;
 		perpy=perpy / dist *w;
+		var tpx=perpx,tpy=perpy;
+		if(mat){
+			perpx=mat.a *tpx+mat.c *tpy;
+			perpy=mat.b *tpx+mat.d *tpy;
+		}
 		result.push(p1x-perpx ,p1y-perpy ,p1x+perpx ,p1y+perpy);
 		for (i=1;i < length-1;i++){
 			p1x=points[(i-1)*2];
@@ -8173,11 +8120,21 @@ var BasePoly=(function(){
 			dist=Math.sqrt(perpx *perpx+perpy *perpy);
 			perpx=perpx / dist *w;
 			perpy=perpy / dist *w;
+			if(mat){
+				tpx=perpx,tpy=perpy;
+				perpx=mat.a *tpx+mat.c *tpy;
+				perpy=mat.b *tpx+mat.d *tpy;
+			}
 			perp2x=-(p2y-p3y);
 			perp2y=p2x-p3x;
 			dist=Math.sqrt(perp2x *perp2x+perp2y *perp2y);
 			perp2x=perp2x / dist *w;
 			perp2y=perp2y / dist *w;
+			if(mat){
+				tpx=perp2x,tpy=perp2y;
+				perp2x=mat.a *tpx+mat.c *tpy;
+				perp2y=mat.b *tpx+mat.d *tpy;
+			}
 			a1=(-perpy+p1y)-(-perpy+p2y);
 			b1=(-perpx+p2x)-(-perpx+p1x);
 			c1=(-perpx+p1x)*(-perpy+p2y)-(-perpx+p2x)*(-perpy+p1y);
@@ -8204,6 +8161,11 @@ var BasePoly=(function(){
 		dist=Math.sqrt(perpx *perpx+perpy *perpy);
 		perpx=perpx / dist *w;
 		perpy=perpy / dist *w;
+		if(mat){
+			tpx=perpx,tpy=perpy;
+			perpx=mat.a *tpx+mat.c *tpy;
+			perpy=mat.b *tpx+mat.d *tpy;
+		}
 		result.push(p2x-perpx ,p2y-perpy ,p2x+perpx ,p2y+perpy);
 		for (i=1;i < length;i++){
 			indices.push(indexBase+(i-1)*2,indexBase+(i-1)*2+1,indexBase+i *2+1,indexBase+i *2+1,indexBase+i *2,indexBase+(i-1)*2);
@@ -8281,7 +8243,6 @@ var BasePoly=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shapes/Earcut.as=======199.999655/199.999655
 //class laya.webgl.shapes.Earcut
 var Earcut=(function(){
 	function Earcut(){}
@@ -8713,7 +8674,6 @@ var Earcut=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shapes/EarcutNode.as=======199.999654/199.999654
 //class laya.webgl.shapes.EarcutNode
 var EarcutNode=(function(){
 	function EarcutNode(i,x,y){
@@ -8742,7 +8702,6 @@ var EarcutNode=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/submit/Submit.as=======199.999652/199.999652
 //class laya.webgl.submit.Submit
 var Submit=(function(){
 	function Submit(renderType){
@@ -8916,7 +8875,6 @@ var Submit=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/submit/SubmitCMD.as=======199.999650/199.999650
 //class laya.webgl.submit.SubmitCMD
 var SubmitCMD=(function(){
 	function SubmitCMD(){
@@ -8973,7 +8931,6 @@ var SubmitCMD=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/submit/SubmitKey.as=======199.999649/199.999649
 /**
 *...
 *@author xie
@@ -9032,7 +8989,6 @@ var SubmitKey=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/submit/SubmitTarget.as=======199.999648/199.999648
 //class laya.webgl.submit.SubmitTarget
 var SubmitTarget=(function(){
 	function SubmitTarget(){
@@ -9120,7 +9076,6 @@ var SubmitTarget=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/text/ArabicReshaper.as=======199.999646/199.999646
 /**
 *Javascript Arabic Reshaper by Louy Alakkad
 *https://github.com/louy/Javascript-Arabic-Reshaper
@@ -9359,7 +9314,6 @@ var ArabicReshaper=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/CONST3D2D.as=======199.999643/199.999643
 //class laya.webgl.utils.CONST3D2D
 var CONST3D2D=(function(){
 	function CONST3D2D(){}
@@ -9376,7 +9330,6 @@ var CONST3D2D=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/MatirxArray.as=======199.999641/199.999641
 //class laya.webgl.utils.MatirxArray
 var MatirxArray=(function(){
 	function MatirxArray(){}
@@ -9415,7 +9368,6 @@ var MatirxArray=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/Mesh2D.as=======199.999640/199.999640
 /**
 *Mesh2d只是保存数据。描述attribute用的。本身不具有渲染功能。
 */
@@ -9593,7 +9545,6 @@ var Mesh2D=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/RenderState2D.as=======199.999634/199.999634
 //class laya.webgl.utils.RenderState2D
 var RenderState2D=(function(){
 	function RenderState2D(){}
@@ -9651,7 +9602,6 @@ var RenderState2D=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/ShaderCompile.as=======199.999633/199.999633
 /**
 *@private
 *<code>ShaderCompile</code> 类用于实现Shader编译。
@@ -10068,7 +10018,6 @@ var ShaderCompile=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/VertexArrayObject.as=======199.999629/199.999629
 /**
 *...
 *@author ...
@@ -10082,7 +10031,6 @@ var VertexArrayObject=(function(){
 
 
 /*__JS__ */(function(){var glErrorShadow={};function error(msg){if(window.console&&window.console.error){window.console.error(msg)}}function log(msg){if(window.console&&window.console.log){window.console.log(msg)}}function synthesizeGLError(err,opt_msg){glErrorShadow[err]=true;if(opt_msg!==undefined){error(opt_msg)}}function wrapGLError(gl){var f=gl.getError;gl.getError=function(){var err;do{err=f.apply(gl);if(err!=gl.NO_ERROR){glErrorShadow[err]=true}}while(err!=gl.NO_ERROR);for(var err in glErrorShadow){if(glErrorShadow[err]){delete glErrorShadow[err];return parseInt(err)}}return gl.NO_ERROR}}var WebGLVertexArrayObjectOES=function WebGLVertexArrayObjectOES(ext){var gl=ext.gl;this.ext=ext;this.isAlive=true;this.hasBeenBound=false;this.elementArrayBuffer=null;this.attribs=new Array(ext.maxVertexAttribs);for(var n=0;n<this.attribs.length;n++){var attrib=new WebGLVertexArrayObjectOES.VertexAttrib(gl);this.attribs[n]=attrib}this.maxAttrib=0};WebGLVertexArrayObjectOES.VertexAttrib=function VertexAttrib(gl){this.enabled=false;this.buffer=null;this.size=4;this.type=gl.FLOAT;this.normalized=false;this.stride=16;this.offset=0;this.cached="";this.recache()};WebGLVertexArrayObjectOES.VertexAttrib.prototype.recache=function recache(){this.cached=[this.size,this.type,this.normalized,this.stride,this.offset].join(":")};var OESVertexArrayObject=function OESVertexArrayObject(gl){var self=this;this.gl=gl;wrapGLError(gl);var original=this.original={getParameter:gl.getParameter,enableVertexAttribArray:gl.enableVertexAttribArray,disableVertexAttribArray:gl.disableVertexAttribArray,bindBuffer:gl.bindBuffer,getVertexAttrib:gl.getVertexAttrib,vertexAttribPointer:gl.vertexAttribPointer};gl.getParameter=function getParameter(pname){if(pname==self.VERTEX_ARRAY_BINDING_OES){if(self.currentVertexArrayObject==self.defaultVertexArrayObject){return null}else{return self.currentVertexArrayObject}}return original.getParameter.apply(this,arguments)};gl.enableVertexAttribArray=function enableVertexAttribArray(index){var vao=self.currentVertexArrayObject;vao.maxAttrib=Math.max(vao.maxAttrib,index);var attrib=vao.attribs[index];attrib.enabled=true;return original.enableVertexAttribArray.apply(this,arguments)};gl.disableVertexAttribArray=function disableVertexAttribArray(index){var vao=self.currentVertexArrayObject;vao.maxAttrib=Math.max(vao.maxAttrib,index);var attrib=vao.attribs[index];attrib.enabled=false;return original.disableVertexAttribArray.apply(this,arguments)};gl.bindBuffer=function bindBuffer(target,buffer){switch(target){case gl.ARRAY_BUFFER:self.currentArrayBuffer=buffer;break;case gl.ELEMENT_ARRAY_BUFFER:self.currentVertexArrayObject.elementArrayBuffer=buffer;break}return original.bindBuffer.apply(this,arguments)};gl.getVertexAttrib=function getVertexAttrib(index,pname){var vao=self.currentVertexArrayObject;var attrib=vao.attribs[index];switch(pname){case gl.VERTEX_ATTRIB_ARRAY_BUFFER_BINDING:return attrib.buffer;case gl.VERTEX_ATTRIB_ARRAY_ENABLED:return attrib.enabled;case gl.VERTEX_ATTRIB_ARRAY_SIZE:return attrib.size;case gl.VERTEX_ATTRIB_ARRAY_STRIDE:return attrib.stride;case gl.VERTEX_ATTRIB_ARRAY_TYPE:return attrib.type;case gl.VERTEX_ATTRIB_ARRAY_NORMALIZED:return attrib.normalized;default:return original.getVertexAttrib.apply(this,arguments)}};gl.vertexAttribPointer=function vertexAttribPointer(indx,size,type,normalized,stride,offset){var vao=self.currentVertexArrayObject;vao.maxAttrib=Math.max(vao.maxAttrib,indx);var attrib=vao.attribs[indx];attrib.buffer=self.currentArrayBuffer;attrib.size=size;attrib.type=type;attrib.normalized=normalized;attrib.stride=stride;attrib.offset=offset;attrib.recache();return original.vertexAttribPointer.apply(this,arguments)};if(gl.instrumentExtension){gl.instrumentExtension(this,"OES_vertex_array_object")}gl.canvas.addEventListener("webglcontextrestored",function(){log("OESVertexArrayObject emulation library context restored");self.reset_()},true);this.reset_()};OESVertexArrayObject.prototype.VERTEX_ARRAY_BINDING_OES=34229;OESVertexArrayObject.prototype.reset_=function reset_(){var contextWasLost=this.vertexArrayObjects!==undefined;if(contextWasLost){for(var ii=0;ii<this.vertexArrayObjects.length;++ii){this.vertexArrayObjects.isAlive=false}}var gl=this.gl;this.maxVertexAttribs=gl.getParameter(gl.MAX_VERTEX_ATTRIBS);this.defaultVertexArrayObject=new WebGLVertexArrayObjectOES(this);this.currentVertexArrayObject=null;this.currentArrayBuffer=null;this.vertexArrayObjects=[this.defaultVertexArrayObject];this.bindVertexArrayOES(null)};OESVertexArrayObject.prototype.createVertexArrayOES=function createVertexArrayOES(){var arrayObject=new WebGLVertexArrayObjectOES(this);this.vertexArrayObjects.push(arrayObject);return arrayObject};OESVertexArrayObject.prototype.deleteVertexArrayOES=function deleteVertexArrayOES(arrayObject){arrayObject.isAlive=false;this.vertexArrayObjects.splice(this.vertexArrayObjects.indexOf(arrayObject),1);if(this.currentVertexArrayObject==arrayObject){this.bindVertexArrayOES(null)}};OESVertexArrayObject.prototype.isVertexArrayOES=function isVertexArrayOES(arrayObject){if(arrayObject&&arrayObject instanceof WebGLVertexArrayObjectOES){if(arrayObject.hasBeenBound&&arrayObject.ext==this){return true}}return false};OESVertexArrayObject.prototype.bindVertexArrayOES=function bindVertexArrayOES(arrayObject){var gl=this.gl;if(arrayObject&&!arrayObject.isAlive){synthesizeGLError(gl.INVALID_OPERATION,"bindVertexArrayOES: attempt to bind deleted arrayObject");return}var original=this.original;var oldVAO=this.currentVertexArrayObject;this.currentVertexArrayObject=arrayObject||this.defaultVertexArrayObject;this.currentVertexArrayObject.hasBeenBound=true;var newVAO=this.currentVertexArrayObject;if(oldVAO==newVAO){return}if(!oldVAO||newVAO.elementArrayBuffer!=oldVAO.elementArrayBuffer){original.bindBuffer.call(gl,gl.ELEMENT_ARRAY_BUFFER,newVAO.elementArrayBuffer)}var currentBinding=this.currentArrayBuffer;var maxAttrib=Math.max(oldVAO?oldVAO.maxAttrib:0,newVAO.maxAttrib);for(var n=0;n<=maxAttrib;n++){var attrib=newVAO.attribs[n];var oldAttrib=oldVAO?oldVAO.attribs[n]:null;if(!oldVAO||attrib.enabled!=oldAttrib.enabled){if(attrib.enabled){original.enableVertexAttribArray.call(gl,n)}else{original.disableVertexAttribArray.call(gl,n)}}if(attrib.enabled){var bufferChanged=false;if(!oldVAO||attrib.buffer!=oldAttrib.buffer){if(currentBinding!=attrib.buffer){original.bindBuffer.call(gl,gl.ARRAY_BUFFER,attrib.buffer);currentBinding=attrib.buffer}bufferChanged=true}if(bufferChanged||attrib.cached!=oldAttrib.cached){original.vertexAttribPointer.call(gl,n,attrib.size,attrib.type,attrib.normalized,attrib.stride,attrib.offset)}}}if(this.currentArrayBuffer!=currentBinding){original.bindBuffer.call(gl,gl.ARRAY_BUFFER,this.currentArrayBuffer)}};window._setupVertexArrayObject=function(gl){var original_getSupportedExtensions=gl.getSupportedExtensions;gl.getSupportedExtensions=function getSupportedExtensions(){var list=original_getSupportedExtensions.call(this)||[];if(list.indexOf("OES_vertex_array_object")<0){list.push("OES_vertex_array_object")}return list};var original_getExtension=gl.getExtension;gl.getExtension=function getExtension(name){var ext=original_getExtension.call(this,name);if(ext){return ext}if(name!=="OES_vertex_array_object"){return null}if(!this.__OESVertexArrayObject){console.log("Setup OES_vertex_array_object polyfill");this.__OESVertexArrayObject=new OESVertexArrayObject(this)}return this.__OESVertexArrayObject}};window._forceSetupVertexArrayObject=function(gl){var original_getSupportedExtensions=gl.getSupportedExtensions;gl.getSupportedExtensions=function getSupportedExtensions(){var list=original_getSupportedExtensions.call(this)||[];if(list.indexOf("OES_vertex_array_object")<0){list.push("OES_vertex_array_object")}return list};var original_getExtension=gl.getExtension;gl.getExtension=function getExtension(name){if(name==="OES_vertex_array_object"){if(!this.__OESVertexArrayObject){console.log("Setup OES_vertex_array_object polyfill");this.__OESVertexArrayObject=new OESVertexArrayObject(this)}return this.__OESVertexArrayObject}else{var ext=original_getExtension.call(this,name);if(ext){return ext}else{return null}}}}}());;
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/WebGL.as=======199.999628/199.999628
 /**
 *@private
 */
@@ -10395,6 +10343,9 @@ var WebGL=(function(){
 	}
 
 	WebGL.enable=function(){
+		Browser.__init__();
+		if (!Browser._supportWebGL)
+			return false;
 		if (Render.isConchApp){
 			WebGL._nativeRender_enable();
 			}else {
@@ -10418,7 +10369,6 @@ var WebGL=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/WebGLContext.as=======199.999627/199.999627
 //class laya.webgl.WebGLContext
 var WebGLContext=(function(){
 	function WebGLContext(){}
@@ -11058,7 +11008,6 @@ var WebGLContext=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/canvas/WebGLContext2D.as=======98.999582/98.999582
 //class laya.webgl.canvas.WebGLContext2D extends laya.resource.Context
 var WebGLContext2D=(function(_super){
 	var ContextParams;
@@ -11813,7 +11762,6 @@ var WebGLContext2D=(function(_super){
 		RenderState2D.worldAlpha=1;
 		BaseShader.activeShader=null;
 		target.start();
-		Config.showCanvasMark ? target.clear(0,1,0,0.3):target.clear(0,0,0,0);
 		context._curSubmit=Submit.RENDERBASE;
 		context.flush();
 		context.clear();
@@ -11853,14 +11801,6 @@ var WebGLContext2D=(function(_super){
 			mat.transformPoint(Point.TEMP.setTo(x,y));
 			mat.translate(Point.TEMP.x+tx,Point.TEMP.y+ty);
 			this._curSubmit=Submit.RENDERBASE;
-		}
-		if (Config.showCanvasMark){
-			this.save();
-			this.lineWidth=4;
-			this.strokeStyle=src._targets ? "yellow" :"green";
-			this.strokeRect(x-1,y-1,width+2,height+2,1);
-			this.strokeRect(x,y,width,height,1);
-			this.restore();
 		}
 	}
 
@@ -12235,7 +12175,7 @@ var WebGLContext2D=(function(_super){
 					this.meshlist.push(this._pathMesh);
 					this._curSubmit=this.addVGSubmit(this._pathMesh);
 				}
-				BasePoly.createLine2(p.path,idx,this.lineWidth,this._pathMesh.vertNum,vertex,p.loop);
+				BasePoly.createLine2(p.path,idx,this.lineWidth,this._pathMesh.vertNum,vertex,p.loop,this._curMat);
 				this._pathMesh.addVertAndIBToMesh(this,vertex,rgba,idx);
 				curEleNum+=idx.length;
 			}
@@ -12404,14 +12344,12 @@ var WebGLContext2D=(function(_super){
 					da-=Math.PI *2;
 				}
 			}
-		}
-		if (r < 101){
-			ndivs=Math.max(10,da *r / 5);
-			}else if (r < 201){
-			ndivs=Math.max(10,da *r / 20);
-			}else {
-			ndivs=Math.max(10,da *r / 40);
-		}
+		};
+		var sx=this.getMatScaleX();
+		var sy=this.getMatScaleY();
+		var sr=r *(sx > sy?sx:sy);
+		var cl=2 *Math.PI *sr;
+		ndivs=(Math.max(cl / 10,10))|0;
 		hda=(da / ndivs)/ 2.0;
 		kappa=Math.abs(4 / 3 *(1-Math.cos(hda))/ Math.sin(hda));
 		if (counterclockwise)
@@ -12644,7 +12582,6 @@ var WebGLContext2D=(function(_super){
 })(Context)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/RenderSprite3D.as=======98.999540/98.999540
 //class laya.webgl.utils.RenderSprite3D extends laya.renders.RenderSprite
 var RenderSprite3D=(function(_super){
 	function RenderSprite3D(type,next){
@@ -12744,7 +12681,6 @@ var RenderSprite3D=(function(_super){
 })(RenderSprite)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shader/d2/skinAnishader/SkinSV.as=======98.999441/98.999441
 //class laya.webgl.shader.d2.skinAnishader.SkinSV extends laya.webgl.shader.d2.value.Value2D
 var SkinSV=(function(_super){
 	function SkinSV(type){
@@ -12764,7 +12700,6 @@ var SkinSV=(function(_super){
 })(Value2D)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shader/d2/value/PrimitiveSV.as=======98.999440/98.999440
 //class laya.webgl.shader.d2.value.PrimitiveSV extends laya.webgl.shader.d2.value.Value2D
 var PrimitiveSV=(function(_super){
 	function PrimitiveSV(args){
@@ -12777,7 +12712,6 @@ var PrimitiveSV=(function(_super){
 })(Value2D)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shader/d2/value/TextureSV.as=======98.999439/98.999439
 //class laya.webgl.shader.d2.value.TextureSV extends laya.webgl.shader.d2.value.Value2D
 var TextureSV=(function(_super){
 	function TextureSV(subID){
@@ -12804,7 +12738,6 @@ var TextureSV=(function(_super){
 })(Value2D)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/resource/CharRender_Canvas.as=======98.999341/98.999341
 //class laya.webgl.resource.CharRender_Canvas extends laya.webgl.resource.ICharRender
 var CharRender_Canvas=(function(_super){
 	function CharRender_Canvas(){
@@ -12931,7 +12864,6 @@ var CharRender_Canvas=(function(_super){
 })(ICharRender)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/resource/CharRender_Native.as=======98.999339/98.999339
 //class laya.webgl.resource.CharRender_Native extends laya.webgl.resource.ICharRender
 var CharRender_Native=(function(_super){
 	function CharRender_Native(){
@@ -12975,7 +12907,6 @@ var CharRender_Native=(function(_super){
 })(ICharRender)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shader/d2/ShaderDefines2D.as=======98.999325/98.999325
 //class laya.webgl.shader.d2.ShaderDefines2D extends laya.webgl.shader.ShaderDefinesBase
 var ShaderDefines2D=(function(_super){
 	function ShaderDefines2D(){
@@ -13025,7 +12956,6 @@ var ShaderDefines2D=(function(_super){
 })(ShaderDefinesBase)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/submit/SubmitCanvas.as=======98.999303/98.999303
 //class laya.webgl.submit.SubmitCanvas extends laya.webgl.submit.Submit
 var SubmitCanvas=(function(_super){
 	function SubmitCanvas(){
@@ -13113,7 +13043,6 @@ var SubmitCanvas=(function(_super){
 })(Submit)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/submit/SubmitTexture.as=======98.999299/98.999299
 //class laya.webgl.submit.SubmitTexture extends laya.webgl.submit.Submit
 var SubmitTexture=(function(_super){
 	function SubmitTexture(renderType){
@@ -13198,7 +13127,6 @@ var SubmitTexture=(function(_super){
 })(Submit)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/MeshParticle2D.as=======98.999279/98.999279
 /**
 *drawImage，fillRect等会用到的简单的mesh。每次添加必然是一个四边形。
 */
@@ -13264,7 +13192,6 @@ var MeshParticle2D=(function(_super){
 })(Mesh2D)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/MeshQuadTexture.as=======98.999278/98.999278
 /**
 *drawImage，fillRect等会用到的简单的mesh。每次添加必然是一个四边形。
 */
@@ -13345,7 +13272,6 @@ var MeshQuadTexture=(function(_super){
 })(Mesh2D)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/MeshTexture.as=======98.999277/98.999277
 /**
 *与MeshQuadTexture基本相同。不过index不是固定的
 */
@@ -13430,7 +13356,6 @@ var MeshTexture=(function(_super){
 })(Mesh2D)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/MeshVG.as=======98.999276/98.999276
 /**
 *用来画矢量的mesh。顶点格式固定为 x,y,rgba
 */
@@ -13504,7 +13429,6 @@ var MeshVG=(function(_super){
 })(Mesh2D)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/ConchSpriteAdpt.as=======97.999677/97.999677
 /**
 *...
 *@author ww
@@ -13592,7 +13516,7 @@ var ConchSpriteAdpt=(function(_super){
 
 	//TODO:coverage
 	__proto._setGraphics=function(value){
-		this._datai32[ /*laya.display.SpriteConst.POSGRAPICS*/23]=value._commandEncoder.getPtrID();
+		this._datai32[ /*laya.display.SpriteConst.POSGRAPICS*/23]=(value)._commandEncoder.getPtrID();
 	}
 
 	__proto._setGraphicsCallBack=function(){
@@ -13837,6 +13761,7 @@ var ConchSpriteAdpt=(function(_super){
 		if (!this._callbackFuncObj){
 			this._callbackFuncObj=/*__JS__ */new CallbackFuncObj();
 		}
+		this._customCmds=[];
 		this._callbackFuncObj.addCallbackFunc(0,(this.customRenderFromNative).bind(this));
 		this._customRenderCmd=LayaGL.instance.createCommandEncoder(128,64,true);
 		this._datai32[ /*laya.display.SpriteConst.POSCALLBACK_OBJ_ID*/54]=this._callbackFuncObj.id;
@@ -14293,7 +14218,6 @@ var ConchSpriteAdpt=(function(_super){
 })(Node)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shader/BaseShader.as=======97.999675/97.999675
 /**
 *...
 *@author ...
@@ -14312,7 +14236,6 @@ var BaseShader=(function(_super){
 })(Resource)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/resource/CharPageTexture.as=======97.999565/97.999565
 //class laya.webgl.resource.CharPageTexture extends laya.resource.Resource
 var CharPageTexture=(function(_super){
 	function CharPageTexture(textureW,textureH,gridNum){
@@ -14479,7 +14402,6 @@ var CharPageTexture=(function(_super){
 })(Resource)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/Buffer.as=======97.999537/97.999537
 //class laya.webgl.utils.Buffer extends laya.resource.Resource
 var Buffer=(function(_super){
 	function Buffer(){
@@ -14524,7 +14446,6 @@ var Buffer=(function(_super){
 })(Resource)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/layagl/ConchSprite.as=======96.999669/96.999669
 //class laya.layagl.ConchSprite extends laya.display.Sprite
 var ConchSprite=(function(_super){
 	function ConchSprite(){
@@ -14601,7 +14522,6 @@ var ConchSprite=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/resource/BaseTexture.as=======96.999474/96.999474
 /**
 *<code>BaseTexture</code> 纹理的父类，抽象类，不允许实例。
 */
@@ -14901,7 +14821,6 @@ var BaseTexture=(function(_super){
 })(Bitmap)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shader/Shader.as=======96.999459/96.999459
 //class laya.webgl.shader.Shader extends laya.webgl.shader.BaseShader
 var Shader=(function(_super){
 	function Shader(vs,ps,saveName,nameMap,bindAttrib){
@@ -15382,7 +15301,6 @@ var Shader=(function(_super){
 })(BaseShader)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/Buffer2D.as=======96.999181/96.999181
 //class laya.webgl.utils.Buffer2D extends laya.webgl.utils.Buffer
 var Buffer2D=(function(_super){
 	function Buffer2D(){
@@ -15655,7 +15573,6 @@ var Buffer2D=(function(_super){
 })(Buffer)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/resource/RenderTexture2D.as=======95.999142/95.999142
 /**
 *<code>RenderTexture</code> 类用于创建渲染目标。
 */
@@ -15894,7 +15811,6 @@ var RenderTexture2D=(function(_super){
 })(BaseTexture)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/resource/Texture2D.as=======95.999141/95.999141
 /**
 *<code>Texture2D</code> 类用于生成2D纹理。
 */
@@ -16281,7 +16197,6 @@ var Texture2D=(function(_super){
 })(BaseTexture)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/shader/d2/Shader2X.as=======95.999123/95.999123
 //class laya.webgl.shader.d2.Shader2X extends laya.webgl.shader.Shader
 var Shader2X=(function(_super){
 	function Shader2X(vs,ps,saveName,nameMap,bindAttrib){
@@ -16325,7 +16240,6 @@ var Shader2X=(function(_super){
 })(Shader)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/IndexBuffer2D.as=======95.998823/95.998823
 //class laya.webgl.utils.IndexBuffer2D extends laya.webgl.utils.Buffer2D
 var IndexBuffer2D=(function(_super){
 	function IndexBuffer2D(bufferUsage){
@@ -16384,7 +16298,6 @@ var IndexBuffer2D=(function(_super){
 })(Buffer2D)
 
 
-	//file:///D:/gittest/gittestnew/webGL/src/laya/webgl/utils/VertexBuffer2D.as=======95.998811/95.998811
 //class laya.webgl.utils.VertexBuffer2D extends laya.webgl.utils.Buffer2D
 var VertexBuffer2D=(function(_super){
 	function VertexBuffer2D(vertexStride,bufferUsage){
@@ -16469,5 +16382,5 @@ var VertexBuffer2D=(function(_super){
 })(Buffer2D)
 
 
-	Laya.__init([CharBook,Path,WebGLContext2D,ShaderCompile]);
+	Laya.__init([CharBook,WebGLContext2D,ShaderCompile,Path]);
 })(window,document,Laya);

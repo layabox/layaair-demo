@@ -5,7 +5,6 @@
 	var ColorUtils=laya.utils.ColorUtils,Filter=laya.filters.Filter,Matrix=laya.maths.Matrix,Render=laya.renders.Render;
 	var RunDriver=laya.utils.RunDriver,ShaderDefines2D=laya.webgl.shader.d2.ShaderDefines2D,Sprite=laya.display.Sprite;
 	var Value2D=laya.webgl.shader.d2.value.Value2D;
-	//file:///D:/gittest/gittestnew/filter/src/laya/filters/BlurFilterGLRender.as=======199.999817/199.999817
 /**
 *@private
 */
@@ -41,7 +40,6 @@ var BlurFilterGLRender=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/filter/src/laya/filters/GlowFilterGLRender.as=======199.999815/199.999815
 /**
 *@private
 */
@@ -74,7 +72,6 @@ var GlowFilterGLRender=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/filter/src/laya/filters/BlurFilter.as=======98.999755/98.999755
 /**
 *模糊滤镜
 */
@@ -122,7 +119,6 @@ var BlurFilter=(function(_super){
 })(Filter)
 
 
-	//file:///D:/gittest/gittestnew/filter/src/laya/filters/GlowFilter.as=======98.999753/98.999753
 /**
 *发光滤镜(也可以当成阴影滤使用）
 */

@@ -8,7 +8,6 @@
 	var Render=laya.renders.Render,RenderSprite=laya.renders.RenderSprite,RenderState2D=laya.webgl.utils.RenderState2D;
 	var Shader=laya.webgl.shader.Shader,Sprite=laya.display.Sprite,Stat=laya.utils.Stat,Texture=laya.resource.Texture;
 	var Utils=laya.utils.Utils,Value2D=laya.webgl.shader.d2.value.Value2D,WebGL=laya.webgl.WebGL,WebGLContext=laya.webgl.WebGLContext;
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/emitter/EmitterBase.as=======199.999797/199.999797
 /**
 *<code>EmitterBase</code> 类是粒子发射器类
 */
@@ -114,7 +113,6 @@ var EmitterBase=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/ParticleData.as=======199.999795/199.999795
 /**
 *@private
 */
@@ -192,7 +190,6 @@ var ParticleData=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/ParticleEmitter.as=======199.999794/199.999794
 /**
 *@private
 */
@@ -236,7 +233,6 @@ var ParticleEmitter=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/ParticleSetting.as=======199.999793/199.999793
 /**
 *<code>ParticleSettings</code> 类是粒子配置数据类
 */
@@ -366,7 +362,6 @@ var ParticleSetting=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/ParticleTemplateBase.as=======199.999790/199.999790
 /**
 *
 *<code>ParticleTemplateBase</code> 类是粒子模板基类
@@ -398,7 +393,6 @@ var ParticleTemplateBase=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/particleUtils/CanvasShader.as=======199.999788/199.999788
 /**
 *@private
 */
@@ -498,7 +492,6 @@ var CanvasShader=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/particleUtils/CMDParticle.as=======199.999787/199.999787
 /**
 *
 *@private
@@ -533,7 +526,6 @@ var CMDParticle=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/particleUtils/PicTool.as=======199.999786/199.999786
 //class laya.particle.particleUtils.PicTool
 var PicTool=(function(){
 	function PicTool(){}
@@ -574,7 +566,6 @@ var PicTool=(function(){
 })()
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/emitter/Emitter2D.as=======98.999595/98.999595
 /**
 *
 *@private
@@ -650,7 +641,6 @@ var Emitter2D=(function(_super){
 })(EmitterBase)
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/ParticleTemplateWebGL.as=======98.999581/98.999581
 /**
 *@private
 */
@@ -796,7 +786,6 @@ var ParticleTemplateWebGL=(function(_super){
 })(ParticleTemplateBase)
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/ParticleTemplateCanvas.as=======98.999579/98.999579
 /**
 *@private
 */
@@ -1064,7 +1053,6 @@ var ParticleTemplateCanvas=(function(_super){
 })(ParticleTemplateBase)
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/shader/value/ParticleShaderValue.as=======98.999563/98.999563
 /**
 *@private
 */
@@ -1113,7 +1101,6 @@ var ParticleShaderValue=(function(_super){
 })(Value2D)
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/ParticleTemplate2D.as=======97.999373/97.999373
 /**
 *@private
 */
@@ -1286,7 +1273,6 @@ var ParticleTemplate2D=(function(_super){
 })(ParticleTemplateWebGL)
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/Particle2D.as=======96.999766/96.999766
 /**
 *<code>Particle2D</code> 类是2D粒子播放类
 *
@@ -1430,7 +1416,6 @@ var Particle2D=(function(_super){
 })(Sprite)
 
 
-	//file:///D:/gittest/gittestnew/particle/src/laya/particle/shader/ParticleShader.as=======95.999244/95.999244
 /**
 *@private
 */
