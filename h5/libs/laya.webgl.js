@@ -7,13 +7,13 @@
 	var DrawCanvasCmd=laya.display.cmd.DrawCanvasCmd,DrawImageCmd=laya.display.cmd.DrawImageCmd,Event=laya.events.Event;
 	var FillTextCmd=laya.display.cmd.FillTextCmd,Filter=laya.filters.Filter,FontInfo=laya.utils.FontInfo,Graphics=laya.display.Graphics;
 	var HTMLCanvas=laya.resource.HTMLCanvas,HTMLChar=laya.utils.HTMLChar,HTMLImage=laya.resource.HTMLImage,Handler=laya.utils.Handler;
-	var Loader=laya.net.Loader,Matrix=laya.maths.Matrix,Node=laya.display.Node,PerfHUD=laya.utils.PerfHUD,Point=laya.maths.Point;
-	var Pool=laya.utils.Pool,Rectangle=laya.maths.Rectangle,Render=laya.renders.Render,RenderSprite=laya.renders.RenderSprite;
-	var Resource=laya.resource.Resource,ResourceManager=laya.resource.ResourceManager,RestoreCmd=laya.display.cmd.RestoreCmd;
-	var RotateCmd=laya.display.cmd.RotateCmd,RunDriver=laya.utils.RunDriver,SaveCmd=laya.display.cmd.SaveCmd;
-	var ScaleCmd=laya.display.cmd.ScaleCmd,Sprite=laya.display.Sprite,SpriteConst=laya.display.SpriteConst,SpriteStyle=laya.display.css.SpriteStyle;
-	var Stage=laya.display.Stage,Stat=laya.utils.Stat,StringKey=laya.utils.StringKey,System=laya.system.System;
-	var Text=laya.display.Text,Texture=laya.resource.Texture,TransformCmd=laya.display.cmd.TransformCmd,TranslateCmd=laya.display.cmd.TranslateCmd;
+	var Loader=laya.net.Loader,Matrix=laya.maths.Matrix,Node=laya.display.Node,Point=laya.maths.Point,Pool=laya.utils.Pool;
+	var Rectangle=laya.maths.Rectangle,Render=laya.renders.Render,RenderSprite=laya.renders.RenderSprite,Resource=laya.resource.Resource;
+	var ResourceManager=laya.resource.ResourceManager,RestoreCmd=laya.display.cmd.RestoreCmd,RotateCmd=laya.display.cmd.RotateCmd;
+	var RunDriver=laya.utils.RunDriver,SaveCmd=laya.display.cmd.SaveCmd,ScaleCmd=laya.display.cmd.ScaleCmd,Sprite=laya.display.Sprite;
+	var SpriteConst=laya.display.SpriteConst,SpriteStyle=laya.display.css.SpriteStyle,Stage=laya.display.Stage;
+	var Stat=laya.utils.Stat,StringKey=laya.utils.StringKey,System=laya.system.System,Text=laya.display.Text;
+	var Texture=laya.resource.Texture,TransformCmd=laya.display.cmd.TransformCmd,TranslateCmd=laya.display.cmd.TranslateCmd;
 	var VectorGraphManager=laya.utils.VectorGraphManager,WordText=laya.utils.WordText;
 Laya.interface('laya.webgl.submit.ISubmit');
 Laya.interface('laya.webgl.canvas.save.ISaveData');
@@ -6991,8 +6991,9 @@ var CharBook=(function(){
 		this.fontScaleY=1.0;
 		this._curStrPos=0;
 		this.tempMat=new Matrix();
+		if (Browser.onMiniGame && !Browser.onAndroid)CharBook.isWan1Wan=true;
 		CharBook.charbookInst=this;
-		CharPages.charRender=Render.isConchApp?(new CharRender_Native()):(new CharRender_Canvas());
+		CharPages.charRender=Render.isConchApp ? (new CharRender_Native()):(new CharRender_Canvas());
 	}
 
 	__class(CharBook,'laya.webgl.resource.CharBook');
@@ -7009,13 +7010,13 @@ var CharBook=(function(){
 		var ret;
 		if (fontFamily===CharBook._lastFont && scaledFontSz===CharBook._lastFontSz){
 			ret=CharBook._lastCharPage;
-			}else{
+			}else {
 			var sz=CharPages.getBmpSize(fontsize)*scale;
 			var szid=Math.floor(sz / CharBook.gridSize);
 			var key=fontFamily+szid;
 			var fid=this.fontPagesName.indexOf(key);
 			if (fid < 0){
-				var selFontPages=new CharPages(fontFamily,sz,Render.isConchApp?0:Math.ceil((fontsize / 4.0)));
+				var selFontPages=new CharPages(fontFamily,sz,Render.isConchApp ? 0 :Math.ceil((fontsize / 4.0)));
 				this.fontPages.push(selFontPages);
 				this.fontPagesName.push(key);
 				ret=selFontPages;
@@ -7076,7 +7077,7 @@ var CharBook=(function(){
 
 	//TODO:coverage
 	__proto.hasFreedText=function(txts,startid){
-		if (txts && txts.length>0){
+		if (txts && txts.length > 0){
 			for (var i=startid,sz=txts.length;i < sz;i++){
 				var pri=txts[i];
 				if (!pri)continue ;
@@ -7106,8 +7107,8 @@ var CharBook=(function(){
 	*/
 	__proto._fast_filltext=function(ctx,data,htmlchars,x,y,font,color,strokeColor,lineWidth,textAlign,underLine){
 		(underLine===void 0)&& (underLine=0);
-		if (data&& data.length <1)return;
-		if (htmlchars && htmlchars.length <1)return;
+		if (data && data.length < 1)return;
+		if (htmlchars && htmlchars.length < 1)return;
 		CharBook._curFont=font._font;
 		this.fontScaleX=this.fontScaleY=1.0;
 		if (CharBook.scaleFontWithCtx){
@@ -7115,8 +7116,8 @@ var CharBook=(function(){
 			var sy=ctx.getMatScaleY();
 			if (sx < 1e-4 || sy < 1e-1)
 				return;
-			if(sx>1)this.fontScaleX=sx;
-			if(sy>1)this.fontScaleY=sy;
+			if (sx > 1)this.fontScaleX=sx;
+			if (sy > 1)this.fontScaleY=sy;
 		}
 		font._italic && (ctx._italicDeg=12);
 		this._curPage=this.selectFont(font._family,font._size);
@@ -7126,7 +7127,7 @@ var CharBook=(function(){
 		var strWidth=0;
 		var isWT=!htmlchars && ((data instanceof laya.utils.WordText ));
 		var isHtmlChar=!!htmlchars;
-		var sameTexData=(CharBook.cacheRenderInfoInWordText && isWT)?wt.pageChars:[];
+		var sameTexData=(CharBook.cacheRenderInfoInWordText && isWT)? wt.pageChars :[];
 		if (isWT){
 			str=wt._text;
 			strWidth=wt.width;
@@ -7152,14 +7153,14 @@ var CharBook=(function(){
 				sameTexData=wt.pageChars=[];
 			}
 		};
-		var startTexID=isWT?wt.startID:0;
-		var startTexIDStroke=isWT?wt.startIDStroke:0;
+		var startTexID=isWT ? wt.startID :0;
+		var startTexIDStroke=isWT ? wt.startIDStroke :0;
 		if (!sameTexData || sameTexData.length < 1){
 			var scaleky=null;
 			if (CharBook.scaleFontWithCtx){
 				CharPages.charRender.scale(Math.max(this.fontScaleX,1.0),Math.max(this.fontScaleY,1.0));
-				if(this.fontScaleX>1.0 || this.fontScaleY>1.0)
-					scaleky=""+((this.fontScaleX *10)| 0)+((this.fontScaleY*10)|0);
+				if (this.fontScaleX > 1.0 || this.fontScaleY > 1.0)
+					scaleky=""+((this.fontScaleX *10)| 0)+((this.fontScaleY *10)| 0);
 			}
 			startTexID=-1;
 			startTexIDStroke=-1;
@@ -7180,26 +7181,26 @@ var CharBook=(function(){
 				var isEmo=this.isEmoji(curstr);
 				var ri;
 				ri=this._curPage.getChar(curstr,lineWidth,font._size,color,strokeColor,bold,false,scaleky);
-				if (ri.isSpace){}
-					else{
+				if (ri.isSpace){
+					}else {
 					var add=sameTexData[ri.tex.id];
 					if (!add){
 						sameTexData[ri.tex.id]=add=[];
-						if (startTexID<0 || startTexID>ri.tex.id)
+						if (startTexID < 0 || startTexID > ri.tex.id)
 							startTexID=ri.tex.id;
 					}
-					add.push({ri:ri,isEmoji:isEmo,x:stx,y:sty,color:'#'+(color & 0xffffff).toString(16),nColor:color,w:ri.bmpWidth / this.fontScaleX,h:ri.bmpHeight / this.fontScaleY });
+					add.push({ri:ri,isEmoji:isEmo,x:stx,y:sty,color:'#'+(color & 0xffffff).toString(16),nColor:color,w:ri.bmpWidth / this.fontScaleX,h:ri.bmpHeight / this.fontScaleY});
 				}
 				if (isHtmlChar){
 					chc=htmlchars[this._curStrPos++];
-					if(chc){
+					if (chc){
 						curstr=chc.char;
 						stx=chc.x;
 						sty=chc.y;
 						}else {
 						curstr=null;
 					}
-					}else{
+					}else {
 					curstr=this.getNextChar(str);
 					stx+=ri.width;
 				}
@@ -7217,7 +7218,7 @@ var CharBook=(function(){
 		if (!data)return;
 		if (data.length <=0)return;
 		var nColor=ColorUtils.create(color).numColor;
-		var nStrokeColor=strokeColor?ColorUtils.create(strokeColor).numColor:0;
+		var nStrokeColor=strokeColor ? ColorUtils.create(strokeColor).numColor :0;
 		CharBook._curFont=fontStr;
 		var font=FontInfo.Parse(fontStr);
 		this._fast_filltext(ctx,null,data,x,y,font,nColor,nStrokeColor,lineWidth,0,0);
@@ -7237,11 +7238,11 @@ var CharBook=(function(){
 		if (data.length <=0)
 			return;
 		var nColor=ColorUtils.create(color).numColor;
-		var nStrokeColor=strokeColor?ColorUtils.create(strokeColor).numColor:0;
+		var nStrokeColor=strokeColor ? ColorUtils.create(strokeColor).numColor :0;
 		CharBook._curFont=fontStr;
 		var font=FontInfo.Parse(fontStr);
 		var nTextAlign=0;
-		switch(textAlign){
+		switch (textAlign){
 			case 'center':
 				nTextAlign=Context.ENUM_TEXTALIGN_CENTER;
 				break ;
@@ -7258,7 +7259,7 @@ var CharBook=(function(){
 		if (data && data.length <=0)
 			return;
 		var nColor=ColorUtils.create(color).numColor;
-		var nStrokeColor=strokeColor?ColorUtils.create(strokeColor).numColor:0;
+		var nStrokeColor=strokeColor ? ColorUtils.create(strokeColor).numColor :0;
 		CharBook._curFont=fontStr;
 		this.fontScaleX=this.fontScaleY=1.0;
 		if (CharBook.scaleFontWithCtx){
@@ -7276,14 +7277,14 @@ var CharBook=(function(){
 		if (font._italic){
 			ctx._italicDeg=12;
 		}
-		this._curPage=this.selectFont(fontFamily,font._size*this.fontScaleX);
+		this._curPage=this.selectFont(fontFamily,font._size *this.fontScaleX);
 		var curx=x;
 		var wt=data;
 		var str=data;
 		var strWidth=0;
 		var isWT=!htmlchars && ((str instanceof laya.utils.WordText ));
 		var isHtmlChar=!!htmlchars;
-		var sameTexData=(CharBook.cacheRenderInfoInWordText && isWT)?wt.pageChars:[];
+		var sameTexData=(CharBook.cacheRenderInfoInWordText && isWT)? wt.pageChars :[];
 		if (isWT){
 			str=wt.toString();
 			strWidth=wt.width;
@@ -7324,8 +7325,8 @@ var CharBook=(function(){
 			var scaleky=null;
 			if (CharBook.scaleFontWithCtx){
 				CharPages.charRender.scale(Math.max(this.fontScaleX,1.0),Math.max(this.fontScaleY,1.0));
-				if(this.fontScaleX>1.0 || this.fontScaleY>1.0)
-					scaleky=""+((this.fontScaleX *10)| 0)+((this.fontScaleY*10)|0);
+				if (this.fontScaleX > 1.0 || this.fontScaleY > 1.0)
+					scaleky=""+((this.fontScaleX *10)| 0)+((this.fontScaleY *10)| 0);
 			};
 			var stx=0;
 			var sty=0;
@@ -7344,8 +7345,8 @@ var CharBook=(function(){
 				var isEmo=this.isEmoji(curstr);
 				var ri;
 				ri=this._curPage.getChar(curstr,lineWidth,font._size,nColor,nStrokeColor,bold,false,scaleky);
-				if (ri.isSpace){}
-					else{
+				if (ri.isSpace){
+					}else {
 					var add=sameTexData[ri.tex.id];
 					if (!add){
 						sameTexData[ri.tex.id]=add=[];
@@ -7354,14 +7355,14 @@ var CharBook=(function(){
 				}
 				if (isHtmlChar){
 					chc=htmlchars[this._curStrPos++];
-					if(chc){
+					if (chc){
 						curstr=chc.char;
 						stx=chc.x;
 						sty=chc.y;
 						}else {
 						curstr=null;
 					}
-					}else{
+					}else {
 					stx+=ri.width;
 					curstr=this.getNextChar(str);
 				}
@@ -7415,7 +7416,7 @@ var CharBook=(function(){
 				var riSaved=pri[j];
 				var ri=riSaved.ri;
 				if (ri.isSpace)continue ;
-				ctx._drawTextureUseColor=CharBook.getFontBmpWithColor?false:!riSaved.isEmoji;
+				ctx._drawTextureUseColor=CharBook.getFontBmpWithColor ? false :!riSaved.isEmoji;
 				if (lastcolor !=riSaved.nColor){
 					ctx.fillStyle=riSaved.color;
 					lastcolor=riSaved.nColor;
@@ -7428,9 +7429,7 @@ var CharBook=(function(){
 
 	//TODO:coverage
 	__proto._drawCharRenderInfo=function(ctx,ri,x,y){
-		ctx._drawTextureM(ri.tex.texture,
-		x-this._curPage.margin_left,y-this._curPage.margin_top,ri.bmpWidth ,ri.bmpHeight,
-		null,1.0,ri.uv);
+		ctx._drawTextureM(ri.tex.texture,x-this._curPage.margin_left,y-this._curPage.margin_top,ri.bmpWidth,ri.bmpHeight,null,1.0,ri.uv);
 		if ((ctx).touches){
 			(ctx).touches.push(ri);
 		}
@@ -7441,7 +7440,7 @@ var CharBook=(function(){
 	*/
 	__proto.GC=function(){
 		var i=0,sz=this.fontPages.length;
-		if(sz){
+		if (sz){
 			var curCleanID=Stat.loopCount % sz;
 			(this.fontPages [curCleanID]).removeLRU();
 		}
@@ -7482,7 +7481,7 @@ var CharBook=(function(){
 				if (this.poolLen > 0){
 					var ret=this.pool[--this.poolLen];
 					ret.setGridNum(gridnum);
-					if(this.poolLen>0)
+					if (this.poolLen > 0)
 						this.clean();
 					return ret;
 				}
@@ -10539,7 +10538,13 @@ var WebGLContext=(function(){
 		WebGLContext.__init_native();
 		laya.webgl.WebGLContext._checkExtensions(gl);
 		if (!WebGL._isWebGL2){
-			(window._setupVertexArrayObject)&&(window._setupVertexArrayObject(gl));
+			VertexArrayObject;
+			if (window._setupVertexArrayObject){
+				if (Browser.onMiniGame)
+					window._forceSetupVertexArrayObject(gl);
+				else
+				window._setupVertexArrayObject(gl);
+			};
 			var ext=((gl).rawgl || gl).getExtension("OES_vertex_array_object");
 			if (ext){
 				console.log("EXT:webgl support OES_vertex_array_object！");
@@ -11762,6 +11767,7 @@ var WebGLContext2D=(function(_super){
 		RenderState2D.worldAlpha=1;
 		BaseShader.activeShader=null;
 		target.start();
+		target.clear(0,0,0,0);
 		context._curSubmit=Submit.RENDERBASE;
 		context.flush();
 		context.clear();

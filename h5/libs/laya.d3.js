@@ -14333,7 +14333,7 @@ var Utils3D=(function(){
 
 	Utils3D._createSceneByJsonForMaker=function(nodeData,outBatchSprites,initTool){
 		var scene3d=Utils3D._createNodeByJsonForMaker(nodeData,outBatchSprites,initTool);
-		Utils3D._addComponentByJsonForMaker(nodeData,outBatchSprites);
+		Utils3D._addComponentByJsonForMaker(nodeData,outBatchSprites,initTool);
 		return scene3d;
 	}
 
@@ -14391,16 +14391,32 @@ var Utils3D=(function(){
 			initTool._idMap[compId]=node;
 		}
 		Utils3D._compIdToNode[compId]=node;
+		var componentsData=nodeData.components;
+		if (componentsData){
+			for (var j=0,m=componentsData.length;j < m;j++){
+				var data=componentsData[j];
+				var clas=Browser.window.Laya[data.type];
+				if (clas){
+					var comp=new clas();
+					if (initTool){
+						initTool._idMap[data.compId]=comp;
+						console.log(data.compId);
+					}
+					}else {
+					console.warn("Unkown component type.");
+				}
+			}
+		}
 		return node;
 	}
 
-	Utils3D._addComponentByJsonForMaker=function(nodeData,outBatchSprites){
+	Utils3D._addComponentByJsonForMaker=function(nodeData,outBatchSprites,initTool){
 		var compId=nodeData.compId;
 		var node=Utils3D._compIdToNode[compId];
 		var childData=nodeData.child;
 		if (childData){
 			for (var i=0,n=childData.length;i < n;i++){
-				var child=Utils3D._addComponentByJsonForMaker(childData[i],outBatchSprites);
+				var child=Utils3D._addComponentByJsonForMaker(childData[i],outBatchSprites,initTool);
 			}
 		};
 		var componentsData=nodeData.components;
@@ -14409,7 +14425,8 @@ var Utils3D=(function(){
 				var data=componentsData[j];
 				var clas=Browser.window.Laya[data.type];
 				if (clas){
-					var component=node.addComponent(clas);
+					var component=initTool._idMap[data.compId];
+					node.addComponentIntance(component);
 					component._parse(data);
 					}else {
 					console.warn("Unkown component type.");
@@ -37338,7 +37355,7 @@ var Rigidbody3D=(function(_super){
 	*/
 	__proto._onScaleChange=function(scale){
 		laya.d3.physics.PhysicsComponent.prototype._onScaleChange.call(this,scale);
-		this._updateMass(this._mass);
+		this._updateMass(this._isKinematic ? 0 :this._mass);
 	}
 
 	/**
