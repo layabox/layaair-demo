@@ -3101,6 +3101,21 @@ var Physics=(function(_super){
 		Laya.physicsTimer.clear(this,this._update);
 	}
 
+	/**获得刚体总数量*/
+	__proto.getBodyCount=function(){
+		return this.world.GetBodyCount();
+	}
+
+	/**获得碰撞总数量*/
+	__proto.getContactCount=function(){
+		return this.world.GetContactCount();
+	}
+
+	/**获得关节总数量*/
+	__proto.getJointCount=function(){
+		return this.world.GetJointCount();
+	}
+
 	/**
 	*设置是否允许休眠，休眠可以提高稳定性和性能，但通常会牺牲准确性
 	*/
@@ -3118,11 +3133,6 @@ var Physics=(function(_super){
 		return this.world.GetGravity();
 		},function(value){
 		this.world.SetGravity(value);
-	});
-
-	/**获得刚体总数量*/
-	__getset(0,__proto,'bodyCount',function(){
-		return this.world.GetBodyCount();
 	});
 
 	/**物理世界根容器，将根据此容器作为物理世界坐标世界，进行坐标变换，默认值为stage

@@ -249,22 +249,6 @@ var ___Laya=(function(){
 		if (Laya._isinit)return;
 		Laya._isinit=true;
 		ArrayBuffer.prototype.slice || (ArrayBuffer.prototype.slice=Laya._arrayBufferSlice);
-		var libs=window._layalibs;
-		if (libs){
-			libs.sort(function(a,b){
-				return a.i > b.i;
-			});
-			for (var j=0;j < libs.length;j++){
-				libs[j].f(window,window.document,Laya);
-			}
-		}
-		if (window.navigator && window.navigator.userAgent && window.navigator.userAgent.indexOf("MiniGame")>-1){
-			if (!Laya["MiniAdpter"]){
-				console.error("请先添加小游戏适配库,详细教程：https://ldc.layabox.com/doc/?nav=zh-ts-5-0-0");
-				}else {
-				Laya["MiniAdpter"].enable();
-			}
-		}
 		Browser.__init__();
 		if (!Render.isConchApp){
 			Context.__init__();
@@ -8642,6 +8626,23 @@ var Browser=(function(){
 		if (Browser._window)return Browser._window;
 		var win=Browser._window=/*__JS__ */window;
 		var doc=Browser._document=win.document;
+		var u=Browser.userAgent=win.navigator.userAgent;
+		var libs=win._layalibs;
+		if (libs){
+			libs.sort(function(a,b){
+				return a.i > b.i;
+			});
+			for (var j=0;j < libs.length;j++){
+				libs[j].f(win,doc,Laya);
+			}
+		}
+		if (u.indexOf("MiniGame")>-1){
+			if (!Laya["MiniAdpter"]){
+				console.error("请先添加小游戏适配库,详细教程：https://ldc.layabox.com/doc/?nav=zh-ts-5-0-0");
+				}else {
+				Laya["MiniAdpter"].enable();
+			}
+		}
 		win.trace=console.log;
 		win.requestAnimationFrame=win.requestAnimationFrame || win.webkitRequestAnimationFrame || win.mozRequestAnimationFrame || win.oRequestAnimationFrame || win.msRequestAnimationFrame || function (fun){
 			return win.setTimeout(fun,1000 / 60);
@@ -8666,8 +8667,7 @@ var Browser=(function(){
 			meta=doc.createElement('meta');
 			meta.name='viewport',meta.content=content;
 			doc.getElementsByTagName('head')[0].appendChild(meta);
-		};
-		var u=Browser.userAgent=win.navigator.userAgent;
+		}
 		Browser.onMobile=u.indexOf("Mobile")>-1;
 		Browser.onIOS=!!u.match(/\(i[^;]+;(U;)? CPU.+Mac OS X/);
 		Browser.onIPhone=u.indexOf("iPhone")>-1;
@@ -8676,7 +8676,7 @@ var Browser=(function(){
 		Browser.onAndroid=u.indexOf('Android')>-1 || u.indexOf('Adr')>-1;
 		Browser.onWP=u.indexOf("Windows Phone")>-1;
 		Browser.onQQBrowser=u.indexOf("QQBrowser")>-1;
-		Browser.onMQQBrowser=u.indexOf("MQQBrowser")>-1 ||(u.indexOf("Mobile")>-1 && u.indexOf("QQ")>-1);
+		Browser.onMQQBrowser=u.indexOf("MQQBrowser")>-1 || (u.indexOf("Mobile")>-1 && u.indexOf("QQ")>-1);
 		Browser.onIE=!!win.ActiveXObject || "ActiveXObject" in win;
 		Browser.onWeiXin=u.indexOf('MicroMessenger')>-1;
 		Browser.onSafari=/*[SAFE]*/ u.indexOf("Safari")>-1;
@@ -12810,7 +12810,7 @@ var Script=(function(_super){
 			Laya.stage.on(/*laya.events.Event.CLICK*/"click",this,this.onStageClick);
 		}
 		if (this.onStageMouseMove!==proto.onStageMouseMove){
-			this.owner.on(/*laya.events.Event.MOUSE_MOVE*/"mousemove",this,this.onStageMouseMove);
+			Laya.stage.on(/*laya.events.Event.MOUSE_MOVE*/"mousemove",this,this.onStageMouseMove);
 		}
 		if (this.onDoubleClick!==proto.onDoubleClick){
 			this.owner.on(/*laya.events.Event.DOUBLE_CLICK*/"doubleclick",this,this.onDoubleClick);
@@ -18141,7 +18141,7 @@ var Sprite=(function(_super){
 		_filters=this._cacheStyle.filters;
 		if (!_filters || _filters.length < 1)return;
 		for (var i=0,n=_filters.length;i < n;i++){
-			_filters[i].action && _filters[i].action.apply(this._cacheStyle);
+			_filters[i]._action && _filters[i]._action.apply(this._cacheStyle);
 		}
 	}
 
@@ -20618,10 +20618,7 @@ var Scene=(function(_super){
 	}
 
 	/**场景打开完成后，调用此方法（如果有弹出动画，则在动画完成后执行）*/
-	__proto.onOpened=function(){
-		console.log("onOpened");
-	}
-
+	__proto.onOpened=function(){}
 	/**
 	*关闭场景
 	*【注意】被关闭的场景，如果没有设置autoDestroyAtRemoved=true，则资源可能不能被回收，需要自己手动回收

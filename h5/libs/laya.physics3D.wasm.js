@@ -1,6 +1,6 @@
 
   // This is laya.physics3D.js, a port of Bullet Physics to JavaScript. zlib licensed.
-  var Physics3D = function(memorySize) {
+  var Physics3D =window.Physics3D= function(memorySize) {
   Physics3D ={};
 
 var b;b||(b=typeof Physics3D !== 'undefined' ? Physics3D : {});var aa={},ba;for(ba in b)b.hasOwnProperty(ba)&&(aa[ba]=b[ba]);b.arguments=[];b.thisProgram="./this.program";b.quit=function(a,c){throw c;};b.preRun=[];b.postRun=[];var ca=!1,da=!1,ea=!1,fa=!1;ca="object"===typeof window;da="function"===typeof importScripts;ea="object"===typeof process&&"function"===typeof require&&!ca&&!da;fa=!ca&&!ea&&!da;var ia="";function ja(a){return b.locateFile?b.locateFile(a,ia):ia+a}
