@@ -362,7 +362,8 @@
         [ "AStarFindPath", "寻路导航", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
         [ "PBRDemo", "基于物理渲染", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
         [ "ScriptSample", "脚本组件", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-        [ "TouchScriptSample", "触碰检测", "", "core,webgl,ani,d3,CameraMoveScript.js,physics3D" ]
+		[ "TouchScriptSample", "触碰检测", "", "core,webgl,ani,d3,CameraMoveScript.js,physics3D" ],
+		[ "TrailRender", "拖尾效果", "", "core,webgl,ani,d3,CameraMoveScript.js,physics3D" ]
 
       ]
 		}]
