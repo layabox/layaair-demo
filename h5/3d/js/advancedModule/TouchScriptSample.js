@@ -1,71 +1,53 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    }
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var TouchScript = /** @class */ (function (_super) {
-    __extends(TouchScript, _super);
-    function TouchScript() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.subText = "";
-        _this.count = 0;
-        return _this;
-    }
-    TouchScript.prototype.onUpdate = function () {
-        if (this.count === 24) {
+class TouchScript extends Laya.Script3D{
+        constructor(){
+            super();
+            this.subText = "";
+            this.count = 0;
+        }
+        onUpdate() {
+            if (this.count === 24) {
             var t = this.text.text;
             var index = t.indexOf("\n");
             t = t.slice(index + 1, t.length);
             this.text.text = t;
             this.count--;
         }
-        if (this.subText !== "") {
+            if (this.subText !== "") {
             this.text.text += this.header + this.subText + "\n";
             this.subText = "";
             this.count++;
+        
         }
-    };
-    TouchScript.prototype.onMouseEnter = function () {
+    }
+    onMouseEnter() {
         this.subText += "onMouseEnter  ";
-    };
-    TouchScript.prototype.onMouseOver = function () {
+    }
+    onMouseOver() {
         this.subText += "onMouseOver  ";
-    };
-    TouchScript.prototype.onMouseOut = function () {
+    }
+    onMouseOut() {
         this.subText += "onMouseOut  ";
-    };
-    TouchScript.prototype.onMouseDown = function () {
+    }
+    onMouseDown() {
         this.subText += "onMouseDown  ";
-    };
-    TouchScript.prototype.onMouseUp = function () {
+    }
+    onMouseUp() {
         this.subText += "onMouseUp  ";
-    };
-    TouchScript.prototype.onMouseClick = function () {
+    }
+    onMouseClick() {
         this.subText += "onMouseClick  ";
-    };
-    TouchScript.prototype.onMouseDrag = function () {
+    }
+    onMouseDrag() {
         this.subText += "onMouseDrag  ";
-    };
-    return TouchScript;
-}(Laya.Script3D));
+    }
 
+}
 
-
-
-
-
+class TouchScriptSample{
+    constructor(){
         Laya3D.init(0, 0, null);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
-        //Stat.show();
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.translate(new Laya.Vector3(0, 8, 20));
@@ -91,8 +73,8 @@ var TouchScript = /** @class */ (function (_super) {
         this.addBox();
         this.addCapsule();
         Laya.stage.addChild(this.text);
-   
-    function addBox() {
+    }
+    addBox(){
         var mat1 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function (tex) {
             mat1.albedoTexture = tex;
@@ -111,8 +93,8 @@ var TouchScript = /** @class */ (function (_super) {
         var script = box.addComponent(TouchScript);
         script.header = "BOX: ";
         script.text = this.text;
-    };
-    function addCapsule() {
+    }
+    addCapsule(){
         var mat3 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
             mat3.albedoTexture = tex;
@@ -130,5 +112,10 @@ var TouchScript = /** @class */ (function (_super) {
         var script = capsule.addComponent(TouchScript);
         script.header = "Capsule: ";
         script.text = this.text;
-    };
+    }
+
+}
+
+//激活启动类
+new TouchScriptSample();
 

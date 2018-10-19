@@ -1,4 +1,35 @@
 
+        // this.rotation = new Laya.Vector3(0, 0.01, 0);
+        // //Laya.Shader3D.debugMode = true;
+        // Laya3D.init(0, 0);
+        // Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
+        // Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+        // Laya.Stat.show();
+        // this.initShader();
+        // var scene = Laya.stage.addChild(new Laya.Scene3D());
+        // var camera = (scene.addChild(new Laya.Camera(0, 0.1, 1000)));
+        // camera.transform.translate(new Laya.Vector3(0, 0.85, 1.7));
+        // camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
+        // camera.addComponent(CameraMoveScript);
+        // var directionLight = scene.addChild(new Laya.DirectionLight());
+        // directionLight.color = new Laya.Vector3(1, 1, 1);
+        // directionLight.direction = new Laya.Vector3(1, -1, 0);
+        // Laya.Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, this.loadSprite3D));
+        // var earth = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.5, 128, 128)));
+        // var customMaterial = new CustomMaterial();
+        // Laya.Texture2D.load("res/threeDimen/texture/earth.png", Laya.Handler.create(null, function (tex) {
+        //     customMaterial.diffuseTexture = tex;
+        // }));
+        // customMaterial.marginalColor = new Laya.Vector3(0.0, 0.3, 1.0);
+        // earth.meshRenderer.sharedMaterial = customMaterial;
+        // Laya.timer.frameLoop(1, this, function () {
+        //     earth.transform.rotate(this.rotation, true);
+        // });
+
+
+
+class Shader_GlowingEdge{
+    constructor(){
         this.rotation = new Laya.Vector3(0, 0.01, 0);
         //Laya.Shader3D.debugMode = true;
         Laya3D.init(0, 0);
@@ -6,16 +37,33 @@
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
         this.initShader();
-        var scene = Laya.stage.addChild(new Laya.Scene3D());
-        var camera = (scene.addChild(new Laya.Camera(0, 0.1, 1000)));
+        this.scene = Laya.stage.addChild(new Laya.Scene3D());
+        var camera = (this.scene.addChild(new Laya.Camera(0, 0.1, 1000)));
         camera.transform.translate(new Laya.Vector3(0, 0.85, 1.7));
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         camera.addComponent(CameraMoveScript);
-        var directionLight = scene.addChild(new Laya.DirectionLight());
+        var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.direction = new Laya.Vector3(1, -1, 0);
-        Laya.Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, function (dude) {
-            scene.addChild(dude);
+        this.customMaterial1 = new CustomMaterial();
+        this.customMaterial2 = new CustomMaterial();
+        this.customMaterial3 = new CustomMaterial();
+        this.customMaterial4 = new CustomMaterial();
+
+        Laya.Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, this.loadSprite3D));
+        this.earth = this.scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.5, 128, 128)));
+        var customMaterial = new CustomMaterial();
+        Laya.Texture2D.load("res/threeDimen/texture/earth.png", Laya.Handler.create(null, function (tex) {
+            customMaterial.diffuseTexture = tex;
+        }));
+        customMaterial.marginalColor = new Laya.Vector3(0.0, 0.3, 1.0);
+        this.earth.meshRenderer.sharedMaterial = customMaterial;
+        Laya.timer.frameLoop(1, this, this.onFrameLoop);
+
+    }
+
+    loadSprite3D(dude){
+            this.scene.addChild(dude);
             var customMaterial1 = new CustomMaterial();
             Laya.Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/head.png", Laya.Handler.create(null, function (tex) {
                 customMaterial1.diffuseTexture = tex;
@@ -45,19 +93,14 @@
             dude.transform.position = new Laya.Vector3(0, 0.5, 0);
             dude.transform.scale = new Laya.Vector3(0.2, 0.2, 0.2);
             dude.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
-        }));
-        var earth = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.5, 128, 128)));
-        var customMaterial = new CustomMaterial();
-        Laya.Texture2D.load("res/threeDimen/texture/earth.png", Laya.Handler.create(null, function (tex) {
-            customMaterial.diffuseTexture = tex;
-        }));
-        customMaterial.marginalColor = new Laya.Vector3(0.0, 0.3, 1.0);
-        earth.meshRenderer.sharedMaterial = customMaterial;
-        Laya.timer.frameLoop(1, this, function () {
-            earth.transform.rotate(this.rotation, true);
-        });
+    }
 
-    function initShader() {
+    onFrameLoop(){
+        this.earth.transform.rotate(this.rotation, true);
+    }
+
+
+    initShader() {
         var attributeMap = {
             'a_Position': Laya.VertexMesh.MESH_POSITION0,
             'a_Normal': Laya.VertexMesh.MESH_NORMAL0,
@@ -142,5 +185,9 @@
             "}";
         var customShader = Laya.Shader3D.add("CustomShader", attributeMap, uniformMap, Laya.SkinnedMeshSprite3D.shaderDefines);
         customShader.addShaderPass(vs, ps);
-    };
-  
+    }
+}
+
+//激活启动类
+new Shader_GlowingEdge();
+

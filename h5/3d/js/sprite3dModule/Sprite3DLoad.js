@@ -1,4 +1,5 @@
-
+class Sprite3DLoad{
+    constructor(){
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -12,3 +13,8 @@
         Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(null, function (sprite) {
                 scene.addChild(sprite);
             }));
+    }
+}
+
+//激活启动类
+new Sprite3DLoad();

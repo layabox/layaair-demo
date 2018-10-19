@@ -1,4 +1,5 @@
-
+class PhysicsWorldContinueCollisionDetection{
+    constructor(){
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -32,7 +33,8 @@
             this.addSphere();
         });
     
-    function addSphere() {
+    }
+    addSphere() {
         var mat2 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function (tex) {
             mat2.albedoTexture = tex;
@@ -47,4 +49,11 @@
         rigidBody.mass = 10;
         rigidBody.ccdSweptSphereRadius = radius;
         rigidBody.ccdMotionThreshold = 0.0001;
-    };
+    }
+
+
+}
+
+
+//激活启动类
+new PhysicsWorldContinueCollisionDetection();

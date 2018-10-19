@@ -1,4 +1,5 @@
-
+class PhysicsWorldBuildingBlocks{
+    constructor(){
         this.ray = new Laya.Ray(new Laya.Vector3(0, 0, 0), new Laya.Vector3(0, 0, 0));
         this.point = new Laya.Vector2();
         this._outHitResult = new Laya.HitResult();
@@ -27,9 +28,16 @@
         rigidBody.colliderShape = boxShape;
         this.addMouseEvent();
         this.addBox();
+    }
 
-function addBox() {
-        //var i:number = 0;
+    addMouseEvent(){
+        Laya.stage.on(Laya.Event.MOUSE_DOWN, this, this.onMouseDown);
+        Laya.stage.on(Laya.Event.MOUSE_UP, this, this.onMouseUp);
+        Laya.stage.on(Laya.Event.MOUSE_OUT, this, this.onMouseOut);
+    }
+
+    addBox(){
+                //var i:number = 0;
         for (var i = 0; i < 8; i++) {
             this.addVerticalBox(-0.65, 0.165 + i * 0.33 * 2, 0);
             this.addVerticalBox(0, 0.165 + i * 0.33 * 2, 0);
@@ -38,8 +46,9 @@ function addBox() {
             this.addHorizontalBox(0, 0.165 + 0.33 + i * 0.33 * 2, 0);
             this.addHorizontalBox(0, 0.165 + 0.33 + i * 0.33 * 2, 0.65);
         }
-    };
-    function addVerticalBox(x, y, z) {
+    }
+
+    addVerticalBox(x, y, z){
         var mat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function (tex) {
             mat.albedoTexture = tex;
@@ -55,8 +64,8 @@ function addBox() {
         rigidBody.restitution = 0.2;
         var boxShape = new Laya.BoxColliderShape(0.5, 0.33, 2);
         rigidBody.colliderShape = boxShape;
-    };
-    function addHorizontalBox(x, y, z) {
+    }
+    addHorizontalBox(x, y, z){
         var mat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function (tex) {
             mat.albedoTexture = tex;
@@ -72,14 +81,9 @@ function addBox() {
         rigidBody.restitution = 0.2;
         var boxShape = new Laya.BoxColliderShape(2, 0.33, 0.5);
         rigidBody.colliderShape = boxShape;
-    };
-    function addMouseEvent() {
-    
-        Laya.stage.on(Laya.Event.MOUSE_DOWN, this, this.onMouseDown);
-        Laya.stage.on(Laya.Event.MOUSE_UP, this, this.onMouseUp);
-        Laya.stage.on(Laya.Event.MOUSE_OUT, this, this.onMouseOut);
-    };
-   function onMouseDown() {
+    }
+
+    onMouseDown() {
         this.posX = this.point.elements[0] = Laya.MouseManager.instance.mouseX;
         this.posY = this.point.elements[1] = Laya.MouseManager.instance.mouseY;
         this.camera.viewportPointToRay(this.point, this.ray);
@@ -94,8 +98,8 @@ function addBox() {
             collider.linearVelocity = Laya.Vector3.ZERO;
         }
         Laya.stage.on(Laya.Event.MOUSE_MOVE, this, this.onMouseMove);
-    };
-    function onMouseMove() {
+    }
+    onMouseMove() {
         this.delX = Laya.MouseManager.instance.mouseX - this.posX;
         this.delY = Laya.MouseManager.instance.mouseY - this.posY;
         if (this.hasSelectedSprite) {
@@ -103,20 +107,27 @@ function addBox() {
         }
         this.posX = Laya.MouseManager.instance.mouseX;
         this.posY = Laya.MouseManager.instance.mouseY;
-    };
-    function onMouseUp() {
+    }
+
+    onMouseUp() {
         Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onMouseMove);
         if (this.hasSelectedSprite) {
             this.hasSelectedRigidBody.angularFactor = Laya.Vector3.ONE;
             this.hasSelectedRigidBody.linearFactor = Laya.Vector3.ONE;
             this.hasSelectedSprite = null;
         }
-    };
-    function onMouseOut() {
+    }
+
+    onMouseOut() {
         Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onMouseMove);
         if (this.hasSelectedSprite) {
             this.hasSelectedRigidBody.angularFactor = Laya.Vector3.ONE;
             this.hasSelectedRigidBody.linearFactor = Laya.Vector3.ONE;
             this.hasSelectedSprite = null;
         }
-    };
+    }
+
+}
+
+//激活启动类
+new PhysicsWorldBuildingBlocks();

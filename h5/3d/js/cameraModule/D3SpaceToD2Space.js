@@ -1,4 +1,5 @@
-
+class D3SpaceToD2Space{
+    constructor(){
         this._position = new Laya.Vector3();
         this._outPos = new Laya.Vector3();
         this.scaleDelta = 0;
@@ -13,16 +14,18 @@
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         var completeHandler = Laya.Handler.create(this, this.onComplete);
         Laya.loader.create("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", completeHandler);
-    
-    function onComplete() {
+    }
+
+    onComplete(){
         Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function (layaMonkey3D) {
             this.layaMonkey3D = layaMonkey3D;
             this.scene.addChild(layaMonkey3D);
             this.layaMonkey2D = Laya.stage.addChild(new Laya.Image("res/threeDimen/monkey.png"));
             Laya.timer.frameLoop(1, this, this.animate);
         }));
-    };
-    function animate(){
+    }
+
+    animate(){
         this._position.x = Math.sin(this.scaleDelta += 0.01);
         this.layaMonkey3D.transform.position = this._position;
         this.layaMonkey3D.transform.scale = new Laya.Vector3(0.1, 0.1, 0.1);
@@ -30,5 +33,10 @@
         this.camera.viewport.project(this.layaMonkey3D.transform.position, this.camera.projectionViewMatrix, this._outPos);
         //赋值给2D
         this.layaMonkey2D.pos(this._outPos.x / Laya.stage.clientScaleX, this._outPos.y / Laya.stage.clientScaleY);
-    };
+    }
+}
+
+//激活启动类
+new D3SpaceToD2Space();
+
     

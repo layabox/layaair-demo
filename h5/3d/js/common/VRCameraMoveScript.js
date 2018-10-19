@@ -1,25 +1,13 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var VRCameraMoveScript = /** @class */ (function (_super) {
-    __extends(VRCameraMoveScript, _super);
-    function VRCameraMoveScript() {
-        var _this = _super.call(this) || this;
-        _this.q0 = new Laya.Quaternion();
-        _this.q1 = new Laya.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)); // - PI/2 around the x-axis
-        _this.q2 = new Laya.Quaternion();
-        _this.q3 = new Laya.Quaternion();
-        return _this;
+class VRCameraMoveScript extends Laya.Script{
+    constructor(){
+        this.q0 = new Laya.Quaternion();
+        this.q1 = new Laya.Quaternion(-Math.sqrt(0.5), 0, 0, Math.sqrt(0.5)); // - PI/2 around the x-axis
+        this.q2 = new Laya.Quaternion();
+        this.q3 = new Laya.Quaternion();
     }
-    VRCameraMoveScript.prototype._initialize = function (owner) {
-        _super.prototype._initialize.call(this, owner);
+
+    _initialize(){
+        super._initialize.call(this, owner);
         this.camera = owner;
         Laya.Browser.window.addEventListener('deviceorientation', function (e) {
             orientation = (Laya.Browser.window.orientation || 0);
@@ -34,12 +22,13 @@ var VRCameraMoveScript = /** @class */ (function (_super) {
             Laya.Quaternion.createFromAxisAngle(Laya.Vector3.UnitZ, -orientation / 360 * Math.PI * 2, this.q3);
             Laya.Quaternion.multiply(this.q2, this.q3, this.camera.transform.localRotation);
         }.bind(this), false);
-    };
-    VRCameraMoveScript.prototype._update = function (state) {
-        _super.prototype._update.call(this, state);
+    }
+
+    _update(state){
+        super._update.call(this, state);
         this.updateCamera(state.elapsedTime);
-    };
-    VRCameraMoveScript.prototype.updateCamera = function (elapsedTime) {
+    }
+    updateCamera(elapsedTime) {
         Laya.KeyBoardManager.hasKeyDown(87) && this.camera.moveForward(-0.002 * elapsedTime); //W
         Laya.KeyBoardManager.hasKeyDown(83) && this.camera.moveForward(0.002 * elapsedTime); //S
         Laya.KeyBoardManager.hasKeyDown(65) && this.camera.moveRight(-0.002 * elapsedTime); //A
@@ -47,9 +36,8 @@ var VRCameraMoveScript = /** @class */ (function (_super) {
         Laya.KeyBoardManager.hasKeyDown(81) && this.camera.moveVertical(0.002 * elapsedTime); //Q
         Laya.KeyBoardManager.hasKeyDown(69) && this.camera.moveVertical(-0.002 * elapsedTime); //E
         this.updateRotation();
-    };
-    VRCameraMoveScript.prototype.updateRotation = function () {
+    }
+    updateRotation() {
         this.camera.transform.localRotation = this.camera.transform.localRotation;
-    };
-    return VRCameraMoveScript;
-}(Laya.Script));
+    }
+}

@@ -1,8 +1,10 @@
-var Tool = /** @class */ (function () {
-    function Tool() {
-    }
-    Tool.linearModel = function (sprite3D, lineSprite3D, color) {
-        var vertex1 = new Laya.Vector3();
+class Tool{
+	constructor(){
+
+	}
+	static linearModel(sprite3D, lineSprite3D, color){
+		debugger;
+		var vertex1 = new Laya.Vector3();
         var vertex2 = new Laya.Vector3();
         var vertex3 = new Laya.Vector3();
         var lineCount = 0;
@@ -43,8 +45,5 @@ var Tool = /** @class */ (function () {
         }
         for (var i = 0, n = sprite3D.numChildren; i < n; i++)
             this.linearModel(sprite3D.getChildAt(i), lineSprite3D, color);
-    };
-    Tool.prototype.Tool = function () {
-    };
-    return Tool;
-}());
+	}
+}

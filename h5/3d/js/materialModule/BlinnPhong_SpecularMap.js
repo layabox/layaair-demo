@@ -1,4 +1,5 @@
-
+class BlinnPhong_SpecularMap{
+    constructor(){
         this.rotation = new Laya.Vector3(0, 0.01, 0);
         this.specularMapUrl = [
             "res/threeDimen/skinModel/dude/Assets/dude/headS.png",
@@ -21,22 +22,38 @@
         directionLight.color = new Laya.Vector3(1, 1, 1);
         //var completeHandler = Laya.Handler.create(this, this.onComplete);
         Laya.loader.create("res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, this.onComplete));
+    }
 
-    function onComplete() {
-        Laya.Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, function (sprite) {
-            var dude1 = this.scene.addChild(sprite);
-            dude1.transform.position = new Laya.Vector3(-1.5, 0, 0);
-            var dude2 = Laya.Sprite3D.instantiate(dude1, this.scene, false, new Laya.Vector3(1.5, 0, 0));
-            var skinnedMeshSprite3d = dude2.getChildAt(0).getChildAt(0);
-            for (var i = 0; i < skinnedMeshSprite3d.skinnedMeshRenderer.materials.length; i++) {
+    onComplete(){
+        Laya.Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, this.loadSprite3D));
+    }
+
+    loadSprite3D(sprite){
+        this.dude1 = this.scene.addChild(sprite);
+        this.dude1.transform.position = new Laya.Vector3(-1.5, 0, 0);
+        this.dude2 = Laya.Sprite3D.instantiate(this.dude1, this.scene, false, new Laya.Vector3(1.5, 0, 0));
+        var skinnedMeshSprite3d = this.dude2.getChildAt(0).getChildAt(0);
+        for (var i = 0; i < skinnedMeshSprite3d.skinnedMeshRenderer.materials.length; i++) {
                 var material = skinnedMeshSprite3d.skinnedMeshRenderer.materials[i];
-                Laya.Texture2D.load(this.specularMapUrl[i], Laya.Handler.create(this, function (mat, tex) {
-                    mat.specularTexture = tex; //高光贴图
-                }, [material]));
-            }
-            Laya.timer.frameLoop(1, this, function () {
-                dude1.transform.rotate(this.rotation);
-                dude2.transform.rotate(this.rotation);
-            });
-        }));
-    };
+                Laya.Texture2D.load(this.specularMapUrl[i], Laya.Handler.create(this, this.loadTexture, [material]));
+            }   
+
+        Laya.timer.frameLoop(1, this, this.rotateSprite);
+    }
+
+    //设置纹理
+    loadTexture(mat, tex){
+        mat.specularTexture = tex; //高光贴图
+    }
+
+    //旋转精灵
+    rotateSprite(){
+        this.dude1.transform.rotate(this.rotation);
+        this.dude2.transform.rotate(this.rotation);
+    }
+}
+
+
+//激活启动类
+new BlinnPhong_SpecularMap();
+

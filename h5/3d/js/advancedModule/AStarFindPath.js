@@ -1,28 +1,31 @@
-
-        this._position = new Laya.Vector3(0, 0, 0);
-        this._upVector3 = new Laya.Vector3(0, 1, 0);
-        this._tarPosition = new Laya.Vector3(0, 0, 0);
-        this._finalPosition = new Laya.Vector3(0, 0, 0);
-        this.index = 0;
-        this.curPathIndex = 0;
-        this.nextPathIndex = 1;
-        this.pointCount = 10;
-        Laya3D.init(0, 0);
-        Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
-        Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
-        Laya.Stat.show();
-        this.path = new Array();
-        //预加载所有资源
-        var resource = [
-            { url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene3D, priority: 1 },
-            { url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1 },
-            { url: "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [1024, 1024, 1, false, true] },
-            { url: "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [64, 64, 1, false, true] }
-        ];
+class AStarFindPath{
+  constructor(){
+    //设置初始化引擎
+    this._position = new Laya.Vector3(0, 0, 0);
+    this._upVector3 = new Laya.Vector3(0, 1, 0);
+    this._tarPosition = new Laya.Vector3(0, 0, 0);
+    this._finalPosition = new Laya.Vector3(0, 0, 0);
+    this.index = 0;
+    this.curPathIndex = 0;
+    this.nextPathIndex = 1;
+    this.pointCount = 10;
+    Laya3D.init(0, 0);
+    Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
+    Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+    Laya.Stat.show();
+    this.path = new Array();
+    //预加载所有资源
+    var resource = [
+      { url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene3D, priority: 1 },
+      { url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1 },
+      { url: "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [1024, 1024, 1, false, true] },
+      { url: "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [64, 64, 1, false, true] }
+      ];
         //加载函数
-        Laya.loader.create(resource, Laya.Handler.create(this, this.onLoadFinish));
-    function onLoadFinish() {
-       //初始化3D场景
+    Laya.loader.create(resource, Laya.Handler.create(this, this.onLoadFinish));
+  }
+  onLoadFinish(){
+      //初始化3D场景
        this.scene = Laya.stage.addChild(Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/XunLongShi.ls"));
        //删除原始资源中包含的默认相机
        var camera = this.scene.getChildByName("Main Camera");
@@ -77,33 +80,38 @@
            this._everyPath = pathFingding.findPath(this.path[this.curPathIndex % this.pointCount].x, this.path[this.curPathIndex++ % this.pointCount].z, this.path[this.nextPathIndex % this.pointCount].x, this.path[this.nextPathIndex++ % this.pointCount].z);
        });
        Laya.timer.loop(40, this, this.loopfun);
-    };
-    function loopfun() {
-        if (this._everyPath && this.index < this._everyPath.length) {
-            //AStar寻路位置
-            this._position.x = this._everyPath[this.index][0];
-            this._position.z = this._everyPath[this.index++][1];
-            //HeightMap获取高度数据
-            this._position.y = this.terrainSprite.getHeight(this._position.x, this._position.z);
-            if (isNaN(this._position.y)) {
-                this._position.y = this.moveSprite3D.transform.position.y;
-            }
-            this._tarPosition.x = this._position.x;
-            this._tarPosition.z = this._position.z;
-            this._tarPosition.y = this.moveSprite3D.transform.position.y;
-            //调整方向
-            this.layaMonkey.transform.lookAt(this._tarPosition, this._upVector3, false);
-            //因为资源规格,这里需要旋转180度
-            this.layaMonkey.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
-            //调整位置
-            Laya.Tween.to(this._finalPosition, { x: this._position.x, y: this._position.y, z: this._position.z }, 40);
-            this.moveSprite3D.transform.position = this._finalPosition;
-        }
-    };
-    function initPath(scene) {
-        for (var i = 0; i < this.pointCount; i++) {
+  }
+  loopfun(){
+    if(this._everyPath && this.index < this._everyPath.length){
+      //AStar寻路位置
+      this._position.x = this._everyPath[this.index][0];
+      this._position.z = this._everyPath[this.index++][1];
+      //HeightMap获取高度数据
+      this._position.y = this.terrainSprite.getHeight(this._position.x, this._position.z);
+      if (isNaN(this._position.y)) {
+        this._position.y = this.moveSprite3D.transform.position.y;
+      }
+      this._tarPosition.x = this._position.x;
+      this._tarPosition.z = this._position.z;
+      this._tarPosition.y = this.moveSprite3D.transform.position.y;
+      //调整方向
+      this.layaMonkey.transform.lookAt(this._tarPosition, this._upVector3, false);
+      //因为资源规格,这里需要旋转180度
+      this.layaMonkey.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
+      //调整位置
+      Laya.Tween.to(this._finalPosition, { x: this._position.x, y: this._position.y, z: this._position.z }, 40);
+      this.moveSprite3D.transform.position = this._finalPosition;
+    }
+  }
+  initPath(scene){
+    for (var i = 0; i < this.pointCount; i++) {
             //as中的String变为了string
             var str = "path" + i;
             this.path.push(scene.getChildByName('Scenes').getChildByName('Area').getChildByName(str).transform.localPosition);
         }
-    };
+  }
+
+}
+
+//激活启动类
+new AStarFindPath();

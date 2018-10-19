@@ -1,4 +1,5 @@
-
+class PhysicsWorldCharacter{
+    constructor(){
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -26,8 +27,9 @@
             this.addCapsule();
         }
         this.addCharacter();
+    }
 
-   function addCharacter() {
+    addCharacter() {
         Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function (monkey) {
             this.scene.addChild(monkey);
             monkey.transform.localScale = new Laya.Vector3(1, 1, 1);
@@ -38,16 +40,16 @@
             this.kinematicSphere = monkey;
             Laya.timer.frameLoop(1, this, this.onKeyDown);
         }));
-    };
-    function onKeyDown() {
+    }
+    onKeyDown() {
         var character = this.kinematicSphere.getComponent(Laya.CharacterController);
         Laya.KeyBoardManager.hasKeyDown(87) && character.move(new Laya.Vector3(0, 0, -0.2)); //W
         Laya.KeyBoardManager.hasKeyDown(83) && character.move(new Laya.Vector3(0, 0, 0.2)); //S
         Laya.KeyBoardManager.hasKeyDown(65) && character.move(new Laya.Vector3(-0.2, 0, 0)); //A
         Laya.KeyBoardManager.hasKeyDown(68) && character.move(new Laya.Vector3(0.2, 0, 0)); //D
         Laya.KeyBoardManager.hasKeyDown(69) && character.jump(); //E
-    };
-    function addBox() {
+    }
+    addBox() {
         var mat1 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function (tex) {
             mat1.albedoTexture = tex;
@@ -63,8 +65,8 @@
         var boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
         rigidBody.colliderShape = boxShape;
         rigidBody.mass = 10;
-    };
-    function addCapsule() {
+    }
+    addCapsule() {
         var mat3 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function (tex) {
             mat3.albedoTexture = tex;
@@ -79,4 +81,9 @@
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;
         rigidBody.mass = 10;
-    };
+    }
+}
+
+
+//激活启动类
+new PhysicsWorldCharacter();

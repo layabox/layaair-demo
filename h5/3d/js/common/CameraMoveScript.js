@@ -1,48 +1,36 @@
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
-var CameraMoveScript = /** @class */ (function (_super) {
-    __extends(CameraMoveScript, _super);
-    function CameraMoveScript() {
-        var _this = 
-        //父类
-        _super.call(this) || this;
-        _this._tempVector3 = new Laya.Vector3();
-        _this.yawPitchRoll = new Laya.Vector3();
-        _this.resultRotation = new Laya.Quaternion();
-        _this.tempRotationZ = new Laya.Quaternion();
-        _this.tempRotationX = new Laya.Quaternion();
-        _this.tempRotationY = new Laya.Quaternion();
-        _this.rotaionSpeed = 0.00006;
-        return _this;
+class CameraMoveScript extends Laya.Script3D{
+    constructor(){
+        super();
+        this._tempVector3 = new Laya.Vector3();
+        this.yawPitchRoll = new Laya.Vector3();
+        this.resultRotation = new Laya.Quaternion();
+        this.tempRotationZ = new Laya.Quaternion();
+        this.tempRotationX = new Laya.Quaternion();
+        this.tempRotationY = new Laya.Quaternion();
+        this.rotaionSpeed = 0.00006;
     }
-    CameraMoveScript.prototype._onAdded = function () {
-        //点击鼠标右键
+
+    _onAdded(){
+         //点击鼠标右键
         Laya.stage.on(Laya.Event.RIGHT_MOUSE_DOWN, this, this.mouseDown);
         //松开鼠标右键
         Laya.stage.on(Laya.Event.RIGHT_MOUSE_UP, this, this.mouseUp);
         //将本组件的父类定义为Camera
         this.camera = this.owner;
-    };
-    CameraMoveScript.prototype._onDestroy = function () {
+    }
+    _onDestroy() {
         //关闭监听函数
         Laya.stage.off(Laya.Event.RIGHT_MOUSE_DOWN, this, this.mouseDown);
         Laya.stage.off(Laya.Event.RIGHT_MOUSE_UP, this, this.mouseUp);
-    };
-    CameraMoveScript.prototype.onUpdate = function (state) {
-        _super.prototype.onUpdate.call(this, state);
+    }
+    onUpdate(state) {
+        //Laya.Script3D.prototype.onUpdate.call(this, state);这两种写法都是可以的，第一种是通过引用类型调用prototype，第二种是通过引用类型的实例进行调用，都是父类中的方法
+		super.onUpdate.call(this, state);
         //每帧调用的函数，传入参数每帧的时间值
         this.updateCamera(Laya.timer.delta);
      
-    };
-    CameraMoveScript.prototype.mouseDown = function (e) {
+    }
+    mouseDown(e) {
         //获得鼠标的旋转值
         this.camera.transform.localRotation.getYawPitchRoll(this.yawPitchRoll);
         //获得鼠标的xy值
@@ -51,38 +39,38 @@ var CameraMoveScript = /** @class */ (function (_super) {
         //设置bool值
         this.isMouseDown = true;
      
-    };
-    CameraMoveScript.prototype.mouseUp = function (e) {
+    }
+    mouseUp(e) {
         //设置bool值
         this.isMouseDown = false;
-    };
+    }
     /**
      * 向前移动。
      */
-    CameraMoveScript.prototype.moveForward = function (distance) {
+    moveForward(distance) {
         this._tempVector3.elements[0] = 0;
         this._tempVector3.elements[1] = 0;
         this._tempVector3.elements[2] = distance;
         this.camera.transform.translate(this._tempVector3);
-    };
+    }
     /**
      * 向右移动。
      */
-    CameraMoveScript.prototype.moveRight = function (distance) {
+    moveRight(distance) {
         this._tempVector3.elements[1] = 0;
         this._tempVector3.elements[2] = 0;
         this._tempVector3.elements[0] = distance;
         this.camera.transform.translate(this._tempVector3);
-    };
+    }
     /**
      * 向上移动。
      */
-    CameraMoveScript.prototype.moveVertical = function (distance) {
+    moveVertical(distance) {
         this._tempVector3.elements[0] = this._tempVector3.elements[2] = 0;
         this._tempVector3.elements[1] = distance;
         this.camera.transform.translate(this._tempVector3, false);
-    };
-    CameraMoveScript.prototype.updateCamera = function (elapsedTime) {
+    }
+   updateCamera(elapsedTime) {
         //是否得到了mouseX的值和mouseY的值
         if (this.isMouseDown) { //!isNaN(this.lastMouseX) && !isNaN(this.lastMouseY) &&
             var scene = this.owner.scene;
@@ -104,8 +92,8 @@ var CameraMoveScript = /** @class */ (function (_super) {
         }
         this.lastMouseX = Laya.stage.mouseX;
         this.lastMouseY = Laya.stage.mouseY;
-    };
-    CameraMoveScript.prototype.updateRotation = function () {
+    }
+    updateRotation() {
         var yprElem = this.yawPitchRoll.elements;
         if (Math.abs(yprElem[1]) < 1.50) {
             Laya.Quaternion.createFromYawPitchRoll(yprElem[0], yprElem[1], yprElem[2], this.tempRotationZ);
@@ -113,6 +101,8 @@ var CameraMoveScript = /** @class */ (function (_super) {
             //？
             this.camera.transform.localRotation = this.camera.transform.localRotation;
         }
-    };
-    return CameraMoveScript;
-}(Laya.Script3D));
+    }
+}
+
+
+

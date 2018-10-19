@@ -1,4 +1,5 @@
-
+class PhysicsWorldCollisionFiflter{
+    constructor(){
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -26,8 +27,9 @@
             this.addBox();
             this.addCapsule();
         }
+    }
 
-    function addKinematicSphere() {
+    addKinematicSphere() {
         var mat2 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function (tex) {
             mat2.albedoTexture = tex;
@@ -45,16 +47,16 @@
         rigidBody.canCollideWith = Laya.Physics3DUtils.COLLISIONFILTERGROUP_CUSTOMFILTER1; //只与自定义组1碰撞(如果多组采用位操作）
         this.kinematicSphere = sphere;
         Laya.timer.frameLoop(1, this, this.onKeyDown);
-    };
-    function onKeyDown() {
+    }
+    onKeyDown() {
         Laya.KeyBoardManager.hasKeyDown(87) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0, -0.2)); //W
         Laya.KeyBoardManager.hasKeyDown(83) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0, 0.2)); //S
         Laya.KeyBoardManager.hasKeyDown(65) && this.kinematicSphere.transform.translate(new Laya.Vector3(-0.2, 0, 0)); //A
         Laya.KeyBoardManager.hasKeyDown(68) && this.kinematicSphere.transform.translate(new Laya.Vector3(0.2, 0, 0)); //D
         Laya.KeyBoardManager.hasKeyDown(81) && this.plane.transform.translate(new Laya.Vector3(-0.01, 0, 0));//Q
         Laya.KeyBoardManager.hasKeyDown(69) && this.plane.transform.translate(new Laya.Vector3(0.01, 0, 0));//E
-    };
-    function addBox() {
+    }
+    addBox() {
         var mat1 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(null, function (tex) {
             mat1.albedoTexture = tex;
@@ -72,8 +74,8 @@
         rigidBody.colliderShape = boxShape;
         rigidBody.mass = 10;
         rigidBody.collisionGroup = Laya.Physics3DUtils.COLLISIONFILTERGROUP_CUSTOMFILTER1; //自定义组1
-    };
-    function addCapsule() {
+    }
+    addCapsule() {
         var mat3 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
             mat3.albedoTexture = tex;
@@ -89,4 +91,10 @@
         rigidBody.colliderShape = sphereShape;
         rigidBody.mass = 10;
         rigidBody.collisionGroup = Laya.Physics3DUtils.COLLISIONFILTERGROUP_CUSTOMFILTER2; //自定义组2,会跳过碰撞
-    };
+    }
+
+}
+
+
+//激活启动类
+new PhysicsWorldCollisionFiflter();

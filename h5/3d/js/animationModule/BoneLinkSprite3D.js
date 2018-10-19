@@ -1,4 +1,5 @@
-
+class BoneLinkSprite3D{
+    constructor(){
         this._dragonScale = new Laya.Vector3(1.5, 1.5, 1.5);
         this._rotation = new Laya.Quaternion(-0.5, -0.5, 0.5, -0.5);
         this._position = new Laya.Vector3(-0.2, 0.0, 0.0);
@@ -18,7 +19,8 @@
             { url: "res/threeDimen/skinModel/BoneLinkScene/PangZi.lh", clas: Laya3D.HIERARCHY, priority: 1 }
         ];
         Laya.loader.create(resource, Laya.Handler.create(this, this.onLoadFinish));
-    function onLoadFinish() {
+    }
+    onLoadFinish(){
         //初始化场景
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
         this.scene.ambientColor = new Laya.Vector3(0.5, 0.5, 0.5);
@@ -73,8 +75,8 @@
         state4.clip.islooping = true;
         this.dragonAnimator2.addState(state4);
         this.loadUI();
-    };
-    function loadUI() {
+    }
+    loadUI(){
         Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, function () {
             this.changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "乘骑坐骑"));
             this.changeActionButton.size(160, 40);
@@ -124,4 +126,9 @@
                 }
             });
         }));
-    };
+    }
+}
+
+//激活启动类
+new BoneLinkSprite3D();
+

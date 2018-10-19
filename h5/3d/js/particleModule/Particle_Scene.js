@@ -1,4 +1,5 @@
-
+class ParticleScene{
+    constructor(){
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -9,3 +10,8 @@
                 camera.transform.translate(new Laya.Vector3(0, 1, 0));
                 camera.addComponent(CameraMoveScript);
             }));
+    }
+}
+
+//激活启动类
+new ParticleScene();

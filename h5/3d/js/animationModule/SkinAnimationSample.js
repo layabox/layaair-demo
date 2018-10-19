@@ -1,4 +1,5 @@
-
+class SkinAnimationSample{
+    constructor(){
         this.curStateIndex = 0;
         this.clipName = ["idle", "fallingback", "idle", "walk", "Take 001"];
         Laya3D.init(0, 0);
@@ -21,20 +22,27 @@
             this.zombieAnimator = zombie.getChildAt(0).getComponent(Laya.Animator); //获取Animator动画组件
             this.loadUI();
         }));
-    
-    function loadUI() {
-        Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, function () {
-            debugger;
-            this.changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "切换动作"));
-            this.changeActionButton.size(160, 40);
-            this.changeActionButton.labelBold = true;
-            this.changeActionButton.labelSize = 30;
-            this.changeActionButton.sizeGrid = "4,4,4,4";
-            this.changeActionButton.scale(Laya.Browser.pixelRatio, Laya.Browser.pixelRatio);
-            this.changeActionButton.pos(Laya.stage.width / 2 - this.changeActionButton.width * Laya.Browser.pixelRatio / 2, Laya.stage.height - 100 * Laya.Browser.pixelRatio);
-            this.changeActionButton.on(Laya.Event.CLICK, this, function () {
+    }
+
+    loadUI(){
+        Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, this.motionSwitch));
+    }
+
+    motionSwitch(){
+        this.changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "切换动作"));
+        this.changeActionButton.size(160, 40);
+        this.changeActionButton.labelBold = true;
+        this.changeActionButton.labelSize = 30;
+        this.changeActionButton.sizeGrid = "4,4,4,4";
+        this.changeActionButton.scale(Laya.Browser.pixelRatio, Laya.Browser.pixelRatio);
+        this.changeActionButton.pos(Laya.stage.width / 2 - this.changeActionButton.width * Laya.Browser.pixelRatio / 2, Laya.stage.height - 100 * Laya.Browser.pixelRatio);
+        this.changeActionButton.on(Laya.Event.CLICK, this, function () {
                 //根据名称播放动画
                 this.zombieAnimator.play(this.clipName[++this.curStateIndex % this.clipName.length]);
-            });
-        }));
-    }
+                });
+
+     }
+}
+
+//激活启动类
+new SkinAnimationSample();

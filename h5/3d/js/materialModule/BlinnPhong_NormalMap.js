@@ -1,4 +1,5 @@
-
+class BlinnPhong_NormalMap{
+    constructor(){
         this.rotation = new Laya.Vector3(0, 0.01, 0);
         this.normalMapUrl = [
             "res/threeDimen/staticModel/lizard/Assets/Lizard/lizardeye_norm.png",
@@ -17,25 +18,40 @@
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(0.0, -0.8, -1.0));
         directionLight.color = new Laya.Vector3(1, 1, 1);
         Laya.loader.create("res/threeDimen/staticModel/lizard/lizard.lh", Laya.Handler.create(this, this.onComplete), this, Laya3D.HIERARCHY);
+    }
 
-    function onComplete() {
-        Laya.Sprite3D.load("res/threeDimen/staticModel/lizard/lizard.lh", Laya.Handler.create(this, function (sprite) {
-            var monster1 = this.scene.addChild(sprite);
-            monster1.transform.position = new Laya.Vector3(-0.6, 0, 0);
-            monster1.transform.localScale = new Laya.Vector3(0.075, 0.075, 0.075);
-            var monster2 = Laya.Sprite3D.instantiate(monster1, this.scene, false, new Laya.Vector3(0.6, 0, 0));
-            monster2.transform.localScale = new Laya.Vector3(0.075, 0.075, 0.075);
-            for (var i = 0; i < monster2.getChildByName("lizard").numChildren; i++) {
-                var meshSprite3D = monster2.getChildByName("lizard").getChildAt(i);
+    onComplete(){
+        Laya.Sprite3D.load("res/threeDimen/staticModel/lizard/lizard.lh", Laya.Handler.create(this, this.loadSprite3D));
+    }
+    //加载精灵
+    loadSprite3D(sprite){
+        this.monster1 = this.scene.addChild(sprite);
+        this. monster1.transform.position = new Laya.Vector3(-0.6, 0, 0);
+        this.monster1.transform.localScale = new Laya.Vector3(0.075, 0.075, 0.075);
+        this.monster2 = Laya.Sprite3D.instantiate(this.monster1, this.scene, false, new Laya.Vector3(0.6, 0, 0));
+        this.monster2.transform.localScale = new Laya.Vector3(0.075, 0.075, 0.075);
+
+        for (var i = 0; i < this.monster2.getChildByName("lizard").numChildren; i++) {
+                var meshSprite3D = this.monster2.getChildByName("lizard").getChildAt(i);
                 var material = meshSprite3D.meshRenderer.material;
                 //法线贴图
-                Laya.Texture2D.load(this.normalMapUrl[i], Laya.Handler.create(this, function (mat, texture) {
-                    mat.normalTexture = texture;
-                }, [material]));
-            }
-            Laya.timer.frameLoop(1, this, function () {
-                monster1.transform.rotate(this.rotation);
-                monster2.transform.rotate(this.rotation);
-            });
-        }));
-    };
+                Laya.Texture2D.load(this.normalMapUrl[i], Laya.Handler.create(this, this.loadTexture, [material]));
+        }   
+
+        Laya.timer.frameLoop(1, this, this.rotateSprite);
+    }
+
+    //设置纹理
+    loadTexture(mat, texture){
+        mat.normalTexture = texture;
+    }
+    //旋转精灵
+    rotateSprite(){
+        this.monster1.transform.rotate(this.rotation);
+        this.monster2.transform.rotate(this.rotation);
+    }
+}
+
+
+//激活启动类
+new BlinnPhong_NormalMap();

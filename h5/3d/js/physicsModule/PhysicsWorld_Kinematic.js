@@ -1,4 +1,5 @@
-
+class PhysicsWorldKinematic{
+    constructor(){
         Laya3D.init(0, 0, null);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -26,8 +27,9 @@
             this.addCapsule();
         }
         this.addKinematicSphere();
+    }
 
-   function addKinematicSphere() {
+    addKinematicSphere() {
         var mat2 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function (tex) {
             mat2.albedoTexture = tex;
@@ -45,16 +47,16 @@
         //rigidBody.detectCollisions = false;
         this.kinematicSphere = sphere;
         Laya.timer.frameLoop(1, this, this.onKeyDown);
-    };
-    function onKeyDown() {
+    }
+    onKeyDown() {
         Laya.KeyBoardManager.hasKeyDown(87) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0, -0.2)); //W
         Laya.KeyBoardManager.hasKeyDown(83) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0, 0.2)); //S
         Laya.KeyBoardManager.hasKeyDown(65) && this.kinematicSphere.transform.translate(new Laya.Vector3(-0.2, 0, 0)); //A
         Laya.KeyBoardManager.hasKeyDown(68) && this.kinematicSphere.transform.translate(new Laya.Vector3(0.2, 0, 0)); //D
         Laya.KeyBoardManager.hasKeyDown(81) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0.2, 0)); //Q
         Laya.KeyBoardManager.hasKeyDown(69) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, -0.2, 0)); //E
-    };
-    function addBox() {
+    }
+    addBox() {
         var mat1 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(null, function (tex) {
             mat1.albedoTexture = tex;
@@ -70,8 +72,8 @@
         var boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
         rigidBody.colliderShape = boxShape;
         rigidBody.mass = 10;
-    };
-    function addCapsule() {
+    }
+    addCapsule() {
         var mat3 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
             mat3.albedoTexture = tex;
@@ -86,4 +88,9 @@
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;
         rigidBody.mass = 10;
-    };
+    }
+}
+
+
+//激活启动类
+new PhysicsWorldKinematic();

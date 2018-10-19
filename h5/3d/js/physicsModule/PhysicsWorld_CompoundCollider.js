@@ -1,4 +1,5 @@
-
+class  PhysicsWorldCompoundCollider{
+    constructor(){
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -26,8 +27,9 @@
         staticCollider.colliderShape = planeShape;
         staticCollider.friction = 2;
         this.randomAddPhysicsSprite();
+    }
 
-    function randomAddPhysicsSprite() {
+    randomAddPhysicsSprite() {
         Laya.timer.loop(1000, this, function () {
             var random = Math.floor(Math.random() * 2) % 2;
             switch (random) {
@@ -41,8 +43,8 @@
                     break;
             }
         });
-    };
-    function addTable() {
+    }
+    addTable() {
         var mat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
             mat.albedoTexture = tex;
@@ -75,8 +77,8 @@
             compoundShape.addChildShape(boxShape4);
             rigidBody.colliderShape = compoundShape;
         }));
-    };
-    function addObject() {
+    }
+    addObject() {
         var mat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function (tex) {
             mat.albedoTexture = tex;
@@ -99,4 +101,9 @@
             compoundShape.addChildShape(sphereShape);
             rigidBody.colliderShape = compoundShape;
         }));
-    };
+    }
+}
+
+
+//激活启动类
+new PhysicsWorldCompoundCollider();

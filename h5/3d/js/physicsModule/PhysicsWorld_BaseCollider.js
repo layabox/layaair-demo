@@ -1,4 +1,5 @@
-
+class PhysicsWorldBaseCollider{
+    constructor(){
         //初始化引擎
         Laya3D.init(0, 0);
         //设置画布模式
@@ -38,10 +39,13 @@
         planeStaticCollider.restitution = 0.3;
         //随机掉落物理物体的脚本
         this.randomAddPhysicsSprite();
-    function randomAddPhysicsSprite() {
+    }
+
+    randomAddPhysicsSprite(){
         Laya.timer.loop(1000, this, this.loopfun);
-    };
-    function loopfun() {
+    }
+
+    loopfun(){
         var random = Math.floor(Math.random() * 3) % 3;
         switch (random) {
             case 0:
@@ -55,8 +59,9 @@
             default:
                 break;
         }
-    };
-    function addBox() {
+    }
+    //添加box
+    addBox(){
         //设置BlinnPhong材质
         var mat1 = new Laya.BlinnPhongMaterial();
         //添加漫反射贴图
@@ -80,10 +85,10 @@
         rigidBody.colliderShape = boxShape;
         //添加重力加速度
         rigidBody.mass = 10;
-    };
-    function addSphere() {
+    }
+    //添加球体
+    addSphere(){
         var mat2 = new Laya.BlinnPhongMaterial();
-        //
         Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function (tex) {
             mat2.albedoTexture = tex;
         }));
@@ -95,8 +100,9 @@
         var sphereShape = new Laya.SphereColliderShape(radius);
         rigidBody.colliderShape = sphereShape;
         rigidBody.mass = 10;
-    };
-    function addCapsule() {
+    }
+    //添加胶囊
+    addCapsule(){
         var mat3 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
             mat3.albedoTexture = tex;
@@ -111,5 +117,13 @@
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;
         rigidBody.mass = 10;
-    };
+    }
+
+}
+
+
+//激活启动类
+new PhysicsWorldBaseCollider();
+
+
 
