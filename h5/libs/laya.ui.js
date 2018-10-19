@@ -4,14 +4,15 @@
 
 	var Animation=laya.display.Animation,Browser=laya.utils.Browser,ClassUtils=laya.utils.ClassUtils,ColorFilter=laya.filters.ColorFilter;
 	var Component=laya.components.Component,Const=laya.Const,Ease=laya.utils.Ease,Event=laya.events.Event,Graphics=laya.display.Graphics;
-	var Handler=laya.utils.Handler,Input=laya.display.Input,Loader=laya.net.Loader,Node=laya.display.Node,Point=laya.maths.Point;
-	var Rectangle=laya.maths.Rectangle,Render=laya.renders.Render,Scene=laya.display.Scene,SceneUtils=laya.utils.SceneUtils;
-	var Sprite=laya.display.Sprite,Text=laya.display.Text,Texture=laya.resource.Texture,Tween=laya.utils.Tween;
-	var Utils=laya.utils.Utils,WeakObject=laya.utils.WeakObject;
+	var Handler=laya.utils.Handler,Input=laya.display.Input,Loader=laya.net.Loader,Matrix=laya.maths.Matrix,Node=laya.display.Node;
+	var Point=laya.maths.Point,Rectangle=laya.maths.Rectangle,Render=laya.renders.Render,Scene=laya.display.Scene;
+	var SceneUtils=laya.utils.SceneUtils,Sprite=laya.display.Sprite,Stage=laya.display.Stage,Text=laya.display.Text;
+	var Texture=laya.resource.Texture,Texture2D=laya.webgl.resource.Texture2D,Tween=laya.utils.Tween,Utils=laya.utils.Utils;
+	var WeakObject=laya.utils.WeakObject;
 Laya.interface('laya.ui.IBox');
 Laya.interface('laya.ui.IItem');
-Laya.interface('laya.ui.ISelect');
 Laya.interface('laya.ui.IRender');
+Laya.interface('laya.ui.ISelect');
 /**
 *<code>Styles</code> 定义了组件常用的样式属性。
 */
@@ -5160,6 +5161,74 @@ var TipManager=(function(_super){
 	TipManager.tipBackColor="#111111";
 	TipManager.tipDelay=200;
 	return TipManager;
+})(UIComponent)
+
+
+/**
+*微信开放数据展示组件，直接实例本组件，即可根据组件宽高，位置，以最优的方式显示开放域数据
+*/
+//class laya.ui.WXOpenDataViewer extends laya.ui.UIComponent
+var WXOpenDataViewer=(function(_super){
+	function WXOpenDataViewer(){
+		this._$4__texture=null;
+		WXOpenDataViewer.__super.call(this);
+		this._width=this._height=200;
+		var tex=new Texture();
+		tex.bitmap=new Texture2D();
+		this.texture=tex;
+	}
+
+	__class(WXOpenDataViewer,'laya.ui.WXOpenDataViewer',_super);
+	var __proto=WXOpenDataViewer.prototype;
+	__proto.onEnable=function(){
+		if (window.wx && window.sharedCanvas)Laya.timer.frameLoop(1,this,this._onLoop);
+	}
+
+	__proto.onDisable=function(){
+		Laya.timer.clear(this,this._onLoop);
+	}
+
+	__proto._onLoop=function(){
+		this.texture.bitmap.loadImageSource(window.sharedCanvas);
+	}
+
+	__proto._postMsg=function(){
+		var mat=new Matrix();
+		mat.translate(this.x,this.y);
+		var stage=Laya.stage;
+		mat.scale(stage._canvasTransform.getScaleX()*this.globalScaleX*stage.transform.getScaleX(),stage._canvasTransform.getScaleY()*this.globalScaleY*stage.transform.getScaleX());
+		this.postMsg({type:"changeMatrix",a:mat.a,b:mat.b,c:mat.c,d:mat.d,tx:mat.tx,ty:mat.ty,w:this.width,h:this.height});
+	}
+
+	/**向开放数据域发送消息*/
+	__proto.postMsg=function(msg){
+		if (window.wx){
+			var openDataContext=window.wx.getOpenDataContext();
+			openDataContext.postMessage(msg);
+		}
+	}
+
+	__getset(0,__proto,'x',_super.prototype._$get_x,function(value){
+		Laya.superSet(UIComponent,this,'x',value);
+		this.callLater(this._postMsg);
+	});
+
+	__getset(0,__proto,'width',_super.prototype._$get_width,function(value){
+		Laya.superSet(UIComponent,this,'width',value);
+		if (window.sharedCanvas)window.sharedCanvas.width=value;
+	});
+
+	__getset(0,__proto,'height',_super.prototype._$get_height,function(value){
+		Laya.superSet(UIComponent,this,'height',value);
+		if (window.sharedCanvas)window.sharedCanvas.height=value;
+	});
+
+	__getset(0,__proto,'y',_super.prototype._$get_y,function(value){
+		Laya.superSet(UIComponent,this,'y',value);
+		this.callLater(this._postMsg);
+	});
+
+	return WXOpenDataViewer;
 })(UIComponent)
 
 

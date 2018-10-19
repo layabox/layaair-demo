@@ -1,7 +1,7 @@
 {
 	"scripts": [
 		"libs/laya.core.js",
-		"libs/laya.physics3D.js",
+		"libs/laya.physics3D.runtime.js",
 		"libs/laya.webgl.js",
 		"libs/laya.filter.js",
 		"libs/laya.particle.js",

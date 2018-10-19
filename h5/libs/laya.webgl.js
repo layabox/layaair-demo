@@ -5656,6 +5656,7 @@ var LayaGLRenderingContext=(function(){
 		this._targets=null;
 		this._width=0;
 		this._height=0;
+		this._cmdEncoder=null;
 	}
 
 	__class(LayaGLRenderingContext,'laya.layagl.LayaGLRenderingContext');
@@ -5760,6 +5761,37 @@ var LayaGLRenderingContext=(function(){
 		commandEncoder.setRectMesh(1,vbData);
 		commandEncoder.modifyMesh(LayaNative2D.GLOBALVALUE_MATRIX32,0,/*laya.layagl.LayaGL.VALUE_OPERATE_M32_MUL*/7);
 		commandEncoder.modifyMesh(LayaNative2D.GLOBALVALUE_DRAWTEXTURE_COLOR,1,/*laya.layagl.LayaGL.VALUE_OPERATE_BYTE4_COLOR_MUL*/15);
+	}
+
+	__proto.getImageData=function(x,y,width,height,callBack){
+		var w=this._targets.sourceWidth;
+		var h=this._targets.sourceHeight;
+		if (x < 0 || y < 0 || width < 0 || height < 0 || width > w || height > h){
+			return;
+		}
+		if (!this._cmdEncoder){
+			this._cmdEncoder=LayaGL.instance.createCommandEncoder(128,64,false);
+		};
+		var gl=LayaGL.instance;
+		this._cmdEncoder.beginEncoding();
+		this._cmdEncoder.clearEncoding();
+		RenderTexture2D.pushRT();
+		this._targets.start();
+		gl.readPixelsAsync(x,y,width,height,/*laya.webgl.WebGLContext.RGBA*/0x1908,/*laya.webgl.WebGLContext.UNSIGNED_BYTE*/0x1401,function(data){
+			/*__JS__ */callBack(data);
+		});
+		this.endRT();
+		this._cmdEncoder.endEncoding();
+		gl.useCommandEncoder(this._cmdEncoder.getPtrID(),-1,0);
+	}
+
+	__proto.toBase64=function(type,encoderOptions,callBack){
+		var width=this._targets.sourceWidth;
+		var height=this._targets.sourceHeight;
+		this.getImageData(0,0,width,height,function(data){
+			/*__JS__ */var base64=conchToBase64(type,encoderOptions,data,width,height);
+			/*__JS__ */callBack(base64);
+		});
 	}
 
 	__getset(0,__proto,'asBitmap',function(){
@@ -6991,7 +7023,12 @@ var CharBook=(function(){
 		this.fontScaleY=1.0;
 		this._curStrPos=0;
 		this.tempMat=new Matrix();
-		if (Browser.onMiniGame && !Browser.onAndroid)CharBook.isWan1Wan=true;
+		var bugIOS=false;
+		var miniadp=Laya['MiniAdpter'];
+		if (miniadp && miniadp.systemInfo && miniadp.systemInfo.system){
+			bugIOS=miniadp.systemInfo.system.toLowerCase()==='ios 10.1.1';
+		}
+		if (Browser.onMiniGame && !Browser.onAndroid && !bugIOS)CharBook.isWan1Wan=true;
 		CharBook.charbookInst=this;
 		CharPages.charRender=Render.isConchApp ? (new CharRender_Native()):(new CharRender_Canvas());
 	}
@@ -10119,10 +10156,46 @@ var WebGL=(function(){
 				prototypeContext.drawTarget=protoLast.drawTarget;
 				prototypeContext._$get_asBitmap=protoLast._$get_asBitmap;
 				prototypeContext._$set_asBitmap=protoLast._$set_asBitmap;
+				prototypeContext.toBase64=protoLast.toBase64;
+				prototypeContext.getImageData=protoLast.getImageData;
 				/*__JS__ */__getset (0,prototypeContext,'asBitmap',prototypeContext._$get_asBitmap,prototypeContext._$set_asBitmap);
 			}
 			ConchSpriteAdpt.init();
 			LayaNative2D.__init__();
+		}
+		RunDriver.drawToCanvas=function (sprite,_renderType,canvasWidth,canvasHeight,offsetX,offsetY){
+			var canvas=new HTMLCanvas(true);
+			canvas.size(canvasWidth,canvasHeight);
+			var context=canvas.getContext("2d");
+			context.asBitmap=true;
+			var canvasCmd=LayaGL.instance.createCommandEncoder(128,64,false);
+			canvasCmd.beginEncoding();
+			canvasCmd.clearEncoding();
+			var layagl=LayaGL.instance;
+			var lastContext=layagl.getCurrentContext();
+			layagl.setCurrentContext(context);
+			context.beginRT();
+			layagl.save();
+			var temp=ConchSpriteAdpt._tempFloatArrayMatrix;
+			temp[0]=1;temp[1]=0;temp[2]=0;temp[3]=1;
+			temp[4]=offsetX;temp[5]=offsetY;
+			layagl.setGlobalValue(LayaNative2D.GLOBALVALUE_MATRIX32,/*laya.layagl.LayaGL.VALUE_OPERATE_SET*/8,temp);
+			(sprite).writeBlockToNative();
+			layagl.restore();
+			layagl.setCurrentContext(lastContext);
+			layagl.commitContextToGPU(context);
+			context.endRT();
+			canvasCmd.endEncoding();
+			layagl.useCommandEncoder(canvasCmd.getPtrID(),-1,0);
+			return canvas;
+		}
+		HTMLCanvas.prototype.getTexture=function (){
+			if (!this._texture){
+				this._texture=this.context._targets;
+				this._texture.uv=RenderTexture2D.flipyuv;
+				this._texture.bitmap=this._texture;
+			}
+			return this._texture;
 		}
 	}
 
@@ -10335,6 +10408,14 @@ var WebGL=(function(){
 				webglctx._drawRenderTexture(outRT,x,y,b.width,b.height,Matrix.TEMP.identity(),1.0,RenderTexture2D.defuv);
 				mat.destroy();
 			}
+		}
+		HTMLCanvas.prototype.getTexture=function (){
+			if (!this._texture){
+				var bitmap=new Texture2D();
+				bitmap.loadImageSource(this.source);
+				this._texture=new Texture(bitmap);
+			}
+			return this._texture;
 		}
 		Float32Array.prototype.slice || (Float32Array.prototype.slice=WebGL._float32ArraySlice);
 		Uint16Array.prototype.slice || (Uint16Array.prototype.slice=WebGL._uint16ArraySlice);
@@ -12781,7 +12862,9 @@ var CharRender_Canvas=(function(_super){
 			}
 			CharRender_Canvas.ctx.save();
 			this.needResetScale=true;
-			CharRender_Canvas.ctx.scale(sx,sy);
+			if(!CharBook.isWan1Wan){
+				CharRender_Canvas.ctx.scale(sx,sy);
+			}
 			this.lastScaleX=sx;
 			this.lastScaleY=sy;
 		}
@@ -14158,6 +14241,8 @@ var ConchSpriteAdpt=(function(_super){
 		spP.repaint=spP.repaintForNative=ConchSprite.prototype.repaintForNative;
 		spP.parentRepaint=spP.parentRepaintForNative=ConchSprite.prototype.parentRepaintForNative;
 		spP._renderChilds=ConchSprite.prototype._renderChilds;
+		spP.writeBlockToNative=ConchSprite.prototype.writeBlockToNative;
+		spP._writeBlockChilds=ConchSprite.prototype._writeBlockChilds;
 	}
 
 	ConchSpriteAdpt.useRenderTarget=function(target){
@@ -14493,6 +14578,18 @@ var ConchSprite=(function(_super){
 		}
 	}
 
+	__proto.writeBlockToNative=function(){
+		var layagl=LayaGL.instance;
+		if (this._children.length > 0){
+			layagl.blockStart(this._conchData);
+			this._writeBlockChilds();
+			layagl.blockEnd(this._conchData);
+		}
+		else{
+			layagl.block(this._conchData);
+		}
+	}
+
 	//TODO:coverage
 	__proto._renderChilds=function(context){
 		var childs=this._children,ele;
@@ -14512,6 +14609,27 @@ var ConchSprite=(function(_super){
 			}else {
 			for (;i < n;++i)
 			(ele=childs[i])._visible && ele.renderToNative(context);
+		}
+	}
+
+	__proto._writeBlockChilds=function(){
+		var childs=this._children,ele;
+		var i=0,n=childs.length;
+		var style=(this)._style;
+		if (style.viewport){
+			var rect=style.viewport;
+			var left=rect.x;
+			var top=rect.y;
+			var right=rect.right;
+			var bottom=rect.bottom;
+			var _x=NaN,_y=NaN;
+			for (;i < n;++i){
+				if ((ele=childs[i])._visible && ((_x=ele._x)< right && (_x+ele.width)> left && (_y=ele._y)< bottom && (_y+ele.height)> top))
+					ele.writeBlockToNative();
+			}
+			}else {
+			for (;i < n;++i)
+			(ele=childs[i])._visible && ele.writeBlockToNative();
 		}
 	}
 
@@ -15607,6 +15725,10 @@ var RenderTexture2D=(function(_super){
 
 	__class(RenderTexture2D,'laya.webgl.resource.RenderTexture2D',_super);
 	var __proto=RenderTexture2D.prototype;
+	__proto.getIsReady=function(){
+		return true;
+	}
+
 	/**
 	*@private
 	*/
@@ -15781,6 +15903,34 @@ var RenderTexture2D=(function(_super){
 	*/
 	__getset(0,__proto,'defaulteTexture',function(){
 		return Texture2D.grayTexture;
+	});
+
+	/**
+	*获取宽度。
+	*/
+	__getset(0,__proto,'sourceWidth',function(){
+		return this._width;
+	});
+
+	/***
+	*获取高度。
+	*/
+	__getset(0,__proto,'sourceHeight',function(){
+		return this._height;
+	});
+
+	/**
+	*获取offsetX。
+	*/
+	__getset(0,__proto,'offsetX',function(){
+		return 0;
+	});
+
+	/***
+	*获取offsetY
+	*/
+	__getset(0,__proto,'offsetY',function(){
+		return 0;
 	});
 
 	/**

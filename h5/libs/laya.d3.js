@@ -3,12 +3,12 @@
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
 
 	var BaseTexture=laya.webgl.resource.BaseTexture,Browser=laya.utils.Browser,Buffer=laya.webgl.utils.Buffer;
-	var Byte=laya.utils.Byte,CommandEncoder=laya.layagl.CommandEncoder,Component=laya.components.Component,Config=Laya.Config;
-	var Context=laya.resource.Context,Event=laya.events.Event,EventDispatcher=laya.events.EventDispatcher,Handler=laya.utils.Handler;
-	var LayaGL=laya.layagl.LayaGL,LayaGLRunner=laya.layagl.LayaGLRunner,Loader=laya.net.Loader,LoaderManager=laya.net.LoaderManager;
-	var MathUtil=laya.maths.MathUtil,Node=laya.display.Node,Render=laya.renders.Render,RenderState2D=laya.webgl.utils.RenderState2D;
-	var RenderTexture2D=laya.webgl.resource.RenderTexture2D,Resource=laya.resource.Resource,RunDriver=laya.utils.RunDriver;
-	var Script=laya.components.Script,Shader=laya.webgl.shader.Shader,ShaderCompile=laya.webgl.utils.ShaderCompile;
+	var Byte=laya.utils.Byte,ClassUtils=laya.utils.ClassUtils,CommandEncoder=laya.layagl.CommandEncoder,Component=laya.components.Component;
+	var Config=Laya.Config,Context=laya.resource.Context,Event=laya.events.Event,EventDispatcher=laya.events.EventDispatcher;
+	var Handler=laya.utils.Handler,LayaGL=laya.layagl.LayaGL,LayaGLRunner=laya.layagl.LayaGLRunner,Loader=laya.net.Loader;
+	var LoaderManager=laya.net.LoaderManager,MathUtil=laya.maths.MathUtil,Node=laya.display.Node,Render=laya.renders.Render;
+	var RenderState2D=laya.webgl.utils.RenderState2D,RenderTexture2D=laya.webgl.resource.RenderTexture2D,Resource=laya.resource.Resource;
+	var RunDriver=laya.utils.RunDriver,Script=laya.components.Script,Shader=laya.webgl.shader.Shader,ShaderCompile=laya.webgl.utils.ShaderCompile;
 	var Sprite=laya.display.Sprite,SpriteConst=laya.display.SpriteConst,Stat=laya.utils.Stat,SubmitKey=laya.webgl.submit.SubmitKey;
 	var Texture2D=laya.webgl.resource.Texture2D,Timer=laya.utils.Timer,URL=laya.net.URL,WebGL=laya.webgl.WebGL;
 	var WebGLContext=laya.webgl.WebGLContext,WebGLContext2D=laya.webgl.canvas.WebGLContext2D;
@@ -10398,11 +10398,6 @@ var CollisionTool=(function(){
 		if (subCollisionFirst)
 			collision=subCollisionFirst[idB];
 		if (!collision){
-			var subCollisionSecond=this._collisions[idB];
-			if (subCollisionSecond)
-				collision=subCollisionSecond[idA];
-		}
-		if (!collision){
 			if (!subCollisionFirst){
 				subCollisionFirst={};
 				this._collisions[idA]=subCollisionFirst;
@@ -10814,6 +10809,7 @@ var PhysicsSimulation=(function(){
 		var rayResultCall=this._nativeAllHitsRayResultCallback;
 		var rayFrom=PhysicsSimulation._nativeTempVector30;
 		var rayTo=PhysicsSimulation._nativeTempVector31;
+		out.length=0;
 		var fromE=from.elements;
 		var toE=to.elements;
 		rayFrom.setValue(-fromE[0],fromE[1],fromE[2]);
@@ -10850,7 +10846,6 @@ var PhysicsSimulation=(function(){
 			}
 			return true;
 			}else {
-			out.length=0;
 			return false;
 		}
 	}
@@ -10994,6 +10989,7 @@ var PhysicsSimulation=(function(){
 		var convexTransform=PhysicsSimulation._nativeTempTransform0;
 		var convexTransTo=PhysicsSimulation._nativeTempTransform1;
 		var sweepShape=shape._nativeShape;
+		out.length=0;
 		var fromPositionE=fromPosition.elements;
 		var toPositionE=toPosition.elements;
 		convexPosFrom.setValue(-fromPositionE[0],fromPositionE[1],fromPositionE[2]);
@@ -11043,7 +11039,6 @@ var PhysicsSimulation=(function(){
 			}
 			return true;
 			}else {
-			out.length=0;
 			return false;
 		}
 	}
@@ -11106,6 +11101,7 @@ var PhysicsSimulation=(function(){
 			var componentA=PhysicsComponent._physicObjectsMap[contactManifold.getBody0().getUserIndex()];
 			var componentB=PhysicsComponent._physicObjectsMap[contactManifold.getBody1().getUserIndex()];
 			var collision=null;
+			var isFirstCollision=false;
 			var contacts=null;
 			var isTrigger=componentA.isTrigger || componentB.isTrigger;
 			if (isTrigger && ((componentA.owner)._needProcessTriggers || (componentB.owner)._needProcessTriggers)){
@@ -11115,9 +11111,12 @@ var PhysicsSimulation=(function(){
 					var distance=pt.getDistance();
 					if (distance <=0){
 						collision=this._collisionsUtils.getCollision(componentA,componentB);
-						collision._isTrigger=true;
 						contacts=collision.contacts;
-						contacts.length=0;
+						isFirstCollision=collision._updateFrame!==loopCount;
+						if (isFirstCollision){
+							collision._isTrigger=true;
+							contacts.length=0;
+						}
 						break ;
 					}
 				}
@@ -11149,16 +11148,19 @@ var PhysicsSimulation=(function(){
 							positionOnBE[2]=nativePostionB.z();
 							if (!collision){
 								collision=this._collisionsUtils.getCollision(componentA,componentB);
-								collision._isTrigger=false;
 								contacts=collision.contacts;
-								contacts.length=0;
+								isFirstCollision=collision._updateFrame!==loopCount;
+								if (isFirstCollision){
+									collision._isTrigger=false;
+									contacts.length=0;
+								}
 							}
 							contacts.push(contactPoint);
 						}
 					}
 				}
 			}
-			if (collision){
+			if (collision&&isFirstCollision){
 				this._currentFrameCollisions.push(collision);
 				collision._setUpdateFrame(loopCount);
 			}
@@ -11246,6 +11248,8 @@ var PhysicsSimulation=(function(){
 		}
 		for (i=0,n=this._previousFrameCollisions.length;i < n;i++){
 			var preFrameCol=this._previousFrameCollisions[i];
+			if (preFrameCol._colliderA.destroyed || preFrameCol._colliderB.destroyed)
+				continue ;
 			if (loopCount-preFrameCol._updateFrame===1){
 				this._collisionsUtils.recoverCollision(preFrameCol);
 				ownerA=preFrameCol._colliderA.owner;
@@ -14374,8 +14378,10 @@ var Utils3D=(function(){
 			case "TrailSprite3D":
 				node=new TrailSprite3D();
 				break ;
-			default :
-				throw new Error("Utils3D:unidentified class type in (.lh) file.");
+			default :;
+				var clas=ClassUtils.getClass(nodeData.props.runtime);
+				node=new clas();
+				break ;
 			};
 		var childData=nodeData.child;
 		if (childData){
@@ -14395,7 +14401,7 @@ var Utils3D=(function(){
 		if (componentsData){
 			for (var j=0,m=componentsData.length;j < m;j++){
 				var data=componentsData[j];
-				var clas=Browser.window.Laya[data.type];
+				clas=Browser.window.Laya[data.type];
 				if (clas){
 					var comp=new clas();
 					if (initTool){
@@ -15106,10 +15112,10 @@ var Laya3D=(function(){
 
 	Laya3D.formatRelativePath=function(base,value){
 		var path;
-		var fullPath=Laya3D.isAbsolute ? value :base+value;
+		path=base+value;
 		var char1=value.charAt(0);
 		if (char1==="."){
-			var parts=fullPath.split("/");
+			var parts=path.split("/");
 			for (var i=0,len=parts.length;i < len;i++){
 				if (parts[i]=='..'){
 					var index=i-1;
@@ -15120,8 +15126,6 @@ var Laya3D=(function(){
 				}
 			}
 			path=parts.join('/');
-			}else {
-			path=fullPath;
 		}
 		(URL.customFormat !=null)&& (path=URL.customFormat(path,null));
 		return path;
@@ -15149,10 +15153,6 @@ var Laya3D=(function(){
 		return formatUrl;
 	}
 
-	Laya3D._parseMaterial=function(mat,secondLevelUrls,urlMap,urlVersion,hierarchyBasePath){
-		mat.path=Laya3D._addHierarchyInnerUrls(secondLevelUrls,urlMap,urlVersion,hierarchyBasePath,mat.path,/*CLASS CONST:Laya3D.MATERIAL*/"MATERIAL");
-	}
-
 	Laya3D._getSprite3DHierarchyInnerUrls=function(node,firstLevelUrls,secondLevelUrls,thirdLevelUrls,fourthLelUrls,subUrls,urlVersion,hierarchyBasePath){
 		var i=0,n=0;
 		var props=node.props;
@@ -15166,11 +15166,11 @@ var Laya3D=(function(){
 				var reflectionTextureData=props.reflectionTexture;
 				(reflectionTextureData)&& (props.reflectionTexture=Laya3D._addHierarchyInnerUrls(thirdLevelUrls,subUrls,urlVersion,hierarchyBasePath,reflectionTextureData,/*CLASS CONST:Laya3D.TEXTURECUBE*/"TEXTURECUBE"));
 				var skyboxMaterial=props.skyboxMaterial;
-				(skyboxMaterial)&& (Laya3D._parseMaterial(skyboxMaterial,secondLevelUrls,subUrls,urlVersion,hierarchyBasePath));
+				(skyboxMaterial)&& (skyboxMaterial.path=Laya3D._addHierarchyInnerUrls(secondLevelUrls,subUrls,urlVersion,hierarchyBasePath,skyboxMaterial.path,/*CLASS CONST:Laya3D.MATERIAL*/"MATERIAL"));
 				break ;
 			case "Camera":;
 				var skyboxMatData=props.skyboxMaterial;
-				(skyboxMatData)&& (Laya3D._parseMaterial(skyboxMatData,secondLevelUrls,subUrls,urlVersion,hierarchyBasePath));
+				(skyboxMatData)&& (skyboxMatData.path=Laya3D._addHierarchyInnerUrls(secondLevelUrls,subUrls,urlVersion,hierarchyBasePath,skyboxMatData.path,/*CLASS CONST:Laya3D.MATERIAL*/"MATERIAL"));
 				break ;
 			case "TrailSprite3D":
 			case "MeshSprite3D":
@@ -15180,12 +15180,12 @@ var Laya3D=(function(){
 				var materials=props.materials;
 				if (materials)
 					for (i=0,n=materials.length;i < n;i++)
-				Laya3D._parseMaterial(materials[i],secondLevelUrls,subUrls,urlVersion,hierarchyBasePath);
+				materials[i].path=Laya3D._addHierarchyInnerUrls(secondLevelUrls,subUrls,urlVersion,hierarchyBasePath,materials[i].path,/*CLASS CONST:Laya3D.MATERIAL*/"MATERIAL");
 				break ;
 			case "ShuriKenParticle3D":;
 				var parMeshPath=props.meshPath;
 				(parMeshPath)&& (props.meshPath=Laya3D._addHierarchyInnerUrls(firstLevelUrls,subUrls,urlVersion,hierarchyBasePath,parMeshPath,/*CLASS CONST:Laya3D.MESH*/"MESH"));
-				Laya3D._parseMaterial(props.material,secondLevelUrls,subUrls,urlVersion,hierarchyBasePath);
+				props.material.path=Laya3D._addHierarchyInnerUrls(secondLevelUrls,subUrls,urlVersion,hierarchyBasePath,props.material.path,/*CLASS CONST:Laya3D.MATERIAL*/"MATERIAL");
 				break ;
 			case "Terrain":
 				Laya3D._addHierarchyInnerUrls(fourthLelUrls,subUrls,urlVersion,hierarchyBasePath,props.dataPath,"TERRAIN");
@@ -15296,7 +15296,7 @@ var Laya3D=(function(){
 	Laya3D._onHierarchyInnerFirstLevResouLoaded=function(loader,processHandler,lhData,subUrls){
 		(processHandler)&& (processHandler.recover());
 		loader._cache=loader._createCache;
-		var item=Sprite3D._parse(lhData,loader._propertyParams,loader._constructParams);
+		var item=lhData.data.type==="Scene3D"? Scene3D._parse(lhData,loader._propertyParams,loader._constructParams):Sprite3D._parse(lhData,loader._propertyParams,loader._constructParams);
 		Laya3D._endLoad(loader,item,subUrls);
 	}
 
@@ -15422,7 +15422,9 @@ var Laya3D=(function(){
 	Laya3D._loadTexture2D=function(loader){
 		var url=loader.url;
 		var index=url.lastIndexOf('.')+1;
-		var ext=url.substr(index,url.length-index);
+		var verIndex=url.indexOf('?');
+		var endIndex=verIndex==-1?url.length:verIndex;
+		var ext=url.substr(index,endIndex-index);
 		var type;
 		switch (ext){
 			case "jpg":
@@ -15511,7 +15513,6 @@ var Laya3D=(function(){
 	Laya3D._enbalePhysics=false;
 	Laya3D._editerEnvironment=false;
 	Laya3D.debugMode=false;
-	Laya3D.isAbsolute=false;
 	__static(Laya3D,
 	['_innerFirstLevelLoaderManager',function(){return this._innerFirstLevelLoaderManager=new LoaderManager();},'_innerSecondLevelLoaderManager',function(){return this._innerSecondLevelLoaderManager=new LoaderManager();},'_innerThirdLevelLoaderManager',function(){return this._innerThirdLevelLoaderManager=new LoaderManager();},'_innerFourthLevelLoaderManager',function(){return this._innerFourthLevelLoaderManager=new LoaderManager();},'_physics3D',function(){return this._physics3D=window.Physics3D;},'physicsSettings',function(){return this.physicsSettings=new PhysicsSettings();}
 	]);
@@ -18874,6 +18875,16 @@ var PhysicsComponent=(function(_super){
 	__class(PhysicsComponent,'laya.d3.physics.PhysicsComponent',_super);
 	var __proto=PhysicsComponent.prototype;
 	/**
+	*@inheritDoc
+	*/
+	__proto._parse=function(data){
+		(data.collisionGroup !=null)&& (this.collisionGroup=data.collisionGroup);
+		(data.canCollideWith !=null)&& (this.canCollideWith=data.canCollideWith);
+		(data.ccdMotionThreshold !=null)&& (this.ccdMotionThreshold=data.ccdMotionThreshold);
+		(data.ccdSweptSphereRadius !=null)&& (this.ccdSweptSphereRadius=data.ccdSweptSphereRadius);
+	}
+
+	/**
 	*@private
 	*/
 	__proto._parseShape=function(shapesData){
@@ -19072,10 +19083,9 @@ var PhysicsComponent=(function(_super){
 	*/
 	__proto._onDestroy=function(){
 		var physics3D=Laya3D._physics3D;
-		this._removeFromSimulation();
 		delete PhysicsComponent._physicObjectsMap[this.id];
 		physics3D.destroy(this._nativeColliderObject);
-		physics3D.destroy(this._colliderShape);
+		this._colliderShape.destroy();
 		_super.prototype._onDestroy.call(this);
 		this._nativeColliderObject=null;
 		this._colliderShape=null;
@@ -19210,8 +19220,10 @@ var PhysicsComponent=(function(_super){
 		},function(value){
 		if (this._collisionGroup!==value){
 			this._collisionGroup=value;
-			this._removeFromSimulation();
-			this._addToSimulation();
+			if (this._simulation && this._colliderShape && this._enabled){
+				this._removeFromSimulation();
+				this._addToSimulation();
+			}
 		}
 	});
 
@@ -19291,8 +19303,10 @@ var PhysicsComponent=(function(_super){
 		},function(value){
 		if (this._canCollideWith!==value){
 			this._canCollideWith=value;
-			var broadphase=this._nativeColliderObject.getBroadphaseHandle();
-			broadphase.set_m_collisionFilterMask(value);
+			if (this._simulation && this._colliderShape && this._enabled){
+				this._removeFromSimulation();
+				this._addToSimulation();
+			}
 		}
 	});
 
@@ -23769,6 +23783,36 @@ var VertexPositionNormalColor=(function(_super){
 
 
 /**
+*@private
+*<code>primitiveGeometry</code> 类用于实现简单几何体。
+*/
+//class laya.d3.resource.models.primitiveGeometry extends laya.d3.core.GeometryElement
+var primitiveGeometry=(function(_super){
+	function primitiveGeometry(){
+		/**@private */
+		//this._vertexBuffer=null;
+		/**@private */
+		//this._indexBuffer=null;
+		primitiveGeometry.__super.call(this);
+	}
+
+	__class(primitiveGeometry,'laya.d3.resource.models.primitiveGeometry',_super);
+	var __proto=primitiveGeometry.prototype;
+	/**
+	*@inheritDoc
+	*/
+	__proto._render=function(state){
+		var count=this._indexBuffer.indexCount;
+		LayaGL.instance.drawElements(/*laya.webgl.WebGLContext.TRIANGLES*/0x0004,count,/*laya.webgl.WebGLContext.UNSIGNED_SHORT*/0x1403,0);
+		Stat.drawCall++;
+		Stat.trianglesFaces+=count / 3;
+	}
+
+	return primitiveGeometry;
+})(GeometryElement)
+
+
+/**
 *<code>VertexPositionNormalColorSkin</code> 类用于创建位置、法线、颜色、骨骼索引、骨骼权重顶点结构。
 */
 //class laya.d3.graphics.Vertex.VertexPositionNormalColorSkin extends laya.d3.graphics.Vertex.VertexMesh
@@ -23827,36 +23871,6 @@ var VertexPositionNormalColorSkin=(function(_super){
 	]);
 	return VertexPositionNormalColorSkin;
 })(VertexMesh)
-
-
-/**
-*@private
-*<code>primitiveGeometry</code> 类用于实现简单几何体。
-*/
-//class laya.d3.resource.models.primitiveGeometry extends laya.d3.core.GeometryElement
-var primitiveGeometry=(function(_super){
-	function primitiveGeometry(){
-		/**@private */
-		//this._vertexBuffer=null;
-		/**@private */
-		//this._indexBuffer=null;
-		primitiveGeometry.__super.call(this);
-	}
-
-	__class(primitiveGeometry,'laya.d3.resource.models.primitiveGeometry',_super);
-	var __proto=primitiveGeometry.prototype;
-	/**
-	*@inheritDoc
-	*/
-	__proto._render=function(state){
-		var count=this._indexBuffer.indexCount;
-		LayaGL.instance.drawElements(/*laya.webgl.WebGLContext.TRIANGLES*/0x0004,count,/*laya.webgl.WebGLContext.UNSIGNED_SHORT*/0x1403,0);
-		Stat.drawCall++;
-		Stat.trianglesFaces+=count / 3;
-	}
-
-	return primitiveGeometry;
-})(GeometryElement)
 
 
 /**
@@ -24036,67 +24050,6 @@ var VertexPositionNormalColorTexture=(function(_super){
 
 
 /**
-*<code>VertexPositionNormalColorTexture</code> 类用于创建位置、法线、颜色、纹理顶点结构。
-*/
-//class laya.d3.graphics.Vertex.VertexPositionNormalColorTexture0Texture1 extends laya.d3.graphics.Vertex.VertexMesh
-var VertexPositionNormalColorTexture0Texture1=(function(_super){
-	function VertexPositionNormalColorTexture0Texture1(position,normal,color,textureCoordinate0,textureCoordinate1){
-		this._position=null;
-		this._normal=null;
-		this._color=null;
-		this._textureCoordinate0=null;
-		this._textureCoordinate1=null;
-		VertexPositionNormalColorTexture0Texture1.__super.call(this);
-		this._position=position;
-		this._normal=normal;
-		this._color=color;
-		this._textureCoordinate0=textureCoordinate0;
-		this._textureCoordinate1=textureCoordinate1;
-	}
-
-	__class(VertexPositionNormalColorTexture0Texture1,'laya.d3.graphics.Vertex.VertexPositionNormalColorTexture0Texture1',_super);
-	var __proto=VertexPositionNormalColorTexture0Texture1.prototype;
-	__getset(0,__proto,'normal',function(){
-		return this._normal;
-	});
-
-	__getset(0,__proto,'position',function(){
-		return this._position;
-	});
-
-	__getset(0,__proto,'color',function(){
-		return this._color;
-	});
-
-	__getset(0,__proto,'textureCoordinate0',function(){
-		return this._textureCoordinate0;
-	});
-
-	__getset(0,__proto,'vertexDeclaration',function(){
-		return VertexPositionNormalColorTexture0Texture1._vertexDeclaration;
-	});
-
-	__getset(0,__proto,'textureCoordinate1',function(){
-		return this._textureCoordinate1;
-	});
-
-	__getset(1,VertexPositionNormalColorTexture0Texture1,'vertexDeclaration',function(){
-		return VertexPositionNormalColorTexture0Texture1._vertexDeclaration;
-	},laya.d3.graphics.Vertex.VertexMesh._$SET_vertexDeclaration);
-
-	__static(VertexPositionNormalColorTexture0Texture1,
-	['_vertexDeclaration',function(){return this._vertexDeclaration=new VertexDeclaration(56,[
-		new VertexElement(0,/*laya.d3.graphics.VertexElementFormat.Vector3*/"vector3",/*laya.d3.graphics.Vertex.VertexMesh.MESH_POSITION0*/0),
-		new VertexElement(12,/*laya.d3.graphics.VertexElementFormat.Vector3*/"vector3",/*laya.d3.graphics.Vertex.VertexMesh.MESH_NORMAL0*/3),
-		new VertexElement(24,/*laya.d3.graphics.VertexElementFormat.Vector4*/"vector4",/*laya.d3.graphics.Vertex.VertexMesh.MESH_COLOR0*/1),
-		new VertexElement(40,/*laya.d3.graphics.VertexElementFormat.Vector2*/"vector2",/*laya.d3.graphics.Vertex.VertexMesh.MESH_TEXTURECOORDINATE0*/2),
-		new VertexElement(48,/*laya.d3.graphics.VertexElementFormat.Vector2*/"vector2",/*laya.d3.graphics.Vertex.VertexMesh.MESH_TEXTURECOORDINATE1*/8)]);}
-	]);
-	return VertexPositionNormalColorTexture0Texture1;
-})(VertexMesh)
-
-
-/**
 *<code>SubMesh</code> 类用于创建子网格数据模板。
 */
 //class laya.d3.resource.models.SubMesh extends laya.d3.core.GeometryElement
@@ -24178,6 +24131,67 @@ var SubMesh=(function(_super){
 
 	return SubMesh;
 })(GeometryElement)
+
+
+/**
+*<code>VertexPositionNormalColorTexture</code> 类用于创建位置、法线、颜色、纹理顶点结构。
+*/
+//class laya.d3.graphics.Vertex.VertexPositionNormalColorTexture0Texture1 extends laya.d3.graphics.Vertex.VertexMesh
+var VertexPositionNormalColorTexture0Texture1=(function(_super){
+	function VertexPositionNormalColorTexture0Texture1(position,normal,color,textureCoordinate0,textureCoordinate1){
+		this._position=null;
+		this._normal=null;
+		this._color=null;
+		this._textureCoordinate0=null;
+		this._textureCoordinate1=null;
+		VertexPositionNormalColorTexture0Texture1.__super.call(this);
+		this._position=position;
+		this._normal=normal;
+		this._color=color;
+		this._textureCoordinate0=textureCoordinate0;
+		this._textureCoordinate1=textureCoordinate1;
+	}
+
+	__class(VertexPositionNormalColorTexture0Texture1,'laya.d3.graphics.Vertex.VertexPositionNormalColorTexture0Texture1',_super);
+	var __proto=VertexPositionNormalColorTexture0Texture1.prototype;
+	__getset(0,__proto,'normal',function(){
+		return this._normal;
+	});
+
+	__getset(0,__proto,'position',function(){
+		return this._position;
+	});
+
+	__getset(0,__proto,'color',function(){
+		return this._color;
+	});
+
+	__getset(0,__proto,'textureCoordinate0',function(){
+		return this._textureCoordinate0;
+	});
+
+	__getset(0,__proto,'vertexDeclaration',function(){
+		return VertexPositionNormalColorTexture0Texture1._vertexDeclaration;
+	});
+
+	__getset(0,__proto,'textureCoordinate1',function(){
+		return this._textureCoordinate1;
+	});
+
+	__getset(1,VertexPositionNormalColorTexture0Texture1,'vertexDeclaration',function(){
+		return VertexPositionNormalColorTexture0Texture1._vertexDeclaration;
+	},laya.d3.graphics.Vertex.VertexMesh._$SET_vertexDeclaration);
+
+	__static(VertexPositionNormalColorTexture0Texture1,
+	['_vertexDeclaration',function(){return this._vertexDeclaration=new VertexDeclaration(56,[
+		new VertexElement(0,/*laya.d3.graphics.VertexElementFormat.Vector3*/"vector3",/*laya.d3.graphics.Vertex.VertexMesh.MESH_POSITION0*/0),
+		new VertexElement(12,/*laya.d3.graphics.VertexElementFormat.Vector3*/"vector3",/*laya.d3.graphics.Vertex.VertexMesh.MESH_NORMAL0*/3),
+		new VertexElement(24,/*laya.d3.graphics.VertexElementFormat.Vector4*/"vector4",/*laya.d3.graphics.Vertex.VertexMesh.MESH_COLOR0*/1),
+		new VertexElement(40,/*laya.d3.graphics.VertexElementFormat.Vector2*/"vector2",/*laya.d3.graphics.Vertex.VertexMesh.MESH_TEXTURECOORDINATE0*/2),
+		new VertexElement(48,/*laya.d3.graphics.VertexElementFormat.Vector2*/"vector2",/*laya.d3.graphics.Vertex.VertexMesh.MESH_TEXTURECOORDINATE1*/8)]);}
+	]);
+	return VertexPositionNormalColorTexture0Texture1;
+})(VertexMesh)
 
 
 /**
@@ -26793,14 +26807,10 @@ var CompoundColliderShape=(function(_super){
 	/**
 	*@private
 	*/
-	__proto._innerRemoveChildShape=function(shape){
-		var index=shape._indexInCompound;
+	__proto._clearChildShape=function(shape){
 		shape._attatched=false;
 		shape._compoundParent=null;
 		shape._indexInCompound=-1;
-		for (var i=index+1,n=this._childColliderShapes.length;i < n;i++)
-		this._childColliderShapes[i]._indexInCompound--;
-		this._nativeShape.removeChildShapeByIndex(index);
 	}
 
 	/**
@@ -26858,8 +26868,12 @@ var CompoundColliderShape=(function(_super){
 	__proto.removeChildShape=function(shape){
 		if (shape._compoundParent===this){
 			var index=shape._indexInCompound;
-			this._innerRemoveChildShape(shape);
-			this._childColliderShapes.splice(index,1);
+			this._clearChildShape(shape);
+			var endShape=this._childColliderShapes[this._childColliderShapes.length-1];
+			endShape._indexInCompound=index;
+			this._childColliderShapes[index]=endShape;
+			this._childColliderShapes.pop();
+			this._nativeShape.removeChildShapeByIndex(index);
 		}
 	}
 
@@ -26867,8 +26881,10 @@ var CompoundColliderShape=(function(_super){
 	*清空子碰撞器形状。
 	*/
 	__proto.clearChildShape=function(){
-		for (var i=0,n=this._childColliderShapes.length;i < n;i++)
-		this._innerRemoveChildShape(this._childColliderShapes[i]);
+		for (var i=0,n=this._childColliderShapes.length;i < n;i++){
+			this._clearChildShape(this._childColliderShapes[i]);
+			this._nativeShape.removeChildShapeByIndex(0);
+		}
 		this._childColliderShapes.length=0;
 	}
 
@@ -27538,7 +27554,7 @@ var Sprite3D=(function(_super){
 		var json=data.data;
 		var outBatchSprits=[];
 		var sprite=Utils3D._createNodeByJson(json,outBatchSprits);
-		StaticBatchManager.combine(null,outBatchSprits);
+		StaticBatchManager.combine(sprite,outBatchSprits);
 		return sprite;
 	}
 
@@ -37249,6 +37265,7 @@ var PhysicsCollider=(function(_super){
 		(data.rollingFriction !=null)&& (this.rollingFriction=data.rollingFriction);
 		(data.restitution !=null)&& (this.restitution=data.restitution);
 		(data.isTrigger !=null)&& (this.isTrigger=data.isTrigger);
+		laya.d3.physics.PhysicsComponent.prototype._parse.call(this,data);
 		this._parseShape(data.shapes);
 	}
 
@@ -37351,6 +37368,35 @@ var Rigidbody3D=(function(_super){
 	}
 
 	/**
+	*@private
+	*Dynamic刚体,初始化时调用一次。
+	*Kinematic刚体,每次物理tick时调用(如果未进入睡眠状态),让物理引擎知道刚体位置。
+	*该函数只有在runtime下调用
+	*/
+	__proto._delegateMotionStateGetWorldTransformNative=function(ridgidBody3D,worldTransPointer){
+		var rigidBody=ridgidBody3D;
+		if (!rigidBody._colliderShape)
+			return;
+		rigidBody._simulation._updatedRigidbodies++;
+		var physics3D=Laya3D._physics3D;
+		var worldTrans=physics3D.wrapPointer(worldTransPointer,physics3D.btTransform);
+		rigidBody._derivePhysicsTransformation(worldTrans,true);
+	}
+
+	/**
+	*@private
+	*Dynamic刚体,物理引擎每帧调用一次,用于更新渲染矩阵。
+	*该函数只有在runtime下调用
+	*/
+	__proto._delegateMotionStateSetWorldTransformNative=function(rigidBody3D,worldTransPointer){
+		var rigidBody=rigidBody3D;
+		rigidBody._simulation._updatedRigidbodies++;
+		var physics3D=Laya3D._physics3D;
+		var worldTrans=physics3D.wrapPointer(worldTransPointer,physics3D.btTransform);
+		rigidBody._updateTransformComponent(worldTrans);
+	}
+
+	/**
 	*@inheritDoc
 	*/
 	__proto._onScaleChange=function(scale){
@@ -37371,8 +37417,16 @@ var Rigidbody3D=(function(_super){
 	__proto._onAdded=function(){
 		var physics3D=Laya3D._physics3D;
 		var motionState=new physics3D.LayaMotionState();
-		motionState.getWorldTransform=this._delegateMotionStateGetWorldTransform;
-		motionState.setWorldTransform=this._delegateMotionStateSetWorldTransform;
+		var isConchApp=/*__JS__ */(window.conch !=null);
+		if (isConchApp && physics3D.LayaMotionState.prototype.setRigidbody){
+			motionState.setRigidbody(this);
+			motionState.setNativeGetWorldTransform(this._delegateMotionStateGetWorldTransformNative);
+			motionState.setNativeSetWorldTransform(this._delegateMotionStateSetWorldTransformNative);
+		}
+		else{
+			motionState.getWorldTransform=this._delegateMotionStateGetWorldTransform;
+			motionState.setWorldTransform=this._delegateMotionStateSetWorldTransform;
+		}
 		motionState.clear=this._delegateMotionStateClear;
 		motionState._rigidbody=this;
 		this._nativeMotionState=motionState;
@@ -37397,7 +37451,12 @@ var Rigidbody3D=(function(_super){
 	*/
 	__proto._onShapeChange=function(colShape){
 		laya.d3.physics.PhysicsComponent.prototype._onShapeChange.call(this,colShape);
-		this._updateMass(this._isKinematic ? 0 :this._mass);
+		if (this._isKinematic){
+			this._updateMass(0);
+			}else {
+			this._nativeColliderObject.setCenterOfMassTransform(this._nativeColliderObject.getWorldTransform());
+			this._updateMass(this._mass);
+		}
 	}
 
 	/**
@@ -37417,6 +37476,7 @@ var Rigidbody3D=(function(_super){
 			this.gravity.fromArray(data.gravity);
 			this.gravity=this.gravity;
 		}
+		laya.d3.physics.PhysicsComponent.prototype._parse.call(this,data);
 		this._parseShape(data.shapes);
 	}
 
@@ -37427,8 +37487,7 @@ var Rigidbody3D=(function(_super){
 		var physics3D=Laya3D._physics3D;
 		this._nativeMotionState.clear();
 		physics3D.destroy(this._nativeMotionState);
-		this._simulation._removeRigidBody(this);
-		this._destroy();
+		laya.d3.physics.PhysicsComponent.prototype._onDestroy.call(this);
 		this._nativeMotionState=null;
 		this._gravity=null;
 		this._totalTorque=null;

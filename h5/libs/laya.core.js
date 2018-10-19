@@ -328,7 +328,7 @@ var ___Laya=(function(){
 	Laya.lateTimer=null;
 	Laya.timer=null;
 	Laya.loader=null;
-	Laya.version="2.0.0beta2";
+	Laya.version="2.0.0beta3";
 	Laya.render=null;
 	Laya._currentStage=null;
 	Laya._isinit=false;
@@ -641,7 +641,6 @@ var Component=(function(){
 	*@private
 	*/
 	__proto._resetComp=function(){
-		this._destroyed=false;
 		this._indexInList=-1;
 		this._enabled=true;
 		this._active=false;
@@ -7264,6 +7263,7 @@ var ResourceVersion=(function(){
 	}
 
 	ResourceVersion.addVersionPrefix=function(originURL){
+		originURL=URL.getAdptedFilePath(originURL);
 		if (ResourceVersion.manifest && ResourceVersion.manifest[originURL]){
 			if (ResourceVersion.type==2)return ResourceVersion.manifest[originURL];
 			return ResourceVersion.manifest[originURL]+"/"+originURL;
@@ -10985,9 +10985,12 @@ var SceneUtils=(function(){
 	}
 
 	SceneUtils.createComp=function(uiView,comp,view,dataMap,initTool){
-		if (uiView.type=="Scene3D"){
+		if (uiView.type=="Scene3D"||uiView.type=="Sprite3D"){
 			var outBatchSprits=[];
 			var scene3D=Laya["Utils3D"]._createSceneByJsonForMaker(uiView,outBatchSprits,initTool);
+			if (uiView.type=="Sprite3D")
+				Laya["StaticBatchManager"].combine(scene3D,outBatchSprits);
+			else
 			Laya["StaticBatchManager"].combine(null,outBatchSprits);
 			return scene3D;
 		}
@@ -11105,7 +11108,9 @@ var SceneUtils=(function(){
 		var compClass=ClassUtils.getClass(runtime);
 		if (!compClass)throw "Can not find class "+runtime;
 		if (json.type==="Script" && compClass.prototype._doAwake){
-			return Pool.createByClass(compClass);
+			var comp=Pool.createByClass(compClass);
+			comp._destroyed=false;
+			return comp;
 		}
 		if (json.props && json.props.hasOwnProperty("renderType")&& json.props["renderType"]=="instance")
 			return compClass["instance"];
@@ -13725,7 +13730,8 @@ var Node=(function(_super){
 	*@return 组件。
 	*/
 	__proto.addComponent=function(type){
-		var comp=new type();
+		var comp=Pool.createByClass(type);
+		comp._destroyed=false;
 		if (comp.isSingleton && this.getComponent(type))
 			throw "无法实例"+type+"组件"+"，"+type+"组件已存在！";
 		this._addComponentInstance(comp);
@@ -15101,7 +15107,7 @@ var Loader=(function(_super){
 	Loader.AVATAR="AVATAR";
 	Loader.TERRAINHEIGHTDATA="TERRAINHEIGHTDATA";
 	Loader.TERRAINRES="TERRAIN";
-	Loader.typeMap={"ttf":"ttf","png":"image","jpg":"image","jpeg":"image","txt":"text","json":"json","prefab":"prefab","xml":"xml","als":"atlas","atlas":"atlas","mp3":"sound","ogg":"sound","wav":"sound","part":"json","fnt":"font","pkm":"pkm","plf":"plf","scene":"json"};
+	Loader.typeMap={"ttf":"ttf","png":"image","jpg":"image","jpeg":"image","txt":"text","json":"json","prefab":"prefab","xml":"xml","als":"atlas","atlas":"atlas","mp3":"sound","ogg":"sound","wav":"sound","part":"json","fnt":"font","pkm":"pkm","plf":"plf","scene":"json","ani":"json","sk":"arraybuffer"};
 	Loader.parserMap={};
 	Loader.maxTimeOut=100;
 	Loader.groupMap={};
@@ -18991,7 +18997,8 @@ var AudioSoundChannel=(function(_super){
 	}
 
 	__proto.__resumePlay=function(){
-		if(this._audio)this._audio.removeEventListener("canplay",this._resumePlay);
+		if (this._audio)this._audio.removeEventListener("canplay",this._resumePlay);
+		if (this.isStopped)return;
 		try {
 			this._audio.currentTime=this.startTime;
 			Browser.container.appendChild(this._audio);
@@ -21728,6 +21735,7 @@ var HTMLCanvas=(function(_super){
 	function HTMLCanvas(createCanvas){
 		//this._ctx=null;
 		//this._source=null;
+		//this._texture=null;
 		HTMLCanvas.__super.call(this);
 		(createCanvas===void 0)&& (createCanvas=false);
 		if(createCanvas || !Render.isWebGL)
@@ -21749,6 +21757,10 @@ var HTMLCanvas=(function(_super){
 	*/
 	__proto.clear=function(){
 		this._ctx && this._ctx.clear();
+		if (this._texture){
+			this._texture.destroy();
+			this._texture=null;
+		}
 	}
 
 	/**
@@ -21799,6 +21811,38 @@ var HTMLCanvas=(function(_super){
 			this._setGPUMemory(w *h *4);
 			this._ctx && this._ctx.size && this._ctx.size(w,h);
 			this._source && (this._source.height=h,this._source.width=w);
+			if (this._texture){
+				this._texture.destroy();
+				this._texture=null;
+			}
+		}
+	}
+
+	__proto.getTexture=function(){
+		if (!this._texture){
+			this._texture=new Texture(this,Texture.DEF_UV);
+		}
+		return this._texture;
+	}
+
+	__proto.toBase64=function(type,encoderOptions,callBack){
+		if (this._source){
+			if (Render.isConchApp && this._source.toBase64){
+				this._source.toBase64(type,encoderOptions,callBack);
+			}
+			else {
+				var base64Data=this._source.toDataURL(type,encoderOptions);
+				callBack(base64Data);
+			}
+		}
+	}
+
+	__proto.getImageData=function(x,y,width,height,callBack){
+		if (this._source){
+			if (Render.isConchApp && this._source.getImageData){
+				this._source.getImageData(x,y,width,height,callBack);
+			}
+			else {}
 		}
 	}
 
@@ -22103,7 +22147,7 @@ var Animation=(function(_super){
 		this._url=url;
 		var _this=this;
 		if (!this._actionName)this._actionName="";
-		if (!_this._setFramesFromCache("")){
+		if (!_this._setFramesFromCache(this._actionName)){
 			if (!atlas || Loader.getAtlas(atlas)){
 				this._loadAnimationData(url,loaded,atlas);
 				}else {
