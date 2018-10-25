@@ -11,160 +11,46 @@
 *@private
 *@author ...
 */
-//class laya.ani.AnimationContent
-var AnimationContent=(function(){
-	function AnimationContent(){
-		this.nodes=null;
-		this.name=null;
-		this.playTime=NaN;
-		this.bone3DMap=null;
-		this.totalKeyframeDatasLength=0;
+//class laya.ani.KeyFramesContent
+var KeyFramesContent=(function(){
+	function KeyFramesContent(){
+		this.startTime=NaN;
+		this.duration=NaN;
+		this.interpolationData=null;
+		//私有插值方式 [type0(插值类型),Data0(插值数据,可为空)，type1(插值类型),Data1(插值数据,可为空)] 注意：254全线性插值，255全不插值
+		this.data=null;
+		//=new Float32Array();
+		this.dData=null;
+		//=new Float32Array();
+		this.nextData=null;
 	}
 
-	__class(AnimationContent,'laya.ani.AnimationContent');
-	return AnimationContent;
-})()
-
-
-/**
-*@private
-*@author ...
-*/
-//class laya.ani.AnimationNodeContent
-var AnimationNodeContent=(function(){
-	function AnimationNodeContent(){
-		this.name=null;
-		this.parentIndex=0;
-		this.parent=null;
-		this.keyframeWidth=0;
-		this.lerpType=0;
-		this.interpolationMethod=null;
-		this.childs=null;
-		this.keyFrame=null;
-		//=new Vector.<KeyFramesContent>;
-		this.playTime=NaN;
-		this.extenData=null;
-		this.dataOffset=0;
-	}
-
-	__class(AnimationNodeContent,'laya.ani.AnimationNodeContent');
-	return AnimationNodeContent;
+	__class(KeyFramesContent,'laya.ani.KeyFramesContent');
+	return KeyFramesContent;
 })()
 
 
 /**
 *@private
 */
-//class laya.ani.AnimationParser01
-var AnimationParser01=(function(){
-	function AnimationParser01(){}
-	__class(AnimationParser01,'laya.ani.AnimationParser01');
-	AnimationParser01.parse=function(templet,reader){
-		var data=reader.__getBuffer();
-		var i=0,j=0,k=0,n=0,l=0,m=0,o=0;
-		var aniClassName=reader.readUTFString();
-		templet._aniClassName=aniClassName;
-		var strList=reader.readUTFString().split("\n");
-		var aniCount=reader.getUint8();
-		var publicDataPos=reader.getUint32();
-		var publicExtDataPos=reader.getUint32();
-		var publicData;
-		if (publicDataPos > 0)
-			publicData=data.slice(publicDataPos,publicExtDataPos);
-		var publicRead=new Byte(publicData);
-		if (publicExtDataPos > 0)
-			templet._publicExtData=data.slice(publicExtDataPos,data.byteLength);
-		templet._useParent=!!reader.getUint8();
-		templet._anis.length=aniCount;
-		for (i=0;i < aniCount;i++){
-			var ani=templet._anis[i]=new AnimationContent();
-			{};
-			ani.nodes=new Array;
-			var name=ani.name=strList[reader.getUint16()];
-			templet._aniMap[name]=i;
-			ani.bone3DMap={};
-			ani.playTime=reader.getFloat32();
-			var boneCount=ani.nodes.length=reader.getUint8();
-			ani.totalKeyframeDatasLength=0;
-			for (j=0;j < boneCount;j++){
-				var node=ani.nodes[j]=new AnimationNodeContent();
-				{};
-				node.childs=[];
-				var nameIndex=reader.getInt16();
-				if (nameIndex >=0){
-					node.name=strList[nameIndex];
-					ani.bone3DMap[node.name]=j;
-				}
-				node.keyFrame=new Array;
-				node.parentIndex=reader.getInt16();
-				node.parentIndex==-1 ? node.parent=null :node.parent=ani.nodes[node.parentIndex]
-				node.lerpType=reader.getUint8();
-				var keyframeParamsOffset=reader.getUint32();
-				publicRead.pos=keyframeParamsOffset;
-				var keyframeDataCount=node.keyframeWidth=publicRead.getUint16();
-				ani.totalKeyframeDatasLength+=keyframeDataCount;
-				if (node.lerpType===0 || node.lerpType===1){
-					node.interpolationMethod=[];
-					node.interpolationMethod.length=keyframeDataCount;
-					for (k=0;k < keyframeDataCount;k++)
-					node.interpolationMethod[k]=AnimationTemplet.interpolation[publicRead.getUint8()];
-				}
-				if (node.parent !=null)
-					node.parent.childs.push(node);
-				var privateDataLen=reader.getUint16();
-				if (privateDataLen > 0){
-					node.extenData=data.slice(reader.pos,reader.pos+privateDataLen);
-					reader.pos+=privateDataLen;
-				};
-				var keyframeCount=reader.getUint16();
-				node.keyFrame.length=keyframeCount;
-				var startTime=0;
-				var keyFrame;
-				for (k=0,n=keyframeCount;k < n;k++){
-					keyFrame=node.keyFrame[k]=new KeyFramesContent();
-					{};
-					keyFrame.duration=reader.getFloat32();
-					keyFrame.startTime=startTime;
-					if (node.lerpType===2){
-						keyFrame.interpolationData=[];
-						var interDataLength=reader.getUint8();
-						var lerpType=0;
-						lerpType=reader.getFloat32();
-						switch (lerpType){
-							case 254:
-								keyFrame.interpolationData.length=keyframeDataCount;
-								for (o=0;o < keyframeDataCount;o++)
-								keyFrame.interpolationData[o]=0;
-								break ;
-							case 255:
-								keyFrame.interpolationData.length=keyframeDataCount;
-								for (o=0;o < keyframeDataCount;o++)
-								keyFrame.interpolationData[o]=5;
-								break ;
-							default :
-								keyFrame.interpolationData.push(lerpType);
-								for (m=1;m < interDataLength;m++){
-									keyFrame.interpolationData.push(reader.getFloat32());
-								}
-							}
-					}
-					keyFrame.data=new Float32Array(keyframeDataCount);
-					keyFrame.dData=new Float32Array(keyframeDataCount);
-					keyFrame.nextData=new Float32Array(keyframeDataCount);
-					for (l=0;l < keyframeDataCount;l++){
-						keyFrame.data[l]=reader.getFloat32();
-						if (keyFrame.data[l] >-0.00000001 && keyFrame.data[l] < 0.00000001)keyFrame.data[l]=0;
-					}
-					startTime+=keyFrame.duration;
-				}
-				keyFrame.startTime=ani.playTime;
-				node.playTime=ani.playTime;
-				templet._calculateKeyFrame(node,keyframeCount,keyframeDataCount);
-			}
-		}
+//class laya.ani.bone.PathConstraintData
+var PathConstraintData=(function(){
+	function PathConstraintData(){
+		this.name=null;
+		this.target=null;
+		this.positionMode=null;
+		this.spacingMode=null;
+		this.rotateMode=null;
+		this.offsetRotation=NaN;
+		this.position=NaN;
+		this.spacing=NaN;
+		this.rotateMix=NaN;
+		this.translateMix=NaN;
+		this.bones=[];
 	}
 
-	return AnimationParser01;
+	__class(PathConstraintData,'laya.ani.bone.PathConstraintData');
+	return PathConstraintData;
 })()
 
 
@@ -293,201 +179,534 @@ var AnimationParser02=(function(){
 /**
 *@private
 */
-//class laya.ani.AnimationState
-var AnimationState=(function(){
-	function AnimationState(){}
-	__class(AnimationState,'laya.ani.AnimationState');
-	AnimationState.stopped=0;
-	AnimationState.paused=1;
-	AnimationState.playing=2;
-	return AnimationState;
+//class laya.ani.AnimationParser01
+var AnimationParser01=(function(){
+	function AnimationParser01(){}
+	__class(AnimationParser01,'laya.ani.AnimationParser01');
+	AnimationParser01.parse=function(templet,reader){
+		var data=reader.__getBuffer();
+		var i=0,j=0,k=0,n=0,l=0,m=0,o=0;
+		var aniClassName=reader.readUTFString();
+		templet._aniClassName=aniClassName;
+		var strList=reader.readUTFString().split("\n");
+		var aniCount=reader.getUint8();
+		var publicDataPos=reader.getUint32();
+		var publicExtDataPos=reader.getUint32();
+		var publicData;
+		if (publicDataPos > 0)
+			publicData=data.slice(publicDataPos,publicExtDataPos);
+		var publicRead=new Byte(publicData);
+		if (publicExtDataPos > 0)
+			templet._publicExtData=data.slice(publicExtDataPos,data.byteLength);
+		templet._useParent=!!reader.getUint8();
+		templet._anis.length=aniCount;
+		for (i=0;i < aniCount;i++){
+			var ani=templet._anis[i]=new AnimationContent();
+			{};
+			ani.nodes=new Array;
+			var name=ani.name=strList[reader.getUint16()];
+			templet._aniMap[name]=i;
+			ani.bone3DMap={};
+			ani.playTime=reader.getFloat32();
+			var boneCount=ani.nodes.length=reader.getUint8();
+			ani.totalKeyframeDatasLength=0;
+			for (j=0;j < boneCount;j++){
+				var node=ani.nodes[j]=new AnimationNodeContent();
+				{};
+				node.childs=[];
+				var nameIndex=reader.getInt16();
+				if (nameIndex >=0){
+					node.name=strList[nameIndex];
+					ani.bone3DMap[node.name]=j;
+				}
+				node.keyFrame=new Array;
+				node.parentIndex=reader.getInt16();
+				node.parentIndex==-1 ? node.parent=null :node.parent=ani.nodes[node.parentIndex]
+				node.lerpType=reader.getUint8();
+				var keyframeParamsOffset=reader.getUint32();
+				publicRead.pos=keyframeParamsOffset;
+				var keyframeDataCount=node.keyframeWidth=publicRead.getUint16();
+				ani.totalKeyframeDatasLength+=keyframeDataCount;
+				if (node.lerpType===0 || node.lerpType===1){
+					node.interpolationMethod=[];
+					node.interpolationMethod.length=keyframeDataCount;
+					for (k=0;k < keyframeDataCount;k++)
+					node.interpolationMethod[k]=AnimationTemplet.interpolation[publicRead.getUint8()];
+				}
+				if (node.parent !=null)
+					node.parent.childs.push(node);
+				var privateDataLen=reader.getUint16();
+				if (privateDataLen > 0){
+					node.extenData=data.slice(reader.pos,reader.pos+privateDataLen);
+					reader.pos+=privateDataLen;
+				};
+				var keyframeCount=reader.getUint16();
+				node.keyFrame.length=keyframeCount;
+				var startTime=0;
+				var keyFrame;
+				for (k=0,n=keyframeCount;k < n;k++){
+					keyFrame=node.keyFrame[k]=new KeyFramesContent();
+					{};
+					keyFrame.duration=reader.getFloat32();
+					keyFrame.startTime=startTime;
+					if (node.lerpType===2){
+						keyFrame.interpolationData=[];
+						var interDataLength=reader.getUint8();
+						var lerpType=0;
+						lerpType=reader.getFloat32();
+						switch (lerpType){
+							case 254:
+								keyFrame.interpolationData.length=keyframeDataCount;
+								for (o=0;o < keyframeDataCount;o++)
+								keyFrame.interpolationData[o]=0;
+								break ;
+							case 255:
+								keyFrame.interpolationData.length=keyframeDataCount;
+								for (o=0;o < keyframeDataCount;o++)
+								keyFrame.interpolationData[o]=5;
+								break ;
+							default :
+								keyFrame.interpolationData.push(lerpType);
+								for (m=1;m < interDataLength;m++){
+									keyFrame.interpolationData.push(reader.getFloat32());
+								}
+							}
+					}
+					keyFrame.data=new Float32Array(keyframeDataCount);
+					keyFrame.dData=new Float32Array(keyframeDataCount);
+					keyFrame.nextData=new Float32Array(keyframeDataCount);
+					for (l=0;l < keyframeDataCount;l++){
+						keyFrame.data[l]=reader.getFloat32();
+						if (keyFrame.data[l] >-0.00000001 && keyFrame.data[l] < 0.00000001)keyFrame.data[l]=0;
+					}
+					startTime+=keyFrame.duration;
+				}
+				keyFrame.startTime=ani.playTime;
+				node.playTime=ani.playTime;
+				templet._calculateKeyFrame(node,keyframeCount,keyframeDataCount);
+			}
+		}
+	}
+
+	return AnimationParser01;
 })()
 
 
 /**
 *@private
 */
-//class laya.ani.bone.Bone
-var Bone=(function(){
-	function Bone(){
+//class laya.ani.bone.DeformAniData
+var DeformAniData=(function(){
+	function DeformAniData(){
+		this.skinName=null;
+		this.deformSlotDataList=[];
+	}
+
+	__class(DeformAniData,'laya.ani.bone.DeformAniData');
+	return DeformAniData;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.IkConstraint
+var IkConstraint=(function(){
+	function IkConstraint(data,bones){
+		this._targetBone=null;
+		this._bones=null;
+		this._data=null;
 		this.name=null;
-		this.root=null;
-		this.parentBone=null;
-		this.length=10;
+		this.mix=NaN;
+		this.bendDirection=NaN;
+		this.isSpine=true;
+		//debug相关代码
+		this._sp=null;
+		this.isDebug=false;
+		this._data=data;
+		this._targetBone=bones[data.targetBoneIndex];
+		this.isSpine=data.isSpine;
+		if (this._bones==null)this._bones=[];
+		this._bones.length=0;
+		for (var i=0,n=data.boneIndexs.length;i < n;i++){
+			this._bones.push(bones[data.boneIndexs[i]]);
+		}
+		this.name=data.name;
+		this.mix=data.mix;
+		this.bendDirection=data.bendDirection;
+	}
+
+	__class(IkConstraint,'laya.ani.bone.IkConstraint');
+	var __proto=IkConstraint.prototype;
+	__proto.apply=function(){
+		switch (this._bones.length){
+			case 1:
+				this._applyIk1(this._bones[0],this._targetBone.resultMatrix.tx,this._targetBone.resultMatrix.ty,this.mix);
+				break ;
+			case 2:
+				if (this.isSpine){
+					this._applyIk2(this._bones[0],this._bones[1],this._targetBone.resultMatrix.tx,this._targetBone.resultMatrix.ty,this.bendDirection,this.mix);
+					}else{
+					this._applyIk3(this._bones[0],this._bones[1],this._targetBone.resultMatrix.tx,this._targetBone.resultMatrix.ty,this.bendDirection,this.mix);
+				}
+				break ;
+			}
+	}
+
+	//TODO:coverage
+	__proto._applyIk1=function(bone,targetX,targetY,alpha){
+		var pp=bone.parentBone;
+		var id=1 / (pp.resultMatrix.a *pp.resultMatrix.d-pp.resultMatrix.b *pp.resultMatrix.c);
+		var x=targetX-pp.resultMatrix.tx;
+		var y=targetY-pp.resultMatrix.ty;
+		var tx=(x *pp.resultMatrix.d-y *pp.resultMatrix.c)*id-bone.transform.x;
+		var ty=(y *pp.resultMatrix.a-x *pp.resultMatrix.b)*id-bone.transform.y;
+		var rotationIK=Math.atan2(ty,tx)*IkConstraint.radDeg-0-bone.transform.skX;
+		if (bone.transform.scX < 0)rotationIK+=180;
+		if (rotationIK > 180)
+			rotationIK-=360;
+		else if (rotationIK <-180)rotationIK+=360;
+		bone.transform.skX=bone.transform.skY=bone.transform.skX+rotationIK *alpha;
+		bone.update();
+	}
+
+	//TODO:coverage
+	__proto.updatePos=function(x,y){
+		if (this._sp){
+			this._sp.pos(x,y);
+		}
+	}
+
+	//TODO:coverage
+	__proto._applyIk2=function(parent,child,targetX,targetY,bendDir,alpha){
+		if (alpha==0){
+			return;
+		};
+		var px=parent.resultTransform.x,py=parent.resultTransform.y;
+		var psx=parent.transform.scX,psy=parent.transform.scY;
+		var csx=child.transform.scX;
+		var os1=0,os2=0,s2=0;
+		if (psx < 0){
+			psx=-psx;
+			os1=180;
+			s2=-1;
+			}else {
+			os1=0;
+			s2=1;
+		}
+		if (psy < 0){
+			psy=-psy;
+			s2=-s2;
+		}
+		if (csx < 0){
+			csx=-csx;
+			os2=180;
+			}else {
+			os2=0
+		};
+		var cx=child.resultTransform.x,cy=NaN,cwx=NaN,cwy=NaN;
+		var a=parent.resultMatrix.a,b=parent.resultMatrix.c;
+		var c=parent.resultMatrix.b,d=parent.resultMatrix.d;
+		var u=Math.abs(psx-psy)<=0.0001;
+		if (!u){
+			cy=0;
+			cwx=a *cx+parent.resultMatrix.tx;
+			cwy=c *cx+parent.resultMatrix.ty;
+			}else {
+			cy=child.resultTransform.y;
+			cwx=a *cx+b *cy+parent.resultMatrix.tx;
+			cwy=c *cx+d *cy+parent.resultMatrix.ty;
+		}
+		if (this.isDebug){
+			if (!this._sp){
+				this._sp=new Sprite();
+				Laya.stage.addChild(this._sp);
+			}
+			this._sp.graphics.clear();
+			this._sp.graphics.drawCircle(targetX,targetY,15,"#ffff00");
+			this._sp.graphics.drawCircle(cwx,cwy,15,"#ff00ff");
+		}
+		parent.setRotation(Math.atan2(cwy-parent.resultMatrix.ty,cwx-parent.resultMatrix.tx));
+		var pp=parent.parentBone;
+		a=pp.resultMatrix.a;
+		b=pp.resultMatrix.c;
+		c=pp.resultMatrix.b;
+		d=pp.resultMatrix.d;
+		var id=1 / (a *d-b *c);
+		var x=targetX-pp.resultMatrix.tx,y=targetY-pp.resultMatrix.ty;
+		var tx=(x *d-y *b)*id-px;
+		var ty=(y *a-x *c)*id-py;
+		x=cwx-pp.resultMatrix.tx;
+		y=cwy-pp.resultMatrix.ty;
+		var dx=(x *d-y *b)*id-px;
+		var dy=(y *a-x *c)*id-py;
+		var l1=Math.sqrt(dx *dx+dy *dy);
+		var l2=child.length *csx;
+		var a1=NaN,a2=NaN;
+		if (u){
+			l2 *=psx;
+			var cos=(tx *tx+ty *ty-l1 *l1-l2 *l2)/ (2 *l1 *l2);
+			if (cos <-1)
+				cos=-1;
+			else if (cos > 1)cos=1;
+			a2=Math.acos(cos)*bendDir;
+			a=l1+l2 *cos;
+			b=l2 *Math.sin(a2);
+			a1=Math.atan2(ty *a-tx *b,tx *a+ty *b);
+			}else {
+			a=psx *l2;
+			b=psy *l2;
+			var aa=a *a,bb=b *b,dd=tx *tx+ty *ty,ta=Math.atan2(ty,tx);
+			c=bb *l1 *l1+aa *dd-aa *bb;
+			var c1=-2 *bb *l1,c2=bb-aa;
+			d=c1 *c1-4 *c2 *c;
+			if (d > 0){
+				var q=Math.sqrt(d);
+				if (c1 < 0)q=-q;
+				q=-(c1+q)/ 2;
+				var r0=q / c2,r1=c / q;
+				var r=Math.abs(r0)< Math.abs(r1)? r0 :r1;
+				if (r *r <=dd){
+					y=Math.sqrt(dd-r *r)*bendDir;
+					a1=ta-Math.atan2(y,r);
+					a2=Math.atan2(y / psy,(r-l1)/ psx);
+				}
+			};
+			var minAngle=0,minDist=Number.MAX_VALUE,minX=0,minY=0;
+			var maxAngle=0,maxDist=0,maxX=0,maxY=0;
+			x=l1+a;
+			d=x *x;
+			if (d > maxDist){
+				maxAngle=0;
+				maxDist=d;
+				maxX=x;
+			}
+			x=l1-a;
+			d=x *x;
+			if (d < minDist){
+				minAngle=Math.PI;
+				minDist=d;
+				minX=x;
+			};
+			var angle=Math.acos(-a *l1 / (aa-bb));
+			x=a *Math.cos(angle)+l1;
+			y=b *Math.sin(angle);
+			d=x *x+y *y;
+			if (d < minDist){
+				minAngle=angle;
+				minDist=d;
+				minX=x;
+				minY=y;
+			}
+			if (d > maxDist){
+				maxAngle=angle;
+				maxDist=d;
+				maxX=x;
+				maxY=y;
+			}
+			if (dd <=(minDist+maxDist)/ 2){
+				a1=ta-Math.atan2(minY *bendDir,minX);
+				a2=minAngle *bendDir;
+				}else {
+				a1=ta-Math.atan2(maxY *bendDir,maxX);
+				a2=maxAngle *bendDir;
+			}
+		};
+		var os=Math.atan2(cy,cx)*s2;
+		var rotation=parent.resultTransform.skX;
+		a1=(a1-os)*IkConstraint.radDeg+os1-rotation;
+		if (a1 > 180)
+			a1-=360;
+		else if (a1 <-180)a1+=360;
+		parent.resultTransform.x=px;
+		parent.resultTransform.y=py;
+		parent.resultTransform.skX=parent.resultTransform.skY=rotation+a1 *alpha;
+		rotation=child.resultTransform.skX;
+		rotation=rotation % 360;
+		a2=((a2+os)*IkConstraint.radDeg-0)*s2+os2-rotation;
+		if (a2 > 180)
+			a2-=360;
+		else if (a2 <-180)a2+=360;
+		child.resultTransform.x=cx;
+		child.resultTransform.y=cy;
+		child.resultTransform.skX=child.resultTransform.skY=child.resultTransform.skY+a2 *alpha;
+		parent.update();
+	}
+
+	//TODO:coverage
+	__proto._applyIk3=function(parent,child,targetX,targetY,bendDir,alpha){
+		if (alpha==0){
+			return;
+		};
+		var cwx=NaN,cwy=NaN;
+		var x=child.resultMatrix.a *child.length;
+		var y=child.resultMatrix.b *child.length;
+		var lLL=x *x+y *y;
+		var lL=Math.sqrt(lLL);
+		var parentX=parent.resultMatrix.tx;
+		var parentY=parent.resultMatrix.ty;
+		var childX=child.resultMatrix.tx;
+		var childY=child.resultMatrix.ty;
+		var dX=childX-parentX;
+		var dY=childY-parentY;
+		var lPP=dX *dX+dY *dY;
+		var lP=Math.sqrt(lPP);
+		dX=targetX-parent.resultMatrix.tx;
+		dY=targetY-parent.resultMatrix.ty;
+		var lTT=dX *dX+dY *dY;
+		var lT=Math.sqrt(lTT);
+		var ikRadianA=0;
+		if (lL+lP <=lT || lT+lL <=lP || lT+lP <=lL){
+			var rate=NaN;
+			if (lL+lP <=lT){
+				rate=1;
+				}else{
+				rate=-1;
+			}
+			childX=parentX+rate*(targetX-parentX)*lP / lT;
+			childY=parentY+rate*(targetY-parentY)*lP / lT;
+		}
+		else{
+			var h=(lPP-lLL+lTT)/ (2 *lTT);
+			var r=Math.sqrt(lPP-h *h *lTT)/ lT;
+			var hX=parentX+(dX *h);
+			var hY=parentY+(dY *h);
+			var rX=-dY *r;
+			var rY=dX *r;
+			if (bendDir>0){
+				childX=hX-rX;
+				childY=hY-rY;
+			}
+			else{
+				childX=hX+rX;
+				childY=hY+rY;
+			}
+		}
+		cwx=childX;
+		cwy=childY;
+		if (this.isDebug){
+			if (!this._sp){
+				this._sp=new Sprite();
+				Laya.stage.addChild(this._sp);
+			}
+			this._sp.graphics.clear();
+			this._sp.graphics.drawCircle(parentX,parentY,15,"#ff00ff");
+			this._sp.graphics.drawCircle(targetX,targetY,15,"#ffff00");
+			this._sp.graphics.drawCircle(cwx,cwy,15,"#ff00ff");
+		};
+		var pRotation=NaN;
+		pRotation=Math.atan2(cwy-parent.resultMatrix.ty,cwx-parent.resultMatrix.tx);
+		parent.setRotation(pRotation);
+		var pTarMatrix;
+		pTarMatrix=IkConstraint._tempMatrix;
+		pTarMatrix.identity();
+		pTarMatrix.rotate(pRotation);
+		pTarMatrix.scale(parent.resultMatrix.getScaleX(),parent.resultMatrix.getScaleY());
+		pTarMatrix.translate(parent.resultMatrix.tx,parent.resultMatrix.ty);
+		pTarMatrix.copyTo(parent.resultMatrix);
+		parent.updateChild();
+		var childRotation=NaN;
+		childRotation=Math.atan2(targetY-cwy,targetX-cwx);
+		child.setRotation(childRotation);
+		var childTarMatrix;
+		childTarMatrix=IkConstraint._tempMatrix;
+		childTarMatrix.identity();
+		childTarMatrix.rotate(childRotation);
+		childTarMatrix.scale(child.resultMatrix.getScaleX(),child.resultMatrix.getScaleY());
+		childTarMatrix.translate(cwx,cwy);
+		pTarMatrix.copyTo(child.resultMatrix);
+		child.updateChild();
+	}
+
+	__static(IkConstraint,
+	['radDeg',function(){return this.radDeg=180 / Math.PI;},'degRad',function(){return this.degRad=Math.PI / 180;},'_tempMatrix',function(){return this._tempMatrix=new Matrix();}
+	]);
+	return IkConstraint;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.SkinSlotDisplayData
+var SkinSlotDisplayData=(function(){
+	function SkinSlotDisplayData(){
+		this.name=null;
+		this.attachmentName=null;
+		this.type=0;
 		this.transform=null;
-		this.inheritScale=true;
-		this.inheritRotation=true;
-		this.rotation=NaN;
-		this.resultRotation=NaN;
-		this.d=-1;
-		this._tempMatrix=null;
-		this._sprite=null;
-		this.resultTransform=new Transform();
-		this.resultMatrix=new Matrix();
-		this._children=[];
+		this.width=NaN;
+		this.height=NaN;
+		this.texture=null;
+		this.bones=null;
+		this.uvs=null;
+		this.weights=null;
+		this.triangles=null;
+		this.vertices=null;
+		this.lengths=null;
+		this.verLen=0;
 	}
 
-	__class(Bone,'laya.ani.bone.Bone');
-	var __proto=Bone.prototype;
-	__proto.setTempMatrix=function(matrix){
-		this._tempMatrix=matrix;
-		var i=0,n=0;
-		var tBone;
-		for (i=0,n=this._children.length;i < n;i++){
-			tBone=this._children[i];
-			tBone.setTempMatrix(this._tempMatrix);
+	__class(SkinSlotDisplayData,'laya.ani.bone.SkinSlotDisplayData');
+	var __proto=SkinSlotDisplayData.prototype;
+	__proto.createTexture=function(currTexture){
+		if (this.texture)return this.texture;
+		this.texture=new Texture(currTexture.bitmap,this.uvs);
+		if (this.uvs[0] > this.uvs[4]
+			&& this.uvs[1] > this.uvs[5]){
+			this.texture.width=currTexture.height;
+			this.texture.height=currTexture.width;
+			this.texture.offsetX=-currTexture.offsetX;
+			this.texture.offsetY=-currTexture.offsetY;
+			this.texture.sourceWidth=currTexture.sourceHeight;
+			this.texture.sourceHeight=currTexture.sourceWidth;
+			}else {
+			this.texture.width=currTexture.width;
+			this.texture.height=currTexture.height;
+			this.texture.offsetX=-currTexture.offsetX;
+			this.texture.offsetY=-currTexture.offsetY;
+			this.texture.sourceWidth=currTexture.sourceWidth;
+			this.texture.sourceHeight=currTexture.sourceHeight;
 		}
-	}
-
-	//TODO:coverage
-	__proto.update=function(pMatrix){
-		this.rotation=this.transform.skX;
-		var tResultMatrix;
-		if (pMatrix){
-			tResultMatrix=this.resultTransform.getMatrix();
-			Matrix.mul(tResultMatrix,pMatrix,this.resultMatrix);
-			this.resultRotation=this.rotation;
-		}
-		else {
-			this.resultRotation=this.rotation+this.parentBone.resultRotation;
-			if (this.parentBone){
-				if (this.inheritRotation && this.inheritScale){
-					tResultMatrix=this.resultTransform.getMatrix();
-					Matrix.mul(tResultMatrix,this.parentBone.resultMatrix,this.resultMatrix);
-				}
-				else {
-					var temp=0;
-					var parent=this.parentBone;
-					var tAngle=NaN;
-					var cos=NaN;
-					var sin=NaN;
-					var tParentMatrix=this.parentBone.resultMatrix;
-					tResultMatrix=this.resultTransform.getMatrix();
-					var worldX=tParentMatrix.a *tResultMatrix.tx+tParentMatrix.c *tResultMatrix.ty+tParentMatrix.tx;
-					var worldY=tParentMatrix.b *tResultMatrix.tx+tParentMatrix.d *tResultMatrix.ty+tParentMatrix.ty;
-					var tTestMatrix=new Matrix();
-					if (this.inheritRotation){
-						tAngle=Math.atan2(parent.resultMatrix.b,parent.resultMatrix.a);
-						cos=Math.cos(tAngle),sin=Math.sin(tAngle);
-						tTestMatrix.setTo(cos,sin,-sin,cos,0,0);
-						Matrix.mul(this._tempMatrix,tTestMatrix,Matrix.TEMP);
-						Matrix.TEMP.copyTo(tTestMatrix);
-						tResultMatrix=this.resultTransform.getMatrix();
-						Matrix.mul(tResultMatrix,tTestMatrix,this.resultMatrix);
-						if (this.resultTransform.scX *this.resultTransform.scY < 0){
-							this.resultMatrix.rotate(Math.PI*0.5);
-						}
-						this.resultMatrix.tx=worldX;
-						this.resultMatrix.ty=worldY;
-					}
-					else if (this.inheritScale){
-						tResultMatrix=this.resultTransform.getMatrix();
-						Matrix.TEMP.identity();
-						Matrix.TEMP.d=this.d;
-						Matrix.mul(tResultMatrix,Matrix.TEMP,this.resultMatrix);
-						this.resultMatrix.tx=worldX;
-						this.resultMatrix.ty=worldY;
-					}
-					else {
-						tResultMatrix=this.resultTransform.getMatrix();
-						Matrix.TEMP.identity();
-						Matrix.TEMP.d=this.d;
-						Matrix.mul(tResultMatrix,Matrix.TEMP,this.resultMatrix);
-						this.resultMatrix.tx=worldX;
-						this.resultMatrix.ty=worldY;
-					}
-				}
-			}
-			else {
-				tResultMatrix=this.resultTransform.getMatrix();
-				tResultMatrix.copyTo(this.resultMatrix);
-			}
-		};
-		var i=0,n=0;
-		var tBone;
-		for (i=0,n=this._children.length;i < n;i++){
-			tBone=this._children[i];
-			tBone.update();
-		}
-	}
-
-	//TODO:coverage
-	__proto.updateChild=function(){
-		var i=0,n=0;
-		var tBone;
-		for (i=0,n=this._children.length;i < n;i++){
-			tBone=this._children[i];
-			tBone.update();
-		}
-	}
-
-	//TODO:coverage
-	__proto.setRotation=function(rd){
-		if (this._sprite){
-			this._sprite.rotation=rd *180 / Math.PI;
-		}
-	}
-
-	//TODO:coverage
-	__proto.updateDraw=function(x,y){
-		if (!Bone.ShowBones || Bone.ShowBones[this.name]){
-			if (this._sprite){
-				this._sprite.x=x+this.resultMatrix.tx;
-				this._sprite.y=y+this.resultMatrix.ty;
-			}
-			else {
-				this._sprite=new Sprite();
-				this._sprite.graphics.drawCircle(0,0,5,"#ff0000");
-				this._sprite.graphics.drawLine(0,0,this.length,0,"#00ff00");
-				this._sprite.graphics.fillText(this.name,0,0,"20px Arial","#00ff00","center");
-				Laya.stage.addChild(this._sprite);
-				this._sprite.x=x+this.resultMatrix.tx;
-				this._sprite.y=y+this.resultMatrix.ty;
-			}
-		};
-		var i=0,n=0;
-		var tBone;
-		for (i=0,n=this._children.length;i < n;i++){
-			tBone=this._children[i];
-			tBone.updateDraw(x,y);
-		}
-	}
-
-	__proto.addChild=function(bone){
-		this._children.push(bone);
-		bone.parentBone=this;
-	}
-
-	//TODO:coverage
-	__proto.findBone=function(boneName){
-		if (this.name==boneName){
-			return this;
-		}
-		else {
-			var i=0,n=0;
-			var tBone;
-			var tResult;
-			for (i=0,n=this._children.length;i < n;i++){
-				tBone=this._children[i];
-				tResult=tBone.findBone(boneName);
-				if (tResult){
-					return tResult;
-				}
+		if (!Render.isWebGL){
+			if (this.uvs[1] > this.uvs[5]){
+				this.texture.offsetY=this.texture.sourceHeight-this.texture.height-this.texture.offsetY;
 			}
 		}
-		return null;
+		return this.texture;
 	}
 
-	//TODO:coverage
-	__proto.localToWorld=function(local){
-		var localX=local[0];
-		var localY=local[1];
-		local[0]=localX *this.resultMatrix.a+localY *this.resultMatrix.c+this.resultMatrix.tx;
-		local[1]=localX *this.resultMatrix.b+localY *this.resultMatrix.d+this.resultMatrix.ty;
+	__proto.destory=function(){
+		if (this.texture)this.texture.destroy();
 	}
 
-	Bone.ShowBones={};
-	return Bone;
+	return SkinSlotDisplayData;
+})()
+
+
+/**
+*@private
+*@author ...
+*/
+//class laya.ani.AnimationNodeContent
+var AnimationNodeContent=(function(){
+	function AnimationNodeContent(){
+		this.name=null;
+		this.parentIndex=0;
+		this.parent=null;
+		this.keyframeWidth=0;
+		this.lerpType=0;
+		this.interpolationMethod=null;
+		this.childs=null;
+		this.keyFrame=null;
+		//=new Vector.<KeyFramesContent>;
+		this.playTime=NaN;
+		this.extenData=null;
+		this.dataOffset=0;
+	}
+
+	__class(AnimationNodeContent,'laya.ani.AnimationNodeContent');
+	return AnimationNodeContent;
 })()
 
 
@@ -951,165 +1170,75 @@ var BoneSlot=(function(){
 /**
 *@private
 */
-//class laya.ani.bone.canvasmesh.MeshData
-var MeshData=(function(){
-	function MeshData(){
-		/**
-		*纹理
-		*/
-		this.texture=null;
-		/**
-		*uv数据
-		*/
-		this.uvs=[0,0,1,0,1,1,0,1];
-		/**
-		*顶点数据
-		*/
-		this.vertices=[0,0,100,0,100,100,0,100];
-		/**
-		*顶点索引
-		*/
-		this.indexes=[0,1,3,3,1,2];
-		/**
-		*uv变换矩阵
-		*/
-		this.uvTransform=null;
-		/**
-		*是否有uv变化矩阵
-		*/
-		this.useUvTransform=false;
-		/**
-		*扩展像素,用来去除黑边
-		*/
-		this.canvasPadding=1;
+//class laya.ani.bone.IkConstraintData
+var IkConstraintData=(function(){
+	function IkConstraintData(){
+		this.name=null;
+		this.targetBoneName=null;
+		this.bendDirection=1;
+		this.mix=1;
+		this.isSpine=true;
+		this.targetBoneIndex=-1;
+		this.boneNames=[];
+		this.boneIndexs=[];
 	}
 
-	__class(MeshData,'laya.ani.bone.canvasmesh.MeshData');
-	var __proto=MeshData.prototype;
-	//TODO:coverage
-	__proto.getBounds=function(){
-		return Rectangle._getWrapRec(this.vertices);
-	}
-
-	return MeshData;
+	__class(IkConstraintData,'laya.ani.bone.IkConstraintData');
+	return IkConstraintData;
 })()
 
 
 /**
+*用于UV转换的工具类
 *@private
 */
-//class laya.ani.bone.DeformAniData
-var DeformAniData=(function(){
-	function DeformAniData(){
-		this.skinName=null;
-		this.deformSlotDataList=[];
-	}
-
-	__class(DeformAniData,'laya.ani.bone.DeformAniData');
-	return DeformAniData;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.DeformSlotData
-var DeformSlotData=(function(){
-	function DeformSlotData(){
-		this.deformSlotDisplayList=[];
-	}
-
-	__class(DeformSlotData,'laya.ani.bone.DeformSlotData');
-	return DeformSlotData;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.DeformSlotDisplayData
-var DeformSlotDisplayData=(function(){
-	function DeformSlotDisplayData(){
-		this.boneSlot=null;
-		this.slotIndex=-1;
-		this.attachment=null;
-		this.deformData=null;
-		this.frameIndex=0;
-		this.timeList=[];
-		this.vectices=[];
-		this.tweenKeyList=[];
-	}
-
-	__class(DeformSlotDisplayData,'laya.ani.bone.DeformSlotDisplayData');
-	var __proto=DeformSlotDisplayData.prototype;
-	__proto.binarySearch1=function(values,target){
-		var low=0;
-		var high=values.length-2;
-		if (high==0)
-			return 1;
-		var current=high >>> 1;
-		while (true){
-			if (values[Math.floor(current+1)] <=target)
-				low=current+1;
-			else
-			high=current;
-			if (low==high)
-				return low+1;
-			current=(low+high)>>> 1;
+//class laya.ani.bone.UVTools
+var UVTools=(function(){
+	function UVTools(){}
+	__class(UVTools,'laya.ani.bone.UVTools');
+	UVTools.getRelativeUV=function(bigUV,smallUV,rst){
+		var startX=bigUV[0];
+		var width=bigUV[2]-bigUV[0];
+		var startY=bigUV[1];
+		var height=bigUV[5]-bigUV[1];
+		if(!rst)rst=[];
+		rst.length=smallUV.length;
+		var i=0,len=0;
+		len=rst.length;
+		var dWidth=1 / width;
+		var dHeight=1 / height;
+		for (i=0;i < len;i+=2){
+			rst[i]=(smallUV[i]-startX)*dWidth;
+			rst[i+1]=(smallUV[i+1]-startY)*dHeight;
 		}
-		return 0;
+		return rst;
 	}
 
-	//TODO:coverage
-	__proto.apply=function(time,boneSlot,alpha){
-		(alpha===void 0)&& (alpha=1);
-		time+=0.05;
-		if (this.timeList.length <=0){
-			return;
-		};
-		var i=0;
-		var n=0;
-		var tTime=this.timeList[0];
-		if (time < tTime){
-			return;
-		};
-		var tVertexCount=this.vectices[0].length;
-		var tVertices=[];
-		var tFrameIndex=this.binarySearch1(this.timeList,time);
-		this.frameIndex=tFrameIndex;
-		if (time >=this.timeList[this.timeList.length-1]){
-			var lastVertices=this.vectices[this.vectices.length-1];
-			if (alpha < 1){
-				for (i=0;i < tVertexCount;i++){
-					tVertices[i]+=(lastVertices[i]-tVertices[i])*alpha;
-				}
-				}else {
-				for (i=0;i < tVertexCount;i++){
-					tVertices[i]=lastVertices[i];
-				}
+	UVTools.getAbsoluteUV=function(bigUV,smallUV,rst){
+		if (bigUV[0]==0 && bigUV[1]==0 && bigUV[4]==1 && bigUV[5]==1){
+			if (rst){
+				Utils.copyArray(rst,smallUV);
+				return rst;
+				}else{
+				return smallUV;
 			}
-			this.deformData=tVertices;
-			return;
 		};
-		var tTweenKey=this.tweenKeyList[this.frameIndex];
-		var tPrevVertices=this.vectices[this.frameIndex-1];
-		var tNextVertices=this.vectices[this.frameIndex];
-		var tPreFrameTime=this.timeList[this.frameIndex-1];
-		var tFrameTime=this.timeList[this.frameIndex];
-		if (this.tweenKeyList[tFrameIndex-1]){
-			alpha=(time-tPreFrameTime)/ (tFrameTime-tPreFrameTime);
-			}else {
-			alpha=0;
-		};
-		var tPrev=NaN;
-		for (i=0;i < tVertexCount;i++){
-			tPrev=tPrevVertices[i];
-			tVertices[i]=tPrev+(tNextVertices[i]-tPrev)*alpha;
+		var startX=bigUV[0];
+		var width=bigUV[2]-bigUV[0];
+		var startY=bigUV[1];
+		var height=bigUV[5]-bigUV[1];
+		if(!rst)rst=[];
+		rst.length=smallUV.length;
+		var i=0,len=0;
+		len=rst.length;
+		for (i=0;i < len;i+=2){
+			rst[i]=smallUV[i]*width+startX;
+			rst[i+1]=smallUV[i+1]*height+startY;
 		}
-		this.deformData=tVertices;
+		return rst;
 	}
 
-	return DeformSlotDisplayData;
+	return UVTools;
 })()
 
 
@@ -1131,357 +1260,14 @@ var DrawOrderData=(function(){
 /**
 *@private
 */
-//class laya.ani.bone.EventData
-var EventData=(function(){
-	function EventData(){
-		this.name=null;
-		this.intValue=0;
-		this.floatValue=NaN;
-		this.stringValue=null;
-		this.time=NaN;
-	}
-
-	__class(EventData,'laya.ani.bone.EventData');
-	return EventData;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.IkConstraint
-var IkConstraint=(function(){
-	function IkConstraint(data,bones){
-		this._targetBone=null;
-		this._bones=null;
-		this._data=null;
-		this.name=null;
-		this.mix=NaN;
-		this.bendDirection=NaN;
-		this.isSpine=true;
-		//debug相关代码
-		this._sp=null;
-		this.isDebug=false;
-		this._data=data;
-		this._targetBone=bones[data.targetBoneIndex];
-		this.isSpine=data.isSpine;
-		if (this._bones==null)this._bones=[];
-		this._bones.length=0;
-		for (var i=0,n=data.boneIndexs.length;i < n;i++){
-			this._bones.push(bones[data.boneIndexs[i]]);
-		}
-		this.name=data.name;
-		this.mix=data.mix;
-		this.bendDirection=data.bendDirection;
-	}
-
-	__class(IkConstraint,'laya.ani.bone.IkConstraint');
-	var __proto=IkConstraint.prototype;
-	__proto.apply=function(){
-		switch (this._bones.length){
-			case 1:
-				this._applyIk1(this._bones[0],this._targetBone.resultMatrix.tx,this._targetBone.resultMatrix.ty,this.mix);
-				break ;
-			case 2:
-				if (this.isSpine){
-					this._applyIk2(this._bones[0],this._bones[1],this._targetBone.resultMatrix.tx,this._targetBone.resultMatrix.ty,this.bendDirection,this.mix);
-					}else{
-					this._applyIk3(this._bones[0],this._bones[1],this._targetBone.resultMatrix.tx,this._targetBone.resultMatrix.ty,this.bendDirection,this.mix);
-				}
-				break ;
-			}
-	}
-
-	//TODO:coverage
-	__proto._applyIk1=function(bone,targetX,targetY,alpha){
-		var pp=bone.parentBone;
-		var id=1 / (pp.resultMatrix.a *pp.resultMatrix.d-pp.resultMatrix.b *pp.resultMatrix.c);
-		var x=targetX-pp.resultMatrix.tx;
-		var y=targetY-pp.resultMatrix.ty;
-		var tx=(x *pp.resultMatrix.d-y *pp.resultMatrix.c)*id-bone.transform.x;
-		var ty=(y *pp.resultMatrix.a-x *pp.resultMatrix.b)*id-bone.transform.y;
-		var rotationIK=Math.atan2(ty,tx)*IkConstraint.radDeg-0-bone.transform.skX;
-		if (bone.transform.scX < 0)rotationIK+=180;
-		if (rotationIK > 180)
-			rotationIK-=360;
-		else if (rotationIK <-180)rotationIK+=360;
-		bone.transform.skX=bone.transform.skY=bone.transform.skX+rotationIK *alpha;
-		bone.update();
-	}
-
-	//TODO:coverage
-	__proto.updatePos=function(x,y){
-		if (this._sp){
-			this._sp.pos(x,y);
-		}
-	}
-
-	//TODO:coverage
-	__proto._applyIk2=function(parent,child,targetX,targetY,bendDir,alpha){
-		if (alpha==0){
-			return;
-		};
-		var px=parent.resultTransform.x,py=parent.resultTransform.y;
-		var psx=parent.transform.scX,psy=parent.transform.scY;
-		var csx=child.transform.scX;
-		var os1=0,os2=0,s2=0;
-		if (psx < 0){
-			psx=-psx;
-			os1=180;
-			s2=-1;
-			}else {
-			os1=0;
-			s2=1;
-		}
-		if (psy < 0){
-			psy=-psy;
-			s2=-s2;
-		}
-		if (csx < 0){
-			csx=-csx;
-			os2=180;
-			}else {
-			os2=0
-		};
-		var cx=child.resultTransform.x,cy=NaN,cwx=NaN,cwy=NaN;
-		var a=parent.resultMatrix.a,b=parent.resultMatrix.c;
-		var c=parent.resultMatrix.b,d=parent.resultMatrix.d;
-		var u=Math.abs(psx-psy)<=0.0001;
-		if (!u){
-			cy=0;
-			cwx=a *cx+parent.resultMatrix.tx;
-			cwy=c *cx+parent.resultMatrix.ty;
-			}else {
-			cy=child.resultTransform.y;
-			cwx=a *cx+b *cy+parent.resultMatrix.tx;
-			cwy=c *cx+d *cy+parent.resultMatrix.ty;
-		}
-		if (this.isDebug){
-			if (!this._sp){
-				this._sp=new Sprite();
-				Laya.stage.addChild(this._sp);
-			}
-			this._sp.graphics.clear();
-			this._sp.graphics.drawCircle(targetX,targetY,15,"#ffff00");
-			this._sp.graphics.drawCircle(cwx,cwy,15,"#ff00ff");
-		}
-		parent.setRotation(Math.atan2(cwy-parent.resultMatrix.ty,cwx-parent.resultMatrix.tx));
-		var pp=parent.parentBone;
-		a=pp.resultMatrix.a;
-		b=pp.resultMatrix.c;
-		c=pp.resultMatrix.b;
-		d=pp.resultMatrix.d;
-		var id=1 / (a *d-b *c);
-		var x=targetX-pp.resultMatrix.tx,y=targetY-pp.resultMatrix.ty;
-		var tx=(x *d-y *b)*id-px;
-		var ty=(y *a-x *c)*id-py;
-		x=cwx-pp.resultMatrix.tx;
-		y=cwy-pp.resultMatrix.ty;
-		var dx=(x *d-y *b)*id-px;
-		var dy=(y *a-x *c)*id-py;
-		var l1=Math.sqrt(dx *dx+dy *dy);
-		var l2=child.length *csx;
-		var a1=NaN,a2=NaN;
-		if (u){
-			l2 *=psx;
-			var cos=(tx *tx+ty *ty-l1 *l1-l2 *l2)/ (2 *l1 *l2);
-			if (cos <-1)
-				cos=-1;
-			else if (cos > 1)cos=1;
-			a2=Math.acos(cos)*bendDir;
-			a=l1+l2 *cos;
-			b=l2 *Math.sin(a2);
-			a1=Math.atan2(ty *a-tx *b,tx *a+ty *b);
-			}else {
-			a=psx *l2;
-			b=psy *l2;
-			var aa=a *a,bb=b *b,dd=tx *tx+ty *ty,ta=Math.atan2(ty,tx);
-			c=bb *l1 *l1+aa *dd-aa *bb;
-			var c1=-2 *bb *l1,c2=bb-aa;
-			d=c1 *c1-4 *c2 *c;
-			if (d > 0){
-				var q=Math.sqrt(d);
-				if (c1 < 0)q=-q;
-				q=-(c1+q)/ 2;
-				var r0=q / c2,r1=c / q;
-				var r=Math.abs(r0)< Math.abs(r1)? r0 :r1;
-				if (r *r <=dd){
-					y=Math.sqrt(dd-r *r)*bendDir;
-					a1=ta-Math.atan2(y,r);
-					a2=Math.atan2(y / psy,(r-l1)/ psx);
-				}
-			};
-			var minAngle=0,minDist=Number.MAX_VALUE,minX=0,minY=0;
-			var maxAngle=0,maxDist=0,maxX=0,maxY=0;
-			x=l1+a;
-			d=x *x;
-			if (d > maxDist){
-				maxAngle=0;
-				maxDist=d;
-				maxX=x;
-			}
-			x=l1-a;
-			d=x *x;
-			if (d < minDist){
-				minAngle=Math.PI;
-				minDist=d;
-				minX=x;
-			};
-			var angle=Math.acos(-a *l1 / (aa-bb));
-			x=a *Math.cos(angle)+l1;
-			y=b *Math.sin(angle);
-			d=x *x+y *y;
-			if (d < minDist){
-				minAngle=angle;
-				minDist=d;
-				minX=x;
-				minY=y;
-			}
-			if (d > maxDist){
-				maxAngle=angle;
-				maxDist=d;
-				maxX=x;
-				maxY=y;
-			}
-			if (dd <=(minDist+maxDist)/ 2){
-				a1=ta-Math.atan2(minY *bendDir,minX);
-				a2=minAngle *bendDir;
-				}else {
-				a1=ta-Math.atan2(maxY *bendDir,maxX);
-				a2=maxAngle *bendDir;
-			}
-		};
-		var os=Math.atan2(cy,cx)*s2;
-		var rotation=parent.resultTransform.skX;
-		a1=(a1-os)*IkConstraint.radDeg+os1-rotation;
-		if (a1 > 180)
-			a1-=360;
-		else if (a1 <-180)a1+=360;
-		parent.resultTransform.x=px;
-		parent.resultTransform.y=py;
-		parent.resultTransform.skX=parent.resultTransform.skY=rotation+a1 *alpha;
-		rotation=child.resultTransform.skX;
-		rotation=rotation % 360;
-		a2=((a2+os)*IkConstraint.radDeg-0)*s2+os2-rotation;
-		if (a2 > 180)
-			a2-=360;
-		else if (a2 <-180)a2+=360;
-		child.resultTransform.x=cx;
-		child.resultTransform.y=cy;
-		child.resultTransform.skX=child.resultTransform.skY=child.resultTransform.skY+a2 *alpha;
-		parent.update();
-	}
-
-	//TODO:coverage
-	__proto._applyIk3=function(parent,child,targetX,targetY,bendDir,alpha){
-		if (alpha==0){
-			return;
-		};
-		var cwx=NaN,cwy=NaN;
-		var x=child.resultMatrix.a *child.length;
-		var y=child.resultMatrix.b *child.length;
-		var lLL=x *x+y *y;
-		var lL=Math.sqrt(lLL);
-		var parentX=parent.resultMatrix.tx;
-		var parentY=parent.resultMatrix.ty;
-		var childX=child.resultMatrix.tx;
-		var childY=child.resultMatrix.ty;
-		var dX=childX-parentX;
-		var dY=childY-parentY;
-		var lPP=dX *dX+dY *dY;
-		var lP=Math.sqrt(lPP);
-		dX=targetX-parent.resultMatrix.tx;
-		dY=targetY-parent.resultMatrix.ty;
-		var lTT=dX *dX+dY *dY;
-		var lT=Math.sqrt(lTT);
-		var ikRadianA=0;
-		if (lL+lP <=lT || lT+lL <=lP || lT+lP <=lL){
-			var rate=NaN;
-			if (lL+lP <=lT){
-				rate=1;
-				}else{
-				rate=-1;
-			}
-			childX=parentX+rate*(targetX-parentX)*lP / lT;
-			childY=parentY+rate*(targetY-parentY)*lP / lT;
-		}
-		else{
-			var h=(lPP-lLL+lTT)/ (2 *lTT);
-			var r=Math.sqrt(lPP-h *h *lTT)/ lT;
-			var hX=parentX+(dX *h);
-			var hY=parentY+(dY *h);
-			var rX=-dY *r;
-			var rY=dX *r;
-			if (bendDir>0){
-				childX=hX-rX;
-				childY=hY-rY;
-			}
-			else{
-				childX=hX+rX;
-				childY=hY+rY;
-			}
-		}
-		cwx=childX;
-		cwy=childY;
-		if (this.isDebug){
-			if (!this._sp){
-				this._sp=new Sprite();
-				Laya.stage.addChild(this._sp);
-			}
-			this._sp.graphics.clear();
-			this._sp.graphics.drawCircle(parentX,parentY,15,"#ff00ff");
-			this._sp.graphics.drawCircle(targetX,targetY,15,"#ffff00");
-			this._sp.graphics.drawCircle(cwx,cwy,15,"#ff00ff");
-		};
-		var pRotation=NaN;
-		pRotation=Math.atan2(cwy-parent.resultMatrix.ty,cwx-parent.resultMatrix.tx);
-		parent.setRotation(pRotation);
-		var pTarMatrix;
-		pTarMatrix=IkConstraint._tempMatrix;
-		pTarMatrix.identity();
-		pTarMatrix.rotate(pRotation);
-		pTarMatrix.scale(parent.resultMatrix.getScaleX(),parent.resultMatrix.getScaleY());
-		pTarMatrix.translate(parent.resultMatrix.tx,parent.resultMatrix.ty);
-		pTarMatrix.copyTo(parent.resultMatrix);
-		parent.updateChild();
-		var childRotation=NaN;
-		childRotation=Math.atan2(targetY-cwy,targetX-cwx);
-		child.setRotation(childRotation);
-		var childTarMatrix;
-		childTarMatrix=IkConstraint._tempMatrix;
-		childTarMatrix.identity();
-		childTarMatrix.rotate(childRotation);
-		childTarMatrix.scale(child.resultMatrix.getScaleX(),child.resultMatrix.getScaleY());
-		childTarMatrix.translate(cwx,cwy);
-		pTarMatrix.copyTo(child.resultMatrix);
-		child.updateChild();
-	}
-
-	__static(IkConstraint,
-	['radDeg',function(){return this.radDeg=180 / Math.PI;},'degRad',function(){return this.degRad=Math.PI / 180;},'_tempMatrix',function(){return this._tempMatrix=new Matrix();}
-	]);
-	return IkConstraint;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.IkConstraintData
-var IkConstraintData=(function(){
-	function IkConstraintData(){
-		this.name=null;
-		this.targetBoneName=null;
-		this.bendDirection=1;
-		this.mix=1;
-		this.isSpine=true;
-		this.targetBoneIndex=-1;
-		this.boneNames=[];
-		this.boneIndexs=[];
-	}
-
-	__class(IkConstraintData,'laya.ani.bone.IkConstraintData');
-	return IkConstraintData;
+//class laya.ani.AnimationState
+var AnimationState=(function(){
+	function AnimationState(){}
+	__class(AnimationState,'laya.ani.AnimationState');
+	AnimationState.stopped=0;
+	AnimationState.paused=1;
+	AnimationState.playing=2;
+	return AnimationState;
 })()
 
 
@@ -1993,104 +1779,6 @@ var PathConstraint=(function(){
 /**
 *@private
 */
-//class laya.ani.bone.PathConstraintData
-var PathConstraintData=(function(){
-	function PathConstraintData(){
-		this.name=null;
-		this.target=null;
-		this.positionMode=null;
-		this.spacingMode=null;
-		this.rotateMode=null;
-		this.offsetRotation=NaN;
-		this.position=NaN;
-		this.spacing=NaN;
-		this.rotateMix=NaN;
-		this.translateMix=NaN;
-		this.bones=[];
-	}
-
-	__class(PathConstraintData,'laya.ani.bone.PathConstraintData');
-	return PathConstraintData;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.SkinData
-var SkinData=(function(){
-	function SkinData(){
-		this.name=null;
-		this.slotArr=[];
-	}
-
-	__class(SkinData,'laya.ani.bone.SkinData');
-	return SkinData;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.SkinSlotDisplayData
-var SkinSlotDisplayData=(function(){
-	function SkinSlotDisplayData(){
-		this.name=null;
-		this.attachmentName=null;
-		this.type=0;
-		this.transform=null;
-		this.width=NaN;
-		this.height=NaN;
-		this.texture=null;
-		this.bones=null;
-		this.uvs=null;
-		this.weights=null;
-		this.triangles=null;
-		this.vertices=null;
-		this.lengths=null;
-		this.verLen=0;
-	}
-
-	__class(SkinSlotDisplayData,'laya.ani.bone.SkinSlotDisplayData');
-	var __proto=SkinSlotDisplayData.prototype;
-	__proto.createTexture=function(currTexture){
-		if (this.texture)return this.texture;
-		this.texture=new Texture(currTexture.bitmap,this.uvs);
-		if (this.uvs[0] > this.uvs[4]
-			&& this.uvs[1] > this.uvs[5]){
-			this.texture.width=currTexture.height;
-			this.texture.height=currTexture.width;
-			this.texture.offsetX=-currTexture.offsetX;
-			this.texture.offsetY=-currTexture.offsetY;
-			this.texture.sourceWidth=currTexture.sourceHeight;
-			this.texture.sourceHeight=currTexture.sourceWidth;
-			}else {
-			this.texture.width=currTexture.width;
-			this.texture.height=currTexture.height;
-			this.texture.offsetX=-currTexture.offsetX;
-			this.texture.offsetY=-currTexture.offsetY;
-			this.texture.sourceWidth=currTexture.sourceWidth;
-			this.texture.sourceHeight=currTexture.sourceHeight;
-		}
-		if (!Render.isWebGL){
-			if (this.uvs[1] > this.uvs[5]){
-				this.texture.offsetY=this.texture.sourceHeight-this.texture.height-this.texture.offsetY;
-			}
-		}
-		return this.texture;
-	}
-
-	__proto.destory=function(){
-		if (this.texture)this.texture.destroy();
-	}
-
-	return SkinSlotDisplayData;
-})()
-
-
-/**
-*@private
-*/
 //class laya.ani.bone.SlotData
 var SlotData=(function(){
 	function SlotData(){
@@ -2112,6 +1800,240 @@ var SlotData=(function(){
 	}
 
 	return SlotData;
+})()
+
+
+/**
+*@private
+*@author ...
+*/
+//class laya.ani.AnimationContent
+var AnimationContent=(function(){
+	function AnimationContent(){
+		this.nodes=null;
+		this.name=null;
+		this.playTime=NaN;
+		this.bone3DMap=null;
+		this.totalKeyframeDatasLength=0;
+	}
+
+	__class(AnimationContent,'laya.ani.AnimationContent');
+	return AnimationContent;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.canvasmesh.MeshData
+var MeshData=(function(){
+	function MeshData(){
+		/**
+		*纹理
+		*/
+		this.texture=null;
+		/**
+		*uv数据
+		*/
+		this.uvs=[0,0,1,0,1,1,0,1];
+		/**
+		*顶点数据
+		*/
+		this.vertices=[0,0,100,0,100,100,0,100];
+		/**
+		*顶点索引
+		*/
+		this.indexes=[0,1,3,3,1,2];
+		/**
+		*uv变换矩阵
+		*/
+		this.uvTransform=null;
+		/**
+		*是否有uv变化矩阵
+		*/
+		this.useUvTransform=false;
+		/**
+		*扩展像素,用来去除黑边
+		*/
+		this.canvasPadding=1;
+	}
+
+	__class(MeshData,'laya.ani.bone.canvasmesh.MeshData');
+	var __proto=MeshData.prototype;
+	//TODO:coverage
+	__proto.getBounds=function(){
+		return Rectangle._getWrapRec(this.vertices);
+	}
+
+	return MeshData;
+})()
+
+
+/**
+*@private
+*...
+*@author ww
+*/
+//class laya.ani.math.BezierLerp
+var BezierLerp=(function(){
+	function BezierLerp(){}
+	__class(BezierLerp,'laya.ani.math.BezierLerp');
+	BezierLerp.getBezierRate=function(t,px0,py0,px1,py1){
+		var key=BezierLerp._getBezierParamKey(px0,py0,px1,py1);
+		var vKey=key *100+t;
+		if (BezierLerp._bezierResultCache[vKey])return BezierLerp._bezierResultCache[vKey];
+		var points=BezierLerp._getBezierPoints(px0,py0,px1,py1,key);
+		var i=0,len=0;
+		len=points.length;
+		for (i=0;i < len;i+=2){
+			if (t <=points[i]){
+				BezierLerp._bezierResultCache[vKey]=points[i+1];
+				return points[i+1];
+			}
+		}
+		BezierLerp._bezierResultCache[vKey]=1;
+		return 1;
+	}
+
+	BezierLerp._getBezierParamKey=function(px0,py0,px1,py1){
+		return (((px0 *100+py0)*100+px1)*100+py1)*100;
+	}
+
+	BezierLerp._getBezierPoints=function(px0,py0,px1,py1,key){
+		if (BezierLerp._bezierPointsCache[key])return BezierLerp._bezierPointsCache[key];
+		var controlPoints;
+		controlPoints=[0,0,px0,py0,px1,py1,1,1];
+		var bz;
+		bz=new Bezier();
+		var points;
+		points=bz.getBezierPoints(controlPoints,100,3);
+		BezierLerp._bezierPointsCache[key]=points;
+		return points;
+	}
+
+	BezierLerp._bezierResultCache={};
+	BezierLerp._bezierPointsCache={};
+	return BezierLerp;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.Transform
+var Transform=(function(){
+	function Transform(){
+		this.skX=0;
+		this.skY=0;
+		this.scX=1;
+		this.scY=1;
+		this.x=0;
+		this.y=0;
+		this.skewX=0;
+		this.skewY=0;
+		this.mMatrix=null;
+	}
+
+	__class(Transform,'laya.ani.bone.Transform');
+	var __proto=Transform.prototype;
+	//TODO:coverage
+	__proto.initData=function(data){
+		if (data.x !=undefined){
+			this.x=data.x;
+		}
+		if (data.y !=undefined){
+			this.y=data.y;
+		}
+		if (data.skX !=undefined){
+			this.skX=data.skX;
+		}
+		if (data.skY !=undefined){
+			this.skY=data.skY;
+		}
+		if (data.scX !=undefined){
+			this.scX=data.scX;
+		}
+		if (data.scY !=undefined){
+			this.scY=data.scY;
+		}
+	}
+
+	//TODO:coverage
+	__proto.getMatrix=function(){
+		var tMatrix;
+		if (this.mMatrix){
+			tMatrix=this.mMatrix;
+			}else {
+			tMatrix=this.mMatrix=new Matrix();
+		}
+		tMatrix.identity();
+		tMatrix.scale(this.scX,this.scY);
+		if (this.skewX || this.skewY){
+			this.skew(tMatrix,this.skewX *Math.PI / 180,this.skewY *Math.PI / 180);
+		}
+		tMatrix.rotate(this.skX *Math.PI / 180);
+		tMatrix.translate(this.x,this.y);
+		return tMatrix;
+	}
+
+	//TODO:coverage
+	__proto.skew=function(m,x,y){
+		var sinX=Math.sin(y);
+		var cosX=Math.cos(y);
+		var sinY=Math.sin(x);
+		var cosY=Math.cos(x);
+		m.setTo(m.a *cosY-m.b *sinX,
+		m.a *sinY+m.b *cosX,
+		m.c *cosY-m.d *sinX,
+		m.c *sinY+m.d *cosX,
+		m.tx *cosY-m.ty *sinX,
+		m.tx *sinY+m.ty *cosX);
+		return m;
+	}
+
+	return Transform;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.EventData
+var EventData=(function(){
+	function EventData(){
+		this.name=null;
+		this.intValue=0;
+		this.floatValue=NaN;
+		this.stringValue=null;
+		this.time=NaN;
+	}
+
+	__class(EventData,'laya.ani.bone.EventData');
+	return EventData;
+})()
+
+
+//TODO:coverage
+//class laya.ani.bone.TfConstraintData
+var TfConstraintData=(function(){
+	function TfConstraintData(){
+		this.name=null;
+		this.targetIndex=0;
+		this.rotateMix=NaN;
+		this.translateMix=NaN;
+		this.scaleMix=NaN;
+		this.shearMix=NaN;
+		this.offsetRotation=NaN;
+		this.offsetX=NaN;
+		this.offsetY=NaN;
+		this.offsetScaleX=NaN;
+		this.offsetScaleY=NaN;
+		this.offsetShearY=NaN;
+		this.boneIndexs=[];
+	}
+
+	__class(TfConstraintData,'laya.ani.bone.TfConstraintData');
+	return TfConstraintData;
 })()
 
 
@@ -2204,230 +2126,308 @@ var TfConstraint=(function(){
 })()
 
 
-//TODO:coverage
-//class laya.ani.bone.TfConstraintData
-var TfConstraintData=(function(){
-	function TfConstraintData(){
+/**
+*@private
+*/
+//class laya.ani.bone.SkinData
+var SkinData=(function(){
+	function SkinData(){
 		this.name=null;
-		this.targetIndex=0;
-		this.rotateMix=NaN;
-		this.translateMix=NaN;
-		this.scaleMix=NaN;
-		this.shearMix=NaN;
-		this.offsetRotation=NaN;
-		this.offsetX=NaN;
-		this.offsetY=NaN;
-		this.offsetScaleX=NaN;
-		this.offsetScaleY=NaN;
-		this.offsetShearY=NaN;
-		this.boneIndexs=[];
+		this.slotArr=[];
 	}
 
-	__class(TfConstraintData,'laya.ani.bone.TfConstraintData');
-	return TfConstraintData;
+	__class(SkinData,'laya.ani.bone.SkinData');
+	return SkinData;
 })()
 
 
 /**
 *@private
 */
-//class laya.ani.bone.Transform
-var Transform=(function(){
-	function Transform(){
-		this.skX=0;
-		this.skY=0;
-		this.scX=1;
-		this.scY=1;
-		this.x=0;
-		this.y=0;
-		this.skewX=0;
-		this.skewY=0;
-		this.mMatrix=null;
+//class laya.ani.bone.DeformSlotDisplayData
+var DeformSlotDisplayData=(function(){
+	function DeformSlotDisplayData(){
+		this.boneSlot=null;
+		this.slotIndex=-1;
+		this.attachment=null;
+		this.deformData=null;
+		this.frameIndex=0;
+		this.timeList=[];
+		this.vectices=[];
+		this.tweenKeyList=[];
 	}
 
-	__class(Transform,'laya.ani.bone.Transform');
-	var __proto=Transform.prototype;
-	//TODO:coverage
-	__proto.initData=function(data){
-		if (data.x !=undefined){
-			this.x=data.x;
+	__class(DeformSlotDisplayData,'laya.ani.bone.DeformSlotDisplayData');
+	var __proto=DeformSlotDisplayData.prototype;
+	__proto.binarySearch1=function(values,target){
+		var low=0;
+		var high=values.length-2;
+		if (high==0)
+			return 1;
+		var current=high >>> 1;
+		while (true){
+			if (values[Math.floor(current+1)] <=target)
+				low=current+1;
+			else
+			high=current;
+			if (low==high)
+				return low+1;
+			current=(low+high)>>> 1;
 		}
-		if (data.y !=undefined){
-			this.y=data.y;
-		}
-		if (data.skX !=undefined){
-			this.skX=data.skX;
-		}
-		if (data.skY !=undefined){
-			this.skY=data.skY;
-		}
-		if (data.scX !=undefined){
-			this.scX=data.scX;
-		}
-		if (data.scY !=undefined){
-			this.scY=data.scY;
-		}
+		return 0;
 	}
 
 	//TODO:coverage
-	__proto.getMatrix=function(){
-		var tMatrix;
-		if (this.mMatrix){
-			tMatrix=this.mMatrix;
+	__proto.apply=function(time,boneSlot,alpha){
+		(alpha===void 0)&& (alpha=1);
+		time+=0.05;
+		if (this.timeList.length <=0){
+			return;
+		};
+		var i=0;
+		var n=0;
+		var tTime=this.timeList[0];
+		if (time < tTime){
+			return;
+		};
+		var tVertexCount=this.vectices[0].length;
+		var tVertices=[];
+		var tFrameIndex=this.binarySearch1(this.timeList,time);
+		this.frameIndex=tFrameIndex;
+		if (time >=this.timeList[this.timeList.length-1]){
+			var lastVertices=this.vectices[this.vectices.length-1];
+			if (alpha < 1){
+				for (i=0;i < tVertexCount;i++){
+					tVertices[i]+=(lastVertices[i]-tVertices[i])*alpha;
+				}
+				}else {
+				for (i=0;i < tVertexCount;i++){
+					tVertices[i]=lastVertices[i];
+				}
+			}
+			this.deformData=tVertices;
+			return;
+		};
+		var tTweenKey=this.tweenKeyList[this.frameIndex];
+		var tPrevVertices=this.vectices[this.frameIndex-1];
+		var tNextVertices=this.vectices[this.frameIndex];
+		var tPreFrameTime=this.timeList[this.frameIndex-1];
+		var tFrameTime=this.timeList[this.frameIndex];
+		if (this.tweenKeyList[tFrameIndex-1]){
+			alpha=(time-tPreFrameTime)/ (tFrameTime-tPreFrameTime);
 			}else {
-			tMatrix=this.mMatrix=new Matrix();
+			alpha=0;
+		};
+		var tPrev=NaN;
+		for (i=0;i < tVertexCount;i++){
+			tPrev=tPrevVertices[i];
+			tVertices[i]=tPrev+(tNextVertices[i]-tPrev)*alpha;
 		}
-		tMatrix.identity();
-		tMatrix.scale(this.scX,this.scY);
-		if (this.skewX || this.skewY){
-			this.skew(tMatrix,this.skewX *Math.PI / 180,this.skewY *Math.PI / 180);
-		}
-		tMatrix.rotate(this.skX *Math.PI / 180);
-		tMatrix.translate(this.x,this.y);
-		return tMatrix;
+		this.deformData=tVertices;
 	}
 
-	//TODO:coverage
-	__proto.skew=function(m,x,y){
-		var sinX=Math.sin(y);
-		var cosX=Math.cos(y);
-		var sinY=Math.sin(x);
-		var cosY=Math.cos(x);
-		m.setTo(m.a *cosY-m.b *sinX,
-		m.a *sinY+m.b *cosX,
-		m.c *cosY-m.d *sinX,
-		m.c *sinY+m.d *cosX,
-		m.tx *cosY-m.ty *sinX,
-		m.tx *sinY+m.ty *cosX);
-		return m;
-	}
-
-	return Transform;
+	return DeformSlotDisplayData;
 })()
 
 
 /**
-*用于UV转换的工具类
 *@private
 */
-//class laya.ani.bone.UVTools
-var UVTools=(function(){
-	function UVTools(){}
-	__class(UVTools,'laya.ani.bone.UVTools');
-	UVTools.getRelativeUV=function(bigUV,smallUV,rst){
-		var startX=bigUV[0];
-		var width=bigUV[2]-bigUV[0];
-		var startY=bigUV[1];
-		var height=bigUV[5]-bigUV[1];
-		if(!rst)rst=[];
-		rst.length=smallUV.length;
-		var i=0,len=0;
-		len=rst.length;
-		var dWidth=1 / width;
-		var dHeight=1 / height;
-		for (i=0;i < len;i+=2){
-			rst[i]=(smallUV[i]-startX)*dWidth;
-			rst[i+1]=(smallUV[i+1]-startY)*dHeight;
-		}
-		return rst;
+//class laya.ani.bone.DeformSlotData
+var DeformSlotData=(function(){
+	function DeformSlotData(){
+		this.deformSlotDisplayList=[];
 	}
 
-	UVTools.getAbsoluteUV=function(bigUV,smallUV,rst){
-		if (bigUV[0]==0 && bigUV[1]==0 && bigUV[4]==1 && bigUV[5]==1){
-			if (rst){
-				Utils.copyArray(rst,smallUV);
-				return rst;
-				}else{
-				return smallUV;
+	__class(DeformSlotData,'laya.ani.bone.DeformSlotData');
+	return DeformSlotData;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.Bone
+var Bone=(function(){
+	function Bone(){
+		this.name=null;
+		this.root=null;
+		this.parentBone=null;
+		this.length=10;
+		this.transform=null;
+		this.inheritScale=true;
+		this.inheritRotation=true;
+		this.rotation=NaN;
+		this.resultRotation=NaN;
+		this.d=-1;
+		this._tempMatrix=null;
+		this._sprite=null;
+		this.resultTransform=new Transform();
+		this.resultMatrix=new Matrix();
+		this._children=[];
+	}
+
+	__class(Bone,'laya.ani.bone.Bone');
+	var __proto=Bone.prototype;
+	__proto.setTempMatrix=function(matrix){
+		this._tempMatrix=matrix;
+		var i=0,n=0;
+		var tBone;
+		for (i=0,n=this._children.length;i < n;i++){
+			tBone=this._children[i];
+			tBone.setTempMatrix(this._tempMatrix);
+		}
+	}
+
+	//TODO:coverage
+	__proto.update=function(pMatrix){
+		this.rotation=this.transform.skX;
+		var tResultMatrix;
+		if (pMatrix){
+			tResultMatrix=this.resultTransform.getMatrix();
+			Matrix.mul(tResultMatrix,pMatrix,this.resultMatrix);
+			this.resultRotation=this.rotation;
+		}
+		else {
+			this.resultRotation=this.rotation+this.parentBone.resultRotation;
+			if (this.parentBone){
+				if (this.inheritRotation && this.inheritScale){
+					tResultMatrix=this.resultTransform.getMatrix();
+					Matrix.mul(tResultMatrix,this.parentBone.resultMatrix,this.resultMatrix);
+				}
+				else {
+					var temp=0;
+					var parent=this.parentBone;
+					var tAngle=NaN;
+					var cos=NaN;
+					var sin=NaN;
+					var tParentMatrix=this.parentBone.resultMatrix;
+					tResultMatrix=this.resultTransform.getMatrix();
+					var worldX=tParentMatrix.a *tResultMatrix.tx+tParentMatrix.c *tResultMatrix.ty+tParentMatrix.tx;
+					var worldY=tParentMatrix.b *tResultMatrix.tx+tParentMatrix.d *tResultMatrix.ty+tParentMatrix.ty;
+					var tTestMatrix=new Matrix();
+					if (this.inheritRotation){
+						tAngle=Math.atan2(parent.resultMatrix.b,parent.resultMatrix.a);
+						cos=Math.cos(tAngle),sin=Math.sin(tAngle);
+						tTestMatrix.setTo(cos,sin,-sin,cos,0,0);
+						Matrix.mul(this._tempMatrix,tTestMatrix,Matrix.TEMP);
+						Matrix.TEMP.copyTo(tTestMatrix);
+						tResultMatrix=this.resultTransform.getMatrix();
+						Matrix.mul(tResultMatrix,tTestMatrix,this.resultMatrix);
+						if (this.resultTransform.scX *this.resultTransform.scY < 0){
+							this.resultMatrix.rotate(Math.PI*0.5);
+						}
+						this.resultMatrix.tx=worldX;
+						this.resultMatrix.ty=worldY;
+					}
+					else if (this.inheritScale){
+						tResultMatrix=this.resultTransform.getMatrix();
+						Matrix.TEMP.identity();
+						Matrix.TEMP.d=this.d;
+						Matrix.mul(tResultMatrix,Matrix.TEMP,this.resultMatrix);
+						this.resultMatrix.tx=worldX;
+						this.resultMatrix.ty=worldY;
+					}
+					else {
+						tResultMatrix=this.resultTransform.getMatrix();
+						Matrix.TEMP.identity();
+						Matrix.TEMP.d=this.d;
+						Matrix.mul(tResultMatrix,Matrix.TEMP,this.resultMatrix);
+						this.resultMatrix.tx=worldX;
+						this.resultMatrix.ty=worldY;
+					}
+				}
+			}
+			else {
+				tResultMatrix=this.resultTransform.getMatrix();
+				tResultMatrix.copyTo(this.resultMatrix);
 			}
 		};
-		var startX=bigUV[0];
-		var width=bigUV[2]-bigUV[0];
-		var startY=bigUV[1];
-		var height=bigUV[5]-bigUV[1];
-		if(!rst)rst=[];
-		rst.length=smallUV.length;
-		var i=0,len=0;
-		len=rst.length;
-		for (i=0;i < len;i+=2){
-			rst[i]=smallUV[i]*width+startX;
-			rst[i+1]=smallUV[i+1]*height+startY;
+		var i=0,n=0;
+		var tBone;
+		for (i=0,n=this._children.length;i < n;i++){
+			tBone=this._children[i];
+			tBone.update();
 		}
-		return rst;
 	}
 
-	return UVTools;
-})()
-
-
-/**
-*@private
-*@author ...
-*/
-//class laya.ani.KeyFramesContent
-var KeyFramesContent=(function(){
-	function KeyFramesContent(){
-		this.startTime=NaN;
-		this.duration=NaN;
-		this.interpolationData=null;
-		//私有插值方式 [type0(插值类型),Data0(插值数据,可为空)，type1(插值类型),Data1(插值数据,可为空)] 注意：254全线性插值，255全不插值
-		this.data=null;
-		//=new Float32Array();
-		this.dData=null;
-		//=new Float32Array();
-		this.nextData=null;
+	//TODO:coverage
+	__proto.updateChild=function(){
+		var i=0,n=0;
+		var tBone;
+		for (i=0,n=this._children.length;i < n;i++){
+			tBone=this._children[i];
+			tBone.update();
+		}
 	}
 
-	__class(KeyFramesContent,'laya.ani.KeyFramesContent');
-	return KeyFramesContent;
-})()
+	//TODO:coverage
+	__proto.setRotation=function(rd){
+		if (this._sprite){
+			this._sprite.rotation=rd *180 / Math.PI;
+		}
+	}
 
+	//TODO:coverage
+	__proto.updateDraw=function(x,y){
+		if (!Bone.ShowBones || Bone.ShowBones[this.name]){
+			if (this._sprite){
+				this._sprite.x=x+this.resultMatrix.tx;
+				this._sprite.y=y+this.resultMatrix.ty;
+			}
+			else {
+				this._sprite=new Sprite();
+				this._sprite.graphics.drawCircle(0,0,5,"#ff0000");
+				this._sprite.graphics.drawLine(0,0,this.length,0,"#00ff00");
+				this._sprite.graphics.fillText(this.name,0,0,"20px Arial","#00ff00","center");
+				Laya.stage.addChild(this._sprite);
+				this._sprite.x=x+this.resultMatrix.tx;
+				this._sprite.y=y+this.resultMatrix.ty;
+			}
+		};
+		var i=0,n=0;
+		var tBone;
+		for (i=0,n=this._children.length;i < n;i++){
+			tBone=this._children[i];
+			tBone.updateDraw(x,y);
+		}
+	}
 
-/**
-*@private
-*...
-*@author ww
-*/
-//class laya.ani.math.BezierLerp
-var BezierLerp=(function(){
-	function BezierLerp(){}
-	__class(BezierLerp,'laya.ani.math.BezierLerp');
-	BezierLerp.getBezierRate=function(t,px0,py0,px1,py1){
-		var key=BezierLerp._getBezierParamKey(px0,py0,px1,py1);
-		var vKey=key *100+t;
-		if (BezierLerp._bezierResultCache[vKey])return BezierLerp._bezierResultCache[vKey];
-		var points=BezierLerp._getBezierPoints(px0,py0,px1,py1,key);
-		var i=0,len=0;
-		len=points.length;
-		for (i=0;i < len;i+=2){
-			if (t <=points[i]){
-				BezierLerp._bezierResultCache[vKey]=points[i+1];
-				return points[i+1];
+	__proto.addChild=function(bone){
+		this._children.push(bone);
+		bone.parentBone=this;
+	}
+
+	//TODO:coverage
+	__proto.findBone=function(boneName){
+		if (this.name==boneName){
+			return this;
+		}
+		else {
+			var i=0,n=0;
+			var tBone;
+			var tResult;
+			for (i=0,n=this._children.length;i < n;i++){
+				tBone=this._children[i];
+				tResult=tBone.findBone(boneName);
+				if (tResult){
+					return tResult;
+				}
 			}
 		}
-		BezierLerp._bezierResultCache[vKey]=1;
-		return 1;
+		return null;
 	}
 
-	BezierLerp._getBezierParamKey=function(px0,py0,px1,py1){
-		return (((px0 *100+py0)*100+px1)*100+py1)*100;
+	//TODO:coverage
+	__proto.localToWorld=function(local){
+		var localX=local[0];
+		var localY=local[1];
+		local[0]=localX *this.resultMatrix.a+localY *this.resultMatrix.c+this.resultMatrix.tx;
+		local[1]=localX *this.resultMatrix.b+localY *this.resultMatrix.d+this.resultMatrix.ty;
 	}
 
-	BezierLerp._getBezierPoints=function(px0,py0,px1,py1,key){
-		if (BezierLerp._bezierPointsCache[key])return BezierLerp._bezierPointsCache[key];
-		var controlPoints;
-		controlPoints=[0,0,px0,py0,px1,py1,1,1];
-		var bz;
-		bz=new Bezier();
-		var points;
-		points=bz.getBezierPoints(controlPoints,100,3);
-		BezierLerp._bezierPointsCache[key]=points;
-		return points;
-	}
-
-	BezierLerp._bezierResultCache={};
-	BezierLerp._bezierPointsCache={};
-	return BezierLerp;
+	Bone.ShowBones={};
+	return Bone;
 })()
 
 
@@ -3612,6 +3612,13 @@ var Skeleton=(function(_super){
 						this._createGraphics(i);
 					}
 				}
+				tGraphics=this._templet.getGrahicsDataWithCache(this._aniClipIndex,this._clipIndex);
+				if (tGraphics){
+					if (this.graphics !=tGraphics){
+						this.graphics=tGraphics;
+					}
+					return;
+				}
 			}
 			}else if (this._aniMode==1){
 			tGraphics=this._getGrahicsDataWithCache(this._aniClipIndex,this._clipIndex);
@@ -3893,7 +3900,7 @@ var Skeleton=(function(_super){
 
 	__proto._checkIsAllParsed=function(_aniClipIndex){
 		var i=0,len=0;
-		len=Math.floor(0.01+this._templet.getAniDuration(this._player.currentAnimationClipIndex)/ 1000 *this._player.cacheFrameRate);
+		len=Math.floor(0.01+this._templet.getAniDuration(_aniClipIndex)/ 1000 *this._player.cacheFrameRate);
 		for (i=0;i < len;i++){
 			if (!this._templet.getGrahicsDataWithCache(_aniClipIndex,i))return;
 		}

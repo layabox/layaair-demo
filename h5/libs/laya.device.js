@@ -57,6 +57,34 @@ var Geolocation=(function(){
 })()
 
 
+/**
+*加速度x/y/z的单位均为m/s²。
+*在硬件（陀螺仪）不支持的情况下，alpha、beta和gamma值为null。
+*
+*@author Survivor
+*/
+//class laya.device.motion.AccelerationInfo
+var AccelerationInfo=(function(){
+	function AccelerationInfo(){
+		/**
+		*x轴上的加速度值。
+		*/
+		this.x=NaN;
+		/**
+		*y轴上的加速度值。
+		*/
+		this.y=NaN;
+		/**
+		*z轴上的加速度值。
+		*/
+		this.z=NaN;
+	}
+
+	__class(AccelerationInfo,'laya.device.motion.AccelerationInfo');
+	return AccelerationInfo;
+})()
+
+
 //class laya.device.geolocation.GeolocationInfo
 var GeolocationInfo=(function(){
 	function GeolocationInfo(){
@@ -135,34 +163,6 @@ var Media=(function(){
 	}
 
 	return Media;
-})()
-
-
-/**
-*加速度x/y/z的单位均为m/s²。
-*在硬件（陀螺仪）不支持的情况下，alpha、beta和gamma值为null。
-*
-*@author Survivor
-*/
-//class laya.device.motion.AccelerationInfo
-var AccelerationInfo=(function(){
-	function AccelerationInfo(){
-		/**
-		*x轴上的加速度值。
-		*/
-		this.x=NaN;
-		/**
-		*y轴上的加速度值。
-		*/
-		this.y=NaN;
-		/**
-		*z轴上的加速度值。
-		*/
-		this.z=NaN;
-	}
-
-	__class(AccelerationInfo,'laya.device.motion.AccelerationInfo');
-	return AccelerationInfo;
 })()
 
 
@@ -480,6 +480,67 @@ var Shake=(function(_super){
 	Shake._instance=null;
 	return Shake;
 })(EventDispatcher)
+
+
+/**
+*@private
+*/
+//class laya.device.media.HtmlVideo extends laya.resource.Bitmap
+var HtmlVideo=(function(_super){
+	function HtmlVideo(){
+		this.video=null;
+		this._source=null;
+		HtmlVideo.__super.call(this);
+		this._width=1;
+		this._height=1;
+		this.createDomElement();
+	}
+
+	__class(HtmlVideo,'laya.device.media.HtmlVideo',_super);
+	var __proto=HtmlVideo.prototype;
+	__proto.createDomElement=function(){
+		var _$this=this;
+		this._source=this.video=Browser.createElement("video");
+		var style=this.video.style;
+		style.position='absolute';
+		style.top='0px';
+		style.left='0px';
+		this.video.addEventListener("loadedmetadata",(function(){
+			this._w=_$this.video.videoWidth;
+			this._h=_$this.video.videoHeight;
+		})['bind'](this));
+	}
+
+	__proto.setSource=function(url,extension){
+		while(this.video.childElementCount)
+		this.video.firstChild.remove();
+		if (extension & Video.MP4)
+			this.appendSource(url,"video/mp4");
+		if (extension & Video.OGG)
+			this.appendSource(url+".ogg","video/ogg");
+	}
+
+	__proto.appendSource=function(source,type){
+		var sourceElement=Browser.createElement("source");
+		sourceElement.src=source;
+		sourceElement.type=type;
+		this.video.appendChild(sourceElement);
+	}
+
+	__proto.getVideo=function(){
+		return this.video;
+	}
+
+	__proto._getSource=function(){
+		return this._source;
+	}
+
+	HtmlVideo.create=function(){
+		return new HtmlVideo();
+	}
+
+	return HtmlVideo;
+})(Bitmap)
 
 
 /**
@@ -864,67 +925,6 @@ var Video=(function(_super){
 	Video.SUPPORT_NO="";
 	return Video;
 })(Sprite)
-
-
-/**
-*@private
-*/
-//class laya.device.media.HtmlVideo extends laya.resource.Bitmap
-var HtmlVideo=(function(_super){
-	function HtmlVideo(){
-		this.video=null;
-		this._source=null;
-		HtmlVideo.__super.call(this);
-		this._width=1;
-		this._height=1;
-		this.createDomElement();
-	}
-
-	__class(HtmlVideo,'laya.device.media.HtmlVideo',_super);
-	var __proto=HtmlVideo.prototype;
-	__proto.createDomElement=function(){
-		var _$this=this;
-		this._source=this.video=Browser.createElement("video");
-		var style=this.video.style;
-		style.position='absolute';
-		style.top='0px';
-		style.left='0px';
-		this.video.addEventListener("loadedmetadata",(function(){
-			this._w=_$this.video.videoWidth;
-			this._h=_$this.video.videoHeight;
-		})['bind'](this));
-	}
-
-	__proto.setSource=function(url,extension){
-		while(this.video.childElementCount)
-		this.video.firstChild.remove();
-		if (extension & Video.MP4)
-			this.appendSource(url,"video/mp4");
-		if (extension & Video.OGG)
-			this.appendSource(url+".ogg","video/ogg");
-	}
-
-	__proto.appendSource=function(source,type){
-		var sourceElement=Browser.createElement("source");
-		sourceElement.src=source;
-		sourceElement.type=type;
-		this.video.appendChild(sourceElement);
-	}
-
-	__proto.getVideo=function(){
-		return this.video;
-	}
-
-	__proto._getSource=function(){
-		return this._source;
-	}
-
-	HtmlVideo.create=function(){
-		return new HtmlVideo();
-	}
-
-	return HtmlVideo;
-})(Bitmap)
 
 
 /**

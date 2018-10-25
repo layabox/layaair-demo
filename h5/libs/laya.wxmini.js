@@ -7,6 +7,64 @@ window.layalib(function(window,document,Laya){
 	var HTMLImage=laya.resource.HTMLImage,Handler=laya.utils.Handler,Input=laya.display.Input,Loader=laya.net.Loader;
 	var LocalStorage=laya.net.LocalStorage,Matrix=laya.maths.Matrix,Render=laya.renders.Render,RunDriver=laya.utils.RunDriver;
 	var SoundChannel=laya.media.SoundChannel,SoundManager=laya.media.SoundManager,URL=laya.net.URL,Utils=laya.utils.Utils;
+/**@private **/
+//class laya.wx.mini.MiniLocalStorage
+var MiniLocalStorage=(function(){
+	function MiniLocalStorage(){}
+	__class(MiniLocalStorage,'laya.wx.mini.MiniLocalStorage');
+	MiniLocalStorage.__init__=function(){
+		MiniLocalStorage.items=MiniLocalStorage;
+	}
+
+	MiniLocalStorage.setItem=function(key,value){
+		try{
+			/*__JS__ */wx.setStorageSync(key,value);
+		}
+		catch(error){
+			/*__JS__ */wx.setStorage({
+				key:key,
+				data:value
+			});
+		}
+	}
+
+	MiniLocalStorage.getItem=function(key){
+		return /*__JS__ */wx.getStorageSync(key);
+	}
+
+	MiniLocalStorage.setJSON=function(key,value){
+		MiniLocalStorage.setItem(key,value);
+	}
+
+	MiniLocalStorage.getJSON=function(key){
+		return MiniLocalStorage.getItem(key);
+	}
+
+	MiniLocalStorage.removeItem=function(key){
+		/*__JS__ */wx.removeStorageSync(key);
+	}
+
+	MiniLocalStorage.clear=function(){
+		/*__JS__ */wx.clearStorageSync();
+	}
+
+	MiniLocalStorage.getStorageInfoSync=function(){
+		try {
+			var res=/*__JS__ */wx.getStorageInfoSync()
+			console.log(res.keys)
+			console.log(res.currentSize)
+			console.log(res.limitSize)
+			return res;
+		}catch (e){}
+		return null;
+	}
+
+	MiniLocalStorage.support=true;
+	MiniLocalStorage.items=null;
+	return MiniLocalStorage;
+})()
+
+
 //class laya.wx.mini.MiniAdpter
 var MiniAdpter=(function(){
 	function MiniAdpter(){}
@@ -780,6 +838,87 @@ var MiniImage=(function(){
 
 
 /**@private **/
+//class laya.wx.mini.MiniLocation
+var MiniLocation=(function(){
+	function MiniLocation(){}
+	__class(MiniLocation,'laya.wx.mini.MiniLocation');
+	MiniLocation.__init__=function(){
+		MiniAdpter.window.navigator.geolocation.getCurrentPosition=MiniLocation.getCurrentPosition;
+		MiniAdpter.window.navigator.geolocation.watchPosition=MiniLocation.watchPosition;
+		MiniAdpter.window.navigator.geolocation.clearWatch=MiniLocation.clearWatch;
+	}
+
+	MiniLocation.getCurrentPosition=function(success,error,options){
+		var paramO;
+		paramO={};
+		paramO.success=getSuccess;
+		paramO.fail=error;
+		MiniAdpter.window.wx.getLocation(paramO);
+		function getSuccess (res){
+			if (success !=null){
+				success(res);
+			}
+		}
+	}
+
+	MiniLocation.watchPosition=function(success,error,options){
+		MiniLocation._curID++;
+		var curWatchO;
+		curWatchO={};
+		curWatchO.success=success;
+		curWatchO.error=error;
+		MiniLocation._watchDic[MiniLocation._curID]=curWatchO;
+		Laya.systemTimer.loop(1000,null,MiniLocation._myLoop);
+		return MiniLocation._curID;
+	}
+
+	MiniLocation.clearWatch=function(id){
+		delete MiniLocation._watchDic[id];
+		if (!MiniLocation._hasWatch()){
+			Laya.systemTimer.clear(null,MiniLocation._myLoop);
+		}
+	}
+
+	MiniLocation._hasWatch=function(){
+		var key;
+		for (key in MiniLocation._watchDic){
+			if (MiniLocation._watchDic[key])return true;
+		}
+		return false;
+	}
+
+	MiniLocation._myLoop=function(){
+		MiniLocation.getCurrentPosition(MiniLocation._mySuccess,MiniLocation._myError);
+	}
+
+	MiniLocation._mySuccess=function(res){
+		var rst={};
+		rst.coords=res;
+		rst.timestamp=Browser.now();
+		var key;
+		for (key in MiniLocation._watchDic){
+			if (MiniLocation._watchDic[key].success){
+				MiniLocation._watchDic[key].success(rst);
+			}
+		}
+	}
+
+	MiniLocation._myError=function(res){
+		var key;
+		for (key in MiniLocation._watchDic){
+			if (MiniLocation._watchDic[key].error){
+				MiniLocation._watchDic[key].error(res);
+			}
+		}
+	}
+
+	MiniLocation._watchDic={};
+	MiniLocation._curID=0;
+	return MiniLocation;
+})()
+
+
+/**@private **/
 //class laya.wx.mini.MiniInput
 var MiniInput=(function(){
 	function MiniInput(){}
@@ -868,219 +1007,6 @@ var MiniInput=(function(){
 
 	return MiniInput;
 })()
-
-
-/**@private **/
-//class laya.wx.mini.MiniLocalStorage
-var MiniLocalStorage=(function(){
-	function MiniLocalStorage(){}
-	__class(MiniLocalStorage,'laya.wx.mini.MiniLocalStorage');
-	MiniLocalStorage.__init__=function(){
-		MiniLocalStorage.items=MiniLocalStorage;
-	}
-
-	MiniLocalStorage.setItem=function(key,value){
-		try{
-			/*__JS__ */wx.setStorageSync(key,value);
-		}
-		catch(error){
-			/*__JS__ */wx.setStorage({
-				key:key,
-				data:value
-			});
-		}
-	}
-
-	MiniLocalStorage.getItem=function(key){
-		return /*__JS__ */wx.getStorageSync(key);
-	}
-
-	MiniLocalStorage.setJSON=function(key,value){
-		MiniLocalStorage.setItem(key,value);
-	}
-
-	MiniLocalStorage.getJSON=function(key){
-		return MiniLocalStorage.getItem(key);
-	}
-
-	MiniLocalStorage.removeItem=function(key){
-		/*__JS__ */wx.removeStorageSync(key);
-	}
-
-	MiniLocalStorage.clear=function(){
-		/*__JS__ */wx.clearStorageSync();
-	}
-
-	MiniLocalStorage.getStorageInfoSync=function(){
-		try {
-			var res=/*__JS__ */wx.getStorageInfoSync()
-			console.log(res.keys)
-			console.log(res.currentSize)
-			console.log(res.limitSize)
-			return res;
-		}catch (e){}
-		return null;
-	}
-
-	MiniLocalStorage.support=true;
-	MiniLocalStorage.items=null;
-	return MiniLocalStorage;
-})()
-
-
-/**@private **/
-//class laya.wx.mini.MiniLocation
-var MiniLocation=(function(){
-	function MiniLocation(){}
-	__class(MiniLocation,'laya.wx.mini.MiniLocation');
-	MiniLocation.__init__=function(){
-		MiniAdpter.window.navigator.geolocation.getCurrentPosition=MiniLocation.getCurrentPosition;
-		MiniAdpter.window.navigator.geolocation.watchPosition=MiniLocation.watchPosition;
-		MiniAdpter.window.navigator.geolocation.clearWatch=MiniLocation.clearWatch;
-	}
-
-	MiniLocation.getCurrentPosition=function(success,error,options){
-		var paramO;
-		paramO={};
-		paramO.success=getSuccess;
-		paramO.fail=error;
-		MiniAdpter.window.wx.getLocation(paramO);
-		function getSuccess (res){
-			if (success !=null){
-				success(res);
-			}
-		}
-	}
-
-	MiniLocation.watchPosition=function(success,error,options){
-		MiniLocation._curID++;
-		var curWatchO;
-		curWatchO={};
-		curWatchO.success=success;
-		curWatchO.error=error;
-		MiniLocation._watchDic[MiniLocation._curID]=curWatchO;
-		Laya.systemTimer.loop(1000,null,MiniLocation._myLoop);
-		return MiniLocation._curID;
-	}
-
-	MiniLocation.clearWatch=function(id){
-		delete MiniLocation._watchDic[id];
-		if (!MiniLocation._hasWatch()){
-			Laya.systemTimer.clear(null,MiniLocation._myLoop);
-		}
-	}
-
-	MiniLocation._hasWatch=function(){
-		var key;
-		for (key in MiniLocation._watchDic){
-			if (MiniLocation._watchDic[key])return true;
-		}
-		return false;
-	}
-
-	MiniLocation._myLoop=function(){
-		MiniLocation.getCurrentPosition(MiniLocation._mySuccess,MiniLocation._myError);
-	}
-
-	MiniLocation._mySuccess=function(res){
-		var rst={};
-		rst.coords=res;
-		rst.timestamp=Browser.now();
-		var key;
-		for (key in MiniLocation._watchDic){
-			if (MiniLocation._watchDic[key].success){
-				MiniLocation._watchDic[key].success(rst);
-			}
-		}
-	}
-
-	MiniLocation._myError=function(res){
-		var key;
-		for (key in MiniLocation._watchDic){
-			if (MiniLocation._watchDic[key].error){
-				MiniLocation._watchDic[key].error(res);
-			}
-		}
-	}
-
-	MiniLocation._watchDic={};
-	MiniLocation._curID=0;
-	return MiniLocation;
-})()
-
-
-/**@private **/
-//class laya.wx.mini.MiniAccelerator extends laya.events.EventDispatcher
-var MiniAccelerator=(function(_super){
-	function MiniAccelerator(){
-		MiniAccelerator.__super.call(this);
-	}
-
-	__class(MiniAccelerator,'laya.wx.mini.MiniAccelerator',_super);
-	var __proto=MiniAccelerator.prototype;
-	/**
-	*侦听加速器运动。
-	*@param observer 回调函数接受4个参数，见类说明。
-	*/
-	__proto.on=function(type,caller,listener,args){
-		_super.prototype.on.call(this,type,caller,listener,args);
-		MiniAccelerator.startListen(this["onDeviceOrientationChange"]);
-		return this;
-	}
-
-	/**
-	*取消侦听加速器。
-	*@param handle 侦听加速器所用处理器。
-	*/
-	__proto.off=function(type,caller,listener,onceOnly){
-		(onceOnly===void 0)&& (onceOnly=false);
-		if (!this.hasListener(type))
-			MiniAccelerator.stopListen();
-		return _super.prototype.off.call(this,type,caller,listener,onceOnly);
-	}
-
-	MiniAccelerator.__init__=function(){
-		try{
-			var Acc;
-			Acc=/*__JS__ */laya.device.motion.Accelerator;
-			if (!Acc)return;
-			Acc["prototype"]["on"]=MiniAccelerator["prototype"]["on"];
-			Acc["prototype"]["off"]=MiniAccelerator["prototype"]["off"];
-			}catch (e){
-		}
-	}
-
-	MiniAccelerator.startListen=function(callBack){
-		MiniAccelerator._callBack=callBack;
-		if (MiniAccelerator._isListening)return;
-		MiniAccelerator._isListening=true;
-		try{
-			/*__JS__ */wx.onAccelerometerChange(MiniAccelerator.onAccelerometerChange);
-		}catch(e){}
-	}
-
-	MiniAccelerator.stopListen=function(){
-		MiniAccelerator._isListening=false;
-		try{
-			/*__JS__ */wx.stopAccelerometer({});
-		}catch(e){}
-	}
-
-	MiniAccelerator.onAccelerometerChange=function(res){
-		var e;
-		e={};
-		e.acceleration=res;
-		e.accelerationIncludingGravity=res;
-		e.rotationRate={};
-		if (MiniAccelerator._callBack !=null){
-			MiniAccelerator._callBack(e);
-		}
-	}
-
-	MiniAccelerator._isListening=false;
-	MiniAccelerator._callBack=null;
-	return MiniAccelerator;
-})(EventDispatcher)
 
 
 /**@private **/
@@ -1424,6 +1350,80 @@ var MiniSound=(function(_super){
 	MiniSound._id=0;
 	MiniSound._audioCache={};
 	return MiniSound;
+})(EventDispatcher)
+
+
+/**@private **/
+//class laya.wx.mini.MiniAccelerator extends laya.events.EventDispatcher
+var MiniAccelerator=(function(_super){
+	function MiniAccelerator(){
+		MiniAccelerator.__super.call(this);
+	}
+
+	__class(MiniAccelerator,'laya.wx.mini.MiniAccelerator',_super);
+	var __proto=MiniAccelerator.prototype;
+	/**
+	*侦听加速器运动。
+	*@param observer 回调函数接受4个参数，见类说明。
+	*/
+	__proto.on=function(type,caller,listener,args){
+		_super.prototype.on.call(this,type,caller,listener,args);
+		MiniAccelerator.startListen(this["onDeviceOrientationChange"]);
+		return this;
+	}
+
+	/**
+	*取消侦听加速器。
+	*@param handle 侦听加速器所用处理器。
+	*/
+	__proto.off=function(type,caller,listener,onceOnly){
+		(onceOnly===void 0)&& (onceOnly=false);
+		if (!this.hasListener(type))
+			MiniAccelerator.stopListen();
+		return _super.prototype.off.call(this,type,caller,listener,onceOnly);
+	}
+
+	MiniAccelerator.__init__=function(){
+		try{
+			var Acc;
+			Acc=/*__JS__ */laya.device.motion.Accelerator;
+			if (!Acc)return;
+			Acc["prototype"]["on"]=MiniAccelerator["prototype"]["on"];
+			Acc["prototype"]["off"]=MiniAccelerator["prototype"]["off"];
+			}catch (e){
+		}
+	}
+
+	MiniAccelerator.startListen=function(callBack){
+		MiniAccelerator._callBack=callBack;
+		if (MiniAccelerator._isListening)return;
+		MiniAccelerator._isListening=true;
+		try{
+			/*__JS__ */wx.onAccelerometerChange(MiniAccelerator.onAccelerometerChange);
+		}catch(e){}
+	}
+
+	MiniAccelerator.stopListen=function(){
+		MiniAccelerator._isListening=false;
+		try{
+			/*__JS__ */wx.stopAccelerometer({});
+		}catch(e){}
+	}
+
+	MiniAccelerator.onAccelerometerChange=function(res){
+		var e;
+		e={};
+		e.acceleration=res;
+		e.accelerationIncludingGravity=res;
+		e.rotationRate={};
+		if (MiniAccelerator._callBack !=null){
+			MiniAccelerator._callBack(e);
+		}
+	}
+
+	MiniAccelerator._isListening=false;
+	MiniAccelerator._callBack=null;
+	return MiniAccelerator;
 })(EventDispatcher)
 
 

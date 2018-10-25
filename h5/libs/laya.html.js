@@ -10,644 +10,6 @@ Laya.interface('laya.html.utils.ILayout');
 /**
 *@private
 */
-//class laya.html.dom.HTMLBrElement
-var HTMLBrElement=(function(){
-	function HTMLBrElement(){}
-	__class(HTMLBrElement,'laya.html.dom.HTMLBrElement');
-	var __proto=HTMLBrElement.prototype;
-	/**@private */
-	__proto._addToLayout=function(out){
-		out.push(this);
-	}
-
-	//TODO:coverage
-	__proto.reset=function(){
-		return this;
-	}
-
-	__proto.destroy=function(){
-		Pool.recover(HTMLElement.getClassName(this),this.reset());
-	}
-
-	__proto._setParent=function(value){}
-	//TODO:coverage
-	__proto._getCSSStyle=function(){
-		if (!HTMLBrElement.brStyle){
-			HTMLBrElement.brStyle=new HTMLStyle();
-			HTMLBrElement.brStyle.setLineElement(true);
-			HTMLBrElement.brStyle.block=true;
-		}
-		return HTMLBrElement.brStyle;
-	}
-
-	__proto.renderSelfToGraphic=function(graphic,gX,gY,recList){}
-	__getset(0,__proto,'URI',null,function(value){
-	});
-
-	__getset(0,__proto,'parent',null,function(value){
-	});
-
-	__getset(0,__proto,'href',null,function(value){
-	});
-
-	HTMLBrElement.brStyle=null;
-	return HTMLBrElement;
-})()
-
-
-/**
-*@private
-*/
-//class laya.html.dom.HTMLElement
-var HTMLElement=(function(){
-	function HTMLElement(){
-		//this.URI=null;
-		//this.parent=null;
-		//this._style=null;
-		//this._text=null;
-		//this._children=null;
-		//this._x=NaN;
-		//this._y=NaN;
-		//this._width=NaN;
-		//this._height=NaN;
-		this._creates();
-		this.reset();
-	}
-
-	__class(HTMLElement,'laya.html.dom.HTMLElement');
-	var __proto=HTMLElement.prototype;
-	__proto._creates=function(){
-		this._style=HTMLStyle.create();
-	}
-
-	/**
-	*重置
-	*/
-	__proto.reset=function(){
-		this.URI=null;
-		this.parent=null;
-		this._style.reset();
-		this._style.ower=this;
-		this._style.valign="middle";
-		if (this._text && this._text.words){
-			var words=this._text.words;
-			var i=0,len=0;
-			len=words.length;
-			var tChar;
-			for (i=0;i < len;i++){
-				tChar=words[i];
-				if (tChar)tChar.recover();
-			}
-		}
-		this._text=HTMLElement._EMPTYTEXT;
-		if (this._children)this._children.length=0;
-		this._x=this._y=this._width=this._height=0;
-		return this;
-	}
-
-	/**@private */
-	__proto._getCSSStyle=function(){
-		return this._style;
-	}
-
-	/**@private */
-	__proto._addChildsToLayout=function(out){
-		var words=this._getWords();
-		if (words==null && (!this._children || this._children.length==0))
-			return false;
-		if (words){
-			for (var i=0,n=words.length;i < n;i++){
-				out.push(words[i]);
-			}
-		}
-		if (this._children)
-			this._children.forEach(function(o,index,array){
-			var _style=o._style;
-			_style._enableLayout && _style._enableLayout()&& o._addToLayout(out);
-		});
-		return true;
-	}
-
-	/**@private */
-	__proto._addToLayout=function(out){
-		if (!this._style)return;
-		var style=this._style;
-		if (style.absolute)return;
-		style.block ? out.push(this):(this._addChildsToLayout(out)&& (this.x=this.y=0));
-	}
-
-	__proto.repaint=function(recreate){
-		(recreate===void 0)&& (recreate=false);
-		this.parentRepaint(recreate);
-	}
-
-	__proto.parentRepaint=function(recreate){
-		(recreate===void 0)&& (recreate=false);
-		if (this.parent)this.parent.repaint(recreate);
-	}
-
-	__proto._setParent=function(value){
-		if ((value instanceof laya.html.dom.HTMLElement )){
-			var p=value;
-			this.URI || (this.URI=p.URI);
-			if (this.style)
-				this.style.inherit(p.style);
-		}
-	}
-
-	__proto.appendChild=function(c){
-		return this.addChild(c);
-	}
-
-	__proto.addChild=function(c){
-		if (c.parent)c.parent.removeChild(c);
-		if (!this._children)this._children=[];
-		this._children.push(c);
-		c.parent=this;
-		c._setParent(this);
-		this.repaint();
-		return c;
-	}
-
-	__proto.removeChild=function(c){
-		if (!this._children)return null;
-		var i=0,len=0;
-		len=this._children.length;
-		for (i=0;i < len;i++){
-			if (this._children[i]==c){
-				this._children.splice(i,1);
-				return c;
-			}
-		}
-		return null;
-	}
-
-	/**
-	*<p>销毁此对象。destroy对象默认会把自己从父节点移除，并且清理自身引用关系，等待js自动垃圾回收机制回收。destroy后不能再使用。</p>
-	*<p>destroy时会移除自身的事情监听，自身的timer监听，移除子对象及从父节点移除自己。</p>
-	*@param destroyChild （可选）是否同时销毁子节点，若值为true,则销毁子节点，否则不销毁子节点。
-	*/
-	__proto.destroy=function(){
-		if (this._children){
-			this.destroyChildren();
-			this._children.length=0;
-		}
-		Pool.recover(HTMLElement.getClassName(this),this.reset());
-	}
-
-	/**
-	*销毁所有子对象，不销毁自己本身。
-	*/
-	__proto.destroyChildren=function(){
-		if (this._children){
-			for (var i=this._children.length-1;i >-1;i--){
-				this._children[i].destroy();
-			}
-			this._children.length=0;
-		}
-	}
-
-	__proto._getWords=function(){
-		if (!this._text)return null;
-		var txt=this._text.text;
-		if (!txt || txt.length===0)
-			return null;
-		var words=this._text.words;
-		if (words && words.length===txt.length)
-			return words;
-		words===null && (this._text.words=words=[]);
-		words.length=txt.length;
-		var size;
-		var style=this.style;
-		var fontStr=style.font;
-		for (var i=0,n=txt.length;i < n;i++){
-			size=Utils.measureText(txt.charAt(i),fontStr);
-			words[i]=HTMLChar.create().setData(txt.charAt(i),size.width,size.height || style.fontSize,style);
-		}
-		return words;
-	}
-
-	//TODO:coverage
-	__proto._isChar=function(){
-		return false;
-	}
-
-	__proto._layoutLater=function(){
-		var style=this.style;
-		if ((style._type & /*laya.html.utils.HTMLStyle.ADDLAYOUTED*/0x200))
-			return;
-		if (style.widthed(this)&& ((this._children && this._children.length > 0)|| this._getWords()!=null)&& style.block){
-			Layout.later(this);
-			style._type |=/*laya.html.utils.HTMLStyle.ADDLAYOUTED*/0x200;
-			}else {
-			this.parent && this.parent._layoutLater();
-		}
-	}
-
-	__proto._setAttributes=function(name,value){
-		switch (name){
-			case 'style':
-				this.style.cssText(value);
-				break ;
-			case 'class':
-				this.className=value;
-				break ;
-			case 'x':
-				this.x=parseFloat(value);
-				break ;
-			case 'y':
-				this.y=parseFloat(value);
-				break ;
-			case 'width':
-				this.width=parseFloat(value);
-				break ;
-			case 'height':
-				this.height=parseFloat(value);
-				break ;
-			default :
-				this[name]=value;
-			}
-	}
-
-	__proto.formatURL=function(url){
-		if (!this.URI)return url;
-		return HTMLElement.formatURL1(url,this.URI ? this.URI.path :null);
-	}
-
-	__proto.drawToGraphic=function(graphic,gX,gY,recList){
-		gX+=this.x;
-		gY+=this.y;
-		var cssStyle=this.style;
-		if (cssStyle.paddingLeft){
-			gX+=cssStyle.paddingLeft;
-		}
-		if (cssStyle.paddingTop){
-			gY+=cssStyle.paddingTop;
-		}
-		if (cssStyle.bgColor !=null || cssStyle.borderColor){
-			graphic.drawRect(gX,gY,this.width,this.height,cssStyle.bgColor,cssStyle.borderColor,1);
-		}
-		this.renderSelfToGraphic(graphic,gX,gY,recList);
-		var i=0,len=0;
-		var tChild;
-		if (this._children && this._children.length > 0){
-			len=this._children.length;
-			for (i=0;i < len;i++){
-				tChild=this._children[i];
-				if (tChild.drawToGraphic !=null)
-					tChild.drawToGraphic(graphic,gX,gY,recList);
-			}
-		}
-	}
-
-	__proto.renderSelfToGraphic=function(graphic,gX,gY,recList){
-		var cssStyle=this.style;
-		var words=this._getWords();
-		var i=0,len=0;
-		if (words){
-			len=words.length;
-			var a;
-			if (cssStyle){
-				var font=cssStyle.font;
-				var color=cssStyle.color;
-				if (cssStyle.stroke){
-					var stroke=cssStyle.stroke;
-					stroke=parseInt(stroke);
-					var strokeColor=cssStyle.strokeColor;
-					graphic.fillBorderWords(words,gX,gY,font,color,strokeColor,stroke);
-					}else {
-					graphic.fillWords(words,gX,gY,font,color);
-				}
-				if (this.href){
-					var lastIndex=words.length-1;
-					var lastWords=words[lastIndex];
-					var lineY=lastWords.y+lastWords.height;
-					if(cssStyle.textDecoration!="none")
-						graphic.drawLine(words[0].x,lineY,lastWords.x+lastWords.width,lineY,color,1);
-					var hitRec=HTMLHitRect.create();
-					hitRec.rec.setTo(words[0].x,lastWords.y,lastWords.x+lastWords.width-words[0].x,lastWords.height);
-					hitRec.href=this.href;
-					recList.push(hitRec);
-				}
-			}
-		}
-	}
-
-	__getset(0,__proto,'href',function(){
-		if (!this._style)return null;
-		return this._style.href;
-		},function(url){
-		if (!this._style)return;
-		if (url !=this._style.href){
-			this._style.href=url;
-			this.repaint();
-		}
-	});
-
-	__getset(0,__proto,'color',null,function(value){
-		this.style.color=value;
-	});
-
-	__getset(0,__proto,'id',null,function(value){
-		HTMLDocument.document.setElementById(value,this);
-	});
-
-	__getset(0,__proto,'innerTEXT',function(){
-		return this._text.text;
-		},function(value){
-		if (this._text===HTMLElement._EMPTYTEXT){
-			this._text={text:value,words:null};
-			}else {
-			this._text.text=value;
-			this._text.words && (this._text.words.length=0);
-		}
-		this.repaint();
-	});
-
-	__getset(0,__proto,'style',function(){
-		return this._style;
-	});
-
-	__getset(0,__proto,'width',function(){
-		return this._width;
-		},function(value){
-		if (this._width!==value){
-			this._width=value;
-			this.repaint();
-		}
-	});
-
-	__getset(0,__proto,'x',function(){
-		return this._x;
-		},function(v){
-		if (this._x !=v){
-			this._x=v;
-			this.parentRepaint();
-		}
-	});
-
-	__getset(0,__proto,'y',function(){
-		return this._y;
-		},function(v){
-		if (this._y !=v){
-			this._y=v;
-			this.parentRepaint();
-		}
-	});
-
-	__getset(0,__proto,'height',function(){
-		return this._height;
-		},function(value){
-		if (this._height!==value){
-			this._height=value;
-			this.repaint();
-		}
-	});
-
-	__getset(0,__proto,'className',null,function(value){
-		this.style.attrs(HTMLDocument.document.styleSheets['.'+value]);
-	});
-
-	HTMLElement.formatURL1=function(url,basePath){
-		if (!url)return "null path";
-		if (!basePath)basePath=URL.basePath;
-		if (url.indexOf(":")> 0)return url;
-		if (URL.customFormat !=null)url=URL.customFormat(url);
-		if (url.indexOf(":")> 0)return url;
-		var char1=url.charAt(0);
-		if (char1==="."){
-			return URL._formatRelativePath (basePath+url);
-			}else if (char1==='~'){
-			return URL.rootPath+url.substring(1);
-			}else if (char1==="d"){
-			if (url.indexOf("data:image")===0)return url;
-			}else if (char1==="/"){
-			return url;
-		}
-		return basePath+url;
-	}
-
-	HTMLElement.getClassName=function(tar){
-		if ((typeof tar=='function'))return tar.name;
-		return tar["constructor"].name;
-	}
-
-	HTMLElement._EMPTYTEXT={text:null,words:null};
-	return HTMLElement;
-})()
-
-
-/**
-*@private
-*/
-//class laya.html.dom.HTMLDocument
-var HTMLDocument=(function(){
-	function HTMLDocument(){
-		this.all=new Array;
-		this.styleSheets=HTMLStyle.styleSheets;
-	}
-
-	__class(HTMLDocument,'laya.html.dom.HTMLDocument');
-	var __proto=HTMLDocument.prototype;
-	//TODO:coverage
-	__proto.getElementById=function(id){
-		return this.all[id];
-	}
-
-	//TODO:coverage
-	__proto.setElementById=function(id,e){
-		this.all[id]=e;
-	}
-
-	__static(HTMLDocument,
-	['document',function(){return this.document=new HTMLDocument();}
-	]);
-	return HTMLDocument;
-})()
-
-
-/**
-*@private
-*/
-//class laya.html.dom.HTMLHitRect
-var HTMLHitRect=(function(){
-	function HTMLHitRect(){
-		//this.rec=null;
-		//this.href=null;
-		this.rec=new Rectangle();
-		this.reset();
-	}
-
-	__class(HTMLHitRect,'laya.html.dom.HTMLHitRect');
-	var __proto=HTMLHitRect.prototype;
-	__proto.reset=function(){
-		this.rec.reset();
-		this.href=null;
-		return this;
-	}
-
-	__proto.recover=function(){
-		Pool.recover("HTMLHitRect",this.reset());
-	}
-
-	HTMLHitRect.create=function(){
-		return Pool.getItemByClass("HTMLHitRect",HTMLHitRect);
-	}
-
-	return HTMLHitRect;
-})()
-
-
-/**
-*@private
-*/
-//class laya.html.utils.HTMLExtendStyle
-var HTMLExtendStyle=(function(){
-	function HTMLExtendStyle(){
-		/**
-		*<p>描边宽度（以像素为单位）。</p>
-		*默认值0，表示不描边。
-		*@default 0
-		*/
-		//this.stroke=NaN;
-		/**
-		*<p>描边颜色，以字符串表示。</p>
-		*@default "#000000";
-		*/
-		//this.strokeColor=null;
-		/**
-		*<p>垂直行间距（以像素为单位）</p>
-		*/
-		//this.leading=NaN;
-		/**行高。 */
-		//this.lineHeight=NaN;
-		//this.letterSpacing=0;
-		//this.href=null;
-		this.reset();
-	}
-
-	__class(HTMLExtendStyle,'laya.html.utils.HTMLExtendStyle');
-	var __proto=HTMLExtendStyle.prototype;
-	__proto.reset=function(){
-		this.stroke=0;
-		this.strokeColor="#000000";
-		this.leading=0;
-		this.lineHeight=0;
-		this.letterSpacing=0;
-		this.href=null;
-		return this;
-	}
-
-	__proto.recover=function(){
-		if (this==HTMLExtendStyle.EMPTY)return;
-		Pool.recover("HTMLExtendStyle",this.reset());
-	}
-
-	HTMLExtendStyle.create=function(){
-		return Pool.getItemByClass("HTMLExtendStyle",HTMLExtendStyle);
-	}
-
-	HTMLExtendStyle.EMPTY=new HTMLExtendStyle();
-	return HTMLExtendStyle;
-})()
-
-
-/**
-*@private
-*/
-//class laya.html.utils.HTMLParse
-var HTMLParse=(function(){
-	function HTMLParse(){}
-	__class(HTMLParse,'laya.html.utils.HTMLParse');
-	HTMLParse.getInstance=function(type){
-		var rst=Pool.getItem(HTMLParse._htmlClassMapShort[type]);
-		if (!rst){
-			rst=ClassUtils.getInstance(type);
-		}
-		return rst;
-	}
-
-	HTMLParse.parse=function(ower,xmlString,url){
-		xmlString=xmlString.replace(/<br>/g,"<br/>");
-		xmlString="<root>"+xmlString+"</root>";
-		xmlString=xmlString.replace(HTMLParse.spacePattern,HTMLParse.char255);
-		var xml=Utils.parseXMLFromString(xmlString);
-		HTMLParse._parseXML(ower,xml.childNodes[0].childNodes,url);
-	}
-
-	HTMLParse._parseXML=function(parent,xml,url,href){
-		var i=0,n=0;
-		if (xml.join || xml.item){
-			for (i=0,n=xml.length;i < n;++i){
-				HTMLParse._parseXML(parent,xml[i],url,href);
-			}
-			}else {
-			var node;
-			var nodeName;
-			if (xml.nodeType==3){
-				var txt;
-				if ((parent instanceof laya.html.dom.HTMLDivParser )){
-					if (xml.nodeName==null){
-						xml.nodeName="#text";
-					}
-					nodeName=xml.nodeName.toLowerCase();
-					txt=xml.textContent.replace(/^\s+|\s+$/g,'');
-					if (txt.length > 0){
-						node=HTMLParse.getInstance(nodeName);
-						if (node){
-							parent.addChild(node);
-							((node).innerTEXT=txt.replace(HTMLParse.char255AndOneSpacePattern," "));
-						}
-					}
-					}else {
-					txt=xml.textContent.replace(/^\s+|\s+$/g,'');
-					if (txt.length > 0){
-						((parent).innerTEXT=txt.replace(HTMLParse.char255AndOneSpacePattern," "));
-					}
-				}
-				return;
-				}else {
-				nodeName=xml.nodeName.toLowerCase();
-				if (nodeName=="#comment")return;
-				node=HTMLParse.getInstance(nodeName);
-				if (node){
-					if (nodeName=="p"){
-						parent.addChild(HTMLParse.getInstance("br"));
-						node=parent.addChild(node);
-						parent.addChild(HTMLParse.getInstance("br"));
-						}else{
-						node=parent.addChild(node);
-					}
-					(node).URI=url;
-					(node).href=href;
-					var attributes=xml.attributes;
-					if (attributes && attributes.length > 0){
-						for (i=0,n=attributes.length;i < n;++i){
-							var attribute=attributes[i];
-							var attrName=attribute.nodeName;
-							var value=attribute.value;
-							node._setAttributes(attrName,value);
-						}
-					}
-					HTMLParse._parseXML(node,xml.childNodes,url,(node).href);
-					}else {
-					HTMLParse._parseXML(parent,xml.childNodes,url,href);
-				}
-			}
-		}
-	}
-
-	HTMLParse.char255=String.fromCharCode(255);
-	HTMLParse.spacePattern=/&nbsp;|&#160;/g;
-	HTMLParse.char255AndOneSpacePattern=new RegExp(String.fromCharCode(255)+"|(\\s+)","g");
-	HTMLParse._htmlClassMapShort={'div':'HTMLDivParser','p':'HTMLElement','img':'HTMLImageElement','span':'HTMLElement','br':'HTMLBrElement','style':'HTMLStyleElement','font':'HTMLElement','a':'HTMLElement','#text':'HTMLElement','link':'HTMLLinkElement'};
-	return HTMLParse;
-})()
-
-
-/**
-*@private
-*/
 //class laya.html.utils.HTMLStyle
 var HTMLStyle=(function(){
 	function HTMLStyle(){
@@ -1270,6 +632,535 @@ var Layout=(function(){
 /**
 *@private
 */
+//class laya.html.dom.HTMLElement
+var HTMLElement=(function(){
+	function HTMLElement(){
+		//this.URI=null;
+		//this.parent=null;
+		//this._style=null;
+		//this._text=null;
+		//this._children=null;
+		//this._x=NaN;
+		//this._y=NaN;
+		//this._width=NaN;
+		//this._height=NaN;
+		this._creates();
+		this.reset();
+	}
+
+	__class(HTMLElement,'laya.html.dom.HTMLElement');
+	var __proto=HTMLElement.prototype;
+	__proto._creates=function(){
+		this._style=HTMLStyle.create();
+	}
+
+	/**
+	*重置
+	*/
+	__proto.reset=function(){
+		this.URI=null;
+		this.parent=null;
+		this._style.reset();
+		this._style.ower=this;
+		this._style.valign="middle";
+		if (this._text && this._text.words){
+			var words=this._text.words;
+			var i=0,len=0;
+			len=words.length;
+			var tChar;
+			for (i=0;i < len;i++){
+				tChar=words[i];
+				if (tChar)tChar.recover();
+			}
+		}
+		this._text=HTMLElement._EMPTYTEXT;
+		if (this._children)this._children.length=0;
+		this._x=this._y=this._width=this._height=0;
+		return this;
+	}
+
+	/**@private */
+	__proto._getCSSStyle=function(){
+		return this._style;
+	}
+
+	/**@private */
+	__proto._addChildsToLayout=function(out){
+		var words=this._getWords();
+		if (words==null && (!this._children || this._children.length==0))
+			return false;
+		if (words){
+			for (var i=0,n=words.length;i < n;i++){
+				out.push(words[i]);
+			}
+		}
+		if (this._children)
+			this._children.forEach(function(o,index,array){
+			var _style=o._style;
+			_style._enableLayout && _style._enableLayout()&& o._addToLayout(out);
+		});
+		return true;
+	}
+
+	/**@private */
+	__proto._addToLayout=function(out){
+		if (!this._style)return;
+		var style=this._style;
+		if (style.absolute)return;
+		style.block ? out.push(this):(this._addChildsToLayout(out)&& (this.x=this.y=0));
+	}
+
+	__proto.repaint=function(recreate){
+		(recreate===void 0)&& (recreate=false);
+		this.parentRepaint(recreate);
+	}
+
+	__proto.parentRepaint=function(recreate){
+		(recreate===void 0)&& (recreate=false);
+		if (this.parent)this.parent.repaint(recreate);
+	}
+
+	__proto._setParent=function(value){
+		if ((value instanceof laya.html.dom.HTMLElement )){
+			var p=value;
+			this.URI || (this.URI=p.URI);
+			if (this.style)
+				this.style.inherit(p.style);
+		}
+	}
+
+	__proto.appendChild=function(c){
+		return this.addChild(c);
+	}
+
+	__proto.addChild=function(c){
+		if (c.parent)c.parent.removeChild(c);
+		if (!this._children)this._children=[];
+		this._children.push(c);
+		c.parent=this;
+		c._setParent(this);
+		this.repaint();
+		return c;
+	}
+
+	__proto.removeChild=function(c){
+		if (!this._children)return null;
+		var i=0,len=0;
+		len=this._children.length;
+		for (i=0;i < len;i++){
+			if (this._children[i]==c){
+				this._children.splice(i,1);
+				return c;
+			}
+		}
+		return null;
+	}
+
+	/**
+	*<p>销毁此对象。destroy对象默认会把自己从父节点移除，并且清理自身引用关系，等待js自动垃圾回收机制回收。destroy后不能再使用。</p>
+	*<p>destroy时会移除自身的事情监听，自身的timer监听，移除子对象及从父节点移除自己。</p>
+	*@param destroyChild （可选）是否同时销毁子节点，若值为true,则销毁子节点，否则不销毁子节点。
+	*/
+	__proto.destroy=function(){
+		if (this._children){
+			this.destroyChildren();
+			this._children.length=0;
+		}
+		Pool.recover(HTMLElement.getClassName(this),this.reset());
+	}
+
+	/**
+	*销毁所有子对象，不销毁自己本身。
+	*/
+	__proto.destroyChildren=function(){
+		if (this._children){
+			for (var i=this._children.length-1;i >-1;i--){
+				this._children[i].destroy();
+			}
+			this._children.length=0;
+		}
+	}
+
+	__proto._getWords=function(){
+		if (!this._text)return null;
+		var txt=this._text.text;
+		if (!txt || txt.length===0)
+			return null;
+		var words=this._text.words;
+		if (words && words.length===txt.length)
+			return words;
+		words===null && (this._text.words=words=[]);
+		words.length=txt.length;
+		var size;
+		var style=this.style;
+		var fontStr=style.font;
+		for (var i=0,n=txt.length;i < n;i++){
+			size=Utils.measureText(txt.charAt(i),fontStr);
+			words[i]=HTMLChar.create().setData(txt.charAt(i),size.width,size.height || style.fontSize,style);
+		}
+		return words;
+	}
+
+	//TODO:coverage
+	__proto._isChar=function(){
+		return false;
+	}
+
+	__proto._layoutLater=function(){
+		var style=this.style;
+		if ((style._type & /*laya.html.utils.HTMLStyle.ADDLAYOUTED*/0x200))
+			return;
+		if (style.widthed(this)&& ((this._children && this._children.length > 0)|| this._getWords()!=null)&& style.block){
+			Layout.later(this);
+			style._type |=/*laya.html.utils.HTMLStyle.ADDLAYOUTED*/0x200;
+			}else {
+			this.parent && this.parent._layoutLater();
+		}
+	}
+
+	__proto._setAttributes=function(name,value){
+		switch (name){
+			case 'style':
+				this.style.cssText(value);
+				break ;
+			case 'class':
+				this.className=value;
+				break ;
+			case 'x':
+				this.x=parseFloat(value);
+				break ;
+			case 'y':
+				this.y=parseFloat(value);
+				break ;
+			case 'width':
+				this.width=parseFloat(value);
+				break ;
+			case 'height':
+				this.height=parseFloat(value);
+				break ;
+			default :
+				this[name]=value;
+			}
+	}
+
+	__proto.formatURL=function(url){
+		if (!this.URI)return url;
+		return HTMLElement.formatURL1(url,this.URI ? this.URI.path :null);
+	}
+
+	__proto.drawToGraphic=function(graphic,gX,gY,recList){
+		gX+=this.x;
+		gY+=this.y;
+		var cssStyle=this.style;
+		if (cssStyle.paddingLeft){
+			gX+=cssStyle.paddingLeft;
+		}
+		if (cssStyle.paddingTop){
+			gY+=cssStyle.paddingTop;
+		}
+		if (cssStyle.bgColor !=null || cssStyle.borderColor){
+			graphic.drawRect(gX,gY,this.width,this.height,cssStyle.bgColor,cssStyle.borderColor,1);
+		}
+		this.renderSelfToGraphic(graphic,gX,gY,recList);
+		var i=0,len=0;
+		var tChild;
+		if (this._children && this._children.length > 0){
+			len=this._children.length;
+			for (i=0;i < len;i++){
+				tChild=this._children[i];
+				if (tChild.drawToGraphic !=null)
+					tChild.drawToGraphic(graphic,gX,gY,recList);
+			}
+		}
+	}
+
+	__proto.renderSelfToGraphic=function(graphic,gX,gY,recList){
+		var cssStyle=this.style;
+		var words=this._getWords();
+		var i=0,len=0;
+		if (words){
+			len=words.length;
+			var a;
+			if (cssStyle){
+				var font=cssStyle.font;
+				var color=cssStyle.color;
+				if (cssStyle.stroke){
+					var stroke=cssStyle.stroke;
+					stroke=parseInt(stroke);
+					var strokeColor=cssStyle.strokeColor;
+					graphic.fillBorderWords(words,gX,gY,font,color,strokeColor,stroke);
+					}else {
+					graphic.fillWords(words,gX,gY,font,color);
+				}
+				if (this.href){
+					var lastIndex=words.length-1;
+					var lastWords=words[lastIndex];
+					var lineY=lastWords.y+lastWords.height;
+					if(cssStyle.textDecoration!="none")
+						graphic.drawLine(words[0].x,lineY,lastWords.x+lastWords.width,lineY,color,1);
+					var hitRec=HTMLHitRect.create();
+					hitRec.rec.setTo(words[0].x,lastWords.y,lastWords.x+lastWords.width-words[0].x,lastWords.height);
+					hitRec.href=this.href;
+					recList.push(hitRec);
+				}
+			}
+		}
+	}
+
+	__getset(0,__proto,'href',function(){
+		if (!this._style)return null;
+		return this._style.href;
+		},function(url){
+		if (!this._style)return;
+		if (url !=this._style.href){
+			this._style.href=url;
+			this.repaint();
+		}
+	});
+
+	__getset(0,__proto,'color',null,function(value){
+		this.style.color=value;
+	});
+
+	__getset(0,__proto,'id',null,function(value){
+		HTMLDocument.document.setElementById(value,this);
+	});
+
+	__getset(0,__proto,'innerTEXT',function(){
+		return this._text.text;
+		},function(value){
+		if (this._text===HTMLElement._EMPTYTEXT){
+			this._text={text:value,words:null};
+			}else {
+			this._text.text=value;
+			this._text.words && (this._text.words.length=0);
+		}
+		this.repaint();
+	});
+
+	__getset(0,__proto,'style',function(){
+		return this._style;
+	});
+
+	__getset(0,__proto,'width',function(){
+		return this._width;
+		},function(value){
+		if (this._width!==value){
+			this._width=value;
+			this.repaint();
+		}
+	});
+
+	__getset(0,__proto,'x',function(){
+		return this._x;
+		},function(v){
+		if (this._x !=v){
+			this._x=v;
+			this.parentRepaint();
+		}
+	});
+
+	__getset(0,__proto,'y',function(){
+		return this._y;
+		},function(v){
+		if (this._y !=v){
+			this._y=v;
+			this.parentRepaint();
+		}
+	});
+
+	__getset(0,__proto,'height',function(){
+		return this._height;
+		},function(value){
+		if (this._height!==value){
+			this._height=value;
+			this.repaint();
+		}
+	});
+
+	__getset(0,__proto,'className',null,function(value){
+		this.style.attrs(HTMLDocument.document.styleSheets['.'+value]);
+	});
+
+	HTMLElement.formatURL1=function(url,basePath){
+		if (!url)return "null path";
+		if (!basePath)basePath=URL.basePath;
+		if (url.indexOf(":")> 0)return url;
+		if (URL.customFormat !=null)url=URL.customFormat(url);
+		if (url.indexOf(":")> 0)return url;
+		var char1=url.charAt(0);
+		if (char1==="."){
+			return URL._formatRelativePath (basePath+url);
+			}else if (char1==='~'){
+			return URL.rootPath+url.substring(1);
+			}else if (char1==="d"){
+			if (url.indexOf("data:image")===0)return url;
+			}else if (char1==="/"){
+			return url;
+		}
+		return basePath+url;
+	}
+
+	HTMLElement.getClassName=function(tar){
+		if ((typeof tar=='function'))return tar.name;
+		return tar["constructor"].name;
+	}
+
+	HTMLElement._EMPTYTEXT={text:null,words:null};
+	return HTMLElement;
+})()
+
+
+/**
+*@private
+*/
+//class laya.html.utils.HTMLExtendStyle
+var HTMLExtendStyle=(function(){
+	function HTMLExtendStyle(){
+		/**
+		*<p>描边宽度（以像素为单位）。</p>
+		*默认值0，表示不描边。
+		*@default 0
+		*/
+		//this.stroke=NaN;
+		/**
+		*<p>描边颜色，以字符串表示。</p>
+		*@default "#000000";
+		*/
+		//this.strokeColor=null;
+		/**
+		*<p>垂直行间距（以像素为单位）</p>
+		*/
+		//this.leading=NaN;
+		/**行高。 */
+		//this.lineHeight=NaN;
+		//this.letterSpacing=0;
+		//this.href=null;
+		this.reset();
+	}
+
+	__class(HTMLExtendStyle,'laya.html.utils.HTMLExtendStyle');
+	var __proto=HTMLExtendStyle.prototype;
+	__proto.reset=function(){
+		this.stroke=0;
+		this.strokeColor="#000000";
+		this.leading=0;
+		this.lineHeight=0;
+		this.letterSpacing=0;
+		this.href=null;
+		return this;
+	}
+
+	__proto.recover=function(){
+		if (this==HTMLExtendStyle.EMPTY)return;
+		Pool.recover("HTMLExtendStyle",this.reset());
+	}
+
+	HTMLExtendStyle.create=function(){
+		return Pool.getItemByClass("HTMLExtendStyle",HTMLExtendStyle);
+	}
+
+	HTMLExtendStyle.EMPTY=new HTMLExtendStyle();
+	return HTMLExtendStyle;
+})()
+
+
+/**
+*@private
+*/
+//class laya.html.utils.HTMLParse
+var HTMLParse=(function(){
+	function HTMLParse(){}
+	__class(HTMLParse,'laya.html.utils.HTMLParse');
+	HTMLParse.getInstance=function(type){
+		var rst=Pool.getItem(HTMLParse._htmlClassMapShort[type]);
+		if (!rst){
+			rst=ClassUtils.getInstance(type);
+		}
+		return rst;
+	}
+
+	HTMLParse.parse=function(ower,xmlString,url){
+		xmlString=xmlString.replace(/<br>/g,"<br/>");
+		xmlString="<root>"+xmlString+"</root>";
+		xmlString=xmlString.replace(HTMLParse.spacePattern,HTMLParse.char255);
+		var xml=Utils.parseXMLFromString(xmlString);
+		HTMLParse._parseXML(ower,xml.childNodes[0].childNodes,url);
+	}
+
+	HTMLParse._parseXML=function(parent,xml,url,href){
+		var i=0,n=0;
+		if (xml.join || xml.item){
+			for (i=0,n=xml.length;i < n;++i){
+				HTMLParse._parseXML(parent,xml[i],url,href);
+			}
+			}else {
+			var node;
+			var nodeName;
+			if (xml.nodeType==3){
+				var txt;
+				if ((parent instanceof laya.html.dom.HTMLDivParser )){
+					if (xml.nodeName==null){
+						xml.nodeName="#text";
+					}
+					nodeName=xml.nodeName.toLowerCase();
+					txt=xml.textContent.replace(/^\s+|\s+$/g,'');
+					if (txt.length > 0){
+						node=HTMLParse.getInstance(nodeName);
+						if (node){
+							parent.addChild(node);
+							((node).innerTEXT=txt.replace(HTMLParse.char255AndOneSpacePattern," "));
+						}
+					}
+					}else {
+					txt=xml.textContent.replace(/^\s+|\s+$/g,'');
+					if (txt.length > 0){
+						((parent).innerTEXT=txt.replace(HTMLParse.char255AndOneSpacePattern," "));
+					}
+				}
+				return;
+				}else {
+				nodeName=xml.nodeName.toLowerCase();
+				if (nodeName=="#comment")return;
+				node=HTMLParse.getInstance(nodeName);
+				if (node){
+					if (nodeName=="p"){
+						parent.addChild(HTMLParse.getInstance("br"));
+						node=parent.addChild(node);
+						parent.addChild(HTMLParse.getInstance("br"));
+						}else{
+						node=parent.addChild(node);
+					}
+					(node).URI=url;
+					(node).href=href;
+					var attributes=xml.attributes;
+					if (attributes && attributes.length > 0){
+						for (i=0,n=attributes.length;i < n;++i){
+							var attribute=attributes[i];
+							var attrName=attribute.nodeName;
+							var value=attribute.value;
+							node._setAttributes(attrName,value);
+						}
+					}
+					HTMLParse._parseXML(node,xml.childNodes,url,(node).href);
+					}else {
+					HTMLParse._parseXML(parent,xml.childNodes,url,href);
+				}
+			}
+		}
+	}
+
+	HTMLParse.char255=String.fromCharCode(255);
+	HTMLParse.spacePattern=/&nbsp;|&#160;/g;
+	HTMLParse.char255AndOneSpacePattern=new RegExp(String.fromCharCode(255)+"|(\\s+)","g");
+	HTMLParse._htmlClassMapShort={'div':'HTMLDivParser','p':'HTMLElement','img':'HTMLImageElement','span':'HTMLElement','br':'HTMLBrElement','style':'HTMLStyleElement','font':'HTMLElement','a':'HTMLElement','#text':'HTMLElement','link':'HTMLLinkElement'};
+	return HTMLParse;
+})()
+
+
+/**
+*@private
+*/
 //class laya.html.utils.LayoutLine
 var LayoutLine=(function(){
 	function LayoutLine(){
@@ -1331,6 +1222,235 @@ var LayoutLine=(function(){
 
 	return LayoutLine;
 })()
+
+
+/**
+*@private
+*/
+//class laya.html.dom.HTMLDocument
+var HTMLDocument=(function(){
+	function HTMLDocument(){
+		this.all=new Array;
+		this.styleSheets=HTMLStyle.styleSheets;
+	}
+
+	__class(HTMLDocument,'laya.html.dom.HTMLDocument');
+	var __proto=HTMLDocument.prototype;
+	//TODO:coverage
+	__proto.getElementById=function(id){
+		return this.all[id];
+	}
+
+	//TODO:coverage
+	__proto.setElementById=function(id,e){
+		this.all[id]=e;
+	}
+
+	__static(HTMLDocument,
+	['document',function(){return this.document=new HTMLDocument();}
+	]);
+	return HTMLDocument;
+})()
+
+
+/**
+*@private
+*/
+//class laya.html.dom.HTMLHitRect
+var HTMLHitRect=(function(){
+	function HTMLHitRect(){
+		//this.rec=null;
+		//this.href=null;
+		this.rec=new Rectangle();
+		this.reset();
+	}
+
+	__class(HTMLHitRect,'laya.html.dom.HTMLHitRect');
+	var __proto=HTMLHitRect.prototype;
+	__proto.reset=function(){
+		this.rec.reset();
+		this.href=null;
+		return this;
+	}
+
+	__proto.recover=function(){
+		Pool.recover("HTMLHitRect",this.reset());
+	}
+
+	HTMLHitRect.create=function(){
+		return Pool.getItemByClass("HTMLHitRect",HTMLHitRect);
+	}
+
+	return HTMLHitRect;
+})()
+
+
+/**
+*@private
+*/
+//class laya.html.dom.HTMLBrElement
+var HTMLBrElement=(function(){
+	function HTMLBrElement(){}
+	__class(HTMLBrElement,'laya.html.dom.HTMLBrElement');
+	var __proto=HTMLBrElement.prototype;
+	/**@private */
+	__proto._addToLayout=function(out){
+		out.push(this);
+	}
+
+	//TODO:coverage
+	__proto.reset=function(){
+		return this;
+	}
+
+	__proto.destroy=function(){
+		Pool.recover(HTMLElement.getClassName(this),this.reset());
+	}
+
+	__proto._setParent=function(value){}
+	//TODO:coverage
+	__proto._getCSSStyle=function(){
+		if (!HTMLBrElement.brStyle){
+			HTMLBrElement.brStyle=new HTMLStyle();
+			HTMLBrElement.brStyle.setLineElement(true);
+			HTMLBrElement.brStyle.block=true;
+		}
+		return HTMLBrElement.brStyle;
+	}
+
+	__proto.renderSelfToGraphic=function(graphic,gX,gY,recList){}
+	__getset(0,__proto,'URI',null,function(value){
+	});
+
+	__getset(0,__proto,'parent',null,function(value){
+	});
+
+	__getset(0,__proto,'href',null,function(value){
+	});
+
+	HTMLBrElement.brStyle=null;
+	return HTMLBrElement;
+})()
+
+
+/**
+*@private
+*/
+//class laya.html.dom.HTMLLinkElement extends laya.html.dom.HTMLElement
+var HTMLLinkElement=(function(_super){
+	function HTMLLinkElement(){
+		//this.type=null;
+		//this._loader=null;
+		HTMLLinkElement.__super.call(this);
+	}
+
+	__class(HTMLLinkElement,'laya.html.dom.HTMLLinkElement',_super);
+	var __proto=HTMLLinkElement.prototype;
+	__proto._creates=function(){}
+	__proto.drawToGraphic=function(graphic,gX,gY,recList){}
+	__proto.reset=function(){
+		if (this._loader)this._loader.off(/*laya.events.Event.COMPLETE*/"complete",this,this._onload);
+		this._loader=null;
+		return this;
+	}
+
+	__proto._onload=function(data){
+		if (this._loader)this._loader=null;
+		switch (this.type){
+			case 'text/css':
+				HTMLStyle.parseCSS(data,this.URI);
+				break ;
+			}
+		this.repaint(true);
+	}
+
+	__getset(0,__proto,'href',_super.prototype._$get_href,function(url){
+		if (!url)return;
+		url=this.formatURL(url);
+		this.URI=new URL(url);
+		if (this._loader)this._loader.off(/*laya.events.Event.COMPLETE*/"complete",this,this._onload);
+		if (Loader.getRes(url)){
+			if (this.type=="text/css"){
+				HTMLStyle.parseCSS(Loader.getRes(url),this.URI);
+			}
+			return;
+		}
+		this._loader=new Loader();
+		this._loader.once(/*laya.events.Event.COMPLETE*/"complete",this,this._onload);
+		this._loader.load(url,/*laya.net.Loader.TEXT*/"text");
+	});
+
+	HTMLLinkElement._cuttingStyle=new RegExp("((@keyframes[\\s\\t]+|)(.+))[\\t\\n\\r\\\s]*{","g");
+	return HTMLLinkElement;
+})(HTMLElement)
+
+
+/**
+*@private
+*/
+//class laya.html.dom.HTMLImageElement extends laya.html.dom.HTMLElement
+var HTMLImageElement=(function(_super){
+	function HTMLImageElement(){
+		//this._tex=null;
+		//this._url=null;
+		HTMLImageElement.__super.call(this);
+	}
+
+	__class(HTMLImageElement,'laya.html.dom.HTMLImageElement',_super);
+	var __proto=HTMLImageElement.prototype;
+	__proto.reset=function(){
+		_super.prototype.reset.call(this);
+		if (this._tex){
+			this._tex.off(/*laya.events.Event.LOADED*/"loaded",this,this.onloaded);
+		}
+		this._tex=null;
+		this._url=null;
+		return this;
+	}
+
+	//TODO:coverage
+	__proto.onloaded=function(){
+		var style=this._style;
+		var w=style.widthed(this)?-1 :this._tex.width;
+		var h=style.heighted(this)?-1 :this._tex.height;
+		if (!style.widthed(this)&& this._width !=this._tex.width){
+			this.width=this._tex.width;
+			this.parent && this.parent._layoutLater();
+		}
+		if (!style.heighted(this)&& this._height !=this._tex.height){
+			this.height=this._tex.height;
+			this.parent && this.parent._layoutLater();
+		}
+		this.repaint();
+	}
+
+	//TODO:coverage
+	__proto._addToLayout=function(out){
+		var style=this._style;
+		!style.absolute && out.push(this);
+	}
+
+	//TODO:coverage
+	__proto.renderSelfToGraphic=function(graphic,gX,gY,recList){
+		if (!this._tex)return;
+		graphic.drawImage(this._tex,gX,gY,this.width || this._tex.width,this.height || this._tex.height);
+	}
+
+	__getset(0,__proto,'src',null,function(url){
+		url=this.formatURL(url);
+		if (this._url===url)return;
+		this._url=url;
+		var tex=this._tex=Loader.getRes(url);
+		if (!tex){
+			this._tex=tex=new Texture();
+			tex.load(url);
+			Loader.cacheRes(url,tex);
+		}
+		tex.getIsReady()? this.onloaded():tex.once(/*laya.events.Event.READY*/"ready",this,this.onloaded);
+	});
+
+	return HTMLImageElement;
+})(HTMLElement)
 
 
 /**
@@ -1473,126 +1593,6 @@ var HTMLDivParser=(function(_super){
 	});
 
 	return HTMLDivParser;
-})(HTMLElement)
-
-
-/**
-*@private
-*/
-//class laya.html.dom.HTMLImageElement extends laya.html.dom.HTMLElement
-var HTMLImageElement=(function(_super){
-	function HTMLImageElement(){
-		//this._tex=null;
-		//this._url=null;
-		HTMLImageElement.__super.call(this);
-	}
-
-	__class(HTMLImageElement,'laya.html.dom.HTMLImageElement',_super);
-	var __proto=HTMLImageElement.prototype;
-	__proto.reset=function(){
-		_super.prototype.reset.call(this);
-		if (this._tex){
-			this._tex.off(/*laya.events.Event.LOADED*/"loaded",this,this.onloaded);
-		}
-		this._tex=null;
-		this._url=null;
-		return this;
-	}
-
-	//TODO:coverage
-	__proto.onloaded=function(){
-		var style=this._style;
-		var w=style.widthed(this)?-1 :this._tex.width;
-		var h=style.heighted(this)?-1 :this._tex.height;
-		if (!style.widthed(this)&& this._width !=this._tex.width){
-			this.width=this._tex.width;
-			this.parent && this.parent._layoutLater();
-		}
-		if (!style.heighted(this)&& this._height !=this._tex.height){
-			this.height=this._tex.height;
-			this.parent && this.parent._layoutLater();
-		}
-		this.repaint();
-	}
-
-	//TODO:coverage
-	__proto._addToLayout=function(out){
-		var style=this._style;
-		!style.absolute && out.push(this);
-	}
-
-	//TODO:coverage
-	__proto.renderSelfToGraphic=function(graphic,gX,gY,recList){
-		if (!this._tex)return;
-		graphic.drawImage(this._tex,gX,gY,this.width || this._tex.width,this.height || this._tex.height);
-	}
-
-	__getset(0,__proto,'src',null,function(url){
-		url=this.formatURL(url);
-		if (this._url===url)return;
-		this._url=url;
-		var tex=this._tex=Loader.getRes(url);
-		if (!tex){
-			this._tex=tex=new Texture();
-			tex.load(url);
-			Loader.cacheRes(url,tex);
-		}
-		tex.getIsReady()? this.onloaded():tex.once(/*laya.events.Event.READY*/"ready",this,this.onloaded);
-	});
-
-	return HTMLImageElement;
-})(HTMLElement)
-
-
-/**
-*@private
-*/
-//class laya.html.dom.HTMLLinkElement extends laya.html.dom.HTMLElement
-var HTMLLinkElement=(function(_super){
-	function HTMLLinkElement(){
-		//this.type=null;
-		//this._loader=null;
-		HTMLLinkElement.__super.call(this);
-	}
-
-	__class(HTMLLinkElement,'laya.html.dom.HTMLLinkElement',_super);
-	var __proto=HTMLLinkElement.prototype;
-	__proto._creates=function(){}
-	__proto.drawToGraphic=function(graphic,gX,gY,recList){}
-	__proto.reset=function(){
-		if (this._loader)this._loader.off(/*laya.events.Event.COMPLETE*/"complete",this,this._onload);
-		this._loader=null;
-		return this;
-	}
-
-	__proto._onload=function(data){
-		if (this._loader)this._loader=null;
-		switch (this.type){
-			case 'text/css':
-				HTMLStyle.parseCSS(data,this.URI);
-				break ;
-			}
-		this.repaint(true);
-	}
-
-	__getset(0,__proto,'href',_super.prototype._$get_href,function(url){
-		if (!url)return;
-		url=this.formatURL(url);
-		this.URI=new URL(url);
-		if (this._loader)this._loader.off(/*laya.events.Event.COMPLETE*/"complete",this,this._onload);
-		if (Loader.getRes(url)){
-			if (this.type=="text/css"){
-				HTMLStyle.parseCSS(Loader.getRes(url),this.URI);
-			}
-			return;
-		}
-		this._loader=new Loader();
-		this._loader.once(/*laya.events.Event.COMPLETE*/"complete",this,this._onload);
-		this._loader.load(url,/*laya.net.Loader.TEXT*/"text");
-	});
-
-	HTMLLinkElement._cuttingStyle=new RegExp("((@keyframes[\\s\\t]+|)(.+))[\\t\\n\\r\\\s]*{","g");
-	return HTMLLinkElement;
 })(HTMLElement)
 
 
