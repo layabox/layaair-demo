@@ -74,7 +74,7 @@ var MiniAdpter=(function(){
 	}
 
 	MiniAdpter.enable=function(){
-		MiniAdpter.init();
+		MiniAdpter.init(Laya.isWXPosMsg,Laya.isWXOpenDataContext);
 	}
 
 	MiniAdpter.init=function(isPosMsg,isSon){

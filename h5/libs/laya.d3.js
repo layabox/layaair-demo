@@ -21780,6 +21780,8 @@ var TrailRenderElement=(function(_super){
 				this._curDisappearIndex++;
 				this._owner._trailDeadLength+=this._everyVertexToPreVertexDistance[this._curDisappearIndex];
 				if (this._curDisappearIndex >=(this._verticesCount+this._virtualVerticesCount)/ 2){
+					if(this._verticesCount < this._maxVerticesCount)
+						continue ;
 					this._isDead=true;
 				}
 			}
@@ -37835,7 +37837,7 @@ var Rigidbody3D=(function(_super){
 		if (this._nativeColliderObject){
 			var nativeValue=Rigidbody3D._nativeTempVector30;
 			Utils3D._convertToBulletVec3(value,nativeValue,true);
-			(this.isSleeping)&& (this.wakeUp());
+			this.wakeUp();
 			this._nativeColliderObject.setLinearVelocity(nativeValue);
 		}
 	});
@@ -37915,7 +37917,7 @@ var Rigidbody3D=(function(_super){
 		if (this._nativeColliderObject){
 			var nativeValue=Rigidbody3D._nativeTempVector30;
 			Utils3D._convertToBulletVec3(value,nativeValue,true);
-			(this.isSleeping)&& (this.wakeUp());
+			this.wakeUp();
 			this._nativeColliderObject.setAngularVelocity(nativeValue);
 		}
 	});

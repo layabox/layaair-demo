@@ -3073,7 +3073,6 @@ var BufferStateBase=(function(){
 	*/
 	__proto.bind=function(){
 		if (BufferStateBase._curBindedBufferState!==this){
-			console.log("绑定VAO3D");
 			LayaGL.instance.bindVertexArray(this._nativeVertexArrayObject);
 			BufferStateBase._curBindedBufferState=this;
 		}
@@ -3084,12 +3083,27 @@ var BufferStateBase=(function(){
 	*/
 	__proto.unBind=function(){
 		if (BufferStateBase._curBindedBufferState===this){
-			console.log("绑定VAO3D null");
 			LayaGL.instance.bindVertexArray(null);
 			BufferStateBase._curBindedBufferState=null;
 			}else {
 			throw "BufferState: must call bind() function first.";
 		}
+	}
+
+	/**
+	*@private
+	*/
+	__proto.bindForNative=function(){
+		LayaGL.instance.bindVertexArray(this._nativeVertexArrayObject);
+		BufferStateBase._curBindedBufferState=this;
+	}
+
+	/**
+	*@private
+	*/
+	__proto.unBindForNative=function(){
+		LayaGL.instance.bindVertexArray(null);
+		BufferStateBase._curBindedBufferState=null;
 	}
 
 	/**
@@ -6097,6 +6111,9 @@ var WebGL=(function(){
 			var stage=Stage;
 			stage.prototype.repaint=stage.prototype.repaintForNative;
 			stage.prototype.render=stage.prototype.renderToNative;
+			var bufferStateBase=BufferStateBase;
+			bufferStateBase.prototype.bind=bufferStateBase.prototype.bindForNative;
+			bufferStateBase.prototype.unBind=bufferStateBase.prototype.unBindForNative;
 			if (Render.isConchApp){
 				/*__JS__ */CommandEncoder=window.GLCommandEncoder;
 				/*__JS__ */LayaGL=window.LayaGLContext;

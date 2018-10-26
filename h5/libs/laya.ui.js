@@ -8547,6 +8547,22 @@ var List=(function(_super){
 	}
 
 	/**
+	*更新数据源，不刷新list，只增加滚动长度
+	*@param array 数据源
+	*/
+	__proto.updateArray=function(array){
+		this._array=array;
+		if (this._scrollBar){
+			var length=array.length;
+			var numX=this._isVertical ? this.repeatX :this.repeatY;
+			var numY=this._isVertical ? this.repeatY :this.repeatX;
+			var lineCount=Math.ceil(length / numX);
+			this._scrollBar.thumbPercent=numY / lineCount;
+			this._scrollBar.slider["_max"]=(lineCount-numY)*this._cellSize+this._cellOffset;
+		}
+	}
+
+	/**
 	*刷新列表数据源。
 	*/
 	__proto.refresh=function(){

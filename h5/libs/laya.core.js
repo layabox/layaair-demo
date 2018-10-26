@@ -332,6 +332,8 @@ var ___Laya=(function(){
 	Laya.render=null;
 	Laya._currentStage=null;
 	Laya._isinit=false;
+	Laya.isWXOpenDataContext=false;
+	Laya.isWXPosMsg=false;
 	__static(Laya,
 	['conchMarket',function(){return this.conchMarket=/*__JS__ */window.conch?conchMarket:null;},'PlatformClass',function(){return this.PlatformClass=/*__JS__ */window.PlatformClass;},'_evcode',function(){return this._evcode="eva"+"l";}
 	]);
