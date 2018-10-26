@@ -20,3 +20,5 @@ class CustomMaterial extends Laya.BaseMaterial{
 CustomMaterial.DIFFUSETEXTURE = 1;
 CustomMaterial.MARGINALCOLOR = 2;
 
+
+window.CustomMaterial = CustomMaterial;

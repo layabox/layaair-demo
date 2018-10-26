@@ -135,3 +135,5 @@ CustomTerrainMaterial.DIFFUSESCALE4 = 9;
 CustomTerrainMaterial.DIFFUSESCALE5 = 10;
 CustomTerrainMaterial.shaderDefines = new Laya.ShaderDefines(Laya.BaseMaterial.shaderDefines);
 
+window.CustomTerrainMaterial = CustomTerrainMaterial;
+

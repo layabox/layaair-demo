@@ -62,3 +62,4 @@ class TriggerCollisionScript extends Laya.Script3D{
 	
 }
 	
+window.TriggerCollisionScript = TriggerCollisionScript;

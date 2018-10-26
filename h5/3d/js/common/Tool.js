@@ -47,3 +47,5 @@ class Tool{
             this.linearModel(sprite3D.getChildAt(i), lineSprite3D, color);
 	}
 }
+
+window.Tool = Tool;
