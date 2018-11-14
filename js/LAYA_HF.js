@@ -293,6 +293,20 @@ function laya_nav(laya) {
                     "en": visual
                 },
                 "blank": "1"
+            }, {
+                "title": {
+                    "zh": "流量共享平台",
+                    "en": "Traffic sharing platform"
+                },
+                "url": {
+                    "zh": laya_http + "share.layabox.com/",
+                    "en": laya_http + "share.layabox.com/"
+                },
+                "visual": {
+                    "zh": visual,
+                    "en": visual
+                },
+                "blank": "1"
             },
             {
                 "title": {
