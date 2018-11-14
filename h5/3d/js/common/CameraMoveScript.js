@@ -103,5 +103,3 @@ class CameraMoveScript extends Laya.Script3D{
         }
     }
 }
-
-window.CameraMoveScript = CameraMoveScript;
