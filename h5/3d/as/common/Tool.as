@@ -16,7 +16,6 @@ package common {
 	public class Tool {
 		
 		public static function linearModel(sprite3D:Sprite3D, lineSprite3D:PixelLineSprite3D, color:Color):void {
-			
 			var vertex1:Vector3 = new Vector3();
 			var vertex2:Vector3 = new Vector3();
 			var vertex3:Vector3 = new Vector3();
@@ -57,10 +56,9 @@ package common {
 					Vector3.transformCoordinate(vertex1, meshSprite3D.transform.worldMatrix, vertex1);
 					Vector3.transformCoordinate(vertex2, meshSprite3D.transform.worldMatrix, vertex2);
 					Vector3.transformCoordinate(vertex3, meshSprite3D.transform.worldMatrix, vertex3);
-					
-					lineSprite3D.setLine(lineCount++, vertex1, vertex2, color, color);
-					lineSprite3D.setLine(lineCount++, vertex2, vertex3, color, color);
-					lineSprite3D.setLine(lineCount++, vertex3, vertex1, color, color);
+					lineSprite3D.addLine(vertex1, vertex2, color, color);
+					lineSprite3D.addLine(vertex2, vertex3, color, color);
+					lineSprite3D.addLine(vertex3, vertex1, color, color);
 				}
 			}
 			

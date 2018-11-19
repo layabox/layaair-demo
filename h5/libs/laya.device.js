@@ -85,6 +85,76 @@ var AccelerationInfo=(function(){
 })()
 
 
+/**
+*保存旋转信息的类。请勿修改本类的属性。
+*@author Survivor
+*/
+//class laya.device.motion.RotationInfo
+var RotationInfo=(function(){
+	function RotationInfo(){
+		/**
+		*<p>
+		*指示设备是否可以提供绝对方位数据（指向地球坐标系），或者设备决定的任意坐标系。
+		*关于坐标系参见<i>https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Orientation_and_motion_data_explained</i>。
+		*</p>
+		*需要注意的是，IOS环境下，该值始终为false。即使如此，你依旧可以从<code>alpha</code>中取得正确的值。
+		*/
+		this.absolute=false;
+		/**
+		*Z轴旋转角度，其值范围从0至360。
+		*若<code>absolute</code>为true或者在IOS中，alpha值是从北方到当前设备方向的角度值。
+		*/
+		this.alpha=NaN;
+		/**
+		*X轴旋转角度,其值范围从-180至180。代表设备从前至后的运动。
+		*/
+		this.beta=NaN;
+		/**
+		*Y轴旋转角度，其值范围从-90至90。代表设备从左至右的运动。
+		*/
+		this.gamma=NaN;
+		/**
+		*罗盘数据的精确度（角度）。仅IOS可用。
+		*/
+		this.compassAccuracy=NaN;
+	}
+
+	__class(RotationInfo,'laya.device.motion.RotationInfo');
+	return RotationInfo;
+})()
+
+
+/**
+*Media用于捕捉摄像头和麦克风。可以捕捉任意之一，或者同时捕捉两者。<code>getCamera</code>前可以使用<code>supported()</code>检查当前浏览器是否支持。
+*<b>NOTE:</b>
+*<p>目前Media在移动平台只支持Android，不支持IOS。只可在FireFox完整地使用，Chrome测试时无法捕捉视频。</p>
+*/
+//class laya.device.media.Media
+var Media=(function(){
+	function Media(){}
+	__class(Media,'laya.device.media.Media');
+	Media.supported=function(){
+		return !!Browser.window.navigator.getUserMedia;
+	}
+
+	Media.getMedia=function(options,onSuccess,onError){
+		if (Browser.window.navigator.getUserMedia){
+			Browser.window.navigator.getUserMedia(options,function(stream){
+				onSuccess.runWith(Browser.window.URL.createObjectURL(stream));
+				},function(err){
+				onError.runWith(err);
+			});
+		}
+	}
+
+	Media.__init$=function(){
+		/*__JS__ */navigator.getUserMedia=navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;;
+	}
+
+	return Media;
+})()
+
+
 //class laya.device.geolocation.GeolocationInfo
 var GeolocationInfo=(function(){
 	function GeolocationInfo(){
@@ -132,76 +202,6 @@ var GeolocationInfo=(function(){
 	});
 
 	return GeolocationInfo;
-})()
-
-
-/**
-*Media用于捕捉摄像头和麦克风。可以捕捉任意之一，或者同时捕捉两者。<code>getCamera</code>前可以使用<code>supported()</code>检查当前浏览器是否支持。
-*<b>NOTE:</b>
-*<p>目前Media在移动平台只支持Android，不支持IOS。只可在FireFox完整地使用，Chrome测试时无法捕捉视频。</p>
-*/
-//class laya.device.media.Media
-var Media=(function(){
-	function Media(){}
-	__class(Media,'laya.device.media.Media');
-	Media.supported=function(){
-		return !!Browser.window.navigator.getUserMedia;
-	}
-
-	Media.getMedia=function(options,onSuccess,onError){
-		if (Browser.window.navigator.getUserMedia){
-			Browser.window.navigator.getUserMedia(options,function(stream){
-				onSuccess.runWith(Browser.window.URL.createObjectURL(stream));
-				},function(err){
-				onError.runWith(err);
-			});
-		}
-	}
-
-	Media.__init$=function(){
-		/*__JS__ */navigator.getUserMedia=navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;;
-	}
-
-	return Media;
-})()
-
-
-/**
-*保存旋转信息的类。请勿修改本类的属性。
-*@author Survivor
-*/
-//class laya.device.motion.RotationInfo
-var RotationInfo=(function(){
-	function RotationInfo(){
-		/**
-		*<p>
-		*指示设备是否可以提供绝对方位数据（指向地球坐标系），或者设备决定的任意坐标系。
-		*关于坐标系参见<i>https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Orientation_and_motion_data_explained</i>。
-		*</p>
-		*需要注意的是，IOS环境下，该值始终为false。即使如此，你依旧可以从<code>alpha</code>中取得正确的值。
-		*/
-		this.absolute=false;
-		/**
-		*Z轴旋转角度，其值范围从0至360。
-		*若<code>absolute</code>为true或者在IOS中，alpha值是从北方到当前设备方向的角度值。
-		*/
-		this.alpha=NaN;
-		/**
-		*X轴旋转角度,其值范围从-180至180。代表设备从前至后的运动。
-		*/
-		this.beta=NaN;
-		/**
-		*Y轴旋转角度，其值范围从-90至90。代表设备从左至右的运动。
-		*/
-		this.gamma=NaN;
-		/**
-		*罗盘数据的精确度（角度）。仅IOS可用。
-		*/
-		this.compassAccuracy=NaN;
-	}
-
-	__class(RotationInfo,'laya.device.motion.RotationInfo');
-	return RotationInfo;
 })()
 
 
@@ -335,75 +335,6 @@ var Accelerator=(function(_super){
 
 
 /**
-*使用Gyroscope.instance获取唯一的Gyroscope引用，请勿调用构造函数。
-*
-*<p>
-*listen()的回调处理器接受两个参数：
-*<code>function onOrientationChange(absolute:Boolean,info:RotationInfo):void</code>
-*<ol>
-*<li><b>absolute</b>:指示设备是否可以提供绝对方位数据（指向地球坐标系），或者设备决定的任意坐标系。关于坐标系参见<i>https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Orientation_and_motion_data_explained</i>。</li>
-*<li><b>info</b>:<code>RotationInfo</code>类型参数，保存设备的旋转值。</li>
-*</ol>
-*</p>
-*
-*<p>
-*浏览器兼容性参见：<i>http://caniuse.com/#search=deviceorientation</i>
-*</p>
-*/
-//class laya.device.motion.Gyroscope extends laya.events.EventDispatcher
-var Gyroscope=(function(_super){
-	function Gyroscope(singleton){
-		Gyroscope.__super.call(this);
-		/*__JS__ */this.onDeviceOrientationChange=this.onDeviceOrientationChange.bind(this);
-	}
-
-	__class(Gyroscope,'laya.device.motion.Gyroscope',_super);
-	var __proto=Gyroscope.prototype;
-	/**
-	*监视陀螺仪运动。
-	*@param observer 回调函数接受一个Boolean类型的<code>absolute</code>和<code>GyroscopeInfo</code>类型参数。
-	*/
-	__proto.on=function(type,caller,listener,args){
-		_super.prototype.on.call(this,type,caller,listener,args);
-		Browser.window.addEventListener('deviceorientation',this.onDeviceOrientationChange);
-		return this;
-	}
-
-	/**
-	*取消指定处理器对陀螺仪的监视。
-	*@param observer
-	*/
-	__proto.off=function(type,caller,listener,onceOnly){
-		(onceOnly===void 0)&& (onceOnly=false);
-		if (!this.hasListener(type))
-			Browser.window.removeEventListener('deviceorientation',this.onDeviceOrientationChange);
-		return _super.prototype.off.call(this,type,caller,listener,onceOnly);
-	}
-
-	__proto.onDeviceOrientationChange=function(e){
-		Gyroscope.info.alpha=e.alpha;
-		Gyroscope.info.beta=e.beta;
-		Gyroscope.info.gamma=e.gamma;
-		if (e.webkitCompassHeading){
-			Gyroscope.info.alpha=e.webkitCompassHeading *-1;
-			Gyroscope.info.compassAccuracy=e.webkitCompassAccuracy;
-		}
-		this.event(/*laya.events.Event.CHANGE*/"change",[e.absolute,Gyroscope.info]);
-	}
-
-	__getset(1,Gyroscope,'instance',function(){Gyroscope._instance=Gyroscope._instance|| new Gyroscope(0);
-		return Gyroscope._instance;
-	},laya.events.EventDispatcher._$SET_instance);
-
-	Gyroscope._instance=null;
-	__static(Gyroscope,
-	['info',function(){return this.info=new RotationInfo();}
-	]);
-	return Gyroscope;
-})(EventDispatcher)
-
-
-/**
 *Shake只能在支持此操作的设备上有效。
 *
 *@author Survivor
@@ -483,64 +414,72 @@ var Shake=(function(_super){
 
 
 /**
-*@private
+*使用Gyroscope.instance获取唯一的Gyroscope引用，请勿调用构造函数。
+*
+*<p>
+*listen()的回调处理器接受两个参数：
+*<code>function onOrientationChange(absolute:Boolean,info:RotationInfo):void</code>
+*<ol>
+*<li><b>absolute</b>:指示设备是否可以提供绝对方位数据（指向地球坐标系），或者设备决定的任意坐标系。关于坐标系参见<i>https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Orientation_and_motion_data_explained</i>。</li>
+*<li><b>info</b>:<code>RotationInfo</code>类型参数，保存设备的旋转值。</li>
+*</ol>
+*</p>
+*
+*<p>
+*浏览器兼容性参见：<i>http://caniuse.com/#search=deviceorientation</i>
+*</p>
 */
-//class laya.device.media.HtmlVideo extends laya.resource.Bitmap
-var HtmlVideo=(function(_super){
-	function HtmlVideo(){
-		this.video=null;
-		this._source=null;
-		HtmlVideo.__super.call(this);
-		this._width=1;
-		this._height=1;
-		this.createDomElement();
+//class laya.device.motion.Gyroscope extends laya.events.EventDispatcher
+var Gyroscope=(function(_super){
+	function Gyroscope(singleton){
+		Gyroscope.__super.call(this);
+		/*__JS__ */this.onDeviceOrientationChange=this.onDeviceOrientationChange.bind(this);
 	}
 
-	__class(HtmlVideo,'laya.device.media.HtmlVideo',_super);
-	var __proto=HtmlVideo.prototype;
-	__proto.createDomElement=function(){
-		var _$this=this;
-		this._source=this.video=Browser.createElement("video");
-		var style=this.video.style;
-		style.position='absolute';
-		style.top='0px';
-		style.left='0px';
-		this.video.addEventListener("loadedmetadata",(function(){
-			this._w=_$this.video.videoWidth;
-			this._h=_$this.video.videoHeight;
-		})['bind'](this));
+	__class(Gyroscope,'laya.device.motion.Gyroscope',_super);
+	var __proto=Gyroscope.prototype;
+	/**
+	*监视陀螺仪运动。
+	*@param observer 回调函数接受一个Boolean类型的<code>absolute</code>和<code>GyroscopeInfo</code>类型参数。
+	*/
+	__proto.on=function(type,caller,listener,args){
+		_super.prototype.on.call(this,type,caller,listener,args);
+		Browser.window.addEventListener('deviceorientation',this.onDeviceOrientationChange);
+		return this;
 	}
 
-	__proto.setSource=function(url,extension){
-		while(this.video.childElementCount)
-		this.video.firstChild.remove();
-		if (extension & Video.MP4)
-			this.appendSource(url,"video/mp4");
-		if (extension & Video.OGG)
-			this.appendSource(url+".ogg","video/ogg");
+	/**
+	*取消指定处理器对陀螺仪的监视。
+	*@param observer
+	*/
+	__proto.off=function(type,caller,listener,onceOnly){
+		(onceOnly===void 0)&& (onceOnly=false);
+		if (!this.hasListener(type))
+			Browser.window.removeEventListener('deviceorientation',this.onDeviceOrientationChange);
+		return _super.prototype.off.call(this,type,caller,listener,onceOnly);
 	}
 
-	__proto.appendSource=function(source,type){
-		var sourceElement=Browser.createElement("source");
-		sourceElement.src=source;
-		sourceElement.type=type;
-		this.video.appendChild(sourceElement);
+	__proto.onDeviceOrientationChange=function(e){
+		Gyroscope.info.alpha=e.alpha;
+		Gyroscope.info.beta=e.beta;
+		Gyroscope.info.gamma=e.gamma;
+		if (e.webkitCompassHeading){
+			Gyroscope.info.alpha=e.webkitCompassHeading *-1;
+			Gyroscope.info.compassAccuracy=e.webkitCompassAccuracy;
+		}
+		this.event(/*laya.events.Event.CHANGE*/"change",[e.absolute,Gyroscope.info]);
 	}
 
-	__proto.getVideo=function(){
-		return this.video;
-	}
+	__getset(1,Gyroscope,'instance',function(){Gyroscope._instance=Gyroscope._instance|| new Gyroscope(0);
+		return Gyroscope._instance;
+	},laya.events.EventDispatcher._$SET_instance);
 
-	__proto._getSource=function(){
-		return this._source;
-	}
-
-	HtmlVideo.create=function(){
-		return new HtmlVideo();
-	}
-
-	return HtmlVideo;
-})(Bitmap)
+	Gyroscope._instance=null;
+	__static(Gyroscope,
+	['info',function(){return this.info=new RotationInfo();}
+	]);
+	return Gyroscope;
+})(EventDispatcher)
 
 
 /**
@@ -925,6 +864,67 @@ var Video=(function(_super){
 	Video.SUPPORT_NO="";
 	return Video;
 })(Sprite)
+
+
+/**
+*@private
+*/
+//class laya.device.media.HtmlVideo extends laya.resource.Bitmap
+var HtmlVideo=(function(_super){
+	function HtmlVideo(){
+		this.video=null;
+		this._source=null;
+		HtmlVideo.__super.call(this);
+		this._width=1;
+		this._height=1;
+		this.createDomElement();
+	}
+
+	__class(HtmlVideo,'laya.device.media.HtmlVideo',_super);
+	var __proto=HtmlVideo.prototype;
+	__proto.createDomElement=function(){
+		var _$this=this;
+		this._source=this.video=Browser.createElement("video");
+		var style=this.video.style;
+		style.position='absolute';
+		style.top='0px';
+		style.left='0px';
+		this.video.addEventListener("loadedmetadata",(function(){
+			this._w=_$this.video.videoWidth;
+			this._h=_$this.video.videoHeight;
+		})['bind'](this));
+	}
+
+	__proto.setSource=function(url,extension){
+		while(this.video.childElementCount)
+		this.video.firstChild.remove();
+		if (extension & Video.MP4)
+			this.appendSource(url,"video/mp4");
+		if (extension & Video.OGG)
+			this.appendSource(url+".ogg","video/ogg");
+	}
+
+	__proto.appendSource=function(source,type){
+		var sourceElement=Browser.createElement("source");
+		sourceElement.src=source;
+		sourceElement.type=type;
+		this.video.appendChild(sourceElement);
+	}
+
+	__proto.getVideo=function(){
+		return this.video;
+	}
+
+	__proto._getSource=function(){
+		return this._source;
+	}
+
+	HtmlVideo.create=function(){
+		return new HtmlVideo();
+	}
+
+	return HtmlVideo;
+})(Bitmap)
 
 
 /**

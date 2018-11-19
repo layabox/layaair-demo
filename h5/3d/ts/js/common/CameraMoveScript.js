@@ -26,24 +26,50 @@ var CameraMoveScript = /** @class */ (function (_super) {
         _this.rotaionSpeed = 0.00006;
         return _this;
     }
-    CameraMoveScript.prototype._onAdded = function () {
-        //点击鼠标右键
-        Laya.stage.on(Laya.Event.RIGHT_MOUSE_DOWN, this, this.mouseDown);
-        //松开鼠标右键
-        Laya.stage.on(Laya.Event.RIGHT_MOUSE_UP, this, this.mouseUp);
-        //将本组件的父类定义为Camera
-        this.camera = this.owner;
-    };
+	CameraMoveScript.prototype._updateRotation = function(){
+		var yprElem:Float32Array = this.yawPitchRoll.elements;
+		if (Math.abs(yprElem[1]) < 1.50) {
+			Quaternion.createFromYawPitchRoll(yprElem[0], yprElem[1], yprElem[2], this.tempRotationZ);
+			this.tempRotationZ.cloneTo(camera.transform.localRotation);
+			this.camera.transform.localRotation = this.camera.transform.localRotation;
+		}
+	};
+	CameraMoveScript.prototype.onAwake = function (){
+		Laya.stage.on(Event.RIGHT_MOUSE_DOWN, this, this.mouseDown);
+		Laya.stage.on(Event.RIGHT_MOUSE_UP, this, this.mouseUp);
+		//Laya.stage.on(Event.RIGHT_MOUSE_OUT, this, mouseOut);
+		this.camera = this.owner;
+	};
     CameraMoveScript.prototype._onDestroy = function () {
         //关闭监听函数
         Laya.stage.off(Laya.Event.RIGHT_MOUSE_DOWN, this, this.mouseDown);
         Laya.stage.off(Laya.Event.RIGHT_MOUSE_UP, this, this.mouseUp);
     };
     CameraMoveScript.prototype.onUpdate = function (state) {
-        _super.prototype.onUpdate.call(this, state);
+        // _super.prototype.onUpdate.call(this, state);
         //每帧调用的函数，传入参数每帧的时间值
-        this.updateCamera(Laya.timer.delta);
-        console.log(this.isMouseDown);
+        // this.updateCamera(Laya.timer.delta);
+        // console.log(this.isMouseDown);
+		var elapsedTime = Laya.timer.delta;
+		if (!isNaN(this.lastMouseX) && !isNaN(this.lastMouseY) && this.isMouseDown) {
+			var scene = this.owner.scene;
+			 Laya.KeyBoardManager.hasKeyDown(87) && this.moveForward(-0.01 * elapsedTime);//W
+			 Laya.KeyBoardManager.hasKeyDown(83) && this.moveForward(0.01 * elapsedTime);//S
+			 Laya.KeyBoardManager.hasKeyDown(65) && this.moveRight(-0.01 * elapsedTime);//A
+			 Laya.KeyBoardManager.hasKeyDown(68) && this.moveRight(0.01 * elapsedTime);//D
+			 Laya.KeyBoardManager.hasKeyDown(81) && this.moveVertical(0.01 * elapsedTime);//Q
+			 Laya.KeyBoardManager.hasKeyDown(69) && this.moveVertical(-0.01 * elapsedTime);//E
+				
+			var offsetX = Laya.stage.mouseX - this.lastMouseX;
+			var offsetY = Laya.stage.mouseY - this.lastMouseY;
+				
+			var yprElem = this.yawPitchRoll.elements;
+			yprElem[0] -= offsetX * this.rotaionSpeed * elapsedTime;
+			yprElem[1] -= offsetY * this.rotaionSpeed * elapsedTime;
+			_updateRotation();
+		}
+		this.lastMouseX = Laya.stage.mouseX;
+		this.lastMouseY = Laya.stage.mouseY;
     };
     CameraMoveScript.prototype.mouseDown = function (e) {
         //获得鼠标的旋转值
@@ -85,7 +111,7 @@ var CameraMoveScript = /** @class */ (function (_super) {
         this._tempVector3.elements[1] = distance;
         this.camera.transform.translate(this._tempVector3, false);
     };
-    CameraMoveScript.prototype.updateCamera = function (elapsedTime) {
+/*     CameraMoveScript.prototype.updateCamera = function (elapsedTime) {
         //是否得到了mouseX的值和mouseY的值
         if (this.isMouseDown) { //!isNaN(this.lastMouseX) && !isNaN(this.lastMouseY) &&
             var scene = this.owner.scene;
@@ -107,7 +133,7 @@ var CameraMoveScript = /** @class */ (function (_super) {
         }
         this.lastMouseX = Laya.stage.mouseX;
         this.lastMouseY = Laya.stage.mouseY;
-    };
+    }; */
     CameraMoveScript.prototype.updateRotation = function () {
         var yprElem = this.yawPitchRoll.elements;
         if (Math.abs(yprElem[1]) < 1.50) {

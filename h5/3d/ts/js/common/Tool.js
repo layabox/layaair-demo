@@ -35,9 +35,9 @@ var Tool = /** @class */ (function () {
                 Laya.Vector3.transformCoordinate(vertex1, meshSprite3D.transform.worldMatrix, vertex1);
                 Laya.Vector3.transformCoordinate(vertex2, meshSprite3D.transform.worldMatrix, vertex2);
                 Laya.Vector3.transformCoordinate(vertex3, meshSprite3D.transform.worldMatrix, vertex3);
-                lineSprite3D.setLine(lineCount++, vertex1, vertex2, color, color);
-                lineSprite3D.setLine(lineCount++, vertex2, vertex3, color, color);
-                lineSprite3D.setLine(lineCount++, vertex3, vertex1, color, color);
+                lineSprite3D.addLine(vertex1, vertex2, color, color);
+				lineSprite3D.addLine(vertex2, vertex3, color, color);
+				lineSprite3D.addLine(vertex3, vertex1, color, color);
             }
         }
         for (var i = 0, n = sprite3D.numChildren; i < n; i++)
