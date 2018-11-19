@@ -2820,6 +2820,77 @@ var WeldJoint=(function(_super){
 
 
 /**
+*2D多边形碰撞体，暂时不支持凹多边形，如果是凹多边形，先手动拆分为多个凸多边形
+*节点个数最多是b2_maxPolygonVertices，这数值默认是8，所以点的数量不建议超过8个，也不能小于3个
+*/
+//class laya.physics.PolygonCollider extends laya.physics.ColliderBase
+var PolygonCollider=(function(_super){
+	function PolygonCollider(){
+		/**相对节点的x轴偏移*/
+		this._x=0;
+		/**相对节点的y轴偏移*/
+		this._y=0;
+		/**用逗号隔开的点的集合，格式：x,y,x,y ...*/
+		this._points="50,0,100,100,0,100";
+		PolygonCollider.__super.call(this);
+	}
+
+	__class(PolygonCollider,'laya.physics.PolygonCollider',_super);
+	var __proto=PolygonCollider.prototype;
+	__proto.getDef=function(){
+		if (!this._shape){
+			this._shape=PolygonCollider._temp || (PolygonCollider._temp=new window.box2d.b2PolygonShape());
+			this._setShape(false);
+		}
+		this.label=(this.label || "PolygonCollider");
+		return _super.prototype.getDef.call(this);
+	}
+
+	__proto._setShape=function(re){
+		(re===void 0)&& (re=true);
+		var arr=this._points.split(",");
+		var len=arr.length;
+		if (len < 6)throw "PolygonCollider points must be greater than 3";
+		if (len % 2==1)throw "PolygonCollider points lenth must a multiplier of 2";
+		var ps=[];
+		for (var i=0,n=len;i < n;i+=2){
+			ps.push(new window.box2d.b2Vec2((this._x+parseInt(arr[i]))/ Physics.PIXEL_RATIO,(this._y+parseInt(arr[i+1]))/ Physics.PIXEL_RATIO));
+		}
+		this._shape.Set(ps,len / 2);
+		if (re)this.refresh();
+	}
+
+	/**相对节点的x轴偏移*/
+	__getset(0,__proto,'x',function(){
+		return this._x;
+		},function(value){
+		this._x=value;
+		if (this._shape)this._setShape();
+	});
+
+	/**相对节点的y轴偏移*/
+	__getset(0,__proto,'y',function(){
+		return this._y;
+		},function(value){
+		this._y=value;
+		if (this._shape)this._setShape();
+	});
+
+	/**用逗号隔开的点的集合，格式：x,y,x,y ...*/
+	__getset(0,__proto,'points',function(){
+		return this._points;
+		},function(value){
+		if (!value)throw "PolygonCollider points cannot be empty";
+		this._points=value;
+		if (this._shape)this._setShape();
+	});
+
+	PolygonCollider._temp=null;
+	return PolygonCollider;
+})(ColliderBase)
+
+
+/**
 *鼠标关节：鼠标关节用于通过鼠标来操控物体。它试图将物体拖向当前鼠标光标的位置。而在旋转方面就没有限制。
 */
 //class laya.physics.joint.MouseJoint extends laya.physics.joint.JointBase
@@ -2913,77 +2984,6 @@ var MouseJoint=(function(_super){
 	MouseJoint._temp=null;
 	return MouseJoint;
 })(JointBase)
-
-
-/**
-*2D多边形碰撞体，暂时不支持凹多边形，如果是凹多边形，先手动拆分为多个凸多边形
-*节点个数最多是b2_maxPolygonVertices，这数值默认是8，所以点的数量不建议超过8个，也不能小于3个
-*/
-//class laya.physics.PolygonCollider extends laya.physics.ColliderBase
-var PolygonCollider=(function(_super){
-	function PolygonCollider(){
-		/**相对节点的x轴偏移*/
-		this._x=0;
-		/**相对节点的y轴偏移*/
-		this._y=0;
-		/**用逗号隔开的点的集合，格式：x,y,x,y ...*/
-		this._points="50,0,100,100,0,100";
-		PolygonCollider.__super.call(this);
-	}
-
-	__class(PolygonCollider,'laya.physics.PolygonCollider',_super);
-	var __proto=PolygonCollider.prototype;
-	__proto.getDef=function(){
-		if (!this._shape){
-			this._shape=PolygonCollider._temp || (PolygonCollider._temp=new window.box2d.b2PolygonShape());
-			this._setShape(false);
-		}
-		this.label=(this.label || "PolygonCollider");
-		return _super.prototype.getDef.call(this);
-	}
-
-	__proto._setShape=function(re){
-		(re===void 0)&& (re=true);
-		var arr=this._points.split(",");
-		var len=arr.length;
-		if (len < 6)throw "PolygonCollider points must be greater than 3";
-		if (len % 2==1)throw "PolygonCollider points lenth must a multiplier of 2";
-		var ps=[];
-		for (var i=0,n=len;i < n;i+=2){
-			ps.push(new window.box2d.b2Vec2((this._x+parseInt(arr[i]))/ Physics.PIXEL_RATIO,(this._y+parseInt(arr[i+1]))/ Physics.PIXEL_RATIO));
-		}
-		this._shape.Set(ps,len / 2);
-		if (re)this.refresh();
-	}
-
-	/**相对节点的x轴偏移*/
-	__getset(0,__proto,'x',function(){
-		return this._x;
-		},function(value){
-		this._x=value;
-		if (this._shape)this._setShape();
-	});
-
-	/**相对节点的y轴偏移*/
-	__getset(0,__proto,'y',function(){
-		return this._y;
-		},function(value){
-		this._y=value;
-		if (this._shape)this._setShape();
-	});
-
-	/**用逗号隔开的点的集合，格式：x,y,x,y ...*/
-	__getset(0,__proto,'points',function(){
-		return this._points;
-		},function(value){
-		if (!value)throw "PolygonCollider points cannot be empty";
-		this._points=value;
-		if (this._shape)this._setShape();
-	});
-
-	PolygonCollider._temp=null;
-	return PolygonCollider;
-})(ColliderBase)
 
 
 /**

@@ -2705,6 +2705,7 @@ var Laya3D=(function(){
 		BlinnPhongMaterial.__init__();
 		PBRStandardMaterial.__init__();
 		PBRSpecularMaterial.__init__();
+		SkyBoxProceduralMaterial.__init__();
 		UnlitMaterial.__init__();
 		TrailSprite3D.__init__();
 		TrailMaterial.__init__();
@@ -2717,6 +2718,7 @@ var Laya3D=(function(){
 		Texture2D.__init__();
 		TextureCube.__init__();
 		SkyBox.__init__();
+		SkyDome.__init__();
 		FrustumCulling.__init__();
 		var createMap=LoaderManager.createMap;
 		createMap["lh"]=[ /*CLASS CONST:Laya3D.HIERARCHY*/"HIERARCHY",Sprite3D._parse];
@@ -6938,6 +6940,92 @@ var Matrix4x4=(function(){
 
 
 /**
+*@private
+*<code>SkyDome</code> 类用于创建天空盒。
+*/
+//class laya.d3.resource.models.SkyDome
+var SkyDome=(function(){
+	function SkyDome(){
+		/**@private */
+		//this._vertexBuffer=null;
+		/**@private */
+		//this._indexBuffer=null;
+		/**@private */
+		//this._bufferState=null;
+		var vertexDeclaration=VertexPositionTexture0.vertexDeclaration;
+		var vertexFloatCount=vertexDeclaration.vertexStride / 4;
+		var numberVertices=(SkyDome._stacks+1)*(SkyDome._slices+1);
+		var numberIndices=(3 *SkyDome._stacks *(SkyDome._slices+1))*2;
+		var vertices=new Float32Array(numberVertices *vertexFloatCount);
+		var indices=new Uint16Array(numberIndices);
+		var stackAngle=Math.PI / SkyDome._stacks;
+		var sliceAngle=(Math.PI *2.0)/ SkyDome._slices;
+		var vertexIndex=0;
+		var vertexCount=0;
+		var indexCount=0;
+		for (var stack=0;stack < (SkyDome._stacks+1);stack++){
+			var r=Math.sin(stack *stackAngle);
+			var y=Math.cos(stack *stackAngle);
+			for (var slice=0;slice < (SkyDome._slices+1);slice++){
+				var x=r *Math.sin(slice *sliceAngle);
+				var z=r *Math.cos(slice *sliceAngle);
+				vertices[vertexCount+0]=x *SkyDome._radius;
+				vertices[vertexCount+1]=y *SkyDome._radius;
+				vertices[vertexCount+2]=z *SkyDome._radius;
+				vertices[vertexCount+3]=-(slice / SkyDome._slices)+0.75;
+				vertices[vertexCount+4]=stack / SkyDome._stacks;
+				vertexCount+=vertexFloatCount;
+				if (stack !=(SkyDome._stacks-1)){
+					indices[indexCount++]=vertexIndex+1;
+					indices[indexCount++]=vertexIndex;
+					indices[indexCount++]=vertexIndex+(SkyDome._slices+1);
+					indices[indexCount++]=vertexIndex+(SkyDome._slices+1);
+					indices[indexCount++]=vertexIndex;
+					indices[indexCount++]=vertexIndex+(SkyDome._slices);
+					vertexIndex++;
+				}
+			}
+		}
+		this._vertexBuffer=new VertexBuffer3D(vertices.length *4,/*laya.webgl.WebGLContext.STATIC_DRAW*/0x88E4,false);
+		this._vertexBuffer.vertexDeclaration=vertexDeclaration;
+		this._indexBuffer=new IndexBuffer3D(/*laya.d3.graphics.IndexBuffer3D.INDEXTYPE_USHORT*/"ushort",indices.length,/*laya.webgl.WebGLContext.STATIC_DRAW*/0x88E4,false);
+		this._vertexBuffer.setData(vertices);
+		this._indexBuffer.setData(indices);
+		var bufferState=new BufferState();
+		bufferState.bind();
+		bufferState.applyVertexBuffer(this._vertexBuffer);
+		bufferState.applyIndexBuffer(this._indexBuffer);
+		bufferState.unBind();
+		this._bufferState=bufferState;
+	}
+
+	__class(SkyDome,'laya.d3.resource.models.SkyDome');
+	var __proto=SkyDome.prototype;
+	/**
+	*@private
+	*/
+	__proto._render=function(state){
+		var indexCount=this._indexBuffer.indexCount;
+		LayaGL.instance.drawElements(/*laya.webgl.WebGLContext.TRIANGLES*/0x0004,indexCount,/*laya.webgl.WebGLContext.UNSIGNED_SHORT*/0x1403,0);
+		Stat.trianglesFaces+=indexCount / 3;
+		Stat.drawCall++;
+	}
+
+	SkyDome.__init__=function(){
+		SkyDome._instance=new SkyDome();
+		SkyDome._instance._vertexBuffer.lock=true;
+		SkyDome._instance._indexBuffer.lock=true;
+	}
+
+	SkyDome._stacks=16;
+	SkyDome._slices=16;
+	SkyDome._radius=1;
+	SkyDome._instance=null;
+	return SkyDome;
+})()
+
+
+/**
 *<code>KeyFrame</code> 类用于创建关键帧实例。
 */
 //class laya.d3.core.Keyframe
@@ -10328,8 +10416,8 @@ var ShaderInit3D=(function(){
 			'u_DirectionLight.Direction':[ /*laya.d3.core.scene.Scene3D.LIGHTDIRECTION*/3,/*laya.d3.shader.Shader3D.PERIOD_SCENE*/4],
 			'u_DirectionLight.Color':[ /*laya.d3.core.scene.Scene3D.LIGHTDIRCOLOR*/4,/*laya.d3.shader.Shader3D.PERIOD_SCENE*/4]
 		};
-		vs="#define OUTER_RADIUS 1.025\n#define RAYLEIGH (lerp(0.0, 0.0025, pow(u_AtmosphereThickness,2.5)))// Rayleigh constant Rayleigh为夜空光和极光亮度单位\n#define MIE 0.0010             // Mie constant 米氏散射\n#define SUN_BRIGHTNESS 20.0    // Sun brightness\n\nconst float outerRadius = OUTER_RADIUS;\nconst float outerRadius2 = OUTER_RADIUS*OUTER_RADIUS;\nconst float innerRadius = 1.0;\nconst float innerRadius2 = 1.0;\nconst float cameraHeight = 0.0001;\n\nconst float HDSundiskIntensityFactor = 15.0;\nconst float simpleSundiskIntensityFactor = 27.0;\n\nconst float sunScale = 400.0 * SUN_BRIGHTNESS;\nconst float mESun = MIE * SUN_BRIGHTNESS;\nconst float m4PI = MIE * 4.0 * 3.14159265;\nconst float scale = 1.0 / (OUTER_RADIUS - 1.0);\nconst float scaleDepth = 0.25;\nconst float scaleOverScaleDepth = (1.0 / (OUTER_RADIUS - 1.0)) / 0.25;\nconst float samples = 2.0; // THIS IS UNROLLED MANUALLY, DON'T TOUCH\n\n// RGB wavelengths        .35 (.62=158), .43 (.68=174), .525 (.75=190)\nconst vec3 c_DefaultScatteringWavelength = vec3(0.65, 0.57, 0.475);//默认散射波长\nconst vec3 c_VariableRangeForScatteringWavelength = vec3(0.15, 0.15, 0.15);//散射播放的可变范围\n\nattribute vec4 a_Position;\n\nuniform mat4 u_MvpMatrix;\nuniform vec3 u_SkyTint;\nuniform vec3 u_GroundTint;\nuniform float u_Exposure;\nuniform float u_AtmosphereThickness;\nuniform DirectionLight u_DirectionLight;\n\nvarying vec3 v_GroundColor;\nvarying vec3 v_SkyColor;\n\n#ifdef SUN_HIGH_QUALITY\n	varying vec3 v_Vertex;\n#elif SKYBOX_SUNDISK_SIMPLEvarying vec3 v_GroundColor;\nvarying vec3 v_SkyColor;\n\n#ifdef SUN_HIGH_QUALITY\n	varying vec3 v_Vertex;\n#elif SUN_SIMPLE\n	varying vec3 v_RayDir;\n#else\n	varying float v_SkyGroundFactor;\n#endif\n\n#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE);\n	varying vec3 v_SunColor;\n#endif\n	varying vec3 v_RayDir;\n#else\n	varying float v_SkyGroundFactor;\n#endif\n\n#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE);\n	varying vec3 v_SunColor;\n#endif\n\n// Calculates the Rayleigh phase function\nfloat getRayleighPhase(vec3 light, vec3 ray) \n{\n	float eyeCos = dot(light, ray);\n	return 0.75 + 0.75*eyeCos;\n}\n\nfloat scale(float inCos)\n{\n	float x = 1.0 - inCos;\n	return 0.25 * exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25))));\n}\n\n\nvoid main () {\n	gl_Position = (u_MvpMatrix*position).xyww;\n\n	vec3 skyTintInGammaSpace = u_SkyTint; //支持非GAMMA空间后要调整\n	vec3 scatteringWavelength = lerp (c_DefaultScatteringWavelength-c_VariableRangeForScatteringWavelength,c_DefaultScatteringWavelength+c_VariableRangeForScatteringWavelength,\n									  vec3(1.0) - skyTintInGammaSpace); // using Tint in sRGB+ gamma allows for more visually linear interpolation and to keep (0.5) at (128, gray in sRGB) point\n	vec3 invWavelength = 1.0 / pow(scatteringWavelength, 4);\n\n	float krESun = RAYLEIGH * SUN_BRIGHTNESS;\n	float kr4PI = RAYLEIGH * 4.0 * 3.14159265;\n\n	vec3 cameraPos = vec3(0.0,innerRadius + cameraHeight,0.0); // The camera's current position\n\n	// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)\n	vec3 eyeRay = normalize(a_Position.xyz);\n\n	float far = 0.0;\n	vec3 cIn, cOut;\n	if (eyeRay.y >= 0.0) {// Sky\n		// Calculate the length of the \"atmosphere\"\n		far = sqrt(outerRadius2 + innerRadius2 * eyeRay.y * eyeRay.y - innerRadius2) - innerRadius * eyeRay.y;\n\n		// Calculate the ray's starting position, then calculate its scattering offset\n		float height = innerRadius + cameraHeight;\n		float depth = exp(scaleOverScaleDepth * -cameraHeight);\n		float startAngle = dot(eyeRay, cameraPos) / height;\n		float startOffset = depth*scale(startAngle);\n\n		// Initialize the scattering loop variables\n		float sampleLength = far / samples;\n		float scaledLength = sampleLength * scale;\n		vec3 sampleRay = eyeRay * sampleLength;\n		vec3 samplePoint = cameraPos + sampleRay * 0.5;\n\n		vec3 frontColor = vec3(0.0);\n		//unrolling this manually to avoid some platform for loop slow\n		{\n			float height = length(samplePoint);\n			float depth = exp(scaleOverScaleDepth * (innerRadius - height));\n			float lightAngle = dot(u_DirectionLight.position, samplePoint) / height;\n			float cameraAngle = dot(eyeRay, samplePoint) / height;\n			float scatter = (startOffset + depth*(scale(lightAngle) - scale(cameraAngle)));\n			float3 attenuate = exp(-clamp(scatter, 0.0, MAX_SCATTER) * (invWavelength * kr4PI + km4PI));\n\n			frontColor += attenuate * (depth * scaledLength);\n			samplePoint += sampleRay;\n		}\n		{\n			float height = length(samplePoint);\n			float depth = exp(scaleOverScaleDepth * (innerRadius - height));\n			float lightAngle = dot(u_DirectionLight.position, samplePoint) / height;\n			float cameraAngle = dot(eyeRay, samplePoint) / height;\n			float scatter = (startOffset + depth*(scale(lightAngle) - scale(cameraAngle)));\n			float3 attenuate = exp(-clamp(scatter, 0.0, MAX_SCATTER) * (invWavelength * kr4PI + km4PI));\n\n			frontColor += attenuate * (depth * scaledLength);\n			samplePoint += sampleRay;\n		}\n\n		// Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader\n		cIn = frontColor * (invWavelength * krESun);\n		cOut = frontColor * kKmESun;\n	} else {// Ground\n		far = (-cameraHeight) / (min(-0.001, eyeRay.y));\n		float3 pos = cameraPos + far * eyeRay;\n\n		// Calculate the ray's starting position, then calculate its scattering offset\n		float depth = exp((-cameraHeight) * (1.0/scaleDepth));\n		float cameraAngle = dot(-eyeRay, pos);\n		float lightAngle = dot(u_DirectionLight.position, pos);\n		float cameraScale = scale(cameraAngle);\n		float lightScale = scale(lightAngle);\n		float cameraOffset = depth*cameraScale;\n		float temp = lightScale + cameraScale;\n\n		// Initialize the scattering loop variables\n		float sampleLength = far / samples;\n		float scaledLength = sampleLength * scale;\n		float3 sampleRay = eyeRay * sampleLength;\n		float3 samplePoint = cameraPos + sampleRay * 0.5;\n\n		// Now loop through the sample rays\n		float3 frontColor = float3(0.0, 0.0, 0.0);\n		float3 attenuate;\n\n		// Loop removed because we kept hitting SM2.0 temp variable limits. Doesn't affect the image too much.\n		{\n			float height = length(samplePoint);\n			float depth = exp(scaleOverScaleDepth * (innerRadius - height));\n			float scatter = depth*temp - cameraOffset;\n			attenuate = exp(-clamp(scatter, 0.0, MAX_SCATTER) * (invWavelength * kr4PI + km4PI));\n			frontColor += attenuate * (depth * scaledLength);\n			samplePoint += sampleRay;\n		}\n\n		cIn = frontColor * (invWavelength * krESun + kmESun);\n		cOut = clamp(attenuate, 0.0, 1.0);\n	}\n\n	#ifdef SUN_HIGH_QUALITY\n		v_Vertex = -a_Position;\n	#elif SUN_SIMPLE\n		v_RayDir = -eyeRay;\n	#else\n		v_SkyGroundFactor = -eyeRay.y / SKY_GROUND_THRESHOLD;\n	#endif\n\n	// if we want to calculate color in vprog:\n	// in case of linear: multiply by _Exposure in here (even in case of lerp it will be common multiplier, so we can skip mul in fshader)\n	v_GroundColor = u_Exposure * (cIn + u_GroundTint*u_GroundTint * cOut);//u_GroundColor*u_GroundColor is gamma space convert to linear space\n	v_SkyColor    = u_Exposure * (cIn * getRayleighPhase(u_DirectionLight.postion, -eyeRay));\n\n	\n	// The sun should have a stable intensity in its course in the sky. Moreover it should match the highlight of a purely specular material.\n	// This matching was done using the Unity3D standard shader BRDF1 on the 5/31/2017\n	// Finally we want the sun to be always bright even in LDR thus the normalization of the lightColor for low intensity.\n	float lightColorIntensity = clamp(length(u_DirectionLight.color), 0.25, 1.0);\n	#ifdef SUN_HIGH_QUALITY \n		v_SunColor = HDSundiskIntensityFactor * saturate(cOut) * u_DirectionLight.color / lightColorIntensity;\n	#elif SUN_SIMPLE\n		v_SunColor = simpleSundiskIntensityFactor * saturate(cOut * kSunScale) * u_DirectionLight.color / lightColorIntensity;\n	#endif\n}\n";
-		ps="#ifdef HIGHPRECISION\n	precision highp float;\n#else\n	precision mediump float;\n#endif\n\nconst float MIE_G = -0.990;\nconst float MIE_G2 = 0.9801;\nconst float SKY_GROUND_THRESHOLD = 0.02;\n\nuniform float u_SunSize;\nuniform float u_SunSizeConvergence;\n\nvarying vec3 v_GroundColor;\nvarying vec3 v_SkyColor;\n\n#ifdef SUN_HIGH_QUALITY\n	varying vec3 v_Vertex;\n#elif SUN_SIMPLE\n	varying vec3 v_RayDir;\n#else\n	varying float v_SkyGroundFactor;\n#endif\n\n#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE);\n	varying vec3 v_SunColor;\n#endif\n\n// Calculates the Mie phase function\nfloat getMiePhase(float eyeCos, float eyeCos2) {\n	float temp = 1.0 + MIE_G2 - 2.0 * MIE_G * eyeCos;\n	temp = pow(temp, pow(u_SunSize,0.65) * 10.0);\n	temp = max(temp,1.0e-4); // prevent division by zero, esp. in half precision\n	temp = 1.5 * ((1.0 - MIE_G2) / (2.0 + MIE_G2)) * (1.0 + eyeCos2) / temp;\n	return temp;\n}\n\n// Calculates the sun shape\nfloat calcSunAttenuation(vec3 lightPos, vec3 ray) {\n	#ifdef SUN_HIGH_QUALITY\n		vec3 delta = lightPos - ray;\n		float dist = length(delta);\n		float spot = 1.0 - smoothstep(0.0, u_SunSize, dist);\n		return spot * spot;\n	#elif SUN_SIMPLE\n		float focusedEyeCos = pow(saturate(dot(lightPos, ray)), u_SunSizeConvergence);\n		return getMiePhase(-focusedEyeCos, focusedEyeCos * focusedEyeCos);\n	#endif\n}\n\nvoid main() {\n	vec3 col = vec3(0.0, 0.0, 0.0);\n\n	// if y > 1 [eyeRay.y < -SKY_GROUND_THRESHOLD] - ground\n	// if y >= 0 and < 1 [eyeRay.y <= 0 and > -SKY_GROUND_THRESHOLD] - horizon\n	// if y < 0 [eyeRay.y > 0] - sky\n	#ifdef SUN_HIGH_QUALITY\n		vec3 ray = v_RayDir;\n		float y = ray.y / SKY_GROUND_THRESHOLD;\n	#elif SUN_SIMPLE\n		vec3 ray = normalize(mul((float3x3)unity_ObjectToWorld, v_Vertex));\n		float y = ray.y / SKY_GROUND_THRESHOLD;\n	#else\n		float y = v_SkyGroundFactor;\n	#endif\n\n	// if we did precalculate color in vprog: just do lerp between them\n	col = lerp(v_SkyColor, v_GroundColor, saturate(y));\n\n	#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE)\n	if (y < 0.0)\n		col += IN.sunColor * calcSunAttenuation(u_DirectionLight.position, -ray);\n	#endif\n\n	col = sqrt(col);//linear space convert to gamma space\n	gl_FragColor=vec4(col,1.0);\n}\n\n\nvoid main() {\n	vec3 color=textureCube(u_CubeTexture, v_Texcoord).rgb*u_TintColor.rgb*u_Exposure*2.0;\n	gl_FragColor=vec4(color,1.0);\n}\n\n";
+		vs="#ifdef HIGHPRECISION\n	precision highp float;\n#else\n	precision mediump float;\n#endif\n\n#include \"Lighting.glsl\";\n\n#define OUTER_RADIUS 1.025\n#define RAYLEIGH (mix(0.0, 0.0025, pow(u_AtmosphereThickness,2.5)))// Rayleigh constant Rayleigh为夜空光和极光亮度单位\n#define MIE 0.0010             // Mie constant 米氏散射\n#define SUN_BRIGHTNESS 20.0    // Sun brightness\n#define MAX_SCATTER 50.0 // Maximum scattering value, to prevent math overflows on Adrenos\n\nconst float SKY_GROUND_THRESHOLD = 0.02;\nconst float outerRadius = OUTER_RADIUS;\nconst float outerRadius2 = OUTER_RADIUS*OUTER_RADIUS;\nconst float innerRadius = 1.0;\nconst float innerRadius2 = 1.0;\nconst float cameraHeight = 0.0001;\n\nconst float HDSundiskIntensityFactor = 15.0;\nconst float simpleSundiskIntensityFactor = 27.0;\n\nconst float sunScale = 400.0 * SUN_BRIGHTNESS;\nconst float kmESun = MIE * SUN_BRIGHTNESS;\nconst float km4PI = MIE * 4.0 * 3.14159265;\nconst float scale = 1.0 / (OUTER_RADIUS - 1.0);\nconst float scaleDepth = 0.25;\nconst float scaleOverScaleDepth = (1.0 / (OUTER_RADIUS - 1.0)) / 0.25;\nconst float samples = 2.0; // THIS IS UNROLLED MANUALLY, DON'T TOUCH\n\n// RGB wavelengths        .35 (.62=158), .43 (.68=174), .525 (.75=190)\nconst vec3 c_DefaultScatteringWavelength = vec3(0.65, 0.57, 0.475);//默认散射波长\nconst vec3 c_VariableRangeForScatteringWavelength = vec3(0.15, 0.15, 0.15);//散射播放的可变范围\n\nattribute vec4 a_Position;\n\nuniform mat4 u_MvpMatrix;\nuniform vec3 u_SkyTint;\nuniform vec3 u_GroundTint;\nuniform float u_Exposure;\nuniform float u_AtmosphereThickness;\nuniform DirectionLight u_DirectionLight;\n\nvarying vec3 v_GroundColor;\nvarying vec3 v_SkyColor;\n\n//TDDO:应该使用elif\n#ifdef SUN_HIGH_QUALITY\n	varying vec3 v_Vertex;\n#else \n	#ifdef SUN_SIMPLE\n		varying vec3 v_RayDir;\n	#else\n		varying float v_SkyGroundFactor;\n	#endif\n#endif\n\n#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE)\n	varying vec3 v_SunColor;\n#endif\n\n// Calculates the Rayleigh phase function\nfloat getRayleighPhase(vec3 light, vec3 ray) \n{\n	float eyeCos = dot(light, ray);\n	return 0.75 + 0.75*eyeCos*eyeCos;\n}\n\nfloat scaleAngle(float inCos)\n{\n	float x = 1.0 - inCos;\n	return 0.25 * exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25))));\n}\n\n\nvoid main () {\n	gl_Position = (u_MvpMatrix*a_Position).xyww;\n\n	vec3 skyTintInGammaSpace = u_SkyTint;//支持非GAMMA空间后要调整\n	vec3 scatteringWavelength = mix(c_DefaultScatteringWavelength-c_VariableRangeForScatteringWavelength,c_DefaultScatteringWavelength+c_VariableRangeForScatteringWavelength,vec3(1.0) - skyTintInGammaSpace); // using Tint in sRGB+ gamma allows for more visually linear interpolation and to keep (0.5) at (128, gray in sRGB) point\n	vec3 invWavelength = 1.0 / pow(scatteringWavelength, vec3(4.0));\n\n	float krESun = RAYLEIGH * SUN_BRIGHTNESS;\n	float kr4PI = RAYLEIGH * 4.0 * 3.14159265;\n\n	vec3 cameraPos = vec3(0.0,innerRadius + cameraHeight,0.0); // The camera's current position\n\n	// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)\n	vec3 eyeRay = normalize(a_Position.xyz);\n\n	float far = 0.0;\n	vec3 cIn, cOut;\n	if (eyeRay.y >= 0.0) {// Sky\n		// Calculate the length of the \"atmosphere\"\n		far = sqrt(outerRadius2 + innerRadius2 * eyeRay.y * eyeRay.y - innerRadius2) - innerRadius * eyeRay.y;\n\n		// Calculate the ray's starting position, then calculate its scattering offset\n		float height = innerRadius + cameraHeight;\n		float depth = exp(scaleOverScaleDepth * -cameraHeight);\n		float startAngle = dot(eyeRay, cameraPos) / height;\n		float startOffset = depth*scaleAngle(startAngle);\n\n		// Initialize the scattering loop variables\n		float sampleLength = far / samples;\n		float scaledLength = sampleLength * scale;\n		vec3 sampleRay = eyeRay * sampleLength;\n		vec3 samplePoint = cameraPos + sampleRay * 0.5;\n\n		vec3 frontColor = vec3(0.0);\n		//unrolling this manually to avoid some platform for loop slow\n		{\n			float height = length(samplePoint);\n			float depth = exp(scaleOverScaleDepth * (innerRadius - height));\n			float lightAngle = dot(-u_DirectionLight.Direction, samplePoint) / height;\n			float cameraAngle = dot(eyeRay, samplePoint) / height;\n			float scatter = (startOffset + depth*(scaleAngle(lightAngle) - scaleAngle(cameraAngle)));\n			vec3 attenuate = exp(-clamp(scatter, 0.0, MAX_SCATTER) * (invWavelength * kr4PI + km4PI));\n\n			frontColor += attenuate * (depth * scaledLength);\n			samplePoint += sampleRay;\n		}\n		{\n			float height = length(samplePoint);\n			float depth = exp(scaleOverScaleDepth * (innerRadius - height));\n			float lightAngle = dot(-u_DirectionLight.Direction, samplePoint) / height;\n			float cameraAngle = dot(eyeRay, samplePoint) / height;\n			float scatter = (startOffset + depth*(scaleAngle(lightAngle) - scaleAngle(cameraAngle)));\n			vec3 attenuate = exp(-clamp(scatter, 0.0, MAX_SCATTER) * (invWavelength * kr4PI + km4PI));\n\n			frontColor += attenuate * (depth * scaledLength);\n			samplePoint += sampleRay;\n		}\n\n		// Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader\n		cIn = frontColor * (invWavelength * krESun);\n		cOut = frontColor * kmESun;\n	} else {// Ground\n		far = (-cameraHeight) / (min(-0.001, eyeRay.y));\n		vec3 pos = cameraPos + far * eyeRay;\n\n		// Calculate the ray's starting position, then calculate its scattering offset\n		float depth = exp((-cameraHeight) * (1.0/scaleDepth));\n		float cameraAngle = dot(-eyeRay, pos);\n		float lightAngle = dot(-u_DirectionLight.Direction, pos);\n		float cameraScale = scaleAngle(cameraAngle);\n		float lightScale = scaleAngle(lightAngle);\n		float cameraOffset = depth*cameraScale;\n		float temp = lightScale + cameraScale;\n\n		// Initialize the scattering loop variables\n		float sampleLength = far / samples;\n		float scaledLength = sampleLength * scale;\n		vec3 sampleRay = eyeRay * sampleLength;\n		vec3 samplePoint = cameraPos + sampleRay * 0.5;\n\n		// Now loop through the sample rays\n		vec3 frontColor = vec3(0.0, 0.0, 0.0);\n		vec3 attenuate;\n\n		// Loop removed because we kept hitting SM2.0 temp variable limits. Doesn't affect the image too much.\n		{\n			float height = length(samplePoint);\n			float depth = exp(scaleOverScaleDepth * (innerRadius - height));\n			float scatter = depth*temp - cameraOffset;\n			attenuate = exp(-clamp(scatter, 0.0, MAX_SCATTER) * (invWavelength * kr4PI + km4PI));\n			frontColor += attenuate * (depth * scaledLength);\n			samplePoint += sampleRay;\n		}\n\n		cIn = frontColor * (invWavelength * krESun + kmESun);\n		cOut = clamp(attenuate, 0.0, 1.0);\n	}\n\n	//TDDO:应该使用elif\n	#ifdef SUN_HIGH_QUALITY\n		v_Vertex = -a_Position.xyz;\n	#else \n		#ifdef SUN_SIMPLE\n			v_RayDir = -eyeRay;\n		#else\n			v_SkyGroundFactor = -eyeRay.y / SKY_GROUND_THRESHOLD;\n		#endif\n	#endif\n\n	// if we want to calculate color in vprog:\n	// in case of linear: multiply by _Exposure in here (even in case of lerp it will be common multiplier, so we can skip mul in fshader)\n	v_GroundColor = u_Exposure * (cIn + u_GroundTint*u_GroundTint * cOut);//u_GroundColor*u_GroundColor is gamma space convert to linear space\n	v_SkyColor    = u_Exposure * (cIn * getRayleighPhase(-u_DirectionLight.Direction, -eyeRay));\n\n	\n	// The sun should have a stable intensity in its course in the sky. Moreover it should match the highlight of a purely specular material.\n	// This matching was done using the Unity3D standard shader BRDF1 on the 5/31/2017\n	// Finally we want the sun to be always bright even in LDR thus the normalization of the lightColor for low intensity.\n	float lightColorIntensity = clamp(length(u_DirectionLight.Color), 0.25, 1.0);\n	//TDDO:应该使用elif\n	#ifdef SUN_HIGH_QUALITY \n		v_SunColor = HDSundiskIntensityFactor * clamp(cOut,0.0,1.0) * u_DirectionLight.Color / lightColorIntensity;\n	#else \n		#ifdef SUN_SIMPLE\n			v_SunColor = simpleSundiskIntensityFactor * clamp(cOut * kSunScale,0.0,1.0) * u_DirectionLight.Color / lightColorIntensity;\n		#endif\n	#endif\n}\n";
+		ps="#ifdef HIGHPRECISION\n	precision highp float;\n#else\n	precision mediump float;\n#endif\n\n#include \"Lighting.glsl\";\n\nconst float MIE_G = -0.990;\nconst float MIE_G2 = 0.9801;\nconst float SKY_GROUND_THRESHOLD = 0.02;\n\nuniform float u_SunSize;\nuniform float u_SunSizeConvergence;\nuniform DirectionLight u_DirectionLight;\n\n\nvarying vec3 v_GroundColor;\nvarying vec3 v_SkyColor;\n\n//TDDO:应该使用elif\n#ifdef SUN_HIGH_QUALITY\n	varying vec3 v_Vertex;\n#else \n	#ifdef SUN_SIMPLE\n		varying vec3 v_RayDir;\n	#else\n		varying float v_SkyGroundFactor;\n	#endif\n#endif\n\n#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE)\n	varying vec3 v_SunColor;\n#endif\n\n// Calculates the Mie phase function\nfloat getMiePhase(float eyeCos, float eyeCos2) {\n	float temp = 1.0 + MIE_G2 - 2.0 * MIE_G * eyeCos;\n	temp = pow(temp, pow(u_SunSize,0.65) * 10.0);\n	temp = max(temp,1.0e-4); // prevent division by zero, esp. in half precision\n	temp = 1.5 * ((1.0 - MIE_G2) / (2.0 + MIE_G2)) * (1.0 + eyeCos2) / temp;\n	return temp;\n}\n\n// Calculates the sun shape\nfloat calcSunAttenuation(vec3 lightPos, vec3 ray) {\n	#ifdef SUN_HIGH_QUALITY\n		vec3 delta = lightPos - ray;\n		float dist = length(delta);\n		float spot = 1.0 - smoothstep(0.0, u_SunSize, dist);\n		return spot * spot;\n	#else //SUN_SIMPLE\n		float focusedEyeCos = pow(clamp(dot(lightPos, ray),0.0,1.0), u_SunSizeConvergence);\n		return getMiePhase(-focusedEyeCos, focusedEyeCos * focusedEyeCos);\n	#endif\n}\n\nvoid main() {\n	// if y > 1 [eyeRay.y < -SKY_GROUND_THRESHOLD] - ground\n	// if y >= 0 and < 1 [eyeRay.y <= 0 and > -SKY_GROUND_THRESHOLD] - horizon\n	// if y < 0 [eyeRay.y > 0] - sky\n	vec3 col = vec3(0.0, 0.0, 0.0);\n	//TDDO:应该使用elif\n	#ifdef SUN_HIGH_QUALITY\n		vec3 ray = normalize(v_Vertex);\n		float y = ray.y / SKY_GROUND_THRESHOLD;\n	#else \n		#ifdef SUN_SIMPLE\n			vec3 ray = v_RayDir;\n			float y = ray.y / SKY_GROUND_THRESHOLD;	\n		#else\n			float y = v_SkyGroundFactor;\n		#endif\n	#endif\n\n	// if we did precalculate color in vprog: just do lerp between them\n	col = mix(v_SkyColor, v_GroundColor, clamp(y,0.0,1.0));\n\n	#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE)\n		if (y < 0.0)\n			col += u_SunSize * calcSunAttenuation(-u_DirectionLight.Direction, -ray);\n	#endif\n\n	col = sqrt(col);//linear space convert to gamma space\n	gl_FragColor=vec4(col,1.0);\n}\n\n";
 		shader=Shader3D.add("SkyBoxProcedural",attributeMap,uniformMap,null,SkyBoxProceduralMaterial.shaderDefines);
 		shader.addShaderPass(vs,ps);
 		attributeMap={
@@ -23255,7 +23343,7 @@ var ShaderPass=(function(_super){
 		this._spriteValidDefine=0;
 		this._materialValidDefine=0;
 		this._validDefineMap={};
-		ShaderPass.__super.call(this,vs,ps,null,this._validDefineMap);
+		ShaderPass.__super.call(this,vs,ps,null,this._validDefineMap,false);
 		var publicDefineMap=owner._publicDefinesMap;
 		var spriteDefineMap=owner._spriteDefinesMap;
 		var materialDefineMap=owner._materialDefinesMap;
@@ -30037,6 +30125,8 @@ var Scene3D=(function(_super){
 		/**@private */
 		//this._lightmaps=null;
 		/**@private */
+		//this._skyboxMesh=null;
+		/**@private */
 		//this._skyboxMaterial=null;
 		/**@private */
 		this._reflectionMode=1;
@@ -30106,6 +30196,7 @@ var Scene3D=(function(_super){
 		this._defineDatas=new DefineDatas();
 		this._shaderValues=new ShaderData(null,22);
 		this.parallelSplitShadowMaps=[];
+		this._skyboxMesh=SkyBox._instance;
 		this.enableFog=false;
 		this.fogStart=300;
 		this.fogRange=1000;
@@ -30443,16 +30534,24 @@ var Scene3D=(function(_super){
 				WebGLContext.setCullFace(gl,false);
 				WebGLContext.setDepthFunc(gl,/*laya.webgl.WebGLContext.LEQUAL*/0x0203);
 				WebGLContext.setDepthMask(gl,false);
-				var shader=state.shader=skyMaterial._shader._passes[0].withCompile(0,0,0);
-				var forceUploadParams=shader.bind()|| (Stat.loopCount!==shader._uploadLoopCount);
-				var skyBox=SkyBox._instance;
-				if (shader._uploadMaterial!==skyMaterial || forceUploadParams){
-					shader.uploadUniforms(shader._materialUniformParamsMap,skyMaterial._shaderValues,true);
-					shader._uploadMaterial=skyMaterial;
-				}
-				if (camera!==shader._uploadCamera || forceUploadParams){
-					shader.uploadUniforms(shader._cameraUniformParamsMap,camera._shaderValues,true);
+				var shader=state.shader=skyMaterial._shader._passes[0].withCompile(0,0,skyMaterial._defineDatas.value);
+				var switchShader=shader.bind();
+				var switchShaderLoop=(Stat.loopCount!==shader._uploadLoopCount);
+				var skyBox=this._skyboxMesh;
+				var uploadScene=(shader._uploadScene!==this.scene)|| switchShaderLoop;
+				if (uploadScene || switchShader){
+					shader.uploadUniforms(shader._sceneUniformParamsMap,this.scene._shaderValues,uploadScene);
+					shader._uploadScene=this.scene;
+				};
+				var uploadCamera=(shader._uploadCamera!==camera)||switchShaderLoop;
+				if (uploadCamera || switchShader){
+					shader.uploadUniforms(shader._cameraUniformParamsMap,camera._shaderValues,uploadCamera);
 					shader._uploadCamera=camera;
+				};
+				var uploadMaterial=(shader._uploadMaterial!==skyMaterial)|| switchShaderLoop;
+				if (uploadMaterial || switchShader){
+					shader.uploadUniforms(shader._materialUniformParamsMap,skyMaterial._shaderValues,uploadMaterial);
+					shader._uploadMaterial=skyMaterial;
 				}
 				skyBox._bufferState.bind();
 				skyBox._render(state);
@@ -36060,6 +36159,8 @@ var BaseCamera=(function(_super){
 		/**@private 正交投影的垂直尺寸。*/
 		//this._orthographicVerticalSize=NaN;
 		/**@private */
+		//this._skyboxMesh=null;
+		/**@private */
 		//this._skyboxMaterial=null;
 		/**@private */
 		//this._orthographic=false;
@@ -36092,6 +36193,7 @@ var BaseCamera=(function(_super){
 		this.renderingOrder=0;
 		this._nearPlane=nearPlane;
 		this._farPlane=farPlane;
+		this._skyboxMesh=SkyBox._instance;
 		this.cullingMask=2147483647;
 		this.clearFlag=/*CLASS CONST:laya.d3.core.BaseCamera.CLEARFLAG_SOLIDCOLOR*/0;
 		this.useOcclusionCulling=true;
@@ -38138,13 +38240,17 @@ var TextureCube=(function(_super){
 			var nextWidth=img.width;
 			var nextHeight=img.height;
 			if (i > 0){
-				if (width!==nextWidth)
-					throw "TextureCube: each side image's width and height must same.";
+				if (width!==nextWidth){
+					console.log("TextureCube: each side image's width and height must same.");
+					return;
+				}
 			}
 			width=nextWidth;
 			height=nextHeight;
-			if (width!==height)
-				throw "TextureCube: each side image's width and height must same.";
+			if (width!==height){
+				console.log("TextureCube: each side image's width and height must same.");
+				return;
+			}
 		}
 		this._width=width;
 		this._height=height;

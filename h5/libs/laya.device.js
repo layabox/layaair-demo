@@ -3,9 +3,9 @@
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
 
 	var Bitmap=laya.resource.Bitmap,Browser=laya.utils.Browser,Event=laya.events.Event,EventDispatcher=laya.events.EventDispatcher;
-	var Handler=laya.utils.Handler,Rectangle=laya.maths.Rectangle,Render=laya.renders.Render,Sprite=laya.display.Sprite;
-	var Stage=laya.display.Stage,Texture=laya.resource.Texture,Utils=laya.utils.Utils,WebGL=laya.webgl.WebGL;
-	var WebGLContext=laya.webgl.WebGLContext;
+	var Handler=laya.utils.Handler,LayaGL=laya.layagl.LayaGL,Rectangle=laya.maths.Rectangle,Render=laya.renders.Render;
+	var Sprite=laya.display.Sprite,Stage=laya.display.Stage,Texture=laya.resource.Texture,Utils=laya.utils.Utils;
+	var WebGL=laya.webgl.WebGL,WebGLContext=laya.webgl.WebGLContext;
 /**
 *使用前可用<code>supported</code>查看浏览器支持。
 */
@@ -501,10 +501,12 @@ var Video=(function(_super){
 		(width===void 0)&& (width=320);
 		(height===void 0)&& (height=240);
 		Video.__super.call(this);
-		if (Render.isWebGL)
+		if (Render.isConchApp || Render.isWebGL){
 			this.htmlVideo=new WebGLVideo();
-		else
-		this.htmlVideo=new HtmlVideo();
+		}
+		else{
+			this.htmlVideo=new HtmlVideo();
+		}
 		this.videoElement=this.htmlVideo.getVideo();
 		this.videoElement.layaTarget=this;
 		this.internalTexture=new Texture(this.htmlVideo);
@@ -540,8 +542,9 @@ var Video=(function(_super){
 	__class(Video,'laya.device.media.Video',_super);
 	var __proto=Video.prototype;
 	__proto.onPlayComplete=function(e){
-		Laya.timer.clear(this,this.renderCanvas);
 		this.event("ended");
+		if(!Render.isConchApp || !this.videoElement.loop)
+			Laya.timer.clear(this,this.renderCanvas);
 	}
 
 	/**
@@ -607,7 +610,7 @@ var Video=(function(_super){
 	__proto.renderCanvas=function(){
 		if (this.readyState===0)
 			return;
-		if (Render.isWebGL)
+		if (Render.isConchApp || Render.isWebGL)
 			this.htmlVideo['updateTexture']();
 		this.graphics.clear();
 		this.graphics.drawTexture(this.internalTexture,0,0,this.width,this.height);
@@ -621,7 +624,13 @@ var Video=(function(_super){
 
 	__proto.size=function(width,height){
 		_super.prototype.size.call(this,width,height)
-		this.videoElement.width=width / Browser.pixelRatio;
+		if (Render.isConchApp){
+			var transform=Utils.getTransformRelativeToWindow(this,0,0);
+			this.videoElement.width=width *transform.scaleX;
+		}
+		else{
+			this.videoElement.width=width / Browser.pixelRatio;
+		}
 		if (this.paused)this.renderCanvas();
 		return this;
 	}
@@ -762,6 +771,28 @@ var Video=(function(_super){
 	});
 
 	/**
+	*设置视频的x坐标
+	*/
+	__getset(0,__proto,'x',_super.prototype._$get_x,function(val){
+		Laya.superSet(Sprite,this,'x',val);
+		if (Render.isConchApp){
+			var transform=Utils.getTransformRelativeToWindow(this,0,0);
+			this.videoElement.style.left=transform.x;
+		}
+	});
+
+	/**
+	*设置视频的y坐标
+	*/
+	__getset(0,__proto,'y',_super.prototype._$get_y,function(val){
+		Laya.superSet(Sprite,this,'y',val);
+		if (Render.isConchApp){
+			var transform=Utils.getTransformRelativeToWindow(this,0,0);
+			this.videoElement.style.top=transform.y;
+		}
+	});
+
+	/**
 	*playbackRate 属性设置或返回音频/视频的当前播放速度。如：
 	*<ul>
 	*<li>1.0 正常速度</li>
@@ -823,15 +854,27 @@ var Video=(function(_super){
 		return this.videoElement.seeking;
 	});
 
-	__getset(0,__proto,'height',_super.prototype._$get_height,function(value){
-		Laya.superSet(Sprite,this,'height',value);
+	__getset(0,__proto,'width',_super.prototype._$get_width,function(value){
+		if (Render.isConchApp){
+			var transform=Utils.getTransformRelativeToWindow(this,0,0);
+			this.videoElement.width=value *transform.scaleX;
+		}
+		else{
+			this.videoElement.width=this.width / Browser.pixelRatio;
+		}
+		Laya.superSet(Sprite,this,'width',value);
 		if (this.paused)this.renderCanvas();
 	});
 
-	__getset(0,__proto,'width',_super.prototype._$get_width,function(value){
-		this.videoElement.width=this.width / Browser.pixelRatio;
-		Laya.superSet(Sprite,this,'width',value);
-		if (this.paused)this.renderCanvas();
+	__getset(0,__proto,'height',_super.prototype._$get_height,function(value){
+		if (Render.isConchApp){
+			var transform=Utils.getTransformRelativeToWindow(this,0,0);
+			this.videoElement.height=value *transform.scaleY;
+		}
+		else{
+			this.videoElement.height=this.height / Browser.pixelRatio;
+		}
+		Laya.superSet(Sprite,this,'height',value);
 	});
 
 	Video.onAbort=function(e){e.target.layaTarget.event("abort")}
@@ -937,9 +980,9 @@ var WebGLVideo=(function(_super){
 		this.preTarget=null;
 		this.preTexture=null;
 		WebGLVideo.__super.call(this);
-		if(Browser.onIPhone)
+		if(!Render.isConchApp && Browser.onIPhone)
 			return;
-		this.gl=WebGL.mainContext;
+		this.gl=/*__JS__ */Render.isConchApp ? LayaGLContext.instance :WebGL.mainContext;
 		this._source=this.gl.createTexture();
 		WebGLContext.bindTexture(this.gl,/*laya.webgl.WebGLContext.TEXTURE_2D*/0x0DE1,this._source);
 		this.gl.texParameteri(/*laya.webgl.WebGLContext.TEXTURE_2D*/0x0DE1,/*laya.webgl.WebGLContext.TEXTURE_WRAP_S*/0x2802,/*laya.webgl.WebGLContext.CLAMP_TO_EDGE*/0x812F);
@@ -952,11 +995,15 @@ var WebGLVideo=(function(_super){
 	var __proto=WebGLVideo.prototype;
 	//(preTarget && preTexture)&& (WebGLContext.bindTexture(gl,preTarget,preTexture));
 	__proto.updateTexture=function(){
-		if(Browser.onIPhone)
+		if(!Render.isConchApp && Browser.onIPhone)
 			return;
 		WebGLContext.bindTexture(this.gl,/*laya.webgl.WebGLContext.TEXTURE_2D*/0x0DE1,this._source);
 		this.gl.texImage2D(/*laya.webgl.WebGLContext.TEXTURE_2D*/0x0DE1,0,/*laya.webgl.WebGLContext.RGB*/0x1907,/*laya.webgl.WebGLContext.RGB*/0x1907,/*laya.webgl.WebGLContext.UNSIGNED_BYTE*/0x1401,this.video);
 	}
+
+	__getset(0,__proto,'_glTexture',function(){
+		return this._source;
+	});
 
 	return WebGLVideo;
 })(HtmlVideo)

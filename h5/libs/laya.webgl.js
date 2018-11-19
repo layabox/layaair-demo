@@ -2364,7 +2364,7 @@ var FillBorderTextCmdNative=(function(){
 var BasePoly=(function(){
 	function BasePoly(){}
 	__class(BasePoly,'laya.webgl.shapes.BasePoly');
-	BasePoly.createLine2=function(p,indices,lineWidth,indexBase,outVertex,loop,mat){
+	BasePoly.createLine2=function(p,indices,lineWidth,indexBase,outVertex,loop){
 		if (p.length < 4)return null;
 		var points=BasePoly.tempData.length>(p.length+2)?BasePoly.tempData:new Array(p.length+2);
 		points[0]=p[0];points[1]=p[1];
@@ -2396,10 +2396,6 @@ var BasePoly=(function(){
 		perpx=perpx / dist *w;
 		perpy=perpy / dist *w;
 		var tpx=perpx,tpy=perpy;
-		if(mat){
-			perpx=mat.a *tpx+mat.c *tpy;
-			perpy=mat.b *tpx+mat.d *tpy;
-		}
 		result.push(p1x-perpx ,p1y-perpy ,p1x+perpx ,p1y+perpy);
 		for (i=1;i < length-1;i++){
 			p1x=points[(i-1)*2];
@@ -2413,21 +2409,11 @@ var BasePoly=(function(){
 			dist=Math.sqrt(perpx *perpx+perpy *perpy);
 			perpx=perpx / dist *w;
 			perpy=perpy / dist *w;
-			if(mat){
-				tpx=perpx,tpy=perpy;
-				perpx=mat.a *tpx+mat.c *tpy;
-				perpy=mat.b *tpx+mat.d *tpy;
-			}
 			perp2x=-(p2y-p3y);
 			perp2y=p2x-p3x;
 			dist=Math.sqrt(perp2x *perp2x+perp2y *perp2y);
 			perp2x=perp2x / dist *w;
 			perp2y=perp2y / dist *w;
-			if(mat){
-				tpx=perp2x,tpy=perp2y;
-				perp2x=mat.a *tpx+mat.c *tpy;
-				perp2y=mat.b *tpx+mat.d *tpy;
-			}
 			a1=(-perpy+p1y)-(-perpy+p2y);
 			b1=(-perpx+p2x)-(-perpx+p1x);
 			c1=(-perpx+p1x)*(-perpy+p2y)-(-perpx+p2x)*(-perpy+p1y);
@@ -2454,11 +2440,6 @@ var BasePoly=(function(){
 		dist=Math.sqrt(perpx *perpx+perpy *perpy);
 		perpx=perpx / dist *w;
 		perpy=perpy / dist *w;
-		if(mat){
-			tpx=perpx,tpy=perpy;
-			perpx=mat.a *tpx+mat.c *tpy;
-			perpy=mat.b *tpx+mat.d *tpy;
-		}
 		result.push(p2x-perpx ,p2y-perpy ,p2x+perpx ,p2y+perpy);
 		for (i=1;i < length;i++){
 			indices.push(indexBase+(i-1)*2,indexBase+(i-1)*2+1,indexBase+i *2+1,indexBase+i *2+1,indexBase+i *2,indexBase+(i-1)*2);
@@ -3315,6 +3296,7 @@ var WebGL=(function(){
 				prototypeContext.toBase64=protoLast.toBase64;
 				prototypeContext.getImageData=protoLast.getImageData;
 				/*__JS__ */__getset (0,prototypeContext,'asBitmap',prototypeContext._$get_asBitmap,prototypeContext._$set_asBitmap);
+				ConchPropertyAdpt.rewriteProperties();
 			}
 			ConchSpriteAdpt.init();
 			LayaNative2D.__init__();
@@ -3464,8 +3446,66 @@ var WebGL=(function(){
 			return canv;
 		}
 		RunDriver.getTexturePixels=function (value,x,y,width,height){
-			alert('由于编不过，注掉了');
-			return null;
+			var st=0,dst=0,i=0;
+			var tex2d=value.bitmap;
+			var texw=tex2d.width;
+			var texh=tex2d.height;
+			if (x+width > texw)width-=(x+width)-texw;
+			if (y+height > texh)height-=(y+height)-texh;
+			if (width <=0 || height <=0)return null;
+			var wstride=width *4;
+			var pix=null;
+			try {
+				pix=tex2d.getPixels();
+			}catch (e){}
+			if (pix){
+				if(x==0&&y==0&&width==texw&&height==texh)
+					return pix;
+				var ret=new Uint8Array(width *height *4);
+				wstride=texw *4;
+				st=x*4;
+				dst=(y+height-1)*wstride+x*4;
+				for (i=height-1;i >=0;i--){
+					ret.set(dt.slice(dst,dst+width*4),st);
+					st+=wstride;
+					dst-=wstride;
+				}
+				return ret;
+			};
+			var ctx=new WebGLContext2D();
+			ctx.size(width,height);
+			ctx.asBitmap=true;
+			var uv=null;
+			if (x !=0 || y !=0 || width !=texw || height !=texh){
+				uv=value.uv.concat();
+				var stu=uv[0];
+				var stv=uv[1];
+				var uvw=uv[2]-stu;
+				var uvh=uv[7]-stv;
+				var uk=uvw / texw;
+				var vk=uvh / texh;
+				uv=[
+				stu+x *uk,stv+y *vk,
+				stu+(x+width)*uk,stv+y *vk,
+				stu+(x+width)*uk,stv+(y+height)*vk,
+				stu+x *uk,stv+(y+height)*vk,];
+			}
+			(ctx)._drawTextureM(value,0,0,width,height,null,1.0,uv);
+			ctx._targets.start();
+			ctx.flush();
+			ctx._targets.end();
+			ctx._targets.restore();
+			var dt=ctx._targets.getData(0,0,width,height);
+			ctx.destroy();
+			var ret=new Uint8Array(width *height *4);
+			st=0;
+			dst=(height-1)*wstride;
+			for (var i=height-1;i >=0;i--){
+				ret.set(dt.slice(dst,dst+wstride),st);
+				st+=wstride;
+				dst-=wstride;
+			}
+			return ret;
 		}
 		Filter._filter=function (sprite,context,x,y){
 			var webglctx=context;
@@ -5290,6 +5330,45 @@ var AlphaCmdNative=(function(){
 
 	AlphaCmdNative.ID="Alpha";
 	return AlphaCmdNative;
+})()
+
+
+//class laya.layagl.ConchPropertyAdpt
+var ConchPropertyAdpt=(function(){
+	function ConchPropertyAdpt(){}
+	__class(ConchPropertyAdpt,'laya.layagl.ConchPropertyAdpt');
+	ConchPropertyAdpt.rewriteProperties=function(){
+		laya.layagl.ConchPropertyAdpt.rewriteNumProperty(Rectangle.prototype,"x");
+		laya.layagl.ConchPropertyAdpt.rewriteNumProperty(Rectangle.prototype,"y");
+		laya.layagl.ConchPropertyAdpt.rewriteNumProperty(Rectangle.prototype,"width");
+		laya.layagl.ConchPropertyAdpt.rewriteNumProperty(Rectangle.prototype,"height");
+		laya.layagl.ConchPropertyAdpt.rewriteFunc(Rectangle.prototype,"recover");
+	}
+
+	ConchPropertyAdpt.rewriteNumProperty=function(proto,p){
+		Object.defineProperty(proto,p,{
+			"get":function (){
+				return this["_"+p] || 0;
+			},
+			"set":function (v){
+				this["_"+p]=v;
+				if (this.onPropertyChanged){
+					this.onPropertyChanged(this);
+				}
+			}
+		});
+	}
+
+	ConchPropertyAdpt.rewriteFunc=function(proto,p){
+		proto["__"+p]=proto[p];
+		proto[p]=function (){
+			proto["__"+p].call(this);
+			if (this.onPropertyChanged)
+				this.onPropertyChanged=null;
+		}
+	}
+
+	return ConchPropertyAdpt;
 })()
 
 
@@ -9147,15 +9226,16 @@ var CharPages=(function(){
 //class laya.webgl.utils.ShaderCompile
 var ShaderCompile=(function(){
 	var ShaderNode,InlcudeFile;
-	function ShaderCompile(vs,ps,nameMap,defs){
+	function ShaderCompile(vs,ps,nameMap,defs,customCompie){
 		//this._nameMap=null;
 		//this._VS=null;
 		//this._PS=null;
 		var _$this=this;
+		(customCompie===void 0)&& (customCompie=true);
 		function _compile (script){
 			var includefiles=[];
 			var top=new ShaderNode(includefiles);
-			_$this._compileToTree(top,script.split('\n'),0,includefiles,defs);
+			_$this._compileToTree(top,script.split('\n'),0,includefiles,defs,customCompie);
 			return top;
 		};
 		var startTime=Browser.now();
@@ -9168,7 +9248,7 @@ var ShaderCompile=(function(){
 
 	__class(ShaderCompile,'laya.webgl.utils.ShaderCompile');
 	var __proto=ShaderCompile.prototype;
-	__proto._compileToTree=function(parent,lines,start,includefiles,defs){
+	__proto._compileToTree=function(parent,lines,start,includefiles,defs,customCompile){
 		var node,preNode;
 		var text,name,fname;
 		var ofs=0,words,noUseNode;
@@ -9257,7 +9337,7 @@ var ShaderCompile=(function(){
 						if ((ofs=words[0].indexOf("?"))< 0){
 							node.setParent(parent);
 							text=inlcudeFile.getWith(words[2]=='with' ? words[3] :null);
-							this._compileToTree(node,text.split('\n'),0,includefiles,defs);
+							this._compileToTree(node,text.split('\n'),0,includefiles,defs,customCompile);
 							node.text="";
 							continue ;
 						}
@@ -12459,30 +12539,11 @@ var WebGLContext2D=(function(_super){
 	*@param dy
 	*/
 	__proto.addPath=function(points,close,convex,dx,dy){
-		var ci=0;
-		var m=this._curMat;
-		if(this._curMat._bTransform){
-			for (var i=0,sz=points.length / 2;i < sz;i++){
-				var x1=points[ci]+dx,y1=points[ci+1]+dy;
-				points[ci]=x1*m.a+y1*m.c+m.tx;
-				points[ci+1]=x1*m.b+y1*m.d+m.ty;
-				ci+=2;
-			}
-			}else {
-			if (m.tx==0 && m.ty==0 && !dx && !dy){}
-				else {
-				for (i=0,sz=points.length / 2;i < sz;i++){
-					var x2=points[ci]+dx,y2=points[ci+1]+dy;
-					points[ci]=x2+m.tx;
-					points[ci+1]=y2+m.ty;
-					ci+=2;
-				}
-			}
-		}
 		this._getPath().push(points,convex);
 	}
 
 	__proto.fill=function(){
+		var m=this._curMat;
 		var tPath=this._getPath();
 		var submit=this._curSubmit;
 		var sameKey=(submit._key.submitType===/*laya.webgl.submit.Submit.KEY_VG*/3 && submit._key.blendShader===this._submitKey.blendShader);
@@ -12498,6 +12559,29 @@ var WebGLContext2D=(function(_super){
 			var vertNum=p.path.length / 2;
 			if (vertNum < 3 ||(vertNum==3 && !p.convex))
 				continue ;
+			var cpath=p.path.concat();
+			var pi=0;
+			var xp=0,yp=0;
+			var _x=NaN,_y=NaN;
+			if (m._bTransform){
+				for (pi=0;pi < vertNum;pi++){
+					xp=pi << 1;
+					yp=xp+1;
+					_x=cpath[xp];
+					_y=cpath[yp];
+					cpath[xp]=m.a *_x+m.c *_y+m.tx;
+					cpath[yp]=m.b *_x+m.d *_y+m.ty;
+				}
+				}else {
+				for (pi=0;pi < vertNum;pi++){
+					xp=pi << 1;
+					yp=xp+1;
+					_x=cpath[xp];
+					_y=cpath[yp];
+					cpath[xp]=_x+m.tx;
+					cpath[yp]=_y+m.ty;
+				}
+			}
 			if (this._pathMesh.vertNum+vertNum > 65535){
 				this._curSubmit._numEle+=curEleNum;
 				curEleNum=0;
@@ -12516,14 +12600,14 @@ var WebGLContext2D=(function(_super){
 				}
 			}
 			else {
-				idx=Earcut.earcut(p.path,null,2);
+				idx=Earcut.earcut(cpath,null,2);
 				if (curvert > 0){
 					for (var ii=0;ii < idx.length;ii++){
 						idx[ii]+=curvert;
 					}
 				}
 			}
-			this._pathMesh.addVertAndIBToMesh(this,p.path,rgba,idx);
+			this._pathMesh.addVertAndIBToMesh(this,cpath,rgba,idx);
 			curEleNum+=idx.length;
 		}
 		this._curSubmit._numEle+=curEleNum;
@@ -12565,7 +12649,31 @@ var WebGLContext2D=(function(_super){
 					this.meshlist.push(this._pathMesh);
 					this._curSubmit=this.addVGSubmit(this._pathMesh);
 				}
-				BasePoly.createLine2(p.path,idx,this.lineWidth,this._pathMesh.vertNum,vertex,p.loop,this._curMat);
+				BasePoly.createLine2(p.path,idx,this.lineWidth,this._pathMesh.vertNum,vertex,p.loop);
+				var ptnum=vertex.length / 2;
+				var m=this._curMat;
+				var pi=0;
+				var xp=0,yp=0;
+				var _x=NaN,_y=NaN;
+				if (m._bTransform){
+					for (pi=0;pi < ptnum;pi++){
+						xp=pi << 1;
+						yp=xp+1;
+						_x=vertex[xp];
+						_y=vertex[yp];
+						vertex[xp]=m.a *_x+m.c *_y+m.tx;
+						vertex[yp]=m.b *_x+m.d *_y+m.ty;
+					}
+					}else {
+					for (pi=0;pi < ptnum;pi++){
+						xp=pi << 1;
+						yp=xp+1;
+						_x=vertex[xp];
+						_y=vertex[yp];
+						vertex[xp]=_x+m.tx;
+						vertex[yp]=_y+m.ty;
+					}
+				}
 				this._pathMesh.addVertAndIBToMesh(this,vertex,rgba,idx);
 				curEleNum+=idx.length;
 			}
@@ -12573,17 +12681,11 @@ var WebGLContext2D=(function(_super){
 		}
 	}
 
-	__proto.moveTo=function(x,y,b){
-		(b===void 0)&& (b=true);
+	__proto.moveTo=function(x,y){
 		var tPath=this._getPath();
 		tPath.newPath();
 		tPath._lastOriX=x;
 		tPath._lastOriY=y;
-		if (b){
-			var _x1=x,_y1=y;
-			x=this._curMat.a *_x1+this._curMat.c *_y1+this._curMat.tx;
-			y=this._curMat.b *_x1+this._curMat.d *_y1+this._curMat.ty;
-		}
 		tPath.addPoint(x,y);
 	}
 
@@ -12593,18 +12695,12 @@ var WebGLContext2D=(function(_super){
 	*@param y
 	*@param b 是否应用矩阵
 	*/
-	__proto.lineTo=function(x,y,b){
-		(b===void 0)&& (b=true);
+	__proto.lineTo=function(x,y){
 		var tPath=this._getPath();
 		if (Math.abs(x-tPath._lastOriX)<1e-3 && Math.abs(y-tPath._lastOriY)<1e-3)
 			return;
 		tPath._lastOriX=x;
 		tPath._lastOriY=y;
-		if (b){
-			var _x1=x,_y1=y;
-			x=this._curMat.a *_x1+this._curMat.c *_y1+this._curMat.tx;
-			y=this._curMat.b *_x1+this._curMat.d *_y1+this._curMat.ty;
-		}
 		tPath.addPoint(x,y);
 	}
 
@@ -12682,8 +12778,8 @@ var WebGLContext2D=(function(_super){
 		var lastx=this._path._lastOriX,lasty=this._path._lastOriY;
 		var _x1=ptx1 ,_y1=pty1;
 		if (Math.abs(_x1-this._path._lastOriX)>0.1 || Math.abs(_y1-this._path._lastOriY)>0.1){
-			x=this._curMat.a *_x1+this._curMat.c *_y1+this._curMat.tx;
-			y=this._curMat.b *_x1+this._curMat.d *_y1+this._curMat.ty;
+			x=_x1;
+			y=_y1;
 			lastx=_x1;
 			lasty=_y1;
 			this._path.addPoint(x,y);
@@ -12698,9 +12794,6 @@ var WebGLContext2D=(function(_super){
 			x=cx+orix;
 			y=cy+oriy;
 			if (Math.abs(lastx-x)>0.1 || Math.abs(lasty-y)>0.1){
-				var _tx1=x,_ty1=y;
-				x=this._curMat.a *_tx1+this._curMat.c *_ty1+this._curMat.tx;
-				y=this._curMat.b *_tx1+this._curMat.d *_ty1+this._curMat.ty;
 				this._path.addPoint(x,y);
 				lastx=x;
 				lasty=y;
@@ -12753,10 +12846,7 @@ var WebGLContext2D=(function(_super){
 			dy=Math.sin(a);
 			x=cx+dx *r;
 			y=cy+dy *r;
-			if (x !=this._path._lastOriX|| y !=this._path._lastOriY){
-				var _tx1=x,_ty1=y;
-				x=this._curMat.a *_tx1+this._curMat.c *_ty1+this._curMat.tx;
-				y=this._curMat.b *_tx1+this._curMat.d *_ty1+this._curMat.ty;
+			if (x !=this._path._lastOriX || y !=this._path._lastOriY){
 				tPath.addPoint(x,y);
 			}
 		}
@@ -12765,9 +12855,6 @@ var WebGLContext2D=(function(_super){
 		x=cx+dx *r;
 		y=cy+dy *r;
 		if (x !=this._path._lastOriX|| y !=this._path._lastOriY){
-			var _x2=x,_y2=y;
-			x=this._curMat.a *_x2+this._curMat.c *_y2+this._curMat.tx;
-			y=this._curMat.b *_x2+this._curMat.d *_y2+this._curMat.ty;
 			tPath.addPoint(x,y);
 		}
 	}
@@ -14118,6 +14205,7 @@ var ConchSpriteAdpt=(function(_super){
 		this._dataf32[ /*laya.display.SpriteConst.POSCLIP*/28+3]=value.height;
 		this._dataf32[ /*laya.display.SpriteConst.POSCLIP_NEG_POS*/32]=-value.x;
 		this._dataf32[ /*laya.display.SpriteConst.POSCLIP_NEG_POS*/32+1]=-value.y;
+		value.onPropertyChanged=this._setScrollRect.bind(this);
 	}
 
 	//TODO:coverage
@@ -16349,6 +16437,49 @@ var Texture2D=(function(_super){
 })(BaseTexture)
 
 
+//class laya.webgl.shader.d2.Shader2X extends laya.webgl.shader.Shader
+var Shader2X=(function(_super){
+	function Shader2X(vs,ps,saveName,nameMap,bindAttrib){
+		this._params2dQuick2=null;
+		this._shaderValueWidth=0;
+		this._shaderValueHeight=0;
+		Shader2X.__super.call(this,vs,ps,saveName,nameMap,bindAttrib);
+	}
+
+	__class(Shader2X,'laya.webgl.shader.d2.Shader2X',_super);
+	var __proto=Shader2X.prototype;
+	//TODO:coverage
+	__proto._disposeResource=function(){
+		_super.prototype._disposeResource.call(this);
+		this._params2dQuick2=null;
+	}
+
+	//TODO:coverage
+	__proto.upload2dQuick2=function(shaderValue){
+		this.upload(shaderValue,this._params2dQuick2 || this._make2dQuick2());
+	}
+
+	//去掉size的所有的uniform
+	__proto._make2dQuick2=function(){
+		if (!this._params2dQuick2){
+			this._params2dQuick2=[];
+			var params=this._params,one;
+			for (var i=0,n=params.length;i < n;i++){
+				one=params[i];
+				if (one.name!=="size")this._params2dQuick2.push(one);
+			}
+		}
+		return this._params2dQuick2;
+	}
+
+	Shader2X.create=function(vs,ps,saveName,nameMap,bindAttrib){
+		return new Shader2X(vs,ps,saveName,nameMap,bindAttrib);
+	}
+
+	return Shader2X;
+})(Shader)
+
+
 /**
 *<code>RenderTexture</code> 类用于创建渲染目标。
 */
@@ -16617,49 +16748,6 @@ var RenderTexture2D=(function(_super){
 	]);
 	return RenderTexture2D;
 })(BaseTexture)
-
-
-//class laya.webgl.shader.d2.Shader2X extends laya.webgl.shader.Shader
-var Shader2X=(function(_super){
-	function Shader2X(vs,ps,saveName,nameMap,bindAttrib){
-		this._params2dQuick2=null;
-		this._shaderValueWidth=0;
-		this._shaderValueHeight=0;
-		Shader2X.__super.call(this,vs,ps,saveName,nameMap,bindAttrib);
-	}
-
-	__class(Shader2X,'laya.webgl.shader.d2.Shader2X',_super);
-	var __proto=Shader2X.prototype;
-	//TODO:coverage
-	__proto._disposeResource=function(){
-		_super.prototype._disposeResource.call(this);
-		this._params2dQuick2=null;
-	}
-
-	//TODO:coverage
-	__proto.upload2dQuick2=function(shaderValue){
-		this.upload(shaderValue,this._params2dQuick2 || this._make2dQuick2());
-	}
-
-	//去掉size的所有的uniform
-	__proto._make2dQuick2=function(){
-		if (!this._params2dQuick2){
-			this._params2dQuick2=[];
-			var params=this._params,one;
-			for (var i=0,n=params.length;i < n;i++){
-				one=params[i];
-				if (one.name!=="size")this._params2dQuick2.push(one);
-			}
-		}
-		return this._params2dQuick2;
-	}
-
-	Shader2X.create=function(vs,ps,saveName,nameMap,bindAttrib){
-		return new Shader2X(vs,ps,saveName,nameMap,bindAttrib);
-	}
-
-	return Shader2X;
-})(Shader)
 
 
 //class laya.webgl.utils.IndexBuffer2D extends laya.webgl.utils.Buffer2D

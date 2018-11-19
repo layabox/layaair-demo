@@ -10,8 +10,8 @@
 	var Texture=laya.resource.Texture,Tween=laya.utils.Tween,Utils=laya.utils.Utils,WeakObject=laya.utils.WeakObject;
 Laya.interface('laya.ui.IBox');
 Laya.interface('laya.ui.IItem');
-Laya.interface('laya.ui.ISelect');
 Laya.interface('laya.ui.IRender');
+Laya.interface('laya.ui.ISelect');
 /**全局配置*/
 //class UIConfig
 var UIConfig=(function(){
