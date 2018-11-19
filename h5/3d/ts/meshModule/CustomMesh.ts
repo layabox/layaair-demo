@@ -32,7 +32,7 @@ class CustomMesh {
         //球体
         var sphere:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.25, 20, 20))) as Laya.MeshSprite3D;
         sphere.transform.position = new Laya.Vector3(1.0, 0.25, 0.6);
-        var sphereLineSprite3D:Laya.PixelLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(2500)) as Laya.PixelLineSprite3D;
+        var sphereLineSprite3D:Laya.PixelLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(3500)) as Laya.PixelLineSprite3D;
         Tool.linearModel(sphere, sphereLineSprite3D, Laya.Color.GREEN);
         
         //圆柱体

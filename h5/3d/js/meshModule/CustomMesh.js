@@ -39,7 +39,7 @@ class CustomMesh{
     drawSphere(){
         this.sphere = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.25, 20, 20)));
         this.sphere.transform.position = new Laya.Vector3(1.0, 0.25, 0.6);
-        var sphereLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(2500));
+        var sphereLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(3500));
         Tool.linearModel(this.sphere, sphereLineSprite3D, Laya.Color.GREEN);
     }
     //圆柱体
