@@ -15,12 +15,16 @@ class SkyDomeSample{
     }
 
     loadMaterial(mat){
-        this.camera.skyboxMaterial = mat;    
-        Laya.timer.frameLoop(1, this, this.onFrameLoop);
+		var skyRenderer = new Laya.SkyRenderer();
+		skyRenderer.mesh = Laya.SkyBox.instance;
+		skyRenderer.material = mat;
+		this.camera.skyRenderer = skyRenderer;
+		Laya.timer.frameLoop(1, this, this.onFrameLoop);
     }
 
     onFrameLoop(){
-        this.camera.skyboxMaterial.exposure = Math.sin(this.exposureNumber += 0.01) + 1;
+        this.camera.skyRenderer.material.exposure = Math.sin(this.exposureNumber += 0.01) + 1;
+		this.camera.skyRenderer.material.rotation += 0.01;
     }
 }
 
