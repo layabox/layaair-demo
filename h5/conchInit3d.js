@@ -49,7 +49,7 @@ var list = [
 	"shaderModule/Shader_GlowingEdge",
 	"shaderModule/Shader_Simple",
 	"shaderModule/Shader_Terrain",
-	"skyModule/SkyBoxSample",
+	"skyModule/Sky_Procedural",
 	"skyModule/SkyDomeSample",
 	"sprite3dModule/Sprite3DClone",
 	"sprite3dModule/Sprite3DLoad",
