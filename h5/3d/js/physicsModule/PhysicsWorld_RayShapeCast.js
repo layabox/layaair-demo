@@ -134,7 +134,7 @@ class PhysicsWorldRayShapeCast{
             switch (this.castType) {
                 case 0:
                     var lineSprite = this.scene.addChild(new Laya.PixelLineSprite3D(1));
-                    lineSprite.setLine(0, from, to, Laya.Color.RED, Laya.Color.RED);
+					lineSprite.addLine(from, to, Color.RED, Color.RED);
                     this.debugSprites.push(lineSprite);
                     if (this.castAll) {
                         //射线发射方法

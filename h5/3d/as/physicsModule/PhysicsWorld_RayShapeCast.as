@@ -123,7 +123,7 @@ package physicsModule {
 				switch (castType) {
 				case 0: 
 					var lineSprite:PixelLineSprite3D = scene.addChild(new PixelLineSprite3D(1)) as PixelLineSprite3D;
-					lineSprite.setLine(0, from, to, Color.RED, Color.RED);
+					lineSprite.addLine(from, to, Color.RED, Color.RED);
 					debugSprites.push(lineSprite);
 					if (castAll) {
 						scene.physicsSimulation.raycastAllFromTo(from, to, hitResults);
