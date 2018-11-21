@@ -6,14 +6,16 @@ package skyModule {
 	import laya.d3.core.material.SkyBoxMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
+	import laya.d3.resource.models.SkyBox;
+	import laya.d3.resource.models.SkyRenderer;
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
 	
 	
-	public class SkyBoxSample2 {
+	public class Sky_SkyBox {
 		
-		public function SkyBoxSample2() {
+		public function Sky_SkyBox() {
 			
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
@@ -28,10 +30,14 @@ package skyModule {
 			
 			//天空盒
 			BaseMaterial.load("../../../../res/threeDimen/skyBox/DawnDusk/SkyBox.lmat", Handler.create(null, function(mat:SkyBoxMaterial):void {
-				camera.skyboxMaterial = mat;
+				var skyRenderer:SkyRenderer = new SkyRenderer();
+				skyRenderer.mesh = SkyBox.instance;
+				skyRenderer.material = mat;
+				camera.skyRenderer = skyRenderer;
 				var exposureNumber:Number = 0;
 				Laya.timer.frameLoop(1, this, function():void {
 					mat.exposure = Math.sin(exposureNumber += 0.01) + 1;
+					mat.rotation += 0.01;
 				});
 			}))
 		}
