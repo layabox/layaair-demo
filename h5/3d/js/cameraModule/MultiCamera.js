@@ -21,7 +21,10 @@ class MultiCamera{
     }
 
     loadLmat(mat){
-        this.camera2.skyboxMaterial = mat;
+        var skyRenderer = new Laya.SkyRenderer();
+		skyRenderer.mesh = Laya.SkyBox.instance;
+		skyRenderer.material = mat;
+		this.camera2.skyRenderer = skyRenderer;
     }
 
     loadSprite(sp){

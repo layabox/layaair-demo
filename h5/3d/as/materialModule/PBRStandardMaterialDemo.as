@@ -20,6 +20,7 @@ package materialModule {
 	import laya.d3.resource.TextureCube;
 	import laya.d3.resource.models.BoxMesh;
 	import laya.d3.resource.models.SkyBox;
+	import laya.d3.resource.models.SkyRenderer;
 	import laya.d3.resource.models.SphereMesh;
 	import laya.d3.shader.Shader3D;
 	import laya.display.Stage;
@@ -46,8 +47,11 @@ package materialModule {
 				var camera:Camera = scene.getChildByName("Main Camera") as Camera;
 				camera.addComponent(CameraMoveScript);
 				camera.clearFlag = BaseCamera.CLEARFLAG_SKY;
-				BaseMaterial.load("../../../../res/threeDimen/skyBox/DawnDusk/SkyBox.lmat", Handler.create(null, function(skyMaterial:SkyBoxMaterial):void {
-					camera.skyboxMaterial = skyMaterial;
+				BaseMaterial.load("../../../../res/threeDimen/skyBox/DawnDusk/SkyBox.lmat", Handler.create(null, function(mat:SkyBoxMaterial):void {
+					var skyRenderer:SkyRenderer = new SkyRenderer();
+					skyRenderer.mesh = SkyBox.instance;
+					skyRenderer.material = mat;
+					camera.skyRenderer = skyRenderer;
 				}));
 				
 				//实例PBR材质

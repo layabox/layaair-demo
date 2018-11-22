@@ -10,6 +10,8 @@ package cameraModule {
 	import laya.d3.math.Vector3;
 	import laya.d3.math.Vector4;
 	import laya.d3.math.Viewport;
+	import laya.d3.resource.models.SkyBox;
+	import laya.d3.resource.models.SkyRenderer;
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
@@ -37,7 +39,10 @@ package cameraModule {
 			camera2.addComponent(CameraMoveScript);
 			camera2.clearFlag = BaseCamera.CLEARFLAG_SKY;
 			BaseMaterial.load("../../../../res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Handler.create(null, function(mat:SkyBoxMaterial):void {
-				camera2.skyboxMaterial = mat;
+				var skyRenderer:SkyRenderer = new SkyRenderer();
+				skyRenderer.mesh = SkyBox.instance;
+				skyRenderer.material = mat;
+				camera2.skyRenderer = skyRenderer;
 			}));
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			
