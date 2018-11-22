@@ -1,4 +1,4 @@
-class SkyDomeSample {
+class Sky_SkyBox {
 	var camera:Laya.Camera;
     constructor() {
         Laya3D.init(0, 0);
@@ -26,4 +26,4 @@ class SkyDomeSample {
         }))
     }
 }
-new SkyDomeSample;
+new Sky_SkyBox;
