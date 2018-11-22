@@ -1,4 +1,4 @@
-class SkyDomeSample{
+class Sky_SkyBox{
     constructor(){
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
@@ -29,4 +29,4 @@ class SkyDomeSample{
 }
 
 //激活启动类
-new SkyDomeSample();
+new Sky_SkyBox();
