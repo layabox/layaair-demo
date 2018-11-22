@@ -295,8 +295,8 @@
 			"prefix": "sky",
 			"tr_zhCN": "天空",
 			"manifest": [
-				["SkyBoxSample", "天空盒", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-				["SkyDomeSample", "天空穹", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+				["Sky_Procedural", "程序化天空", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+				["Sky_SkyBox", "天空盒", "", "core,webgl,ani,d3,CameraMoveScript.js"]
 			]
 		},
 		{

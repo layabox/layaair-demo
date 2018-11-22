@@ -304,8 +304,8 @@
 				  "prefix": "sky",
 				  "tr_zhCN": "Sky",
 				  "manifest": [
-					  ["SkyBoxSample", "Sky box1", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-					  ["SkyDomeSample", "Sky box2", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+					  ["Sky_Procedural", "SkyProcedural", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					  ["Sky_SkyBox", "SkyBox", "", "core,webgl,ani,d3,CameraMoveScript.js"]
 				  ]
 			  },
 			  {
