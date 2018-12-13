@@ -15,7 +15,9 @@
         LAYA_DEMO
     </title>
     <script type="text/javascript">
-    if (!location.search) {
+    let search = location.search;
+    let isSearchLegal = search.includes("language") && search.includes("category") && search.includes("group") && search.includes("name");
+    if (!isSearchLegal) {
         var isChinese = navigator.language.indexOf('zh') !== -1;
         if(!isChinese)
             location.search = "language=en&category=2d&group=Sprite&name=DisplayImage";
