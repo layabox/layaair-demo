@@ -1,67 +1,76 @@
-(function()
-{
-	var Graphics = Laya.Graphics;
-	var Sprite = Laya.Sprite;
-	var Browser = Laya.Browser;
-	var WebGL = Laya.WebGL;
+let 
+	colors = ["#5D0776", "#EC8A49", "#AF3666", "#F6C84C", "#4C779A"],
+	colorCount = 0,
+	isDown = false,
+	path = [],
+	color = colors[0],
+	liveGraphics,
+	canvasGraphics;
 
-	var colors = ["#5D0776", "#EC8A49", "#AF3666", "#F6C84C", "#4C779A"];
-	var colorCount = 0;
-	var isDown = false;
-	var path = [];
-	var color = colors[0];
-	var liveGraphics;
-	var canvasGraphics;
+class PIXI_Example_21 {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler,
+			Loader = Laya.Loader;
 
-	(function()
-	{
+		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.width, Browser.height, WebGL);
+
+		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
+		Laya.stage.alignH = Stage.ALIGN_CENTER;
+
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#3da8bb";
 
-		createCanvases();
+		Stat.show();
 
-		Laya.timer.frameLoop(1, this, animate);
+		this.createCanvases();
 
-		Laya.stage.on('mousedown', this, onMouseDown);
-		Laya.stage.on('mousemove', this, onMouseMove);
-		Laya.stage.on('mouseup', this, onMouseUp);
-	})();
+		Laya.timer.frameLoop(1, this, this.animate);
 
-	function createCanvases()
-	{
-		var graphicsCanvas = new Sprite();
+		Laya.stage.on('mousedown', this, this.onMouseDown);
+		Laya.stage.on('mousemove', this, this.onMouseMove);
+		Laya.stage.on('mouseup', this, this.onMouseUp);
+	}
+
+	createCanvases() {
+		const Sprite = Laya.Sprite;
+
+		let graphicsCanvas = new Sprite();
 		Laya.stage.addChild(graphicsCanvas);
-		var liveGraphicsCanvas = new Sprite();
+		let liveGraphicsCanvas = new Sprite();
 		Laya.stage.addChild(liveGraphicsCanvas);
 
 		liveGraphics = liveGraphicsCanvas.graphics;
 		canvasGraphics = graphicsCanvas.graphics;
 	}
 
-	function onMouseDown()
-	{
+	onMouseDown() {
 		isDown = true;
 		color = colors[colorCount++ % colors.length];
 		path.length = 0;
 	}
 
-	function onMouseMove()
-	{
+	onMouseMove() {
 		if (!isDown) return;
 
 		path.push(Laya.stage.mouseX);
 		path.push(Laya.stage.mouseY);
 	}
 
-	function onMouseUp()
-	{
+	onMouseUp() {
 		isDown = false;
 		canvasGraphics.drawPoly(0, 0, path.concat(), color);
 	}
 
-	function animate()
-	{
+	animate() {
 		liveGraphics.clear();
 		liveGraphics.drawPoly(0, 0, path, color);
 	}
-})();
+}
+
+new PIXI_Example_21();

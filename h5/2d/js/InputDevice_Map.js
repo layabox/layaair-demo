@@ -1,46 +1,50 @@
-(function()
-{
-	var Stage       = Laya.Stage;
-	var Text        = Laya.Text;
-	var Geolocation = Laya.Geolocation;
-	var Position    = Laya.Position;
-	var Browser     = Laya.Browser;
-	var Handler     = Laya.Handler;
+let	
+	map,
+	marker,
+	mapDiv,
+	infoText;
 
-	// 百度地图
-	var map;
-	var marker;
-	var BMap = Browser.window.BMap;
-	var convertor = new BMap.Convertor();
-	
-	// Div
-	var mapDiv;
-	
-	var infoText;
-	(function()
-	{
+class InputDevice_Map {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler,
+			Geolocation = Laya.Geolocation;
+
+		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.width, 255);
+
+		// Laya.stage.alignV = Stage.ALIGN_MIDDLE;
+		// Laya.stage.alignH = Stage.ALIGN_CENTER;
+
 		Laya.stage.scaleMode = Stage.SCALE_NOSCALE;
+		Laya.stage.bgColor = "#232628";
+
+		// 本地运行，需要在index.html中引用百度地图API文件
+		this.createDom();
+		this.initMap();
+		this.createInfoText();
 		
-		createDom();
-		initMap();
-		createInfoText();
-		
-		var successHandler = new Handler(this, updatePosition);
-		var errorHandler = new Handler(this, onError);
+		let successHandler = new Handler(this, this.updatePosition);
+		let errorHandler = new Handler(this, this.onError);
 		
 		// 使用高精度位置
 		Geolocation.enableHighAccuracy = true;
 		Geolocation.watchPosition(successHandler, errorHandler);
 		
 		// 绑定作用域
-		convertToBaiduCoord = convertToBaiduCoord.bind(this);
-	 })();
-	function createDom() 
-	{
+		this.convertToBaiduCoord = this.convertToBaiduCoord.bind(this);
+	}
+
+	createDom() {
+		const Browser = Laya.Browser;
+
 		mapDiv = Browser.createElement("div");
 
-		var style = mapDiv.style;
+		let style = mapDiv.style;
 		style.position = "absolute";
 		style.top = Laya.stage.height / Browser.pixelRatio + "px";
 		style.left = "0px";
@@ -49,9 +53,12 @@
 		
 		Browser.document.body.appendChild(mapDiv);
 	}
-		
-	function initMap() 
-	{
+
+	initMap() {
+		const 
+			Browser = Laya.Browser,
+			BMap = Browser.window.BMap;
+
 		// 初始化地图
 		map = new BMap.Map(mapDiv);
 		
@@ -67,11 +74,13 @@
 		// 创建标注物
 		marker = new BMap.Marker(new BMap.Point(0,0));
 		map.addOverlay(marker);
-		var label = new BMap.Label("当前位置", { offset: new BMap.Size(-15, 30) });
+		let label = new BMap.Label("当前位置", { offset: new BMap.Size(-15, 30) });
 		marker.setLabel(label);
 	}
-	function createInfoText()
-	{
+
+	createInfoText() {
+		const Text = Laya.Text;
+
 		infoText = new Text();
 		Laya.stage.addChild(infoText);
 		infoText.fontSize = 50;
@@ -80,13 +89,18 @@
 	}
 		
 	// 更新设备位置
-	function updatePosition(p) 
-	{
+	updatePosition(p) {
+		const 
+			Browser = Laya.Browser,
+			BMap = Browser.window.BMap;
+
+		let convertor = new BMap.Convertor();
+
 		// 转换为百度地图坐标
-		var point = new BMap.Point(p.longitude, p.latitude);
+		let point = new BMap.Point(p.longitude, p.latitude);
 		// 把原始坐标转换为百度坐标，部分设备可能获取到的是谷歌坐标，这时第三个参数改为3才是正确的。
-		convertor.translate([point], 1, 5, convertToBaiduCoord);
-		
+		convertor.translate([point], 1, 5, this.convertToBaiduCoord);
+
 		// 更新当前获取到的地理信息
 		infoText.text = 
 			"经度：" + p.longitude + 
@@ -102,11 +116,9 @@
 	}
 		
 	// 将原始坐标转换为百度坐标
-	function convertToBaiduCoord(data)
-	{
-		if (data.status == 0)
-		{
-			var position = data.points[0];
+	convertToBaiduCoord(data) {
+		if (data.status == 0) {
+			let position = data.points[0];
 			// 设置标注物位置
 			marker.setPosition(position);
 			
@@ -115,8 +127,9 @@
 		}
 	}
 		
-	function onError(e) 
-	{
+	onError(e) {
+		const Geolocation = Laya.Geolocation;
+
 		if (e.code == Geolocation.TIMEOUT)
 			alert("获取位置超时");
 		else if (e.code == Geolocation.POSITION_UNAVAILABLE)
@@ -124,5 +137,6 @@
 		else if (e.code == Geolocation.PERMISSION_DENIED)
 			alert("无权限");
 	}
-})();
-	
+}
+
+new InputDevice_Map();

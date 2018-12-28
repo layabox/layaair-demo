@@ -1,38 +1,34 @@
-// 这段代码需要在setupDemo之前执行。
-(function()
-{
-	// 项渲染器
-	var Box   = Laya.Box;
-	var Image = Laya.Image;
+const 
+	WID = 373,
+	HEI = 85;
+const Box = Laya.Box;
 
-	var WID = 373,
-		HEI = 85;
+class Item extends Box {
+	constructor(){
+		super();
+		const Image = Laya.Image;
 
-	function Item()
-	{
-		Item.__super.call(this);
 		this.size(WID, HEI);
 		this.img = new Image();
 		this.addChild(this.img);
-
-		this.setImg = function(src)
-		{
-			this.img.skin = src;
-		}
 	}
-	Laya.class(Item, "Item", Box);
 
-	// 主要逻辑代码
-	var Stage   = Laya.Stage;
-	var List    = Laya.List;
-	var Handler = Laya.Handler;
-	var WebGL   = Laya.WebGL;
-	
+	setImg(src) {
+		this.img.skin = src;
+	}
+}
 
-	(function()
-	{
+class UI_List {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
+
 		// 不支持WebGL时自动切换至Canvas
-		Laya.init(800, 600, WebGL);
+		Laya.init(550, 400, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
@@ -40,12 +36,17 @@
 		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		setup();
-	})();
+		Stat.show();
+		this.setup();
+	}
 
-	function setup()
-	{
-		var list = new List();
+	setup() {
+		const 
+			List = Laya.List,
+			Handler = Laya.Handler;
+		
+		let list = new List();
+		Laya.stage.addChild(list);
 
 		list.itemRender = Item;
 
@@ -59,15 +60,13 @@
 		list.vScrollBarSkin = "";
 
 		list.selectEnable = true;
-		list.selectHandler = new Handler(this, onSelect);
+		list.selectHandler = new Handler(this, this.onSelect);
 
-		list.renderHandler = new Handler(this, updateItem);
-		Laya.stage.addChild(list);
+		list.renderHandler = new Handler(this, this.updateItem);
 
 		// 设置数据项为对应图片的路径
-		var data = [];
-		for (var i = 0; i < 10; ++i)
-		{
+		let data = [];
+		for (let i = 0; i < 10; ++i) {
 			data.push("res/ui/listskins/1.jpg");
 			data.push("res/ui/listskins/2.jpg");
 			data.push("res/ui/listskins/3.jpg");
@@ -77,13 +76,13 @@
 		list.array = data;
 	}
 
-	function updateItem(cell, index)
-	{
+	updateItem(cell, index) {
 		cell.setImg(cell.dataSource);
 	}
 
-	function onSelect(index)
-	{
+	onSelect(index) {
 		console.log("当前选择的索引：" + index);
 	}
-})();
+}
+
+new UI_List();

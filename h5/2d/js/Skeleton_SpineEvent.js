@@ -1,89 +1,90 @@
-(function()
-{
-	var EventData = Laya.EventData;
-	var Skeleton  = Laya.Skeleton;
-	var Templet   = Laya.Templet;
-	var Sprite    = Laya.Sprite;
-	var Event     = Laya.Event;
-	var Browser   = Laya.Browser;
-	var Handler   = Laya.Handler;
-	var Stat      = Laya.Stat;
-	var Tween     = Laya.Tween;
-	var WebGL     = Laya.WebGL;
+let 
+	mFactory,
+	mArmature,
+	mStartX = 400,
+	mStartY = 500,
+	mCurrIndex = 0,
+	mLabelSprite;
 
-	var mAniPath;
-	var mStartX = 400;
-	var mStartY = 500;
-	var mFactory;
-	var mActionIndex = 0;
-	var mCurrIndex = 0;
-	var mArmature;
-	var mCurrSkinIndex = 0;
-	var mFactory2;
-	var mLabelSprite;
-	(function(){
-		Laya.init(Browser.width, Browser.height,WebGL);
+class Skeleton_SpineEvent {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Sprite = Laya.Sprite;
+
+		// 不支持WebGL时自动切换至Canvas
+		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
+
+		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
+		Laya.stage.alignH = Stage.ALIGN_CENTER;
+
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#ffffff";
-		Stat.show();
+
 		mLabelSprite = new Sprite();
-		startFun();
-	})();
-	function startFun()
-	{
-		mAniPath = "res/spine/spineRes6/alien.sk";
+		Stat.show();
+		this.startFun();
+	}
+
+	startFun() {
+		const 
+			Templet = Laya.Templet,
+			Event = Laya.Event;
+		const mAniPath = "res/spine/spineRes6/alien.sk";
+
 		mFactory = new Templet();
-		mFactory.on(Event.COMPLETE, this, parseComplete);
-		mFactory.on(Event.ERROR, this, onError);
+		mFactory.on(Event.COMPLETE, this, this.parseComplete);
+		mFactory.on(Event.ERROR, this, this.onError);
 		mFactory.loadAni(mAniPath);
 	}
-	
-	function onError()
-	{
+
+	onError() {
 		trace("error");
 	}
-	
-	function parseComplete() {
-		//创建模式为1，可以启用换装
+
+	parseComplete() {
+		const Event = Laya.Event;
+		// 创建模式为1，使用动画自己的缓冲区，可以启用换装(相当耗费内存)
 		mArmature = mFactory.buildArmature(1);
-		mArmature.x = mStartX;
-		mArmature.y = mStartY;
-		mArmature.scale(0.5, 0.5);
 		Laya.stage.addChild(mArmature);
-		mArmature.on(Event.LABEL, this, onEvent);
-		mArmature.on(Event.STOPPED, this, completeHandler);
-		play();
+		mArmature.pos(mStartX, mStartY);
+		mArmature.scale(0.5, 0.5);
+		mArmature.on(Event.LABEL, this, this.onEvent);
+		mArmature.on(Event.STOPPED, this, this.completeHandler);
+		this.play();
 	}
-	
-	function completeHandler()
-	{
-		play();
+
+	completeHandler() {
+		this.play();
 	}
-	
-	function play()
-	{
+
+	play() {
 		mCurrIndex++;
-		if (mCurrIndex >= mArmature.getAnimNum())
-		{
+		let aniNum = mArmature.getAnimNum();
+		if (mCurrIndex >= aniNum) {
 			mCurrIndex = 0;
 		}
-		mArmature.play(mCurrIndex,false);
-		
+		mArmature.play(mCurrIndex, false);
 	}
-	
-	function onEvent(e)
-	{
-		var tEventData = e;
-		
+
+	onEvent(e) {
+		const 
+			Tween = Laya.Tween,
+			Handler = Laya.Handler;
+		let tEventData = e;
+
 		Laya.stage.addChild(mLabelSprite);
-		mLabelSprite.x = mStartX;
-		mLabelSprite.y = mStartY;
-		mLabelSprite.graphics.clear();
+		mLabelSprite.pos(mStartX, mStartY);
 		mLabelSprite.graphics.fillText(tEventData.name, 0, 0, "20px Arial", "#ff0000", "center");
-		Tween.to(mLabelSprite, { y:mStartY - 200 }, 1000, null,Handler.create(this,playEnd))
+		Tween.to(mLabelSprite, { y: mStartY - 200 }, 1000, null, Handler.create(this, this.playEnd))
 	}
-	
-	function playEnd()
-	{
+
+	playEnd() {
 		mLabelSprite.removeSelf();
 	}
-})();
+}
+
+new Skeleton_SpineEvent();

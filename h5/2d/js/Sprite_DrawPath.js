@@ -1,30 +1,27 @@
-(function()
-{
-	var Sprite  = Laya.Sprite;
-	var Stage   = Laya.Stage;
-	var Browser = Laya.Browser;
-	var WebGL   = Laya.WebGL;
+class Sprite_DrawPath {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		drawPentagram();
-	})();
+		this.drawPentagram();
+	}
 
-	function drawPentagram()
-	{
-		var canvas = new Sprite();
+	drawPentagram() {
+		let canvas = new Laya.Sprite();
 		Laya.stage.addChild(canvas);
-
-		var path = [];
+		
+		let path = [];
 		path.push(0, -130);
 		path.push(33, -33);
 		path.push(137, -30);
@@ -38,4 +35,6 @@
 
 		canvas.graphics.drawPoly(Laya.stage.width / 2, Laya.stage.height / 2, path, "#FF7F50");
 	}
-})();
+}
+
+new Sprite_DrawPath();

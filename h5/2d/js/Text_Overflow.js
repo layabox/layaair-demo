@@ -1,12 +1,11 @@
-(function()
-{
-	var Stage   = Laya.Stage;
-	var Text    = Laya.Text;
-	var Browser = Laya.Browser;
-	var WebGL   = Laya.WebGL;
+class Text_Overflow {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(600, 300, WebGL);
 
@@ -16,27 +15,29 @@
 		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		createTexts();
-	})();
+		this.createInput();
+	}
 
-	function createTexts()
-	{
-		var t1 = createText();
+	createInput() {
+		const Text = Laya.Text;
+
+		let t1 = this.createText();
 		t1.overflow = Text.VISIBLE;
 		t1.pos(10, 10);
 
-		var t2 = createText();
+		let t2 = this.createText();
 		t2.overflow = Text.SCROLL;
 		t2.pos(10, 110);
 
-		var t3 = createText();
+		let t3 = this.createText();
 		t3.overflow = Text.HIDDEN;
 		t3.pos(10, 210);
 	}
 
-	function createText()
-	{
-		var txt = new Text();
+	createText() {
+		const Text = Laya.Text;
+
+		let txt = new Text();
 
 		txt.text =
 			"Layabox是HTML5引擎技术提供商与优秀的游戏发行商，面向AS/JS/TS开发者提供HTML5开发技术方案！\n" +
@@ -53,4 +54,6 @@
 
 		return txt;
 	}
-})()
+}
+
+new Text_Overflow();

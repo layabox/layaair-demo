@@ -1,27 +1,28 @@
-(function()
-{
-	var Input = Laya.Input;
-	var Stage = Laya.Stage;
-	var Browser = Laya.Browser;
-	var WebGL = Laya.WebGL;
+class Text_Editable {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
-		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
+		Laya.init(Browser.width, Browser.height, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		createInput();
-	})();
+		this.createInput();
+	}
 
-	function createInput()
-	{
-		var inputText = new Input();
+	createInput() {
+		const Input = Laya.Input;
+
+		let inputText = new Input();
+		Laya.stage.addChild(inputText);
 
 		inputText.size(350, 100);
 		inputText.x = Laya.stage.width - inputText.width >> 1;
@@ -35,7 +36,7 @@
 		inputText.bgColor = "#666666";
 		inputText.color = "#ffffff";
 		inputText.fontSize = 20;
-
-		Laya.stage.addChild(inputText);
 	}
-})();
+}
+
+new Text_Editable();

@@ -1,18 +1,19 @@
-(function()
-{
-	var Stage = Laya.Stage;
-	var TextInput = Laya.TextInput;
-	var Handler = Laya.Handler;
-	var WebGL = Laya.WebGL;
+let 
+	SPACING = 100,
+	INPUT_WIDTH = 300,
+	INPUT_HEIGHT = 50,
+	Y_OFFSET = 50,
+	skins;
 
-	var SPACING = 100;
-	var INPUT_WIDTH = 300;
-	var INPUT_HEIGHT = 50;
-	var Y_OFFSET = 50;
-	var skins;
+class UI_Input {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(800, 600, WebGL);
 
@@ -22,23 +23,23 @@
 		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		skins = ["res/ui/input (1).png", "res/ui/input (2).png", "res/ui/input (3).png", "res/ui/input (4).png"];
-		Laya.loader.load(skins, Handler.create(this, onLoadComplete)); //加载资源。
-	})();
+		Stat.show();
+		skins = ["res/ui/input (1).png", "res/ui/input (2).png", "res/ui/input (3).png", "res/ui/input (4).png"]
+		Laya.loader.load(skins, Handler.create(this, this.onLoadComplete));
+	}
 
-	function onLoadComplete()
-	{
-		for (var i = 0; i < skins.length; ++i)
-		{
-			var input = createInput(skins[i]);
+	onLoadComplete() {
+		for (let i = 0, len = skins.length; i < len; ++i) {
+			var input = this.createInput(skins[i]);
 			input.prompt = 'Type:';
 			input.x = (Laya.stage.width - input.width) / 2;
 			input.y = i * SPACING + Y_OFFSET;
 		}
 	}
 
-	function createInput(skin)
-	{
+	createInput(skin) {
+		const TextInput = Laya.TextInput;
+
 		var ti = new TextInput();
 
 		ti.skin = skin;
@@ -53,4 +54,6 @@
 
 		return ti;
 	}
-})();
+}
+
+new UI_Input();

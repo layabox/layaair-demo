@@ -1,57 +1,64 @@
-(function()
-{
-	var Sprite    = Laya.Sprite;
-	var Browser   = Laya.Browser;
-	var Handler   = Laya.Handler;
-	var Stat      = Laya.Stat;
-	var Rectangle = Laya.Rectangle;
-	var WebGL     = Laya.WebGL;
+let 
+	texturePath = "res/tinyMaggot.png",
 
-	var texturePath = "res/tinyMaggot.png";
+	padding = 100,
+	maggotAmount = 5000,
 
-	var padding = 100;
-	var maggotAmount = 5000;
+	tick = 0,
+	maggots = [],
+	wrapBounds,
+	maggotTexture;
 
-	var tick = 0;
-	var maggots = [];
-	var wrapBounds;
-	var maggotTexture;
+class PerformanceTest_Maggots {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler,
+			Rectangle = Laya.Rectangle;
 
-	(function()
-	{
+		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.width, Browser.height, WebGL);
-		Laya.stage.bgColor = "#000000";
+
+		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
+		Laya.stage.alignH = Stage.ALIGN_CENTER;
+
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
+		Laya.stage.bgColor = "#232628";
+
 		Stat.show();
 
 		wrapBounds = new Rectangle(-padding, -padding, Laya.stage.width + padding * 2, Laya.stage.height + padding * 2);
 
-		Laya.loader.load(texturePath, Handler.create(this, onTextureLoaded));
-	})();
-
-	function onTextureLoaded()
-	{
-		maggotTexture = Laya.loader.getRes(texturePath);
-		initMaggots();
-		Laya.timer.frameLoop(1, this, animate);
+		Laya.loader.load(texturePath, Handler.create(this, this.onTextureLoaded));
 	}
 
-	function initMaggots()
-	{
-		var maggotContainer;
-		for (var i = 0; i < maggotAmount; i++)
-		{
-			if (i % 16000 == 0)
-				maggotContainer = createNewContainer();
+	onTextureLoaded() {
+		maggotTexture = Laya.loader.getRes(texturePath);
+		this.initMaggots();
+		Laya.timer.frameLoop(1, this, this.animate);
+	}
 
-			var maggot = newMaggot();
+	initMaggots() {
+		let maggotContainer;
+		for (let i = 0; i < maggotAmount; i++) {
+			if (i % 16000 == 0)
+				maggotContainer = this.createNewContainer();
+
+			let maggot = this.newMaggot();
 			maggotContainer.addChild(maggot);
 			maggots.push(maggot);
 		}
 	}
 
-	function createNewContainer()
-	{
-		var container = new Sprite();
+	createNewContainer() {
+		const 
+			Sprite = Laya.Sprite,
+			Browser = Laya.Browser;
+
+		let container = new Sprite();
 		container.size(Browser.clientWidth, Browser.clientHeight);
 		// 此处cacheAsBitmap主要是为了创建新画布
 		// 解除IBQuadrangle数量限制
@@ -61,14 +68,15 @@
 		return container;
 	}
 
-	function newMaggot()
-	{
-		var maggot = new Sprite();
+	newMaggot() {
+		const Sprite = Laya.Sprite;
+
+		let maggot = new Sprite();
 		maggot.graphics.drawTexture(maggotTexture, 0, 0);
 
 		maggot.pivot(16.5, 35);
 
-		var rndScale = 0.8 + Math.random() * 0.3;
+		let rndScale = 0.8 + Math.random() * 0.3;
 		maggot.scale(rndScale, rndScale);
 		maggot.rotation = 0.1;
 		maggot.x = Math.random() * Laya.stage.width;
@@ -82,13 +90,12 @@
 		return maggot;
 	}
 
-	function animate()
-	{
-		var maggot;
-		var wb = wrapBounds;
-		var angleUnit = 180 / Math.PI;
-		var dir, x = 0.0, y = 0.0;
-		for (var i = 0; i < maggotAmount; i++)
+	animate() {
+		let maggot;
+		let wb = wrapBounds;
+		let angleUnit = 180 / Math.PI;
+		let dir, x = 0.0, y = 0.0;
+		for (let i = 0; i < maggotAmount; i++)
 		{
 			maggot = maggots[i];
 
@@ -118,4 +125,6 @@
 
 		tick += 0.1;
 	}
-})();
+}
+
+new PerformanceTest_Maggots();

@@ -1,109 +1,108 @@
-(function()
-{
-	var Sprite  = Laya.Sprite;
-	var Stage   = Laya.Stage;
-	var Event   = Laya.Event;
-	var Browser = Laya.Browser;
-	var Tween   = Laya.Tween;
-	var WebGL   = Laya.WebGL;
+//swipe滚动范围
+let TrackLength = 200;
+//触发swipe的拖动距离
+let TOGGLE_DIST = TrackLength / 2;
 
-	//swipe滚动范围
-	var TrackLength = 200;
-	//触发swipe的拖动距离
-	var TOGGLE_DIST = TrackLength / 2;
+let buttonPosition, beginPosition, endPosition;
+let button;
 
-	var buttonPosition, beginPosition, endPosition;
-	var button;
+class Interaction_Swipe {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-
-		setup();
-	})();
-
-
-	function setup()
-	{
-		createSprtie();
-		drawTrack();
+		Stat.show();
+		this.setup();
 	}
 
+	setup() {
+		this.createSprite();
+		this.drawTrack();
+	}
 
-	function createSprtie()
-	{
+	createSprite() {
+		const 
+			Sprite = Laya.Sprite,
+			Event = Laya.Event;
+
 		const w = 50;
 		const h = 30;
 
-		button = new Sprite();
-		button.graphics.drawRect(0, 0, w, h, "#FF7F50");
-		button.pivot(w / 2, h / 2);
+		this.button = new Sprite();
+		this.button.graphics.drawRect(0, 0, w, h, "#FF7F50");
+		this.button.pivot(w / 2, h / 2);
 		//设置宽高（要接收鼠标事件必须设置宽高，否则不会被命中）  
-		button.size(w, h);
-		button.x = (Laya.stage.width - TrackLength) / 2;
-		button.y = Laya.stage.height / 2;
+		this.button.size(w, h);
+		this.button.x = (Laya.stage.width - TrackLength) / 2;
+		this.button.y = Laya.stage.height / 2;
 
-		button.on(Event.MOUSE_DOWN, this, onMouseDown);
+		this.button.on(Event.MOUSE_DOWN, this, this.onMouseDown);
 
-		Laya.stage.addChild(button);
+		Laya.stage.addChild(this.button);
 		//左侧临界点设为圆形初始位置
-		beginPosition = button.x;
+		beginPosition = this.button.x;
 		//右侧临界点设置
 		endPosition = beginPosition + TrackLength;
 	}
 
-
-	function drawTrack()
-	{
-		var graph = new Sprite();
+	drawTrack() {
 		Laya.stage.graphics.drawLine(
 			beginPosition, Laya.stage.height / 2,
 			endPosition, Laya.stage.height / 2,
 			"#FFFFFF", 20);
-		Laya.stage.addChild(graph);
 	}
 
 	/**按下事件处理*/
-	function onMouseDown(e)
-	{
-		//添加鼠标移到侦听
-		Laya.stage.on(Event.MOUSE_MOVE, this, onMouseMove);
-		buttonPosition = button.x;
+	onMouseDown(e) {
+		const Event = Laya.Event;
 
-		Laya.stage.on(Event.MOUSE_UP, this, onMouseUp);
-		Laya.stage.on(Event.MOUSE_OUT, this, onMouseUp);
+		//添加鼠标移到侦听
+		Laya.stage.on(Event.MOUSE_MOVE, this, this.onMouseMove);
+		buttonPosition = this.button.x;
+
+		Laya.stage.on(Event.MOUSE_UP, this, this.onMouseUp);
+		Laya.stage.on(Event.MOUSE_OUT, this, this.onMouseUp);
 	}
 	/**移到事件处理*/
-	function onMouseMove(e)
-	{
-		button.x = Math.max(Math.min(Laya.stage.mouseX, endPosition), beginPosition);
+	onMouseMove(e) {
+		this.button.x = Math.max(Math.min(Laya.stage.mouseX, endPosition), beginPosition);
 	}
 
 
 	/**抬起事件处理*/
-	function onMouseUp(e)
-	{
-		Laya.stage.off(Event.MOUSE_MOVE, this, onMouseMove);
-		Laya.stage.off(Event.MOUSE_UP, this, onMouseUp);
-		Laya.stage.off(Event.MOUSE_OUT, this, onMouseUp);
+	onMouseUp(e) {
+		const 
+			Event = Laya.Event,
+			Tween = Laya.Tween;
+
+		Laya.stage.off(Event.MOUSE_MOVE, this, this.onMouseMove);
+		Laya.stage.off(Event.MOUSE_UP, this, this.onMouseUp);
+		Laya.stage.off(Event.MOUSE_OUT, this, this.onMouseUp);
 
 		// 滑动到目的地
-		var dist = Laya.stage.mouseX - buttonPosition;
+		let dist = Laya.stage.mouseX - buttonPosition;
 
-		var targetX = beginPosition;
-		if (dist > TOGGLE_DIST)
+		let targetX = beginPosition;
+		if (dist > TOGGLE_DIST) {
 			targetX = endPosition;
-		Tween.to(button,
-		{
+		}
+		Tween.to(this.button, {
 			x: targetX
 		}, 100);
 	}
-})();
+}
+
+new Interaction_Swipe();

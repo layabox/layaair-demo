@@ -1,78 +1,60 @@
-(function()
-{
-	var Stage   = Laya.Stage;
-	var Text    = Laya.Text;
-	var Event   = Laya.Event;
-	var Browser = Laya.Browser;
-	var WebGL   = Laya.WebGL;
+let logger, keyDownList;
 
-	var logger, keyDownList;
+class Interaction_Keyboard {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-
-		setup();
-	})();
-
-	function setup()
-	{
-		listenKeyboard();
-		createLogger();
-
-		Laya.timer.frameLoop(1, this, keyboardInspector);
+		Stat.show();
+		this.setup();
 	}
 
-	function listenKeyboard()
-	{
+	setup() {
+		this.listenKeyboard();
+		this.createLogger();
+
+		Laya.timer.frameLoop(1, this, this.keyboardInspector);
+	}
+
+	listenKeyboard() {
+		const Event = Laya.Event;
+
+		// 用Set实现更好一些
 		keyDownList = [];
 
-		//添加键盘按下事件,一直按着某按键则会不断触发
-		Laya.stage.on(Event.KEY_DOWN, this, onKeyDown);
-		//添加键盘抬起事件
-		Laya.stage.on(Event.KEY_UP, this, onKeyUp);
+		// 添加键盘按下事件,一直按着某按键则会不断触发
+		Laya.stage.on(Event.KEY_DOWN, this, this.onKeyDown);
+		// 添加键盘抬起事件
+		Laya.stage.on(Event.KEY_UP, this, this.onKeyUp);
 	}
 
-	/**键盘按下处理*/
-	function onKeyDown(e)
-	{
+	/** 键盘按下处理 */
+	onKeyDown(e) {
 		keyDownList[e["keyCode"]] = true;
 	}
 
-	/**键盘抬起处理*/
-	function onKeyUp(e)
-	{
+	/** 键盘抬起处理 */
+	onKeyUp(e) {
 		delete keyDownList[e["keyCode"]];
 	}
 
-	function keyboardInspector()
-	{
-		var numKeyDown = keyDownList.length;
+	/** 添加提示文本 */
+	createLogger() {
+		const Text = Laya.Text;
 
-		var newText = '[ ';
-		for (var i = 0; i < numKeyDown; i++)
-		{
-			if (keyDownList[i])
-			{
-				newText += i + " ";
-			}
-		}
-		newText += ']';
-
-		logger.changeText(newText);
-	}
-
-	/**添加提示文本*/
-	function createLogger()
-	{
 		logger = new Text();
 
 		logger.size(Laya.stage.width, Laya.stage.height);
@@ -85,4 +67,21 @@
 
 		Laya.stage.addChild(logger);
 	}
-})();
+
+	keyboardInspector() {
+		let numKeyDown = keyDownList.length;
+
+		let newText = '[ ';
+		console.log(numKeyDown);
+		for (let i = 0; i < numKeyDown; i++) {
+			if (keyDownList[i]) {
+				newText += i + " ";
+			}
+		}
+		newText += ']';
+
+		logger.changeText(newText);
+	}
+}
+
+new Interaction_Keyboard();

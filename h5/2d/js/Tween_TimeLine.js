@@ -1,84 +1,92 @@
-(function ()
-{
-	var Sprite = Laya.Sprite;
-	var Stage = Laya.Stage;
-	var Event = Laya.Event;
-	var Keyboard = Laya.Keyboard;
-	var TimeLine = Laya.TimeLine;
-	var WebGL = Laya.WebGL;
+class Tween_TimeLine {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-
-	var target;
-	var timeLine = new TimeLine();
-	(function ()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(550, 400, WebGL);
-		
+
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
-		
+
 		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
-		
-		setup();
-	})();
-	function setup()
-	{	
-		createApe();
-		createTimerLine();
-		Laya.stage.on( Event.KEY_DOWN, this, this.keyDown);
+
+		Stat.show();
+		this.setup();
 	}
-	function createApe()
-	{
-		target = new Sprite();
-		target.loadImage("res/apes/monkey2.png");
-		Laya.stage.addChild(target);
-		target.pivot(55, 72);
-		target.pos(100,100);
+
+	setup() {
+		const Event = Laya.Event;
+
+		this.createApe();
+		this.createTimerLine();
+		Laya.stage.on(Event.KEY_DOWN, this, this.keyDown);
+	}
+
+	createApe() {
+		const Sprite = Laya.Sprite;
+
+		this.target = new Sprite();
+		Laya.stage.addChild(this.target);
+
+		this.target.loadImage("res/apes/monkey2.png");
+		this.target.pivot(55, 72);
+		this.target.pos(100,100);
 	}
 	
-	function createTimerLine()
-	{
-		
-		timeLine.addLabel("turnRight",0).to(target,{x:450, y:100, scaleX:0.5, scaleY:0.5},2000,null,0)
-				.addLabel("turnDown",0).to(target,{x:450, y:300, scaleX:0.2, scaleY:1, alpha:1},2000,null,0)
-				.addLabel("turnLeft",0).to(target,{x:100, y:300, scaleX:1, scaleY:0.2, alpha:0.1},2000,null,0)
-				.addLabel("turnUp",0).to(target,{x:100, y:100, scaleX:1, scaleY:1, alpha:1},2000,null,0);
-		timeLine.play(0,true);
-		timeLine.on(Event.COMPLETE,this,this.onComplete);
-		timeLine.on(Event.LABEL, this, this.onLabel);
-	}	
-	function onComplete()
-	{
+	createTimerLine() {
+		const 
+			TimeLine = Laya.TimeLine,
+			Event = Laya.Event;
+
+		this.timeLine = new TimeLine();
+		// addLabel(label:String, offset:Number) offset: 标签事件相对于上个动画的偏移时间(单位：毫秒)
+		this.timeLine.addLabel("turnRight", 0).to(this.target, {x:450, y:100, scaleX:0.5, scaleY:0.5}, 2000, null, 0)
+			.addLabel("turnDown", 0).to(this.target, {x:450, y:300, scaleX:0.2, scaleY:1, alpha:1}, 2000, null, 0)
+			.addLabel("turnLeft", 0).to(this.target, {x:100, y:300, scaleX:1, scaleY:0.2, alpha:0.1}, 2000, null, 0)
+			.addLabel("turnUp", 0).to(this.target, {x:100, y:100, scaleX:1, scaleY:1, alpha:1}, 2000, null, 0);
+		this.timeLine.play(0, true);
+		this.timeLine.on(Event.COMPLETE, this, this.onComplete);
+		this.timeLine.on(Event.LABEL, this, this.onLabel);
+	}
+
+	onComplete() {
 		console.log("timeLine complete!!!!");
 	}
-	function onLabel(label)
-	{
+	
+	onLabel(label) {
 		console.log("LabelName:" + label);
 	}
-	function keyDown(e)
-	{
-		switch(e.keyCode)
-		{
+
+	keyDown(e) {
+		const Keyboard = Laya.Keyboard;
+
+		switch(e.keyCode) {
 			case Keyboard.LEFT:
-				timeLine.play("turnLeft");
+				this.timeLine.play("turnLeft");
 				break;
 			case Keyboard.RIGHT:
-				timeLine.play("turnRight");
+				this.timeLine.play("turnRight");
 				break;
 			case Keyboard.UP:
-				timeLine.play("turnUp");
+				this.timeLine.play("turnUp");
 				break;
 			case Keyboard.DOWN:
-				timeLine.play("turnDown");
+				this.timeLine.play("turnDown");
 				break;
 			case Keyboard.P:
-				timeLine.pause();
+				this.timeLine.pause();
 				break;
 			case Keyboard.R:
-				timeLine.resume();
+				this.timeLine.resume();
 				break;
 		}
 	}
-})();
+}
+
+new Tween_TimeLine();

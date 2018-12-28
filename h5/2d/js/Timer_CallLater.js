@@ -1,14 +1,14 @@
-(function()
-{
-	var Stage   = Laya.Stage;
-	var Text    = Laya.Text;
-	var Browser = Laya.Browser;
-	var WebGL   = Laya.WebGL;
+class Timer_CallLater {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
-		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
+		Laya.init(550, 400, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
@@ -16,22 +16,22 @@
 		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		demonstrate();
-	})();
+		Stat.show();
+		this.demonstrate();
+	}
 
-	function demonstrate()
-	{
-		for (var i = 0; i < 10; i++)
-		{
-			Laya.timer.callLater(this, onCallLater);
+	demonstrate() {
+		for (let i = 0; i < 10; i++) {
+			Laya.timer.callLater(this, this.onCallLater);
 		}
 	}
 
-	function onCallLater()
-	{
+	onCallLater() {
+		const Text = Laya.Text;
+
 		console.log("onCallLater triggered");
 
-		var text = new Text();
+		let text = new Text();
 		text.font = "SimHei";
 		text.fontSize = 30;
 		text.color = "#FFFFFF";
@@ -42,4 +42,7 @@
 		text.align = "center";
 		Laya.stage.addChild(text);
 	}
-})();
+
+}
+
+new Timer_CallLater();

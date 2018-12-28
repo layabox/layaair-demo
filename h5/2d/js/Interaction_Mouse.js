@@ -1,37 +1,38 @@
-(function()
-{
-	var Sprite  = Laya.Sprite;
-	var Stage   = Laya.Stage;
-	var Text    = Laya.Text;
-	var Event   = Laya.Event;
-	var Browser = Laya.Browser;
-	var WebGL   = Laya.WebGL;
+let txt;
 
-	var txt;
+class Interaction_Mouse {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		setup();
-	})();
-
-	function setup()
-	{
-		createInteractiveTarget();
-		createLogger();
+		Stat.show();
+		this.setup();
 	}
 
-	function createInteractiveTarget()
-	{
-		var rect = new Sprite();
+	setup() {
+		this.createInteractiveTarget();
+		this.createLogger();
+	}
+
+	createInteractiveTarget() {
+		const 
+			Event = Laya.Event,
+			Sprite = Laya.Sprite;
+
+		let rect = new Sprite();
 		rect.graphics.drawRect(0, 0, 200, 200, "#D2691E");
 
 		rect.size(200, 200);
@@ -40,75 +41,76 @@
 		Laya.stage.addChild(rect);
 
 		//增加鼠标事件
-		rect.on(Event.MOUSE_DOWN, this, mouseHandler);
-		rect.on(Event.MOUSE_UP, this, mouseHandler);
-		rect.on(Event.CLICK, this, mouseHandler);
-		rect.on(Event.RIGHT_MOUSE_DOWN, this, mouseHandler);
-		rect.on(Event.RIGHT_MOUSE_UP, this, mouseHandler);
-		rect.on(Event.RIGHT_CLICK, this, mouseHandler);
-		rect.on(Event.MOUSE_MOVE, this, mouseHandler);
-		rect.on(Event.MOUSE_OVER, this, mouseHandler);
-		rect.on(Event.MOUSE_OUT, this, mouseHandler);
-		rect.on(Event.DOUBLE_CLICK, this, mouseHandler);
-		rect.on(Event.MOUSE_WHEEL, this, mouseHandler);
+		rect.on(Event.MOUSE_DOWN, this, this.mouseHandler);
+		rect.on(Event.MOUSE_UP, this, this.mouseHandler);
+		rect.on(Event.CLICK, this, this.mouseHandler);
+		rect.on(Event.RIGHT_MOUSE_DOWN, this, this.mouseHandler);
+		rect.on(Event.RIGHT_MOUSE_UP, this, this.mouseHandler);
+		rect.on(Event.RIGHT_CLICK, this, this.mouseHandler);
+		rect.on(Event.MOUSE_MOVE, this, this.mouseHandler);
+		rect.on(Event.MOUSE_OVER, this, this.mouseHandler);
+		rect.on(Event.MOUSE_OUT, this, this.mouseHandler);
+		rect.on(Event.DOUBLE_CLICK, this, this.mouseHandler);
+		rect.on(Event.MOUSE_WHEEL, this, this.mouseHandler);
 	}
 
 	/**
 	 * 鼠标响应事件处理
 	 */
-	function mouseHandler(e)
-	{
-		switch (e.type)
-		{
+	mouseHandler(e) {
+		const Event = Laya.Event;
+
+		switch (e.type) {
 			case Event.MOUSE_DOWN:
-				appendText("\n————————\n左键按下");
+				this.appendText("\n————————\n左键按下");
 				break;
 			case Event.MOUSE_UP:
-				appendText("\n左键抬起");
+				this.appendText("\n左键抬起");
 				break;
 			case Event.CLICK:
-				appendText("\n左键点击\n————————");
+				this.appendText("\n左键点击\n————————");
 				break;
 			case Event.RIGHT_MOUSE_DOWN:
-				appendText("\n————————\n右键按下");
+				this.appendText("\n————————\n右键按下");
 				break;
 			case Event.RIGHT_MOUSE_UP:
-				appendText("\n右键抬起");
+				this.appendText("\n右键抬起");
 				break;
 			case Event.RIGHT_CLICK:
-				appendText("\n右键单击\n————————");
+				this.appendText("\n右键单击\n————————");
 				break;
 			case Event.MOUSE_MOVE:
 				// 如果上一个操作是移动，提示信息仅加入.字符
-				if (/鼠标移动\.*$/.test(txt.text))
-					appendText(".");
-				else
-					appendText("\n鼠标移动");
+				if (/鼠标移动\.*$/.test(txt.text)) {
+					this.appendText(".");
+				} else {
+					this.appendText("\n鼠标移动");
+				}
 				break;
 			case Event.MOUSE_OVER:
-				appendText("\n鼠标经过目标");
+				this.appendText("\n鼠标经过目标");
 				break;
 			case Event.MOUSE_OUT:
-				appendText("\n鼠标移出目标");
+				this.appendText("\n鼠标移出目标");
 				break;
 			case Event.DOUBLE_CLICK:
-				appendText("\n鼠标左键双击\n————————");
+				this.appendText("\n鼠标左键双击\n————————");
 				break;
 			case Event.MOUSE_WHEEL:
-				appendText("\n鼠标滚轮滚动");
+				this.appendText("\n鼠标滚轮滚动");
 				break;
 		}
 	}
 
-	function appendText(value)
-	{
+	appendText(value) {
 		txt.text += value;
 		txt.scrollY = txt.maxScrollY;
 	}
 
 	/**添加提示文本*/
-	function createLogger()
-	{
+	createLogger() {
+		const Text = Laya.Text;
+
 		txt = new Text();
 
 		txt.overflow = Text.SCROLL;
@@ -121,4 +123,6 @@
 
 		Laya.stage.addChild(txt);
 	}
-})();
+}
+
+new Interaction_Mouse();

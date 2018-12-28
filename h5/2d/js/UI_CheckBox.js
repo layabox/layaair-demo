@@ -1,21 +1,21 @@
-(function()
-{
-	var Stage    = Laya.Stage;
-	var CheckBox = Laya.CheckBox;
-	var Handler  = Laya.Handler;
-	var WebGL    = Laya.WebGL;
+let COL_AMOUNT = 2,
+	ROW_AMOUNT = 3,
+	HORIZONTAL_SPACING = 200,
+	VERTICAL_SPACING = 100,
+	X_OFFSET = 100,
+	Y_OFFSET = 50,
 
-	var COL_AMOUNT = 2;
-	var ROW_AMOUNT = 3;
-	var HORIZONTAL_SPACING = 200;
-	var VERTICAL_SPACING = 100;
-	var X_OFFSET = 100;
-	var Y_OFFSET = 50;
+	skins;
 
-	var skins;
+class UI_CheckBox {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(800, 600, WebGL);
 
@@ -27,36 +27,33 @@
 
 		skins = ["res/ui/checkbox (1).png", "res/ui/checkbox (2).png", "res/ui/checkbox (3).png", "res/ui/checkbox (4).png", "res/ui/checkbox (5).png", "res/ui/checkbox (6).png"];
 
-		Laya.loader.load(skins, Handler.create(this, onCheckBoxSkinLoaded));
-	})();
+		Laya.loader.load(skins, Handler.create(this, this.onCheckBoxSkinLoaded));
+	}
 
-	function onCheckBoxSkinLoaded()
-	{
-		var cb;
-		for (var i = 0; i < COL_AMOUNT; ++i)
-		{
-			for (var j = 0; j < ROW_AMOUNT; ++j)
-			{
-				cb = createCheckBox(skins[i * ROW_AMOUNT + j]);
+	onCheckBoxSkinLoaded() {
+		let cb;
+		for (let i = 0; i < COL_AMOUNT; ++i) {
+			for (let j = 0; j < ROW_AMOUNT; ++j) {
+				cb = this.createCheckBox(skins[i * ROW_AMOUNT + j]);
 				cb.selected = true;
 
 				cb.x = HORIZONTAL_SPACING * i + X_OFFSET;
 				cb.y += VERTICAL_SPACING * j + Y_OFFSET;
 
 				// 给左边的三个CheckBox添加事件使其能够切换标签
-				if (i == 0)
-				{
+				if (i === 0) {
 					cb.y += 20;
-					cb.on("change", this, updateLabel, [cb]);
-					updateLabel(cb);
+					cb.on("change", this, this.updateLabel, [cb]);
+					this.updateLabel(cb);
 				}
 			}
 		}
 	}
 
-	function createCheckBox(skin)
-	{
-		var cb = new CheckBox(skin);
+	createCheckBox(skin) {
+		const CheckBox = Laya.CheckBox;
+
+		let cb = new CheckBox(skin);
 		Laya.stage.addChild(cb);
 
 		cb.labelColors = "white";
@@ -67,8 +64,9 @@
 		return cb;
 	}
 
-	function updateLabel(checkBox)
-	{
+	updateLabel(checkBox) {
 		checkBox.label = checkBox.selected ? "已选中" : "未选中";
 	}
-})();
+}
+
+new UI_CheckBox();

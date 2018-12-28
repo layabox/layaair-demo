@@ -1,61 +1,66 @@
-(function()
-{
-	var Sprite  = Laya.Sprite;
-	var Stage   = Laya.Stage;
-	var Event   = Laya.Event;
-	var Browser = Laya.Browser;
-	var Ease    = Laya.Ease;
-	var Tween   = Laya.Tween;
-	var WebGL   = Laya.WebGL;
+const ROTATE = "rotate";
 
-	var ROTATE = "rotate";
-	var sp;
+class Interaction_CustomEvent {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		createSprite();
-	})();
-
-
-	function createSprite()
-	{
-		sp = new Sprite();
-		sp.graphics.drawRect(0, 0, 200, 200, "#D2691E");
-		sp.pivot(100, 100);
-
-		sp.x = Laya.stage.width / 2;
-		sp.y = Laya.stage.height / 2;
-
-		sp.size(200, 200);
-		Laya.stage.addChild(sp);
-
-		sp.on(ROTATE, this, onRotate); // 侦听自定义的事件
-		sp.on(Event.CLICK, this, onSpriteClick);
+		Stat.show();
+		this.setup();
 	}
 
+	setup() {
+		this.createSprite();
+	}
 
-	function onSpriteClick(e)
-	{
-		var randomAngle = Math.random() * 180;
+	createSprite() {
+		const 
+			Sprite = Laya.Sprite,
+			Event = Laya.Event;
+
+		this.sp = new Sprite();
+		this.sp.graphics.drawRect(0, 0, 200, 200, "#D2691E");
+		this.sp.pivot(100, 100);
+
+		this.sp.x = Laya.stage.width / 2;
+		this.sp.y = Laya.stage.height / 2;
+
+		this.sp.size(200, 200);
+		Laya.stage.addChild(this.sp);
+
+		this.sp.on(ROTATE, this, this.onRotate); // 侦听自定义的事件
+		this.sp.on(Event.CLICK, this, this.onSpriteClick);
+	}
+
+	onSpriteClick(e) {
+		let randomAngle = Math.random() * 180;
 		//发送自定义事件
-		sp.event(ROTATE, [randomAngle]);
+		this.sp.event(ROTATE, [randomAngle]);
 	}
 
 	// 触发自定义的rotate事件
-	function onRotate(newAngle)
-	{
-		Tween.to(sp,
-		{
+	onRotate(newAngle) {
+		const 
+			Tween = Laya.Tween,
+			Ease = Laya.Ease;
+
+		Tween.to(this.sp, {
 			"rotation": newAngle
 		}, 1000, Ease.elasticOut);
 	}
-})();
+}
+
+new Interaction_CustomEvent();

@@ -1,38 +1,48 @@
-(function()
-{
-	var Event   = Laya.Event;
-	var Loader  = Laya.Loader;
-	var Texture = Laya.Texture;
-	var Handler = Laya.Handler;
+let numLoaded = 0;
 
-	(function()
-	{
-		Laya.init(550, 400);
+class Loader_ProgressAndErrorHandle {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler,
+			Event = Laya.Event,
+			Loader = Laya.Loader;
+
+		// 不支持WebGL时自动切换至Canvas
+		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
+
+		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
+		Laya.stage.alignH = Stage.ALIGN_CENTER;
+
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
+		Laya.stage.bgColor = "#232628";
 
 		// 无加载失败重试
 		Laya.loader.retryNum = 0;
 
 		var urls = ["do not exist", "res/fighter/fighter.png", "res/legend/map.jpg"];
-		Laya.loader.load(urls, Handler.create(this, onAssetLoaded), Handler.create(this, onLoading, null, false), Loader.TEXT);
+		Laya.loader.load(urls, Handler.create(this, this.onAssetLoaded), Handler.create(this, this.onLoading, null, false), Loader.TEXT);
 
 		// 侦听加载失败
-		Laya.loader.on(Event.ERROR, this, onError);
-	})();
+		Laya.loader.on(Event.ERROR, this, this.onError);
+	}
 
-	function onAssetLoaded(texture)
-	{
+	onAssetLoaded(texture) {
 		// 使用texture
 		console.log("加载结束");
 	}
 
 	// 加载进度侦听器
-	function onLoading(progress)
-	{
+	onLoading(progress) {
 		console.log("加载进度: " + progress);
 	}
 
-	function onError(err)
-	{
+	onError(err) {
 		console.log("加载失败: " + err);
 	}
-})();
+}
+
+new Loader_ProgressAndErrorHandle();

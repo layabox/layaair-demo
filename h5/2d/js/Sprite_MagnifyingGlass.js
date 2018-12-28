@@ -1,56 +1,58 @@
-(function()
-{
-	var Sprite = Laya.Sprite;
-	var Stage = Laya.Stage;
-	var Browser = Laya.Browser;
-	var Handler = Laya.Handler;
-	var WebGL = Laya.WebGL;
+let 
+	bgPath = "res/bg2.png",
+	maskPath = "res/mask.png";
 
-	var maskSp;
-	var bg2;
+class Sprite_MagnifyingGlass {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
-		Laya.init(1136, 640, WebGL);
+		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		Laya.loader.load("res/bg2.png", Handler.create(this, setup));
-	})();
+		Laya.loader.load([bgPath, maskPath], Laya.Handler.create(this, this.setup));
+	}
 
-	function setup()
-	{
-		var bg = new Sprite();
-		bg.loadImage("res/bg2.png");
+	setup() {
+		const 
+			Sprite = Laya.Sprite;
+		let 
+			bgRes = Laya.loader.getRes(bgPath),
+			maskRes = Laya.loader.getRes(maskPath);
+
+		let bg = new Sprite();
 		Laya.stage.addChild(bg);
+		bg.graphics.drawTexture(bgRes);
 
-		bg2 = new Sprite();
-		bg2.loadImage("res/bg2.png");
+		let bg2 = new Sprite();
 		Laya.stage.addChild(bg2);
+		bg2.graphics.drawTexture(bgRes);
 		bg2.scale(3, 3);
 
-		//创建mask
-		maskSp = new Sprite();
-		maskSp.loadImage("res/mask.png");
+		// 创建mask
+		let maskSp = new Sprite();
+		maskSp.graphics.drawTexture(maskRes);
 		maskSp.pivot(50, 50);
 
-		//设置mask
+		// 设置mask
 		bg2.mask = maskSp;
 
-		Laya.stage.on("mousemove", this, onMouseMove);
-	}
+		Laya.stage.on(Laya.Event.MOUSE_MOVE, this, () => {
+			bg2.x = -Laya.stage.mouseX * 2;
+			bg2.y = -Laya.stage.mouseY * 2;
 
-	function onMouseMove()
-	{
-		bg2.x = -Laya.stage.mouseX * 2;
-		bg2.y = -Laya.stage.mouseY * 2;
-
-		maskSp.x = Laya.stage.mouseX;
-		maskSp.y = Laya.stage.mouseY;
+			maskSp.x = Laya.stage.mouseX;
+			maskSp.y = Laya.stage.mouseY;
+		});
 	}
-})();
+}
+
+new Sprite_MagnifyingGlass();

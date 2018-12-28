@@ -1,79 +1,84 @@
-(function()
-{
-	var Skeleton = Laya.Skeleton;
-	var Templet  = Laya.Templet;
-	var Event    = Laya.Event;
-	var Browser  = Laya.Browser;
-	var Stat     = Laya.Stat;
-	var WebGL    = Laya.WebGL;
+let 
+	mFactory,
+	mArmature,
+	mStartX = 200,
+	mStartY = 500,
+	mCurrIndex = 0,
+	mSkinList = ["goblin","goblingirl"],
+	mCurrSkinIndex = 0;
 
+class Skeleton_ChangeSkin {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Sprite = Laya.Sprite;
 
-	var mAniPath;
-	var mStartX = 400;
-	var mStartY = 500;
-	var mFactory;
-	var mActionIndex = 0;
-	var mCurrIndex = 0;
-	var mArmature;
-	var mCurrSkinIndex = 0;
-	var mSkinList = ["goblin","goblingirl"];
-	(function()
-	{
-		WebGL.enable();
-		Laya.init(Browser.width, Browser.height);
+		// 不支持WebGL时自动切换至Canvas
+		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
+
+		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
+		Laya.stage.alignH = Stage.ALIGN_CENTER;
+
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#ffffff";
+
 		Stat.show();
-		startFun();
-	})();
-    function startFun()
-	{
-		mAniPath = "res/spine/spineRes2/goblins.sk";
+		this.startFun();
+	}
+
+	startFun() {
+		const 
+			Templet = Laya.Templet,
+			Event = Laya.Event;
+		const mAniPath = "res/spine/spineRes2/goblins.sk";
+
 		mFactory = new Templet();
-		mFactory.on(Event.COMPLETE, this, parseComplete);
-		mFactory.on(Event.ERROR, this, onError);
+		mFactory.on(Event.COMPLETE, this, this.parseComplete);
+		mFactory.on(Event.ERROR, this, this.onError);
 		mFactory.loadAni(mAniPath);
 	}
-	
-	function onError()
-	{
+
+	onError() {
 		trace("error");
 	}
-	
-	function parseComplete() {
-		//创建模式为1，可以启用换装
+
+	parseComplete() {
+		const Event = Laya.Event;
+		// 创建模式为1，使用动画自己的缓冲区，可以启用换装(相当耗费内存)
 		mArmature = mFactory.buildArmature(1);
-		mArmature.x = mStartX;
-		mArmature.y = mStartY;
 		Laya.stage.addChild(mArmature);
-		mArmature.on(Event.STOPPED, this, completeHandler);
-		play();
-		changeSkin();
-		Laya.timer.loop(1000, this, changeSkin);
+		mArmature.pos(mStartX, mStartY);
+		// mArmature.scale(0.5, 0.5);
+		mArmature.on(Event.STOPPED, this, this.completeHandler);
+		this.play();
+		this.changeSkin();
+		Laya.timer.loop(1000, this, this.changeSkin);
 	}
-	
-	function changeSkin()
-	{
+
+	changeSkin() {
 		mCurrSkinIndex++;
-		if (mCurrSkinIndex >= mSkinList.length)
-		{
+		let skinLength = mSkinList.length;
+		if (mCurrSkinIndex >= skinLength) {
 			mCurrSkinIndex = 0;
 		}
 		mArmature.showSkinByName(mSkinList[mCurrSkinIndex]);
 	}
-	
-	function completeHandler()
-	{
-		play();
+
+	completeHandler() {
+		this.play();
 	}
-	
-	function play()
-	{
+
+	play() {
 		mCurrIndex++;
-		if (mCurrIndex >= mArmature.getAnimNum())
-		{
+		let aniNum = mArmature.getAnimNum();
+		if (mCurrIndex >= aniNum) {
 			mCurrIndex = 0;
 		}
-		mArmature.play(mCurrIndex,false);
-		
+		mArmature.play(mCurrIndex, false);
 	}
-})();
+}
+
+new Skeleton_ChangeSkin();

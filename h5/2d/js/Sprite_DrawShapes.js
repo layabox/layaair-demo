@@ -1,30 +1,26 @@
-(function()
-{
-    var Sprite = Laya.Sprite;
-    var Stage = Laya.Stage;
-    var WebGL = Laya.WebGL;
+class Sprite_DrawShapes {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage;
 
-    var sp;
+		// 不支持WebGL时自动切换至Canvas
+		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
-    (function()
-    {
-        // 不支持WebGL时自动切换至Canvas
-        Laya.init(740, 400, WebGL);
+		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
+		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-        Laya.stage.alignV = Stage.ALIGN_MIDDLE;
-        Laya.stage.alignH = Stage.ALIGN_CENTER;
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
+		Laya.stage.bgColor = "#232628";
 
-        Laya.stage.scaleMode = "showall";
-        Laya.stage.bgColor = "#232628";
+		this.drawSomething();
+	}
 
-        drawSomething();
-    })();
-
-    function drawSomething()
-    {
-        sp = new Sprite();
-        Laya.stage.addChild(sp);
-        //画线
+	drawSomething() {
+		let sp = new Laya.Sprite();
+		Laya.stage.addChild(sp);
+		//画线
         sp.graphics.drawLine(10, 58, 146, 58, "#ff0000", 3);
         //画连续直线
         sp.graphics.drawLines(176, 58, [0, 0, 39, -50, 78, 0, 117, 50, 156, 0], "#ff0000", 5);
@@ -56,5 +52,8 @@
         {
             fillStyle: "#00ffff"
         });
-    }
-})();
+	}
+
+}
+
+new Sprite_DrawShapes();

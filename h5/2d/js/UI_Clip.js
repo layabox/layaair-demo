@@ -1,20 +1,18 @@
-(function()
-{
-	var Stage   = Laya.Stage;
-	var Button  = Laya.Button;
-	var Clip    = Laya.Clip;
-	var Image   = Laya.Image;
-	var Handler = Laya.Handler;
-	var WebGL   = Laya.WebGL;
+let buttonSkin = "res/ui/button-7.png",
+	clipSkin = "res/ui/num0-9.png",
+	bgSkin = "res/ui/coutDown.png",
 
-	var buttonSkin = "res/ui/button-7.png";
-	var clipSkin = "res/ui/num0-9.png";
-	var bgSkin = "res/ui/coutDown.png";
+	currFrame;
 
-	var counter, currFrame, controller;
+class UI_Clip {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(800, 600, WebGL);
 
@@ -24,72 +22,73 @@
 		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		Laya.loader.load([buttonSkin, clipSkin, bgSkin], laya.utils.Handler.create(this, onSkinLoaded));
-	})();
-
-	function onSkinLoaded()
-	{
-		showBg();
-		createTimerAnimation();
-		showTotalSeconds();
-		createController();
+		Laya.loader.load([buttonSkin, clipSkin, bgSkin], Handler.create(this, this.onSkinLoaded));
 	}
 
-	function showBg()
-	{
-		var bg = new Image(bgSkin);
+	onSkinLoaded() {
+		this.showBg();
+		this.createTimerAnimation();
+		this.showTotalSeconds();
+		this.createController();
+	}
+
+	showBg() {
+		const Image = Laya.Image;
+
+		let bg = new Image(bgSkin);
 		bg.size(224, 302);
 		bg.pos(Laya.stage.width - bg.width >> 1, Laya.stage.height - bg.height >> 1);
 		Laya.stage.addChild(bg);
 	}
 
-	function createTimerAnimation()
-	{
-		counter = new Clip(clipSkin, 10, 1);
-		counter.autoPlay = true;
-		counter.interval = 1000;
+	createTimerAnimation() {
+		const Clip = Laya.Clip;
 
-		counter.x = (Laya.stage.width - counter.width) / 2 - 35;
-		counter.y = (Laya.stage.height - counter.height) / 2 - 40;
+		this.counter = new Clip(clipSkin, 10, 1);
+		Laya.stage.addChild(this.counter);
 
-		Laya.stage.addChild(counter);
+		this.counter.autoPlay = true;
+		this.counter.interval = 1000;
+
+		this.counter.x = (Laya.stage.width - this.counter.width) / 2 - 35;
+		this.counter.y = (Laya.stage.height - this.counter.height) / 2 - 40;
 	}
 
-	function showTotalSeconds()
-	{
-		var clip = new Clip(clipSkin, 10, 1);
+	showTotalSeconds() {
+		const Clip = Laya.Clip;
+
+		let clip = new Clip(clipSkin, 10, 1);
 		clip.index = clip.clipX - 1;
-		clip.pos(counter.x + 60, counter.y);
+		clip.pos(this.counter.x + 60, this.counter.y);
 		Laya.stage.addChild(clip);
 	}
 
-	function createController()
-	{
-		controller = new Button(buttonSkin, "暂停");
-		controller.labelBold = true;
-		controller.labelColors = "#FFFFFF,#FFFFFF,#FFFFFF,#FFFFFF";
-		controller.size(84, 30);
+	createController() {
+		const Button = Laya.Button;
 
-		controller.on('click', this, onClipSwitchState);
+		this.controller = new Button(buttonSkin, "暂停");
+		this.controller.labelBold = true;
+		this.controller.labelColors = "#FFFFFF,#FFFFFF,#FFFFFF,#FFFFFF";
+		this.controller.size(84, 30);
 
-		controller.x = (Laya.stage.width - controller.width) / 2;
-		controller.y = (Laya.stage.height - controller.height) / 2 + 110;
-		Laya.stage.addChild(controller);
+		this.controller.on('click', this, this.onClipSwitchState);
+
+		this.controller.x = (Laya.stage.width - this.controller.width) / 2;
+		this.controller.y = (Laya.stage.height - this.controller.height) / 2 + 110;
+		Laya.stage.addChild(this.controller);
 	}
 
-	function onClipSwitchState()
-	{
-		if (counter.isPlaying)
-		{
-			counter.stop();
-			currFrame = counter.index;
-			controller.label = "播放";
-		}
-		else
-		{
-			counter.play();
-			counter.index = currFrame;
-			controller.label = "暂停";
+	onClipSwitchState() {
+		if (this.counter.isPlaying) {
+			this.counter.stop();
+			currFrame = this.counter.index;
+			this.controller.label = "播放";
+		} else {
+			this.counter.play();
+			this.counter.index = currFrame;
+			this.controller.label = "暂停";
 		}
 	}
-})();
+}
+
+new UI_Clip();

@@ -1,14 +1,14 @@
-(function()
-{
-	var Stage = Laya.Stage;
-	var Tab = Laya.Tab;
-	var Handler = Laya.Handler;
-	var WebGL = Laya.WebGL;
+let skins = ["res/ui/tab1.png", "res/ui/tab2.png"];
 
-	var skins = ["res/ui/tab1.png", "res/ui/tab2.png"];
+class UI_Tab {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(550, 400, WebGL);
 
@@ -18,24 +18,26 @@
 		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		Laya.stage.bgColor = "#3d3d3d";
-		Laya.loader.load(skins, Handler.create(this, onSkinLoaded));
-	})();
+		Stat.show();
+		Laya.loader.load(skins, Handler.create(this, this.onSkinLoaded));
+	}
 
-	function onSkinLoaded()
-	{
-		var tabA = createTab(skins[0]);
+	onSkinLoaded() {
+		let tabA = this.createTab(skins[0]);
 		tabA.pos(40, 120);
 		tabA.labelColors = "#000000,#d3d3d3,#333333";
 
-		var tabB = createTab(skins[1]);
+		let tabB =this. createTab(skins[1]);
 		tabB.pos(40, 220);
 		tabB.labelColors = "#FFFFFF,#8FB299,#FFFFFF";
 	}
 
-	function createTab(skin)
-	{
-		var tab = new Tab();
+	createTab(skin) {
+		const 
+			Tab = Laya.Tab,
+			Handler = Laya.Handler;
+		
+		let tab = new Tab();
 		tab.skin = skin;
 
 		tab.labelBold = true;
@@ -47,16 +49,17 @@
 
 		tab.selectedIndex = 1;
 
-		onSelect(tab.selectedIndex);
-		tab.selectHandler = new Handler(this, onSelect);
+		this.onSelect(tab.selectedIndex);
+		tab.selectHandler = new Handler(this, this.onSelect);
 
 		Laya.stage.addChild(tab);
 
 		return tab;
 	}
 
-	function onSelect(index)
-	{
+	onSelect(index) {
 		console.log("当前选择的标签页索引为 " + index);
 	}
-})();
+}
+
+new UI_Tab();

@@ -1,69 +1,67 @@
-(function()
-{
-	var Skeleton = Laya.Skeleton;
-	var Templet = Laya.Templet;
-	var Event = Laya.Event;
-	var GlowFilter = Laya.GlowFilter;
-	var Loader = Laya.Loader;
-	var Texture = Laya.Texture;
-	var Browser = Laya.Browser;
-	var Handler = Laya.Handler;
-	var Stat = Laya.Stat;
-	var WebGL = Laya.WebGL;
+let 
+	mArmature,
+	fileName = "Dragon",
+	mTexturePath,
+	mAniPath,
 
-	var mArmature;
-	var fileName = "Dragon";
-	var mTexturePath;
-	var mAniPath;
+	rowCount = 10,
+	colCount = 10,
+	xOff = 50,
+	yOff = 100,
 
-	var rowCount = 10;
-	var colCount = 10;
-	var xOff = 50;
-	var yOff = 100;
+	mSpacingX,
+	mSpacingY,
+	mAnimationArray = [],
+	mFactory,
+	mActionIndex = 0;
 
-	var mSpacingX;
-	var mSpacingY;
-	var mAnimationArray = [];
-	var mFactory;
+class PerformanceTest_Skeleton {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler,
+			Loader = Laya.Loader;
 
-	function init()
-	{
-		mSpacingX = Browser.width / colCount;
-		mSpacingY = Browser.height / rowCount;
-
+		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.width, Browser.height, WebGL);
+
+		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
+		Laya.stage.alignH = Stage.ALIGN_CENTER;
+
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
+		Laya.stage.bgColor = "#232628";
+
 		Stat.show();
 
+		mSpacingX = Browser.width / colCount;
+		mSpacingY = Browser.height / rowCount;
 		mTexturePath = "res/skeleton/" + fileName + "/" + fileName + ".png";
 		mAniPath = "res/skeleton/" + fileName + "/" + fileName + ".sk";
-		Laya.loader.load([
-		{
-			url: mTexturePath,
-			type: Loader.IMAGE
-		},
-		{
-			url: mAniPath,
-			type: Loader.BUFFER
-		}], Handler.create(this, onAssetsLoaded));
+		Laya.loader.load([{ url: mTexturePath, type: Loader.IMAGE }, { url: mAniPath, type: Loader.BUFFER }], Handler.create(this, this.onAssetsLoaded));
 	}
-	init();
 
-	function onAssetsLoaded()
-	{
-		var tTexture = Loader.getRes(mTexturePath);
-		var arraybuffer = Loader.getRes(mAniPath);
+	onAssetsLoaded() {
+		const 
+			Loader = Laya.Loader,
+			Templet = Laya.Templet,
+			Event = Laya.Event;
+
+		let tTexture = Loader.getRes(mTexturePath);
+		let arraybuffer = Loader.getRes(mAniPath);
 		mFactory = new Templet();
-		mFactory.on(Event.COMPLETE, this, parseComplete);
+		mFactory.on(Event.COMPLETE, this, this.parseComplete);
 		mFactory.parseData(tTexture, arraybuffer, 10);
 	}
 
 
-	function parseComplete()
-	{
-		for (var i = 0; i < rowCount; i++)
-		{
-			for (var j = 0; j < colCount; j++)
-			{
+	parseComplete() {
+		const Event = Laya.Event;
+
+		for (let i = 0; i < rowCount; i++) {
+			for (let j = 0; j < colCount; j++) {
 				mArmature = mFactory.buildArmature();
 				mArmature.x = xOff + j * mSpacingX;
 				mArmature.y = yOff + i * mSpacingY;
@@ -72,23 +70,19 @@
 				Laya.stage.addChild(mArmature);
 			}
 		}
-		Laya.stage.on(Event.CLICK, this, toggleAction);
+		Laya.stage.on(Event.CLICK, this, this.toggleAction);
 	}
 
-
-	var mActionIndex = 0;
-
-	function toggleAction(e)
-	{
+	toggleAction(e) {
 		mActionIndex++;
-		var tAnimNum = mArmature.getAnimNum();
-		if (mActionIndex >= tAnimNum)
-		{
+		let tAnimNum = mArmature.getAnimNum();
+		if (mActionIndex >= tAnimNum) {
 			mActionIndex = 0;
 		}
-		for (var i = 0, n = mAnimationArray.length; i < n; i++)
-		{
+		for (let i = 0, n = mAnimationArray.length; i < n; i++) {
 			mAnimationArray[i].play(mActionIndex, true);
 		}
 	}
-})();
+}
+
+new PerformanceTest_Skeleton();

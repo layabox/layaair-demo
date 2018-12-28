@@ -1,18 +1,18 @@
-(function()
-{
-	var Stage      = Laya.Stage;
-	var RadioGroup = Laya.RadioGroup;
-	var Handler    = Laya.Handler;
-	var WebGL      = Laya.WebGL;
+let SPACING  = 150,
+	X_OFFSET = 200,
+	Y_OFFSET = 200,
 
-	var SPACING  = 150;
-	var X_OFFSET = 200;
-	var Y_OFFSET = 200;
+	skins;
 
-	var skins;
+class UI_RadioGroup {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(800, 600, WebGL);
 
@@ -23,23 +23,25 @@
 		Laya.stage.bgColor = "#232628";
 
 		skins = ["res/ui/radioButton (1).png", "res/ui/radioButton (2).png", "res/ui/radioButton (3).png"];
-		Laya.loader.load(skins, Handler.create(this, initRadioGroups));
-	})();
+		Laya.loader.load(skins, Handler.create(this, this.initRadioGroups));
+	}
 
-	function initRadioGroups()
-	{
-		for (var i = 0; i < skins.length; ++i)
-		{
-			var rg = createRadioGroup(skins[i]);
+	initRadioGroups() {
+		for (let i = 0; i < skins.length; ++i) {
+			let rg = this.createRadioGroup(skins[i]);
 			rg.selectedIndex = i;
 			rg.x = i * SPACING + X_OFFSET;
 			rg.y = Y_OFFSET;
 		}
+		
 	}
 
-	function createRadioGroup(skin)
-	{
-		var rg = new RadioGroup();
+	createRadioGroup(skin) {
+		const 
+			RadioGroup = Laya.RadioGroup,
+			Handler = Laya.Handler;
+
+		let rg = new RadioGroup();
 		rg.skin = skin;
 
 		rg.space = 70;
@@ -51,14 +53,15 @@
 		rg.labelBold = true;
 		rg.labelPadding = "5,0,0,5";
 
-		rg.selectHandler = new Handler(this, onSelectChange);
+		rg.selectHandler = new Handler(this, this.onSelectChange);
 		Laya.stage.addChild(rg);
 
 		return rg;
 	}
 
-	function onSelectChange(index)
-	{
+	onSelectChange(index) {
 		console.log("你选择了第 " + (index + 1) + " 项");
 	}
-})();
+}
+
+new UI_RadioGroup();

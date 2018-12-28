@@ -1,31 +1,32 @@
-(function()
-{
-    var Stage    = Laya.Stage;
-    var TextArea = Laya.TextArea;
-    var Browser  = Laya.Browser;
-    var Handler  = Laya.Handler;
-    var WebGL    = Laya.WebGL;
+let skin = "res/ui/textarea.png";
 
-    var skin = "res/ui/textarea.png";
+class UI_TextArea {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-    (function()
-    {
-        // 不支持WebGL时自动切换至Canvas
-        Laya.init(550, 400, WebGL);
+		// 不支持WebGL时自动切换至Canvas
+		Laya.init(550, 400, WebGL);
 
-        Laya.stage.alignV = Stage.ALIGN_MIDDLE;
-        Laya.stage.alignH = Stage.ALIGN_CENTER;
+		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
+		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-        Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
-        Laya.stage.bgColor = "#232628";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
+		Laya.stage.bgColor = "#232628";
 
+		Stat.show();
+		Laya.loader.load(skin, Handler.create(this, this.onLoadComplete));
+	}
 
-        Laya.loader.load(skin, Handler.create(this, onLoadComplete));
-    })();
+	onLoadComplete() {
+		const 
+			TextArea = Laya.TextArea;
 
-    function onLoadComplete()
-    {
-        var ta = new TextArea("");
+		let ta = new TextArea("");
         ta.skin = skin;
 
         ta.font = "Arial";
@@ -39,8 +40,8 @@
 
         ta.padding = "70,8,8,8";
 
-        var scaleFactor = Browser.pixelRatio;
-
         Laya.stage.addChild(ta);
-    }
-})();
+	}
+}
+
+new UI_TextArea();

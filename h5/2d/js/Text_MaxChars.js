@@ -1,12 +1,11 @@
-(function()
-{
-	var Input   = Laya.Input;
-	var Stage   = Laya.Stage;
-	var Browser = Laya.Browser;
-	var WebGL   = Laya.WebGL;
+class Text_MaxChars {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
@@ -16,12 +15,14 @@
 		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		createInput();
-	})();
+		this.createInput();
+	}
 
-	function createInput()
-	{
-		var inputText = new Input();
+	createInput() {
+		const Input = Laya.Input;
+
+		let inputText = new Input();
+		Laya.stage.addChild(inputText);
 
 		inputText.size(350, 100);
 		inputText.x = Laya.stage.width - inputText.width >> 1;
@@ -34,7 +35,7 @@
 		inputText.fontSize = 20;
 
 		inputText.maxChars = 5;
-
-		Laya.stage.addChild(inputText);
 	}
-})();
+}
+
+new Text_MaxChars();

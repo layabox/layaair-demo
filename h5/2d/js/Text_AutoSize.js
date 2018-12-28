@@ -1,45 +1,47 @@
-(function()
-{
-	var Stage   = Laya.Stage;
-	var Text    = Laya.Text;
-	var Browser = Laya.Browser;
-	var WebGL   = Laya.WebGL;
+class Text_AutoSize {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(550, 400, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		setup();
-	})();
+		this.setup();
+	}
 
-	function setup()
-	{
+	setup() {
+		const Text = Laya.Text;
+
 		// 该文本自动适应尺寸
-		var autoSizeText = createSampleText();
+		var autoSizeText = this.createSampleText();
 		autoSizeText.overflow = Text.VISIBLE;
 		autoSizeText.y = 50;
 
 		// 该文本被限制了宽度
-		var widthLimitText = createSampleText();
+		var widthLimitText = this.createSampleText();
 		widthLimitText.width = 100;
 		widthLimitText.y = 180;
 
 		//该文本被限制了高度 
-		var heightLimitText = createSampleText();
+		var heightLimitText = this.createSampleText();
 		heightLimitText.height = 20;
 		heightLimitText.y = 320;
 	}
 
-	function createSampleText()
-	{
-		var text = new Text();
+	createSampleText() {
+		const Text = Laya.Text;
+
+		let text = new Text();
+		Laya.stage.addChild(text);
 		text.overflow = Text.HIDDEN;
 
 		text.color = "#FFFFFF";
@@ -48,9 +50,11 @@
 		text.borderColor = "#FFFF00";
 		text.x = 80;
 
-		Laya.stage.addChild(text);
 		text.text = "A POWERFUL HTML5 ENGINE ON FLASH TECHNICAL\n" + "A POWERFUL HTML5 ENGINE ON FLASH TECHNICAL\n" + "A POWERFUL HTML5 ENGINE ON FLASH TECHNICAL";
 
 		return text;
+
 	}
-})();
+}
+
+new Text_AutoSize();

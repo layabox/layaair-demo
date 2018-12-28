@@ -1,62 +1,62 @@
-(function()
-{
-	var Sprite = Laya.Sprite;
-	var Stage = Laya.Stage;
-	var Event = Laya.Event;
-	var Texture = Laya.Texture;
-	var Browser = Laya.Browser;
-	var Ease = Laya.Ease;
-	var Handler = Laya.Handler;
-	var Tween = Laya.Tween;
-	var WebGL = Laya.WebGL;
+const 
+	HOLD_TRIGGER_TIME = 1000,
+	apePath = "res/apes/monkey2.png";
+let isApeHold = false;
 
-	const HOLD_TRIGGER_TIME = 1000;
-	const apePath = "res/apes/monkey2.png";
+class Interaction_Hold {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-	//触发hold事件时间为1秒
-	var ape, isApeHold;
-
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
-		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
+		Laya.init(550, 400, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		Laya.loader.load(apePath, Handler.create(this, createApe));
-	})();
+		Stat.show();
+		Laya.loader.load(apePath, Handler.create(this, this.createApe));
+	}
 
-	function createApe()
-	{
-		// 添加一只猩猩
-		ape = new Sprite();
-		ape.loadImage(apePath);
+	createApe() {
+		const 
+			Sprite = Laya.Sprite,
+			Event = Laya.Event;
 
-		var texture = Laya.loader.getRes(apePath);
-		ape.pivot(texture.width / 2, texture.height / 2);
-		ape.pos(Laya.stage.width / 2, Laya.stage.height / 2);
-		ape.scale(0.8, 0.8);
-		Laya.stage.addChild(ape);
+		this.ape = new Sprite();
+		this.ape.loadImage(apePath);
+
+		let texture = Laya.loader.getRes(apePath);
+		this.ape.pivot(texture.width / 2, texture.height / 2);
+		this.ape.pos(Laya.stage.width / 2, Laya.stage.height / 2);
+		this.ape.scale(0.8, 0.8);
+		Laya.stage.addChild(this.ape);
 
 		// 鼠标交互
-		ape.on(Event.MOUSE_DOWN, this, onApePress);
+		this.ape.on(Event.MOUSE_DOWN, this, this.onApePress);
 	}
 
-	function onApePress(e)
-	{
+	onApePress(e) {
+		const Event = Laya.Event;
+
 		// 鼠标按下后，HOLD_TRIGGER_TIME毫秒后hold
-		Laya.timer.once(HOLD_TRIGGER_TIME, this, onHold);
-		Laya.stage.on(Event.MOUSE_UP, this, onApeRelease);
+		Laya.timer.once(HOLD_TRIGGER_TIME, this, this.onHold);
+		Laya.stage.on(Event.MOUSE_UP, this, this.onApeRelease);
 	}
 
-	function onHold()
-	{
-		Tween.to(ape,
-		{
+	onHold() {
+		const 
+			Tween = Laya.Tween,
+			Ease = Laya.Ease;
+		
+		Tween.to(this.ape, {
 			"scaleX": 1,
 			"scaleY": 1
 		}, 500, Ease.bounceOut);
@@ -64,21 +64,23 @@
 	}
 
 	/** 鼠标放开后停止hold */
-	function onApeRelease()
-	{
+	onApeRelease() {
+		const 
+			Tween = Laya.Tween,
+			Event = Laya.Event;
 		// 鼠标放开时，如果正在hold，则播放放开的效果
-		if (isApeHold)
-		{
+		if (isApeHold) {
 			isApeHold = false;
-			Tween.to(ape,
-			{
+			Tween.to(this.ape, {
 				"scaleX": 0.8,
 				"scaleY": 0.8
 			}, 300);
+		} else { // 如果未触发hold，终止触发hold
+			Laya.timer.clear(this, this.onHold);
 		}
-		else // 如果未触发hold，终止触发hold
-			Laya.timer.clear(this, onHold);
 
-		Laya.stage.off(Event.MOUSE_UP, this, onApeRelease);
+		Laya.stage.off(Event.MOUSE_UP, this, this.onApeRelease);
 	}
-})();
+}
+
+new Interaction_Hold();

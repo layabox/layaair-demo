@@ -1,58 +1,58 @@
-(function()
-{
-	var Sprite = Laya.Sprite;
-	var Stage = Laya.Stage;
-	var Event = Laya.Event;
-	var Rectangle = Laya.Rectangle;
-	var Texture = Laya.Texture;
-	var Browser = Laya.Browser;
-	var Handler = Laya.Handler;
-	var WebGL = Laya.WebGL;
+const ApePath = "res/apes/monkey2.png";
+let dragRegion;
 
-	var ApePath = "res/apes/monkey2.png";
+class Interaction_Drag {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler;
 
-	var ape, dragRegion;
-
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		Laya.loader.load(ApePath, Handler.create(this, setup));
-	})();
-
-	function setup()
-	{
-		createApe();
-		showDragRegion();
+		Stat.show();
+		Laya.loader.load(ApePath, Handler.create(this, this.setup));
 	}
 
-	function createApe()
-	{
-		ape = new Sprite();
-
-		ape.loadImage(ApePath);
-		Laya.stage.addChild(ape);
-
-		var texture = Laya.loader.getRes(ApePath);
-		ape.pivot(texture.width / 2, texture.height / 2);
-		ape.x = Laya.stage.width / 2;
-		ape.y = Laya.stage.height / 2;
-
-		ape.on(Event.MOUSE_DOWN, this, onStartDrag);
+	setup() {
+		this.createApe();
+		this.showDragRegion();
 	}
 
-	function showDragRegion()
-	{
+	createApe() {
+		const 
+			Sprite = Laya.Sprite,
+			Event = Laya.Event;
+
+		this.ape = new Sprite();
+
+		this.ape.loadImage(ApePath);
+		Laya.stage.addChild(this.ape);
+
+		let texture = Laya.loader.getRes(ApePath);
+		this.ape.pivot(texture.width / 2, texture.height / 2);
+		this.ape.x = Laya.stage.width / 2;
+		this.ape.y = Laya.stage.height / 2;
+
+		this.ape.on(Event.MOUSE_DOWN, this, this.onStartDrag);
+	}
+
+	showDragRegion() {
+		const 
+			Rectangle = Laya.Rectangle;
+		
 		//拖动限制区域
-		var dragWidthLimit = 350;
-		var dragHeightLimit = 200;
+		let dragWidthLimit = 350;
+		let dragHeightLimit = 200;
 		dragRegion = new Rectangle(Laya.stage.width - dragWidthLimit >> 1, Laya.stage.height - dragHeightLimit >> 1, dragWidthLimit, dragHeightLimit);
 
 		//画出拖动限制区域
@@ -61,9 +61,10 @@
 			null, "#FFFFFF", 2);
 	}
 
-	function onStartDrag(e)
-	{
+	onStartDrag(e) {
 		//鼠标按下开始拖拽(设置了拖动区域和超界弹回的滑动效果)
-		ape.startDrag(dragRegion, true, 100);
+		this.ape.startDrag(dragRegion, true, 100);
 	}
-})();
+}
+
+new Interaction_Drag();

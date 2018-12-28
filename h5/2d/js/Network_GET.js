@@ -1,40 +1,43 @@
-﻿(function()
-{
-	var Stage       = Laya.Stage;
-	var Text        = Laya.Text;
-	var Event       = Laya.Event;
-	var HttpRequest = Laya.HttpRequest;
-	var Browser     = Laya.Browser;
-	var WebGL       = Laya.WebGL;
+﻿let hr, logger;
+class Network_GET {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler,
+			Event = Laya.Event,
+			Accelerator = Laya.Accelerator;
 
-	var hr, logger;
-
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
-		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
+		Laya.init(Browser.width, Browser.height, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		connect();
-		showLogger();
-	})();
+		this.connect();
+		this.showLogger();
+	}
 
-	function connect()
-	{
+	connect() {
+		const 
+			HttpRequest = Laya.HttpRequest,
+			Event = Laya.Event;
+		
 		hr = new HttpRequest();
-		hr.once(Event.PROGRESS, this, onHttpRequestProgress);
-		hr.once(Event.COMPLETE, this, onHttpRequestComplete);
-		hr.once(Event.ERROR, this, onHttpRequestError);
+		hr.once(Event.PROGRESS, this, this.onHttpRequestProgress);
+		hr.once(Event.COMPLETE, this, this.onHttpRequestComplete);
+		hr.once(Event.ERROR, this, this.onHttpRequestError);
 		hr.send('http://xkxz.zhonghao.huo.inner.layabox.com/api/getData?name=myname&psword=xxx', null, 'get', 'text');
 	}
 
-	function showLogger()
-	{
+	showLogger() {
+		const Text = Laya.Text;
+		
 		logger = new Text();
 
 		logger.fontSize = 30;
@@ -47,18 +50,17 @@
 		Laya.stage.addChild(logger);
 	}
 
-	function onHttpRequestError(e)
-	{
+	onHttpRequestError(e) {
 		console.log(e);
 	}
 
-	function onHttpRequestProgress(e)
-	{
-		console.log(e)
+	onHttpRequestProgress(e) {
+		console.log(e);
 	}
 
-	function onHttpRequestComplete(e)
-	{
+	onHttpRequestComplete(e) {
 		logger.text += "收到数据：" + hr.data;
 	}
-})();
+}
+
+new Network_GET();

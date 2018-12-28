@@ -1,13 +1,11 @@
-(function()
-{
-	var Input   = Laya.Input;
-	var Stage   = Laya.Stage;
-	var Text    = Laya.Text;
-	var Browser = Laya.Browser;
-	var WebGL   = Laya.WebGL;
+class Text_Restrict {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat;
 
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(550, 300, WebGL);
 
@@ -17,49 +15,53 @@
 		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		createTexts();
-	})();
+		this.createTexts();
+	}
 
-	function createTexts()
-	{
-		createLabel("只允许输入数字：").pos(50, 20);
-		var input = createInput();
+	createTexts() {
+		this.createLabel("只允许输入数字：").pos(50, 20);
+		let input = this.createInput();
 		input.pos(50, 50);
 		input.restrict = "0-9";
 
-		createLabel("只允许输入字母：").pos(50, 100);
-		input = createInput();
+		this.createLabel("只允许输入字母：").pos(50, 100);
+		input = this.createInput();
 		input.pos(50, 130);
 		input.restrict = "a-zA-Z";
 
-		createLabel("只允许输入中文字符：").pos(50, 180);
-		input = createInput();
+		this.createLabel("只允许输入中文字符：").pos(50, 180);
+		input = this.createInput();
 		input.pos(50, 210);
 		input.restrict = "\u4e00-\u9fa5";
 	}
 
-	function createLabel(text)
-	{
-		var label = new Text();
+	createLabel(text) {
+		const Text = Laya.Text;
+
+		let label = new Text();
+		Laya.stage.addChild(label);
 		label.text = text;
 		label.color = "white";
 		label.fontSize = 20;
-		Laya.stage.addChild(label);
 		return label;
 	}
 
-	function createInput()
-	{
-		var input = new Input();
-		input.size(200, 30);
+	createInput() {
+		const Input = Laya.Input;
+		
+		let input = new Input();
+		Laya.stage.addChild(input);
 
+		input.size(200, 30);
 		input.borderColor = "#FFFF00";
 		input.bold = true;
 		input.fontSize = 20;
 		input.color = "#FFFFFF";
 		input.padding = [0, 4, 0, 4];
 
-		Laya.stage.addChild(input);
+		
 		return input;
 	}
-})();
+}
+
+new Text_Restrict();

@@ -1,68 +1,54 @@
-(function()
-{
-	var Sprite           = Laya.Sprite;
-	var AccelerationInfo = Laya.AccelerationInfo;
-	var Accelerator      = Laya.Accelerator;
-	var Point            = Laya.Point;
-	var Browser          = Laya.Browser;
-	var Handler          = Laya.Handler;
-	var WebGL            = Laya.WebGL;
+let 
+	seg,
+	segments = [],
+	foods = [],
+	initialSegmentsAmount = 5,
+	vx = 0, 
+	vy = 0,
+	targetPosition;
 
-	function Segment(width, height)
-	{
-		Segment.super(this);
+class InputDevice_GluttonousSnake {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Stat = Laya.Stat,
+			Handler = Laya.Handler,
+			Event = Laya.Event,
+			Accelerator = Laya.Accelerator;
 
-		Segment.prototype.init = function()
-		{
-			this.graphics.drawRect(-height / 2, -height / 2, width + height, height, "#FF7F50");
-		}
-		// 获取关节另一头位置
-		Segment.prototype.getPinPosition = function()
-		{
-			var radian = this.rotation * Math.PI / 180;
-			var tx = this.x + Math.cos(radian) * this.width;
-			var ty = this.y + Math.sin(radian) * this.width;
-			
-			return new Point(tx, ty);
-		}
-
-		this.size(width, height);
-		this.init();
-	}
-	Laya.class(Segment, "Segment", Sprite);
-
-	var seg;
-	var segments = [];
-	var foods = [];
-	var initialSegmentsAmount = 5;
-	var vx = 0, vy = 0;
-	var targetPosition;
-	(function()
-	{
+		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.width, Browser.height, WebGL);
-			
-		// 初始化蛇
-		initSnake();
-		// 监视加速器状态
-		Accelerator.instance.on(Laya.Event.CHANGE, this, monitorAccelerator);
-		// 游戏循环
-		Laya.timer.frameLoop(1, this, animate);
-		// 食物生产
-		Laya.timer.loop(3000, this, produceFood);
-		// 游戏开始时有一个食物
-		produceFood();
-	})()
 
-	function initSnake()
-	{
-		for (var i = 0; i < initialSegmentsAmount; i++)
-		{
-			addSegment();
+		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
+		Laya.stage.alignH = Stage.ALIGN_CENTER;
+
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
+		Laya.stage.bgColor = "#232628";
+
+		// 初始化蛇
+		this.initSnake();
+		// 监视加速器状态
+		Accelerator.instance.on(Event.CHANGE, this, this.monitorAccelerator);
+		// 游戏循环
+		Laya.timer.frameLoop(1, this, this.animate);
+		// 食物生产
+		Laya.timer.loop(3000, this, this.produceFood);
+		// 游戏开始时有一个食物
+		this.produceFood();
+	}
+
+	initSnake() {
+		const 
+			Point = Laya.Point;
+
+		for (let i = 0; i < initialSegmentsAmount; i++) {
+			this.addSegment();
 			
 			// 蛇头部设置
-			if (i == 0)
-			{
-				var header = segments[0];
+			if (i == 0) {
+				let header = segments[0];
 				
 				// 初始化位置
 				header.rotation = 180;
@@ -78,61 +64,56 @@
 			}
 		}
 	}
-		
-	function monitorAccelerator(acceleration, accelerationIncludingGravity, rotationRate, interval)
-	{
+
+	monitorAccelerator(acceleration, accelerationIncludingGravity, rotationRate, interval) {
 		vx = accelerationIncludingGravity.x;
 		vy = accelerationIncludingGravity.y;
 	}
-			
-	function addSegment()
-	{
-		var seg = new Segment(40, 30);
+
+	addSegment() {
+		let seg = new Segment(40, 30);
 		Laya.stage.addChildAt(seg, 0);
 		
 		// 蛇尾与上一节身体对齐
-		if (segments.length > 0)
-		{
-			var prevSeg = segments[segments.length - 1];
+		if (segments.length > 0) {
+			let prevSeg = segments[segments.length - 1];
 			seg.rotation = prevSeg.rotation;
-			var point = seg.getPinPosition();
+			let point = seg.getPinPosition();
 			seg.x = prevSeg.x - point.x;
 			seg.y = prevSeg.y - point.y;
 		}
 		
 		segments.push(seg);
 	}
-			
-	function animate()
-	{
-		var seg = segments[0];
+
+	animate() {
+		let seg = segments[0];
 		
 		// 更新蛇的位置
 		targetPosition.x += vx;
 		targetPosition.y += vy;
 		
 		// 限制蛇的移动范围
-		limitMoveRange();
+		this.limitMoveRange();
 		// 检测觅食
-		checkEatFood();
+		this.checkEatFood();
 		
 		// 更新所有关节位置
-		var targetX = targetPosition.x;
-		var targetY = targetPosition.y;
+		let targetX = targetPosition.x;
+		let targetY = targetPosition.y;
 		
-		for (var i = 0, len = segments.length; i < len; i++)
-		{
+		for (let i = 0, len = segments.length; i < len; i++) {
 			seg = segments[i];
 			
-			var dx = targetX - seg.x;
-			var dy = targetY - seg.y;
+			let dx = targetX - seg.x;
+			let dy = targetY - seg.y;
 			
-			var radian = Math.atan2(dy, dx);
+			let radian = Math.atan2(dy, dx);
 			seg.rotation = radian * 180 / Math.PI;
 			
-			var pinPosition = seg.getPinPosition();
-			var w = pinPosition.x - seg.x;
-			var h = pinPosition.y - seg.y;
+			let pinPosition = seg.getPinPosition();
+			let w = pinPosition.x - seg.x;
+			let h = pinPosition.y - seg.y;
 			
 			seg.x = targetX - w;
 			seg.y = targetY - h;
@@ -142,8 +123,7 @@
 		}
 	}
 			
-	function limitMoveRange()
-	{
+	limitMoveRange() {
 		if (targetPosition.x < 0)
 			targetPosition.x = 0;
 		else if (targetPosition.x > Laya.stage.width)
@@ -154,28 +134,26 @@
 			targetPosition.y = Laya.stage.height;
 	}
 			
-	function checkEatFood()
-	{
-		var food;
-		for (var i = foods.length - 1; i >= 0; i--)
-		{
+	checkEatFood() {
+		let food;
+		for (let i = foods.length - 1; i >= 0; i--) {
 			food = foods[i];
-			if (food.hitTestPoint(targetPosition.x, targetPosition.y))
-			{
-				addSegment();
+			if (food.hitTestPoint(targetPosition.x, targetPosition.y)) {
+				this.addSegment();
 				Laya.stage.removeChild(food);
 				foods.splice(i, 1);
 			}
 		}
 	}
 			
-	function produceFood()
-	{
+	produceFood() {
+		const Sprite = Laya.Sprite;
+
 		// 最多五个食物同屏
 		if (foods.length == 5)
 			return;
 		
-		var food = new Sprite();
+		let food = new Sprite();
 		Laya.stage.addChild(food);
 		foods.push(food);
 		
@@ -186,4 +164,29 @@
 		food.x = Math.random() * Laya.stage.width;
 		food.y = Math.random() * Laya.stage.height;
 	}
-})()
+}
+
+class Segment extends Laya.Sprite {
+	constructor(width, height) {
+		super();
+		this.size(width, height);
+		this.init();
+	}
+	
+	init() {
+		this.graphics.drawRect(-this.height / 2, -this.height / 2, this.width + this.height, this.height, "#FF7F50");
+	}
+	
+	// 获取关节另一头位置
+	getPinPosition() {
+		const Point = Laya.Point;
+
+		let radian = this.rotation * Math.PI / 180;
+		let tx = this.x + Math.cos(radian) * this.width;
+		let ty = this.y + Math.sin(radian) * this.width;
+		
+		return new Point(tx, ty);
+	}
+}
+
+new InputDevice_GluttonousSnake();

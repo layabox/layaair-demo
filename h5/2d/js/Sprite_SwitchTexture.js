@@ -1,55 +1,50 @@
-(function()
-{
-	var Sprite  = Laya.Sprite;
-	var Stage   = Laya.Stage;
-	var Texture = Laya.Texture;
-	var Browser = Laya.Browser;
-	var Handler = Laya.Handler;
-	var WebGL   = Laya.WebGL;
+let 
+	monkey1Str = "res/apes/monkey1.png",
+	monkey2Str = "res/apes/monkey2.png",
+	monkey1Res,
+	monkey2Res;
 
-	var texture1 = "res/apes/monkey2.png";
-	var texture2 = "res/apes/monkey3.png";
-	var flag = false;
+class Sprite_SwitchTexture {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage;
 
-	var ape;
-
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
 		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		Laya.loader.load([texture1, texture2], Handler.create(this, onAssetsLoaded));
-	})();
-
-	function onAssetsLoaded()
-	{
-		ape = new Sprite();
-		Laya.stage.addChild(ape);
-		ape.pivot(55, 72);
-		ape.pos(Laya.stage.width / 2, Laya.stage.height / 2);
-
-		// 显示默认纹理
-		switchTexture();
-
-		ape.on("click", this, switchTexture);
+		this.flag = true;
+		Laya.loader.load([monkey1Str, monkey2Str], Laya.Handler.create(this, this.onAssetsLoaded));
 	}
 
-	function switchTexture()
-	{
-		var textureUrl = (flag = !flag) ? texture1 : texture2;
+	onAssetsLoaded() {
+		monkey1Res = Laya.loader.getRes(monkey1Str),
+		monkey2Res = Laya.loader.getRes(monkey2Str);
+		this.ape = new Laya.Sprite();
+		Laya.stage.addChild(this.ape);
+		this.ape.pivot(55, 72);
+		this.ape.pos(Laya.stage.width / 2, Laya.stage.height / 2);
 
-		// 更换纹理
-		ape.graphics.clear();
-		var texture = Laya.loader.getRes(textureUrl);
-		ape.graphics.drawTexture(texture, 0, 0);
+		this.switchTexture();
 
-		// 设置交互区域
-		ape.size(texture.width, texture.height);
+		this.ape.on(Laya.Event.CLICK, this, this.switchTexture);
 	}
-})();
+	
+	switchTexture() {
+		let monkey = (this.flag = !this.flag) ? monkey1Res : monkey2Res;
+
+		this.ape.graphics.clear();
+		this.ape.graphics.drawTexture(monkey, 0, 0);
+
+		this.ape.size(monkey.width, monkey.height);
+	}
+}
+
+new Sprite_SwitchTexture();

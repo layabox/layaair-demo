@@ -1,78 +1,71 @@
-(function()
-{
-	var Sprite       = Laya.Sprite;
-	var Stage        = Laya.Stage;
-	var Text         = Laya.Text;
-	var Event        = Laya.Event;
-	var SoundManager = Laya.SoundManager;
-	var Browser      = Laya.Browser;
-	var Handler      = Laya.Handler;
-	var WebGL        = Laya.WebGL;
+class Sound_SimpleDemo {
+	constructor() {
+		const 
+			Browser = Laya.Browser,
+			WebGL = Laya.WebGL,
+			Stage = Laya.Stage,
+			Loader = Laya.Loader,
+			Stat = Laya.Stat;
 
-	//声明一个信息文本
-	var txtInfo;
-
-	(function()
-	{
 		// 不支持WebGL时自动切换至Canvas
-		Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
+		Laya.init(Browser.width, Browser.height, WebGL);
 
 		Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 		Laya.stage.alignH = Stage.ALIGN_CENTER;
 
-		Laya.stage.scaleMode = "showall";
+		Laya.stage.scaleMode = Stage.SCALE_SHOWALL;
 		Laya.stage.bgColor = "#232628";
 
-		setup();
-	})();
+		Stat.show();
+		this.setup();
+	}
 
-	function setup()
-	{
+	setup() {
+		const Event = Laya.Event;
 		var gap = 10;
 
 		//创建一个Sprite充当音效播放按钮
-		var soundButton = createButton("播放音效");
+		let soundButton = this.createButton("播放音效");
 		soundButton.x = (Laya.stage.width - soundButton.width * 2 + gap) / 2;
 		soundButton.y = (Laya.stage.height - soundButton.height) / 2;
-		Laya.stage.addChild(soundButton);
 
 		//创建一个Sprite充当音乐播放按钮
-		var musicButton = createButton("播放音乐");
+		var musicButton = this.createButton("播放音乐");
 		musicButton.x = soundButton.x + gap + soundButton.width;
 		musicButton.y = soundButton.y;
-		Laya.stage.addChild(musicButton);
 
-		soundButton.on(Event.CLICK, this, onPlaySound);
-		musicButton.on(Event.CLICK, this, onPlayMusic);
+		soundButton.on(Event.CLICK, this, this.onPlaySound);
+		musicButton.on(Event.CLICK, this, this.onPlayMusic);
 	}
 
-	function createButton(label)
-	{
-		var w = 110;
-		var h = 40;
+	createButton(labelText) {
+		let w = 110,
+			h = 40;
 
-		var button = new Sprite();
-		button.size(w, h);
-		button.graphics.drawRect(0, 0, w, h, "#FF7F50");
-		button.graphics.fillText(label, w / 2, 8, "25px SimHei", "#FFFFFF", "center");
-		Laya.stage.addChild(button);
-		return button;
+		const Sprite = Laya.Sprite;
+		let btn = new Sprite();
+		Laya.stage.addChild(btn);
+		btn.size(w, h);
+		btn.graphics.drawRect(0, 0, w, h, "#FF7F50");
+		btn.graphics.fillText(labelText, w / 2, 8, "24px SimHei", "#FFFFFF", "center");
+		return btn;
 	}
 
-	function onPlayMusic(e)
-	{
-		console.log("播放音乐");
-		SoundManager.playMusic("res/sounds/bgm.mp3", 1, new Handler(this, onComplete));
-	}
-
-	function onPlaySound(e)
-	{
+	// 播放音效
+	onPlaySound() {
 		console.log("播放音效");
-		SoundManager.playSound("res/sounds/btn.mp3", 1, new Handler(this, onComplete));
+		Laya.SoundManager.playMusic("res/sounds/btn.mp3", 1, new Laya.Handler(this, this.onComplete));
 	}
 
-	function onComplete()
-	{
+	// 播放音乐
+	onPlayMusic() {
+		console.log("播放音乐");
+		Laya.SoundManager.playMusic("res/sounds/bgm.mp3", 1, new Laya.Handler(this, this.onComplete));
+	}
+
+	onComplete() {
 		console.log("播放完成");
 	}
-})();
+}
+
+new Sound_SimpleDemo();
