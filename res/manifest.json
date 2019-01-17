@@ -303,7 +303,7 @@
 			"prefix": "scene",
 			"tr_zhCN": "3D场景",
 			"manifest": [
-				["SceneLoad1", "场景展示1", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+				["SceneLoad1", "场景展示1", "", "core,webgl,ani,d3,CameraMoveScript.js,physics3D"],
 				["SceneLoad2", "场景展示2", "", "core,webgl,ani,d3,CameraMoveScript.js"]
 			]
 		},
@@ -357,7 +357,7 @@
 			"tr_zhCN": "高级应用",
       "manifest": [
 		[ "Laya3DCombineHtml", "Laya3D与网页混合", "", "core,webgl,ani,d3" ],
-		[ "GarbageCollection", "释放显存", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+		[ "GarbageCollection", "释放显存", "", "core,webgl,ani,d3,ui,CameraMoveScript.js" ],
         [ "RealTimeShadow", "实时阴影", "", "core,webgl,ani,d3" ],
         [ "RenderTextureDemo", "渲染纹理", "", "core,webgl,ui,ani,d3,CameraMoveScript.js" ],
         [ "AStarFindPath", "寻路导航", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
