@@ -8,8 +8,8 @@ var id = GetQueryString("id") || 0;
 
 var list = [
 	"advancedModule/AStarFindPath",
-	"advancedModule/GarbageCollection",
 	"advancedModule/Laya3DCombineHtml",
+	"advancedModule/GarbageCollection",
 	"advancedModule/PBRDemo",
 	"advancedModule/RealTimeShadow",
 	"advancedModule/RenderTextureDemo",
@@ -51,7 +51,7 @@ var list = [
 	"shaderModule/Shader_Simple",
 	"shaderModule/Shader_Terrain",
 	"skyModule/Sky_Procedural",
-	"skyModule/SkyDomeSample",
+	"skyModule/Sky_SkyBox",
 	"sprite3dModule/Sprite3DClone",
 	"sprite3dModule/Sprite3DLoad",
 	"sprite3dModule/Sprite3DTransform",	
