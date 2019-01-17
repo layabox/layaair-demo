@@ -1,7 +1,6 @@
 package animationModule {
 	import common.CameraMoveScript;
 	import laya.d3.component.Animator;
-	import laya.d3.component.AnimatorState;
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.light.DirectionLight;
@@ -48,9 +47,6 @@ package animationModule {
 			Sprite3D.load("../../../../res/threeDimen/skinModel/Zombie/Zombie.lh", Handler.create(null, function(zombie:Sprite3D):void {
 				scene.addChild(zombie);
 				zombieAnimator = (zombie.getChildAt(0) as Sprite3D).getComponent(Animator) as Animator;//获取Animator动画组件
-				debugger;
-				var ass:AnimatorState = zombieAnimator.getControllerLayer(0).getAnimatorState("walk1");
-				debugger;
 				loadUI();
 			}));
 		}

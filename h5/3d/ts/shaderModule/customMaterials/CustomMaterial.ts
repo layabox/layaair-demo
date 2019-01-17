@@ -1,6 +1,6 @@
 class CustomMaterial extends Laya.BaseMaterial {
-    public static DIFFUSETEXTURE: number = 1;
-    public static MARGINALCOLOR: number = 2;
+    public static DIFFUSETEXTURE: number =  Laya.Shader3D.propertyNameToID("u_texture");
+    public static MARGINALCOLOR: number = Laya.Shader3D.propertyNameToID("u_marginalColor");
     constructor() {
         super();
         this.setShaderName("CustomShader");

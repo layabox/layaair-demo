@@ -10,7 +10,7 @@ package meshModule {
 	import laya.d3.math.Quaternion;
 	import laya.d3.math.Vector3;
 	import laya.d3.resource.models.Mesh;
-	import laya.d3.resource.models.PlaneMesh;
+	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.ui.Button;
@@ -54,7 +54,7 @@ package meshModule {
 				var layaMonkeyLineSprite3D:PixelLineSprite3D = lineSprite3D.addChild(new PixelLineSprite3D(5000)) as PixelLineSprite3D;
 				Tool.linearModel(layaMonkey, layaMonkeyLineSprite3D, Color.GREEN);
 				
-				var plane:MeshSprite3D = sprite3D.addChild(new MeshSprite3D(new PlaneMesh(6, 6, 10, 10))) as MeshSprite3D;
+				var plane:MeshSprite3D = sprite3D.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(6, 6, 10, 10))) as MeshSprite3D;
 				plane.transform.position = new Vector3(0, 0, -1);
 				var planeLineSprite3D:PixelLineSprite3D = lineSprite3D.addChild(new PixelLineSprite3D(1000)) as PixelLineSprite3D;
 				Tool.linearModel(plane, planeLineSprite3D, Color.GRAY);

@@ -17,10 +17,7 @@ package physicsModule {
 	import laya.d3.physics.shape.BoxColliderShape;
 	import laya.d3.physics.shape.CapsuleColliderShape;
 	import laya.d3.physics.shape.SphereColliderShape;
-	import laya.d3.resource.models.BoxMesh;
-	import laya.d3.resource.models.CapsuleMesh;
-	import laya.d3.resource.models.PlaneMesh;
-	import laya.d3.resource.models.SphereMesh;
+	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.ui.Button;
@@ -56,7 +53,7 @@ package physicsModule {
 			directionLight.color = new Vector3(1, 1, 1);
 			directionLight.transform.worldMatrix.setForward(new Vector3(-1.0, -1.0, 1.0));
 			
-			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(new PlaneMesh(20, 20, 10, 10))) as MeshSprite3D;
+			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(20, 20, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
 			Texture2D.load("../../../../res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;
@@ -137,7 +134,7 @@ package physicsModule {
 				case 1: 
 					var boxCollider:BoxColliderShape = new BoxColliderShape(1.0, 1.0, 1.0);
 					for (i = 0; i < 21; i++) {
-						var boxSprite:MeshSprite3D = scene.addChild(new MeshSprite3D(new BoxMesh(1.0, 1.0, 1.0))) as MeshSprite3D;
+						var boxSprite:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(1.0, 1.0, 1.0))) as MeshSprite3D;
 						var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
 						mat.albedoColor = new Vector4(1.0, 1.0, 1.0, 0.5);
 						mat.renderMode = BlinnPhongMaterial.RENDERMODE_TRANSPARENT;
@@ -159,7 +156,7 @@ package physicsModule {
 				case 2: 
 					var sphereCollider:SphereColliderShape = new SphereColliderShape(0.5);
 					for (i = 0; i < 41; i++) {
-						var sphereSprite:MeshSprite3D = scene.addChild(new MeshSprite3D(new SphereMesh(0.5))) as MeshSprite3D;
+						var sphereSprite:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(0.5))) as MeshSprite3D;
 						var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
 						mat.albedoColor = new Vector4(1.0, 1.0, 1.0, 0.5);
 						mat.renderMode = BlinnPhongMaterial.RENDERMODE_TRANSPARENT;
@@ -182,7 +179,7 @@ package physicsModule {
 				case 3: 
 					var capsuleCollider:CapsuleColliderShape = new CapsuleColliderShape(0.25, 1.0);
 					for (i = 0; i < 41; i++) {
-						var capsuleSprite:MeshSprite3D = scene.addChild(new MeshSprite3D(new CapsuleMesh(0.25, 1.0))) as MeshSprite3D;
+						var capsuleSprite:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createCapsule(0.25, 1.0))) as MeshSprite3D;
 						var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
 						mat.albedoColor = new Vector4(1.0, 1.0, 1.0, 0.5);
 						mat.renderMode = BlinnPhongMaterial.RENDERMODE_TRANSPARENT;
@@ -227,7 +224,7 @@ package physicsModule {
 			var sX:int = Math.random() * 0.75 + 0.25;
 			var sY:int = Math.random() * 0.75 + 0.25;
 			var sZ:int = Math.random() * 0.75 + 0.25;
-			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(new BoxMesh(sX, sY, sZ))) as MeshSprite3D;
+			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(sX, sY, sZ))) as MeshSprite3D;
 			box.meshRenderer.material = mat1;
 			box.transform.position = new Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
 			box.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
@@ -246,7 +243,7 @@ package physicsModule {
 			
 			var raidius:int = Math.random() * 0.2 + 0.2;
 			var height:int = Math.random() * 0.5 + 0.8;
-			var capsule:MeshSprite3D = scene.addChild(new MeshSprite3D(new CapsuleMesh(raidius, height))) as MeshSprite3D;
+			var capsule:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createCapsule(raidius, height))) as MeshSprite3D;
 			capsule.meshRenderer.material = mat3;
 			capsule.transform.position = new Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
 			capsule.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);

@@ -19,7 +19,7 @@ class PhysicsWorldRayShapeCast{
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
-        var plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(20, 20, 10, 10)));
+        var plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(20, 20, 10, 10)));
         var planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
             planeMat.albedoTexture = tex;
@@ -60,7 +60,7 @@ class PhysicsWorldRayShapeCast{
         var sX = Math.random() * 0.75 + 0.25;
         var sY = Math.random() * 0.75 + 0.25;
         var sZ = Math.random() * 0.75 + 0.25;
-        var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(sX, sY, sZ)));
+        var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         box.meshRenderer.material = mat1;
         box.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         box.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
@@ -77,7 +77,7 @@ class PhysicsWorldRayShapeCast{
         }));
         var raidius = Math.random() * 0.2 + 0.2;
         var height = Math.random() * 0.5 + 0.8;
-        var capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.CapsuleMesh(raidius, height)));
+        var capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = mat3;
         capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
@@ -151,7 +151,7 @@ class PhysicsWorldRayShapeCast{
                 case 1:
                     var boxCollider = new Laya.BoxColliderShape(1.0, 1.0, 1.0);
                     for (i = 0; i < 21; i++) {
-                        var boxSprite = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1.0, 1.0, 1.0)));
+                        var boxSprite = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(1.0, 1.0, 1.0)));
                         var mat = new Laya.BlinnPhongMaterial();
                         mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 0.5);
                         mat.renderMode = Laya.BlinnPhongMaterial.RENDERMODE_TRANSPARENT;
@@ -175,7 +175,7 @@ class PhysicsWorldRayShapeCast{
                 case 2:
                     var sphereCollider = new Laya.SphereColliderShape(0.5);
                     for (i = 0; i < 41; i++) {
-                        var sphereSprite = this.scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.5)));
+                        var sphereSprite = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(0.5)));
                         var mat = new Laya.BlinnPhongMaterial();
                         mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 0.5);
                         mat.renderMode = 2;
@@ -198,7 +198,7 @@ class PhysicsWorldRayShapeCast{
                 case 3:
                     var capsuleCollider = new Laya.CapsuleColliderShape(0.25, 1.0);
                     for (i = 0; i < 41; i++) {
-                        var capsuleSprite = this.scene.addChild(new Laya.MeshSprite3D(new Laya.CapsuleMesh(0.25, 1.0)));
+                        var capsuleSprite = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(0.25, 1.0)));
                         var mat = new Laya.BlinnPhongMaterial();
                         mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 0.5);
                         mat.renderMode = 2;

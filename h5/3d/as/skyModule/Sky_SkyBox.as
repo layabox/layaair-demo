@@ -30,10 +30,9 @@ package skyModule {
 			
 			//天空盒
 			BaseMaterial.load("../../../../res/threeDimen/skyBox/DawnDusk/SkyBox.lmat", Handler.create(null, function(mat:SkyBoxMaterial):void {
-				var skyRenderer:SkyRenderer = new SkyRenderer();
+				var skyRenderer:SkyRenderer =camera.skyRenderer;
 				skyRenderer.mesh = SkyBox.instance;
 				skyRenderer.material = mat;
-				camera.skyRenderer = skyRenderer;
 				var exposureNumber:Number = 0;
 				Laya.timer.frameLoop(1, this, function():void {
 					mat.exposure = Math.sin(exposureNumber += 0.01) + 1;

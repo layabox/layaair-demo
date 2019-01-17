@@ -27,7 +27,7 @@ class PhysicsWorld_RayShapeCast
 		directionLight.color = new Laya.Vector3(1, 1, 1);
 		directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
 		
-		var plane:Laya.MeshSprite3D =this.scene.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(20, 20, 10, 10))) as Laya.MeshSprite3D;
+		var plane:Laya.MeshSprite3D =this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(20, 20, 10, 10))) as Laya.MeshSprite3D;
 		var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
 		Laya.Texture2D.load("../../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
 			planeMat.albedoTexture = tex;
@@ -112,7 +112,7 @@ class PhysicsWorld_RayShapeCast
 			case 1: 
 				var boxCollider:Laya.BoxColliderShape = new Laya.BoxColliderShape(1.0, 1.0, 1.0);
 				for (i = 0; i < 21; i++) {
-					var boxSprite:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(1.0, 1.0, 1.0))) as Laya.MeshSprite3D;
+					var boxSprite:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(1.0, 1.0, 1.0))) as Laya.MeshSprite3D;
 					var mat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
 					mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 0.5);
 					mat.renderMode = Laya.BlinnPhongMaterial.RENDERMODE_TRANSPARENT;
@@ -135,7 +135,7 @@ class PhysicsWorld_RayShapeCast
 			case 2: 
 				var sphereCollider:Laya.SphereColliderShape = new Laya.SphereColliderShape(0.5);
 				for (i = 0; i < 41; i++) {
-					var sphereSprite:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.5))) as Laya.MeshSprite3D;
+					var sphereSprite:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(0.5))) as Laya.MeshSprite3D;
 					var mat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
 					mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 0.5);
 					mat.renderMode = 2;
@@ -158,7 +158,7 @@ class PhysicsWorld_RayShapeCast
 			case 3: 
 				var capsuleCollider:Laya.CapsuleColliderShape = new Laya.CapsuleColliderShape(0.25, 1.0);
 				for (i = 0; i < 41; i++) {
-					var capsuleSprite:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.CapsuleMesh(0.25, 1.0))) as Laya.MeshSprite3D;
+					var capsuleSprite:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(0.25, 1.0))) as Laya.MeshSprite3D;
 					var mat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
 					mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 0.5);
 					mat.renderMode = 2;
@@ -201,7 +201,7 @@ class PhysicsWorld_RayShapeCast
         var sX:number = Math.random() * 0.75 + 0.25;
         var sY:number = Math.random() * 0.75 + 0.25;
         var sZ:number = Math.random() * 0.75 + 0.25;
-        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(sX, sY, sZ))) as Laya.MeshSprite3D;
+        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ))) as Laya.MeshSprite3D;
         box.meshRenderer.material = mat1;
         box.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         box.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
@@ -220,7 +220,7 @@ class PhysicsWorld_RayShapeCast
         
         var raidius:number = Math.random() * 0.2 + 0.2;
         var height:number = Math.random() * 0.5 + 0.8;
-        var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.CapsuleMesh(raidius, height))) as Laya.MeshSprite3D;
+        var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height))) as Laya.MeshSprite3D;
         capsule.meshRenderer.material = mat3;
         capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);

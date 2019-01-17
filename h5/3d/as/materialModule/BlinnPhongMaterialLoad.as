@@ -1,29 +1,16 @@
 package materialModule {
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
-	import laya.d3.core.PhasorSpriter3D;
-	import laya.d3.core.Sprite3D;
 	import laya.d3.core.light.DirectionLight;
+	import laya.d3.core.material.BaseMaterial;
 	import laya.d3.core.material.BlinnPhongMaterial;
-	import laya.d3.core.material.StandardMaterial;
-	import laya.d3.core.render.RenderState;
-	import laya.d3.core.scene.Scene;
 	import laya.d3.core.scene.Scene3D;
-	import laya.d3.graphics.IndexBuffer3D;
-	import laya.d3.graphics.VertexBuffer3D;
 	import laya.d3.math.Quaternion;
 	import laya.d3.math.Vector3;
-	import laya.d3.math.Vector4;
 	import laya.d3.resource.models.Mesh;
 	import laya.display.Stage;
-	import laya.events.Event;
-	import laya.ui.Button;
-	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.webgl.WebGLContext;
-	import common.CameraMoveScript;
-	import common.Tool;
 	
 	/**
 	 * ...
@@ -47,14 +34,15 @@ package materialModule {
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			directionLight.color = new Vector3(0.6, 0.6, 0.6);
-			directionLight.direction = new Vector3(1, -1, -1);
 			
 			Mesh.load("../../../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm", Handler.create(null, function(mesh:Mesh):void {
 				var layaMonkey:MeshSprite3D = scene.addChild(new MeshSprite3D(mesh)) as MeshSprite3D;
-				//加载材质
-				layaMonkey.meshRenderer.material = BlinnPhongMaterial.load("../../../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
 				layaMonkey.transform.localScale = new Vector3(0.3, 0.3, 0.3);
 				layaMonkey.transform.rotation = new Quaternion(0.7071068, 0, 0, -0.7071067);
+				//加载材质
+				BaseMaterial.load("../../../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat", Handler.create(null, function(mat:BaseMaterial):void {
+					layaMonkey.meshRenderer.material = mat;
+				}));
 				
 				Laya.timer.frameLoop(1, this, function():void {
 					layaMonkey.transform.rotate(rotation, false);

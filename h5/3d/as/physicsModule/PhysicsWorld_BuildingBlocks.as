@@ -13,8 +13,7 @@ package physicsModule {
 	import laya.d3.physics.PhysicsCollider;
 	import laya.d3.physics.Rigidbody3D;
 	import laya.d3.physics.shape.BoxColliderShape;
-	import laya.d3.resource.models.BoxMesh;
-	import laya.d3.resource.models.PlaneMesh;
+	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.events.MouseManager;
@@ -53,7 +52,7 @@ package physicsModule {
 			directionLight.color = new Vector3(1, 1, 1);
 			directionLight.transform.worldMatrix.setForward(new Vector3(-1.0, -1.0, 1.0));
 			
-			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(new PlaneMesh(13, 13, 10, 10))) as MeshSprite3D;
+			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(13, 13, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
 			Texture2D.load("../../../../res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;
@@ -91,7 +90,7 @@ package physicsModule {
 				mat.albedoTexture = tex;
 			}));
 			
-			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(new BoxMesh(2, 0.33, 0.5))) as MeshSprite3D;
+			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(2, 0.33, 0.5))) as MeshSprite3D;
 			box.meshRenderer.material = mat;
 			box.meshRenderer.castShadow = true;
 			box.meshRenderer.receiveShadow = true;
@@ -112,7 +111,7 @@ package physicsModule {
 				mat.albedoTexture = tex;
 			}));
 			
-			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(new BoxMesh(0.5, 0.33, 2))) as MeshSprite3D;
+			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(0.5, 0.33, 2))) as MeshSprite3D;
 			box.meshRenderer.material = mat;
 			box.meshRenderer.castShadow = true;
 			box.meshRenderer.receiveShadow = true;

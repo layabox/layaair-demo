@@ -31,7 +31,7 @@ class PhysicsWorld_BuildingBlocks
         directionLight.color = new Laya.Vector3(1,1,1);
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1,-1,1));
 
-        var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(13,13,10,10))) as Laya.MeshSprite3D;
+        var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(13,13,10,10))) as Laya.MeshSprite3D;
        var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
 
         Laya.Texture2D.load("../../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
@@ -69,7 +69,7 @@ class PhysicsWorld_BuildingBlocks
             mat.albedoTexture = tex;
         }));
         
-        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(0.5, 0.33, 2))) as Laya.MeshSprite3D;
+        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(0.5, 0.33, 2))) as Laya.MeshSprite3D;
         box.meshRenderer.material = mat;
         box.meshRenderer.castShadow = true;
         box.meshRenderer.receiveShadow = true;
@@ -89,7 +89,7 @@ class PhysicsWorld_BuildingBlocks
 				mat.albedoTexture = tex;
 			}));
 			
-			var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(2, 0.33, 0.5))) as Laya.MeshSprite3D;
+			var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(2, 0.33, 0.5))) as Laya.MeshSprite3D;
 			box.meshRenderer.material = mat;
 			box.meshRenderer.castShadow = true;
 			box.meshRenderer.receiveShadow = true;

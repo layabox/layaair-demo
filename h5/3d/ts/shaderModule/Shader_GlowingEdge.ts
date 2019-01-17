@@ -1,7 +1,6 @@
 class Shader_GlowingEdge {
     private rotation:Laya.Vector3 = new Laya.Vector3(0, 0.01, 0);
     constructor() {
-        //Laya.Shader3D.debugMode = true;
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -24,25 +23,25 @@ class Shader_GlowingEdge {
             scene.addChild(dude);
             
             var customMaterial1:CustomMaterial = new CustomMaterial();
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/head.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+            Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/head.png", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
                 customMaterial1.diffuseTexture = tex;
             }));
             customMaterial1.marginalColor = new Laya.Vector3(1, 0.7, 0);
             
             var customMaterial2:CustomMaterial = new CustomMaterial();
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/jacket.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+            Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/jacket.png", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
                 customMaterial2.diffuseTexture = tex;
             }));
             customMaterial2.marginalColor = new Laya.Vector3(1, 0.7, 0);
             
             var customMaterial3:CustomMaterial = new CustomMaterial();
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/pants.png",Laya.Handler.create(null,function(tex:Laya.Texture2D):void{
+            Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/pants.png",Laya.Handler.create(this,function(tex:Laya.Texture2D):void{
                 customMaterial3.diffuseTexture = tex;
             }));
             customMaterial3.marginalColor = new Laya.Vector3(1, 0.7, 0);
             
             var customMaterial4:CustomMaterial = new CustomMaterial();
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/upBodyC.png",Laya.Handler.create(null,function(tex:Laya.Texture2D):void{
+            Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/upBodyC.png",Laya.Handler.create(this,function(tex:Laya.Texture2D):void{
                 customMaterial4.diffuseTexture =tex ;
             }))
            
@@ -61,7 +60,7 @@ class Shader_GlowingEdge {
             dude.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
         });
         
-        var earth:Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.5, 128, 128))) as Laya.MeshSprite3D;
+        var earth:Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(0.5, 128, 128))) as Laya.MeshSprite3D;
         
         var customMaterial:CustomMaterial = new CustomMaterial();
         Laya.Texture2D.load("../../res/threeDimen/texture/earth.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void{
@@ -83,14 +82,14 @@ class Shader_GlowingEdge {
             'a_BoneIndices': Laya.VertexMesh.MESH_BLENDINDICES0
         };
         var uniformMap:Object = {
-            'u_Bones': [Laya.SkinnedMeshSprite3D.BONES, Laya.Shader3D.PERIOD_CUSTOM], 
-            'u_CameraPos': [Laya.BaseCamera.CAMERAPOS, Laya.Shader3D.PERIOD_CAMERA], 
-            'u_MvpMatrix': [Laya.Sprite3D.MVPMATRIX, Laya.Shader3D.PERIOD_SPRITE], 
-            'u_WorldMat': [Laya.Sprite3D.WORLDMATRIX, Laya.Shader3D.PERIOD_SPRITE], 
-            'u_texture': [CustomMaterial.DIFFUSETEXTURE, Laya.Shader3D.PERIOD_MATERIAL], 
-            'u_marginalColor': [CustomMaterial.MARGINALCOLOR, Laya.Shader3D.PERIOD_MATERIAL], 
-            'u_DirectionLight.Direction': [Laya.Scene3D.LIGHTDIRECTION, Laya.Shader3D.PERIOD_SCENE], 
-            'u_DirectionLight.Color': [Laya.Scene3D.LIGHTDIRCOLOR, Laya.Shader3D.PERIOD_SCENE]
+            'u_Bones': Laya.Shader3D.PERIOD_CUSTOM, 
+            'u_CameraPos': Laya.Shader3D.PERIOD_CAMERA, 
+            'u_MvpMatrix': Laya.Shader3D.PERIOD_SPRITE, 
+            'u_WorldMat': Laya.Shader3D.PERIOD_SPRITE, 
+            'u_texture': Laya.Shader3D.PERIOD_MATERIAL, 
+            'u_marginalColor': Laya.Shader3D.PERIOD_MATERIAL, 
+            'u_DirectionLight.Direction': Laya.Shader3D.PERIOD_SCENE, 
+            'u_DirectionLight.Color': Laya.Shader3D.PERIOD_SCENE
         };
         var vs:string ="attribute vec4 a_Position;\n"+
         "attribute vec2 a_Texcoord;\n"+
@@ -158,9 +157,10 @@ class Shader_GlowingEdge {
         "gl_FragColor = texture2D(u_texture, v_Texcoord) + vec4(Emissive,1.0);\n"+
         "}";
         
-        
-        var customShader:Laya.Shader3D = Laya.Shader3D.add("CustomShader", attributeMap, uniformMap,Laya.SkinnedMeshSprite3D.shaderDefines);
-        customShader.addShaderPass(vs, ps);
+		var customShader:Laya.Shader3D = Laya.Shader3D.add("CustomShader");
+		var subShader:Laya.SubShader = new Laya.SubShader(attributeMap, uniformMap, Laya.SkinnedMeshSprite3D.shaderDefines);
+		customShader.addSubShader(subShader);
+		subShader.addShaderPass(vs,ps);
     }
 }
 new Shader_GlowingEdge;

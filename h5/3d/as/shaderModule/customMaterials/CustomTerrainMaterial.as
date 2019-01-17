@@ -1,29 +1,26 @@
-package shaderModule.customMaterials 
-{
+package shaderModule.customMaterials {
 	import laya.d3.core.material.BaseMaterial;
 	import laya.d3.math.Vector2;
-	import laya.d3.math.Vector3;
-	import laya.d3.math.Vector4;
+	import laya.d3.shader.Shader3D;
 	import laya.d3.shader.ShaderDefines;
 	import laya.webgl.resource.BaseTexture;
+	
 	/**
 	 * ...
-	 * @author 
+	 * @author
 	 */
-	public class CustomTerrainMaterial extends BaseMaterial 
-	{
-		
-		public static var SPLATALPHATEXTURE:int = 0;
-		public static var DIFFUSETEXTURE1:int = 1;
-		public static var DIFFUSETEXTURE2:int = 2;
-		public static var DIFFUSETEXTURE3:int = 3;
-		public static var DIFFUSETEXTURE4:int = 4;
-		public static var DIFFUSETEXTURE5:int = 5;
-		public static var DIFFUSESCALE1:int = 6;
-		public static var DIFFUSESCALE2:int = 7;
-		public static var DIFFUSESCALE3:int = 8;
-		public static var DIFFUSESCALE4:int = 9;
-		public static var DIFFUSESCALE5:int = 10;
+	public class CustomTerrainMaterial extends BaseMaterial {
+		public static var SPLATALPHATEXTURE:int = Shader3D.propertyNameToID("u_SplatAlphaTexture");
+		public static var DIFFUSETEXTURE1:int = Shader3D.propertyNameToID("u_DiffuseTexture1");
+		public static var DIFFUSETEXTURE2:int = Shader3D.propertyNameToID("u_DiffuseTexture2");
+		public static var DIFFUSETEXTURE3:int = Shader3D.propertyNameToID("u_DiffuseTexture3");
+		public static var DIFFUSETEXTURE4:int = Shader3D.propertyNameToID("u_DiffuseTexture4");
+		public static var DIFFUSETEXTURE5:int = Shader3D.propertyNameToID("u_DiffuseTexture5");
+		public static var DIFFUSESCALE1:int = Shader3D.propertyNameToID("u_DiffuseScale1");
+		public static var DIFFUSESCALE2:int = Shader3D.propertyNameToID("u_DiffuseScale2");
+		public static var DIFFUSESCALE3:int = Shader3D.propertyNameToID("u_DiffuseScale3");
+		public static var DIFFUSESCALE4:int = Shader3D.propertyNameToID("u_DiffuseScale4");
+		public static var DIFFUSESCALE5:int = Shader3D.propertyNameToID("u_DiffuseScale5");
 		
 		/**自定义地形材质细节宏定义。*/
 		public static var SHADERDEFINE_DETAIL_NUM1:int;
@@ -41,10 +38,10 @@ package shaderModule.customMaterials
 		public static function __init__():void {
 			
 			SHADERDEFINE_DETAIL_NUM1 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM1");
-            SHADERDEFINE_DETAIL_NUM2 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM2");
-            SHADERDEFINE_DETAIL_NUM3 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM3");
-            SHADERDEFINE_DETAIL_NUM4 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM4");
-            SHADERDEFINE_DETAIL_NUM5 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM5");
+			SHADERDEFINE_DETAIL_NUM2 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM2");
+			SHADERDEFINE_DETAIL_NUM3 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM3");
+			SHADERDEFINE_DETAIL_NUM4 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM4");
+			SHADERDEFINE_DETAIL_NUM5 = shaderDefines.registerDefine("CUSTOM_DETAIL_NUM5");
 		}
 		
 		/**
@@ -209,10 +206,10 @@ package shaderModule.customMaterials
 		}
 		
 		public function CustomTerrainMaterial() {
-			super(11);
+			super();
 			setShaderName("CustomTerrainShader");
 		}
-		
+	
 	}
 
 }

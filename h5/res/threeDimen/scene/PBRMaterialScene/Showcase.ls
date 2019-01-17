@@ -27,7 +27,7 @@
 					"isStatic":false,
 					"name":"Wooden_Barrel (3)",
 					"layer":0,
-					"translate":[
+					"position":[
 						0.51,
 						0.86,
 						-0.06
@@ -60,7 +60,7 @@
 					"isStatic":false,
 					"name":"Wooden_Barrel (2)",
 					"layer":0,
-					"translate":[
+					"position":[
 						0.31,
 						0.21,
 						0.47
@@ -93,7 +93,7 @@
 					"isStatic":false,
 					"name":"Wooden_Barrel (1)",
 					"layer":0,
-					"translate":[
+					"position":[
 						0.3,
 						0.25,
 						-0.16
@@ -126,7 +126,7 @@
 					"isStatic":false,
 					"name":"Wooden_Barrel",
 					"layer":0,
-					"translate":[
+					"position":[
 						0.75,
 						0.25,
 						0.12
@@ -164,7 +164,7 @@
 					"nearPlane":0.3,
 					"farPlane":1000,
 					"layer":0,
-					"translate":[
+					"position":[
 						-1.494,
 						1.049,
 						1.754
@@ -204,7 +204,7 @@
 					"intensity":1,
 					"lightmapBakedType":0,
 					"layer":0,
-					"translate":[
+					"position":[
 						0,
 						3,
 						0
@@ -235,7 +235,7 @@
 					"isStatic":false,
 					"name":"Plane",
 					"layer":0,
-					"translate":[
+					"position":[
 						0,
 						0,
 						0

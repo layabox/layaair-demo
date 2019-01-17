@@ -4,8 +4,8 @@ class Sky_SkyBox{
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
-        var scene = Laya.stage.addChild(new Laya.Scene3D());
-        this.camera = scene.addChild(new Laya.Camera(0, 0.1, 100));
+        this.scene = Laya.stage.addChild(new Laya.Scene3D());
+        this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.rotate(new Laya.Vector3(10, 0, 0), true, false);
         this.camera.addComponent(CameraMoveScript);
         this.camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
@@ -15,16 +15,18 @@ class Sky_SkyBox{
     }
 
     loadMaterial(mat){
-		var skyRenderer = new Laya.SkyRenderer();
+		var skyRenderer = this.scene.skyRenderer;
 		skyRenderer.mesh = Laya.SkyBox.instance;
 		skyRenderer.material = mat;
-		this.camera.skyRenderer = skyRenderer;
+		//this.camera.skyRenderer = skyRenderer;
 		Laya.timer.frameLoop(1, this, this.onFrameLoop);
+		
+		
     }
 
     onFrameLoop(){
-        this.camera.skyRenderer.material.exposure = Math.sin(this.exposureNumber += 0.01) + 1;
-		this.camera.skyRenderer.material.rotation += 0.01;
+        this.scene.skyRenderer.material.exposure = Math.sin(this.exposureNumber += 0.01) + 1;
+		this.scene.skyRenderer.material.rotation += 0.01;
     }
 }
 

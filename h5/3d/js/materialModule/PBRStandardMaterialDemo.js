@@ -30,10 +30,9 @@ class PBRStandardMaterialDemo{
     }
 
     loadMaterial(skyMaterial){
-        var skyRenderer = new Laya.SkyRenderer();
+        var skyRenderer = this.camera.skyRenderer;
         skyRenderer.mesh = Laya.SkyBox.instance;
         skyRenderer.material = skyMaterial;
-        this.camera.skyRenderer = skyRenderer;
     }
 
     setTexture(){

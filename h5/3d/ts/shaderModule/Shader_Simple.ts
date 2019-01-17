@@ -34,8 +34,8 @@ class Shader_Simple {
             'a_Normal': Laya.VertexMesh.MESH_NORMAL0
         };
         var uniformMap:Object = {
-            'u_MvpMatrix': [Laya.Sprite3D.MVPMATRIX, Laya.Shader3D.PERIOD_SPRITE], 
-            'u_WorldMat': [Laya.Sprite3D.WORLDMATRIX, Laya.Shader3D.PERIOD_SPRITE]
+            'u_MvpMatrix': Laya.Shader3D.PERIOD_SPRITE, 
+            'u_WorldMat': Laya.Shader3D.PERIOD_SPRITE
         };
         var vs:string ="attribute vec4 a_Position;\n"+
         "uniform mat4 u_MvpMatrix;\n"+
@@ -58,9 +58,11 @@ class Shader_Simple {
         "{\n"+
         "gl_FragColor=vec4(v_Normal,1.0);\n"+
         "}";      
-        var customShader:Laya.Shader3D = Laya.Shader3D.add("CustomShader", attributeMap, uniformMap);
-        
-        customShader.addShaderPass(vs, ps);
+
+		var customShader:Laya.Shader3D = Laya.Shader3D.add("CustomShader");
+		var subShader:Laya.SubShader =new Laya.SubShader(attributeMap, uniformMap);
+		customShader.addSubShader(subShader);
+		subShader.addShaderPass(vs, ps);
     }
 }
 new Shader_Simple;

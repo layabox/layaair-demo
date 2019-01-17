@@ -5,17 +5,15 @@ package physicsModule {
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
-	import laya.d3.math.Quaternion;
 	import laya.d3.math.Vector3;
 	import laya.d3.math.Vector4;
-	import laya.d3.physics.Rigidbody3D;
 	import laya.d3.physics.PhysicsCollider;
+	import laya.d3.physics.Rigidbody3D;
 	import laya.d3.physics.shape.BoxColliderShape;
 	import laya.d3.physics.shape.CompoundColliderShape;
 	import laya.d3.physics.shape.SphereColliderShape;
-	import laya.d3.physics.shape.StaticPlaneColliderShape;
 	import laya.d3.resource.models.Mesh;
-	import laya.d3.resource.models.PlaneMesh;
+	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
@@ -43,7 +41,7 @@ package physicsModule {
 			directionLight.color = new Vector3(1, 1, 1);
 			directionLight.transform.worldMatrix.setForward(new Vector3(-1.0, -1.0, 1.0));
 			
-			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(new PlaneMesh(13, 13, 10, 10))) as MeshSprite3D;
+			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(13, 13, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
 			Texture2D.load("../../../../res/threeDimen/Physics/grass.png", Handler.create(null, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;

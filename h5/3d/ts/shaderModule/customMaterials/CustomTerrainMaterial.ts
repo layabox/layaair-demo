@@ -1,15 +1,15 @@
 class CustomTerrainMaterial extends Laya.BaseMaterial {
-    public static SPLATALPHATEXTURE:number = 0;
-    public static DIFFUSETEXTURE1:number = 1;
-    public static DIFFUSETEXTURE2:number = 2;
-    public static DIFFUSETEXTURE3:number = 3;
-    public static DIFFUSETEXTURE4:number = 4;
-    public static DIFFUSETEXTURE5:number = 5;
-    public static DIFFUSESCALE1:number = 6;
-    public static DIFFUSESCALE2:number = 7;
-    public static DIFFUSESCALE3:number = 8;
-    public static DIFFUSESCALE4:number = 9;
-    public static DIFFUSESCALE5:number = 10;
+	public static SPLATALPHATEXTURE = Laya.Shader3D.propertyNameToID("u_SplatAlphaTexture");
+	public static DIFFUSETEXTURE1 = Laya.Shader3D.propertyNameToID("u_DiffuseTexture1");
+	public static DIFFUSETEXTURE2 = Laya.Shader3D.propertyNameToID("u_DiffuseTexture2");
+	public static DIFFUSETEXTURE3 = Laya.Shader3D.propertyNameToID("u_DiffuseTexture3");
+	public static DIFFUSETEXTURE4 = Laya.Shader3D.propertyNameToID("u_DiffuseTexture4");
+	public static DIFFUSETEXTURE5 = Laya.Shader3D.propertyNameToID("u_DiffuseTexture5");
+	public static DIFFUSESCALE1 = Laya.Shader3D.propertyNameToID("u_DiffuseScale1");
+	public static DIFFUSESCALE2 = Laya.Shader3D.propertyNameToID("u_DiffuseScale2");
+	public static DIFFUSESCALE3 = Laya.Shader3D.propertyNameToID("u_DiffuseScale3");
+	public static DIFFUSESCALE4 = Laya.Shader3D.propertyNameToID("u_DiffuseScale4");
+	public static DIFFUSESCALE5 = Laya.Shader3D.propertyNameToID("u_DiffuseScale5");
     
     /**自定义地形材质细节宏定义。*/
     public static SHADERDEFINE_DETAIL_NUM1:number;

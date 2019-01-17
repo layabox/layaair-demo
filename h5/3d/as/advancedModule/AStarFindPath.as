@@ -23,7 +23,6 @@ package advancedModule {
 	import laya.events.Event;
 	import laya.net.Loader;
 	import laya.utils.Handler;
-	import laya.utils.Stat;
 	import laya.utils.Tween;
 	import laya.webgl.resource.Texture2D;
 	
@@ -69,7 +68,6 @@ package advancedModule {
 			
 			//删除原始资源中包含的默认相机
 			var camera:Camera = scene.getChildByName("Main Camera") as Camera;
-			camera.addComponent(CameraMoveScript);
 			camera.removeSelf();
 			
 			//根据场景中方块生成路径点
@@ -113,10 +111,6 @@ package advancedModule {
 			
 			//初始化相机
 			var moveCamera:Camera = moveSprite3D.addChild(new Camera()) as Camera;
-			camera.clearFlag = BaseCamera.CLEARFLAG_SKY;
-			BaseMaterial.load("../../../../res/threeDimen/skyBox/skyBox3/skyBox3.lmat",Handler.create(null,function(mat:SkyBoxMaterial):void{
-				camera.skyboxMaterial =mat ;
-			}));
 			moveCamera.transform.localPosition = new Vector3(0, 7, -7);
 			moveCamera.transform.rotate(new Vector3(-45, 180, 0), true, false);
 			

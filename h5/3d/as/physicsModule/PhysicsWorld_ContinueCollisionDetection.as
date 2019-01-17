@@ -11,8 +11,7 @@ package physicsModule {
 	import laya.d3.physics.Rigidbody3D;
 	import laya.d3.physics.shape.BoxColliderShape;
 	import laya.d3.physics.shape.SphereColliderShape;
-	import laya.d3.resource.models.PlaneMesh;
-	import laya.d3.resource.models.SphereMesh;
+	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
@@ -47,7 +46,7 @@ package physicsModule {
 			directionLight.transform.worldMatrix.setForward(new Vector3(-1.0, -1.0, -1.0));
 			
 			//平面
-			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(new PlaneMesh(10, 10, 10, 10))) as MeshSprite3D;
+			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(10, 10, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
 			Texture2D.load("../../../../res/threeDimen/Physics/grass.png", Handler.create(null, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;
@@ -72,7 +71,7 @@ package physicsModule {
 			}));
 			
 			var radius:Number = Math.random() * 0.2 + 0.2;
-			var sphere:MeshSprite3D = scene.addChild(new MeshSprite3D(new SphereMesh(radius))) as MeshSprite3D;
+			var sphere:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(radius))) as MeshSprite3D;
 			sphere.meshRenderer.material = mat2;
 			sphere.transform.position = new Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
 			

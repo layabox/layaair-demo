@@ -29,7 +29,7 @@ class PhysicsWorld_BaseCollider
         //不清楚是否识别01
         directionlight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0,-1.0,-1.0));
         //平面加载
-        var plane : Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(10,10,10,10))) as Laya.MeshSprite3D;
+        var plane : Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(10,10,10,10))) as Laya.MeshSprite3D;
         var planeMat: Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("../../res/threeDimen/Physics/grass.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
             planeMat.albedoTexture = tex;
@@ -83,7 +83,7 @@ class PhysicsWorld_BaseCollider
         var sY:number = Math.random()*0.75+0.25;
         var sZ:number = Math.random()*0.75+0.25;
         //设置box模型
-        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(sX,sY,sZ)))as Laya.MeshSprite3D;
+        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX,sY,sZ)))as Laya.MeshSprite3D;
         //将box的模型赋予材质
         box.meshRenderer.material = mat1;
         //设置掉落位置
@@ -105,7 +105,7 @@ class PhysicsWorld_BaseCollider
             mat2.albedoTexture = tex;
         }));
         var radius:number = Math.random() * 0.2 + 0.2;
-        var sphere: Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(radius))) as Laya.MeshSprite3D;
+        var sphere: Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius))) as Laya.MeshSprite3D;
         sphere.meshRenderer.material = mat2;
         sphere.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
         
@@ -124,7 +124,7 @@ class PhysicsWorld_BaseCollider
         
         var raidius:number = Math.random() * 0.2 + 0.2;
         var height:number = Math.random() * 0.5 + 0.8;
-        var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.CapsuleMesh(raidius, height))) as Laya.MeshSprite3D;
+        var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height))) as Laya.MeshSprite3D;
         capsule.meshRenderer.material = mat3;
         capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
         capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);

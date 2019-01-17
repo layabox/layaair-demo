@@ -3,28 +3,15 @@ package materialModule {
 	import laya.d3.core.BaseCamera;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
-	import laya.d3.core.Sprite3D;
 	import laya.d3.core.material.BaseMaterial;
 	import laya.d3.core.material.PBRStandardMaterial;
 	import laya.d3.core.material.SkyBoxMaterial;
-	import laya.d3.core.material.UnlitMaterial;
-	import laya.d3.core.particleShuriKen.ShurikenParticleMaterial;
-	import laya.d3.core.pixelLine.PixelLineData;
-	import laya.d3.core.pixelLine.PixelLineSprite3D;
 	import laya.d3.core.scene.Scene3D;
-	import laya.d3.core.trail.TrailMaterial;
-	import laya.d3.core.trail.TrailSprite3D;
-	import laya.d3.math.Color;
-	import laya.d3.math.Vector3;
 	import laya.d3.math.Vector4;
-	import laya.d3.resource.TextureCube;
-	import laya.d3.resource.models.BoxMesh;
 	import laya.d3.resource.models.SkyBox;
 	import laya.d3.resource.models.SkyRenderer;
-	import laya.d3.resource.models.SphereMesh;
 	import laya.d3.shader.Shader3D;
 	import laya.display.Stage;
-	import laya.events.Event;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
 	import laya.webgl.resource.Texture2D;
@@ -48,10 +35,9 @@ package materialModule {
 				camera.addComponent(CameraMoveScript);
 				camera.clearFlag = BaseCamera.CLEARFLAG_SKY;
 				BaseMaterial.load("../../../../res/threeDimen/skyBox/DawnDusk/SkyBox.lmat", Handler.create(null, function(mat:SkyBoxMaterial):void {
-					var skyRenderer:SkyRenderer = new SkyRenderer();
+					var skyRenderer:SkyRenderer = camera.skyRenderer;
 					skyRenderer.mesh = SkyBox.instance;
 					skyRenderer.material = mat;
-					camera.skyRenderer = skyRenderer;
 				}));
 				
 				//实例PBR材质

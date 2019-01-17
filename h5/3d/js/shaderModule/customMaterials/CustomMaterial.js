@@ -17,6 +17,6 @@ class CustomMaterial extends Laya.BaseMaterial{
 
 }
 //ES6可以定义静态属性，这些属性是CustomMaterial的属性，不属于CustomMaterial实例的属性。ES7提案将支持在class中使用static定义静态属性
-CustomMaterial.DIFFUSETEXTURE = 1;
-CustomMaterial.MARGINALCOLOR = 2;
+CustomMaterial.DIFFUSETEXTURE = Laya.Shader3D.propertyNameToID("u_texture");
+CustomMaterial.MARGINALCOLOR = Laya.Shader3D.propertyNameToID("u_marginalColor");
 

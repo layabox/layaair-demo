@@ -3,18 +3,13 @@ package skyModule {
 	import laya.d3.core.BaseCamera;
 	import laya.d3.core.Camera;
 	import laya.d3.core.light.DirectionLight;
-	import laya.d3.core.material.BaseMaterial;
-	import laya.d3.core.material.BlinnPhongMaterial;
-	import laya.d3.core.material.SkyBoxMaterial;
 	import laya.d3.core.material.SkyProceduralMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
-	import laya.d3.math.Vector4;
 	import laya.d3.resource.models.SkyDome;
 	import laya.d3.resource.models.SkyRenderer;
 	import laya.d3.shader.Shader3D;
 	import laya.display.Stage;
-	import laya.utils.Handler;
 	import laya.utils.Stat;
 	
 	public class Sky_Procedural {
@@ -27,14 +22,13 @@ package skyModule {
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			Stat.show();
 			
+			//初始化3D场景
+			var scene:Scene3D = Laya.stage.addChild(new Scene3D()) as Scene3D;
+			
 			//初始化天空渲染器
-			var skyRenderer:SkyRenderer = new SkyRenderer();
+			var skyRenderer:SkyRenderer = scene.skyRenderer;
 			skyRenderer.mesh = SkyDome.instance;
 			skyRenderer.material = new SkyProceduralMaterial();
-			
-			//初始化3D场景并设置天空渲染器
-			var scene:Scene3D = Laya.stage.addChild(new Scene3D()) as Scene3D;
-			scene.skyRenderer = skyRenderer;
 			
 			//初始化相机并设置清除标记为天空
 			var camera:Camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;

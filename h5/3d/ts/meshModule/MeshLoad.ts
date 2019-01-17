@@ -29,7 +29,7 @@ class MeshLoad {
             var layaMonkeyLineSprite3D:Laya.PixelLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(5000)) as Laya.PixelLineSprite3D;
             Tool.linearModel(layaMonkey, layaMonkeyLineSprite3D, Laya.Color.GREEN);
             
-            var plane:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(6, 6, 10, 10))) as Laya.MeshSprite3D;
+            var plane:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(6, 6, 10, 10))) as Laya.MeshSprite3D;
             plane.transform.position = new Laya.Vector3(0, 0, -1);
             var planeLineSprite3D:Laya.PixelLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(1000)) as Laya.PixelLineSprite3D;
             Tool.linearModel(plane, planeLineSprite3D, Laya.Color.GRAY);

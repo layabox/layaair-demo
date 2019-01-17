@@ -21,7 +21,7 @@ class PhysicsWorld_TriggerAndCollisionEvent
 			directionLight.color = new Laya.Vector3(1, 1, 1);
 			directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
 			
-			var plane:MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(20, 20, 10, 10))) as Laya.MeshSprite3D;
+			var plane:MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(20, 20, 10, 10))) as Laya.MeshSprite3D;
 			var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
             Laya.Texture2D.load("../../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
 				planeMat.albedoTexture = tex;
@@ -47,7 +47,7 @@ class PhysicsWorld_TriggerAndCollisionEvent
         mat2.albedoColor = new Laya.Vector4(1.0, 0.0, 0.0, 1.0);
         
         var radius:number = 0.8;
-        var sphere:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(radius))) as Laya.MeshSprite3D;
+        var sphere:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius))) as Laya.MeshSprite3D;
         sphere.meshRenderer.material = mat2;
         sphere.transform.position = new Laya.Vector3(0, 0.8, 0);
         
@@ -80,7 +80,7 @@ class PhysicsWorld_TriggerAndCollisionEvent
         var sX:number = Math.random() * 0.75 + 0.25;
         var sY:number = Math.random() * 0.75 + 0.25;
         var sZ:number = Math.random() * 0.75 + 0.25;
-        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(sX, sY, sZ))) as Laya.MeshSprite3D;
+        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ))) as Laya.MeshSprite3D;
         box.meshRenderer.material = mat1;
         box.transform.position = new Laya.Vector3(Math.random() * 16 - 8, sY / 2, Math.random() * 16 - 8);
         box.transform.rotationEuler = new Laya.Vector3(0, Math.random() * 360, 0);
@@ -101,7 +101,7 @@ class PhysicsWorld_TriggerAndCollisionEvent
         
         var raidius:number = Math.random() * 0.2 + 0.2;
         var height:number = Math.random() * 0.5 + 0.8;
-        var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.CapsuleMesh(raidius, height))) as Laya.MeshSprite3D;
+        var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height))) as Laya.MeshSprite3D;
         capsule.meshRenderer.material = mat3;
         capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
@@ -122,7 +122,7 @@ class PhysicsWorld_TriggerAndCollisionEvent
         }));
         
         var radius:Number = Math.random() * 0.2 + 0.2;
-        var sphere:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(radius))) as Laya.MeshSprite3D;
+        var sphere:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius))) as Laya.MeshSprite3D;
         sphere.meshRenderer.material = mat2;
         sphere.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
         

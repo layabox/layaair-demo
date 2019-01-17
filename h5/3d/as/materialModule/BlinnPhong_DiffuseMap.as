@@ -6,7 +6,7 @@ package materialModule {
 	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
-	import laya.d3.resource.models.SphereMesh;
+	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
@@ -33,10 +33,10 @@ package materialModule {
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			directionLight.color = new Vector3(1, 1, 1);
 			
-			var earth1:MeshSprite3D = scene.addChild(new MeshSprite3D(new SphereMesh())) as MeshSprite3D;
+			var earth1:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere())) as MeshSprite3D;
 			earth1.transform.position = new Vector3(-0.6, 0, 0);
 			
-			var earth2:MeshSprite3D = scene.addChild(new MeshSprite3D(new SphereMesh())) as MeshSprite3D;
+			var earth2:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere())) as MeshSprite3D;
 			earth2.transform.position = new Vector3(0.6, 0, 0);
 			var material:BlinnPhongMaterial = new BlinnPhongMaterial();
 			//漫反射贴图

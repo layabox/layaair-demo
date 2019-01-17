@@ -25,10 +25,10 @@ package common {
 				var meshSprite3D:MeshSprite3D = sprite3D as MeshSprite3D;
 				var mesh:Mesh = meshSprite3D.meshFilter.sharedMesh as Mesh;
 				
-				var vbBuffer:VertexBuffer3D = mesh._vertexBuffers ? mesh._vertexBuffers[0] : (mesh as PrimitiveMesh)._primitveGeometry._vertexBuffer;
+				var vbBuffer:VertexBuffer3D = mesh._vertexBuffers[0];
 				
 				var vbBufferData:Float32Array = vbBuffer.getData();
-				var ibBufferData:Uint16Array = mesh._indexBuffer ? mesh._indexBuffer.getData() : (mesh as PrimitiveMesh)._primitveGeometry._indexBuffer.getData();
+				var ibBufferData:Uint16Array = mesh._indexBuffer.getData();
 				var vertexStrideCount:int = vbBuffer.vertexDeclaration.vertexStride / 4;
 				var loopCount:int = 0;
 				var index:int = 0;

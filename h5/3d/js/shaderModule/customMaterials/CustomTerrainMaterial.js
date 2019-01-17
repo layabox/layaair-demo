@@ -122,17 +122,17 @@ class CustomTerrainMaterial extends Laya.BaseMaterial{
     }
 }
 //ES6可以定义静态属性，这些属性是CustomMaterial的属性，不属于CustomMaterial实例的属性。ES7提案将支持在class中使用static定义静态属性
-CustomTerrainMaterial.SPLATALPHATEXTURE = 0;
-CustomTerrainMaterial.DIFFUSETEXTURE1 = 1;
-CustomTerrainMaterial.DIFFUSETEXTURE2 = 2;
-CustomTerrainMaterial.DIFFUSETEXTURE3 = 3;
-CustomTerrainMaterial.DIFFUSETEXTURE4 = 4;
-CustomTerrainMaterial.DIFFUSETEXTURE5 = 5;
-CustomTerrainMaterial.DIFFUSESCALE1 = 6;
-CustomTerrainMaterial.DIFFUSESCALE2 = 7;
-CustomTerrainMaterial.DIFFUSESCALE3 = 8;
-CustomTerrainMaterial.DIFFUSESCALE4 = 9;
-CustomTerrainMaterial.DIFFUSESCALE5 = 10;
+CustomTerrainMaterial.SPLATALPHATEXTURE = Laya.Shader3D.propertyNameToID("u_SplatAlphaTexture");
+CustomTerrainMaterial.DIFFUSETEXTURE1 = Laya.Shader3D.propertyNameToID("u_DiffuseTexture1");
+CustomTerrainMaterial.DIFFUSETEXTURE2 = Laya.Shader3D.propertyNameToID("u_DiffuseTexture2");
+CustomTerrainMaterial.DIFFUSETEXTURE3 = Laya.Shader3D.propertyNameToID("u_DiffuseTexture3");
+CustomTerrainMaterial.DIFFUSETEXTURE4 = Laya.Shader3D.propertyNameToID("u_DiffuseTexture4");
+CustomTerrainMaterial.DIFFUSETEXTURE5 = Laya.Shader3D.propertyNameToID("u_DiffuseTexture5");
+CustomTerrainMaterial.DIFFUSESCALE1 = Laya.Shader3D.propertyNameToID("u_DiffuseScale1");
+CustomTerrainMaterial.DIFFUSESCALE2 = Laya.Shader3D.propertyNameToID("u_DiffuseScale2");
+CustomTerrainMaterial.DIFFUSESCALE3 = Laya.Shader3D.propertyNameToID("u_DiffuseScale3");
+CustomTerrainMaterial.DIFFUSESCALE4 = Laya.Shader3D.propertyNameToID("u_DiffuseScale4");
+CustomTerrainMaterial.DIFFUSESCALE5 = Laya.Shader3D.propertyNameToID("u_DiffuseScale5");
 CustomTerrainMaterial.shaderDefines = new Laya.ShaderDefines(Laya.BaseMaterial.shaderDefines);
 
 

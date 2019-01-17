@@ -26,7 +26,7 @@ class MeshLoad{
         this.layaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
         this.layaMonkeyLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(5000));
         Tool.linearModel(this.layaMonkey, this.layaMonkeyLineSprite3D, Laya.Color.GREEN);
-        var plane = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(6, 6, 10, 10)));
+        var plane = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(6, 6, 10, 10)));
         plane.transform.position = new Laya.Vector3(0, 0, -1);
         var planeLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(1000));
         Tool.linearModel(plane, planeLineSprite3D, Laya.Color.GRAY);

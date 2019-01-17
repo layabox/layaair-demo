@@ -1,20 +1,17 @@
 package shaderModule {
+	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
-	import laya.d3.core.Sprite3D;
-	import laya.d3.core.scene.Scene;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.graphics.Vertex.VertexMesh;
 	import laya.d3.math.Quaternion;
 	import laya.d3.math.Vector3;
-	import laya.d3.resource.models.CapsuleMesh;
 	import laya.d3.resource.models.Mesh;
-	import laya.d3.resource.models.SphereMesh;
 	import laya.d3.shader.Shader3D;
+	import laya.d3.shader.SubShader;
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import common.CameraMoveScript;
 	import shaderModule.customMaterials.CustomMaterial;
 	
 	/**
@@ -56,13 +53,18 @@ package shaderModule {
 		
 		private function initShader():void {
 			
-			var attributeMap:Object = {'a_Position': VertexMesh.MESH_POSITION0, 'a_Normal': VertexMesh.MESH_NORMAL0};
-			var uniformMap:Object = {'u_MvpMatrix': [Sprite3D.MVPMATRIX, Shader3D.PERIOD_SPRITE], 'u_WorldMat': [Sprite3D.WORLDMATRIX, Shader3D.PERIOD_SPRITE]};
+			var attributeMap:Object = {
+				'a_Position': VertexMesh.MESH_POSITION0, 
+				'a_Normal': VertexMesh.MESH_NORMAL0};
+			var uniformMap:Object = {
+				'u_MvpMatrix': Shader3D.PERIOD_SPRITE, 
+				'u_WorldMat': Shader3D.PERIOD_SPRITE};
 			var vs:String = __INCLUDESTR__("customShader/simpleShader.vs");
 			var ps:String = __INCLUDESTR__("customShader/simpleShader.ps");
-			var customShader:Shader3D = Shader3D.add("CustomShader", attributeMap, uniformMap);
-			
-			customShader.addShaderPass(vs, ps);
+			var customShader:Shader3D = Shader3D.add("CustomShader");
+			var subShader:SubShader =new SubShader(attributeMap, uniformMap);
+			customShader.addSubShader(subShader);
+			subShader.addShaderPass(vs, ps);
 		}
 	
 	}

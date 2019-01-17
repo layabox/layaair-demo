@@ -1,6 +1,7 @@
 package shaderModule.customMaterials {
 	import laya.d3.core.material.BaseMaterial;
 	import laya.d3.math.Vector3;
+	import laya.d3.shader.Shader3D;
 	import laya.webgl.resource.BaseTexture;
 	
 	/**
@@ -8,8 +9,8 @@ package shaderModule.customMaterials {
 	 * @author ...
 	 */
 	public class CustomMaterial extends BaseMaterial {
-		public static var DIFFUSETEXTURE:int = 1;
-		public static var MARGINALCOLOR:int = 2;
+		public static var DIFFUSETEXTURE:int = Shader3D.propertyNameToID("u_texture");
+		public static var MARGINALCOLOR:int = Shader3D.propertyNameToID("u_marginalColor");
 		
 		/**
 		 * 获取漫反射贴图。
@@ -35,8 +36,11 @@ package shaderModule.customMaterials {
 			_shaderValues.setVector(MARGINALCOLOR, value);
 		}
 		
+		
+	
+		
 		public function CustomMaterial() {
-			super(2);
+			super();
 			setShaderName("CustomShader");
 		}
 	}

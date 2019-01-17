@@ -39,10 +39,9 @@ package cameraModule {
 			camera2.addComponent(CameraMoveScript);
 			camera2.clearFlag = BaseCamera.CLEARFLAG_SKY;
 			BaseMaterial.load("../../../../res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Handler.create(null, function(mat:SkyBoxMaterial):void {
-				var skyRenderer:SkyRenderer = new SkyRenderer();
+				var skyRenderer:SkyRenderer = camera2.skyRenderer;
 				skyRenderer.mesh = SkyBox.instance;
 				skyRenderer.material = mat;
-				camera2.skyRenderer = skyRenderer;
 			}));
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			

@@ -24,7 +24,7 @@ class PhysicsWorld_ContinueCollisionDetection
 			directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
 			
 			//平面
-			var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(10, 10, 10, 10))) as Laya.MeshSprite3D;
+			var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(10, 10, 10, 10))) as Laya.MeshSprite3D;
 			var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
 			Laya.Texture2D.load("../../res/threeDimen/Physics/grass.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
 				planeMat.albedoTexture = tex;
@@ -49,7 +49,7 @@ class PhysicsWorld_ContinueCollisionDetection
 		}));
         
         var radius:number = Math.random() * 0.2 + 0.2;
-        var sphere:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(radius))) as Laya.MeshSprite3D;
+        var sphere:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius))) as Laya.MeshSprite3D;
         sphere.meshRenderer.material = mat2;
         sphere.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
         

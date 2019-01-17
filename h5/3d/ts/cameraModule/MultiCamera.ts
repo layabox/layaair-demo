@@ -20,10 +20,9 @@ class MultiCamera {
         camera2.addComponent(CameraMoveScript);
         camera2.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
         Laya.BaseMaterial.load("../../res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Laya.Handler.create(null, function(mat:Laya.SkyBoxMaterial):void {
-            var skyRenderer = new Laya.SkyRenderer();
+            var skyRenderer:Laya.SkyRenderer = this.camera2.skyRenderer;
             skyRenderer.mesh = Laya.SkyBox.instance;
             skyRenderer.material = mat;
-            camera2.skyRenderer = skyRenderer;
         }));
         
         var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;

@@ -59,20 +59,20 @@ class Shader_Terrain {
             'a_Texcoord0': Laya.VertexMesh.MESH_TEXTURECOORDINATE0
         };
         var uniformMap:Object = {
-            'u_MvpMatrix': [Laya.Sprite3D.MVPMATRIX, Laya.Shader3D.PERIOD_SPRITE], 
-            'u_WorldMat': [Laya.Sprite3D.WORLDMATRIX, Laya.Shader3D.PERIOD_SPRITE], 
-            'u_CameraPos': [Laya.BaseCamera.CAMERAPOS, Laya.Shader3D.PERIOD_CAMERA], 
-            'u_SplatAlphaTexture': [CustomTerrainMaterial.SPLATALPHATEXTURE, Laya.Shader3D.PERIOD_MATERIAL], 
-            'u_DiffuseTexture1': [CustomTerrainMaterial.DIFFUSETEXTURE1, Laya.Shader3D.PERIOD_MATERIAL], 
-            'u_DiffuseTexture2': [CustomTerrainMaterial.DIFFUSETEXTURE2, Laya.Shader3D.PERIOD_MATERIAL], 
-            'u_DiffuseTexture3': [CustomTerrainMaterial.DIFFUSETEXTURE3, Laya.Shader3D.PERIOD_MATERIAL], 
-            'u_DiffuseTexture4': [CustomTerrainMaterial.DIFFUSETEXTURE4, Laya.Shader3D.PERIOD_MATERIAL], 
-            'u_DiffuseTexture5': [CustomTerrainMaterial.DIFFUSETEXTURE5, Laya.Shader3D.PERIOD_MATERIAL], 
-            'u_DiffuseScale1': [CustomTerrainMaterial.DIFFUSESCALE1, Laya.Shader3D.PERIOD_MATERIAL], 
-            'u_DiffuseScale2': [CustomTerrainMaterial.DIFFUSESCALE2, Laya.Shader3D.PERIOD_MATERIAL], 
-            'u_DiffuseScale3': [CustomTerrainMaterial.DIFFUSESCALE3, Laya.Shader3D.PERIOD_MATERIAL], 
-            'u_DiffuseScale4': [CustomTerrainMaterial.DIFFUSESCALE4, Laya.Shader3D.PERIOD_MATERIAL], 
-            'u_DiffuseScale5': [CustomTerrainMaterial.DIFFUSESCALE5, Laya.Shader3D.PERIOD_MATERIAL]
+            'u_MvpMatrix':  Laya.Shader3D.PERIOD_SPRITE], 
+            'u_WorldMat': Laya.Shader3D.PERIOD_SPRITE], 
+            'u_CameraPos': Laya.Shader3D.PERIOD_CAMERA], 
+            'u_SplatAlphaTexture':  Laya.Shader3D.PERIOD_MATERIAL, 
+            'u_DiffuseTexture1':  Laya.Shader3D.PERIOD_MATERIAL, 
+            'u_DiffuseTexture2':  Laya.Shader3D.PERIOD_MATERIAL, 
+            'u_DiffuseTexture3':  Laya.Shader3D.PERIOD_MATERIAL, 
+            'u_DiffuseTexture4': Laya.Shader3D.PERIOD_MATERIAL, 
+            'u_DiffuseTexture5': Laya.Shader3D.PERIOD_MATERIAL, 
+            'u_DiffuseScale1': Laya.Shader3D.PERIOD_MATERIAL, 
+            'u_DiffuseScale2': Laya.Shader3D.PERIOD_MATERIAL, 
+            'u_DiffuseScale3': Laya.Shader3D.PERIOD_MATERIAL, 
+            'u_DiffuseScale4': Laya.Shader3D.PERIOD_MATERIAL, 
+            'u_DiffuseScale5': Laya.Shader3D.PERIOD_MATERIAL
         };
         
         var vs:String = "attribute vec4 a_Position;\n"+
@@ -140,8 +140,10 @@ class Shader_Terrain {
         "gl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * splatAlpha.b + color4.xyz * splatAlpha.a + color5.xyz * (1.0 - splatAlpha.r - splatAlpha.g - splatAlpha.b - splatAlpha.a);\n"+
         "#endif\n"+
         "}";
-        var customTerrianShader:Laya.Shader3D = Laya.Shader3D.add("CustomTerrainShader", attributeMap, uniformMap, Laya.RenderableSprite3D.shaderDefines, CustomTerrainMaterial.shaderDefines);
-        customTerrianShader.addShaderPass(vs, ps);
+		var customTerrianShader:Laya.Shader3D = Laya.Shader3D.add("CustomTerrainShader");
+		var subShader:Laya.SubShader =new Laya.SubShader(attributeMap, uniformMap, Laya.RenderableSprite3D.shaderDefines, CustomTerrainMaterial.shaderDefines);
+		customTerrianShader.addSubShader(subShader);
+		subShader.addShaderPass(vs, ps);
     }
 }
 new Shader_Terrain;

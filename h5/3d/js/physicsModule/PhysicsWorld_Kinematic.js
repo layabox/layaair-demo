@@ -12,7 +12,7 @@ class PhysicsWorldKinematic{
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
-        var plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(20, 20, 10, 10)));
+        var plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(20, 20, 10, 10)));
         var planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function (tex) {
             planeMat.albedoTexture = tex;
@@ -36,7 +36,7 @@ class PhysicsWorldKinematic{
         }));
         mat2.albedoColor = new Laya.Vector4(1.0, 0.0, 0.0, 1.0);
         var radius = 0.8;
-        var sphere = this.scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(radius)));
+        var sphere = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius)));
         sphere.meshRenderer.material = mat2;
         sphere.transform.position = new Laya.Vector3(0, 0.8, 0);
         var rigidBody = sphere.addComponent(Laya.Rigidbody3D);
@@ -64,7 +64,7 @@ class PhysicsWorldKinematic{
         var sX = Math.random() * 0.75 + 0.25;
         var sY = Math.random() * 0.75 + 0.25;
         var sZ = Math.random() * 0.75 + 0.25;
-        var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(sX, sY, sZ)));
+        var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         box.meshRenderer.material = mat1;
         box.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         box.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
@@ -80,7 +80,7 @@ class PhysicsWorldKinematic{
         }));
         var raidius = Math.random() * 0.2 + 0.2;
         var height = Math.random() * 0.5 + 0.8;
-        var capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.CapsuleMesh(raidius, height)));
+        var capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = mat3;
         capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);

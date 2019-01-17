@@ -17,10 +17,10 @@ class BlinnPhong_DiffuseMap {
         directionLight.direction = new Laya.Vector3(0, -0.8, -1);
         directionLight.color = new Laya.Vector3(1, 1, 1);
         
-        var earth1:Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh())) as Laya.MeshSprite3D;
+        var earth1:Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere())) as Laya.MeshSprite3D;
         earth1.transform.position = new Laya.Vector3( -0.6, 0, 0);
         
-        var earth2:Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh())) as Laya.MeshSprite3D;
+        var earth2:Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere())) as Laya.MeshSprite3D;
         earth2.transform.position = new Laya.Vector3( 0.6, 0, 0);
         var material:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
         //漫反射贴图

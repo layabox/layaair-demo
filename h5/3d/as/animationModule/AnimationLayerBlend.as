@@ -1,13 +1,6 @@
 package animationModule {
 	import laya.d3.component.Animator;
-	import laya.d3.core.BaseCamera;
-	import laya.d3.core.Camera;
-	import laya.d3.core.MeshSprite3D;
-	import laya.d3.core.Sprite3D;
-	import laya.d3.core.material.SkyBoxMaterial;
 	import laya.d3.core.scene.Scene3D;
-	import laya.d3.math.Vector3;
-	import laya.d3.resource.models.SkyBox;
 	import laya.d3.shader.Shader3D;
 	import laya.display.Stage;
 	import laya.events.Event;
@@ -15,7 +8,6 @@ package animationModule {
 	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import common.CameraMoveScript;
 	
 	public class AnimationLayerBlend {
 		private var motionCross:Boolean = false;

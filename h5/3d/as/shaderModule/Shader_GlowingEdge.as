@@ -1,29 +1,20 @@
 package shaderModule {
-	import laya.ani.AnimationTemplet;
-	import laya.d3.component.animation.SkinAnimations;
-	import laya.d3.core.BaseCamera;
+	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.SkinnedMeshSprite3D;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.material.BaseMaterial;
-	import laya.d3.core.scene.Scene;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.graphics.Vertex.VertexMesh;
-	import laya.d3.graphics.VertexElementUsage;
 	import laya.d3.math.Vector3;
-	import laya.d3.resource.Texture2D;
-	import laya.d3.resource.models.CapsuleMesh;
-	import laya.d3.resource.models.Mesh;
-	import laya.d3.resource.models.SphereMesh;
+	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.d3.shader.Shader3D;
-	import laya.d3.shader.ShaderCompile3D;
+	import laya.d3.shader.SubShader;
 	import laya.display.Stage;
-	import laya.events.Event;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import common.CameraMoveScript;
 	import laya.webgl.resource.Texture2D;
 	import shaderModule.customMaterials.CustomMaterial;
 	
@@ -52,7 +43,6 @@ package shaderModule {
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			directionLight.color = new Vector3(1, 1, 1);
-			directionLight.direction = new Vector3(1, -1, 0);
 			
 			Sprite3D.load("../../../../res/threeDimen/skinModel/dude/dude.lh", Handler.create(null, function(dude:Sprite3D):void {
 				scene.addChild(dude);
@@ -93,7 +83,7 @@ package shaderModule {
 				dude.transform.rotate(new Vector3(0, 180, 0), false, false);
 			}))
 			
-			var earth:MeshSprite3D = scene.addChild(new MeshSprite3D(new SphereMesh(0.5, 128, 128))) as MeshSprite3D;
+			var earth:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(0.5, 128, 128))) as MeshSprite3D;
 			
 			var customMaterial:CustomMaterial = new CustomMaterial();
 			Texture2D.load("../../../../res/threeDimen/texture/earth.png", Handler.create(null, function(tex:Texture2D):void{
@@ -115,18 +105,20 @@ package shaderModule {
 				'a_BoneWeights': VertexMesh.MESH_BLENDWEIGHT0, 
 				'a_BoneIndices': VertexMesh.MESH_BLENDINDICES0};
 			var uniformMap:Object = {
-				'u_Bones': [SkinnedMeshSprite3D.BONES, Shader3D.PERIOD_CUSTOM], 
-				'u_CameraPos': [BaseCamera.CAMERAPOS, Shader3D.PERIOD_CAMERA], 
-				'u_MvpMatrix': [Sprite3D.MVPMATRIX, Shader3D.PERIOD_SPRITE], 
-				'u_WorldMat': [Sprite3D.WORLDMATRIX, Shader3D.PERIOD_SPRITE], 
-				'u_texture': [CustomMaterial.DIFFUSETEXTURE, Shader3D.PERIOD_MATERIAL], 
-				'u_marginalColor': [CustomMaterial.MARGINALCOLOR, Shader3D.PERIOD_MATERIAL], 
-				'u_DirectionLight.Direction': [Scene3D.LIGHTDIRECTION, Shader3D.PERIOD_SCENE], 
-				'u_DirectionLight.Color': [Scene3D.LIGHTDIRCOLOR, Shader3D.PERIOD_SCENE]};
+				'u_Bones':Shader3D.PERIOD_CUSTOM, 
+				'u_CameraPos': Shader3D.PERIOD_CAMERA, 
+				'u_MvpMatrix': Shader3D.PERIOD_SPRITE, 
+				'u_WorldMat': Shader3D.PERIOD_SPRITE, 
+				'u_texture': Shader3D.PERIOD_MATERIAL, 
+				'u_marginalColor': Shader3D.PERIOD_MATERIAL, 
+				'u_DirectionLight.Direction': Shader3D.PERIOD_SCENE, 
+				'u_DirectionLight.Color': Shader3D.PERIOD_SCENE};
 			var vs:String = __INCLUDESTR__("customShader/glowingEdgeShader.vs");
 			var ps:String = __INCLUDESTR__("customShader/glowingEdgeShader.ps");
-			var customShader:Shader3D = Shader3D.add("CustomShader", attributeMap, uniformMap, SkinnedMeshSprite3D.shaderDefines);
-			customShader.addShaderPass(vs, ps);
+			var customShader:Shader3D = Shader3D.add("CustomShader");
+			var subShader:SubShader = new SubShader(attributeMap, uniformMap, SkinnedMeshSprite3D.shaderDefines);
+			customShader.addSubShader(subShader);
+			subShader.addShaderPass(vs,ps);
 		}
 	}
 }

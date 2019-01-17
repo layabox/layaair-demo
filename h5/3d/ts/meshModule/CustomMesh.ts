@@ -23,38 +23,38 @@ class CustomMesh {
         this.lineSprite3D = scene.addChild(new Laya.Sprite3D()) as Laya.Sprite3D;
         
         //正方体
-        var box:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.BoxMesh(0.5, 0.5, 0.5))) as Laya.MeshSprite3D;
+        var box:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(0.5, 0.5, 0.5))) as Laya.MeshSprite3D;
         box.transform.position = new Laya.Vector3(2.0, 0.25, 0.6);
         box.transform.rotate(new Laya.Vector3(0, 45, 0), false, false);
         var boxLineSprite3D:Laya.PixelLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(100)) as Laya.PixelLineSprite3D;
         Tool.linearModel(box, boxLineSprite3D, Laya.Color.GREEN);
         
         //球体
-        var sphere:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.SphereMesh(0.25, 20, 20))) as Laya.MeshSprite3D;
+        var sphere:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(0.25, 20, 20))) as Laya.MeshSprite3D;
         sphere.transform.position = new Laya.Vector3(1.0, 0.25, 0.6);
         var sphereLineSprite3D:Laya.PixelLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(3500)) as Laya.PixelLineSprite3D;
         Tool.linearModel(sphere, sphereLineSprite3D, Laya.Color.GREEN);
         
         //圆柱体
-        var cylinder:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.CylinderMesh(0.25, 1, 20))) as Laya.MeshSprite3D;
+        var cylinder:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCylinder(0.25, 1, 20))) as Laya.MeshSprite3D;
         cylinder.transform.position = new Laya.Vector3(0, 0.5, 0.6);
         var cylinderLineSprite3D:Laya.PixelLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(1000)) as Laya.PixelLineSprite3D;
         Tool.linearModel(cylinder, cylinderLineSprite3D, Laya.Color.GREEN);
         
         //胶囊体
-        var capsule:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.CapsuleMesh(0.25, 1, 10, 20))) as Laya.MeshSprite3D;
+        var capsule:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(0.25, 1, 10, 20))) as Laya.MeshSprite3D;
         capsule.transform.position = new Laya.Vector3( -1.0, 0.5, 0.6);
         var capsuleLineSprite3D:Laya.PixelLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(3000)) as Laya.PixelLineSprite3D;
         Tool.linearModel(capsule, capsuleLineSprite3D, Laya.Color.GREEN);
         
         //圆锥体
-        var cone:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.ConeMesh(0.25, 0.75))) as Laya.MeshSprite3D;
+        var cone:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCone(0.25, 0.75))) as Laya.MeshSprite3D;
         cone.transform.position = new Laya.Vector3( -2.0, 0.375, 0.6);
         var coneLineSprite3D:Laya.PixelLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(500)) as Laya.PixelLineSprite3D;
         Tool.linearModel(cone, coneLineSprite3D, Laya.Color.GREEN);
         
         //平面
-        var plane:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PlaneMesh(6, 6, 10, 10))) as Laya.MeshSprite3D;
+        var plane:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(6, 6, 10, 10))) as Laya.MeshSprite3D;
         var planeLineSprite3D:Laya.PixelLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(1000)) as Laya.PixelLineSprite3D;
         Tool.linearModel(plane, planeLineSprite3D, Laya.Color.GRAY);
         

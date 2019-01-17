@@ -1,20 +1,16 @@
 package lightModule {
+	import common.CameraMoveScript;
 	import laya.d3.component.Animator;
 	import laya.d3.component.AnimatorState;
 	import laya.d3.core.Camera;
-	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.light.PointLight;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Quaternion;
 	import laya.d3.math.Vector3;
-	import laya.d3.resource.models.Mesh;
-	import laya.d3.resource.models.SphereMesh;
 	import laya.display.Stage;
-	import laya.events.Event;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import common.CameraMoveScript;
 	
 	/**
 	 * ...
