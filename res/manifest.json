@@ -356,7 +356,8 @@
 			"prefix": "advanced",
 			"tr_zhCN": "高级应用",
       "manifest": [
-        [ "Laya3DCombineHtml", "Laya3D与网页混合", "", "core,webgl,ani,d3" ],
+		[ "Laya3DCombineHtml", "Laya3D与网页混合", "", "core,webgl,ani,d3" ],
+		[ "GarbageCollection", "释放显存", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
         [ "RealTimeShadow", "实时阴影", "", "core,webgl,ani,d3" ],
         [ "RenderTextureDemo", "渲染纹理", "", "core,webgl,ui,ani,d3,CameraMoveScript.js" ],
         [ "AStarFindPath", "寻路导航", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
