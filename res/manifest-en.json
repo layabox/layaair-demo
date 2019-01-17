@@ -312,7 +312,7 @@
 				  "prefix": "scene",
 				  "tr_zhCN": "3D scene",
 				  "manifest": [
-					  ["SceneLoad1", "Scene demo1 ", "", "core,webgl,ani,d3,CameraMoveScript.js，physics3D"],
+					  ["SceneLoad1", "Scene demo1 ", "", "core,webgl,ani,d3,CameraMoveScript.js,physics3D"],
 					  ["SceneLoad2", "Scene demo2", "", "core,webgl,ani,d3,CameraMoveScript.js"]
 				  ]
 			  },

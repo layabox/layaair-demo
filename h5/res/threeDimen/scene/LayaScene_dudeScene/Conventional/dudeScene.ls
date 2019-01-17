@@ -4,6 +4,13 @@
 		"type":"Scene3D",
 		"props":{
 			"name":"dudeScene",
+			"sky":{
+				"material":{
+					"type":"Laya.SkyProceduralMaterial",
+					"path":"Assets/Sky.lmat"
+				},
+				"mesh":"SkyDome"
+			},
 			"ambientColor":[
 				0.3970588,
 				0.3970588,
@@ -12,7 +19,7 @@
 			"reflectionIntensity":1,
 			"lightmaps":[],
 			"enableFog":true,
-			"fogStart":1.5,
+			"fogStart":1,
 			"fogRange":2,
 			"fogColor":[
 				0.2642733,
@@ -186,8 +193,8 @@
 					],
 					"rotation":[
 						0,
-						0.9848078,
-						0.1736482,
+						0.9914449,
+						0.1305262,
 						0
 					],
 					"scale":[
@@ -221,7 +228,7 @@
 				"props":{
 					"name":"Plane",
 					"active":true,
-					"isStatic":true,
+					"isStatic":false,
 					"layer":0,
 					"position":[
 						0,
@@ -243,7 +250,7 @@
 					"enableRender":true,
 					"materials":[
 						{
-							"path":"Assets/Materials/layabox 17.lmat"
+							"path":"Assets/Materials/layabox.lmat"
 						}
 					]
 				},
@@ -269,7 +276,7 @@
 				"props":{
 					"name":"Cube",
 					"active":true,
-					"isStatic":true,
+					"isStatic":false,
 					"layer":0,
 					"position":[
 						0.4088883,
@@ -291,7 +298,7 @@
 					"enableRender":true,
 					"materials":[
 						{
-							"path":"Assets/Materials/layabox 17.lmat"
+							"path":"Assets/Materials/layabox.lmat"
 						}
 					]
 				},
@@ -326,7 +333,7 @@
 				"props":{
 					"name":"Capsule",
 					"active":true,
-					"isStatic":true,
+					"isStatic":false,
 					"layer":0,
 					"position":[
 						-0.622,
@@ -348,7 +355,7 @@
 					"enableRender":true,
 					"materials":[
 						{
-							"path":"Assets/Materials/layabox 17.lmat"
+							"path":"Assets/Materials/layabox.lmat"
 						}
 					]
 				},
@@ -380,12 +387,12 @@
 				"props":{
 					"name":"Cylinder",
 					"active":true,
-					"isStatic":true,
+					"isStatic":false,
 					"layer":0,
 					"position":[
-						-0.525,
+						-0.5,
 						0.1,
-						-0.859
+						-0.8
 					],
 					"rotation":[
 						0,
@@ -402,7 +409,7 @@
 					"enableRender":true,
 					"materials":[
 						{
-							"path":"Assets/Materials/layabox 17.lmat"
+							"path":"Assets/Materials/layabox.lmat"
 						}
 					]
 				},
@@ -434,12 +441,12 @@
 				"props":{
 					"name":"Sphere",
 					"active":true,
-					"isStatic":true,
+					"isStatic":false,
 					"layer":0,
 					"position":[
-						0.514,
-						0.075,
-						-0.894
+						0.5,
+						0.05,
+						-0.8
 					],
 					"rotation":[
 						0,
@@ -456,7 +463,7 @@
 					"enableRender":true,
 					"materials":[
 						{
-							"path":"Assets/Materials/layabox 17.lmat"
+							"path":"Assets/Materials/layabox.lmat"
 						}
 					]
 				},
