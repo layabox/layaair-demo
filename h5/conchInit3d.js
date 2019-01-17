@@ -10,7 +10,6 @@ var list = [
 	"advancedModule/AStarFindPath",
 	"advancedModule/GarbageCollection",
 	"advancedModule/Laya3DCombineHtml",
-	"advancedModule/GarbageCollection",
 	"advancedModule/PBRDemo",
 	"advancedModule/RealTimeShadow",
 	"advancedModule/RenderTextureDemo",
