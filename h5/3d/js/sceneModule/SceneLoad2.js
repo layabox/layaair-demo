@@ -1,4 +1,4 @@
-class TerrainScene{
+class SceneLoad2{
     constructor(){
         Laya.Shader3D.debugMode = true;
         Laya3D.init(0, 0);
@@ -23,4 +23,4 @@ class TerrainScene{
 
 
 //激活启动类
-new TerrainScene();
+new SceneLoad2();

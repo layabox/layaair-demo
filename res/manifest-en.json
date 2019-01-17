@@ -312,8 +312,8 @@
 				  "prefix": "scene",
 				  "tr_zhCN": "3D scene",
 				  "manifest": [
-					  ["SceneLoad", "Scene loading ", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-					  ["TerrainScene", "Terrain scene", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+					  ["SceneLoad1", "Scene demo1 ", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					  ["SceneLoad2", "Scene demo2", "", "core,webgl,ani,d3,CameraMoveScript.js"]
 				  ]
 			  },
 			  {
@@ -366,6 +366,7 @@
 				  "tr_zhCN": "Advanced application ",
 			"manifest": [
 			  [ "Laya3DCombineHtml", "Laya3D Mixing with web pages ", "", "core,webgl,ani,d3" ],
+			  [ "GarbageCollection", "Garbage collection ", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
 			  [ "RealTimeShadow", "Real time shadow", "", "core,webgl,ani,d3" ],
 			  [ "RenderTextureDemo", "Render Texture ", "", "core,webgl,ui,ani,d3,CameraMoveScript.js" ],
 			  [ "AStarFindPath", "Path finding navigation ", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],

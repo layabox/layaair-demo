@@ -303,8 +303,8 @@
 			"prefix": "scene",
 			"tr_zhCN": "3D场景",
 			"manifest": [
-				["SceneLoad", "场景加载", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-				["TerrainScene", "地形场景", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+				["SceneLoad1", "场景展示1", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+				["SceneLoad2", "场景展示2", "", "core,webgl,ani,d3,CameraMoveScript.js"]
 			]
 		},
 		{

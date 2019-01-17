@@ -9,6 +9,7 @@ var id = GetQueryString("id") || 0;
 var list = [
 	"advancedModule/AStarFindPath",
 	"advancedModule/Laya3DCombineHtml",
+	"advancedModule/GarbageCollection",
 	"advancedModule/PBRDemo",
 	"advancedModule/RealTimeShadow",
 	"advancedModule/RenderTextureDemo",
@@ -44,8 +45,8 @@ var list = [
 	"physicsModule/PhysicsWorld_MeshCollider",
 	"physicsModule/PhysicsWorld_RayShapeCast",
 	"physicsModule/PhysicsWorld_TriggerAndCollisionEvent",
-	"sceneModule/SceneLoad",
-	"sceneModule/TerrainScene",
+	"sceneModule/SceneLoad1",
+	"sceneModule/SceneLoad2",
 	"shaderModule/Shader_GlowingEdge",
 	"shaderModule/Shader_Simple",
 	"shaderModule/Shader_Terrain",
