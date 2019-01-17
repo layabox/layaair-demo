@@ -8,842 +8,77 @@
 	var Input=laya.display.Input,Loader=laya.net.Loader,LoaderManager=laya.net.LoaderManager,LocalStorage=laya.net.LocalStorage;
 	var MathUtil=laya.maths.MathUtil,Matrix=laya.maths.Matrix,Node=laya.display.Node,Point=laya.maths.Point,Pool=laya.utils.Pool;
 	var Rectangle=laya.maths.Rectangle,Render=laya.renders.Render,RenderSprite=laya.renders.RenderSprite,Resource=laya.resource.Resource;
-	var ResourceManager=laya.resource.ResourceManager,Sprite=laya.display.Sprite,Stage=laya.display.Stage,Stat=laya.utils.Stat;
-	var Text=laya.display.Text,Texture=laya.resource.Texture,Timer=laya.utils.Timer,Utils=laya.utils.Utils;
+	var Sprite=laya.display.Sprite,Stage=laya.display.Stage,Stat=laya.utils.Stat,Text=laya.display.Text,Texture=laya.resource.Texture;
+	var Timer=laya.utils.Timer,Utils=laya.utils.Utils;
 /**
-*
+*...
 *@author ww
-*@version 1.0
-*
-*@created 2015-9-25 上午10:48:54
 */
-//class laya.debug.tools.TraceTool
-var TraceTool=(function(){
-	function TraceTool(){}
-	__class(TraceTool,'laya.debug.tools.TraceTool');
-	TraceTool.closeAllLog=function(){
-		var logFun;
-		logFun=TraceTool.emptyLog;
-		Browser.window.console.log=logFun;
-	}
-
-	TraceTool.emptyLog=function(){}
-	TraceTool.traceObj=function(obj){
-		TraceTool.tempArr.length=0;
-		var key;
-		for(key in obj){
-			TraceTool.tempArr.push(key+":"+obj[key]);
-		};
-		var rst;
-		rst=TraceTool.tempArr.join("\n");
-		console.log(rst);
-		return rst;
-	}
-
-	TraceTool.traceObjR=function(obj){
-		TraceTool.tempArr.length=0;
-		var key;
-		for(key in obj){
-			TraceTool.tempArr.push(obj[key]+":"+key);
-		};
-		var rst;
-		rst=TraceTool.tempArr.join("\n");
-		console.log(rst);
-		return rst;
-	}
-
-	TraceTool.traceSize=function(tar){
-		DebugTool.dTrace("Size: x:"+tar.x+" y:"+tar.y+" w:"+tar.width+" h:"+tar.height+" scaleX:"+tar.scaleX+" scaleY:"+tar.scaleY);
-	}
-
-	TraceTool.traceSplit=function(msg){
-		console.log("---------------------"+msg+"---------------------------");
-	}
-
-	TraceTool.group=function(gName){
-		/*__JS__ */console.group(gName);;
-	}
-
-	TraceTool.groupEnd=function(){
-		/*__JS__ */console.groupEnd();;
-	}
-
-	TraceTool.getCallStack=function(life,s){
-		(life===void 0)&& (life=1);
-		(s===void 0)&& (s=1);
-		var caller;
-		caller=TraceTool.getCallStack;
-		caller=caller.caller.caller;
-		var msg;
-		msg="";
-		while(caller&&life>0){
-			if(s<=0){
-				msg+=caller+"<-";
-				life--;
-				}else{
-			}
-			caller=caller.caller;
-			s--;
-		}
-		return msg;
-	}
-
-	TraceTool.getCallLoc=function(index){
-		(index===void 0)&& (index=2);
-		var loc;
-		try {
-			TraceTool.Erroer.i++;
-			}catch (e){
-			var arr;
-			arr=e.stack.replace(/Error\n/).split(/\n/);
-			if (arr[index]){
-				loc=arr[index].replace(/^\s+|\s+$/,"");
-				}else{
-				loc="unknow";
-			}
-		}
-		return loc;
-	}
-
-	TraceTool.traceCallStack=function(){
-		var loc;
-		try {
-			TraceTool.Erroer.i++;
-			}catch (e){
-			loc=e.stack;
-		}
-		console.log(loc);
-		return loc;
-	}
-
-	TraceTool.getPlaceHolder=function(len){
-		if(!TraceTool.holderDic.hasOwnProperty(len)){
-			var rst;
-			rst="";
-			var i=0;
-			for(i=0;i<len;i++){
-				rst+="-";
-			}
-			TraceTool.holderDic[len]=rst;
-		}
-		return TraceTool.holderDic[len];
-	}
-
-	TraceTool.traceTree=function(tar,depth,isFirst){
-		(depth===void 0)&& (depth=0);
-		(isFirst===void 0)&& (isFirst=true);
-		if(isFirst){
-			console.log("traceTree");
-		}
-		if(!tar)return;
-		var i=0;
-		var len=0;
-		if(tar.numChildren<1){
-			console.log(tar);
-			return;
-		}
-		TraceTool.group(tar);
-		len=tar.numChildren;
-		depth++;
-		for(i=0;i<len;i++){
-			TraceTool.traceTree(tar.getChildAt(i),depth,false);
-		}
-		TraceTool.groupEnd();
-	}
-
-	TraceTool.getClassName=function(tar){
-		return tar["constructor"].name;
-	}
-
-	TraceTool.traceSpriteInfo=function(tar,showBounds,showSize,showTree){
-		(showBounds===void 0)&& (showBounds=true);
-		(showSize===void 0)&& (showSize=true);
-		(showTree===void 0)&& (showTree=true);
-		if(!((tar instanceof laya.display.Sprite ))){
-			console.log("not Sprite");
-			return;
-		}
-		if(!tar){
-			console.log("null Sprite");
-			return;
-		}
-		TraceTool.traceSplit("traceSpriteInfo");
-		DebugTool.dTrace(laya.debug.tools.TraceTool.getClassName(tar)+":"+tar.name);
-		if(showTree){
-			TraceTool.traceTree(tar);
+//class laya.debug.tools.ResTools
+var ResTools=(function(){
+	function ResTools(){}
+	__class(ResTools,'laya.debug.tools.ResTools');
+	ResTools.getCachedResList=function(){
+		if (Render.isWebGL){
+			return ResTools.getWebGlResList();
 			}else{
-			console.log(tar);
-		}
-		if(showSize){
-			TraceTool.traceSize(tar);
-		}
-		if(showBounds){
-			console.log("bounds:"+tar.getBounds());
+			return ResTools.getCanvasResList();
 		}
 	}
 
-	TraceTool.tempArr=[];
-	TraceTool.Erroer=null;
-	TraceTool.holderDic={};
-	return TraceTool;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.view.nodeInfo.NodeConsts
-var NodeConsts=(function(){
-	function NodeConsts(){}
-	__class(NodeConsts,'laya.debug.view.nodeInfo.NodeConsts');
-	NodeConsts.defaultFitlerStr="x,y,width,height,scaleX,scaleY,alpha,renderCost";
-	NodeConsts.RenderCostMaxTime=3000;
-	return NodeConsts;
-})()
-
-
-/**
-*本类用于操作html对象
-*@author ww
-*/
-//class laya.debug.tools.JSTools
-var JSTools=(function(){
-	function JSTools(){}
-	__class(JSTools,'laya.debug.tools.JSTools');
-	JSTools.showToBody=function(el,x,y){
-		(x===void 0)&& (x=0);
-		(y===void 0)&& (y=0);
-		Browser.document.body.appendChild(el);
-		var style;
-		style=el.style;
-		style.position="absolute";
-		style.top=y+"px";
-		style.left=x+"px";
-	}
-
-	JSTools.showToParent=function(el,x,y,parent){
-		(x===void 0)&& (x=0);
-		(y===void 0)&& (y=0);
-		parent.appendChild(el);
-		var style;
-		style=el.style;
-		style.position="absolute";
-		style.top=y+"px";
-		style.left=x+"px";
-	}
-
-	JSTools.addToBody=function(el){
-		Browser.document.body.appendChild(el);
-	}
-
-	JSTools.setPos=function(el,x,y){
-		var style;
-		style=el.style;
-		style.top=y+"px";
-		style.left=x+"px";
-	}
-
-	JSTools.setSize=function(el,width,height){
-		var style;
-		style=el.style;
-		style.width=width+"px";
-		style.height=height+"px";
-	}
-
-	JSTools.setTransform=function(el,mat){
-		var style;
-		style=el.style;
-		style.transformOrigin=style.webkitTransformOrigin=style.msTransformOrigin=style.mozTransformOrigin=style.oTransformOrigin="0px 0px 0px";
-		style.transform=style.webkitTransform=style.msTransform=style.mozTransform=style.oTransform="matrix("+mat.toString()+")";
-	}
-
-	JSTools.noMouseEvent=function(el){
-		var style;
-		style=el.style;
-		style["pointer-events"]="none";
-	}
-
-	JSTools.setMouseEnable=function(el,enable){
-		var style;
-		style=el.style;
-		style["pointer-events"]=enable?"auto":"none";
-	}
-
-	JSTools.setZIndex=function(el,zIndex){
-		var style;
-		style=el.style;
-		style["z-index"]=zIndex;
-	}
-
-	JSTools.showAboveSprite=function(el,sprite,dx,dy){
-		(dx===void 0)&& (dx=0);
-		(dy===void 0)&& (dy=0);
-		var pos;
-		pos=new Point();
-		pos=sprite.localToGlobal(pos);
-		pos.x+=dx;
-		pos.y+=dy;
-		pos.x+=Laya.stage.offset.x;
-		pos.y+=Laya.stage.offset.y;
-		JSTools.showToBody(el,pos.x,pos.y);
-	}
-
-	JSTools.removeElement=function(el){
-		Browser.removeElement(el);
-	}
-
-	JSTools.isElementInDom=function(el){
-		return el && el.parentNode;
-	}
-
-	JSTools.getImageSpriteByFile=function(file,width,height){
-		(width===void 0)&& (width=0);
-		(height===void 0)&& (height=0);
-		var reader;
-		/*__JS__ */reader=new FileReader();;
-		reader.readAsDataURL(file);
-		var sprite;
-		sprite=new Sprite();
-		reader.onload=function (e){
-			var txt;
-			txt=new Texture();
-			txt.load(reader.result);
-			sprite.graphics.drawTexture(txt,0,0,width,height);
-		}
-		return sprite;
-	}
-
-	JSTools.getPixelRatio=function(){
-		if (JSTools._pixelRatio > 0)return JSTools._pixelRatio;
-		var canvas=Browser.createElement("canvas");
-		var context=canvas.getContext('2d');
-		var devicePixelRatio=Browser.window.devicePixelRatio || 1;
-		var backingStoreRatio=context.webkitBackingStorePixelRatio ||
-		context.mozBackingStorePixelRatio ||
-		context.msBackingStorePixelRatio ||
-		context.oBackingStorePixelRatio ||
-		context.backingStorePixelRatio || 1;
-		var ratio=devicePixelRatio / backingStoreRatio;
-		console.log("pixelRatioc:",ratio);
-		JSTools._pixelRatio=ratio;
-		return ratio;
-	}
-
-	JSTools._pixelRatio=-1;
-	return JSTools;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.DebugConsts
-var DebugConsts=(function(){
-	function DebugConsts(){}
-	__class(DebugConsts,'laya.debug.tools.DebugConsts');
-	DebugConsts.CLICK_SELECT_COLOR="#ff0000";
-	DebugConsts.CANVAS_REC_COLOR="#FF00FF";
-	DebugConsts.RECACHE_REC_COLOR="#00ff00";
-	DebugConsts.SPRITE_REC_COLOR="#ff0000";
-	DebugConsts.SPRITE_REC_LINEWIDTH=2;
-	return DebugConsts;
-})()
-
-
-/**
-*
-*@author ww
-*@version 1.0
-*
-*@created 2015-11-9 下午3:26:01
-*/
-//class laya.debug.tools.LayoutTools
-var LayoutTools=(function(){
-	function LayoutTools(){}
-	__class(LayoutTools,'laya.debug.tools.LayoutTools');
-	LayoutTools.layoutToXCount=function(items,xCount,dx,dY,sx,sy){
-		(xCount===void 0)&& (xCount=1);
-		(dx===void 0)&& (dx=0);
-		(dY===void 0)&& (dY=0);
-		(sx===void 0)&& (sx=0);
-		(sy===void 0)&& (sy=0);
-		var tX=NaN,tY=NaN;
-		var tItem;
-		var i=0,len=0;
-		var tCount=0;
-		var maxHeight=0;
-		tCount=0;
-		maxHeight=0;
-		tX=sx;
-		tY=sy;
-		len=items.length;
-		for (i=0;i < len;i++){
-			tItem=items[i];
-			tItem.x=tX;
-			tItem.y=tY;
-			if (tItem.height > maxHeight){
-				maxHeight=tItem.height;
-			}
-			tCount++;
-			if (tCount >=xCount){
-				tCount=tCount % xCount;
-				tItem.y+=maxHeight+dY;
-				maxHeight=0;
-				}else{
-				tX+=tItem.width+dx;
+	ResTools.getWebGlResList=function(){
+		var rst;
+		rst=[];
+		var tResource;
+		var _resources;
+		_resources=laya.resource.ResourceManager.currentResourceManager["_resources"];
+		for(var i=0;i <_resources.length;i++){
+			tResource=_resources[i];
+			if(ClassTool.getClassName(tResource)=="WebGLImage"){
+				var url=tResource["src"];
+				if(url&&url.indexOf("data:image/png;base64")<0)
+					rst.push(url);
 			}
 		}
+		return rst;
 	}
 
-	LayoutTools.layoutToWidth=function(items,width,dX,dY,sx,sy){
-		var tX=NaN,tY=NaN;
-		var tItem;
-		var i=0,len=0;
-		tX=sx;
-		tY=sy;
-		len=items.length;
-		for(i=0;i<len;i++){
-			tItem=items[i];
-			if(tX+tItem.width+dX>width){
-				tX=sx;
-				tY+=dY+tItem.height;
-				}else{
-			}
-			tItem.x=tX;
-			tItem.y=tY;
-			tX+=dX+tItem.width;
-		}
+	ResTools.getCanvasResList=function(){
+		var picDic;
+		picDic={};
+		var dataO;
+		dataO=Loader.loadedMap;
+		ResTools.collectPics(dataO,picDic);
+		return ResTools.getArrFromDic(picDic);
 	}
 
-	return LayoutTools;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.RenderAnalyser
-var RenderAnalyser=(function(){
-	function RenderAnalyser(){
-		this.timeDic={};
-		this.resultDic={};
-		this.countDic={};
-		this.resultCountDic={};
-		this.nodeDic={};
-		this.isWorking=false;
-		this.working=true;
-	}
-
-	__class(RenderAnalyser,'laya.debug.tools.RenderAnalyser');
-	var __proto=RenderAnalyser.prototype;
-	__proto.render=function(sprite,time){
-		this.addTime(sprite,time);
-	}
-
-	__proto.addTime=function(sprite,time){
-		IDTools.idObj(sprite);
-		var key=0;
-		key=IDTools.getObjID(sprite);
-		if (!this.timeDic.hasOwnProperty(key)){
-			this.timeDic[key]=0;
-		}
-		this.timeDic[key]=this.timeDic[key]+time;
-		if (!this.countDic.hasOwnProperty(key)){
-			this.countDic[key]=0;
-		}
-		this.countDic[key]=this.countDic[key]+1;
-		this.nodeDic[key]=sprite;
-	}
-
-	__proto.getTime=function(sprite){
-		IDTools.idObj(sprite);
-		var key=0;
-		key=IDTools.getObjID(sprite);
-		if (!this.resultDic[key])return 0;
-		return this.resultDic[key];
-	}
-
-	__proto.getCount=function(sprite){
-		IDTools.idObj(sprite);
-		var key=0;
-		key=IDTools.getObjID(sprite);
-		return this.resultCountDic[key];
-	}
-
-	__proto.reset=function(){
+	ResTools.getArrFromDic=function(dic){
 		var key;
-		for (key in this.timeDic){
-			this.timeDic[key]=0;
-			this.countDic[key]=0;
-		}
-		ObjectTools.clearObj(this.nodeDic);
-	}
-
-	__proto.updates=function(){
-		ObjectTools.clearObj(this.resultDic);
-		ObjectTools.insertValue(this.resultDic,this.timeDic);
-		ObjectTools.clearObj(this.resultCountDic);
-		ObjectTools.insertValue(this.resultCountDic,this.countDic);
-		this.reset();
-	}
-
-	__getset(0,__proto,'working',null,function(v){
-		this.isWorking=v;
-		if (v){
-			Laya.timer.loop(NodeConsts.RenderCostMaxTime,this,this.updates);
-			}else{
-			Laya.timer.clear(this,this.updates);
-		}
-	});
-
-	__static(RenderAnalyser,
-	['I',function(){return this.I=new RenderAnalyser();}
-	]);
-	return RenderAnalyser;
-})()
-
-
-/**
-*
-*@author ww
-*@version 1.0
-*
-*@created 2015-9-25 下午7:19:44
-*/
-//class laya.debug.tools.DisControlTool
-var DisControlTool=(function(){
-	function DisControlTool(){}
-	__class(DisControlTool,'laya.debug.tools.DisControlTool');
-	DisControlTool.getObjectsUnderPoint=function(sprite,x,y,rst,filterFun){
-		rst=rst?rst:[];
-		if(filterFun!=null&&!filterFun(sprite))return rst;
-		if (sprite.getBounds().contains(x,y)){
-			rst.push(sprite);
-			var tS;
-			var tempP=new Point();
-			tempP.setTo(x,y);
-			tempP=sprite.fromParentPoint(tempP);
-			x=tempP.x;
-			y=tempP.y;
-			for (var i=sprite._children.length-1;i >-1;i--){
-				var child=sprite._children[i];
-				if((child instanceof laya.display.Sprite ))
-					DisControlTool.getObjectsUnderPoint(child,x,y,rst,filterFun);
-			}
+		var rst;
+		rst=[];
+		for (key in dic){
+			rst.push(key);
 		}
 		return rst;
 	}
 
-	DisControlTool.getObjectsUnderGlobalPoint=function(sprite,filterFun){
-		var point=new Point();
-		point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
-		if(sprite.parent)
-			point=(sprite.parent).globalToLocal(point);
-		return DisControlTool.getObjectsUnderPoint(sprite,point.x,point.y,null,filterFun);
-	}
-
-	DisControlTool.findFirstObjectsUnderGlobalPoint=function(){
-		var disList;
-		disList=DisControlTool.getObjectsUnderGlobalPoint(Laya.stage);
-		if (!disList)return null;
-		var i=0,len=0;
-		var tDis;
-		len=disList.length;
-		for (i=len-1;i>=0;i--){
-			tDis=disList[i];
-			if (tDis && tDis.numChildren < 1){
-				return tDis;
-			}
-		}
-		return tDis;
-	}
-
-	DisControlTool.visibleAndEnableObjFun=function(tar){
-		return tar.visible&&tar.mouseEnabled;
-	}
-
-	DisControlTool.visibleObjFun=function(tar){
-		return tar.visible;
-	}
-
-	DisControlTool.getMousePoint=function(sprite){
-		var point=new Point();
-		point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
-		point=sprite.globalToLocal(point);
-		return point;
-	}
-
-	DisControlTool.isChildE=function(parent,child){
-		if (!parent)return false;
-		while (child){
-			if (child.parent==parent)return true;
-			child=child.parent;
-		}
-		return false;
-	}
-
-	DisControlTool.isInTree=function(pNode,child){
-		return pNode==child || DisControlTool.isChildE(pNode,child);
-	}
-
-	DisControlTool.setTop=function(tar){
-		if(tar&&tar.parent){
-			var tParent;
-			tParent=tar.parent;
-			tParent.setChildIndex(tar,tParent.numChildren-1);
-		}
-	}
-
-	DisControlTool.clearItemRelativeInfo=function(item){
-		var Nan="NaN";
-		item.getLayout().left=Nan;
-		item.getLayout().right=Nan;
-		item.getLayout().top=Nan;
-		item.getLayout().bottom=Nan;
-	}
-
-	DisControlTool.swap=function(tarA,tarB){
-		if (tarA==tarB)return;
-		var iA=0;
-		iA=tarA.parent.getChildIndex(tarA);
-		var iB=0;
-		iB=tarB.parent.getChildIndex(tarB);
-		var bP;
-		bP=tarB.parent;
-		tarA.parent.addChildAt(tarB,iA);
-		bP.addChildAt(tarA,iB);
-	}
-
-	DisControlTool.insertToTarParent=function(tarA,tars,after){
-		(after===void 0)&& (after=false);
-		var tIndex=0;
-		var parent;
-		if(!tarA)return;
-		parent=tarA.parent;
-		if(!parent)return;
-		tIndex=parent.getChildIndex(tarA);
-		if(after)tIndex++;
-		DisControlTool.insertToParent(parent,tars,tIndex);
-	}
-
-	DisControlTool.insertToParent=function(parent,tars,index){
-		(index===void 0)&& (index=-1);
-		if(!parent)return;
-		if(index<0)index=parent.numChildren;
-		var i=0,len=0;
-		len=tars.length;
-		for(i=0;i<len;i++){
-			DisControlTool.transParent(tars[i],parent);
-			parent.addChildAt(tars[i],index);
-		}
-	}
-
-	DisControlTool.transParent=function(tar,newParent){
-		if(!tar||!newParent)return;
-		if(!tar.parent)return;
-		var preParent;
-		preParent=tar.parent;
-		var pos;
-		pos=new Point(tar.x,tar.y);
-		pos=preParent.localToGlobal(pos);
-		pos=newParent.globalToLocal(pos);
-		tar.pos(pos.x,pos.y);
-	}
-
-	DisControlTool.transPoint=function(nowParent,tarParent,point){
-		point=nowParent.localToGlobal(point);
-		point=tarParent.globalToLocal(point);
-		return point;
-	}
-
-	DisControlTool.removeItems=function(itemList){
-		var i=0,len=0;
-		len=itemList.length;
-		for (i=0;i < len;i++){
-			(itemList [i]).removeSelf();
-		}
-	}
-
-	DisControlTool.addItems=function(itemList,parent){
-		var i=0,len=0;
-		len=itemList.length;
-		for (i=0;i < len;i++){
-			parent.addChild(itemList[i]);
-		}
-	}
-
-	DisControlTool.getAllChild=function(tar){
-		if(!tar)return [];
-		var i=0;
-		var len=0;
-		var rst=[];
-		len=tar.numChildren;
-		for(i=0;i<len;i++){
-			rst.push(tar.getChildAt(i));
-		}
-		return rst;
-	}
-
-	DisControlTool.upDis=function(child){
-		if(child&&child.parent){
-			var tParent;
-			tParent=child.parent;
-			var newIndex=0;
-			newIndex=tParent.getChildIndex(child)+1;
-			if(newIndex>=tParent.numChildren){
-				newIndex=tParent.numChildren-1;
-			}
-			console.log("setChildIndex:"+newIndex);
-			tParent.setChildIndex(child,newIndex);
-		}
-	}
-
-	DisControlTool.downDis=function(child){
-		if(child&&child.parent){
-			var tParent;
-			tParent=child.parent;
-			var newIndex=0;
-			newIndex=tParent.getChildIndex(child)-1;
-			if(newIndex<0)newIndex=0;
-			console.log("setChildIndex:"+newIndex);
-			tParent.setChildIndex(child,newIndex);
-		}
-	}
-
-	DisControlTool.setResizeAbleEx=function(node){
-		var clickItem;
-		clickItem=node.getChildByName("resizeBtn");
-		if (clickItem){
-			SimpleResizer.setResizeAble(clickItem,node);
-		}
-	}
-
-	DisControlTool.setResizeAble=function(node){
-		node.on(/*laya.events.Event.CLICK*/"click",null,DisControlTool.resizeHandler,[node]);
-	}
-
-	DisControlTool.resizeHandler=function(tar){
-		DisResizer.setUp(tar);
-	}
-
-	DisControlTool.setDragingItem=function(dragBar,tar){
-		dragBar.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",null,DisControlTool.dragingHandler,[tar]);
-		tar.on(/*laya.events.Event.DRAG_END*/"dragend",null,DisControlTool.dragingEnd,[tar]);
-	}
-
-	DisControlTool.dragingHandler=function(tar){
-		if (tar){
-			tar.startDrag();
-		}
-	}
-
-	DisControlTool.dragingEnd=function(tar){
-		DisControlTool.intFyDisPos(tar);
-		console.log(tar.x,tar.y);
-	}
-
-	DisControlTool.showToStage=function(dis,offX,offY){
-		(offX===void 0)&& (offX=0);
-		(offY===void 0)&& (offY=0);
-		var rec=dis.getBounds();
-		dis.x=Laya.stage.mouseX+offX;
-		dis.y=Laya.stage.mouseY+offY;
-		if (dis.x+rec.width > Laya.stage.width){
-			dis.x-=rec.width+offX;
-		}
-		if (dis.y+rec.height > Laya.stage.height){
-			dis.y-=rec.height+offY;
-		}
-		DisControlTool.intFyDisPos(dis);
-	}
-
-	DisControlTool.intFyDisPos=function(dis){
-		if (!dis)return;
-		dis.x=Math.round(dis.x);
-		dis.y=Math.round(dis.y);
-	}
-
-	DisControlTool.showOnly=function(disList,showItem){
-		var i=0,len=0;
-		len=disList.length;
-		for (i=0;i < len;i++){
-			disList[i].visible=disList[i]==showItem;
-		}
-	}
-
-	DisControlTool.showOnlyByIndex=function(disList,index){
-		DisControlTool.showOnly(disList,disList[index]);
-	}
-
-	DisControlTool.addOnly=function(disList,showItem,parent){
-		var i=0,len=0;
-		len=disList.length;
-		for (i=0;i < len;i++){
-			if (disList[i] !=showItem){
-				disList[i].removeSelf();
-				}else{
-				parent.addChild(disList[i]);
+	ResTools.collectPics=function(dataO,picDic){
+		if (!dataO)return;
+		var key;
+		var tTexture;
+		for (key in dataO){
+			tTexture=dataO[key];
+			if (tTexture){
+				if (tTexture.bitmap&&tTexture.bitmap.src){
+					var url=tTexture.bitmap.src;
+					if(url.indexOf("data:image/png;base64")<0)
+						picDic[tTexture.bitmap.src]=true;
+				}
 			}
 		}
 	}
 
-	DisControlTool.addOnlyByIndex=function(disList,index,parent){
-		DisControlTool.addOnly(disList,disList[index],parent);
-	}
-
-	__static(DisControlTool,
-	['tempP',function(){return this.tempP=new Point();}
-	]);
-	return DisControlTool;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.MathTools
-var MathTools=(function(){
-	function MathTools(){}
-	__class(MathTools,'laya.debug.tools.MathTools');
-	MathTools.sortBigFirst=function(a,b){
-		if (a==b)
-			return 0;
-		return b > a ? 1 :-1;
-	}
-
-	MathTools.sortSmallFirst=function(a,b){
-		if (a==b)
-			return 0;
-		return b > a ?-1 :1;
-	}
-
-	MathTools.sortNumBigFirst=function(a,b){
-		return parseFloat(b)-parseFloat(a);
-	}
-
-	MathTools.sortNumSmallFirst=function(a,b){
-		return parseFloat(a)-parseFloat(b);
-	}
-
-	MathTools.sortByKey=function(key,bigFirst,forceNum){
-		(bigFirst===void 0)&& (bigFirst=false);
-		(forceNum===void 0)&& (forceNum=true);
-		var _sortFun;
-		if (bigFirst){
-			_sortFun=forceNum ? MathTools.sortNumBigFirst :MathTools.sortBigFirst;
-			}else {
-			_sortFun=forceNum ? MathTools.sortNumSmallFirst :MathTools.sortSmallFirst;
-		}
-		return function (a,b){
-			return _sortFun(a[key],b[key]);
-		};
-	}
-
-	return MathTools;
+	return ResTools;
 })()
 
 
@@ -880,1811 +115,6 @@ var DisPool=(function(){
 
 	DisPool._objDic={};
 	return DisPool;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.enginehook.SpriteRenderHook
-var SpriteRenderHook=(function(){
-	function SpriteRenderHook(){
-		/**@private */
-		this._repaint=1;
-		this._renderType=1;
-		this._x=0;
-		this._y=0;
-	}
-
-	__class(SpriteRenderHook,'laya.debug.tools.enginehook.SpriteRenderHook');
-	var __proto=SpriteRenderHook.prototype;
-	/**
-	*更新、呈现显示对象。
-	*@param context 渲染的上下文引用。
-	*@param x X轴坐标。
-	*@param y Y轴坐标。
-	*/
-	__proto.render=function(context,x,y){
-		if ((this)==Laya.stage){
-			CacheAnalyser.renderLoopBegin();
-		};
-		var preTime=0;
-		preTime=Browser.now();
-		Stat.spriteCount++;
-		if (this["ShowBorderSign"]){
-			DebugTool.showDisBoundToSprite(this,DebugInfoLayer.I.cacheViewLayer,DebugConsts.SPRITE_REC_COLOR,DebugConsts.SPRITE_REC_LINEWIDTH);
-		}
-		RenderSprite.renders[this._renderType]._fun(this,context,x+this._x,y+this._y);
-		this._repaint=0;
-		RenderAnalyser.I.render(this,Browser.now()-preTime);
-	}
-
-	SpriteRenderHook.init=function(){
-		if (SpriteRenderHook.I)return;
-		SpriteRenderHook.I=new SpriteRenderHook();
-		SpriteRenderHook.setRenderHook();
-	}
-
-	SpriteRenderHook.setRenderHook=function(){
-		Sprite["prototype"]["render"]=SpriteRenderHook.I.render;
-	}
-
-	SpriteRenderHook.showDisplayBorder=function(sprite,ifShowBorder){
-		(ifShowBorder===void 0)&& (ifShowBorder=true);
-		sprite["ShowBorderSign"]=ifShowBorder;
-	}
-
-	SpriteRenderHook.isDisplayShowBorder=function(sprite){
-		return sprite["ShowBorderSign"];
-	}
-
-	SpriteRenderHook.I=null;
-	SpriteRenderHook.ShowBorderSign="ShowBorderSign";
-	return SpriteRenderHook;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.DebugPanel
-var DebugPanel=(function(){
-	function DebugPanel(){
-		this.tShowObj=null;
-		this.preValueO={};
-		this.div=null;
-		this.debug_view=null;
-		this.height=300;
-		this.width=600;
-		this.clickedHandler=null;
-		this.dragArea=10;
-		this.fromMe=false;
-		this._treeDataList=null;
-		this._init();
-	}
-
-	__class(DebugPanel,'laya.debug.DebugPanel');
-	var __proto=DebugPanel.prototype;
-	__proto.removeNoDisplayKeys=function(arr){
-		var i=0;
-		for (i=arr.length-1;i >=0;i--){
-			if (DebugPanel.noDisplayKeys[arr[i]]){
-				arr.splice(i,1);
-			}
-		}
-	}
-
-	__proto.updateShowKeys=function(){
-		DebugPanel.tObjKeys.length=0;
-		if (!this.tShowObj)
-			return;
-		DebugPanel.tObjKeys=ClassTool.getObjectDisplayAbleKeys(this.tShowObj,DebugPanel.tObjKeys);
-		if (this.tShowObj==Laya.stage){
-			this.removeNoDisplayKeys(DebugPanel.tObjKeys);
-		}
-		DebugPanel.tObjKeys.sort(MathUtil.sortSmallFirst);
-	}
-
-	__proto._init=function(){
-		var _$this=this;
-		this.div=Browser.document.createElement('div');
-		Browser.document.body.appendChild(this.div);
-		this.clickedHandler=new Handler(this,this.onClickSelected);
-		this.debug_view=Browser.window.layaair_debug_view;
-		this.debug_view.initLayaAirDebugView(this.div);
-		this.debug_view.tree.attachEvent("onSelect",function(id){
-			var dataO;
-			dataO=_$this.getDataByID(id,_$this._treeDataList[0]);
-			if (dataO.target){
-				DebugTool.showDisBound(dataO.target);
-				_$this.showTargetInfo(dataO.target);
-			}
-		});
-		this.debug_view.setValueChangeHandler(function(data,new_value){
-			_$this.onValueChange(data,new_value);
-		});
-		this.debug_view.onRefresh(function(){
-			DebugPanel.I.setRoot(Laya.stage);
-		});
-		this.debug_view.onInspectElement(function(){
-			ClickSelectTool.I.beginClickSelect(_$this.clickedHandler);
-		});
-		this.debug_view.onLogInfo(function(){
-			console.log(_$this.tShowObj);
-		});
-		this.debug_view.onPrintEnabledNodeChain(function(){
-			DebugTool.traceDisMouseEnable(_$this.tShowObj);
-		});
-		this.debug_view.onPrintSizeChain(function(){
-			DebugTool.traceDisSizeChain(_$this.tShowObj);
-		});
-		this.debug_view.onToggleVisibility(function(selectd){
-			if (_$this.tShowObj){
-				_$this.tShowObj.visible=_$this.debug_view.getVisibility();
-			}
-		});
-		this.debug_view.onToggleDebugBorder(function(selectd){
-			if (!_$this.tShowObj)
-				return;
-			SpriteRenderHook.showDisplayBorder(_$this.tShowObj,_$this.debug_view.getShowDebugBorder());
-		});
-		this.debug_view.onToggleShowCurrentCache(function(selectd){
-			CacheAnalyser.showRecacheSprite=_$this.debug_view.getShowCurrentCache();
-		});
-		this.debug_view.onToggleShowAllCache(function(selectd){
-			CacheAnalyser.showCacheSprite=_$this.debug_view.getShowAllCache();
-		});
-		this.debug_view.onToggleShowAtlas(function(selectd){
-			console.log("toggle show atlas:",_$this.debug_view.getShowAtlas());
-			if (_$this.debug_view.getShowAtlas()){
-				AtlasTools.getInstance().start();
-			}
-			else {
-				AtlasTools.getInstance().end();
-			}
-		});
-		JSTools.showToBody(this.div,0,0);
-		this.initNewDivs();
-		this.initDragWork();
-		this.initTreeWidthDrag();
-		Laya.stage.on(/*laya.events.Event.RESIZE*/"resize",this,this.adptPos);
-		this.adptPos();
-	}
-
-	__proto.initNewDivs=function(){
-		var _$this=this;
-		var parentNode;
-		parentNode=Browser.document.getElementById("show_current_cache_control").parentNode;
-		var switchNode;
-		switchNode=Browser.createElement("input");
-		switchNode.type="checkbox";
-		parentNode.appendChild(switchNode);
-		parentNode.append("右侧");
-		function onSwitchChange (e){
-			if (e.target.checked){
-				DebugPanel.sideType="right";
-				}else{
-				DebugPanel.sideType="bottom";
-			}
-			_$this.adptPos();
-		}
-		switchNode.addEventListener("change",onSwitchChange);
-	}
-
-	__proto.initTreeWidthDrag=function(){
-		var _$this=this;
-		var leftDiv;
-		var rightDiv;
-		leftDiv=Browser.document.getElementById("tree_container");
-		var parentNode;
-		parentNode=leftDiv.parentNode;
-		rightDiv=parentNode.children[1];
-		var isMouseDown=false;
-		var preX=NaN;
-		var preY=NaN;
-		function onDivMouseMove (e){
-			var abs=NaN;
-			abs=Math.abs(DebugPanel.getOffset(e,"X")-leftDiv.clientWidth);
-			if (abs < _$this.dragArea){
-				_$this.div.style.cursor="e-resize";
-				}else{
-				_$this.div.style.cursor="auto";
-			}
-		}
-		function onDivMouseDown (e){
-			var abs=NaN;
-			abs=Math.abs(DebugPanel.getOffset(e,"X")-leftDiv.clientWidth);
-			if (abs < _$this.dragArea){
-				_$this.div.style.cursor="e-resize";
-				isMouseDown=true;
-				}else{
-				isMouseDown=false;
-				return;
-			}
-			e.stopPropagation();
-		}
-		function onBodyMouseMove (e){
-			if (!isMouseDown)
-				return;
-			leftDiv.style.width=DebugPanel.getOffset(e,"X")+"px";
-			e.stopPropagation();
-		}
-		function onDivMouseUp (e){
-			if (!isMouseDown)
-				return;
-			isMouseDown=false;
-			e.stopPropagation();
-		}
-		parentNode.addEventListener("mousedown",onDivMouseDown,true)
-		parentNode.addEventListener("mousemove",onDivMouseMove,true)
-		Browser.document.body.addEventListener("mousemove",onBodyMouseMove)
-		Browser.document.body.addEventListener("mouseup",onDivMouseUp)
-	}
-
-	__proto.initDragWork=function(){
-		var _$this=this;
-		var isMouseDown=false;
-		var preX=NaN;
-		var preY=NaN;
-		function onDivMouseMove (e){
-			if (DebugPanel.sideType=="bottom"){
-				if (DebugPanel.getOffset(e,"Y")< _$this.dragArea){
-					_$this.div.style.cursor="n-resize";
-				}
-				else {
-					_$this.div.style.cursor="auto";
-				}
-			}
-			else {
-				if (DebugPanel.getOffset(e,"X")< _$this.dragArea){
-					_$this.div.style.cursor="e-resize";
-				}
-				else {
-					_$this.div.style.cursor="auto";
-				}
-			}
-		}
-		function onDivMouseDown (e){
-			if (DebugPanel.sideType=="bottom"){
-				if (DebugPanel.getOffset(e,"Y")> _$this.dragArea)
-					return;
-				}else{
-				if (DebugPanel.getOffset(e,"X")> _$this.dragArea)
-					return;
-			}
-			isMouseDown=true;
-			preX=e.pageX;
-			preY=e.pageY;
-			e.stopPropagation();
-		}
-		function onBodyMouseMove (e){
-			if (!isMouseDown)
-				return;
-			var curX=NaN;
-			var curY=NaN;
-			var dX=NaN;
-			var dY=NaN;
-			curX=e.pageX;
-			curY=e.pageY;
-			dX=curX-preX;
-			dY=curY-preY;
-			if (DebugPanel.sideType=="bottom"){
-				_$this.height-=dY;
-				}else{
-				_$this.width-=dX;
-			}
-			_$this.adptPos();
-			preX=curX;
-			preY=curY;
-			e.stopPropagation();
-		}
-		function onDivMouseUp (e){
-			if (!isMouseDown)
-				return;
-			isMouseDown=false;
-			e.stopPropagation();
-		}
-		this.div.addEventListener("mousedown",onDivMouseDown,true)
-		this.div.addEventListener("mousemove",onDivMouseMove,true)
-		Browser.document.body.addEventListener("mousemove",onBodyMouseMove)
-		Browser.document.body.addEventListener("mouseup",onDivMouseUp)
-	}
-
-	__proto.onClickSelected=function(target){
-		var dataO;
-		if (!this._treeDataList)
-			return;
-		this.debug_view.tree.selectItem(IDTools.getObjID(target));
-		this.debug_view.bounceUpInspectButton();
-	}
-
-	__proto.updateLoop=function(){
-		if (this.tShowObj){
-			this.showTargetInfo(this.tShowObj);
-		}
-	}
-
-	__proto.onSelectItem=function(obj){
-		var tTarget;
-		tTarget=obj.target;
-		this.showTargetInfo(tTarget);
-	}
-
-	__proto.onValueChange=function(obj,newValue){
-		if (obj["type"]=="number"){
-			newValue=DebugPanel.mParseFloat(newValue);
-		}
-		if (obj["type"]=="boolean"){
-			newValue=newValue.toString()=="true";
-		}
-		if (this.tShowObj){
-			var key;
-			key=obj["key"];
-			this.preValueO[key]=this.tShowObj[key]=newValue;
-		}
-	}
-
-	__proto.showTargetInfo=function(tTarget){
-		if (!tTarget)
-			return;
-		this.debug_view.setVisibility(tTarget.visible);
-		this.debug_view.setShowDebugBorder(SpriteRenderHook.isDisplayShowBorder(tTarget));
-		var i=0,len=0;
-		len=DebugPanel.tObjKeys.length;
-		var key;
-		if (this.tShowObj==tTarget){
-			for (i=0;i < len;i++){
-				key=DebugPanel.tObjKeys[i];
-				if (this.preValueO[key] !=tTarget[key]){
-					this.debug_view.changeValueByLabel(key,tTarget[key]);
-				}
-			}
-		}
-		else {
-			this.tShowObj=tTarget;
-			this.updateShowKeys();
-			var dataList;
-			dataList=DebugPanel.getObjectData(tTarget);
-			this.debug_view.setContents(dataList);
-		}
-		for (i=0;i < len;i++){
-			key=DebugPanel.tObjKeys[i];
-			this.preValueO[key]=tTarget[key];
-		}
-	}
-
-	__proto.adptPos=function(){
-		if (this.fromMe)
-			return;
-		this.fromMe=true;
-		if (DebugPanel.sideType=="bottom"){
-			JSTools.setPos(this.div,0,Browser.clientHeight-this.height);
-			this.debug_view.resize(Browser.clientWidth,this.height);
-			if (!DebugPanel.overlay){
-				Laya.stage.setScreenSize(Browser.clientWidth *Browser.pixelRatio,(Browser.clientHeight-this.height)*Browser.pixelRatio);
-			}
-		}
-		else {
-			JSTools.setPos(this.div,Browser.clientWidth-this.width,0);
-			this.debug_view.resize(this.width,Browser.clientHeight);
-			if (!DebugPanel.overlay){
-				Laya.stage.setScreenSize((Browser.clientWidth-this.width)*Browser.pixelRatio,Browser.clientHeight *Browser.pixelRatio);
-			}
-		}
-		this.fromMe=false;
-	}
-
-	__proto.setRoot=function(sprite){
-		var mtreeo;
-		mtreeo=DebugPanel.getSpriteTreeArr(sprite);
-		this._treeDataList=[mtreeo];
-		var wraped;
-		wraped={};
-		wraped.id=0;
-		wraped.item=[mtreeo];
-		this.debug_view.setTree(wraped);
-		Laya.timer.loop(500,this,this.updateLoop);
-	}
-
-	__proto.getDataByID=function(targetID,nodeO){
-		if (!nodeO)
-			return null;
-		if (targetID==nodeO.id)
-			return nodeO;
-		var childs;
-		childs=nodeO["item"];
-		if (!childs)
-			return null;
-		var i=0,len=0;
-		len=childs.length;
-		var tRst;
-		for (i=0;i < len;i++){
-			tRst=this.getDataByID(targetID,childs[i]);
-			if (tRst)
-				return tRst;
-		}
-		return null;
-	}
-
-	__proto.getDataByTarget=function(target,nodeO){
-		if (!nodeO)
-			return null;
-		if (target==nodeO.target)
-			return nodeO;
-		var childs;
-		childs=nodeO["item"];
-		if (!childs)
-			return null;
-		var i=0,len=0;
-		len=childs.length;
-		var tRst;
-		for (i=0;i < len;i++){
-			tRst=this.getDataByTarget(target,childs[i]);
-			if (tRst)
-				return tRst;
-		}
-		return null;
-	}
-
-	DebugPanel.enable=function(underGame,bgColor){
-		(underGame===void 0)&& (underGame=true);
-		(bgColor===void 0)&& (bgColor="#ffffff");
-		if (!DebugPanel._enable && !DebugPanel.I){
-			DebugPanel._enable=true;
-			DebugPanel.overlay=!underGame;
-			DivScripts.init();
-			DebugTool.initBasicFunctions();
-			RenderSpriteHook.init();
-			SpriteRenderHook.init();
-			DebugPanel.I=new DebugPanel();
-			DebugPanel.I.setRoot(Laya.stage);
-			CacheAnalyser.showRecacheSprite=false;
-			if (bgColor){
-				DebugPanel.I.div.style.background=bgColor;
-			}
-		}
-	}
-
-	DebugPanel.getSpriteTreeArr=function(sprite){
-		var rst;
-		rst={};
-		rst["text"]=""+ClassTool.getNodeClassAndName(sprite);
-		rst.target=sprite;
-		IDTools.idObj(sprite);
-		rst.id=IDTools.getObjID(sprite);
-		var childs;
-		childs=sprite._children;
-		var i=0,len=0;
-		len=childs.length;
-		var tchild;
-		var childsList;
-		childsList=[];
-		rst["item"]=childsList;
-		for (i=0;i < len;i++){
-			childsList.push(DebugPanel.getSpriteTreeArr(childs[i]));
-		}
-		return rst;
-	}
-
-	DebugPanel.getObjectData=function(data){
-		var dataList;
-		var tData;
-		var key;
-		var tValue;
-		var tType;
-		dataList=[];
-		var keys;
-		keys=DebugPanel.tObjKeys;
-		var i=0,len=0;
-		len=keys.length;
-		for (i=0;i < len;i++){
-			key=keys[i];
-			tValue=data[key];
-			tType=typeof(tValue);
-			if (key.charAt(0)=="_")
-				continue ;
-			if (DebugPanel.displayTypes[tType]){
-				tData={};
-				tData["key"]=key;
-				tData["value"]=tValue;
-				tData["type"]=tType;
-				dataList.push(tData);
-			}
-		}
-		return dataList;
-	}
-
-	DebugPanel.getOffset=function(e,sign){
-		var target;
-		target=e.target;
-		var cTarget;
-		cTarget=e.currentTarget;
-		var kSign;
-		if (sign=="X"){
-			kSign="offsetLeft";
-			}else{
-			kSign="offsetTop";
-		};
-		var value=NaN;
-		value=e["offset"+sign];
-		while (target&&target !=cTarget){
-			value+=target[kSign];
-			target=target.offsetParent;
-		}
-		return value;
-	}
-
-	DebugPanel.mParseFloat=function(v){
-		var rst=NaN;
-		rst=parseFloat(v);
-		if (isNaN(rst))
-			return 0;
-		return rst;
-	}
-
-	DebugPanel.I=null;
-	DebugPanel.overlay=false;
-	DebugPanel._enable=false;
-	DebugPanel.ChildrenSign="item";
-	DebugPanel.LabelSign="text";
-	DebugPanel.tObjKeys=[];
-	DebugPanel.Bottom="bottom";
-	DebugPanel.Right="right";
-	DebugPanel.sideType="bottom";
-	__static(DebugPanel,
-	['displayTypes',function(){return this.displayTypes={"boolean":true,"number":true,"string":true};},'displayKeys',function(){return this.displayKeys=[["x","number"],["y","number"],["width","number"],["width","number"],["width","number"],["width","number"],["width","number"],["width","number"],["width","number"],["width","number"],["width","number"],];},'noDisplayKeys',function(){return this.noDisplayKeys={"desginWidth":true,"desginHeight":true};}
-	]);
-	return DebugPanel;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.enginehook.FunctionTimeHook
-var FunctionTimeHook=(function(){
-	function FunctionTimeHook(){}
-	__class(FunctionTimeHook,'laya.debug.tools.enginehook.FunctionTimeHook');
-	FunctionTimeHook.hookFun=function(obj,funName){
-		if (!obj)return;
-		if (obj.timeHooked)return;
-		var myKey;
-		FunctionTimeHook.HookID++;
-		myKey=ClassTool.getNodeClassAndName(obj)+"."+funName+"():"+FunctionTimeHook.HookID;
-		var timePreFun=function (__args){
-			var args=arguments;
-			FunctionTimeHook.funBegin(myKey);
-		};
-		var timeEndFun=function (__args){
-			var args=arguments;
-			FunctionTimeHook.funEnd(myKey);
-		}
-		obj.timeHooked=true;
-		FunHook.hook(obj,funName,timePreFun,timeEndFun);
-	}
-
-	FunctionTimeHook.funBegin=function(funKey){
-		FunctionTimeHook.funPre[funKey]=Browser.now();
-	}
-
-	FunctionTimeHook.funEnd=function(funKey){
-		if (!FunctionTimeHook.funPre[funKey])FunctionTimeHook.funPre[funKey]=0;
-		FunctionTimeHook.counter.add(funKey,Browser.now()-FunctionTimeHook.funPre[funKey]);
-	}
-
-	FunctionTimeHook.fresh=function(){
-		FunctionTimeHook.funEnd("TotalSign");
-		FunctionTimeHook.counter.record();
-		FunctionTimeHook.funBegin("TotalSign");
-	}
-
-	FunctionTimeHook.HookID=1;
-	FunctionTimeHook.funPre={};
-	FunctionTimeHook.TotalSign="TotalSign";
-	__static(FunctionTimeHook,
-	['counter',function(){return this.counter=new CountTool();}
-	]);
-	return FunctionTimeHook;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.DebugTxt
-var DebugTxt=(function(){
-	function DebugTxt(){}
-	__class(DebugTxt,'laya.debug.tools.DebugTxt');
-	DebugTxt.init=function(){
-		if (DebugTxt._txt)return;
-		DebugTxt._txt=new Text();
-		DebugTxt._txt.pos(100,100);
-		DebugTxt._txt.color="#ff00ff";
-		DebugTxt._txt.zOrder=999;
-		DebugTxt._txt.fontSize=24;
-		DebugTxt._txt.text="debugTxt inited";
-		Laya.stage.addChild(DebugTxt._txt);
-	}
-
-	DebugTxt.getArgArr=function(arg){
-		var rst;
-		rst=[];
-		var i=0,len=arg.length;
-		for(i=0;i<len;i++){
-			rst.push(arg[i]);
-		}
-		return rst;
-	}
-
-	DebugTxt.dTrace=function(__arg){
-		var arg=arguments;
-		arg=DebugTxt.getArgArr(arg);
-		var str;
-		str=arg.join(" ");
-		if (DebugTxt._txt){
-			DebugTxt._txt.text=str+"\n"+DebugTxt._txt.text;
-		}
-	}
-
-	DebugTxt.getTimeStr=function(){
-		var dateO=/*__JS__ */new Date();
-		return dateO.toTimeString();
-	}
-
-	DebugTxt.traceTime=function(msg){
-		DebugTxt.dTrace(DebugTxt.getTimeStr());
-		DebugTxt.dTrace(msg);
-	}
-
-	DebugTxt.show=function(__arg){
-		var arg=arguments;
-		arg=DebugTxt.getArgArr(arg);
-		var str;
-		str=arg.join(" ");
-		if (DebugTxt._txt){
-			DebugTxt._txt.text=str;
-		}
-	}
-
-	DebugTxt._txt=null;
-	DebugTxt.I=null;
-	return DebugTxt;
-})()
-
-
-/**
-*
-*@author ww
-*@version 1.0
-*
-*@created 2015-11-27 上午9:58:59
-*/
-//class laya.debug.tools.JsonTool
-var JsonTool=(function(){
-	function JsonTool(){}
-	__class(JsonTool,'laya.debug.tools.JsonTool');
-	JsonTool.getJsonString=function(obj,singleLine,split,depth,Width){
-		(singleLine===void 0)&& (singleLine=true);
-		(split===void 0)&& (split="\n");
-		(depth===void 0)&& (depth=0);
-		(Width===void 0)&& (Width=4);
-		var preStr="";
-		preStr=JsonTool.getEmptyStr(depth*Width);
-		var rst;
-		var keyValues;
-		keyValues={};
-		var tKey;
-		var tValue;
-		var type;
-		var keys;
-		keys=[];
-		for(tKey in obj){
-			keys.push(tKey);
-			tValue=obj[tKey];
-			if(JsonTool.singleLineKey[tKey]){
-				keyValues[tKey]=JsonTool.getValueStr(tValue,true,split,depth+1,Width);
-				}else{
-				keyValues[tKey]=JsonTool.getValueStr(tValue,singleLine,split,depth+1,Width);
-			}
-		};
-		var i=0,len=0;
-		len=keys.length;
-		keys.sort();
-		keys=keys.reverse();
-		var keyPreStr;
-		keyPreStr=JsonTool.getEmptyStr((depth+1)*Width);
-		if(singleLine){
-			split="";
-			preStr="";
-			keyPreStr="";
-		};
-		var keyValueStrArr;
-		keyValueStrArr=[];
-		for(i=0;i<len;i++){
-			tKey=keys[i];
-			keyValueStrArr.push(keyPreStr+JsonTool.wrapValue(tKey)+":"+keyValues[tKey]);
-		}
-		rst="{"+split+keyValueStrArr.join(","+split)+split+preStr+"}";
-		return rst;
-	}
-
-	JsonTool.wrapValue=function(value,wraper){
-		(wraper===void 0)&& (wraper="\"");
-		return wraper+value+wraper;
-	}
-
-	JsonTool.getArrStr=function(arr,singleLine,split,depth,Width){
-		(singleLine===void 0)&& (singleLine=true);
-		(split===void 0)&& (split="\n");
-		(depth===void 0)&& (depth=0);
-		(Width===void 0)&& (Width=4);
-		var rst;
-		var i=0,len=0;
-		len=arr.length;
-		var valueStrArr;
-		valueStrArr=[];
-		for(i=0;i<len;i++){
-			valueStrArr.push(JsonTool.getValueStr(arr[i],singleLine,split,depth+1,Width));
-		};
-		var preStr="";
-		preStr=JsonTool.getEmptyStr((depth+1)*Width);
-		if(singleLine){
-			split="";
-			preStr="";
-		}
-		rst="["+split+preStr+valueStrArr.join(","+split+preStr)+"]";
-		return rst;
-	}
-
-	JsonTool.quote=function(string){
-		JsonTool.escapable.lastIndex=0;
-		return JsonTool.escapable.test(string)? '"'+string.replace(JsonTool.escapable,function(a){
-			var c=JsonTool.meta[a];
-			return typeof c==='string' ? c :
-			'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4);
-		})+'"' :'"'+string+'"';
-	}
-
-	JsonTool.getValueStr=function(tValue,singleLine,split,depth,Width){
-		(singleLine===void 0)&& (singleLine=true);
-		(split===void 0)&& (split="\n");
-		(depth===void 0)&& (depth=0);
-		(Width===void 0)&& (Width=0);
-		var rst;
-		if((typeof tValue=='string')){
-			rst=JsonTool.quote(tValue);
-			}else if(tValue==null){
-			rst="null";
-			}else if((typeof tValue=='number')|| ((typeof tValue=='number')&& Math.floor(tValue)==tValue)|| (typeof tValue=='boolean')){
-			rst=tValue;
-			}else if((tValue instanceof Array)){
-			rst=JsonTool.getArrStr(tValue,singleLine,split,depth,Width);
-			}else if((typeof tValue=='object')){
-			rst=JsonTool.getJsonString(tValue,singleLine,split,depth,Width);
-			}else{
-			rst=tValue;
-		}
-		return rst;
-	}
-
-	JsonTool.getEmptyStr=function(width){
-		if(!JsonTool.emptyDic.hasOwnProperty(width)){
-			var i=0;
-			var len=0;
-			len=width;
-			var rst;
-			rst="";
-			for(i=0;i<len;i++){
-				rst+=" ";
-			}
-			JsonTool.emptyDic[width]=rst;
-		}
-		return JsonTool.emptyDic[width];
-	}
-
-	JsonTool.emptyDic={};
-	__static(JsonTool,
-	['singleLineKey',function(){return this.singleLineKey={
-			"props":true
-		};},'escapable',function(){return this.escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;},'meta',function(){return this.meta = {   
-		'\b':'\\b',
-		'\t':'\\t',
-		'\n':'\\n',
-		'\f':'\\f',
-		'\r':'\\r',
-		'"' :'\\"',
-		'\\':'\\\\'
-};}
-
-
-]);
-return JsonTool;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.UVTools
-var UVTools$1=(function(){
-	function UVTools(){}
-	__class(UVTools,'laya.debug.tools.UVTools',null,'UVTools$1');
-	UVTools.getUVByRec=function(x,y,width,height){
-		return [x,y,x+width,y,x+width,y+height,x,y+height];
-	}
-
-	UVTools.getRecFromUV=function(uv){
-		var rst;
-		rst=new Rectangle(uv[0],uv[1],uv[2]-uv[0],uv[5]-uv[1]);
-		return rst;
-	}
-
-	UVTools.isUVRight=function(uv){
-		if(uv[0]!=uv[6])return false;
-		if(uv[1]!=uv[3])return false;
-		if(uv[2]!=uv[4])return false;
-		if(uv[5]!=uv[7])return false;
-		return true;
-	}
-
-	UVTools.getTextureRec=function(texture){
-		var rst;
-		rst=UVTools.getRecFromUV(texture.uv);
-		rst.x*=texture.bitmap.width;
-		rst.y*=texture.bitmap.height;
-		rst.width*=texture.bitmap.width;
-		rst.height*=texture.bitmap.height;
-		return rst;
-	}
-
-	return UVTools;
-})()
-
-
-/**
-*布局工具类,目前只支持水平方向布局
-*@author ww
-*/
-//class laya.debug.tools.layout.Layouter
-var Layouter=(function(){
-	function Layouter(){
-		/**
-		*布局用的数据，与布局方法有关
-		*/
-		this.data=null;
-		/**
-		*布局涉及的对象
-		*/
-		this._items=null;
-		/**
-		*布局用的函数
-		*/
-		this.layoutFun=null;
-		/**
-		*布局起始x
-		*/
-		this._sX=0;
-		/**
-		*布局宽
-		*/
-		this._width=0;
-	}
-
-	__class(Layouter,'laya.debug.tools.layout.Layouter');
-	var __proto=Layouter.prototype;
-	__proto.layout=function(){
-		this.layoutFun(this._width,this._items,this.data,this._sX);
-	}
-
-	/**
-	*重新布局
-	*
-	*/
-	__proto.changed=function(){
-		Laya.timer.callLater(this,this.layout);
-	}
-
-	/**
-	*根据当前的对象状态计算位置大小
-	*
-	*/
-	__proto.calSize=function(){
-		var i=0,len=0;
-		var tItem;
-		tItem=this.items[0];
-		this._sX=tItem.x;
-		var maxX=NaN;
-		maxX=this._sX+tItem.width;
-		len=this.items.length;
-		for (i=1;i < len;i++){
-			tItem=this.items[i];
-			if (this._sX > tItem.x){
-				this._sX=tItem.x;
-			}
-			if (maxX < tItem.x+tItem.width){
-				maxX=tItem.x+tItem.width;
-			}
-		}
-		this._width=maxX-this._sX;
-	}
-
-	__getset(0,__proto,'width',function(){
-		return this._width;
-		},function(v){
-		this._width=v;
-		this.changed();
-	});
-
-	__getset(0,__proto,'x',function(){
-		return this._sX;
-		},function(v){
-		this._sX=v;
-		this.changed();
-	});
-
-	__getset(0,__proto,'items',function(){
-		return this._items;
-		},function(arr){
-		this._items=arr;
-		this.calSize();
-	});
-
-	return Layouter;
-})()
-
-
-/**
-*
-*@author ww
-*@version 1.0
-*
-*@created 2015-9-24 下午6:37:56
-*/
-//class laya.debug.tools.CountTool
-var CountTool=(function(){
-	function CountTool(){
-		this.data={};
-		this.preO={};
-		this.changeO={};
-		this.count=0;
-	}
-
-	__class(CountTool,'laya.debug.tools.CountTool');
-	var __proto=CountTool.prototype;
-	__proto.reset=function(){
-		this.data={};
-		this.count=0;
-	}
-
-	__proto.add=function(name,num){
-		(num===void 0)&& (num=1);
-		this.count++;
-		if(!this.data.hasOwnProperty(name)){
-			this.data[name]=0;
-		}
-		this.data[name]=this.data[name]+num;
-	}
-
-	__proto.getKeyCount=function(key){
-		if(!this.data.hasOwnProperty(key)){
-			this.data[key]=0;
-		}
-		return this.data[key];
-	}
-
-	__proto.getKeyChange=function(key){
-		if (!this.changeO[key])return 0;
-		return this.changeO[key];
-	}
-
-	__proto.record=function(){
-		var key;
-		for (key in this.changeO){
-			this.changeO[key]=0;
-		}
-		for (key in this.data){
-			if (!this.preO[key])this.preO[key]=0;
-			this.changeO[key]=this.data[key]-this.preO[key];
-			this.preO[key]=this.data[key]
-		}
-	}
-
-	__proto.getCount=function(dataO){
-		var rst=0;
-		var key;
-		for (key in dataO){
-			rst+=dataO[key];
-		}
-		return rst;
-	}
-
-	__proto.traceSelf=function(dataO){
-		if (!dataO)dataO=this.data;
-		var tCount=0;
-		tCount=this.getCount(dataO);
-		console.log("total:"+tCount);
-		return "total:"+tCount+"\n"+TraceTool.traceObj(dataO);
-	}
-
-	__proto.traceSelfR=function(dataO){
-		if (!dataO)dataO=this.data;
-		var tCount=0;
-		tCount=this.getCount(dataO);
-		console.log("total:"+tCount);
-		return "total:"+tCount+"\n"+TraceTool.traceObjR(dataO);
-	}
-
-	return CountTool;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.GetSetProfile
-var GetSetProfile=(function(){
-	function GetSetProfile(){}
-	__class(GetSetProfile,'laya.debug.tools.GetSetProfile');
-	GetSetProfile.removeNoDisplayKeys=function(arr){
-		var i=0;
-		for (i=arr.length-1;i >=0;i--){
-			if (GetSetProfile.noDisplayKeys[arr[i]]){
-				arr.splice(i,1);
-			}
-		}
-	}
-
-	GetSetProfile.getClassCount=function(className){
-		return GetSetProfile.countDic[className];
-	}
-
-	GetSetProfile.addClassCount=function(className){
-		if (!GetSetProfile.countDic[className]){
-			GetSetProfile.countDic[className]=1;
-		}
-		else {
-			GetSetProfile.countDic[className]=GetSetProfile.countDic[className]+1;
-		}
-	}
-
-	GetSetProfile.init=function(){
-		if (GetSetProfile._inited)
-			return;
-		GetSetProfile._inited=true;
-		var createFun=function (sp){
-			GetSetProfile.classCreated(sp);
-		}
-		FunHook.hook(Node,"call",null,createFun);
-		GetSetProfile.handlerO={};
-		GetSetProfile.handlerO["get"]=function (target,key,receiver){
-			console.log("get",target,key,receiver);
-			return /*__JS__ */Reflect.get(target,key,receiver);
-		};
-		GetSetProfile.handlerO["set"]=function (target,key,value,receiver){
-			console.log("set",target,key,value,receiver);
-			return /*__JS__ */Reflect.set(target,key,value,receiver);
-		}
-	}
-
-	GetSetProfile.classCreated=function(obj,oClas){
-		if (GetSetProfile.fromMe)
-			return;
-		var className;
-		className=ClassTool.getClassName(obj);
-		GetSetProfile.addClassCount(className);
-		GetSetProfile.addClassCount("ALL");
-		IDTools.idObj(obj);
-		var classDes;
-		classDes=GetSetProfile.hookClassDic[className];
-		if (!classDes){
-			GetSetProfile.profileClass(obj["constructor"]);
-			classDes=GetSetProfile.hookClassDic[className];
-			if (!classDes)
-				return;
-		}
-		GetSetProfile.hookObj2(obj,classDes);
-	}
-
-	GetSetProfile.hookObj=function(obj,keys){
-		var handler=GetSetProfile.handlerO;
-		/*__JS__ */new Proxy(obj,handler);
-	}
-
-	GetSetProfile.hookObj2=function(obj,keys){
-		var i=0,len=0;
-		len=keys.length;
-		for (i=0;i < len;i++){
-			GetSetProfile.hookVar(obj,keys[i]);
-		}
-	}
-
-	GetSetProfile.profileClass=function(clz){
-		var className;
-		className=ClassTool.getClassName(clz);
-		GetSetProfile.fromMe=true;
-		var tO=new clz();
-		GetSetProfile.fromMe=false;
-		var keys;
-		keys=ClassTool.getObjectDisplayAbleKeys(tO);
-		keys=ObjectTools.getNoSameArr(keys);
-		var i=0,len=0;
-		len=keys.length;
-		var tV;
-		var key;
-		for (i=len-1;i >=0;i--){
-			key=keys[i];
-			tV=tO[key];
-			if ((typeof tV=='function')){
-				keys.splice(i,1);
-			}
-		}
-		len=keys.length;
-		GetSetProfile.removeNoDisplayKeys(keys);
-		GetSetProfile.hookClassDic[className]=keys;
-	}
-
-	GetSetProfile.hookPrototype=function(tO,key){
-		console.log("hook:",key);
-		try {
-			GetSetProfile.hookVar(tO,key);
-		}
-		catch (e){
-			console.log("fail",key);
-		}
-	}
-
-	GetSetProfile.reportCall=function(obj,name,type){
-		IDTools.idObj(obj);
-		var objID=0;
-		objID=IDTools.getObjID(obj);
-		var className;
-		className=ClassTool.getClassName(obj);
-		GetSetProfile.recordInfo(className,name,type,objID);
-		GetSetProfile.recordInfo("ALL",name,type,objID);
-	}
-
-	GetSetProfile.recordInfo=function(className,name,type,objID){
-		var propCallsDic;
-		if (!GetSetProfile.infoDic[className]){
-			GetSetProfile.infoDic[className]={};
-		}
-		propCallsDic=GetSetProfile.infoDic[className];
-		var propCalls;
-		if (!propCallsDic[name]){
-			propCallsDic[name]={};
-		}
-		propCalls=propCallsDic[name];
-		var propCallO;
-		if (!propCalls[type]){
-			propCalls[type]={};
-		}
-		propCallO=propCalls[type];
-		if (!propCallO[objID]){
-			propCallO[objID]=1;
-			if (!propCallO["objCount"]){
-				propCallO["objCount"]=1;
-			}
-			else {
-				propCallO["objCount"]=propCallO["objCount"]+1;
-			}
-		}
-		else {
-			propCallO[objID]=propCallO[objID]+1;
-		}
-		if (!propCallO["count"]){
-			propCallO["count"]=1;
-		}
-		else {
-			propCallO["count"]=propCallO["count"]+1;
-		}
-	}
-
-	GetSetProfile.showInfo=function(){
-		var rstO;
-		rstO={};
-		var rstO1;
-		rstO1={};
-		var arr;
-		arr=[];
-		var arr1;
-		arr1=[];
-		var className;
-		var keyName;
-		var type;
-		for (className in GetSetProfile.infoDic){
-			var tClassO;
-			var tClassO1;
-			tClassO=GetSetProfile.infoDic[className];
-			rstO[className]=tClassO1={};
-			for (keyName in tClassO){
-				var tKeyO;
-				var tKeyO1;
-				tKeyO=tClassO[keyName];
-				tClassO1[keyName]=tKeyO1={};
-				for(type in tKeyO){
-					var tDataO;
-					var tDataO1;
-					tDataO=tKeyO[type];
-					tDataO["rate"]=tDataO["objCount"] / GetSetProfile.getClassCount(className);
-					tKeyO1[type]=tDataO["rate"];
-					var tSKey;
-					tSKey=className+"_"+keyName+"_"+type;
-					rstO1[tSKey]=tDataO["rate"];
-					if (className=="ALL"){
-						if (type=="get"){
-							arr.push([tSKey,tDataO["rate"],tDataO["count"]]);
-							}else{
-							arr1.push([tSKey,tDataO["rate"],tDataO["count"]]);
-						}
-					}
-				}
-			}
-		}
-		console.log(GetSetProfile.infoDic);
-		console.log(GetSetProfile.countDic);
-		console.log(rstO);
-		console.log(rstO1);
-		console.log("nodeCount:",GetSetProfile.getClassCount("ALL"));
-		console.log("sort by rate");
-		GetSetProfile.showStaticInfo(arr,arr1,"1");
-		console.log("sort by count");
-		GetSetProfile.showStaticInfo(arr,arr1,"2");
-	}
-
-	GetSetProfile.showStaticInfo=function(arr,arr1,sortKey){
-		console.log("get:");
-		GetSetProfile.showStaticArray(arr,sortKey);
-		console.log("set:");
-		GetSetProfile.showStaticArray(arr1,sortKey);
-	}
-
-	GetSetProfile.showStaticArray=function(arr,sortKey){
-		(sortKey===void 0)&& (sortKey="1");
-		arr.sort(MathUtil.sortByKey(sortKey,true,true));
-		var i=0,len=0;
-		len=arr.length;
-		var tArr;
-		for (i=0;i < len;i++){
-			tArr=arr[i];
-			console.log(tArr[0],Math.floor(tArr[1]*100),tArr[2]);
-		}
-	}
-
-	GetSetProfile.hookVar=function(obj,name,setHook,getHook){
-		if (!setHook)
-			setHook=[];
-		if (!getHook)
-			getHook=[];
-		var preO=obj;
-		var preValue;
-		var newKey="___@"+newKey;
-		var des;
-		des=ClassTool.getOwnPropertyDescriptor(obj,name);
-		var ndes={};
-		var mSet=function (value){
-			preValue=value;
-		};
-		var mGet=function (){
-			return preValue;
-		};
-		var mSet1=function (value){
-			var _t=/*__JS__ */this;
-			GetSetProfile.reportCall(_t,name,"set");
-		};
-		var mGet1=function (){
-			var _t=/*__JS__ */this;
-			GetSetProfile.reportCall(_t,name,"get");
-			return preValue;
-		}
-		getHook.push(mGet1);
-		setHook.push(mSet1);
-		while (!des && obj["__proto__"]){
-			obj=obj["__proto__"];
-			des=ClassTool.getOwnPropertyDescriptor(obj,name);
-		}
-		if (des){
-			ndes.set=des.set ? des.set :mSet;
-			ndes.get=des.get ? des.get :mGet;
-			if (!des.get){
-				preValue=preO[name];
-			}
-			ndes.enumerable=des.enumerable;
-			setHook.push(ndes.set);
-			getHook.push(ndes.get);
-			FunHook.hookFuns(ndes,"set",setHook);
-			FunHook.hookFuns(ndes,"get",getHook,getHook.length-1);
-			ClassTool.defineProperty(preO,name,ndes);
-		}
-		if (!des){
-			ndes.set=mSet;
-			ndes.get=mGet;
-			preValue=preO[name];
-			setHook.push(ndes.set);
-			getHook.push(ndes.get);
-			FunHook.hookFuns(ndes,"set",setHook);
-			FunHook.hookFuns(ndes,"get",getHook,getHook.length-1);
-			ClassTool.defineProperty(preO,name,ndes);
-		}
-	}
-
-	GetSetProfile._inited=false;
-	GetSetProfile.handlerO=null;
-	GetSetProfile.ALL="ALL";
-	GetSetProfile.countDic={};
-	GetSetProfile.fromMe=false;
-	GetSetProfile.hookClassDic={};
-	GetSetProfile.infoDic={};
-	__static(GetSetProfile,
-	['noDisplayKeys',function(){return this.noDisplayKeys={"conchModel":true};}
-	]);
-	return GetSetProfile;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.enginehook.ClassCreateHook
-var ClassCreateHook=(function(){
-	function ClassCreateHook(){
-		this.createInfo={};
-	}
-
-	__class(ClassCreateHook,'laya.debug.tools.enginehook.ClassCreateHook');
-	var __proto=ClassCreateHook.prototype;
-	__proto.hookClass=function(clz){
-		var _$this=this;
-		if (ClassCreateHook.isInited)return;
-		ClassCreateHook.isInited=true;
-		var createFun=function (sp){
-			_$this.classCreated(sp,clz);
-		}
-		FunHook.hook(clz,"call",createFun);
-	}
-
-	__proto.classCreated=function(clz,oClass){
-		var key;
-		key=ClassTool.getNodeClassAndName(clz);
-		var depth=0;
-		var tClz;
-		tClz=clz;
-		while (tClz && tClz !=oClass){
-			tClz=tClz.__super;
-			depth++;
-		}
-		if (!ClassCreateHook.I.createInfo[key]){
-			ClassCreateHook.I.createInfo[key]=0;
-		}
-		ClassCreateHook.I.createInfo[key]=ClassCreateHook.I.createInfo[key]+1;
-		RunProfile.run(key,depth+6);
-	}
-
-	__proto.getClassCreateInfo=function(clz){
-		var key;
-		key=ClassTool.getClassName(clz);
-		return RunProfile.getRunInfo(key);
-	}
-
-	ClassCreateHook.isInited=false;
-	__static(ClassCreateHook,
-	['I',function(){return this.I=new ClassCreateHook();}
-	]);
-	return ClassCreateHook;
-})()
-
-
-/**
-*
-*@author ww
-*@version 1.0
-*
-*@created 2015-9-24 下午6:15:01
-*/
-//class laya.debug.tools.WalkTools
-var WalkTools=(function(){
-	function WalkTools(){}
-	__class(WalkTools,'laya.debug.tools.WalkTools');
-	WalkTools.walkTarget=function(target,fun,_this){
-		fun.apply(_this,[target]);
-		var i=0;
-		var len=0;
-		var tChild;
-		len=target.numChildren;
-		for(i=0;i<len;i++){
-			tChild=target.getChildAt(i);
-			WalkTools.walkTarget(tChild,fun,tChild);
-		}
-	}
-
-	WalkTools.walkTargetEX=function(target,fun,_this,filterFun){
-		if (filterFun !=null && !filterFun(target))return;
-		fun.apply(_this,[target]);
-		var i=0;
-		var len=0;
-		var tChild;
-		var childs;
-		childs=target._children;
-		len=childs.length;
-		for(i=0;i<len;i++){
-			tChild=childs[i];
-			WalkTools.walkTarget(tChild,fun,tChild);
-		}
-	}
-
-	WalkTools.walkChildren=function(target,fun,_this){
-		if(!target||target.numChildren<1)return;
-		WalkTools.walkArr(DisControlTool.getAllChild(target),fun,_this);
-	}
-
-	WalkTools.walkArr=function(arr,fun,_this){
-		if(!arr)return;
-		var i=0;
-		var len=0;
-		len=arr.length;
-		for(i=0;i<len;i++){
-			fun.apply(_this,[arr[i],i]);
-		}
-	}
-
-	return WalkTools;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.view.nodeInfo.NodeUtils
-var NodeUtils=(function(){
-	function NodeUtils(){}
-	__class(NodeUtils,'laya.debug.view.nodeInfo.NodeUtils');
-	NodeUtils.getFilterdTree=function(sprite,keys){
-		if (!keys)
-			keys=NodeUtils.defaultKeys;
-		var me;
-		me={};
-		var key;
-		var i=0,len=0;
-		len=keys.length;
-		for (i=0;i < len;i++){
-			key=keys[i];
-			me[key]=sprite[key];
-		};
-		var cList;
-		var tChild;
-		cList=sprite._children;
-		len=cList.length;
-		var mClist;
-		mClist=[];
-		for (i=0;i < len;i++){
-			tChild=cList[i];
-			mClist.push(NodeUtils.getFilterdTree(tChild,keys));
-		}
-		me.childs=mClist;
-		return me;
-	}
-
-	NodeUtils.getNodeValue=function(node,key){
-		var rst;
-		if ((node instanceof laya.display.Sprite )){
-			var tNode;
-			tNode=node;
-			switch (key){
-				case "gRec":
-					rst=laya.debug.view.nodeInfo.NodeUtils.getGRec(tNode).toString();
-					break ;
-				case "gAlpha":
-					rst=laya.debug.view.nodeInfo.NodeUtils.getGAlpha(tNode)+"";
-					break ;
-				case "cmdCount":
-					rst=laya.debug.view.nodeInfo.NodeUtils.getNodeCmdCount(tNode)+"";
-					break ;
-				case "cmdAll":
-					rst=laya.debug.view.nodeInfo.NodeUtils.getNodeCmdTotalCount(tNode)+"";
-					break ;
-				case "nodeAll":
-					rst=""+laya.debug.view.nodeInfo.NodeUtils.getNodeCount(tNode);
-					break ;
-				case "nodeVisible":
-					rst=""+laya.debug.view.nodeInfo.NodeUtils.getNodeCount(tNode,true);
-					break ;
-				case "nodeRender":
-					rst=""+laya.debug.view.nodeInfo.NodeUtils.getRenderNodeCount(tNode);
-					break ;
-				case "nodeReCache":
-					rst=""+laya.debug.view.nodeInfo.NodeUtils.getReFreshRenderNodeCount(tNode);
-					break ;
-				case "renderCost":
-					rst=""+RenderAnalyser.I.getTime(tNode);
-					break ;
-				case "renderCount":
-					rst=""+RenderAnalyser.I.getCount(tNode);
-					break ;
-				default :
-					rst=node[key]+"";
-				}
-		}
-		else {
-			rst=node[key]+"";
-		}
-		return rst;
-	}
-
-	NodeUtils.getPropertyDesO=function(tValue,keys){
-		if (!keys)
-			keys=NodeUtils.defaultKeys;
-		var rst={};
-		if ((typeof tValue=='object')){
-			rst.label=""+ClassTool.getNodeClassAndName(tValue);
-		}
-		else {
-			rst.label=""+tValue;
-		}
-		rst.type="";
-		rst.path=tValue;
-		rst.childs=[];
-		rst.isDirectory=false;
-		var key;
-		var i=0,len=0;
-		var tChild;
-		if ((tValue instanceof laya.display.Node )){
-			rst.des=ClassTool.getNodeClassAndName(tValue);
-			rst.isDirectory=true;
-			len=keys.length;
-			for (i=0;i < len;i++){
-				key=keys[i];
-				tChild=NodeUtils.getPropertyDesO(tValue[key],keys);
-				if (tValue.hasOwnProperty(key)){
-					tChild.label=""+key+":"+tChild.des;
-				}
-				else {
-					tChild.label=""+key+":"+NodeUtils.getNodeValue(tValue,key);
-				}
-				rst.childs.push(tChild);
-			}
-			key="_children";
-			tChild=NodeUtils.getPropertyDesO(tValue[key],keys);
-			tChild.label=""+key+":"+tChild.des;
-			tChild.isChilds=true;
-			rst.childs.push(tChild);
-		}
-		else if ((tValue instanceof Array)){
-			rst.des="Array["+(tValue).length+"]";
-			rst.isDirectory=true;
-			var tList;
-			tList=tValue;
-			len=tList.length;
-			for (i=0;i < len;i++){
-				tChild=NodeUtils.getPropertyDesO(tList[i],keys);
-				tChild.label=""+i+":"+tChild.des;
-				rst.childs.push(tChild);
-			}
-		}
-		else if ((typeof tValue=='object')){
-			rst.des=ClassTool.getNodeClassAndName(tValue);
-			rst.isDirectory=true;
-			for (key in tValue){
-				tChild=NodeUtils.getPropertyDesO(tValue[key],keys);
-				tChild.label=""+key+":"+tChild.des;
-				rst.childs.push(tChild);
-			}
-		}
-		else {
-			rst.des=""+tValue;
-		}
-		rst.hasChild=rst.childs.length > 0;
-		return rst;
-	}
-
-	NodeUtils.adptShowKeys=function(keys){
-		var i=0,len=0;
-		len=keys.length;
-		for (i=len-1;i >=0;i--){
-			keys[i]=StringTool.trimSide(keys[i]);
-			if (keys[i].length < 1){
-				keys.splice(i,1);
-			}
-		}
-		return keys;
-	}
-
-	NodeUtils.getNodeTreeData=function(sprite,keys){
-		NodeUtils.adptShowKeys(keys);
-		var treeO;
-		treeO=NodeUtils.getPropertyDesO(sprite,keys);
-		var treeArr;
-		treeArr=[];
-		NodeUtils.getTreeArr(treeO,treeArr);
-		return treeArr;
-	}
-
-	NodeUtils.getTreeArr=function(treeO,arr,add){
-		(add===void 0)&& (add=true);
-		if (add)
-			arr.push(treeO);
-		var tArr=treeO.childs;
-		var i=0,len=tArr.length;
-		for (i=0;i < len;i++){
-			if (!add){
-				tArr[i].nodeParent=null;
-			}
-			else {
-				tArr[i].nodeParent=treeO;
-			}
-			if (tArr[i].isDirectory){
-				NodeUtils.getTreeArr(tArr[i],arr);
-			}
-			else {
-				arr.push(tArr[i]);
-			}
-		}
-	}
-
-	NodeUtils.traceStage=function(){
-		console.log(NodeUtils.getFilterdTree(Laya.stage,null));
-		console.log("treeArr:",NodeUtils.getNodeTreeData(Laya.stage,null));
-	}
-
-	NodeUtils.getNodeCount=function(node,visibleRequire){
-		(visibleRequire===void 0)&& (visibleRequire=false);
-		if (visibleRequire){
-			if (!node.visible)
-				return 0;
-		};
-		var rst=0;
-		rst=1;
-		var i=0,len=0;
-		var cList;
-		cList=node._children;
-		len=cList.length;
-		for (i=0;i < len;i++){
-			rst+=NodeUtils.getNodeCount(cList[i],visibleRequire);
-		}
-		return rst;
-	}
-
-	NodeUtils.getGVisible=function(node){
-		while (node){
-			if (!node.visible)
-				return false;
-			node=node.parent;
-		}
-		return true;
-	}
-
-	NodeUtils.getGAlpha=function(node){
-		var rst=NaN;
-		rst=1;
-		while (node){
-			rst *=node.alpha;
-			node=node.parent;
-		}
-		return rst;
-	}
-
-	NodeUtils.getGPos=function(node){
-		var point;
-		point=new Point();
-		node.localToGlobal(point);
-		return point;
-	}
-
-	NodeUtils.getGRec=function(node){
-		var pointList;
-		pointList=node._getBoundPointsM(true);
-		if (!pointList || pointList.length < 1)
-			return Rectangle.TEMP.setTo(0,0,0,0);
-		pointList=GrahamScan.pListToPointList(pointList,true);
-		WalkTools.walkArr(pointList,node.localToGlobal,node);
-		pointList=GrahamScan.pointListToPlist(pointList);
-		var _disBoundRec;
-		_disBoundRec=Rectangle._getWrapRec(pointList,_disBoundRec);
-		return _disBoundRec;
-	}
-
-	NodeUtils.getGGraphicRec=function(node){
-		var pointList;
-		pointList=node.getGraphicBounds()._getBoundPoints();
-		if (!pointList || pointList.length < 1)
-			return Rectangle.TEMP.setTo(0,0,0,0);
-		pointList=GrahamScan.pListToPointList(pointList,true);
-		WalkTools.walkArr(pointList,node.localToGlobal,node);
-		pointList=GrahamScan.pointListToPlist(pointList);
-		var _disBoundRec;
-		_disBoundRec=Rectangle._getWrapRec(pointList,_disBoundRec);
-		return _disBoundRec;
-	}
-
-	NodeUtils.getNodeCmdCount=function(node){
-		var rst=0;
-		if (node.graphics){
-			if (node.graphics.cmds){
-				rst=node.graphics.cmds.length;
-			}
-			else {
-				if (node.graphics._one){
-					rst=1;
-				}
-				else {
-					rst=0;
-				}
-			}
-		}
-		else {
-			rst=0;
-		}
-		return rst;
-	}
-
-	NodeUtils.getNodeCmdTotalCount=function(node){
-		var rst=0;
-		var i=0,len=0;
-		var cList;
-		cList=node._children;
-		len=cList.length;
-		rst=NodeUtils.getNodeCmdCount(node);
-		for (i=0;i < len;i++){
-			rst+=NodeUtils.getNodeCmdTotalCount(cList[i]);
-		}
-		return rst;
-	}
-
-	NodeUtils.getRenderNodeCount=function(node){
-		if (node.cacheAs !="none")
-			return 1;
-		var rst=0;
-		var i=0,len=0;
-		var cList;
-		cList=node._children;
-		len=cList.length;
-		rst=1;
-		for (i=0;i < len;i++){
-			rst+=NodeUtils.getRenderNodeCount(cList[i]);
-		}
-		return rst;
-	}
-
-	NodeUtils.getReFreshRenderNodeCount=function(node){
-		var rst=0;
-		var i=0,len=0;
-		var cList;
-		cList=node._children;
-		len=cList.length;
-		rst=1;
-		for (i=0;i < len;i++){
-			rst+=NodeUtils.getRenderNodeCount(cList[i]);
-		}
-		return rst;
-	}
-
-	NodeUtils.showCachedSpriteRecs=function(){
-		NodeUtils.g=DebugInfoLayer.I.graphicLayer.graphics;
-		NodeUtils.g.clear();
-		WalkTools.walkTarget(Laya.stage,NodeUtils.drawCachedBounds,null);
-	}
-
-	NodeUtils.drawCachedBounds=function(sprite){
-		if (sprite.cacheAs=="none")
-			return;
-		if (DebugInfoLayer.I.isDebugItem(sprite))
-			return;
-		var rec;
-		rec=NodeUtils.getGRec(sprite);
-		NodeUtils.g.drawRect(rec.x,rec.y,rec.width,rec.height,null,"#0000ff",2);
-	}
-
-	NodeUtils.g=null;
-	__static(NodeUtils,
-	['defaultKeys',function(){return this.defaultKeys=["x","y","width","height"];}
-	]);
-	return NodeUtils;
 })()
 
 
@@ -3229,18 +659,39 @@ var StringTool=(function(){
 })()
 
 
-//class laya.debug.data.Base64AtlasManager
-var Base64AtlasManager=(function(){
-	function Base64AtlasManager(){}
-	__class(Base64AtlasManager,'laya.debug.data.Base64AtlasManager');
-	Base64AtlasManager.replaceRes=function(uiO){
-		Base64AtlasManager.base64.replaceRes(uiO);
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.Base64ImageTool
+var Base64ImageTool=(function(){
+	function Base64ImageTool(){}
+	__class(Base64ImageTool,'laya.debug.tools.Base64ImageTool');
+	Base64ImageTool.getCanvasPic=function(img){
+		img=img.bitmap;
+		var canvas=Browser.createElement("canvas");
+		var ctx=canvas.getContext('2d');
+		canvas.height=img.height;
+		canvas.width=img.width;
+		ctx.drawImage(img.bitmap,0,0);
+		return canvas;
 	}
 
-	__static(Base64AtlasManager,
-	['dataO',function(){return this.dataO={"comp/button1.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGIAAABRCAYAAAApS3MNAAABSUlEQVR4Xu3a0QmFMADFUJ1JXM0h3moPZ6qg4AoNeLqAIenFn65jjLE40w2sQkxvcAMI0eggRKSDEEJUDEQ4/COEiBiIYFiEEBEDEQyLECJiIIJhEUJEDEQwLEKIiIEIhkUIETEQwbAIISIGIhgWIUTEQATDIoSIGIhgWIQQEQMRDIsQImIggnEvYvv9IzjfxDiP/XlgJsTcCyDEXP/v14UQImIggmERQkQMRDAsQoiIgQiGRQgRMRDBsAghIgYiGBYhRMRABMMihIgYiGBYhBARAxEMixAiYiCCYRFCRAxEMCxCiIiBCMa7iAjPpzG8fY3kF0KIiIEIhkUIETEQwbAIISIGIhgWIUTEQATDIoSIGIhgWIQQEQMRDIsQImIggmERQkQMRDAsQoiIgQiGRQgRMRDBsAghIgYiGBYhRMRABMMihIgYiGBcGJiOHTRZjZAAAAAASUVORK5CYII=","comp/line2.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAECAYAAACOXx+WAAAAG0lEQVQYV2NkoDJgpLJ5DIxtra3/qWko1V0IAJvgApS1libIAAAAAElFTkSuQmCC","view/create.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAkCAYAAAC9itu8AAAAdElEQVQ4T2NkwAIWLFjwH5t4QkICIyM2CXQxmAHka/j///9mXDYxMjL6YtgwBDUg+w8crIT8MBQ0oEca55JvWNPS9xgu4tISzADyNfz///8MnrRkgmHDENSALWng9fRQ0DA40xLecglbWhpqGoZCMUNKUQkANAHAJVkE5XwAAAAASUVORK5CYII=","view/rendertime.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAkCAYAAAC9itu8AAABeUlEQVQ4T+2Uv0tCURSAvyNdcwiXBlsaaomWFgeHlqAtCPsDJHwIiUtDSxERtErtmQ6CjkHo4FpDBQ0tbVFR0BYE0eQvOnFF7T17QlOTd3m88873OD8+rtA9uVzOBIPBlIisAwvd8B1QajQahXQ63bIx6QHFYrEEJHrv7qeqZhzHOfYA+Xw+Yow5B+YHoGwymdxW1QAQEFWNAk8i8uEDuZM3gUcLZIEJYNcNqWrVcZyd7p9t8jLwYIFTYBx47UHlcjmcSCQ+B5JtpU0LnAFj3br7kE+yTalb4BCYczVqoT3AjteW4T73FlgFNgY+1IGQz4hPLGCAI2DGbweu2Auw1Vmcqk4C+8DsEOgZOBCR9/6mVdU2vgIsAdOuIVwANRFpezatuahpTYVSop1m+y6pasm8NQqSvvW61KwslkSHuCRkgvErr0taiUXaal1Sr0siWRO/9HfpF+RN9nfpB/qqmrXrv7mktVhYVm5GLo1cct9LI5e8d84/3UvfAgdlKH0EO7MAAAAASUVORK5CYII=","view/cache.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAkCAYAAABSSLCCAAAAcElEQVQ4T2NcsGDB/4SEBEYGBgYGYtmMxCpENhhsA6mA8f///5tHNTEwkBcQpIYcSD15kUtWigi51vR/jVYdOGUQy2YkViGywWSnvTOkhiAonkY1gZIRqSEHTntkRe4g10RWQIyWe5Bgo2O5R7dkBADztyP+yFzirAAAAABJRU5ErkJggg==","comp/clip_selectBox.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAoCAYAAAAIeF9DAAAAsElEQVRoQ+3ZQQ0AMQzEwAuqEgh/Sj2pKObhIrBsrfLonHPu12MMTEGYFg+kIFaPgmA9ClIQzQDG0w0pCGYAw2khBcEMYDgtpCCYAQynhRQEM4DhtJCCYAYwnBZSEMwAhtNCCoIZwHBmd/tTh6IUBIrx/tRbiFWkIFaPFoL1KEhBNAMYTzekIJgBDKeFFAQzgOG0kIJgBjCcFlIQzACG00IKghnAcFpIQTADGE4LwYL8U/BE1dCJ3PsAAAAASUVORK5CYII=","comp/label.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAASCAYAAACQCxruAAAAmElEQVRoQ+3aMQqAQBBDUef+hx4Zq1mrbPnhWylECHmghVZ397OOqqp97TlugdNzgEXFIaaFuwROt0LmBEay5aXb920+FjIpMJItLy1wvhUyKTCSLS8tcL4VMikwki0vLXC+FTIpMJItLy1wvhUyKTCSLS89wPP1Qeh8M0zy+84gMMbruqjA15OxbtjAu7mPa5bj0fb/A8cLgD4n/wQKNiIAAAAASUVORK5CYII=","comp/clip_tree_arrow.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAQCAYAAAArij59AAAAwUlEQVQoU5WRPRKCMBCFWUt6vYQeB06RUDpoBbFDa7yDwm30FGi9dHnOMiQDBgvT5c3b7+0PRVEUlVV9A3NmzL6T//SRfMz5CgCdtVafjlmzaHAigAbM2tE8YVo1pf0yvABoc9D3wACgBbMKIgD4qqDJsqqlMV8VGL5n/88geCJKlijSMBXFZUNx/CSi9WwX1r7R99thzKKqkxXRbMUWSE2u2sEwHsxHCbrMVSq6N4xRD9HAvJstylEkarhurlqnfQC58YP5+CvQNwAAAABJRU5ErkJggg==","view/bg_panel.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAMUlEQVRYR+3QQREAAAjDMGZk/l2CDD6pgl7SduexGCBAgAABAgQIECBAgAABAgS+BQ4oyStBhXcy5AAAAABJRU5ErkJggg==","view/bg_top.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAMUlEQVRYR+3QQREAAAjDMKZp/rWBDD6pgl7SduexGCBAgAABAgQIECBAgAABAgS+BQ6WyDMhXMLeQgAAAABJRU5ErkJggg==","view/clickselect.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAqCAYAAACDdWrxAAACfElEQVRIS8WVO2iTYRSGn5OWqpMOurg0VRBdVVCsg7GgDjpZECyirl4GEYfSgBlaB5VSpApdxCJIoeKgg7dKC21ALahIiyiKKUjxAiI4qCH1lRP/hPhfAnHpGZPv+c4573nP95ukO/xHmINmtq8RtswsPiipB/gAPAFem5nCbcSWKukIsD84/A2YBh4DL8ysWLkk0qOkDcD5GLF+Ac+Ap35ZHGjAdWB5gtJvgZFYVSWdBHaFwBlg1Mw8K0ngFiAbAm+a2XBij/6HpBbgBrAEmAVeAZ1AFU40QDCWrcBZL0/S4Vq4HtgB7DWzU5XyauDBMhhWz70ryVVdb2ZuhGpI2g1MODjfiMFrxZk3s9WNwJ6snHFxQUlXgXfAPeC5mf2O2Y5oqZLcMceCw1+AseCSSTP7mSiOpM3A7RixfvgYgAd+WUQcSSnfPWBlgtIvgf5YVSVdBA6GQF/mS2bmWcvbERmHJF+payFw0MzO1TWApKXBViwL3h5/Pk4AVTjRAMFY9njJXl6wLccrcD3wAHDUzBwuRw18JtbkbkFJruomM7sf2o4u4Jals/mFRgxeFcfBQm97UyOwM+WMiwums/k3QnMps+HWpuLIRC5TCrcRW2pbT35MRiY4XDRsVmiU5uJQIZfxb0k5Ij229eQPySJ287MLGO8Rd1M0XY6AO3LjzYVSy3fAH+VICL4a6o9VtTWbnzbYGKI+IrtQ6Ns2EFuq/5jOTnWD9f4DikeFvvbqhyg2Yzo3voJSy2fAjfEJMYPRQQ2caAAfC7AW2WkvrzU79dCwnRW4Hjgg6JrrbV9VKbkKw1Csyd2Ca7on1y2krHOub3t16//2n79SarbsH7BKtfejoCjmAAAAAElFTkSuQmCC","view/resize.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAqCAYAAACDdWrxAAABeUlEQVRIS+2UvUpdURCFvxXRKJpIEBURsVAIiiBoaaGCjY2VLyH4MBaCPoWlnQlpI6SxsQmkURQL5eK/6JK57iuRnMPZtxAkuOFUhzWz96xvjcg8tluAT5LOQqJMHba/AgPAD0nOEtruAOaB6Lon6U+ucAoYTLe7Bb5XCm1/BCaAXqAVOAHyOkYn27PA5/TGWmXHxvBeT2i7TVIM4MUp7ZhGPlY3V/pVKUxEjAIjyac74LIAjK70PwCoyfYXYDJwyqDoHtiRdFOfql0naBgIrILF/ZIi1yH6h1XbYXCPpKOq7s34GEX7JB00m445YBzYlPSQ1dF2N7CaWN2W9DNXuJxAj1uGVeuVQtvh32LyuR34DexWCv+CfAXoBzYkHb8Boe1OSRcFkBdfNY18IQiUtFUpTJjNAPEFHVfAaQFyjZ3zNBzbQ8BSWkZViEbk1uIpjXR8AKbT7jwEvpVUqEk6L0pHLN5hSWWxeq7XjI/v6Sgz0vZ7Ov7DdDwCkcb1m86tSukAAAAASUVORK5CYII=","view/clickanalyse.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAqCAYAAACDdWrxAAAC7UlEQVRIS5WWT2hUZxTFfyfGFolkoUVKrHQiEaX+IfgHa54UQzUqpWYhLbQU6ULNwgYXuog6yiiTgK2LgtAu6yqbFkpRBEURQzJEBN200NqKkxoDLnQhFUrizJU7vje8SSbzZr7FwDy+c75z7z3nfU80uMxMDin9JC0zewvYAHwIrAH65wWaWQuwOdy8CVgUHnBd0sUKoJktBbYC24B1QHMVNeck3ZWZrYhtXpUg/3/gS0kzDnT2/cDqpFqBUUnnK5pjZutDgo01Tr0g6XbVrprZypBgO9AUU/EK+ErSyzLQzC5XkTkCfBR7fl/Smeh/qasOlPRp9DAkOgp8H5P9o6SriUAnMrOzgNdswNeSntcL9IYNAQ8kHYuXU5Y6u8ZIupldAO5I+nkOsNb8wjk/ljTZKFCSvMbSMrPSiOpNx9uAz3UP4IbfWSsdrcDH4eZuYHF46LCk47PT8S6wG9gbJmRhlfoPSLrhJvdERJs7E+S73dZKmnagsx8JB50UEHdY3+x0dIUEO2qcekTSr/OlY21I4N5dEJMwA6yX9CKejqkqGn8DemPPb0v6YrZXpyS1xYbsRD3AtZjsk5IuJQKdyMyGAa/ZnbNR0tN6gd6wXwAP8SfV0jGnxki6mV1xyf4ubdTkPue/Jf3TEJCMNZFRMQLtyNwqvaTrSkdHZry1MFM8bLLPgY5U8/SyeYHvncotb5b1A/t8c2QGg3sT2WBLBbD95PiGogr9Ej0Gbap8r4ZJ5kR+MPhW7WdGd5npEFaa15IE+YWW5uklf2S6/1N7OnfasG+Ad5KiAfyVzwYfVDQnlc71YTaA8Ntrvtq/y2eDgapdTZ0a60UMhjdvmcCgWDClJge7npSBqfRYYY5M6U/M/NqO1mQ+G7xf4VUH5rNBOXtviLQfzH0afizop0fZroOJQCdKpcfyUKrZFhTpfDgU/F4nMNcH9gPwLJ8Nls3xarUaI+mp9NhTg5GJbPBZQyb3OReayP17rutmHPga1PpCOk+zrlEAAAAASUVORK5CYII=","view/res.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAoCAYAAAD6xArmAAADwUlEQVRIS+3WT2gcdRQH8O/b2SwNC7l4MAEPvbilUkoPOUmLjSDrZn4hxYKH/kGwyB4tQogiu/N+GymyoWguhVBQKKkHQTHsW9fUQwqKp4AgtMXkInhILl4CkoTdmSe/6XZp2pntLli8uMedt9/3mze/33yW8Jw+9Jxy0TeYmV8FcFVVTxPRiwA6AP5U1TvZbHapUqn8nrawxGBVJWvtNVWdJ6K05h1V/dhaW08KT/wRM1sAVQCRqn5JRLdyudw9Iora7faJKIrKqnrBNSWiahAEC0+GHwpm5utEdD+KopsuBMDbzPxt0oqstRdV9Za7lslkzlar1Z8erzsUHATBJhG93C34fmJi4ly5XG6nzTEIgjoRzanqkrX2amowM98F8Fq3wK34PWb+Ii14cXExv7e3V6hWq78+axQrANwt/kVEl5j5h0G2IzMfUdWCtfa3R/VPzvhTAG8AOM/MfwwYehTANwB+ZOYPE4ODIDhJRJvMvD9IqLW2GEXRbSJ6AcBtZr6UGPzoS2Y+lc/nt+bm5v5Oa2CtvaKqywC8bs06M7+eGszMn7nTBqDOzPNpwcvLyyPb29vfAZh2Naq6Za0tpAbXarUzURS53eGKL1trv0oKZ+a3AHytqplMJlOOoui4tfaDvqOw1lZUtabubBOtqOqN0dHRB/v7++62XwHwDoB33dkAUGPmoO92e/yitXZeVT8BkE1acbdpPQiCj4hIBw52hQsLC8c6nc77AN4E8FK3yQ4R/Qzgc2b+Je0ZDPU+fjiZp1eXFD5U8CB7u+/DGybgXxnFMA3/m1GISGwegNMAeuYBuON53lKpVBrePBG5RkTuSPc1b2ZmZnDzRKRnHoDYvIODg3u5XM69/E8AKAO40G1aNcb0N6/ZbF5X1fsAbjpInXnGmETzGo3GRdew+0DPGmPSzRORTQA988bHx89NTk6mmtdoNGLziGjJ9/1085rN5l1VPWSeMSbVvLW1tXwYhoXp6en+5olIbB6A2Dzf9wcyb319/cju7m5hdnY22TwRic3zPO98qVQayLxWq3U0DMPYPGNMsnmrq6snx8bGNqempgYyT0SKzjoAsXnGmP7mNZvNU9lsdqtYLKaaJyJXABwyzxiTbp6IxOYRUd33/VTzNjY2RnZ2dnrmAdgyxqSbJyJnAMTmEdFl3/cTzROR2DzHk6qWiei4Maa/eSJScZY99FRXPM+7MTIy8iAMQ6/dbsfmEVHPPGPM4OaJiBtDqnmuqfuL4Pv+8Oa1Wq1jYRg+ZR6A2DxjzP/mPRupfwAf56Q4urCh6QAAAABJRU5ErkJggg==","view/tab_panel.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAABICAYAAADyMAW8AAAAcUlEQVRYR+3WsQ3AMAhE0TCMeyTvP1tShRQo7lxYegxA8fUPLuac97VhwuKXKhTlFxRQ9GPDClawYvGEDwxIZu7pFRZXr4ACinY1ghWsYMX/NxWQr22edyvGGHt6hcV1NqGAon8QVrCCFYteISDnBuQB3xJuQcDkEngAAAAASUVORK5CYII=","view/btn_close.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAqCAYAAACz+XvQAAACmUlEQVRIS7WWS0/bUBCFz7mJmyZxENm06mNVoVZC7LqGn9FNqy55/BSWSEhs2/4uuqFVoA150JLKJvGdaiIH2TfXNoKQpeP5PHPO3GMTK/5xxTwsAUWkBeBZ+qAByb/Zh4pIA8CL9NqY5Dj7vw9YA/ABwDsAfwB8ITnUIhF5CuATgNcAfgH4RnJSCkwLl6AA/lXBtLZQQxFxoTr6q6LOFl2WmuJAtcY7ZuXIixsczfRyTlPfhpSN7BpwBeBtFdQLFJE2gI8AXi7GBBBl3Fdnv5L87XbpWxuFfQbw3NXM0dQLLdrDIH3ylGTiLLYB8CS9lpCc3tmU+xzL1Z9lEXl/n06KavjowCiK1uM4fqMd1Ov1s3a7fZntZjabtSeTiQYHgiC4aLVavZwpbofT6TQYDAaH1tod3bMwDHc7nc5PLZrNZmG/3z8WkS1jzGm32z1oNBqjUqD+6YM2m81xFWyeNkUaulAAlyKyWdTZbdqUmZKFakEVrLRDV7P5zY6m3rQp6tA1AMC5tXY7he51Op0fdwbGcdwdDodHWc2MMdcL9wGM1tbW9sMw/L6UNm6HChuNRifW2g1XM0dTL3TJZS1KkkTDFbVaLQqCIJcm6k0URRpxuvg39Xo9rtzDh5zt1Z/lXq+32rR5dKC1dt0YM08bAGd65BxN1ZB52ojIBcl82rgdWmsDkocAdgDoW22X5DxtSIZJkhyT3AJwCuCAZD5tfCP7oMaYcRVs/tAiDT1QHX2zqLPbtCkzxYFqjXfM3GKXAR3NtC6nqTccioAeA84BbCuU5B4Af9r4gCLSBXCU1UxErjPuj0Rk3xiznDYuMIWdANhwNXM09UKXXNai9LtQ9y4yxuS/XUijr9L0lXBDMp82j370HhJdWvsftiHJYFPSIqEAAAAASUVORK5CYII=","comp/combobox.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFsAAABCCAYAAAA476rKAAACfElEQVR4Xu3bMYsTURQF4PMmExgIWkgEU5hskyJYxGYKY5VS7NzCylL8Bftj3NbKQjuxTBWbaUwhKdIYLCJotlACA5m8kQTZZZkkeN9dbuNJOXPPu/DN5ZHkMa7dbpfgx0TAEdvEedeE2HbWxDa0JjaxLQUMe3HPJrahQECrNE3RarUOJheLBbIsq9znZAdgJ0mC4XCIer1eSa/Xa4xGI+R5TuwA272RTqeDfr9fuTeZTDCfz/dmONkK/cFggGazebnCcrnEeDw+uCKxFdiNRmO3nURRBO/9bvtYrVbEVpgejXa7XfR6PUynU8xms6O1nGzlU3DO7fbu7V5dlsf/0yO2ElsSJ7ZES1lLbCWgJE5siZaylthKQEmc2BItZS2xlYCSOLElWspaYisBJXFiS7SUtcRWAkrixJZoKWuJrQSUxIkt0VLWElsJKIkTW6L1t5an6wFooRGerofKBeZ4uh4IFxrj6XqoXECOp+sBaJoIT9c1esIsT9eFYFbl/J5tJc13agyliU1sWwHDbtyziW0oYNiKk22JfXJ6xnfXjcDdFttnb43a/b9tovQ5iG30/IltBL1tQ2xiGwoYtuJkE9tQILBV/ugl4rh2MF1sPJJP59fuc7IDsTe37mHz8Bki+MoKHhFqn9+j9vs7sQN9K7G89xRx837levHzG5Lph8p1TrZK3iF//ApxdLVI4YFk/BpA9Uc5sVXYwObOCfyDJ3AoUcIh+vIRtYuve1clthJ7G8/7p4hv30Xx6weSybuDKxL7BrARxcjTF0iyN4AviH0Tpto1ONlaQUGe2AIsbSmxtYKCPLEFWNpSYmsFBXliC7C0pZfY2oWY/zeBP8uaLni/AFTVAAAAAElFTkSuQmCC","comp/textinput.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFsAAAAWCAYAAACv8OArAAAAZElEQVRYR+3UQQkAMAwEwcZI/LtsoSL2NTGwMByZ3b3HJQIDO3H+EdidNezQGjbsUiBs+dmwQ4EwZdmwQ4EwZdmwQ4EwZdmwQ4EwZdmwQ4EwZdmwQ4EwZdmwQ4EwZdmwQ4Ew9QBe0R29X9x+dwAAAABJRU5ErkJggg==","comp/vscroll.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAhCAYAAAA/F0BXAAAAOklEQVRIS2N8+OzVf2YWFgYmJiYGcgHjqCEYQTcaJpipaTRMRsOEmDJmNJ2MppPRdEJMCIymE2JCCQAYonwDuu2VMAAAAABJRU5ErkJggg==","comp/vscroll$down.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAzCAYAAABxCePHAAAC/klEQVRIS+2WS0wTURSG/zszBcrLFVvjio0LiAqRRDAmGpRodFE1MQQQkOKGqBujRo3ExLjB4MaKgDzUaGQhvoJGYwAjYoioERcuDGxYEIwPkBY6nWvObXuLnXZaSklYOIu5M/fxzZn/nvPPsInJKa5qGhRFQaIH+w8xSbcymtTd+gBFYXAdyjM9sf7ORxgGR0t5/j9jpkhq2t5B0xQwBrgqNsnJ9V0j4BzQdQNtNYXWkKz0NDiaXkBTFTCFoaWmCHVtQ+AGh+4z0HNiO2bmPNYQGiXQvkuPoaqqiIgi8Pl8eHBqtwlA86MKS6Cy8z1gjIFzjqcXHBEBlpBgRNuOd+HVlYqogJiQIChcg/BtW5k8SaSSkxPJ5PRPTttHfkI7kcghIpn8NYfp33NLXp+TnYG1OWvA3ox9499nPSjdkCsgHJxOIjc43VMrugL9dEUD4Oj/PA4CsUfDX/jOjbmisHTDCCzi4t4QgLDrQF+qTYOmqhgYGw9BvLpv0ZNjQwieaU9b7ZCDriFhSt3VBSZNartHA6aUJ7SK+jqO5n5pSp1HiqSw1e3Di0ypwBpiU1XsudwnTanraDEqrg2GmZLbGkJh2jQVZY29JlPqPe03JX/uxLE7Nk3DjjP3pCn1Ne7HrNsjdYoLQsmWYtNQ3NCBgeZKzLrn/foEoogbQgvSUmz4454P7VQikGhpHzGSZdVOUqqYTGli6gemZ9yJ+0lSTalk/TrxtQOYaBnESbTinokev4UG+p+9/xoyJQKQn8x7vf7JjEFZ1FJBBvuC12RINIdAwtkIQuksnxgHhKBUZ6scQtLSNyiWJpav47z9STjbjfJ8k5iVN0eEs911bhZjUTWpbR+RztZ6uFBERNCq1rfS2e43lFhDsjPscDS9lM7W4dyCquuvpbM9PFkq0iHm7mSl2yP+bj05uxdeXZe5FHOL6Xdr17nQ79bziwew4NXFqwUTMiaEtKBPwtZjnRi8WgXPglfqsyQITc60pwpAeNpH1GRZtRM0pWVVcTJM6S+dYaRsIf025wAAAABJRU5ErkJggg==","comp/vscroll$bar.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAA/CAYAAAAGyyO8AAABYElEQVRYR+2Wv0sDMRTH30tarCg6dRWnQnFT6OiqoP+tk+Cig+AiHayDiNSlg+jgD47K1US+Lwm5s4o/mkElN1xy73KfcF/efTi+Ht3Y0X1Btw8FffdoLy3QSnuZ+HhwZe+exrS13hGGJYsTWSszN0rJ1zHDDbJ0eDYkgHjv5Nxub3TIGEsTY/xDVq6NAN7MfW2u2aCG1nQ0GEZIOXmp7Pw5BPDF+VaGIGQfbM6k0ng5kw8/wF/eJzP5JInZkjg2CSS8zk6vCys7Wb8r5qqsncAP+pdR1Lu9rvgVT4uYg+3F+PCtAzjzu/taKdKKBSS2/wkEMBg/Q+rB50zqzZb7ZPoD/GeZ1HySxGxJHJsEEl5nc22VmCFalpFJTjLKNUtFxlDfP72IogYAP8PPZekWM5OqjErFWpjjbxprABJRA/JYjOOOX4Bgo6bWGYKsfMg5k+lmy5n8uUxm8kkSs6Vw7Cstibc9Fv5vWQAAAABJRU5ErkJggg==","comp/vscroll$up.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAzCAYAAABxCePHAAADF0lEQVRIS92WTUhUURTHz31vPv0KKmkXrtxUGNomkCANLdCUpEatJFuIClIEFRl9kGH0BYWQElLpotGKEJXAtKQooYUFpi1axLQZMCyyZJqv926cM2/uTM288emoUHfx3v16v3fuuef+72Hume/c7/cBAwaLKWaLBZjLPc0Zk0CSJGBs4SDOObDP7i9ckuXkIbLJRJDFFrJk2SGNvZNwy7ExoZEJLWnqfQ+4SlUFaHNs0gXpQhq6x0GWGe0Y7oCicGivyYsLigup7XgFJlkCJjFwNm2HqrZR4CqHoKLC3fr8GFAMpPLqEJhMoZjpay6Bnx4vpKfYoLx1kCwKBlXoOV78BygGsudCH1nwtNVBgHBBUFFzL1n0+Gx5YghOxhINiAbFG1uZODESxf+bJShKrulv8HUusp1G/IBz1qTZIGvdamBjU584Aopzs+lbDhwfFFgc2/imLq0fazgAHF5MumBtuh3YwJsPfGdeNqgY1qqqfcSprRLgr7rWZzWbwCTL8HLKFYEEgkrUn+eHIDzNbltBSG33O+jcnxNZmrYcw5Yc7hoXotRenRPyz0IgBzrGYkTp9qEtxiEV10eEKD08Wgh7bzwTonSvIV/soK5jd53rE6I0eGY3/PL5wWYxQ+nFgShRKqK6LqTwhJNEafRKNQHCcWK3WmDHqR5NlMoSQzAWUV+9vkBMsKXYLCSbs3Oe+SGqqupGrIL3h3YclifYkjo7yZ7izIzUUGrhnvXAzA+PURkR8xCwPnMVsCUVpW0bsiCUKOH9S0980JvaLJSQUTal9Q+9/RgRJQSgnvgCgdBkxkCKektSpC9cR0HCOQgiZUMI3njijwYg+COzLP9rkLr7E3Dn4Gbhp7BPDC+n0TkhlK2zJpccuSBIfVdsutVdt9U4pLbjtVC2B0cKYN/N50LZHh0rFGGguztV14aFsvWfLiVhSrVboaSlXyjbk/NlBNKFVLT0k7INX3KAx+sXfkBlKzjpJItGLlcmhmSkptAB83h9MTuCICxBRUkMwUmY5+uFPY7LmJ7GW05SZycsSos9xUsmSr8BfgGeWI6+BgEAAAAASUVORK5CYII=","comp/button.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE0AAABFCAYAAAAPWmvdAAABA0lEQVR4Xu3ZMRGDUBRFwXwfKSgxFhfRgAbUxEakkCEO3qmX+p9m5w7NW9v7cz18I4EFbeT1fwxtbgYtmEGDVgRC458GLQiExNKgBYGQWBq0IBASS4MWBEJiadCCQEgsDVoQCImlQQsCIbE0aEEgJJZW0Pbj64Q3hFvQhmL3CQ8atLlAKCwNWhAIiaVBCwIhsTRoQSAklgYtCITE0qAFgZBYGrQgEBJLgxYEQmJp0IJASCwNWhAIiaUVtOfrdMIbwi1oQ7H7hAcN2lwgFJYGLQiExNKgBYGQWBq0IBASS4MWBEJiadCCQEgsDVoQCImlQQsCIbE0aEEgJJYGLQiExNIC2g/MxaMp6CSauwAAAABJRU5ErkJggg==","view/bg_tool.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAMklEQVRYR+3QQREAAAjDMCYG/DsEGXxSBb2ke7YeiwECBAgQIECAAAECBAgQIEDgW+AAAeIuAVS/mngAAAAASUVORK5CYII=","comp/minBtn.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAA8CAYAAAB1odqiAAAArUlEQVRYR+3X0QmAMAwE0GQN19B9nM193CmiIH7ZXOAoRc/fpjl8jVDdOj/eOc8USBcXqUjLAtDQRMSOdHb3JatTYCZUXodIy10bGxTI1Lx6/YA0Ima6W2tKFcjmdpGKtCow7NBAdxozy+804Gfx/cDqbLzWDzs0ekNY4B9nOMEehMKTVIEEyKeFSKmc18+MppRtipJuYPCa1SkwEyqvo6Tlxm8bFEijvBt9n/QA/fOPydLHcUIAAAAASUVORK5CYII=","view/zoom_out.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAoCAYAAAD6xArmAAACy0lEQVRIS92WQU8TQRTH/28oQkj0CL0QOMAJQkz4DkS6A+GA+A00Hrhj0uy8NiTwEdBPAOrB0Fnq3U8g6gkOSjxUjpCQCu08M5u2qaVAt7YmOqfNZPa3b9/+Z35L6NOgPnHx98Gbm5sTlUplA0AGQBpACcBBKpXazmaz3+5607YVM/MjEXlNRPdbASJyTkRrzPz+Nvg1MDNPAvgI4AGA10qpvHPuSCk17ZwLAazV4HPM/PUmeDvwSwBPAbxl5sf+RmYWZo7XMvOehwPYYebnScAnAMaVUrNhGH5pBefz+Rnn3GcAJ8w8kQT8E8A9AEMA/HXrqM9fMrO/bjvataJvFdd7/IaZfS9/67ExZpeIngB4xczPklQ8KSKHPmoispdKpXKjo6PHp6enU5VKxXhoV6moVXhnjpVS5wDOwjD81K7qG7e033lXV1cviMjvvDEAP0TkYHBwcKtarT4UkXcALolo1RhTaIV3dVYYY9aIyOfZDw9fMcYUm+FdgWvtYgCmBisrpRbCMPxQh3cNbgM3zJzvCdhDcrncuojMA8gy8/eegTvO8U0Lk87/UY9ve9h/BI6iyJ+1GyLScB4RHQDYDoKgO+dFURSfFQCuOQ9A7LwgCJI5r1gsTlar1YbznHP5crl8NDw8PK2Uip3n4QMDA3OLi4udO89a23Ce1jp2nrVWtNbxh7bWxs4jop0gCDp3XhRFJyIy7pybXV5ejp3XDN7f359RSsXO01p37jxrbey8i4uLoZGRkWvOa5q/1Fp37rx+VtxwntY6dl5zK6Io2hWR2Hla686dV0vFoY+aP8xFJJdOp49LpdIUEZkaNHkqfIWd5JiIzkXkLAiCZM7zO09EYueJyBgRxc4joi0ADeeJyOrS0lJvnBdFkf8xbDhPKbWSyWR647xCocC+53XnAVjQWvfGeS1wo7XunfOstesA5pVS2Uwm8w877xeHf444cscwYAAAAABJRU5ErkJggg==","view/refresh2.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAA/CAYAAAAPIIPGAAAEIElEQVRYR+2XTUhjVxTH/+fGpBrGT/xoBQdFFMMQLNLNbLooLbaFzqKMUhCSZwsuhGG6KCNd6DuRLgqzmGVxUd8LUrpoYWZTKO1yNi2F1oVtceEHflSLqNEav8bklPuqgsl75sUPSsucTQj33v895+R/7y+XcA1B16CJ/6GoYRiDItKfzWZjExMTv5/XtoLlx2Kxm0qp1wH0AHgTwC4RfWRZ1mdewp6ig4ODN9Lp9CMieh+AchH41Lbtj92EXUUHBgaCh4eH3wJ4zSObGSLqtSzrZ9+ihmF8CODR8YIflFL3MplMNxF9IiJWIBC4Pz4+/ldR5RuG8QuAlwGsAWi3bTsVj8dvAWhOJpPfFPK2a/mGYewDeAHAV7Zt9+aK9PX1VYRCoVcApNxa4CX6J4B6AE9t2341V9QwjO8AvAFg27btytxxL9EvAbynJxNRj2VZX58sjMfjd4joyT9D9NiyrHf9iup+/gggBCALQPfxVwARAO8cWywD4LZt2z/5EtWT+vv774rIBIBSlx/mmT5dyWTyC9+WOpkYi8XalVIPRKQbwItEpHv9PRE9tCzrt6IsVcgyhcYLnv1CAkWXfxFBxzEXXXipq+8imz7P9CJdO3+N754y86A+vYFAIDY8PHw58DHzTQB54DNNs3jwMfONY6R4go+Z/YNvbGwsuLKyci74APQys3/wMfMZ8InIPaVUt4g44AuHw/eHhoaKAx8znwEfM6dGR0dviUizaZoXA59pmvtE5ICPmfPAx8wVABzwubXA1VLM7IBPRJ4mEok88DHzKfiY2R/4mPkUfCLSk0gkTsHHzHdE5Immnog8TiQS/sDHzK7gE5EIEZ2CTyl1e2RkxD/4TNO8S0Su4BORZ0qpftM0iwefaZrtAB4QkQM+AA74ADxk5ufgc78CfV99xdy61yMajUbfAvA5gJeKycZj7gqADygajf5xRYIn+6xoUbmCDM9I/LuidXV1qK2txdzcHPb39ZPAOwpmGgqFUFFRgerqauczm81iaWkJa2v64eLhU6+eKqXQ1NTkZOcWq6urWF5edh1zzZSI0NbWhvLyctdFBwcHmJ2dxe7urn/R+vp6J0sd6XQaCwsLqKysRGNjI9bX17G4uIhMRr8jiig/EokgHA7j6OgIU1NTjkBZWRl0f7e2tgo60LX8rq4u/UjC5uamU2ZuBAIBZ1O9mVsLXEU7OztRUlKCnZ0dTE9P54nqfmsnaNHJycm8cVfRlpYW1NTUOJN1pjrjk6iqqkJra6vzNZVKYWZmxp+oLq2jo8NpgQ7dx729PZSWlkKL6hARpwr9Q+aGp/m12Zubm6H9mhtacH5+HhsbG/4tdTJTZ9bQ0OD0LxgMOm7Y3t6GNv55R7XgMS3oH5cJ/y3Rq775V3X5bx8zSv8DuWzoa2vgb5tumbHGlerDAAAAAElFTkSuQmCC","view/settings2.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAA/CAYAAAAPIIPGAAAD2ElEQVRYR+1Xz08bRxT+ZjAGYQoH4rS9IBJBQJEsUC8VKNdQtamUE0fLayqhKHeOaGbFkT8gFVLZtXzk1qqKSs4NUg8RXCIQVoOQ2jRFHHCwBRj2VW+zttY/14BXVaPOyR7NfPN9771536xACEOEgImPDHRhYaHv/Pz8kEMVjUbjq6urxVZhayo/lUo9chzndTabfWMYxkMAGx7QrG3bL5LJ5B0p5f1MJvNz7QENQdPp9LdE9CMAZrcHYAaoxJ8AvARwD8AtAI9t2/7JD9wQdH5+/q7jOLzx04DqeCelnFlbW/s9EJQXGIbxq8eQ//4mhPieiJjlEwBf8qQQYtOyLFZRNeqYJpPJWCQSeUBEzz3JrwqFwvT6+vo575ybm4vGYrFNAF8AICnlbKlU2sxms4Uych2oYRh5AJ9UFggxb1mW5aeSTqfTRLTmm3tv2/bAVUCfWpb1zA9qGAaHwD/XGjQU+WVGHU0Ug4ZSUjXFnwMwXVP8nP1RAPG2i5/Z+q9pKpWaFUL8wvNE9FUmk9m48jWtLWavofztNZTb124oN2neH1mTvmoo/pcfHDGtdZ9nLbw4rrW+nvGZpvlISvl6aWnpjWmaD4nINT4hxKxS6sXy8vIdx3HuK6XaMz6ttWt8QohDInKNTwjhJtWzlJdCiHtEdEtK+VgpFWx8Wuu7RMQbWxofEb0TQsxordszPq11Q+MjoidCCNf4AGxqrYONb2VlJVYsFh84jvPck/yKW5/W2jU+rXWUwdj4OBQcYzbCxcXF5sanlMoLIaqMTylVZXymaVYZHxG9N02zufE1AH2qlKoyPqUUh6AyFwgaivzyVehoorxkdL6k/MUPIEdE0/7i5zcUGx8Rxdsufmbrv6ZKqSrjM01z48rXtLbFeA3FNT4At6/dUIJ7V/MV/6HOn0gkvgbwA4DPbyLZ2/sWwHcikUj82SHAMqe3DMrv+I6Ofw9USonJyUlXzfb2NhzHaamsKdPBwUGcnp7i7OwMAwMDGBsbc4H29vaQz+fR09OD3t5eHB8f1x3QEJQBR0dHcXFx4QL39/dXbTw5OXEBI5EIcrlcHXBDUGYxPj6O7u7uljJLpRJ2d3ddNf7RVD6DlhkWCgUcHrof0YjH44jFYu5vnt/Z2QmWz0lhsHIMi8Wiu/HDF6T7mMDExAT6+vjR8iHGHA5/8uqYTk1Noaurq3L6/v4+jo6OqtgMDQ1hZGSkMnd5eYmtra3K/0DQg4ODivTyLg7B8PBw+6ChyC8f39FEMWgoJRVK8TPbjl/T2mruWEO5SYMNo/P/xaDfeB712U3YeXv/ALDwD+TbY8Dbd9BBAAAAAElFTkSuQmCC","view/setting.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAkCAYAAAC9itu8AAACAklEQVQ4T5XUS4iOcRTH8c9xCeVeiiiXhSJRJFIusRO2lEtZKFlgY6GxZDUrk2TFwii22JJLlERRLKRQJmXBkHIb8+hM/2d6ememed93957n93v+55zf9/mHll9VVTNxopTPR8T3piTyT1VVs7AL9zEd+4roOn5gK25HxLfacAjL8A8TWw6ta28jorc2LMLhIu7Ds2Jah4XlRVci4mNUVTUDadiLFF/G5GL4iyOYjxsYMnQ1BDfxujk0VmJPecFAO4bV2Nk05Bqzz3Za6ut86JJDx2vN4Hbj3hjBbcOt4eCaQZXUj5daT4pGoNFimI1zpdYVEf2jsTQX+5MX5NaOFdFFJHzJ2bWI+FJv6SRWYACTWliqa68ioqc2LMWpwtJ7PCymzVhSWOqOiHeZdPachqNIcXdBJV/2B6cLa5cwZLjQYOkqnuNsOeEM1uJgE43xDBsaH9QQfJ21VNBoHfpBaWHLiKGLoeO1ZnAHkpcxgkvOeoeDa0FjTnNLEfF1PJamYkcR3YmIX6OxNA35Kb7BFKwvoqf4jeV4GRE/azQ2Yh4GMaGFpbr2OSKe1Ibse1MRJ84fimkxMqc0Pc55MrjsOYvZRoofNW6/vPUSwEQ+2+tPQ14h9fX4Ap+aQ2MB1pQTB9sx5K24qmnorKWCRvtDF0PHa+0suBaW0ry91O5mus3n/wHmQwUTIH+tVgAAAABJRU5ErkJggg==","view/refresh.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAkCAYAAAC9itu8AAACiElEQVQ4T4WVS4iPYRTGf4/7/X6XcivXcktEUhTKQkqyYCOKjWyUhezFThbIlJ3LYrIRkoWGUhhhTMko4zJujYRpxgxHj9737/P3zfh239c57/uc5/zO+UQ3T0QsBRYCtZI+5jBVx0fEcGA6MA+YCXQCVyXddWwlISL6ARuARcXvhQPrJF3/nRARvYHtwLRuFLYCFyW15ITl6XTHvwIuJzlrgHrgiqSOiqSI2ANMAL4BxyW1R8RYYKSkp8Vb8w2HgD7AE0kXSozoD0wC2nPCAWAw0CyppiRhBzAD6MgJW4D5KdDFNeSkiJgFbEvONeYE698N2K0ArPsDMAZwguN+AmeKfZgLbAb6llj7A7gk6eFfnY6I0cDKpNc1tQFNwG1JvvFPp0sKXQ2sAGokveuJpVHAHGBJ4ul76vLNapbs9dYk6R8oU7driyztA2Z3w5L1n5LUnBPWptMd/xw4l+RscsHAeeNSZMloTAG+AIcltUXERPdB0qMylk4klu5LOlni2ABgqm3Oko4BQ4Fnko6WJOxPzlXg2wV4hv2czuOYhmsBsDf1rD7fYP0HkyyzZN0twHjACZmlI0WWFgM7e2DprKQ71SyNA9YDBnFYcq0RuOZ5/h9LdsVS6yV97YmlgYDn2X3wjUa7QdKLapY8015ePrWMJVtembhewLI0YWU4eZvck/Q525pXo4M/AY+TLMP40u+SuooseVjsitm/IakzItz5QcXhKSZsBCyrpdjlwuZwfSO8mLOkdYAHqFXSrRKWvErtXFdOcJcnp0AX96ZwuldQ5uxtTrD+VUmWWXqfujwk8eQ4f68rsuRG+d/gZVb9eIk9kPS6miXvIv91rNc12TXPc5MkTyO/AFhJCujHqZlCAAAAAElFTkSuQmCC","comp/checkbox.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAqCAYAAACDdWrxAAABbUlEQVRIS+2TP0gCURzHv88GRYsrExyOo5cEQVEtWdQQpE4N0R+HxmirXXCrKYigqMF2IRqCQByaLJqNIFpyUIzu4rIwpExODy88ITD/cJ603Rsf7/OGz+/zI5TSEAE20cZRgBMySKni8XrbwICrWAwG2ESZIadFS53J0R25brCyHZNud1vbcRuPV7fDAOu9GXJatNSZHN2R6wb/PfJCrxOZCR8Gbk6hWc6Xg8PrcgBETMIVPdIGSjYG/NoOSHcfkLqDK3qsBSRIrgRAuBF1quUPEUPhYGMwb2dhywrqQ3F0Dt++jSokJMBdhmDO52pB2WwFP7OK8rgH9os99IgppNf3QWwMFP4RNHKALrmoflIj53l6CaWpRcBkgiIkYHl6gDTrh5JJg57v/kJ1YOUixw7jfWELxMpAKUmAXAR7tg3LZ7am3IbjKDBOvPiDqkUmcoj+9H1d7k3nmHdweBubB70ON9wRzQH8pVVQb+Q/zZAEfpwDCU4AAAAASUVORK5CYII=","comp/btn_close.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAA8CAYAAAB1odqiAAAE6UlEQVRYR+3Y30+bVRgH8G/T0t/0Jy0USrIsC0E2GMKAVYcRpmSbEzIGZhqyxCxeceGVF3pjvJl/wYyJWZYY4hZBFnBuBBUW2ewYAxlsSMiyLKH8aEt/0vZtSxvM+562We15C6jlxr53zfO8z+ec5z2nOTmCk598tY19fAQs+Hlvz76QX1zpAwd+1NMNXzieU1QtFeKbvn4CXvqgC95wLKegRirC1e8GCPjh+53wMnRwedkG54aLG4yhSI/ycnPawHaKJ5M1MhGuXR8k4MX3OnjBx3NPcLX3DPfepSu3odfrYC4r5X7bVlbhcrnT4kdrjlA7xYLffj9EwJ6udnhCW9TEJ08XUgWTqE6n5XLdbk9G7MjhKmodrbwAfQPDBLxw7h1ecH3dDq/Xm1GYrZqceXIgGo0GJSXFvOCNmz8RsLv9NNyhKO+icTqc8Pl8acDLyWyr1Wo1DEYDbw2dXIz+4TsE7DzbBneQH2SruDZc8Pv9GSiLqVQq6Iv0WVe5TiHG4K1RAnaceguuYCTrCx63G4FAgAoqlUpodbqs7+sVEgyN/ELAs20t2Ajwgz6vF6FgMGtL5QoF1BoNL1qklODW6DgBT518gxcM+P1gQqFdLRqZXA6lSkVFWXDk198I2NZyAs7NMDXR7XRmYBKZjMuNMEzmljHQF46hUIrR8XsEbG228IJ+T/rGFkskkMoVHBgOBRGNRNI2vkpL/5YsODZhJeCbJ47D4WeoM4wyDLai5PsWiCUQJ2aXTN4pnswzqmS4e+8BAZstDbxg1qW3hyALTlinCPh6Uz1C0Rg2w/S/tz3UpaYWSgsgF4twf3IagvOXr297PR5YGuv+bd2s71sfzkCj1ULQe+3u9vraGlg0lw+LlZhMEIzUNu7vmYYFmz/9LJeTS9We+PIymaGl6wLizo2cokJDEawDNxLg+W7EHTkGjUWw/tBPwOMdnYg7nNQZep4/Q2B9jYspS0zQHjyUlrdTPJksNBrwYGiQgE3vtiNup4O2SSuOzk5y7z2ubYKyuBiaAwe5394XzxGw29Pi5iYLdeDCYgMmfxxOgKfPIG53UBNt049SBVNo4g864HRmxMz1x3hAIybv3CZg49ttiK/bqYneFRuCLldGYTY5OfPkQBR6PTRl6cfIVEtLivHw51ECNrS2Ir62zrtKfWtrCHo8acDLyWyrFVot1CYTbw2hqQRTY2MJsLk5K8hW8TkcCPp8GSiHqdVQG41ZtxUHTkwQ8NhrFsRXyUrke3wuF0L+TSooVxVCrc9+iBKWmvDodysB65saEFtZ5cX8Hi+YQDBrS2VKBVRa/jONqKwU05NTBKyrexWxlRUquOnfBBNidrVoZHIZClWF1DqisjLMzPxBwNraasRsdHDD6c7ApDIJVzTMRDJiRQb6EUNkLsPs7DwBa6qrELPZqCNzu/1pG1siEUOhkHK5wWAYkUg0La7T0U9tIrMZc/MLBKw+XImtZTrIMBFEouQkIBEXQJaYXXJ0O8WTeQXlZsw/XSRg1SsVvGDWpbuHIAsu/LlEwMrKCsQDAcQ93j2U2H2qUKuBUKnE4uISBF9f/Hj7wJwVhyordl/hH2Q+W1zCixoLOdNUj98Ei+byYbH5lnPkmJhL6O+18/c0/1m38/c0qVbm72nYVuTvadgu5O9pUtsif0+Tv6dhF8P/657mLz4NfQVdLmZiAAAAAElFTkSuQmCC","comp/textarea.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFsAAAAXCAYAAABkrDOOAAAA4klEQVRoQ+3ZvQrCMBiF4e9rU+sPOErRqxDRe/KG9Fp0EAc3VzuIg1ML4uDmlkaaquDenMUTyJoDD+8W3ZyKlaoshSeogHOy1m1euOmoI1EU+auqQUf/8XHnnBzLp3jsWdaVJEnEGEPsADXU2Ifro8Gej/uSpqnHruvmaVegqirZX+4N9mIy8Nh13XEct7vE18RaK7vzjdiIFoiNUH5vEJvYQAHgFMsmNlAAOMWyiQ0UAE6xbGIDBYBTLJvYQAHgFMsmNlAAOMWyiQ0UAE79lM2fmrDy358a/q6Hhf68ng175QueKdEXxUGVVwAAAABJRU5ErkJggg==","view/re.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAoCAYAAAD6xArmAAACpklEQVRIS+WWPUgcQRiG3+8O70QEUwTB1EJgsTGdRRrhOMjOtEtSRbBIBMFKuCtkZleES2uRQoWQJggKKW7Of7GyTRvBLkVShhS73OXMfWGOU85Es7uXs0m2XeZh+OZ95xnCHX10R1ykBvu+P5fP59+VSqVvf9pUarBS6jWAR0Q0rbWOboP3BCaiOQAHAKTW+vtN8L8BW96W4zjPPM/78Ss8FlypVEYajYbHzALAJIAHALJdoDWl1Esi4m74rWBmpiAI5pk5AHAvJj0VrXU5Fmyhvu+/AfA8YRxfaa1LsWDf92eZeSMJlJnXtdYvEo1Ca30G4GEH/ImI1lqt1nE+nz9vNBrLnVTY39uO4zxNdHgrKytjzWbzs13FzKfDw8PFxcXF8HL3Nscd8BEAN3HcgiCYbLVaHyyIiGaUUm+7R9JzQZRSo0T0BUCGmRd831/tBttK53K5zXK5/DV1pZVSG0Q0C2BXa/0kySEmKojWeoiZD4hoKpvNTiwtLX1MC7+1IFrrQWZeJaJxx3EKN5186lF0LwiC4DEz31dKvU+z69i7Ig0stnm9wv4zsDGm7bxCodBf5xlj2s5j5mkpZf+c1wHPEdFBGIbS87z+OO8S3EnAVhRFvTnv8PBwpF6ve0QkiGiSmX9znuu66ZxXq9XmAcQ6j5krUspkzqvVaqmcJ4SId54xxl6ZiZwHYN113WTOq1arZ0R05TwAa5lM5rher5/ncrllAPYl1HZeFEXJnLe3tzd2cXHRdh6A04GBgWKxWLxyXlcqjqIochPHbWdn58p5AGaEENec13NB9vf3R5vNZtt5RLTguu4159lKA9gUQqR3njHGHpx9tOxKKfvnvGq1OmQrC2AKwIQQon/OOzk5GQzD0I5hPIqi/jvPGNN2npTyH3feTzoJOzgswwlqAAAAAElFTkSuQmCC","view/search.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAqCAYAAABcOxDuAAABX0lEQVRIS+3VsUrEQBAG4H9HiDZiJQg+gJVaiKAoWClYXWeZ7D6CtbWFr5Ai2ayQxkLQRgsLGwtBUQsRC6sDCxHxEIvIZSRwxRGSu83pNUe23c0H+89kR2AISwzBxAiinuctCSH2AawD+AFwRkR7QRC85CO0ur5SaoOZzwGM54A3IlrJw1aolPIewEJJUY+01jvde31RKeUMgNceXdLSWk9VQl3XnSWiZhnKzF9RFE1WQrPDUsonAHNFsBDiJAzDRmXUdd1tIjoFMJaDW0KI1TAMH61RpdQ0Mx8z8zMzHxLRAYBlAG0Al2ma7hpjHqxbqgNeAJgHcKW1XutEMeE4Ttv3/axXC1dh9XPgbZqmW8aYd9t3ohCVUt4BWARwkyTJZhzHH7Zgdq4MvQbw7ThOw/f9zypgKVoVsS7UX+C+v+kgeI0Oklrvb0Yw03rwlZW8Hnz14OvqjXrw1e/pPyfwCww91CttlMG7AAAAAElFTkSuQmCC","view/save.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAoCAYAAAD6xArmAAAA1klEQVRIS+2VzQ3DIAyFwxwdoMMAA/VQ8ZByyEBhmA7QOVxxKLIaOcIoSZUfrlifHw/wM91Ky6zE7SZgANTaDEDhzYJ5odSMC7nA5U7+b4X2dVQr3ic4hHCTlMcY33xPZUUGcwBvdEJwjcfGGIQQ4rd2qenWA3hyAUuABwCP31NtN+i1v02qP4DicRybM885J2ceB/NCyUupfuLxBS4WbmKF9rNUv4p9gq21d0l5SunF91RWZDAH8EYnBNd4nDPPWitnXst0I6Leez+feVowEQ3e+wNk3ge7C/Qp3GfwkgAAAABJRU5ErkJggg=="};},'base64',function(){return this.base64=new Base64Atlas(Base64AtlasManager.dataO);}
-	]);
-	return Base64AtlasManager;
+	Base64ImageTool.getBase64Pic=function(img){
+		return Base64ImageTool.getCanvasPic(img).toDataURL("image/png");
+	}
+
+	Base64ImageTool.getPreloads=function(base64Data){
+		var rst;
+		rst=[];
+		var key;
+		for (key in base64Data){
+			rst.push({url:base64Data[key],type:/*laya.net.Loader.IMAGE*/"image" });
+		}
+		return rst;
+	}
+
+	return Base64ImageTool;
 })()
 
 
@@ -3248,316 +699,397 @@ var Base64AtlasManager=(function(){
 *...
 *@author ww
 */
-//class laya.debug.tools.layout.LayoutFuns
-var LayoutFuns=(function(){
-	function LayoutFuns(){}
-	__class(LayoutFuns,'laya.debug.tools.layout.LayoutFuns');
-	LayoutFuns.sameWidth=function(totalWidth,items,data,sX){
-		(sX===void 0)&& (sX=0);
-		var dWidth=0;
-		if (data && data.dWidth)
-			dWidth=data.dWidth;
-		var perWidth=NaN;
-		perWidth=(totalWidth-(items.length-1)*dWidth)/ items.length;
-		var tItem;
-		var i=0,len=0;
-		var tX=NaN;
-		tX=sX;
-		len=items.length;
-		for (i=0;i < len;i++){
-			tItem=items[i];
-			tItem.x=tX;
-			tItem.width=perWidth;
-			tX+=dWidth+perWidth;
+//class laya.debug.tools.ObjTimeCountTool
+var ObjTimeCountTool=(function(){
+	function ObjTimeCountTool(){
+		this.timeDic={};
+		this.resultDic={};
+		this.countDic={};
+		this.resultCountDic={};
+		this.nodeDic={};
+		this.resultNodeDic={};
+	}
+
+	__class(ObjTimeCountTool,'laya.debug.tools.ObjTimeCountTool');
+	var __proto=ObjTimeCountTool.prototype;
+	__proto.addTime=function(sprite,time){
+		IDTools.idObj(sprite);
+		var key=0;
+		key=IDTools.getObjID(sprite);
+		if (!this.timeDic.hasOwnProperty(key)){
+			this.timeDic[key]=0;
 		}
-	}
-
-	LayoutFuns.getSameWidthLayout=function(items,dWidth){
-		var data;
-		data={};
-		data.dWidth=dWidth;
-		return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.sameWidth);
-	}
-
-	LayoutFuns.getLayouter=function(items,data,fun){
-		var layouter;
-		layouter=new Layouter();
-		layouter.items=items;
-		layouter.data=data;
-		layouter.layoutFun=fun;
-		return layouter;
-	}
-
-	LayoutFuns.sameDis=function(totalWidth,items,data,sX){
-		(sX===void 0)&& (sX=0);
-		var dWidth=NaN;
-		dWidth=totalWidth;
-		var tItem;
-		var i=0,len=0;
-		len=items.length;
-		LayoutFuns.prepareForLayoutWidth(totalWidth,items);
-		for (i=0;i < len;i++){
-			tItem=items[i];
-			dWidth-=tItem.width;
+		this.timeDic[key]=this.timeDic[key]+time;
+		if (!this.countDic.hasOwnProperty(key)){
+			this.countDic[key]=0;
 		}
-		if (items.length > 1)
-			dWidth=dWidth / (items.length-1);
-		var tX=NaN;
-		tX=sX;
-		len=items.length;
-		for (i=0;i < len;i++){
-			tItem=items[i];
-			tItem.x=tX;
-			tX+=dWidth+tItem.width;
+		this.countDic[key]=this.countDic[key]+1;
+		this.nodeDic[key]=sprite;
+	}
+
+	__proto.getTime=function(sprite){
+		IDTools.idObj(sprite);
+		var key=0;
+		key=IDTools.getObjID(sprite);
+		if (!this.resultDic[key])return 0;
+		return this.resultDic[key];
+	}
+
+	__proto.getCount=function(sprite){
+		IDTools.idObj(sprite);
+		var key=0;
+		key=IDTools.getObjID(sprite);
+		return this.resultCountDic[key];
+	}
+
+	__proto.reset=function(){
+		var key;
+		for (key in this.timeDic){
+			this.timeDic[key]=0;
+			this.countDic[key]=0;
 		}
+		ObjectTools.clearObj(this.nodeDic);
 	}
 
-	LayoutFuns.getSameDisLayout=function(items,rateSame){
-		(rateSame===void 0)&& (rateSame=false);
-		var data;
-		data={};
-		if (rateSame){
-			var i=0,len=0;
-			len=items.length;
-			var tItem;
-			var totalWidth=NaN;
-			totalWidth=0;
-			for (i=0;i < len;i++){
-				tItem=items[i];
-				totalWidth+=tItem.width;
-			}
-			totalWidth=tItem.x+tItem.width;
-			for (i=0;i < len;i++){
-				tItem=items[i];
-				LayoutFuns.setItemRate(tItem,tItem.width / totalWidth);
-			}
+	__proto.updates=function(){
+		ObjectTools.clearObj(this.resultDic);
+		ObjectTools.insertValue(this.resultDic,this.timeDic);
+		ObjectTools.clearObj(this.resultCountDic);
+		ObjectTools.insertValue(this.resultCountDic,this.countDic);
+		ObjectTools.insertValue(this.resultNodeDic,this.nodeDic);
+		this.reset();
+	}
+
+	return ObjTimeCountTool;
+})()
+
+
+/**
+*本类调用原生watch接口，仅火狐有效
+*@author ww
+*@version 1.0
+*
+*@created 2015-10-26 上午9:48:18
+*/
+//class laya.debug.tools.exp.Watch
+var Watch=(function(){
+	function Watch(){}
+	__class(Watch,'laya.debug.tools.exp.Watch');
+	Watch.watch=function(obj,name,callBack){
+		/*__JS__ */obj.watch(name,callBack);
+	}
+
+	Watch.unwatch=function(obj,name,callBack){
+		/*__JS__ */obj.unwatch(name,callBack);
+	}
+
+	return Watch;
+})()
+
+
+/**
+*XML转Object类
+*@author ww
+*
+*/
+//class laya.debug.tools.XML2ObjectNodejs
+var XML2ObjectNodejs=(function(){
+	function XML2ObjectNodejs(){}
+	__class(XML2ObjectNodejs,'laya.debug.tools.XML2ObjectNodejs');
+	__getset(1,XML2ObjectNodejs,'arrays',function(){
+		if(!XML2ObjectNodejs._arrays){
+			XML2ObjectNodejs._arrays=[];
 		}
-		return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.sameDis);
-	}
+		return XML2ObjectNodejs._arrays;
+		},function(a){
+		XML2ObjectNodejs._arrays=a;
+	});
 
-	LayoutFuns.fullFill=function(totalWidth,items,data,sX){
-		(sX===void 0)&& (sX=0);
-		var dL=0,dR=0;
-		if (data){
-			if (data.dL)
-				dL=data.dL;
-			if (data.dR)
-				dR=data.dR;
-		};
-		var item;
-		var i=0,len=0;
-		len=items.length;
-		for (i=0;i < len;i++){
-			item=items[i];
-			item.x=sX+dL;
-			item.width=totalWidth-dL-dR;
-		}
-	}
-
-	LayoutFuns.getFullFillLayout=function(items,dL,dR){
-		(dL===void 0)&& (dL=0);
-		(dR===void 0)&& (dR=0);
-		var data;
-		data={};
-		data.dL=dL;
-		data.dR=dR;
-		return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.fullFill);
-	}
-
-	LayoutFuns.fixPos=function(totalWidth,items,data,sX){
-		(sX===void 0)&& (sX=0);
-		var dLen=0;
-		var poss=[];
-		var isRate=false;
-		if (data){
-			if (data.dLen)
-				dLen=data.dLen;
-			if (data.poss)
-				poss=data.poss;
-			if (data.isRate)
-				isRate=data.isRate;
-		};
-		var item;
-		var i=0,len=0;
-		len=poss.length;
-		var tX=NaN;
-		tX=sX;
-		var tValue=NaN;
-		var preItem;
-		preItem=null;
-		for (i=0;i < len;i++){
-			item=items[i];
-			tValue=sX+poss[i];
-			if (isRate){
-				tValue=sX+poss[i] *totalWidth;
-			}
-			item.x=tValue;
-			if (preItem){
-				preItem.width=item.x-dLen-preItem.x;
-			}
-			preItem=item;
-		};
-		var lastItem;
-		lastItem=items[items.length-1];
-		lastItem.width=sX+totalWidth-dLen-lastItem.x;
-	}
-
-	LayoutFuns.getFixPos=function(items,dLen,isRate,poss){
-		(dLen===void 0)&& (dLen=0);
-		(isRate===void 0)&& (isRate=false);
-		var data;
-		data={};
-		var layout;
-		layout=LayoutFuns.getLayouter(items,data,LayoutFuns.fixPos);
-		var i=0,len=0;
-		var sX=NaN;
-		var totalWidth=NaN;
-		sX=layout.x;
-		totalWidth=layout.width;
-		if (!poss){
-			poss=[];
-			len=items.length;
-			var tValue=NaN;
-			for (i=0;i < len;i++){
-				tValue=items[i].x-sX;
-				if (isRate){
-					tValue=tValue / totalWidth;
+	XML2ObjectNodejs.parse=function(node,isFirst){
+		(isFirst===void 0)&& (isFirst=true);
+		var obj={};
+		if(isFirst)
+			obj.Name=node.localName;
+		var numOfChilds=node[XML2ObjectNodejs.ChildrenSign]?node[XML2ObjectNodejs.ChildrenSign].length:0;
+		var childs=[];
+		var children={};
+		obj.c=children;
+		obj.cList=childs;
+		for(var i=0;i<numOfChilds;i++){
+			var childNode=node[XML2ObjectNodejs.ChildrenSign][i];
+			var childNodeName=childNode.localName;
+			var value;
+			var numOfAttributes=0
+			if (!childNodeName)continue ;
+			value=XML2ObjectNodejs.parse(childNode,true);
+			childs.push(value);
+			if(children[childNodeName]){
+				if(XML2ObjectNodejs.getTypeof(children[childNodeName])=="array"){
+					children[childNodeName].push(value);
+					}else {
+					children[childNodeName]=[children[childNodeName],value];
 				}
-				else{
-				}
-				poss.push(tValue);
+				}else if(XML2ObjectNodejs.isArray(childNodeName)){
+				children[childNodeName]=[value];
+				}else {
+				children[childNodeName]=value;
 			}
 		}
-		data.dLen=dLen;
-		data.poss=poss;
-		data.isRate=isRate;
-		return layout;
-	}
-
-	LayoutFuns.clearItemsRelativeInfo=function(items){
-		var i=0,len=0;
-		len=items.length;
-		for (i=0;i < len;i++){
-			LayoutFuns.clearItemRelativeInfo(items[i]);
-		}
-	}
-
-	LayoutFuns.clearItemRelativeInfo=function(item){
-		var Nan="NaN";
-		item.getLayout().left=Nan;
-		item.getLayout().right=Nan;
-	}
-
-	LayoutFuns.prepareForLayoutWidth=function(totalWidth,items){
-		var i=0,len=0;
-		len=items.length;
-		for (i=0;i < len;i++){
-			LayoutFuns.prepareItemForLayoutWidth(totalWidth,items[i]);
-		}
-	}
-
-	LayoutFuns.getSumWidth=function(items){
-		var sum=NaN;
-		sum=0;
-		var i=0,len=0;
-		len=items.length;
-		for (i=0;i < len;i++){
-			sum+=items[i].width;
-		}
-		return sum;
-	}
-
-	LayoutFuns.prepareItemForLayoutWidth=function(totalWidth,item){
-		if (LayoutFuns.getItemRate(item)> 0){
-			item.width=totalWidth *LayoutFuns.getItemRate(item);
-		}
-	}
-
-	LayoutFuns.setItemRate=function(item,rate){
-		item["layoutRate"]=rate;
-	}
-
-	LayoutFuns.getItemRate=function(item){
-		return item["layoutRate"] ? item["layoutRate"] :-1;
-	}
-
-	LayoutFuns.setItemFreeSize=function(item,free){
-		(free===void 0)&& (free=true);
-		item["layoutFreeSize"]=free;
-	}
-
-	LayoutFuns.isItemFreeSize=function(item){
-		return item["layoutFreeSize"];
-	}
-
-	LayoutFuns.lockedDis=function(totalWidth,items,data,sX){
-		(sX===void 0)&& (sX=0);
-		var dists;
-		dists=data.dists;
-		var sumDis=NaN;
-		sumDis=data.sumDis;
-		var sumWidth=NaN;
-		var i=0,len=0;
-		var tItem;
-		var preItem;
-		LayoutFuns.prepareForLayoutWidth(totalWidth,items);
-		sumWidth=LayoutFuns.getSumWidth(items);
-		var dWidth=NaN;
-		dWidth=totalWidth-sumDis-sumWidth;
-		var freeItem;
-		freeItem=LayoutFuns.getFreeItem(items);
-		if(freeItem){
-			freeItem.width+=dWidth;
-		}
-		preItem=items[0];
-		preItem.x=sX;
-		len=items.length;
-		for(i=1;i<len;i++){
-			tItem=items[i];
-			tItem.x=preItem.x+preItem.width+dists[i-1];
-			preItem=tItem;
-		}
-	}
-
-	LayoutFuns.getFreeItem=function(items){
-		var i=0,len=0;
-		len=items.length;
-		for (i=0;i < len;i++){
-			if(LayoutFuns.isItemFreeSize(items[i])){
-				return items[i];
+		numOfAttributes=0;
+		if(node.attributes){
+			numOfAttributes=node.attributes.length;
+			var prop={};
+			obj.p=prop;
+			for(i=0;i<numOfAttributes;i++){
+				prop[node.attributes[i].name.toString()]=String(node.attributes[i].nodeValue);
 			}
 		}
-		return null;
-	}
-
-	LayoutFuns.getLockedDis=function(items){
-		var data;
-		data={};
-		var dists;
-		var i=0,len=0;
-		var tItem;
-		var preItem;
-		var sumDis=NaN;
-		sumDis=0;
-		var tDis=NaN;
-		preItem=items[0];
-		dists=[];
-		len=items.length;
-		for(i=1;i<len;i++){
-			tItem=items[i];
-			tDis=tItem.x-preItem.x-preItem.width;
-			dists.push(tDis);
-			sumDis+=tDis;
-			preItem=tItem;
+		if(numOfChilds==0){
+			if(numOfAttributes==0){
+			}else {}
 		}
-		data.dists=dists;
-		data.sumDis=sumDis;
-		return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.lockedDis);
+		return obj;
 	}
 
-	LayoutFuns.RateSign="layoutRate";
-	LayoutFuns.FreeSizeSign="layoutFreeSize";
-	return LayoutFuns;
+	XML2ObjectNodejs.getArr=function(v){
+		if(!v)return [];
+		if(XML2ObjectNodejs.getTypeof(v)=="array")return v;
+		return [v];
+	}
+
+	XML2ObjectNodejs.isArray=function(nodeName){
+		var numOfArrays=XML2ObjectNodejs._arrays ? XML2ObjectNodejs._arrays.length :0;
+		for(var i=0;i<numOfArrays;i++){
+			if(nodeName==XML2ObjectNodejs._arrays[i]){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	XML2ObjectNodejs.getTypeof=function(o){
+		if(typeof(o)=="object"){
+			if(o.length==null){
+				return "object";
+				}else if(typeof(o.length)=="number"){
+				return "array";
+				}else {
+				return "object";
+			}
+			}else {
+			return typeof(o);
+		}
+	}
+
+	XML2ObjectNodejs._arrays=null;
+	XML2ObjectNodejs.ChildrenSign="childNodes";
+	return XML2ObjectNodejs;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.TouchDebugTools
+var TouchDebugTools=(function(){
+	function TouchDebugTools(){}
+	__class(TouchDebugTools,'laya.debug.tools.TouchDebugTools');
+	TouchDebugTools.getTouchIDs=function(events){
+		var rst;
+		rst=[];
+		var i=0,len=0;
+		len=events.length;
+		for (i=0;i < len;i++){
+			rst.push(events[i].identifier||0);
+		}
+		return rst;
+	}
+
+	TouchDebugTools.traceTouchIDs=function(msg,events){
+		DebugTxt.dTrace(msg+":"+TouchDebugTools.getTouchIDs(events).join(","));
+	}
+
+	return TouchDebugTools;
+})()
+
+
+/**
+*
+*@author ww
+*@version 1.0
+*
+*@created 2015-9-25 上午10:48:54
+*/
+//class laya.debug.tools.TraceTool
+var TraceTool=(function(){
+	function TraceTool(){}
+	__class(TraceTool,'laya.debug.tools.TraceTool');
+	TraceTool.closeAllLog=function(){
+		var logFun;
+		logFun=TraceTool.emptyLog;
+		Browser.window.console.log=logFun;
+	}
+
+	TraceTool.emptyLog=function(){}
+	TraceTool.traceObj=function(obj){
+		TraceTool.tempArr.length=0;
+		var key;
+		for(key in obj){
+			TraceTool.tempArr.push(key+":"+obj[key]);
+		};
+		var rst;
+		rst=TraceTool.tempArr.join("\n");
+		console.log(rst);
+		return rst;
+	}
+
+	TraceTool.traceObjR=function(obj){
+		TraceTool.tempArr.length=0;
+		var key;
+		for(key in obj){
+			TraceTool.tempArr.push(obj[key]+":"+key);
+		};
+		var rst;
+		rst=TraceTool.tempArr.join("\n");
+		console.log(rst);
+		return rst;
+	}
+
+	TraceTool.traceSize=function(tar){
+		DebugTool.dTrace("Size: x:"+tar.x+" y:"+tar.y+" w:"+tar.width+" h:"+tar.height+" scaleX:"+tar.scaleX+" scaleY:"+tar.scaleY);
+	}
+
+	TraceTool.traceSplit=function(msg){
+		console.log("---------------------"+msg+"---------------------------");
+	}
+
+	TraceTool.group=function(gName){
+		/*__JS__ */console.group(gName);;
+	}
+
+	TraceTool.groupEnd=function(){
+		/*__JS__ */console.groupEnd();;
+	}
+
+	TraceTool.getCallStack=function(life,s){
+		(life===void 0)&& (life=1);
+		(s===void 0)&& (s=1);
+		var caller;
+		caller=TraceTool.getCallStack;
+		caller=caller.caller.caller;
+		var msg;
+		msg="";
+		while(caller&&life>0){
+			if(s<=0){
+				msg+=caller+"<-";
+				life--;
+				}else{
+			}
+			caller=caller.caller;
+			s--;
+		}
+		return msg;
+	}
+
+	TraceTool.getCallLoc=function(index){
+		(index===void 0)&& (index=2);
+		var loc;
+		try {
+			TraceTool.Erroer.i++;
+			}catch (e){
+			var arr;
+			arr=e.stack.replace(/Error\n/).split(/\n/);
+			if (arr[index]){
+				loc=arr[index].replace(/^\s+|\s+$/,"");
+				}else{
+				loc="unknow";
+			}
+		}
+		return loc;
+	}
+
+	TraceTool.traceCallStack=function(){
+		var loc;
+		try {
+			TraceTool.Erroer.i++;
+			}catch (e){
+			loc=e.stack;
+		}
+		console.log(loc);
+		return loc;
+	}
+
+	TraceTool.getPlaceHolder=function(len){
+		if(!TraceTool.holderDic.hasOwnProperty(len)){
+			var rst;
+			rst="";
+			var i=0;
+			for(i=0;i<len;i++){
+				rst+="-";
+			}
+			TraceTool.holderDic[len]=rst;
+		}
+		return TraceTool.holderDic[len];
+	}
+
+	TraceTool.traceTree=function(tar,depth,isFirst){
+		(depth===void 0)&& (depth=0);
+		(isFirst===void 0)&& (isFirst=true);
+		if(isFirst){
+			console.log("traceTree");
+		}
+		if(!tar)return;
+		var i=0;
+		var len=0;
+		if(tar.numChildren<1){
+			console.log(tar);
+			return;
+		}
+		TraceTool.group(tar);
+		len=tar.numChildren;
+		depth++;
+		for(i=0;i<len;i++){
+			TraceTool.traceTree(tar.getChildAt(i),depth,false);
+		}
+		TraceTool.groupEnd();
+	}
+
+	TraceTool.getClassName=function(tar){
+		return tar["constructor"].name;
+	}
+
+	TraceTool.traceSpriteInfo=function(tar,showBounds,showSize,showTree){
+		(showBounds===void 0)&& (showBounds=true);
+		(showSize===void 0)&& (showSize=true);
+		(showTree===void 0)&& (showTree=true);
+		if(!((tar instanceof laya.display.Sprite ))){
+			console.log("not Sprite");
+			return;
+		}
+		if(!tar){
+			console.log("null Sprite");
+			return;
+		}
+		TraceTool.traceSplit("traceSpriteInfo");
+		DebugTool.dTrace(laya.debug.tools.TraceTool.getClassName(tar)+":"+tar.name);
+		if(showTree){
+			TraceTool.traceTree(tar);
+			}else{
+			console.log(tar);
+		}
+		if(showSize){
+			TraceTool.traceSize(tar);
+		}
+		if(showBounds){
+			console.log("bounds:"+tar.getBounds());
+		}
+	}
+
+	TraceTool.tempArr=[];
+	TraceTool.Erroer=null;
+	TraceTool.holderDic={};
+	return TraceTool;
 })()
 
 
@@ -3640,238 +1172,149 @@ var DisController=(function(){
 *...
 *@author ww
 */
-//class laya.debug.tools.VisibleAnalyser
-var VisibleAnalyser=(function(){
-	function VisibleAnalyser(){}
-	__class(VisibleAnalyser,'laya.debug.tools.VisibleAnalyser');
-	VisibleAnalyser.analyseTarget=function(node){
-		var isInstage=false;
-		isInstage=node.displayedInStage;
-		var gRec;
-		gRec=NodeUtils.getGRec(node);
-		var stageRec=new Rectangle();
-		stageRec.setTo(0,0,Laya.stage.width,Laya.stage.height);
-		var isInVisibleRec=false;
-		var visibleRec;
-		visibleRec=stageRec.intersection(gRec);
-		if (visibleRec.width > 0 && visibleRec.height > 0){
-			isInVisibleRec=true;
-		}
-		else{
-			isInVisibleRec=false;
-		};
-		var gAlpha=NaN;
-		gAlpha=NodeUtils.getGAlpha(node);
-		var gVisible=false;
-		gVisible=NodeUtils.getGVisible(node);
-		var msg;
-		msg="";
-		msg+="isInstage:"+isInstage+"\n";
-		msg+="isInVisibleRec:"+isInVisibleRec+"\n";
-		msg+="gVisible:"+gVisible+"\n";
-		msg+="gAlpha:"+gAlpha+"\n";
-		if (isInstage && isInVisibleRec && gVisible && gAlpha > 0){
-			if (Render.isWebGL){
-				VisibleAnalyser.anlyseRecVisible(node);
-			}
-			msg+="coverRate:"+VisibleAnalyser.coverRate+"\n";
-			if (VisibleAnalyser._coverList.length > 0){
-				Laya.timer.once(1000,null,VisibleAnalyser.showListLater);
-			}
-		}
-		console.log(msg);
+//class laya.debug.tools.enginehook.RenderSpriteHook
+var RenderSpriteHook=(function(){
+	function RenderSpriteHook(){
+		/**@private */
+		//this._next=null;
+		/**@private */
+		//this._fun=null;
 	}
 
-	VisibleAnalyser.showListLater=function(){}
-	VisibleAnalyser.isCoverByBrother=function(node){
-		var parent=node.parent;
-		if (!parent)
+	__class(RenderSpriteHook,'laya.debug.tools.enginehook.RenderSpriteHook');
+	var __proto=RenderSpriteHook.prototype;
+	__proto._canvas=function(sprite,context,x,y){
+		var _cacheStyle=sprite._cacheStyle;
+		var _next=this._next;
+		var _repaint;
+		if (!_cacheStyle.enableCanvasRender){
+			RenderSpriteHook._oldCanvas.call(this,sprite,context,x,y);
 			return;
-		var _childs;
-		_childs=parent._children;
-		var index=0;
-		index=_childs.indexOf(node);
-		if (index < 0)
-			return;
-		var i=0,len=0;
-		var canvas;
-		var rec;
-		rec=parent.getSelfBounds();
-		if (rec.width <=0 || rec.height <=0)
-			return;
-	}
-
-	VisibleAnalyser.anlyseRecVisible=function(node){
-		VisibleAnalyser.isNodeWalked=false;
-		VisibleAnalyser._analyseTarget=node;
-		if (!VisibleAnalyser.mainCanvas)
-			VisibleAnalyser.mainCanvas=CanvasTools.createCanvas(Laya.stage.width,Laya.stage.height);
-		CanvasTools.clearCanvas(VisibleAnalyser.mainCanvas);
-		VisibleAnalyser.tColor=1;
-		VisibleAnalyser.resetCoverList();
-		WalkTools.walkTargetEX(Laya.stage,VisibleAnalyser.recVisibleWalker,null,VisibleAnalyser.filterFun);
-		if (!VisibleAnalyser.isTarRecOK){
-			VisibleAnalyser.coverRate=0;
 		}
-		else{
-			VisibleAnalyser.coverRate=CanvasTools.getDifferRate(VisibleAnalyser.preImageData,VisibleAnalyser.tarImageData);
-		}
-		console.log("coverRate:",VisibleAnalyser.coverRate);
-	}
-
-	VisibleAnalyser.getRecArea=function(rec){
-		return rec.width *rec.height;
-	}
-
-	VisibleAnalyser.addCoverNode=function(node,coverRate){
-		var data;
-		data={};
-		data.path=node;
-		data.label=ClassTool.getNodeClassAndName(node)+":"+coverRate;
-		data.coverRate=coverRate;
-		VisibleAnalyser._coverList.push(data);
-		console.log("coverByNode:",node,coverRate);
-	}
-
-	VisibleAnalyser.resetCoverList=function(){
-		VisibleAnalyser._coverList.length=0;
-	}
-
-	VisibleAnalyser.recVisibleWalker=function(node){
-		if (node==VisibleAnalyser._analyseTarget){
-			VisibleAnalyser.isNodeWalked=true;
-			VisibleAnalyser.tarRec.copyFrom(NodeUtils.getGRec(node));
-			console.log("tarRec:",VisibleAnalyser.tarRec.toString());
-			if (VisibleAnalyser.tarRec.width > 0 && VisibleAnalyser.tarRec.height > 0){
-				VisibleAnalyser.isTarRecOK=true;
-				VisibleAnalyser.tColor++;
-				CanvasTools.fillCanvasRec(VisibleAnalyser.mainCanvas,VisibleAnalyser.tarRec,ColorTool.toHexColor(VisibleAnalyser.tColor));
-				VisibleAnalyser.preImageData=CanvasTools.getImageDataFromCanvasByRec(VisibleAnalyser.mainCanvas,VisibleAnalyser.tarRec);
-				VisibleAnalyser.tarImageData=CanvasTools.getImageDataFromCanvasByRec(VisibleAnalyser.mainCanvas,VisibleAnalyser.tarRec);
-			}
-			else{
-				console.log("tarRec Not OK:",VisibleAnalyser.tarRec);
-			}
-		}
-		else{
-			if (VisibleAnalyser.isTarRecOK){
-				var tRec;
-				tRec=NodeUtils.getGRec(node);
-				VisibleAnalyser.interRec=VisibleAnalyser.tarRec.intersection(tRec,VisibleAnalyser.interRec);
-				if (VisibleAnalyser.interRec && VisibleAnalyser.interRec.width > 0 && VisibleAnalyser.interRec.height > 0){
-					VisibleAnalyser.tColor++;
-					CanvasTools.fillCanvasRec(VisibleAnalyser.mainCanvas,tRec,ColorTool.toHexColor(VisibleAnalyser.tColor));
-					VisibleAnalyser.tImageData=CanvasTools.getImageDataFromCanvasByRec(VisibleAnalyser.mainCanvas,VisibleAnalyser.tarRec);
-					var dRate=NaN;
-					dRate=CanvasTools.getDifferRate(VisibleAnalyser.preImageData,VisibleAnalyser.tImageData);
-					VisibleAnalyser.preImageData=VisibleAnalyser.tImageData;
-					VisibleAnalyser.addCoverNode(node,dRate);
-				}
-			}
-		}
-	}
-
-	VisibleAnalyser.filterFun=function(node){
-		if (node.visible==false)
-			return false;
-		if (node.alpha < 0)
-			return false;
-		if (DebugInfoLayer.I.isDebugItem(node))return false;
-		return true;
-	}
-
-	VisibleAnalyser.isNodeWalked=false;
-	VisibleAnalyser._analyseTarget=null;
-	VisibleAnalyser.isTarRecOK=false;
-	VisibleAnalyser.mainCanvas=null;
-	VisibleAnalyser.preImageData=null;
-	VisibleAnalyser.tImageData=null;
-	VisibleAnalyser.tarImageData=null;
-	VisibleAnalyser.coverRate=NaN;
-	VisibleAnalyser.tColor=0;
-	VisibleAnalyser._coverList=[];
-	__static(VisibleAnalyser,
-	['tarRec',function(){return this.tarRec=new Rectangle();},'interRec',function(){return this.interRec=new Rectangle();}
-	]);
-	return VisibleAnalyser;
-})()
-
-
-/**
-*全局时间速率控制类
-*@author ww
-*/
-//class laya.debug.tools.TimerControlTool
-var TimerControlTool=(function(){
-	function TimerControlTool(){}
-	__class(TimerControlTool,'laya.debug.tools.TimerControlTool');
-	TimerControlTool.now=function(){
-		if (TimerControlTool._timeRate !=1)return TimerControlTool.getRatedNow();
-		return Date.now();
-	}
-
-	TimerControlTool.getRatedNow=function(){
-		var dTime=NaN;
-		dTime=TimerControlTool.getNow()-TimerControlTool._startTime;
-		return dTime *TimerControlTool._timeRate+TimerControlTool._startTime;
-	}
-
-	TimerControlTool.getNow=function(){
-		return Date.now();
-	}
-
-	TimerControlTool.setTimeRate=function(rate){
-		if (TimerControlTool._browerNow==null)TimerControlTool._browerNow=Browser["now"];
-		TimerControlTool._startTime=TimerControlTool.getNow();
-		TimerControlTool._timeRate=rate;
-		if (rate !=1){
-			Browser["now"]=TimerControlTool.now;
+		if (sprite._needRepaint()|| (!_cacheStyle.canvas)){
+			_repaint=true;
 			}else{
-			if(TimerControlTool._browerNow!=null)
-				Browser["now"]=TimerControlTool._browerNow;
+			_repaint=false;
+		};
+		var preTime;
+		preTime=Browser.now();
+		RenderSpriteHook._oldCanvas.call(this,sprite,context,x,y);
+		if (_repaint){
+			CacheAnalyser.I.reCacheCanvas(sprite,Browser.now()-preTime);
+			}else{
+			CacheAnalyser.I.renderCanvas(sprite,Browser.now()-preTime);
 		}
 	}
 
-	TimerControlTool.recoverRate=function(){
-		TimerControlTool.setTimeRate(1);
+	RenderSpriteHook.init=function(){
+		if (RenderSpriteHook._oldCanvas)return;
+		RenderSpriteHook._oldCanvas=RenderSprite["prototype"]["_canvas"];
+		RenderSprite["prototype"]["_canvas"]=RenderSpriteHook["prototype"]["_canvas"];
 	}
 
-	TimerControlTool._startTime=NaN;
-	TimerControlTool._timeRate=1;
-	TimerControlTool._browerNow=null;
-	return TimerControlTool;
+	RenderSpriteHook.IMAGE=0x01;
+	RenderSpriteHook.FILTERS=0x02;
+	RenderSpriteHook.ALPHA=0x04;
+	RenderSpriteHook.TRANSFORM=0x08;
+	RenderSpriteHook.CANVAS=0x10;
+	RenderSpriteHook.BLEND=0x20;
+	RenderSpriteHook.CLIP=0x40;
+	RenderSpriteHook.STYLE=0x80;
+	RenderSpriteHook.GRAPHICS=0x100;
+	RenderSpriteHook.CUSTOM=0x200;
+	RenderSpriteHook.ENABLERENDERMERGE=0x400;
+	RenderSpriteHook.CHILDS=0x800;
+	RenderSpriteHook.INIT=0x11111;
+	RenderSpriteHook.renders=[];
+	RenderSpriteHook._oldCanvas=null;
+	RenderSpriteHook.I=null;
+	RenderSpriteHook._preCreateFun=null;
+	return RenderSpriteHook;
 })()
 
 
 /**
-*本类调用原生observe接口，仅支持部分浏览器，chrome有效
-*变化输出为异步方式,所以无法跟踪到是什么函数导致变化
+*...
 *@author ww
-*@version 1.0
-*
-*@created 2015-10-26 上午9:35:45
 */
-//class laya.debug.tools.exp.Observer
-var Observer=(function(){
-	function Observer(){}
-	__class(Observer,'laya.debug.tools.exp.Observer');
-	Observer.observe=function(obj,callBack){
-		/*__JS__ */Object.observe(obj,callBack);
+//class laya.debug.tools.RenderAnalyser
+var RenderAnalyser=(function(){
+	function RenderAnalyser(){
+		this.timeDic={};
+		this.resultDic={};
+		this.countDic={};
+		this.resultCountDic={};
+		this.nodeDic={};
+		this.isWorking=false;
+		this.working=true;
 	}
 
-	Observer.unobserve=function(obj,callBack){
-		/*__JS__ */Object.unobserve(obj,callBack);
+	__class(RenderAnalyser,'laya.debug.tools.RenderAnalyser');
+	var __proto=RenderAnalyser.prototype;
+	__proto.render=function(sprite,time){
+		this.addTime(sprite,time);
 	}
 
-	Observer.observeDiffer=function(obj,sign,msg){
-		(msg===void 0)&& (msg="obDiffer");
-		var differFun=function (){
-			DifferTool.differ(sign,obj,msg);
+	__proto.addTime=function(sprite,time){
+		IDTools.idObj(sprite);
+		var key=0;
+		key=IDTools.getObjID(sprite);
+		if (!this.timeDic.hasOwnProperty(key)){
+			this.timeDic[key]=0;
 		}
-		Observer.observe(obj,differFun);
+		this.timeDic[key]=this.timeDic[key]+time;
+		if (!this.countDic.hasOwnProperty(key)){
+			this.countDic[key]=0;
+		}
+		this.countDic[key]=this.countDic[key]+1;
+		this.nodeDic[key]=sprite;
 	}
 
-	return Observer;
+	__proto.getTime=function(sprite){
+		IDTools.idObj(sprite);
+		var key=0;
+		key=IDTools.getObjID(sprite);
+		if (!this.resultDic[key])return 0;
+		return this.resultDic[key];
+	}
+
+	__proto.getCount=function(sprite){
+		IDTools.idObj(sprite);
+		var key=0;
+		key=IDTools.getObjID(sprite);
+		return this.resultCountDic[key];
+	}
+
+	__proto.reset=function(){
+		var key;
+		for (key in this.timeDic){
+			this.timeDic[key]=0;
+			this.countDic[key]=0;
+		}
+		ObjectTools.clearObj(this.nodeDic);
+	}
+
+	__proto.updates=function(){
+		ObjectTools.clearObj(this.resultDic);
+		ObjectTools.insertValue(this.resultDic,this.timeDic);
+		ObjectTools.clearObj(this.resultCountDic);
+		ObjectTools.insertValue(this.resultCountDic,this.countDic);
+		this.reset();
+	}
+
+	__getset(0,__proto,'working',null,function(v){
+		this.isWorking=v;
+		if (v){
+			Laya.timer.loop(NodeConsts.RenderCostMaxTime,this,this.updates);
+			}else{
+			Laya.timer.clear(this,this.updates);
+		}
+	});
+
+	__static(RenderAnalyser,
+	['I',function(){return this.I=new RenderAnalyser();}
+	]);
+	return RenderAnalyser;
 })()
 
 
@@ -4278,354 +1721,383 @@ var ObjectTools=(function(){
 
 
 /**
-*...
-*@author ww
-*/
-//class laya.debug.tools.TimeTool
-var TimeTool=(function(){
-	function TimeTool(){}
-	__class(TimeTool,'laya.debug.tools.TimeTool');
-	TimeTool.getTime=function(sign,update){
-		(update===void 0)&& (update=true);
-		if (!TimeTool.timeDic[sign]){
-			TimeTool.timeDic[sign]=0;
-		};
-		var tTime=NaN;
-		tTime=Browser.now();
-		var rst=NaN;
-		rst=tTime-TimeTool.timeDic[sign];
-		TimeTool.timeDic[sign]=tTime;
-		return rst;
-	}
-
-	TimeTool.runAllCallLater=function(){
-		if(TimeTool._deep>0)debugger;
-		TimeTool._deep++;
-		var timer;
-		timer=Laya.timer;
-		var laters=timer["_laters"];
-		for (var i=0,n=laters.length-1;i <=n;i++){
-			var handler=laters[i];
-			if(handler){
-				handler.method!==null && handler.run(false);
-				timer["_recoverHandler"](handler);
-				}else{
-				debugger;
-			}
-			i===n && (n=laters.length-1);
-		}
-		laters.length=0;
-		TimeTool._deep--;
-	}
-
-	TimeTool.timeDic={};
-	TimeTool._deep=0;
-	return TimeTool;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.ClickSelectTool
-var ClickSelectTool=(function(){
-	function ClickSelectTool(){
-		this.completeHandler=null;
-		this.tSelectTar=null;
-		this._selectTip=new Sprite();
-		this._selectTip.setSelfBounds(new Rectangle(0,0,0,0));
-		Notice.listen(/*laya.debug.tools.DisplayHook.ITEM_CLICKED*/"ItemClicked",this,this.itemClicked);
-	}
-
-	__class(ClickSelectTool,'laya.debug.tools.ClickSelectTool');
-	var __proto=ClickSelectTool.prototype;
-	__proto.beginClickSelect=function(complete){
-		this.completeHandler=complete;
-		ClickSelectTool.isClickSelectState=true;
-		this.clickSelectChange();
-	}
-
-	__proto.clickSelectChange=function(){
-		if (!Browser.onPC)return;
-		this.tSelectTar=null;
-		this.clearSelectTip();
-		if (ClickSelectTool.isClickSelectState){
-			Laya.timer.loop(200,this,this.updateSelectTar,null,true);
-			}else{
-			Laya.timer.clear(this,this.updateSelectTar);
-		}
-	}
-
-	__proto.clearSelectTip=function(){
-		this._selectTip.removeSelf();
-	}
-
-	__proto.updateSelectTar=function(){
-		this.clearSelectTip();
-		this.tSelectTar=DisplayHook.instance.getDisUnderMouse();
-		if (!this.tSelectTar){
-			return;
-		}
-		if (DebugInfoLayer.I.isDebugItem(this.tSelectTar))return;
-		var g;
-		g=this._selectTip.graphics;
-		g.clear();
-		var rec;
-		rec=NodeUtils.getGRec(this.tSelectTar);
-		DebugInfoLayer.I.popLayer.addChild(this._selectTip);
-		g.drawRect(0,0,rec.width,rec.height,null,DebugConsts.CLICK_SELECT_COLOR,2);
-		this._selectTip.pos(rec.x,rec.y);
-	}
-
-	__proto.itemClicked=function(tar){
-		if (!ClickSelectTool.isClickSelectState)return;
-		if (ClickSelectTool.ignoreDebugTool){
-			if (DebugInfoLayer.I.isDebugItem(tar))return;
-		}
-		DebugTool.showDisBound(tar);
-		if (this.completeHandler){
-			this.completeHandler.runWith(tar);
-		}
-		ClickSelectTool.isClickSelectState=false;
-		this.clickSelectChange();
-	}
-
-	__getset(1,ClickSelectTool,'I',function(){
-		if (!ClickSelectTool._I)ClickSelectTool._I=new ClickSelectTool();
-		return ClickSelectTool._I;
-	});
-
-	ClickSelectTool._I=null;
-	ClickSelectTool.isClickSelectState=false;
-	ClickSelectTool.ignoreDebugTool=false;
-	return ClickSelectTool;
-})()
-
-
-/**
 *
 *@author ww
 *@version 1.0
 *
-*@created 2015-9-28 上午10:39:47
+*@created 2015-9-25 下午7:19:44
 */
-//class laya.debug.tools.DTrace
-var DTrace=(function(){
-	function DTrace(){}
-	__class(DTrace,'laya.debug.tools.DTrace');
-	DTrace.getArgArr=function(arg){
-		var rst;
-		rst=[];
-		var i=0,len=arg.length;
-		for(i=0;i<len;i++){
-			rst.push(arg[i]);
+//class laya.debug.tools.DisControlTool
+var DisControlTool=(function(){
+	function DisControlTool(){}
+	__class(DisControlTool,'laya.debug.tools.DisControlTool');
+	DisControlTool.getObjectsUnderPoint=function(sprite,x,y,rst,filterFun){
+		rst=rst?rst:[];
+		if(filterFun!=null&&!filterFun(sprite))return rst;
+		if (sprite.getBounds().contains(x,y)){
+			rst.push(sprite);
+			var tS;
+			var tempP=new Point();
+			tempP.setTo(x,y);
+			tempP=sprite.fromParentPoint(tempP);
+			x=tempP.x;
+			y=tempP.y;
+			for (var i=sprite._children.length-1;i >-1;i--){
+				var child=sprite._children[i];
+				if((child instanceof laya.display.Sprite ))
+					DisControlTool.getObjectsUnderPoint(child,x,y,rst,filterFun);
+			}
 		}
 		return rst;
 	}
 
-	DTrace.dTrace=function(__arg){
-		var arg=arguments;
-		arg=DTrace.getArgArr(arg);
-		arg.push(TraceTool.getCallLoc(2));
-		/*__JS__ */console.log.apply(console,arg);
-		var str;
-		str=arg.join(" ");
+	DisControlTool.getObjectsUnderGlobalPoint=function(sprite,filterFun){
+		var point=new Point();
+		point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+		if(sprite.parent)
+			point=(sprite.parent).globalToLocal(point);
+		return DisControlTool.getObjectsUnderPoint(sprite,point.x,point.y,null,filterFun);
 	}
 
-	DTrace.timeStart=function(sign){
-		/*__JS__ */console.time(sign);;
+	DisControlTool.findFirstObjectsUnderGlobalPoint=function(){
+		var disList;
+		disList=DisControlTool.getObjectsUnderGlobalPoint(Laya.stage);
+		if (!disList)return null;
+		var i=0,len=0;
+		var tDis;
+		len=disList.length;
+		for (i=len-1;i>=0;i--){
+			tDis=disList[i];
+			if (tDis && tDis.numChildren < 1){
+				return tDis;
+			}
+		}
+		return tDis;
 	}
 
-	DTrace.timeEnd=function(sign){
-		/*__JS__ */console.timeEnd(sign);;
+	DisControlTool.visibleAndEnableObjFun=function(tar){
+		return tar.visible&&tar.mouseEnabled;
 	}
 
-	DTrace.traceTable=function(data){
-		/*__JS__ */console.table(data);;
+	DisControlTool.visibleObjFun=function(tar){
+		return tar.visible;
 	}
 
-	return DTrace;
+	DisControlTool.getMousePoint=function(sprite){
+		var point=new Point();
+		point.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+		point=sprite.globalToLocal(point);
+		return point;
+	}
+
+	DisControlTool.isChildE=function(parent,child){
+		if (!parent)return false;
+		while (child){
+			if (child.parent==parent)return true;
+			child=child.parent;
+		}
+		return false;
+	}
+
+	DisControlTool.isInTree=function(pNode,child){
+		return pNode==child || DisControlTool.isChildE(pNode,child);
+	}
+
+	DisControlTool.setTop=function(tar){
+		if(tar&&tar.parent){
+			var tParent;
+			tParent=tar.parent;
+			tParent.setChildIndex(tar,tParent.numChildren-1);
+		}
+	}
+
+	DisControlTool.clearItemRelativeInfo=function(item){
+		var Nan="NaN";
+		item.getLayout().left=Nan;
+		item.getLayout().right=Nan;
+		item.getLayout().top=Nan;
+		item.getLayout().bottom=Nan;
+	}
+
+	DisControlTool.swap=function(tarA,tarB){
+		if (tarA==tarB)return;
+		var iA=0;
+		iA=tarA.parent.getChildIndex(tarA);
+		var iB=0;
+		iB=tarB.parent.getChildIndex(tarB);
+		var bP;
+		bP=tarB.parent;
+		tarA.parent.addChildAt(tarB,iA);
+		bP.addChildAt(tarA,iB);
+	}
+
+	DisControlTool.insertToTarParent=function(tarA,tars,after){
+		(after===void 0)&& (after=false);
+		var tIndex=0;
+		var parent;
+		if(!tarA)return;
+		parent=tarA.parent;
+		if(!parent)return;
+		tIndex=parent.getChildIndex(tarA);
+		if(after)tIndex++;
+		DisControlTool.insertToParent(parent,tars,tIndex);
+	}
+
+	DisControlTool.insertToParent=function(parent,tars,index){
+		(index===void 0)&& (index=-1);
+		if(!parent)return;
+		if(index<0)index=parent.numChildren;
+		var i=0,len=0;
+		len=tars.length;
+		for(i=0;i<len;i++){
+			DisControlTool.transParent(tars[i],parent);
+			parent.addChildAt(tars[i],index);
+		}
+	}
+
+	DisControlTool.transParent=function(tar,newParent){
+		if(!tar||!newParent)return;
+		if(!tar.parent)return;
+		var preParent;
+		preParent=tar.parent;
+		var pos;
+		pos=new Point(tar.x,tar.y);
+		pos=preParent.localToGlobal(pos);
+		pos=newParent.globalToLocal(pos);
+		tar.pos(pos.x,pos.y);
+	}
+
+	DisControlTool.transPoint=function(nowParent,tarParent,point){
+		point=nowParent.localToGlobal(point);
+		point=tarParent.globalToLocal(point);
+		return point;
+	}
+
+	DisControlTool.removeItems=function(itemList){
+		var i=0,len=0;
+		len=itemList.length;
+		for (i=0;i < len;i++){
+			(itemList [i]).removeSelf();
+		}
+	}
+
+	DisControlTool.addItems=function(itemList,parent){
+		var i=0,len=0;
+		len=itemList.length;
+		for (i=0;i < len;i++){
+			parent.addChild(itemList[i]);
+		}
+	}
+
+	DisControlTool.getAllChild=function(tar){
+		if(!tar)return [];
+		var i=0;
+		var len=0;
+		var rst=[];
+		len=tar.numChildren;
+		for(i=0;i<len;i++){
+			rst.push(tar.getChildAt(i));
+		}
+		return rst;
+	}
+
+	DisControlTool.upDis=function(child){
+		if(child&&child.parent){
+			var tParent;
+			tParent=child.parent;
+			var newIndex=0;
+			newIndex=tParent.getChildIndex(child)+1;
+			if(newIndex>=tParent.numChildren){
+				newIndex=tParent.numChildren-1;
+			}
+			console.log("setChildIndex:"+newIndex);
+			tParent.setChildIndex(child,newIndex);
+		}
+	}
+
+	DisControlTool.downDis=function(child){
+		if(child&&child.parent){
+			var tParent;
+			tParent=child.parent;
+			var newIndex=0;
+			newIndex=tParent.getChildIndex(child)-1;
+			if(newIndex<0)newIndex=0;
+			console.log("setChildIndex:"+newIndex);
+			tParent.setChildIndex(child,newIndex);
+		}
+	}
+
+	DisControlTool.setResizeAbleEx=function(node){
+		var clickItem;
+		clickItem=node.getChildByName("resizeBtn");
+		if (clickItem){
+			SimpleResizer.setResizeAble(clickItem,node);
+		}
+	}
+
+	DisControlTool.setResizeAble=function(node){
+		node.on(/*laya.events.Event.CLICK*/"click",null,DisControlTool.resizeHandler,[node]);
+	}
+
+	DisControlTool.resizeHandler=function(tar){
+		DisResizer.setUp(tar);
+	}
+
+	DisControlTool.setDragingItem=function(dragBar,tar){
+		dragBar.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",null,DisControlTool.dragingHandler,[tar]);
+		tar.on(/*laya.events.Event.DRAG_END*/"dragend",null,DisControlTool.dragingEnd,[tar]);
+	}
+
+	DisControlTool.dragingHandler=function(tar){
+		if (tar){
+			tar.startDrag();
+		}
+	}
+
+	DisControlTool.dragingEnd=function(tar){
+		DisControlTool.intFyDisPos(tar);
+		console.log(tar.x,tar.y);
+	}
+
+	DisControlTool.showToStage=function(dis,offX,offY){
+		(offX===void 0)&& (offX=0);
+		(offY===void 0)&& (offY=0);
+		var rec=dis.getBounds();
+		dis.x=Laya.stage.mouseX+offX;
+		dis.y=Laya.stage.mouseY+offY;
+		if (dis.x+rec.width > Laya.stage.width){
+			dis.x-=rec.width+offX;
+		}
+		if (dis.y+rec.height > Laya.stage.height){
+			dis.y-=rec.height+offY;
+		}
+		DisControlTool.intFyDisPos(dis);
+	}
+
+	DisControlTool.intFyDisPos=function(dis){
+		if (!dis)return;
+		dis.x=Math.round(dis.x);
+		dis.y=Math.round(dis.y);
+	}
+
+	DisControlTool.showOnly=function(disList,showItem){
+		var i=0,len=0;
+		len=disList.length;
+		for (i=0;i < len;i++){
+			disList[i].visible=disList[i]==showItem;
+		}
+	}
+
+	DisControlTool.showOnlyByIndex=function(disList,index){
+		DisControlTool.showOnly(disList,disList[index]);
+	}
+
+	DisControlTool.addOnly=function(disList,showItem,parent){
+		var i=0,len=0;
+		len=disList.length;
+		for (i=0;i < len;i++){
+			if (disList[i] !=showItem){
+				disList[i].removeSelf();
+				}else{
+				parent.addChild(disList[i]);
+			}
+		}
+	}
+
+	DisControlTool.addOnlyByIndex=function(disList,index,parent){
+		DisControlTool.addOnly(disList,disList[index],parent);
+	}
+
+	__static(DisControlTool,
+	['tempP',function(){return this.tempP=new Point();}
+	]);
+	return DisControlTool;
 })()
 
 
 /**
-*本类用于调整对象的宽高以及坐标
+*...
 *@author ww
 */
-//class laya.debug.tools.resizer.DisResizer
-var DisResizer=(function(){
-	function DisResizer(){}
-	__class(DisResizer,'laya.debug.tools.resizer.DisResizer');
-	DisResizer.init=function(){
-		if (DisResizer._up)return;
-		DisResizer._up=new AutoFillRec("T");
-		DisResizer._up.height=2;
-		DisResizer._up.type=0;
-		DisResizer._down=new AutoFillRec("T");
-		DisResizer._down.height=2;
-		DisResizer._down.type=0;
-		DisResizer._left=new AutoFillRec("R");
-		DisResizer._left.width=2;
-		DisResizer._left.type=1;
-		DisResizer._right=new AutoFillRec("R");
-		DisResizer._right.width=2;
-		DisResizer._right.type=1;
-		DisResizer._barList=[DisResizer._up,DisResizer._down,DisResizer._left,DisResizer._right];
-		DisResizer.addEvent();
+//class laya.debug.tools.MathTools
+var MathTools=(function(){
+	function MathTools(){}
+	__class(MathTools,'laya.debug.tools.MathTools');
+	MathTools.sortBigFirst=function(a,b){
+		if (a==b)
+			return 0;
+		return b > a ? 1 :-1;
 	}
 
-	DisResizer.stageDown=function(e){
-		var target;
-		target=e.target;
-		if (DisResizer._tar && DisControlTool.isInTree(DisResizer._tar,target)){
-			return;
+	MathTools.sortSmallFirst=function(a,b){
+		if (a==b)
+			return 0;
+		return b > a ?-1 :1;
+	}
+
+	MathTools.sortNumBigFirst=function(a,b){
+		return parseFloat(b)-parseFloat(a);
+	}
+
+	MathTools.sortNumSmallFirst=function(a,b){
+		return parseFloat(a)-parseFloat(b);
+	}
+
+	MathTools.sortByKey=function(key,bigFirst,forceNum){
+		(bigFirst===void 0)&& (bigFirst=false);
+		(forceNum===void 0)&& (forceNum=true);
+		var _sortFun;
+		if (bigFirst){
+			_sortFun=forceNum ? MathTools.sortNumBigFirst :MathTools.sortBigFirst;
+			}else {
+			_sortFun=forceNum ? MathTools.sortNumSmallFirst :MathTools.sortSmallFirst;
 		}
-		DisResizer.clear();
-	}
-
-	DisResizer.clear=function(){
-		DisResizer._tar=null;
-		Laya.stage.off(/*laya.events.Event.MOUSE_UP*/"mouseup",null,DisResizer.stageDown);
-		DisControlTool.removeItems(DisResizer._barList);
-		DisResizer.clearDragEvents();
-	}
-
-	DisResizer.addEvent=function(){
-		var i=0,len=0;
-		var tBar;
-		len=DisResizer._barList.length;
-		for (i=0;i < len;i++){
-			tBar=DisResizer._barList[i];
-			tBar.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",null,DisResizer.barDown);
-		}
-	}
-
-	DisResizer.barDown=function(e){
-		DisResizer.clearDragEvents();
-		DisResizer.tBar=e.target;
-		if (!DisResizer.tBar)return;
-		var area;
-		area=new Rectangle();
-		if (DisResizer.tBar.type==0){
-			area.x=DisResizer.tBar.x;
-			area.width=0;
-			area.y=DisResizer.tBar.y-200;
-			area.height=400;
-			}else{
-			area.x=DisResizer.tBar.x-200;
-			area.width=400;
-			area.y=0;
-			area.height=0;
+		return function (a,b){
+			return _sortFun(a[key],b[key]);
 		};
-		var option;
-		option={};
-		option.area=area;
-		DisResizer.tBar.record();
-		DisResizer.tBar.startDrag(area);
-		DisResizer.tBar.on(/*laya.events.Event.DRAG_MOVE*/"dragmove",null,DisResizer.draging);
-		DisResizer.tBar.on(/*laya.events.Event.DRAG_END*/"dragend",null,DisResizer.dragEnd);
 	}
 
-	DisResizer.draging=function(e){
-		console.log("draging");
-		if (!DisResizer.tBar)return;
-		if (!DisResizer._tar)return;
-		switch(DisResizer.tBar){
-			case DisResizer._left:
-				DisResizer._tar.x+=DisResizer.tBar.getDx();
-				DisResizer._tar.width-=DisResizer.tBar.getDx();
-				DisResizer._up.width-=DisResizer.tBar.getDx();
-				DisResizer._down.width-=DisResizer.tBar.getDx();
-				DisResizer._right.x-=DisResizer.tBar.getDx();
-				DisResizer.tBar.x-=DisResizer.tBar.getDx();
-				break ;
-			case DisResizer._right:
-				DisResizer._tar.width+=DisResizer.tBar.getDx();
-				DisResizer._up.width+=DisResizer.tBar.getDx();
-				DisResizer._down.width+=DisResizer.tBar.getDx();
-				break ;
-			case DisResizer._up:
-				DisResizer._tar.y+=DisResizer.tBar.getDy();
-				DisResizer._tar.height-=DisResizer.tBar.getDy();
-				DisResizer._right.height-=DisResizer.tBar.getDy();
-				DisResizer._left.height-=DisResizer.tBar.getDy();
-				DisResizer._down.y-=DisResizer.tBar.getDy();
-				DisResizer.tBar.y-=DisResizer.tBar.getDy();
-				break ;
-			case DisResizer._down:
-				DisResizer._tar.height+=DisResizer.tBar.getDy();
-				DisResizer._right.height+=DisResizer.tBar.getDy();
-				DisResizer._left.height+=DisResizer.tBar.getDy();
-				break ;
-			}
-		DisResizer.tBar.record();
+	return MathTools;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.UVTools
+var UVTools$1=(function(){
+	function UVTools(){}
+	__class(UVTools,'laya.debug.tools.UVTools',null,'UVTools$1');
+	UVTools.getUVByRec=function(x,y,width,height){
+		return [x,y,x+width,y,x+width,y+height,x,y+height];
 	}
 
-	DisResizer.dragEnd=function(e){
-		console.log("dragEnd");
-		DisResizer.clearDragEvents();
-		DisResizer.updates();
+	UVTools.getRecFromUV=function(uv){
+		var rst;
+		rst=new Rectangle(uv[0],uv[1],uv[2]-uv[0],uv[5]-uv[1]);
+		return rst;
 	}
 
-	DisResizer.clearDragEvents=function(){
-		if (!DisResizer.tBar)return;
-		DisResizer.tBar.off(/*laya.events.Event.DRAG_MOVE*/"dragmove",null,DisResizer.draging);
-		DisResizer.tBar.off(/*laya.events.Event.DRAG_END*/"dragend",null,DisResizer.dragEnd);
+	UVTools.isUVRight=function(uv){
+		if(uv[0]!=uv[6])return false;
+		if(uv[1]!=uv[3])return false;
+		if(uv[2]!=uv[4])return false;
+		if(uv[5]!=uv[7])return false;
+		return true;
 	}
 
-	DisResizer.setUp=function(dis,force){
-		(force===void 0)&& (force=false);
-		if (force && dis==DisResizer._tar){
-			return;
-		};
-		DisControlTool.removeItems(DisResizer._barList);
-		if (DisResizer._tar==dis){
-			DisResizer._tar=null;
-			DisResizer.clearDragEvents();
-			if(!force)
-				return;
-		}
-		DisResizer._tar=dis;
-		DisResizer.updates();
-		DisControlTool.addItems(DisResizer._barList,dis);
-		Laya.stage.off(/*laya.events.Event.MOUSE_UP*/"mouseup",null,DisResizer.stageDown);
-		Laya.stage.on(/*laya.events.Event.MOUSE_UP*/"mouseup",null,DisResizer.stageDown);
+	UVTools.getTextureRec=function(texture){
+		var rst;
+		rst=UVTools.getRecFromUV(texture.uv);
+		rst.x*=texture.bitmap.width;
+		rst.y*=texture.bitmap.height;
+		rst.width*=texture.bitmap.width;
+		rst.height*=texture.bitmap.height;
+		return rst;
 	}
 
-	DisResizer.updates=function(){
-		var dis;
-		dis=DisResizer._tar;
-		if(!dis)return;
-		var bounds;
-		bounds=new Rectangle(0,0,dis.width,dis.height);
-		DisResizer._up.x=bounds.x;
-		DisResizer._up.y=bounds.y;
-		DisResizer._up.width=bounds.width;
-		DisResizer._down.x=bounds.x;
-		DisResizer._down.y=bounds.y+bounds.height-2;
-		DisResizer._down.width=bounds.width;
-		DisResizer._left.x=bounds.x;
-		DisResizer._left.y=bounds.y;
-		DisResizer._left.height=bounds.height;
-		DisResizer._right.x=bounds.x+bounds.width-2;
-		DisResizer._right.y=bounds.y;
-		DisResizer._right.height=bounds.height;
-	}
-
-	DisResizer.Side=2;
-	DisResizer.Vertical=1;
-	DisResizer.Horizon=0;
-	DisResizer._up=null;
-	DisResizer._down=null;
-	DisResizer._left=null;
-	DisResizer._right=null;
-	DisResizer._barList=null;
-	DisResizer._tar=null;
-	DisResizer.barWidth=2;
-	DisResizer.useGetBounds=false;
-	DisResizer.tBar=null;
-	return DisResizer;
+	return UVTools;
 })()
 
 
@@ -4657,60 +2129,6 @@ var DebugExport=(function(){
 
 	]);
 	return DebugExport;
-})()
-
-
-/**
-*本类用于监控对象值变化
-*@author ww
-*@version 1.0
-*
-*@created 2015-10-23 下午4:18:27
-*/
-//class laya.debug.tools.Watcher
-var Watcher=(function(){
-	function Watcher(){}
-	__class(Watcher,'laya.debug.tools.Watcher');
-	Watcher.watch=function(obj,name,funs){
-		VarHook.hookVar(obj,name,funs);
-	}
-
-	Watcher.traceChange=function(obj,name,sign){
-		(sign===void 0)&& (sign="var changed:");
-		VarHook.hookVar(obj,name,[Watcher.getTraceValueFun(name),VarHook.getLocFun(sign)]);
-	}
-
-	Watcher.debugChange=function(obj,name){
-		VarHook.hookVar(obj,name,[VarHook.getLocFun("debug loc"),FunHook.debugHere]);
-	}
-
-	Watcher.differChange=function(obj,name,sign,msg){
-		(msg===void 0)&& (msg="");
-		VarHook.hookVar(obj,name,[Watcher.getDifferFun(obj,name,sign,msg)]);
-	}
-
-	Watcher.getDifferFun=function(obj,name,sign,msg){
-		(msg===void 0)&& (msg="");
-		var rst;
-		rst=function (){
-			DifferTool.differ(sign,obj[name],msg);
-		}
-		return rst;
-	}
-
-	Watcher.traceValue=function(value){
-		console.log("value:",value);
-	}
-
-	Watcher.getTraceValueFun=function(name){
-		var rst;
-		rst=function (value){
-			console.log("set "+name+" :",value);
-		}
-		return rst;
-	}
-
-	return Watcher;
 })()
 
 
@@ -4788,437 +2206,48 @@ var AtlasTools=(function(){
 
 
 /**
-*...
-*@author ww
-*/
-//class laya.debug.tools.MouseEventAnalyser
-var MouseEventAnalyser=(function(){
-	function MouseEventAnalyser(){}
-	__class(MouseEventAnalyser,'laya.debug.tools.MouseEventAnalyser');
-	MouseEventAnalyser.analyseNode=function(node){
-		DebugTool.showDisBound(node,true);
-		var _node;
-		_node=node;
-		ObjectTools.clearObj(MouseEventAnalyser.infoO);
-		ObjectTools.clearObj(MouseEventAnalyser.nodeO);
-		ObjectTools.clearObj(MouseEventAnalyser.hitO);
-		var nodeList;
-		nodeList=[];
-		while (node){
-			IDTools.idObj(node);
-			MouseEventAnalyser.nodeO[IDTools.getObjID(node)]=node;
-			nodeList.push(node);
-			node=node.parent;
-		}
-		MouseEventAnalyser.check(Laya.stage,Laya.stage.mouseX,Laya.stage.mouseY,null);
-		var canStr;
-		if (MouseEventAnalyser.hitO[IDTools.getObjID(_node)]){
-			console.log("can hit");
-			canStr="can hit";
-		}
-		else{
-			console.log("can't hit");
-			canStr="can't hit";
-		};
-		var i=0,len=0;
-		nodeList=nodeList.reverse();
-		len=nodeList.length;
-		var rstTxts;
-		rstTxts=["[分析对象]:"+ClassTool.getNodeClassAndName(_node)+":"+canStr];
-		for (i=0;i < len;i++){
-			node=nodeList[i];
-			if (MouseEventAnalyser.hitO[IDTools.getObjID(node)]){
-				console.log("can hit:",ClassTool.getNodeClassAndName(node));
-				console.log("原因:",MouseEventAnalyser.infoO[IDTools.getObjID(node)]);
-				rstTxts.push("can hit:"+" "+ClassTool.getNodeClassAndName(node));
-				rstTxts.push("原因:"+" "+MouseEventAnalyser.infoO[IDTools.getObjID(node)]);
-			}
-			else{
-				console.log("can't hit:"+ClassTool.getNodeClassAndName(node));
-				console.log("原因:",MouseEventAnalyser.infoO[IDTools.getObjID(node)] ? MouseEventAnalyser.infoO[IDTools.getObjID(node)] :"鼠标事件在父级已停止派发");
-				rstTxts.push("can't hit:"+" "+ClassTool.getNodeClassAndName(node));
-				rstTxts.push("原因:"+" "+(MouseEventAnalyser.infoO[IDTools.getObjID(node)] ? MouseEventAnalyser.infoO[IDTools.getObjID(node)] :"鼠标事件在父级已停止派发"));
-			}
-		};
-		var rstStr;
-		rstStr=rstTxts.join("\n");
-	}
-
-	MouseEventAnalyser.check=function(sp,mouseX,mouseY,callBack){
-		IDTools.idObj(sp);
-		var isInAnlyseChain=false;
-		isInAnlyseChain=MouseEventAnalyser.nodeO[IDTools.getObjID(sp)];
-		MouseEventAnalyser._point.setTo(mouseX,mouseY);
-		sp.fromParentPoint(MouseEventAnalyser._point);
-		mouseX=MouseEventAnalyser._point.x;
-		mouseY=MouseEventAnalyser._point.y;
-		var scrollRect=sp.scrollRect;
-		if (scrollRect){
-			MouseEventAnalyser._rect.setTo(scrollRect.x,scrollRect.y,scrollRect.width,scrollRect.height);
-			var isHit=MouseEventAnalyser._rect.contains(mouseX,mouseY);
-			if (!isHit){
-				if (isInAnlyseChain){
-					MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="scrollRect没有包含鼠标"+MouseEventAnalyser._rect.toString()+":"+mouseX+","+mouseY;
-				}
-				return false;
-			}
-		};
-		var i=0,len=0;
-		var cList;
-		cList=sp._children;
-		len=cList.length;
-		var child;
-		var childInChain;
-		childInChain=null;
-		for (i=0;i < len;i++){
-			child=cList[i];
-			IDTools.idObj(child);
-			if (MouseEventAnalyser.nodeO[IDTools.getObjID(child)]){
-				childInChain=child;
-				break ;
-			}
-		};
-		var coverByOthers=false;
-		coverByOthers=childInChain ? true :false;
-		var flag=false;
-		if (sp.hitTestPrior && !sp.mouseThrough && !MouseEventAnalyser.hitTest(sp,mouseX,mouseY)){
-			MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="hitTestPrior=true，宽高区域不包含鼠标:"+":"+mouseX+","+mouseY+" size:"+sp.width+","+sp.height;
-			return false;
-		}
-		for (i=sp._children.length-1;i >-1;i--){
-			child=sp._children[i];
-			if (child==childInChain){
-				if (!childInChain.mouseEnabled){
-					MouseEventAnalyser.infoO[IDTools.getObjID(childInChain)]="mouseEnabled=false";
-				}
-				if (!childInChain.visible){
-					MouseEventAnalyser.infoO[IDTools.getObjID(childInChain)]="visible=false";
-				}
-				coverByOthers=false;
-			}
-			if (child.mouseEnabled && child.visible){
-				flag=MouseEventAnalyser.check(child,mouseX ,mouseY,callBack);
-				if (flag){
-					MouseEventAnalyser.hitO[IDTools.getObjID(sp)]=true;
-					MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="子对象被击中";
-					if (child==childInChain){
-						MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="子对象被击中,"+"击中对象在分析链中";
-					}
-					else{
-						MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="子对象被击中,"+"击中对象不在分析链中";
-						if (coverByOthers){
-							MouseEventAnalyser.infoO[IDTools.getObjID(childInChain)]="被兄弟节点挡住,兄弟节点信息:"+ClassTool.getNodeClassAndName(child)+","+child.getBounds().toString();
-							DebugTool.showDisBound(child,false,"#ffff00");
-						}
-					}
-					return true;
-				}
-				else{
-					if (child==childInChain){
-						coverByOthers=false;
-					}
-				}
-			}
-		};
-		var mHitRect=new Rectangle();
-		var graphicHit=false;
-		graphicHit=sp.getGraphicBounds().contains(mouseX,mouseY);
-		if (sp.width > 0 && sp.height > 0){
-			var hitRect=MouseEventAnalyser._rect;
-			if (!sp.mouseThrough){
-				if (sp.hitArea)
-					hitRect=sp.hitArea;
-				else
-				hitRect.setTo(0,0,sp.width,sp.height);
-				mHitRect.copyFrom(hitRect);
-				isHit=hitRect.contains(mouseX,mouseY);
-			}
-			else{
-				isHit=graphicHit;
-				mHitRect.copyFrom(sp.getGraphicBounds());
-			}
-			if (isHit){
-				MouseEventAnalyser.hitO[IDTools.getObjID(sp)]=true;
-			}
-			}else{
-		}
-		if (!isHit){
-			if (graphicHit){
-				MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="子对象未包含鼠标，实际绘图区域包含鼠标，设置的宽高区域不包含鼠标:"+":"+mouseX+","+mouseY+" hitRec:"+mHitRect.toString()+" graphicBounds:"+sp.getGraphicBounds().toString()+"，设置mouseThrough=true或将宽高设置到实际绘图区域可解决问题";
-				}else{
-				MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="子对象未包含鼠标，实际绘图区域不包含鼠标，设置的宽高区域不包含鼠标:"+":"+mouseX+","+mouseY+" hitRec:"+mHitRect.toString()+" graphicBounds:"+sp.getGraphicBounds().toString();
-			}
-		}
-		else{
-			MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="自身区域被击中";
-		}
-		return isHit;
-	}
-
-	MouseEventAnalyser.hitTest=function(sp,mouseX,mouseY){
-		var isHit=false;
-		if ((sp.hitArea instanceof laya.utils.HitArea )){
-			return sp.hitArea.isHit(mouseX,mouseY);
-		}
-		if (sp.width > 0 && sp.height > 0 || sp.mouseThrough || sp.hitArea){
-			var hitRect=MouseEventAnalyser._rect;
-			if (!sp.mouseThrough){
-				if (sp.hitArea)hitRect=sp.hitArea;
-				else hitRect.setTo(0,0,sp.width,sp.height);
-				isHit=hitRect.contains(mouseX,mouseY);
-				}else {
-				isHit=sp.getGraphicBounds().contains(mouseX,mouseY);
-			}
-		}
-		return isHit;
-	}
-
-	MouseEventAnalyser.infoO={};
-	MouseEventAnalyser.nodeO={};
-	MouseEventAnalyser.hitO={};
-	__static(MouseEventAnalyser,
-	['_matrix',function(){return this._matrix=new Matrix();},'_point',function(){return this._point=new Point();},'_rect',function(){return this._rect=new Rectangle();}
-	]);
-	return MouseEventAnalyser;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.CacheAnalyser
-var CacheAnalyser=(function(){
-	function CacheAnalyser(){}
-	__class(CacheAnalyser,'laya.debug.tools.CacheAnalyser');
-	var __proto=CacheAnalyser.prototype;
-	__proto.renderCanvas=function(sprite,time){
-		(time===void 0)&& (time=0);
-		if (!CacheAnalyser.showCacheSprite)return;
-		if (DebugInfoLayer.I.isDebugItem(sprite))return;
-		DebugTool.showDisBoundToSprite(sprite,DebugInfoLayer.I.cacheViewLayer,DebugConsts.CANVAS_REC_COLOR,4);
-	}
-
-	__proto.reCacheCanvas=function(sprite,time){
-		(time===void 0)&& (time=0);
-		if (!CacheAnalyser.showRecacheSprite)return;
-		if (DebugInfoLayer.I.isDebugItem(sprite))return;
-		var info;
-		info=CacheAnalyser.getNodeInfoByNode(sprite);
-		info.addCount(time);
-		CacheAnalyser.counter.addTime(sprite,time);
-		if (!info.parent){
-			DebugInfoLayer.I.nodeRecInfoLayer.addChild(info);
-		}
-	}
-
-	CacheAnalyser.renderLoopBegin=function(){
-		DebugInfoLayer.I.cacheViewLayer.graphics.clear();
-	}
-
-	CacheAnalyser.getNodeInfoByNode=function(node){
-		IDTools.idObj(node);
-		var key=0;
-		key=IDTools.getObjID(node);
-		if (!CacheAnalyser._nodeInfoDic[key]){
-			CacheAnalyser._nodeInfoDic[key]=new ReCacheRecInfo();
-		}
-		(CacheAnalyser._nodeInfoDic [key]).setTarget(node);
-		return CacheAnalyser._nodeInfoDic[key];
-	}
-
-	CacheAnalyser._nodeInfoDic={};
-	CacheAnalyser.showCacheSprite=false;
-	CacheAnalyser.showRecacheSprite=true;
-	__static(CacheAnalyser,
-	['counter',function(){return this.counter=new ObjTimeCountTool();},'I',function(){return this.I=new CacheAnalyser();}
-	]);
-	return CacheAnalyser;
-})()
-
-
-/**
 *
 *@author ww
 *@version 1.0
 *
-*@created 2015-10-29 上午9:45:33
+*@created 2015-9-28 上午10:39:47
 */
-//class laya.debug.tools.IDTools
-var IDTools=(function(){
-	function IDTools(){
-		this.tID=1;
-	}
-
-	__class(IDTools,'laya.debug.tools.IDTools');
-	var __proto=IDTools.prototype;
-	__proto.getID=function(){
-		return this.tID++;
-	}
-
-	IDTools.getAID=function(){
-		return IDTools._ID.getID();
-	}
-
-	IDTools.idObjE=function(obj,sign){
-		(sign===void 0)&& (sign="default");
-		if (obj["_M_id_"])return obj;
-		if(!sign){
-			sign="default";
-		}
-		if(!IDTools._idDic[sign]){
-			IDTools._idDic[sign]=new IDTools();
-		}
-		obj["_M_id_"]=IDTools._idDic[sign].getAID();
-		return obj;
-	}
-
-	IDTools.setObjID=function(obj,id){
-		obj["_M_id_"]=id;
-		return obj;
-	}
-
-	IDTools.idObj=function(obj){
-		if (obj["_M_id_"])return obj;
-		obj["_M_id_"]=IDTools.getAID();
-		return obj;
-	}
-
-	IDTools.getObjID=function(obj){
-		if(!obj)return-1;
-		return obj["_M_id_"];
-	}
-
-	IDTools.idSign="_M_id_";
-	__static(IDTools,
-	['_ID',function(){return this._ID=new IDTools();},'_idDic',function(){return this._idDic={"default":new IDTools()};}
-	]);
-	return IDTools;
-})()
-
-
-/**
-*
-*@author ww
-*@version 1.0
-*
-*@created 2015-12-30 下午5:12:53
-*/
-//class laya.debug.tools.ValueChanger
-var ValueChanger=(function(){
-	function ValueChanger(){
-		this.target=null;
-		this.key=null;
-		this._tValue=NaN;
-		this.preValue=0;
-	}
-
-	__class(ValueChanger,'laya.debug.tools.ValueChanger');
-	var __proto=ValueChanger.prototype;
-	__proto.record=function(){
-		this.preValue=this.value;
-	}
-
-	__proto.showValueByAdd=function(addValue){
-		this.value=this.preValue+addValue;
-	}
-
-	__proto.showValueByScale=function(scale){
-		this.value=this.preValue *scale;
-	}
-
-	__proto.recover=function(){
-		this.value=this.preValue;
-	}
-
-	__proto.dispose=function(){
-		this.target=null;
-	}
-
-	__getset(0,__proto,'value',function(){
-		if(this.target){
-			this._tValue=this.target[this.key];
-		}
-		return this._tValue;
-		},function(nValue){
-		this._tValue=nValue;
-		if(this.target){
-			this.target[this.key]=nValue;
-		}
-	});
-
-	__getset(0,__proto,'dValue',function(){
-		return this.value-this.preValue;
-	});
-
-	__getset(0,__proto,'scaleValue',function(){
-		return this.value/this.preValue;
-	});
-
-	ValueChanger.create=function(target,key){
+//class laya.debug.tools.DTrace
+var DTrace=(function(){
+	function DTrace(){}
+	__class(DTrace,'laya.debug.tools.DTrace');
+	DTrace.getArgArr=function(arg){
 		var rst;
-		rst=new ValueChanger();
-		rst.target=target;
-		rst.key=key;
+		rst=[];
+		var i=0,len=arg.length;
+		for(i=0;i<len;i++){
+			rst.push(arg[i]);
+		}
 		return rst;
 	}
 
-	return ValueChanger;
-})()
-
-
-/**
-*
-*@author ww
-*@version 1.0
-*
-*@created 2015-12-24 下午4:20:25
-*/
-//class laya.debug.tools.DisEditor
-var DisEditor=(function(){
-	function DisEditor(){
-		this.tar=null;
-		this.rec=new Sprite();
-		this.rootContainer=new Sprite();
+	DTrace.dTrace=function(__arg){
+		var arg=arguments;
+		arg=DTrace.getArgArr(arg);
+		arg.push(TraceTool.getCallLoc(2));
+		/*__JS__ */console.log.apply(console,arg);
+		var str;
+		str=arg.join(" ");
 	}
 
-	__class(DisEditor,'laya.debug.tools.DisEditor');
-	var __proto=DisEditor.prototype;
-	__proto.setTarget=function(target){
-		this.tar=target;
-		var g;
-		g=this.rec.graphics;
-		g.clear();
-		var bounds;
-		bounds=this.tar.getSelfBounds();
-		g.drawRect(bounds.x,bounds.y,bounds.width,bounds.height,null,"#00ff00");
-		this.createSameDisChain();
-		Laya.stage.addChild(this.rootContainer);
+	DTrace.timeStart=function(sign){
+		/*__JS__ */console.time(sign);;
 	}
 
-	__proto.createSameDisChain=function(){
-		var tParent;
-		var cpParent;
-		var preTar;
-		preTar=this.rec;
-		tParent=this.tar;
-		while(tParent&&tParent!=Laya.stage){
-			cpParent=new Sprite();
-			cpParent.addChild(preTar);
-			cpParent.x=tParent.x;
-			cpParent.y=tParent.y;
-			cpParent.scaleX=tParent.scaleX;
-			cpParent.scaleY=tParent.scaleY;
-			cpParent.rotation=tParent.rotation;
-			cpParent.scrollRect=tParent.scrollRect;
-			preTar=cpParent;
-			tParent=tParent.parent;
-		}
-		this.rootContainer.removeChildren();
-		this.rootContainer.addChild(preTar);
+	DTrace.timeEnd=function(sign){
+		/*__JS__ */console.timeEnd(sign);;
 	}
 
-	return DisEditor;
+	DTrace.traceTable=function(data){
+		/*__JS__ */console.table(data);;
+	}
+
+	return DTrace;
 })()
 
 
@@ -5226,87 +2255,494 @@ var DisEditor=(function(){
 *...
 *@author ww
 */
-//class laya.debug.tools.ObjTimeCountTool
-var ObjTimeCountTool=(function(){
-	function ObjTimeCountTool(){
-		this.timeDic={};
-		this.resultDic={};
-		this.countDic={};
-		this.resultCountDic={};
-		this.nodeDic={};
-		this.resultNodeDic={};
+//class laya.debug.DebugPanel
+var DebugPanel=(function(){
+	function DebugPanel(){
+		this.tShowObj=null;
+		this.preValueO={};
+		this.div=null;
+		this.debug_view=null;
+		this.height=300;
+		this.width=600;
+		this.clickedHandler=null;
+		this.dragArea=10;
+		this.fromMe=false;
+		this._treeDataList=null;
+		this._init();
 	}
 
-	__class(ObjTimeCountTool,'laya.debug.tools.ObjTimeCountTool');
-	var __proto=ObjTimeCountTool.prototype;
-	__proto.addTime=function(sprite,time){
-		IDTools.idObj(sprite);
-		var key=0;
-		key=IDTools.getObjID(sprite);
-		if (!this.timeDic.hasOwnProperty(key)){
-			this.timeDic[key]=0;
+	__class(DebugPanel,'laya.debug.DebugPanel');
+	var __proto=DebugPanel.prototype;
+	__proto.removeNoDisplayKeys=function(arr){
+		var i=0;
+		for (i=arr.length-1;i >=0;i--){
+			if (DebugPanel.noDisplayKeys[arr[i]]){
+				arr.splice(i,1);
+			}
 		}
-		this.timeDic[key]=this.timeDic[key]+time;
-		if (!this.countDic.hasOwnProperty(key)){
-			this.countDic[key]=0;
+	}
+
+	__proto.updateShowKeys=function(){
+		DebugPanel.tObjKeys.length=0;
+		if (!this.tShowObj)
+			return;
+		DebugPanel.tObjKeys=ClassTool.getObjectDisplayAbleKeys(this.tShowObj,DebugPanel.tObjKeys);
+		if (this.tShowObj==Laya.stage){
+			this.removeNoDisplayKeys(DebugPanel.tObjKeys);
 		}
-		this.countDic[key]=this.countDic[key]+1;
-		this.nodeDic[key]=sprite;
+		DebugPanel.tObjKeys.sort(MathUtil.sortSmallFirst);
 	}
 
-	__proto.getTime=function(sprite){
-		IDTools.idObj(sprite);
-		var key=0;
-		key=IDTools.getObjID(sprite);
-		if (!this.resultDic[key])return 0;
-		return this.resultDic[key];
+	__proto._init=function(){
+		var _$this=this;
+		this.div=Browser.document.createElement('div');
+		Browser.document.body.appendChild(this.div);
+		this.clickedHandler=new Handler(this,this.onClickSelected);
+		this.debug_view=Browser.window.layaair_debug_view;
+		this.debug_view.initLayaAirDebugView(this.div);
+		this.debug_view.tree.attachEvent("onSelect",function(id){
+			var dataO;
+			dataO=_$this.getDataByID(id,_$this._treeDataList[0]);
+			if (dataO.target){
+				DebugTool.showDisBound(dataO.target);
+				_$this.showTargetInfo(dataO.target);
+			}
+		});
+		this.debug_view.setValueChangeHandler(function(data,new_value){
+			_$this.onValueChange(data,new_value);
+		});
+		this.debug_view.onRefresh(function(){
+			DebugPanel.I.setRoot(Laya.stage);
+		});
+		this.debug_view.onInspectElement(function(){
+			ClickSelectTool.I.beginClickSelect(_$this.clickedHandler);
+		});
+		this.debug_view.onLogInfo(function(){
+			console.log(_$this.tShowObj);
+		});
+		this.debug_view.onPrintEnabledNodeChain(function(){
+			DebugTool.traceDisMouseEnable(_$this.tShowObj);
+		});
+		this.debug_view.onPrintSizeChain(function(){
+			DebugTool.traceDisSizeChain(_$this.tShowObj);
+		});
+		this.debug_view.onToggleVisibility(function(selectd){
+			if (_$this.tShowObj){
+				_$this.tShowObj.visible=_$this.debug_view.getVisibility();
+			}
+		});
+		this.debug_view.onToggleDebugBorder(function(selectd){
+			if (!_$this.tShowObj)
+				return;
+			SpriteRenderHook.showDisplayBorder(_$this.tShowObj,_$this.debug_view.getShowDebugBorder());
+		});
+		this.debug_view.onToggleShowCurrentCache(function(selectd){
+			CacheAnalyser.showRecacheSprite=_$this.debug_view.getShowCurrentCache();
+		});
+		this.debug_view.onToggleShowAllCache(function(selectd){
+			CacheAnalyser.showCacheSprite=_$this.debug_view.getShowAllCache();
+		});
+		this.debug_view.onToggleShowAtlas(function(selectd){
+			console.log("toggle show atlas:",_$this.debug_view.getShowAtlas());
+			if (_$this.debug_view.getShowAtlas()){
+				AtlasTools.getInstance().start();
+			}
+			else {
+				AtlasTools.getInstance().end();
+			}
+		});
+		JSTools.showToBody(this.div,0,0);
+		this.initNewDivs();
+		this.initDragWork();
+		this.initTreeWidthDrag();
+		Laya.stage.on(/*laya.events.Event.RESIZE*/"resize",this,this.adptPos);
+		this.adptPos();
 	}
 
-	__proto.getCount=function(sprite){
-		IDTools.idObj(sprite);
-		var key=0;
-		key=IDTools.getObjID(sprite);
-		return this.resultCountDic[key];
+	__proto.initNewDivs=function(){
+		var _$this=this;
+		var parentNode;
+		parentNode=Browser.document.getElementById("show_current_cache_control").parentNode;
+		var switchNode;
+		switchNode=Browser.createElement("input");
+		switchNode.type="checkbox";
+		parentNode.appendChild(switchNode);
+		parentNode.append("右侧");
+		function onSwitchChange (e){
+			if (e.target.checked){
+				DebugPanel.sideType="right";
+				}else{
+				DebugPanel.sideType="bottom";
+			}
+			_$this.adptPos();
+		}
+		switchNode.addEventListener("change",onSwitchChange);
 	}
 
-	__proto.reset=function(){
+	__proto.initTreeWidthDrag=function(){
+		var _$this=this;
+		var leftDiv;
+		var rightDiv;
+		leftDiv=Browser.document.getElementById("tree_container");
+		var parentNode;
+		parentNode=leftDiv.parentNode;
+		rightDiv=parentNode.children[1];
+		var isMouseDown=false;
+		var preX=NaN;
+		var preY=NaN;
+		function onDivMouseMove (e){
+			var abs=NaN;
+			abs=Math.abs(DebugPanel.getOffset(e,"X")-leftDiv.clientWidth);
+			if (abs < _$this.dragArea){
+				_$this.div.style.cursor="e-resize";
+				}else{
+				_$this.div.style.cursor="auto";
+			}
+		}
+		function onDivMouseDown (e){
+			var abs=NaN;
+			abs=Math.abs(DebugPanel.getOffset(e,"X")-leftDiv.clientWidth);
+			if (abs < _$this.dragArea){
+				_$this.div.style.cursor="e-resize";
+				isMouseDown=true;
+				}else{
+				isMouseDown=false;
+				return;
+			}
+			e.stopPropagation();
+		}
+		function onBodyMouseMove (e){
+			if (!isMouseDown)
+				return;
+			leftDiv.style.width=DebugPanel.getOffset(e,"X")+"px";
+			e.stopPropagation();
+		}
+		function onDivMouseUp (e){
+			if (!isMouseDown)
+				return;
+			isMouseDown=false;
+			e.stopPropagation();
+		}
+		parentNode.addEventListener("mousedown",onDivMouseDown,true)
+		parentNode.addEventListener("mousemove",onDivMouseMove,true)
+		Browser.document.body.addEventListener("mousemove",onBodyMouseMove)
+		Browser.document.body.addEventListener("mouseup",onDivMouseUp)
+	}
+
+	__proto.initDragWork=function(){
+		var _$this=this;
+		var isMouseDown=false;
+		var preX=NaN;
+		var preY=NaN;
+		function onDivMouseMove (e){
+			if (DebugPanel.sideType=="bottom"){
+				if (DebugPanel.getOffset(e,"Y")< _$this.dragArea){
+					_$this.div.style.cursor="n-resize";
+				}
+				else {
+					_$this.div.style.cursor="auto";
+				}
+			}
+			else {
+				if (DebugPanel.getOffset(e,"X")< _$this.dragArea){
+					_$this.div.style.cursor="e-resize";
+				}
+				else {
+					_$this.div.style.cursor="auto";
+				}
+			}
+		}
+		function onDivMouseDown (e){
+			if (DebugPanel.sideType=="bottom"){
+				if (DebugPanel.getOffset(e,"Y")> _$this.dragArea)
+					return;
+				}else{
+				if (DebugPanel.getOffset(e,"X")> _$this.dragArea)
+					return;
+			}
+			isMouseDown=true;
+			preX=e.pageX;
+			preY=e.pageY;
+			e.stopPropagation();
+		}
+		function onBodyMouseMove (e){
+			if (!isMouseDown)
+				return;
+			var curX=NaN;
+			var curY=NaN;
+			var dX=NaN;
+			var dY=NaN;
+			curX=e.pageX;
+			curY=e.pageY;
+			dX=curX-preX;
+			dY=curY-preY;
+			if (DebugPanel.sideType=="bottom"){
+				_$this.height-=dY;
+				}else{
+				_$this.width-=dX;
+			}
+			_$this.adptPos();
+			preX=curX;
+			preY=curY;
+			e.stopPropagation();
+		}
+		function onDivMouseUp (e){
+			if (!isMouseDown)
+				return;
+			isMouseDown=false;
+			e.stopPropagation();
+		}
+		this.div.addEventListener("mousedown",onDivMouseDown,true)
+		this.div.addEventListener("mousemove",onDivMouseMove,true)
+		Browser.document.body.addEventListener("mousemove",onBodyMouseMove)
+		Browser.document.body.addEventListener("mouseup",onDivMouseUp)
+	}
+
+	__proto.onClickSelected=function(target){
+		var dataO;
+		if (!this._treeDataList)
+			return;
+		this.debug_view.tree.selectItem(IDTools.getObjID(target));
+		this.debug_view.bounceUpInspectButton();
+	}
+
+	__proto.updateLoop=function(){
+		if (this.tShowObj){
+			this.showTargetInfo(this.tShowObj);
+		}
+	}
+
+	__proto.onSelectItem=function(obj){
+		var tTarget;
+		tTarget=obj.target;
+		this.showTargetInfo(tTarget);
+	}
+
+	__proto.onValueChange=function(obj,newValue){
+		if (obj["type"]=="number"){
+			newValue=DebugPanel.mParseFloat(newValue);
+		}
+		if (obj["type"]=="boolean"){
+			newValue=newValue.toString()=="true";
+		}
+		if (this.tShowObj){
+			var key;
+			key=obj["key"];
+			this.preValueO[key]=this.tShowObj[key]=newValue;
+		}
+	}
+
+	__proto.showTargetInfo=function(tTarget){
+		if (!tTarget)
+			return;
+		this.debug_view.setVisibility(tTarget.visible);
+		this.debug_view.setShowDebugBorder(SpriteRenderHook.isDisplayShowBorder(tTarget));
+		var i=0,len=0;
+		len=DebugPanel.tObjKeys.length;
 		var key;
-		for (key in this.timeDic){
-			this.timeDic[key]=0;
-			this.countDic[key]=0;
+		if (this.tShowObj==tTarget){
+			for (i=0;i < len;i++){
+				key=DebugPanel.tObjKeys[i];
+				if (this.preValueO[key] !=tTarget[key]){
+					this.debug_view.changeValueByLabel(key,tTarget[key]);
+				}
+			}
 		}
-		ObjectTools.clearObj(this.nodeDic);
+		else {
+			this.tShowObj=tTarget;
+			this.updateShowKeys();
+			var dataList;
+			dataList=DebugPanel.getObjectData(tTarget);
+			this.debug_view.setContents(dataList);
+		}
+		for (i=0;i < len;i++){
+			key=DebugPanel.tObjKeys[i];
+			this.preValueO[key]=tTarget[key];
+		}
 	}
 
-	__proto.updates=function(){
-		ObjectTools.clearObj(this.resultDic);
-		ObjectTools.insertValue(this.resultDic,this.timeDic);
-		ObjectTools.clearObj(this.resultCountDic);
-		ObjectTools.insertValue(this.resultCountDic,this.countDic);
-		ObjectTools.insertValue(this.resultNodeDic,this.nodeDic);
-		this.reset();
+	__proto.adptPos=function(){
+		if (this.fromMe)
+			return;
+		this.fromMe=true;
+		if (DebugPanel.sideType=="bottom"){
+			JSTools.setPos(this.div,0,Browser.clientHeight-this.height);
+			this.debug_view.resize(Browser.clientWidth,this.height);
+			if (!DebugPanel.overlay){
+				Laya.stage.setScreenSize(Browser.clientWidth *Browser.pixelRatio,(Browser.clientHeight-this.height)*Browser.pixelRatio);
+			}
+		}
+		else {
+			JSTools.setPos(this.div,Browser.clientWidth-this.width,0);
+			this.debug_view.resize(this.width,Browser.clientHeight);
+			if (!DebugPanel.overlay){
+				Laya.stage.setScreenSize((Browser.clientWidth-this.width)*Browser.pixelRatio,Browser.clientHeight *Browser.pixelRatio);
+			}
+		}
+		this.fromMe=false;
 	}
 
-	return ObjTimeCountTool;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.view.StyleConsts
-var StyleConsts=(function(){
-	function StyleConsts(){}
-	__class(StyleConsts,'laya.debug.view.StyleConsts');
-	StyleConsts.setViewScale=function(view){
-		view.scaleX=view.scaleY=StyleConsts.PanelScale;
+	__proto.setRoot=function(sprite){
+		var mtreeo;
+		mtreeo=DebugPanel.getSpriteTreeArr(sprite);
+		this._treeDataList=[mtreeo];
+		var wraped;
+		wraped={};
+		wraped.id=0;
+		wraped.item=[mtreeo];
+		this.debug_view.setTree(wraped);
+		Laya.timer.loop(500,this,this.updateLoop);
 	}
 
-	__static(StyleConsts,
-	['PanelScale',function(){return this.PanelScale=Browser.onPC?1:Browser.pixelRatio;}
+	__proto.getDataByID=function(targetID,nodeO){
+		if (!nodeO)
+			return null;
+		if (targetID==nodeO.id)
+			return nodeO;
+		var childs;
+		childs=nodeO["item"];
+		if (!childs)
+			return null;
+		var i=0,len=0;
+		len=childs.length;
+		var tRst;
+		for (i=0;i < len;i++){
+			tRst=this.getDataByID(targetID,childs[i]);
+			if (tRst)
+				return tRst;
+		}
+		return null;
+	}
+
+	__proto.getDataByTarget=function(target,nodeO){
+		if (!nodeO)
+			return null;
+		if (target==nodeO.target)
+			return nodeO;
+		var childs;
+		childs=nodeO["item"];
+		if (!childs)
+			return null;
+		var i=0,len=0;
+		len=childs.length;
+		var tRst;
+		for (i=0;i < len;i++){
+			tRst=this.getDataByTarget(target,childs[i]);
+			if (tRst)
+				return tRst;
+		}
+		return null;
+	}
+
+	DebugPanel.enable=function(underGame,bgColor){
+		(underGame===void 0)&& (underGame=true);
+		(bgColor===void 0)&& (bgColor="#ffffff");
+		if (!DebugPanel._enable && !DebugPanel.I){
+			DebugPanel._enable=true;
+			DebugPanel.overlay=!underGame;
+			DivScripts.init();
+			DebugTool.initBasicFunctions();
+			RenderSpriteHook.init();
+			SpriteRenderHook.init();
+			DebugPanel.I=new DebugPanel();
+			DebugPanel.I.setRoot(Laya.stage);
+			CacheAnalyser.showRecacheSprite=false;
+			if (bgColor){
+				DebugPanel.I.div.style.background=bgColor;
+			}
+		}
+	}
+
+	DebugPanel.getSpriteTreeArr=function(sprite){
+		var rst;
+		rst={};
+		rst["text"]=""+ClassTool.getNodeClassAndName(sprite);
+		rst.target=sprite;
+		IDTools.idObj(sprite);
+		rst.id=IDTools.getObjID(sprite);
+		var childs;
+		childs=sprite._children;
+		var i=0,len=0;
+		len=childs.length;
+		var tchild;
+		var childsList;
+		childsList=[];
+		rst["item"]=childsList;
+		for (i=0;i < len;i++){
+			childsList.push(DebugPanel.getSpriteTreeArr(childs[i]));
+		}
+		return rst;
+	}
+
+	DebugPanel.getObjectData=function(data){
+		var dataList;
+		var tData;
+		var key;
+		var tValue;
+		var tType;
+		dataList=[];
+		var keys;
+		keys=DebugPanel.tObjKeys;
+		var i=0,len=0;
+		len=keys.length;
+		for (i=0;i < len;i++){
+			key=keys[i];
+			tValue=data[key];
+			tType=typeof(tValue);
+			if (key.charAt(0)=="_")
+				continue ;
+			if (DebugPanel.displayTypes[tType]){
+				tData={};
+				tData["key"]=key;
+				tData["value"]=tValue;
+				tData["type"]=tType;
+				dataList.push(tData);
+			}
+		}
+		return dataList;
+	}
+
+	DebugPanel.getOffset=function(e,sign){
+		var target;
+		target=e.target;
+		var cTarget;
+		cTarget=e.currentTarget;
+		var kSign;
+		if (sign=="X"){
+			kSign="offsetLeft";
+			}else{
+			kSign="offsetTop";
+		};
+		var value=NaN;
+		value=e["offset"+sign];
+		while (target&&target !=cTarget){
+			value+=target[kSign];
+			target=target.offsetParent;
+		}
+		return value;
+	}
+
+	DebugPanel.mParseFloat=function(v){
+		var rst=NaN;
+		rst=parseFloat(v);
+		if (isNaN(rst))
+			return 0;
+		return rst;
+	}
+
+	DebugPanel.I=null;
+	DebugPanel.overlay=false;
+	DebugPanel._enable=false;
+	DebugPanel.ChildrenSign="item";
+	DebugPanel.LabelSign="text";
+	DebugPanel.tObjKeys=[];
+	DebugPanel.Bottom="bottom";
+	DebugPanel.Right="right";
+	DebugPanel.sideType="bottom";
+	__static(DebugPanel,
+	['displayTypes',function(){return this.displayTypes={"boolean":true,"number":true,"string":true};},'displayKeys',function(){return this.displayKeys=[["x","number"],["y","number"],["width","number"],["width","number"],["width","number"],["width","number"],["width","number"],["width","number"],["width","number"],["width","number"],["width","number"],];},'noDisplayKeys',function(){return this.noDisplayKeys={"desginWidth":true,"desginHeight":true};}
 	]);
-	return StyleConsts;
+	return DebugPanel;
 })()
 
 
@@ -5485,6 +2921,125 @@ var DisplayHook=(function(){
 *...
 *@author ww
 */
+//class laya.debug.tools.CacheAnalyser
+var CacheAnalyser=(function(){
+	function CacheAnalyser(){}
+	__class(CacheAnalyser,'laya.debug.tools.CacheAnalyser');
+	var __proto=CacheAnalyser.prototype;
+	__proto.renderCanvas=function(sprite,time){
+		(time===void 0)&& (time=0);
+		if (!CacheAnalyser.showCacheSprite)return;
+		if (DebugInfoLayer.I.isDebugItem(sprite))return;
+		DebugTool.showDisBoundToSprite(sprite,DebugInfoLayer.I.cacheViewLayer,DebugConsts.CANVAS_REC_COLOR,4);
+	}
+
+	__proto.reCacheCanvas=function(sprite,time){
+		(time===void 0)&& (time=0);
+		if (!CacheAnalyser.showRecacheSprite)return;
+		if (DebugInfoLayer.I.isDebugItem(sprite))return;
+		var info;
+		info=CacheAnalyser.getNodeInfoByNode(sprite);
+		info.addCount(time);
+		CacheAnalyser.counter.addTime(sprite,time);
+		if (!info.parent){
+			DebugInfoLayer.I.nodeRecInfoLayer.addChild(info);
+		}
+	}
+
+	CacheAnalyser.renderLoopBegin=function(){
+		DebugInfoLayer.I.cacheViewLayer.graphics.clear();
+	}
+
+	CacheAnalyser.getNodeInfoByNode=function(node){
+		IDTools.idObj(node);
+		var key=0;
+		key=IDTools.getObjID(node);
+		if (!CacheAnalyser._nodeInfoDic[key]){
+			CacheAnalyser._nodeInfoDic[key]=new ReCacheRecInfo();
+		}
+		(CacheAnalyser._nodeInfoDic [key]).setTarget(node);
+		return CacheAnalyser._nodeInfoDic[key];
+	}
+
+	CacheAnalyser._nodeInfoDic={};
+	CacheAnalyser.showCacheSprite=false;
+	CacheAnalyser.showRecacheSprite=true;
+	__static(CacheAnalyser,
+	['counter',function(){return this.counter=new ObjTimeCountTool();},'I',function(){return this.I=new CacheAnalyser();}
+	]);
+	return CacheAnalyser;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.view.nodeInfo.NodeConsts
+var NodeConsts=(function(){
+	function NodeConsts(){}
+	__class(NodeConsts,'laya.debug.view.nodeInfo.NodeConsts');
+	NodeConsts.defaultFitlerStr="x,y,width,height,scaleX,scaleY,alpha,renderCost";
+	NodeConsts.RenderCostMaxTime=3000;
+	return NodeConsts;
+})()
+
+
+/**
+*本类调用原生observe接口，仅支持部分浏览器，chrome有效
+*变化输出为异步方式,所以无法跟踪到是什么函数导致变化
+*@author ww
+*@version 1.0
+*
+*@created 2015-10-26 上午9:35:45
+*/
+//class laya.debug.tools.exp.Observer
+var Observer=(function(){
+	function Observer(){}
+	__class(Observer,'laya.debug.tools.exp.Observer');
+	Observer.observe=function(obj,callBack){
+		/*__JS__ */Object.observe(obj,callBack);
+	}
+
+	Observer.unobserve=function(obj,callBack){
+		/*__JS__ */Object.unobserve(obj,callBack);
+	}
+
+	Observer.observeDiffer=function(obj,sign,msg){
+		(msg===void 0)&& (msg="obDiffer");
+		var differFun=function (){
+			DifferTool.differ(sign,obj,msg);
+		}
+		Observer.observe(obj,differFun);
+	}
+
+	return Observer;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.view.StyleConsts
+var StyleConsts=(function(){
+	function StyleConsts(){}
+	__class(StyleConsts,'laya.debug.view.StyleConsts');
+	StyleConsts.setViewScale=function(view){
+		view.scaleX=view.scaleY=StyleConsts.PanelScale;
+	}
+
+	__static(StyleConsts,
+	['PanelScale',function(){return this.PanelScale=Browser.onPC?1:Browser.pixelRatio;}
+	]);
+	return StyleConsts;
+})()
+
+
+/**
+*...
+*@author ww
+*/
 //class laya.debug.divui.DivScripts
 var DivScripts=(function(){
 	function DivScripts(){}
@@ -5501,343 +3056,179 @@ var DivScripts=(function(){
 
 
 /**
-*XML转Object类
-*@author ww
 *
-*/
-//class laya.debug.tools.XML2ObjectNodejs
-var XML2ObjectNodejs=(function(){
-	function XML2ObjectNodejs(){}
-	__class(XML2ObjectNodejs,'laya.debug.tools.XML2ObjectNodejs');
-	__getset(1,XML2ObjectNodejs,'arrays',function(){
-		if(!XML2ObjectNodejs._arrays){
-			XML2ObjectNodejs._arrays=[];
-		}
-		return XML2ObjectNodejs._arrays;
-		},function(a){
-		XML2ObjectNodejs._arrays=a;
-	});
-
-	XML2ObjectNodejs.parse=function(node,isFirst){
-		(isFirst===void 0)&& (isFirst=true);
-		var obj={};
-		if(isFirst)
-			obj.Name=node.localName;
-		var numOfChilds=node[XML2ObjectNodejs.ChildrenSign]?node[XML2ObjectNodejs.ChildrenSign].length:0;
-		var childs=[];
-		var children={};
-		obj.c=children;
-		obj.cList=childs;
-		for(var i=0;i<numOfChilds;i++){
-			var childNode=node[XML2ObjectNodejs.ChildrenSign][i];
-			var childNodeName=childNode.localName;
-			var value;
-			var numOfAttributes=0
-			if (!childNodeName)continue ;
-			value=XML2ObjectNodejs.parse(childNode,true);
-			childs.push(value);
-			if(children[childNodeName]){
-				if(XML2ObjectNodejs.getTypeof(children[childNodeName])=="array"){
-					children[childNodeName].push(value);
-					}else {
-					children[childNodeName]=[children[childNodeName],value];
-				}
-				}else if(XML2ObjectNodejs.isArray(childNodeName)){
-				children[childNodeName]=[value];
-				}else {
-				children[childNodeName]=value;
-			}
-		}
-		numOfAttributes=0;
-		if(node.attributes){
-			numOfAttributes=node.attributes.length;
-			var prop={};
-			obj.p=prop;
-			for(i=0;i<numOfAttributes;i++){
-				prop[node.attributes[i].name.toString()]=String(node.attributes[i].nodeValue);
-			}
-		}
-		if(numOfChilds==0){
-			if(numOfAttributes==0){
-			}else {}
-		}
-		return obj;
-	}
-
-	XML2ObjectNodejs.getArr=function(v){
-		if(!v)return [];
-		if(XML2ObjectNodejs.getTypeof(v)=="array")return v;
-		return [v];
-	}
-
-	XML2ObjectNodejs.isArray=function(nodeName){
-		var numOfArrays=XML2ObjectNodejs._arrays ? XML2ObjectNodejs._arrays.length :0;
-		for(var i=0;i<numOfArrays;i++){
-			if(nodeName==XML2ObjectNodejs._arrays[i]){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	XML2ObjectNodejs.getTypeof=function(o){
-		if(typeof(o)=="object"){
-			if(o.length==null){
-				return "object";
-				}else if(typeof(o.length)=="number"){
-				return "array";
-				}else {
-				return "object";
-			}
-			}else {
-			return typeof(o);
-		}
-	}
-
-	XML2ObjectNodejs._arrays=null;
-	XML2ObjectNodejs.ChildrenSign="childNodes";
-	return XML2ObjectNodejs;
-})()
-
-
-/**
-*本类用于监控对象 set get 函数的调用
 *@author ww
 *@version 1.0
 *
-*@created 2015-10-23 下午2:52:48
+*@created 2015-9-24 下午6:37:56
 */
-//class laya.debug.tools.hook.VarHook
-var VarHook=(function(){
-	function VarHook(){}
-	__class(VarHook,'laya.debug.tools.hook.VarHook');
-	VarHook.hookVar=function(obj,name,setHook,getHook){
-		if(!setHook)setHook=[];
-		if(!getHook)getHook=[];
-		var preO=obj;
-		var preValue=obj[name];
-		var des;
-		des=ClassTool.getOwnPropertyDescriptor(obj,name);
-		var ndes={};
-		var mSet=function (value){
-			console.log("var hook set "+name+":",value);
-			preValue=value;
-		};
-		var mGet=function (){
-			console.log("var hook get"+name+":",preValue);
-			return preValue;
-		}
-		if(des){
-			ndes.set=mSet;
-			ndes.get=mGet;
-			ndes.enumerable=des.enumerable;
-			setHook.push(ndes.set);
-			getHook.push(ndes.get);
-			FunHook.hookFuns(ndes,"set",setHook);
-			FunHook.hookFuns(ndes,"get",getHook,getHook.length-1);
-			ClassTool.defineProperty(obj,name,ndes);
-			return;
-		}
-		while(!des&&obj["__proto__"]){
-			obj=obj["__proto__"];
-			des=ClassTool.getOwnPropertyDescriptor(obj,name);
-		}
-		if (des){
-			ndes.set=des.set?des.set:mSet;
-			ndes.get=des.get?des.get:mGet;
-			ndes.enumerable=des.enumerable;
-			setHook.push(ndes.set);
-			getHook.push(ndes.get);
-			FunHook.hookFuns(ndes,"set",setHook);
-			FunHook.hookFuns(ndes,"get",getHook,getHook.length-1);
-			ClassTool.defineProperty(preO,name,ndes);
-		}
-		if(!des){
-			console.log("get des fail add directly");
-			ndes.set=mSet;
-			ndes.get=mGet;
-			setHook.push(ndes.set);
-			getHook.push(ndes.get);
-			FunHook.hookFuns(ndes,"set",setHook);
-			FunHook.hookFuns(ndes,"get",getHook,getHook.length-1);
-			ClassTool.defineProperty(obj,name,ndes);
-		}
+//class laya.debug.tools.CountTool
+var CountTool=(function(){
+	function CountTool(){
+		this.data={};
+		this.preO={};
+		this.changeO={};
+		this.count=0;
 	}
 
-	VarHook.getLocFun=function(msg,level){
-		(msg===void 0)&& (msg="");
-		(level===void 0)&& (level=0);
-		level+=1;
-		var rst;
-		rst=function (){
-			FunHook.traceLoc(level,msg);
+	__class(CountTool,'laya.debug.tools.CountTool');
+	var __proto=CountTool.prototype;
+	__proto.reset=function(){
+		this.data={};
+		this.count=0;
+	}
+
+	__proto.add=function(name,num){
+		(num===void 0)&& (num=1);
+		this.count++;
+		if(!this.data.hasOwnProperty(name)){
+			this.data[name]=0;
 		}
-		return rst;
+		this.data[name]=this.data[name]+num;
 	}
 
-	return VarHook;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.ResTools
-var ResTools=(function(){
-	function ResTools(){}
-	__class(ResTools,'laya.debug.tools.ResTools');
-	ResTools.getCachedResList=function(){
-		if (Render.isWebGL){
-			return ResTools.getWebGlResList();
-			}else{
-			return ResTools.getCanvasResList();
+	__proto.getKeyCount=function(key){
+		if(!this.data.hasOwnProperty(key)){
+			this.data[key]=0;
 		}
+		return this.data[key];
 	}
 
-	ResTools.getWebGlResList=function(){
-		var rst;
-		rst=[];
-		var tResource;
-		var _resources;
-		_resources=ResourceManager.currentResourceManager["_resources"];
-		for(var i=0;i <_resources.length;i++){
-			tResource=_resources[i];
-			if(ClassTool.getClassName(tResource)=="WebGLImage"){
-				var url=tResource["src"];
-				if(url&&url.indexOf("data:image/png;base64")<0)
-					rst.push(url);
-			}
-		}
-		return rst;
+	__proto.getKeyChange=function(key){
+		if (!this.changeO[key])return 0;
+		return this.changeO[key];
 	}
 
-	ResTools.getCanvasResList=function(){
-		var picDic;
-		picDic={};
-		var dataO;
-		dataO=Loader.loadedMap;
-		ResTools.collectPics(dataO,picDic);
-		return ResTools.getArrFromDic(picDic);
-	}
-
-	ResTools.getArrFromDic=function(dic){
+	__proto.record=function(){
 		var key;
-		var rst;
-		rst=[];
-		for (key in dic){
-			rst.push(key);
+		for (key in this.changeO){
+			this.changeO[key]=0;
 		}
-		return rst;
+		for (key in this.data){
+			if (!this.preO[key])this.preO[key]=0;
+			this.changeO[key]=this.data[key]-this.preO[key];
+			this.preO[key]=this.data[key]
+		}
 	}
 
-	ResTools.collectPics=function(dataO,picDic){
-		if (!dataO)return;
+	__proto.getCount=function(dataO){
+		var rst=0;
 		var key;
-		var tTexture;
 		for (key in dataO){
-			tTexture=dataO[key];
-			if (tTexture){
-				if (tTexture.bitmap&&tTexture.bitmap.src){
-					var url=tTexture.bitmap.src;
-					if(url.indexOf("data:image/png;base64")<0)
-						picDic[tTexture.bitmap.src]=true;
-				}
-			}
+			rst+=dataO[key];
 		}
+		return rst;
 	}
 
-	return ResTools;
+	__proto.traceSelf=function(dataO){
+		if (!dataO)dataO=this.data;
+		var tCount=0;
+		tCount=this.getCount(dataO);
+		console.log("total:"+tCount);
+		return "total:"+tCount+"\n"+TraceTool.traceObj(dataO);
+	}
+
+	__proto.traceSelfR=function(dataO){
+		if (!dataO)dataO=this.data;
+		var tCount=0;
+		tCount=this.getCount(dataO);
+		console.log("total:"+tCount);
+		return "total:"+tCount+"\n"+TraceTool.traceObjR(dataO);
+	}
+
+	return CountTool;
 })()
 
 
 /**
-*
+*布局工具类,目前只支持水平方向布局
 *@author ww
-*@version 1.0
-*
-*@created 2015-12-23 下午12:00:48
 */
-//class laya.debug.tools.RecInfo
-var RecInfo=(function(){
-	function RecInfo(){
-		this.oX=0;
-		this.oY=0;
-		this.hX=1;
-		this.hY=0;
-		this.vX=0;
-		this.vY=1;
+//class laya.debug.tools.layout.Layouter
+var Layouter=(function(){
+	function Layouter(){
+		/**
+		*布局用的数据，与布局方法有关
+		*/
+		this.data=null;
+		/**
+		*布局涉及的对象
+		*/
+		this._items=null;
+		/**
+		*布局用的函数
+		*/
+		this.layoutFun=null;
+		/**
+		*布局起始x
+		*/
+		this._sX=0;
+		/**
+		*布局宽
+		*/
+		this._width=0;
 	}
 
-	__class(RecInfo,'laya.debug.tools.RecInfo');
-	var __proto=RecInfo.prototype;
-	__proto.initByPoints=function(oPoint,ePoint,vPoint){
-		this.oX=oPoint.x;
-		this.oY=oPoint.y;
-		this.hX=ePoint.x;
-		this.hY=ePoint.y;
-		this.vX=vPoint.x;
-		this.vY=vPoint.y;
+	__class(Layouter,'laya.debug.tools.layout.Layouter');
+	var __proto=Layouter.prototype;
+	__proto.layout=function(){
+		this.layoutFun(this._width,this._items,this.data,this._sX);
 	}
 
-	__getset(0,__proto,'rotation',function(){
-		return this.rotationRad/Math.PI*180;
-	});
+	/**
+	*重新布局
+	*
+	*/
+	__proto.changed=function(){
+		Laya.timer.callLater(this,this.layout);
+	}
+
+	/**
+	*根据当前的对象状态计算位置大小
+	*
+	*/
+	__proto.calSize=function(){
+		var i=0,len=0;
+		var tItem;
+		tItem=this.items[0];
+		this._sX=tItem.x;
+		var maxX=NaN;
+		maxX=this._sX+tItem.width;
+		len=this.items.length;
+		for (i=1;i < len;i++){
+			tItem=this.items[i];
+			if (this._sX > tItem.x){
+				this._sX=tItem.x;
+			}
+			if (maxX < tItem.x+tItem.width){
+				maxX=tItem.x+tItem.width;
+			}
+		}
+		this._width=maxX-this._sX;
+	}
 
 	__getset(0,__proto,'width',function(){
-		return Math.sqrt((this.hX-this.oX)*(this.hX-this.oX)+(this.hY-this.oY)*(this.hY-this.oY));
+		return this._width;
+		},function(v){
+		this._width=v;
+		this.changed();
 	});
 
 	__getset(0,__proto,'x',function(){
-		return this.oX;
+		return this._sX;
+		},function(v){
+		this._sX=v;
+		this.changed();
 	});
 
-	__getset(0,__proto,'rotationRadV',function(){
-		var dx=this.vX-this.oX;
-		var dy=this.vY-this.oY;
-		return Math.atan2(dy,dx);
+	__getset(0,__proto,'items',function(){
+		return this._items;
+		},function(arr){
+		this._items=arr;
+		this.calSize();
 	});
 
-	__getset(0,__proto,'y',function(){
-		return this.oY;
-	});
-
-	__getset(0,__proto,'rotationRad',function(){
-		var dx=this.hX-this.oX;
-		var dy=this.hY-this.oY;
-		return Math.atan2(dy,dx);
-	});
-
-	__getset(0,__proto,'height',function(){
-		return Math.sqrt((this.vX-this.oX)*(this.vX-this.oX)+(this.vY-this.oY)*(this.vY-this.oY));
-	});
-
-	__getset(0,__proto,'rotationV',function(){
-		return this.rotationRadV/Math.PI*180;
-	});
-
-	RecInfo.createByPoints=function(oPoint,ePoint,vPoint){
-		var rst;
-		rst=new RecInfo();
-		rst.initByPoints(oPoint,ePoint,vPoint);
-		return rst;
-	}
-
-	RecInfo.getGlobalPoints=function(sprite,x,y){
-		return sprite.localToGlobal(new Point(x,y));
-	}
-
-	RecInfo.getGlobalRecInfo=function(sprite,x0,y0,x1,y1,x2,y2){
-		(x0===void 0)&& (x0=0);
-		(y0===void 0)&& (y0=0);
-		(x1===void 0)&& (x1=1);
-		(y1===void 0)&& (y1=0);
-		(x2===void 0)&& (x2=0);
-		(y2===void 0)&& (y2=1);
-		return RecInfo.createByPoints(RecInfo.getGlobalPoints(sprite,x0,y0),RecInfo.getGlobalPoints(sprite,x1,y1),RecInfo.getGlobalPoints(sprite,x2,y2));
-	}
-
-	return RecInfo;
+	return Layouter;
 })()
 
 
@@ -5924,207 +3315,64 @@ var DifferTool=(function(){
 
 
 /**
-*
+*...
 *@author ww
-*@version 1.0
-*
-*@created 2015-10-23 下午2:24:04
 */
-//class laya.debug.tools.ClassTool
-var ClassTool=(function(){
-	function ClassTool(){}
-	__class(ClassTool,'laya.debug.tools.ClassTool');
-	ClassTool.defineProperty=function(obj,name,des){
-		/*__JS__ */Object.defineProperty(obj,name,des);;
+//class laya.debug.tools.enginehook.SpriteRenderHook
+var SpriteRenderHook=(function(){
+	function SpriteRenderHook(){
+		/**@private */
+		this._repaint=1;
+		this._renderType=1;
+		this._x=0;
+		this._y=0;
 	}
 
-	ClassTool.getOwnPropertyDescriptor=function(obj,name){
-		var rst;
-		/*__JS__ */rst=Object.getOwnPropertyDescriptor(obj,name);;
-		return rst;
-	}
-
-	ClassTool.getOwnPropertyDescriptors=function(obj){
-		var rst;
-		/*__JS__ */rst=Object.getOwnPropertyDescriptors(obj);;
-		return rst;
-	}
-
-	ClassTool.getOwnPropertyNames=function(obj){
-		var rst;
-		/*__JS__ */rst=Object.getOwnPropertyNames(obj);;
-		return rst;
-	}
-
-	ClassTool.getObjectGetSetKeys=function(obj,rst){
-		if (!rst)rst=[];
-		var keys;
-		keys=laya.debug.tools.ClassTool.getOwnPropertyNames(obj);
-		var key;
-		for (key in keys){
-			key=keys[key];
-			if (key.indexOf("_$get_")>=0){
-				key=key.replace("_$get_","");
-				rst.push(key);
-			}
+	__class(SpriteRenderHook,'laya.debug.tools.enginehook.SpriteRenderHook');
+	var __proto=SpriteRenderHook.prototype;
+	/**
+	*更新、呈现显示对象。
+	*@param context 渲染的上下文引用。
+	*@param x X轴坐标。
+	*@param y Y轴坐标。
+	*/
+	__proto.render=function(context,x,y){
+		if ((this)==Laya.stage){
+			CacheAnalyser.renderLoopBegin();
+		};
+		var preTime=0;
+		preTime=Browser.now();
+		Stat.spriteCount++;
+		if (this["ShowBorderSign"]){
+			DebugTool.showDisBoundToSprite(this,DebugInfoLayer.I.cacheViewLayer,DebugConsts.SPRITE_REC_COLOR,DebugConsts.SPRITE_REC_LINEWIDTH);
 		}
-		if (obj["__proto__"]){
-			ClassTool.getObjectGetSetKeys(obj["__proto__"],rst);
-		}
-		return rst;
+		RenderSprite.renders[this._renderType]._fun(this,context,x+this._x,y+this._y);
+		this._repaint=0;
+		RenderAnalyser.I.render(this,Browser.now()-preTime);
 	}
 
-	ClassTool.getObjectDisplayAbleKeys=function(obj,rst){
-		if (!rst)rst=[];
-		var key;
-		var tValue;
-		var tType;
-		for (key in obj){
-			tValue=obj[key];
-			tType=typeof(tValue);
-			if (key.charAt(0)=="_")continue ;
-			rst.push(key);
-		}
-		ClassTool.getObjectGetSetKeys(obj,rst);
-		rst=ObjectTools.getNoSameArr(rst);
-		return rst;
+	SpriteRenderHook.init=function(){
+		if (SpriteRenderHook.I)return;
+		SpriteRenderHook.I=new SpriteRenderHook();
+		SpriteRenderHook.setRenderHook();
 	}
 
-	ClassTool.getClassName=function(tar){
-		if ((typeof tar=='function'))return tar.name;
-		return tar["constructor"].name;
+	SpriteRenderHook.setRenderHook=function(){
+		Sprite["prototype"]["render"]=SpriteRenderHook.I.render;
 	}
 
-	ClassTool.getNodeClassAndName=function(tar){
-		if (!tar)return "null";
-		var rst;
-		if (tar.name){
-			rst=ClassTool.getClassName(tar)+"("+tar.name+")";
-			}else{
-			rst=ClassTool.getClassName(tar);
-		}
-		return rst;
+	SpriteRenderHook.showDisplayBorder=function(sprite,ifShowBorder){
+		(ifShowBorder===void 0)&& (ifShowBorder=true);
+		sprite["ShowBorderSign"]=ifShowBorder;
 	}
 
-	ClassTool.getClassNameByClz=function(clz){
-		return clz["name"];
+	SpriteRenderHook.isDisplayShowBorder=function(sprite){
+		return sprite["ShowBorderSign"];
 	}
 
-	ClassTool.getClassByName=function(className){
-		var rst;
-		rst=Laya._runScript(className);
-		return rst;
-	}
-
-	ClassTool.createObjByName=function(className){
-		var clz;
-		clz=ClassTool.getClassByName(className);
-		return new clz();
-	}
-
-	__static(ClassTool,
-	['displayTypes',function(){return this.displayTypes={"boolean":true,"number":true,"string":true };}
-	]);
-	return ClassTool;
-})()
-
-
-/**
-*XML转Object类
-*@author ww
-*
-*/
-//class laya.debug.tools.XML2Object
-var XML2Object=(function(){
-	function XML2Object(){}
-	__class(XML2Object,'laya.debug.tools.XML2Object');
-	__getset(1,XML2Object,'arrays',function(){
-		if(!XML2Object._arrays){
-			XML2Object._arrays=[];
-		}
-		return XML2Object._arrays;
-		},function(a){
-		XML2Object._arrays=a;
-	});
-
-	XML2Object.parse=function(node,isFirst){
-		(isFirst===void 0)&& (isFirst=true);
-		var obj={};
-		if(isFirst)
-			obj.Name=node.localName;
-		var numOfChilds=node.children.length;
-		var childs=[];
-		var children={};
-		obj.c=children;
-		obj.cList=childs;
-		for(var i=0;i<numOfChilds;i++){
-			var childNode=node.children[i];
-			var childNodeName=childNode.localName;
-			var value;
-			var numOfAttributes
-			value=XML2Object.parse(childNode,true);
-			childs.push(value);
-			if(children[childNodeName]){
-				if(XML2Object.getTypeof(children[childNodeName])=="array"){
-					children[childNodeName].push(value);
-					}else {
-					children[childNodeName]=[children[childNodeName],value];
-				}
-				}else if(XML2Object.isArray(childNodeName)){
-				children[childNodeName]=[value];
-				}else {
-				children[childNodeName]=value;
-			}
-		}
-		numOfAttributes=0;
-		if(node.attributes){
-			numOfAttributes=node.attributes.length;
-			var prop={};
-			obj.p=prop;
-			for(i=0;i<numOfAttributes;i++){
-				prop[node.attributes[i].name.toString()]=String(node.attributes[i].nodeValue);
-			}
-		}
-		if(numOfChilds==0){
-			if(numOfAttributes==0){
-				obj="";
-			}else {}
-		}
-		return obj;
-	}
-
-	XML2Object.getArr=function(v){
-		if(!v)return [];
-		if(XML2Object.getTypeof(v)=="array")return v;
-		return [v];
-	}
-
-	XML2Object.isArray=function(nodeName){
-		var numOfArrays=XML2Object._arrays ? XML2Object._arrays.length :0;
-		for(var i=0;i<numOfArrays;i++){
-			if(nodeName==XML2Object._arrays[i]){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	XML2Object.getTypeof=function(o){
-		if(typeof(o)=="object"){
-			if(o.length==null){
-				return "object";
-				}else if(typeof(o.length)=="number"){
-				return "array";
-				}else {
-				return "object";
-			}
-			}else {
-			return typeof(o);
-		}
-	}
-
-	XML2Object._arrays=null;
-	return XML2Object;
+	SpriteRenderHook.I=null;
+	SpriteRenderHook.ShowBorderSign="ShowBorderSign";
+	return SpriteRenderHook;
 })()
 
 
@@ -6304,6 +3552,634 @@ var CanvasTools=(function(){
 
 
 /**
+*
+*@author ww
+*@version 1.0
+*
+*@created 2015-9-24 下午6:15:01
+*/
+//class laya.debug.tools.WalkTools
+var WalkTools=(function(){
+	function WalkTools(){}
+	__class(WalkTools,'laya.debug.tools.WalkTools');
+	WalkTools.walkTarget=function(target,fun,_this){
+		fun.apply(_this,[target]);
+		var i=0;
+		var len=0;
+		var tChild;
+		len=target.numChildren;
+		for(i=0;i<len;i++){
+			tChild=target.getChildAt(i);
+			WalkTools.walkTarget(tChild,fun,tChild);
+		}
+	}
+
+	WalkTools.walkTargetEX=function(target,fun,_this,filterFun){
+		if (filterFun !=null && !filterFun(target))return;
+		fun.apply(_this,[target]);
+		var i=0;
+		var len=0;
+		var tChild;
+		var childs;
+		childs=target._children;
+		len=childs.length;
+		for(i=0;i<len;i++){
+			tChild=childs[i];
+			WalkTools.walkTarget(tChild,fun,tChild);
+		}
+	}
+
+	WalkTools.walkChildren=function(target,fun,_this){
+		if(!target||target.numChildren<1)return;
+		WalkTools.walkArr(DisControlTool.getAllChild(target),fun,_this);
+	}
+
+	WalkTools.walkArr=function(arr,fun,_this){
+		if(!arr)return;
+		var i=0;
+		var len=0;
+		len=arr.length;
+		for(i=0;i<len;i++){
+			fun.apply(_this,[arr[i],i]);
+		}
+	}
+
+	return WalkTools;
+})()
+
+
+/**
+*XML转Object类
+*@author ww
+*
+*/
+//class laya.debug.tools.XML2Object
+var XML2Object=(function(){
+	function XML2Object(){}
+	__class(XML2Object,'laya.debug.tools.XML2Object');
+	__getset(1,XML2Object,'arrays',function(){
+		if(!XML2Object._arrays){
+			XML2Object._arrays=[];
+		}
+		return XML2Object._arrays;
+		},function(a){
+		XML2Object._arrays=a;
+	});
+
+	XML2Object.parse=function(node,isFirst){
+		(isFirst===void 0)&& (isFirst=true);
+		var obj={};
+		if(isFirst)
+			obj.Name=node.localName;
+		var numOfChilds=node.children.length;
+		var childs=[];
+		var children={};
+		obj.c=children;
+		obj.cList=childs;
+		for(var i=0;i<numOfChilds;i++){
+			var childNode=node.children[i];
+			var childNodeName=childNode.localName;
+			var value;
+			var numOfAttributes
+			value=XML2Object.parse(childNode,true);
+			childs.push(value);
+			if(children[childNodeName]){
+				if(XML2Object.getTypeof(children[childNodeName])=="array"){
+					children[childNodeName].push(value);
+					}else {
+					children[childNodeName]=[children[childNodeName],value];
+				}
+				}else if(XML2Object.isArray(childNodeName)){
+				children[childNodeName]=[value];
+				}else {
+				children[childNodeName]=value;
+			}
+		}
+		numOfAttributes=0;
+		if(node.attributes){
+			numOfAttributes=node.attributes.length;
+			var prop={};
+			obj.p=prop;
+			for(i=0;i<numOfAttributes;i++){
+				prop[node.attributes[i].name.toString()]=String(node.attributes[i].nodeValue);
+			}
+		}
+		if(numOfChilds==0){
+			if(numOfAttributes==0){
+				obj="";
+			}else {}
+		}
+		return obj;
+	}
+
+	XML2Object.getArr=function(v){
+		if(!v)return [];
+		if(XML2Object.getTypeof(v)=="array")return v;
+		return [v];
+	}
+
+	XML2Object.isArray=function(nodeName){
+		var numOfArrays=XML2Object._arrays ? XML2Object._arrays.length :0;
+		for(var i=0;i<numOfArrays;i++){
+			if(nodeName==XML2Object._arrays[i]){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	XML2Object.getTypeof=function(o){
+		if(typeof(o)=="object"){
+			if(o.length==null){
+				return "object";
+				}else if(typeof(o.length)=="number"){
+				return "array";
+				}else {
+				return "object";
+			}
+			}else {
+			return typeof(o);
+		}
+	}
+
+	XML2Object._arrays=null;
+	return XML2Object;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.view.nodeInfo.NodeUtils
+var NodeUtils=(function(){
+	function NodeUtils(){}
+	__class(NodeUtils,'laya.debug.view.nodeInfo.NodeUtils');
+	NodeUtils.getFilterdTree=function(sprite,keys){
+		if (!keys)
+			keys=NodeUtils.defaultKeys;
+		var me;
+		me={};
+		var key;
+		var i=0,len=0;
+		len=keys.length;
+		for (i=0;i < len;i++){
+			key=keys[i];
+			me[key]=sprite[key];
+		};
+		var cList;
+		var tChild;
+		cList=sprite._children;
+		len=cList.length;
+		var mClist;
+		mClist=[];
+		for (i=0;i < len;i++){
+			tChild=cList[i];
+			mClist.push(NodeUtils.getFilterdTree(tChild,keys));
+		}
+		me.childs=mClist;
+		return me;
+	}
+
+	NodeUtils.getNodeValue=function(node,key){
+		var rst;
+		if ((node instanceof laya.display.Sprite )){
+			var tNode;
+			tNode=node;
+			switch (key){
+				case "gRec":
+					rst=laya.debug.view.nodeInfo.NodeUtils.getGRec(tNode).toString();
+					break ;
+				case "gAlpha":
+					rst=laya.debug.view.nodeInfo.NodeUtils.getGAlpha(tNode)+"";
+					break ;
+				case "cmdCount":
+					rst=laya.debug.view.nodeInfo.NodeUtils.getNodeCmdCount(tNode)+"";
+					break ;
+				case "cmdAll":
+					rst=laya.debug.view.nodeInfo.NodeUtils.getNodeCmdTotalCount(tNode)+"";
+					break ;
+				case "nodeAll":
+					rst=""+laya.debug.view.nodeInfo.NodeUtils.getNodeCount(tNode);
+					break ;
+				case "nodeVisible":
+					rst=""+laya.debug.view.nodeInfo.NodeUtils.getNodeCount(tNode,true);
+					break ;
+				case "nodeRender":
+					rst=""+laya.debug.view.nodeInfo.NodeUtils.getRenderNodeCount(tNode);
+					break ;
+				case "nodeReCache":
+					rst=""+laya.debug.view.nodeInfo.NodeUtils.getReFreshRenderNodeCount(tNode);
+					break ;
+				case "renderCost":
+					rst=""+RenderAnalyser.I.getTime(tNode);
+					break ;
+				case "renderCount":
+					rst=""+RenderAnalyser.I.getCount(tNode);
+					break ;
+				default :
+					rst=node[key]+"";
+				}
+		}
+		else {
+			rst=node[key]+"";
+		}
+		return rst;
+	}
+
+	NodeUtils.getPropertyDesO=function(tValue,keys){
+		if (!keys)
+			keys=NodeUtils.defaultKeys;
+		var rst={};
+		if ((typeof tValue=='object')){
+			rst.label=""+ClassTool.getNodeClassAndName(tValue);
+		}
+		else {
+			rst.label=""+tValue;
+		}
+		rst.type="";
+		rst.path=tValue;
+		rst.childs=[];
+		rst.isDirectory=false;
+		var key;
+		var i=0,len=0;
+		var tChild;
+		if ((tValue instanceof laya.display.Node )){
+			rst.des=ClassTool.getNodeClassAndName(tValue);
+			rst.isDirectory=true;
+			len=keys.length;
+			for (i=0;i < len;i++){
+				key=keys[i];
+				tChild=NodeUtils.getPropertyDesO(tValue[key],keys);
+				if (tValue.hasOwnProperty(key)){
+					tChild.label=""+key+":"+tChild.des;
+				}
+				else {
+					tChild.label=""+key+":"+NodeUtils.getNodeValue(tValue,key);
+				}
+				rst.childs.push(tChild);
+			}
+			key="_children";
+			tChild=NodeUtils.getPropertyDesO(tValue[key],keys);
+			tChild.label=""+key+":"+tChild.des;
+			tChild.isChilds=true;
+			rst.childs.push(tChild);
+		}
+		else if ((tValue instanceof Array)){
+			rst.des="Array["+(tValue).length+"]";
+			rst.isDirectory=true;
+			var tList;
+			tList=tValue;
+			len=tList.length;
+			for (i=0;i < len;i++){
+				tChild=NodeUtils.getPropertyDesO(tList[i],keys);
+				tChild.label=""+i+":"+tChild.des;
+				rst.childs.push(tChild);
+			}
+		}
+		else if ((typeof tValue=='object')){
+			rst.des=ClassTool.getNodeClassAndName(tValue);
+			rst.isDirectory=true;
+			for (key in tValue){
+				tChild=NodeUtils.getPropertyDesO(tValue[key],keys);
+				tChild.label=""+key+":"+tChild.des;
+				rst.childs.push(tChild);
+			}
+		}
+		else {
+			rst.des=""+tValue;
+		}
+		rst.hasChild=rst.childs.length > 0;
+		return rst;
+	}
+
+	NodeUtils.adptShowKeys=function(keys){
+		var i=0,len=0;
+		len=keys.length;
+		for (i=len-1;i >=0;i--){
+			keys[i]=StringTool.trimSide(keys[i]);
+			if (keys[i].length < 1){
+				keys.splice(i,1);
+			}
+		}
+		return keys;
+	}
+
+	NodeUtils.getNodeTreeData=function(sprite,keys){
+		NodeUtils.adptShowKeys(keys);
+		var treeO;
+		treeO=NodeUtils.getPropertyDesO(sprite,keys);
+		var treeArr;
+		treeArr=[];
+		NodeUtils.getTreeArr(treeO,treeArr);
+		return treeArr;
+	}
+
+	NodeUtils.getTreeArr=function(treeO,arr,add){
+		(add===void 0)&& (add=true);
+		if (add)
+			arr.push(treeO);
+		var tArr=treeO.childs;
+		var i=0,len=tArr.length;
+		for (i=0;i < len;i++){
+			if (!add){
+				tArr[i].nodeParent=null;
+			}
+			else {
+				tArr[i].nodeParent=treeO;
+			}
+			if (tArr[i].isDirectory){
+				NodeUtils.getTreeArr(tArr[i],arr);
+			}
+			else {
+				arr.push(tArr[i]);
+			}
+		}
+	}
+
+	NodeUtils.traceStage=function(){
+		console.log(NodeUtils.getFilterdTree(Laya.stage,null));
+		console.log("treeArr:",NodeUtils.getNodeTreeData(Laya.stage,null));
+	}
+
+	NodeUtils.getNodeCount=function(node,visibleRequire){
+		(visibleRequire===void 0)&& (visibleRequire=false);
+		if (visibleRequire){
+			if (!node.visible)
+				return 0;
+		};
+		var rst=0;
+		rst=1;
+		var i=0,len=0;
+		var cList;
+		cList=node._children;
+		len=cList.length;
+		for (i=0;i < len;i++){
+			rst+=NodeUtils.getNodeCount(cList[i],visibleRequire);
+		}
+		return rst;
+	}
+
+	NodeUtils.getGVisible=function(node){
+		while (node){
+			if (!node.visible)
+				return false;
+			node=node.parent;
+		}
+		return true;
+	}
+
+	NodeUtils.getGAlpha=function(node){
+		var rst=NaN;
+		rst=1;
+		while (node){
+			rst *=node.alpha;
+			node=node.parent;
+		}
+		return rst;
+	}
+
+	NodeUtils.getGPos=function(node){
+		var point;
+		point=new Point();
+		node.localToGlobal(point);
+		return point;
+	}
+
+	NodeUtils.getGRec=function(node){
+		var pointList;
+		pointList=node._getBoundPointsM(true);
+		if (!pointList || pointList.length < 1)
+			return Rectangle.TEMP.setTo(0,0,0,0);
+		pointList=GrahamScan.pListToPointList(pointList,true);
+		WalkTools.walkArr(pointList,node.localToGlobal,node);
+		pointList=GrahamScan.pointListToPlist(pointList);
+		var _disBoundRec;
+		_disBoundRec=Rectangle._getWrapRec(pointList,_disBoundRec);
+		return _disBoundRec;
+	}
+
+	NodeUtils.getGGraphicRec=function(node){
+		var pointList;
+		pointList=node.getGraphicBounds()._getBoundPoints();
+		if (!pointList || pointList.length < 1)
+			return Rectangle.TEMP.setTo(0,0,0,0);
+		pointList=GrahamScan.pListToPointList(pointList,true);
+		WalkTools.walkArr(pointList,node.localToGlobal,node);
+		pointList=GrahamScan.pointListToPlist(pointList);
+		var _disBoundRec;
+		_disBoundRec=Rectangle._getWrapRec(pointList,_disBoundRec);
+		return _disBoundRec;
+	}
+
+	NodeUtils.getNodeCmdCount=function(node){
+		var rst=0;
+		if (node.graphics){
+			if (node.graphics.cmds){
+				rst=node.graphics.cmds.length;
+			}
+			else {
+				if (node.graphics._one){
+					rst=1;
+				}
+				else {
+					rst=0;
+				}
+			}
+		}
+		else {
+			rst=0;
+		}
+		return rst;
+	}
+
+	NodeUtils.getNodeCmdTotalCount=function(node){
+		var rst=0;
+		var i=0,len=0;
+		var cList;
+		cList=node._children;
+		len=cList.length;
+		rst=NodeUtils.getNodeCmdCount(node);
+		for (i=0;i < len;i++){
+			rst+=NodeUtils.getNodeCmdTotalCount(cList[i]);
+		}
+		return rst;
+	}
+
+	NodeUtils.getRenderNodeCount=function(node){
+		if (node.cacheAs !="none")
+			return 1;
+		var rst=0;
+		var i=0,len=0;
+		var cList;
+		cList=node._children;
+		len=cList.length;
+		rst=1;
+		for (i=0;i < len;i++){
+			rst+=NodeUtils.getRenderNodeCount(cList[i]);
+		}
+		return rst;
+	}
+
+	NodeUtils.getReFreshRenderNodeCount=function(node){
+		var rst=0;
+		var i=0,len=0;
+		var cList;
+		cList=node._children;
+		len=cList.length;
+		rst=1;
+		for (i=0;i < len;i++){
+			rst+=NodeUtils.getRenderNodeCount(cList[i]);
+		}
+		return rst;
+	}
+
+	NodeUtils.showCachedSpriteRecs=function(){
+		NodeUtils.g=DebugInfoLayer.I.graphicLayer.graphics;
+		NodeUtils.g.clear();
+		WalkTools.walkTarget(Laya.stage,NodeUtils.drawCachedBounds,null);
+	}
+
+	NodeUtils.drawCachedBounds=function(sprite){
+		if (sprite.cacheAs=="none")
+			return;
+		if (DebugInfoLayer.I.isDebugItem(sprite))
+			return;
+		var rec;
+		rec=NodeUtils.getGRec(sprite);
+		NodeUtils.g.drawRect(rec.x,rec.y,rec.width,rec.height,null,"#0000ff",2);
+	}
+
+	NodeUtils.g=null;
+	__static(NodeUtils,
+	['defaultKeys',function(){return this.defaultKeys=["x","y","width","height"];}
+	]);
+	return NodeUtils;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.enginehook.FunctionTimeHook
+var FunctionTimeHook=(function(){
+	function FunctionTimeHook(){}
+	__class(FunctionTimeHook,'laya.debug.tools.enginehook.FunctionTimeHook');
+	FunctionTimeHook.hookFun=function(obj,funName){
+		if (!obj)return;
+		if (obj.timeHooked)return;
+		var myKey;
+		FunctionTimeHook.HookID++;
+		myKey=ClassTool.getNodeClassAndName(obj)+"."+funName+"():"+FunctionTimeHook.HookID;
+		var timePreFun=function (__args){
+			var args=arguments;
+			FunctionTimeHook.funBegin(myKey);
+		};
+		var timeEndFun=function (__args){
+			var args=arguments;
+			FunctionTimeHook.funEnd(myKey);
+		}
+		obj.timeHooked=true;
+		FunHook.hook(obj,funName,timePreFun,timeEndFun);
+	}
+
+	FunctionTimeHook.funBegin=function(funKey){
+		FunctionTimeHook.funPre[funKey]=Browser.now();
+	}
+
+	FunctionTimeHook.funEnd=function(funKey){
+		if (!FunctionTimeHook.funPre[funKey])FunctionTimeHook.funPre[funKey]=0;
+		FunctionTimeHook.counter.add(funKey,Browser.now()-FunctionTimeHook.funPre[funKey]);
+	}
+
+	FunctionTimeHook.fresh=function(){
+		FunctionTimeHook.funEnd("TotalSign");
+		FunctionTimeHook.counter.record();
+		FunctionTimeHook.funBegin("TotalSign");
+	}
+
+	FunctionTimeHook.HookID=1;
+	FunctionTimeHook.funPre={};
+	FunctionTimeHook.TotalSign="TotalSign";
+	__static(FunctionTimeHook,
+	['counter',function(){return this.counter=new CountTool();}
+	]);
+	return FunctionTimeHook;
+})()
+
+
+/**
+*
+*@author ww
+*@version 1.0
+*
+*@created 2015-12-30 下午5:12:53
+*/
+//class laya.debug.tools.ValueChanger
+var ValueChanger=(function(){
+	function ValueChanger(){
+		this.target=null;
+		this.key=null;
+		this._tValue=NaN;
+		this.preValue=0;
+	}
+
+	__class(ValueChanger,'laya.debug.tools.ValueChanger');
+	var __proto=ValueChanger.prototype;
+	__proto.record=function(){
+		this.preValue=this.value;
+	}
+
+	__proto.showValueByAdd=function(addValue){
+		this.value=this.preValue+addValue;
+	}
+
+	__proto.showValueByScale=function(scale){
+		this.value=this.preValue *scale;
+	}
+
+	__proto.recover=function(){
+		this.value=this.preValue;
+	}
+
+	__proto.dispose=function(){
+		this.target=null;
+	}
+
+	__getset(0,__proto,'value',function(){
+		if(this.target){
+			this._tValue=this.target[this.key];
+		}
+		return this._tValue;
+		},function(nValue){
+		this._tValue=nValue;
+		if(this.target){
+			this.target[this.key]=nValue;
+		}
+	});
+
+	__getset(0,__proto,'dValue',function(){
+		return this.value-this.preValue;
+	});
+
+	__getset(0,__proto,'scaleValue',function(){
+		return this.value/this.preValue;
+	});
+
+	ValueChanger.create=function(target,key){
+		var rst;
+		rst=new ValueChanger();
+		rst.target=target;
+		rst.key=key;
+		return rst;
+	}
+
+	return ValueChanger;
+})()
+
+
+/**
 *类实例创建分析工具
 *@author ww
 *@version 1.0
@@ -6378,664 +4254,6 @@ var RunProfile=(function(){
 *@author ww
 *@version 1.0
 *
-*@created 2015-9-24 下午3:00:38
-*/
-//class laya.debug.DebugTool
-var DebugTool=(function(){
-	function DebugTool(){}
-	__class(DebugTool,'laya.debug.DebugTool');
-	__getset(1,DebugTool,'target',function(){
-		return DebugTool._target;
-		},function(v){
-		DebugTool._target=v;
-	});
-
-	__getset(1,DebugTool,'isThisShow',function(){
-		return false;
-	});
-
-	/**
-	*设置是否显示帧率信息
-	*@param value 是否显示true|false
-	*/
-	__getset(1,DebugTool,'showStatu',null,function(value){
-		if (value){
-			Stat.show();
-		}
-		else {
-			Stat.hide();
-			DebugTool.clearDebugLayer();
-		}
-	});
-
-	/**
-	*是否自动显示点击对象的边框
-	*@param value
-	*/
-	__getset(1,DebugTool,'showBound',function(){
-		return DebugTool._showBound;
-		},function(value){
-		DebugTool._showBound=value;
-		if (!DebugTool._showBound){
-			DebugTool.clearDebugLayer();
-		}
-	});
-
-	DebugTool.getMenuShowEvent=function(){
-		if (Browser.onMobile){
-			return /*laya.events.Event.DOUBLE_CLICK*/"doubleclick";
-		}
-		else {
-			return /*laya.events.Event.RIGHT_CLICK*/"rightclick";
-		}
-	}
-
-	DebugTool.initBasicFunctions=function(){
-		DisplayHook.initMe();
-		if (!DebugTool.debugLayer){
-			DebugInfoLayer.init();
-			DebugTool.debugLayer=DebugInfoLayer.I.graphicLayer;
-			DebugTool.debugLayer.mouseEnabled=false;
-			DebugTool.debugLayer.mouseThrough=true;
-			DebugTool.showStatu=true;
-			Laya.stage.on(/*laya.events.Event.KEY_DOWN*/"keydown",null,DebugTool.keyHandler);
-			DebugExport.export();
-		}
-	}
-
-	DebugTool.dTrace=function(str){
-		if (DebugTool._traceFun !=null){
-			DebugTool._traceFun(str);
-		}
-		console.log(str);
-	}
-
-	DebugTool.keyHandler=function(e){
-		var key;
-		key=String.fromCharCode(e.keyCode);
-		if (!e.altKey)
-			return;
-		switch (e.keyCode){
-			case 38:
-				DebugTool.showParent();
-				break ;
-			case 40:
-				DebugTool.showChild();
-				break ;
-			case 37:
-				DebugTool.showBrother(DebugTool.target,1);
-				break ;
-			case 39:
-				DebugTool.showBrother(DebugTool.target,-1);
-				break ;
-			}
-		DebugTool.dealCMDKey(key);
-	}
-
-	DebugTool.dealCMDKey=function(key){
-		switch (key){
-			case "上":
-				DebugTool.showParent();
-				break ;
-			case "下":
-				DebugTool.showChild();
-				break ;
-			case "左":
-				DebugTool.showBrother(DebugTool.target,1);
-				break ;
-			case "右":
-				DebugTool.showBrother(DebugTool.target,-1);
-				break ;
-			case "B":
-				DebugTool.showAllBrother();
-				break ;
-			case "C":
-				DebugTool.showAllChild();
-				break ;
-			case "E":
-				DebugTool.traceDisMouseEnable();
-				break ;
-			case "S":
-				DebugTool.traceDisSizeChain();
-				break ;
-			case "D":
-				DisControlTool.downDis(DebugTool.target);
-				break ;
-			case "U":
-				DisControlTool.upDis(DebugTool.target);
-				break ;
-			case "N":
-				DebugTool.getNodeInfo();
-				break ;
-			case "M":
-				DebugTool.showAllUnderMosue();
-				break ;
-			case "I":
-				break ;
-			case "O":
-				break ;
-			case "L":
-				DisController.I.switchType();
-				break ;
-			case "Q":
-				DebugTool.showNodeInfo();
-				break ;
-			case "F":
-				DebugTool.showToolPanel();
-				break ;
-			case "P":
-				DebugTool.showToolFilter();
-				break ;
-			case "V":
-				DebugTool.selectNodeUnderMouse();
-				break ;
-			case "A":
-				break ;
-			case "K":
-				NodeUtils.traceStage();
-				break ;
-			case "T":
-				DebugTool.switchNodeTree();
-				break ;
-			case "R":
-				break ;
-			case "X":
-				break ;
-			case "mCMD":
-				DebugTool.traceCMD();
-				break ;
-			case "allCMD":
-				DebugTool.traceCMDR();
-				break ;
-			}
-	}
-
-	DebugTool.switchNodeTree=function(){}
-	DebugTool.analyseMouseHit=function(){
-		if (DebugTool.target)
-			MouseEventAnalyser.analyseNode(DebugTool.target);
-	}
-
-	DebugTool.selectNodeUnderMouse=function(){
-		DisplayHook.instance.selectDisUnderMouse();
-		DebugTool.showDisBound();
-		return;
-	}
-
-	DebugTool.showToolPanel=function(){}
-	DebugTool.showToolFilter=function(){}
-	DebugTool.showNodeInfo=function(){
-		if (NodeInfoPanel.I.isWorkState){
-			NodeInfoPanel.I.recoverNodes();
-		}
-		else {
-			NodeInfoPanel.I.showDisInfo(DebugTool.target);
-		}
-	}
-
-	DebugTool.switchDisController=function(){
-		if (DisController.I.target){
-			DisController.I.target=null;
-		}
-		else {
-			if (DebugTool.target){
-				DisController.I.target=DebugTool.target;
-			}
-		}
-	}
-
-	DebugTool.showParent=function(sprite){
-		if (!sprite)
-			sprite=DebugTool.target;
-		if (!sprite){
-			console.log("no targetAvalible");
-			return null;
-		}
-		DebugTool.target=sprite.parent;
-		DebugTool.autoWork();
-	}
-
-	DebugTool.showChild=function(sprite){
-		if (!sprite)
-			sprite=DebugTool.target;
-		if (!sprite){
-			console.log("no targetAvalible");
-			return null;
-		}
-		if (sprite.numChildren > 0){
-			DebugTool.target=sprite.getChildAt(0);
-			DebugTool.autoWork();
-		}
-	}
-
-	DebugTool.showAllChild=function(sprite){
-		if (!sprite)
-			sprite=DebugTool.target;
-		if (!sprite){
-			console.log("no targetAvalible");
-			return null;
-		}
-		DebugTool.selectedNodes=DisControlTool.getAllChild(sprite);
-		DebugTool.showSelected();
-	}
-
-	DebugTool.showAllUnderMosue=function(){
-		DebugTool.selectedNodes=DisControlTool.getObjectsUnderGlobalPoint(Laya.stage);
-		DebugTool.showSelected();
-	}
-
-	DebugTool.showParentChain=function(sprite){
-		if (!sprite)
-			return;
-		DebugTool.selectedNodes=[];
-		var tar;
-		tar=sprite.parent;
-		while (tar){
-			DebugTool.selectedNodes.push(tar);
-			tar=tar.parent;
-		}
-		DebugTool.showSelected();
-	}
-
-	DebugTool.showAllBrother=function(sprite){
-		if (!sprite)
-			sprite=DebugTool.target;
-		if (!sprite){
-			console.log("no targetAvalible");
-			return null;
-		}
-		if (!sprite.parent)
-			return;
-		DebugTool.selectedNodes=DisControlTool.getAllChild(sprite.parent);
-		DebugTool.showSelected();
-	}
-
-	DebugTool.showBrother=function(sprite,dID){
-		(dID===void 0)&& (dID=1);
-		if (!sprite)
-			sprite=DebugTool.target;
-		if (!sprite){
-			console.log("no targetAvalible");
-			return null;
-		};
-		var p;
-		p=sprite.parent;
-		if (!p)
-			return;
-		var n=0;
-		n=p.getChildIndex(sprite);
-		n+=dID;
-		if (n < 0)
-			n+=p.numChildren;
-		if (n >=p.numChildren)
-			n-=p.numChildren;
-		DebugTool.target=p.getChildAt(n);
-		DebugTool.autoWork();
-	}
-
-	DebugTool.clearDebugLayer=function(){
-		if (DebugTool.debugLayer.graphics)
-			DebugTool.debugLayer.graphics.clear();
-	}
-
-	DebugTool.showSelected=function(){
-		if (!DebugTool.autoShowSelected)
-			return;
-		if (!DebugTool.selectedNodes || DebugTool.selectedNodes.length < 1)
-			return;
-		console.log("selected:",DebugTool.selectedNodes);
-		var i=0;
-		var len=0;
-		len=DebugTool.selectedNodes.length;
-		DebugTool.clearDebugLayer();
-		for (i=0;i < len;i++){
-			DebugTool.showDisBound(DebugTool.selectedNodes[i],false);
-		}
-	}
-
-	DebugTool.getClassCreateInfo=function(className){
-		return RunProfile.getRunInfo(className);
-	}
-
-	DebugTool.autoWork=function(){
-		if (!DebugTool.isThisShow)
-			return;
-		if (DebugTool.showBound)
-			DebugTool.showDisBound();
-		if (DebugTool.autoTraceSpriteInfo && DebugTool.target){
-			TraceTool.traceSpriteInfo(DebugTool.target,DebugTool.autoTraceBounds,DebugTool.autoTraceSize,DebugTool.autoTraceTree);
-		}
-		if (!DebugTool.target)
-			return;
-		if (DebugTool.autoTraceCMD){
-			DebugTool.traceCMD();
-		}
-		if (DebugTool.autoTraceCMDR){
-			DebugTool.traceCMDR();
-		}
-		if (DebugTool.autoTraceEnable){
-			DebugTool.traceDisMouseEnable(DebugTool.target);
-		}
-	}
-
-	DebugTool.traceDisMouseEnable=function(tar){
-		console.log("----------------traceDisMouseEnable--------------------");
-		if (!tar)
-			tar=DebugTool.target;
-		if (!tar){
-			console.log("no targetAvalible");
-			return null;
-		};
-		var strArr;
-		strArr=[];
-		DebugTool.selectedNodes=[];
-		while (tar){
-			strArr.push(ClassTool.getNodeClassAndName(tar)+": mouseEnabled:"+tar.mouseEnabled+" hitFirst:"+tar.hitTestPrior);
-			DebugTool.selectedNodes.push(tar);
-			tar=tar.parent;
-		}
-		console.log(strArr.join("\n"));
-		DebugTool.showSelected();
-		return strArr.join("\n");
-	}
-
-	DebugTool.traceDisSizeChain=function(tar){
-		console.log("---------------------traceDisSizeChain-------------------");
-		if (!tar)
-			tar=DebugTool.target;
-		if (!tar){
-			console.log("no targetAvalible");
-			return null;
-		}
-		DebugTool.selectedNodes=[];
-		var strArr;
-		strArr=[];
-		while (tar){
-			strArr.push(ClassTool.getNodeClassAndName(tar)+": x:"+tar.x+" y:"+tar.y+" w:"+tar.width+" h:"+tar.height+" scaleX:"+tar.scaleX+" scaleY:"+tar.scaleY);
-			DebugTool.selectedNodes.push(tar);
-			tar=tar.parent;
-		}
-		console.log(strArr.join("\n"));
-		DebugTool.showSelected();
-		return strArr.join("\n");
-	}
-
-	DebugTool.showDisBound=function(sprite,clearPre,color){
-		(clearPre===void 0)&& (clearPre=true);
-		(color===void 0)&& (color="#ff0000");
-		if (!sprite)
-			sprite=DebugTool.target;
-		if (!sprite){
-			console.log("no targetAvalible");
-			return null;
-		}
-		if (clearPre)
-			DebugTool.clearDebugLayer();
-		var pointList;
-		pointList=sprite._getBoundPointsM(true);
-		if (!pointList || pointList.length < 1)
-			return;
-		pointList=GrahamScan.pListToPointList(pointList,true);
-		WalkTools.walkArr(pointList,sprite.localToGlobal,sprite);
-		pointList=GrahamScan.pointListToPlist(pointList);
-		DebugTool._disBoundRec=Rectangle._getWrapRec(pointList,DebugTool._disBoundRec);
-		DebugTool.debugLayer.graphics.drawRect(DebugTool._disBoundRec.x,DebugTool._disBoundRec.y,DebugTool._disBoundRec.width,DebugTool._disBoundRec.height,null,color);
-		DebugInfoLayer.I.setTop();
-	}
-
-	DebugTool.showDisBoundToSprite=function(sprite,graphicSprite,color,lineWidth){
-		(color===void 0)&& (color="#ff0000");
-		(lineWidth===void 0)&& (lineWidth=1);
-		var pointList;
-		pointList=sprite._getBoundPointsM(true);
-		if (!pointList || pointList.length < 1)
-			return;
-		pointList=GrahamScan.pListToPointList(pointList,true);
-		WalkTools.walkArr(pointList,sprite.localToGlobal,sprite);
-		pointList=GrahamScan.pointListToPlist(pointList);
-		DebugTool._disBoundRec=Rectangle._getWrapRec(pointList,DebugTool._disBoundRec);
-		graphicSprite.graphics.drawRect(DebugTool._disBoundRec.x,DebugTool._disBoundRec.y,DebugTool._disBoundRec.width,DebugTool._disBoundRec.height,null,color,lineWidth);
-	}
-
-	DebugTool.getNodeInfo=function(){
-		DebugTool.counter.reset();
-		WalkTools.walkTarget(Laya.stage,DebugTool.addNodeInfo);
-		console.log("node info:");
-		DebugTool.counter.traceSelf();
-		return DebugTool.counter.data;
-	}
-
-	DebugTool.findByClass=function(className){
-		DebugTool._classList=[];
-		DebugTool._tFindClass=className;
-		WalkTools.walkTarget(Laya.stage,DebugTool.addClassNode);
-		DebugTool.selectedNodes=DebugTool._classList;
-		DebugTool.showSelected();
-		return DebugTool._classList;
-	}
-
-	DebugTool.addClassNode=function(node){
-		var type;
-		type=node["constructor"].name;
-		if (type==DebugTool._tFindClass){
-			DebugTool._classList.push(node);
-		}
-	}
-
-	DebugTool.traceCMD=function(sprite){
-		if (!sprite)
-			sprite=DebugTool.target;
-		if (!sprite){
-			console.log("no targetAvalible");
-			return null;
-		}
-		console.log("self CMDs:");
-		console.log(sprite.graphics.cmds);
-		var renderSprite;
-		renderSprite=RenderSprite.renders[sprite._renderType];
-		console.log("renderSprite:",renderSprite);
-		DebugTool._rSpList.length=0;
-		while (renderSprite && renderSprite["_sign"] > 0){
-			DebugTool._rSpList.push(DebugTool.cmdToTypeO[renderSprite["_sign"]]);
-			renderSprite=renderSprite._next;
-		}
-		console.log("fun:",DebugTool._rSpList.join(","));
-		DebugTool.counter.reset();
-		DebugTool.addCMDs(sprite.graphics.cmds);
-		DebugTool.counter.traceSelf();
-		return DebugTool.counter.data;
-	}
-
-	DebugTool.addCMDs=function(cmds){
-		WalkTools.walkArr(cmds,DebugTool.addCMD);
-	}
-
-	DebugTool.addCMD=function(cmd){
-		DebugTool.counter.add(cmd.callee);
-	}
-
-	DebugTool.traceCMDR=function(sprite){
-		if (!sprite)
-			sprite=DebugTool.target;
-		if (!sprite){
-			console.log("no targetAvalible");
-			return 0;
-		}
-		DebugTool.counter.reset();
-		WalkTools.walkTarget(sprite,DebugTool.getCMdCount);
-		console.log("cmds include children");
-		DebugTool.counter.traceSelf();
-		return DebugTool.counter.data;
-	}
-
-	DebugTool.getCMdCount=function(target){
-		if (!target)
-			return 0;
-		if (! (target instanceof laya.display.Sprite ))
-			return 0;
-		if (!target.graphics.cmds)
-			return 0;
-		DebugTool.addCMDs(target.graphics.cmds);
-		var rst=target.graphics.cmds.length;
-		return rst;
-	}
-
-	DebugTool.addNodeInfo=function(node){
-		var type;
-		type=node["constructor"].name;
-		DebugTool.counter.add(type);
-	}
-
-	DebugTool.find=function(filter,ifShowSelected){
-		(ifShowSelected===void 0)&& (ifShowSelected=true);
-		var rst;
-		rst=DebugTool.findTarget(Laya.stage,filter);
-		DebugTool.selectedNodes=rst;
-		if (DebugTool.selectedNodes){
-			DebugTool.target=DebugTool.selectedNodes[0];
-		}
-		if (ifShowSelected)
-			DebugTool.showSelected();
-		return rst;
-	}
-
-	DebugTool.findByName=function(name){
-		DebugTool.nameFilter.name=name;
-		return DebugTool.find(DebugTool.nameFilter);
-	}
-
-	DebugTool.findNameStartWith=function(startStr){
-		DebugTool.nameFilter.name=DebugTool.getStartWithFun(startStr);
-		return DebugTool.find(DebugTool.nameFilter);
-	}
-
-	DebugTool.findNameHas=function(hasStr,showSelected){
-		(showSelected===void 0)&& (showSelected=true);
-		DebugTool.nameFilter.name=DebugTool.getHasFun(hasStr);
-		return DebugTool.find(DebugTool.nameFilter,showSelected);
-	}
-
-	DebugTool.getStartWithFun=function(startStr){
-		var rst=function (str){
-			if (!str)
-				return false;
-			if (str.indexOf(startStr)==0)
-				return true;
-			return false;
-		};
-		return rst;
-	}
-
-	DebugTool.getHasFun=function(hasStr){
-		var rst=function (str){
-			if (!str)
-				return false;
-			if (str.indexOf(hasStr)>=0)
-				return true;
-			return false;
-		};
-		return rst;
-	}
-
-	DebugTool.findTarget=function(target,filter){
-		var rst=[];
-		if (DebugTool.isFit(target,filter))
-			rst.push(target);
-		var i=0;
-		var len=0;
-		var tChild;
-		len=target.numChildren;
-		for (i=0;i < len;i++){
-			tChild=target.getChildAt(i);
-			if ((tChild instanceof laya.display.Sprite )){
-				rst=rst.concat(DebugTool.findTarget(tChild,filter));
-			}
-		}
-		return rst;
-	}
-
-	DebugTool.findClassHas=function(target,str){
-		var rst=[];
-		if (ClassTool.getClassName(target).indexOf(str)>=0)
-			rst.push(target);
-		var i=0;
-		var len=0;
-		var tChild;
-		len=target.numChildren;
-		for (i=0;i < len;i++){
-			tChild=target.getChildAt(i);
-			if ((tChild instanceof laya.display.Sprite )){
-				rst=rst.concat(DebugTool.findClassHas(tChild,str));
-			}
-		}
-		return rst;
-	}
-
-	DebugTool.isFit=function(tar,filter){
-		if (!tar)
-			return false;
-		if (!filter)
-			return true;
-		if ((typeof filter=='function')){
-			return (filter)(tar);
-		};
-		var key;
-		for (key in filter){
-			if ((typeof (filter[key])=='function')){
-				if (!filter[key](tar[key]))
-					return false;
-			}
-			else {
-				if (tar[key] !=filter[key])
-					return false;
-			}
-		}
-		return true;
-	}
-
-	DebugTool.log=function(__args){
-		var args=arguments;
-		var arr;
-		arr=DTrace.getArgArr(args);
-		if (DebugTool._logFun !=null){
-			DebugTool._logFun(arr.join(" "));
-		}
-	}
-
-	DebugTool.enableCacheAnalyse=false;
-	DebugTool.enableNodeCreateAnalyse=true;
-	DebugTool._traceFun=null;
-	DebugTool.debugLayer=null;
-	DebugTool._target=null;
-	DebugTool.selectedNodes=[];
-	DebugTool.autoShowSelected=true;
-	DebugTool._showBound=true;
-	DebugTool._disBoundRec=null;
-	DebugTool.autoTraceEnable=false;
-	DebugTool.autoTraceBounds=false;
-	DebugTool.autoTraceSize=false;
-	DebugTool.autoTraceTree=true;
-	DebugTool.autoTraceCMD=true;
-	DebugTool.autoTraceCMDR=false;
-	DebugTool.autoTraceSpriteInfo=true;
-	DebugTool._classList=null;
-	DebugTool._tFindClass=null;
-	DebugTool._rSpList=[];
-	DebugTool._logFun=null;
-	__static(DebugTool,
-	['text',function(){return this.text=new Stat();},'cmdToTypeO',function(){return this.cmdToTypeO={
-	};},'counter',function(){return this.counter=new CountTool();},'nameFilter',function(){return this.nameFilter={"name":"name"};}
-
-	]);
-	return DebugTool;
-})()
-
-
-/**
-*
-*@author ww
-*@version 1.0
-*
 *@created 2016-6-24 下午6:07:30
 */
 //class laya.debug.tools.SingleTool
@@ -7076,6 +4294,686 @@ var SingleTool=(function(){
 	['I',function(){return this.I=new SingleTool();}
 	]);
 	return SingleTool;
+})()
+
+
+//class laya.debug.data.Base64AtlasManager
+var Base64AtlasManager=(function(){
+	function Base64AtlasManager(){}
+	__class(Base64AtlasManager,'laya.debug.data.Base64AtlasManager');
+	Base64AtlasManager.replaceRes=function(uiO){
+		Base64AtlasManager.base64.replaceRes(uiO);
+	}
+
+	__static(Base64AtlasManager,
+	['dataO',function(){return this.dataO={"comp/button1.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGIAAABRCAYAAAApS3MNAAABSUlEQVR4Xu3a0QmFMADFUJ1JXM0h3moPZ6qg4AoNeLqAIenFn65jjLE40w2sQkxvcAMI0eggRKSDEEJUDEQ4/COEiBiIYFiEEBEDEQyLECJiIIJhEUJEDEQwLEKIiIEIhkUIETEQwbAIISIGIhgWIUTEQATDIoSIGIhgWIQQEQMRDIsQImIggnEvYvv9IzjfxDiP/XlgJsTcCyDEXP/v14UQImIggmERQkQMRDAsQoiIgQiGRQgRMRDBsAghIgYiGBYhRMRABMMihIgYiGBYhBARAxEMixAiYiCCYRFCRAxEMCxCiIiBCMa7iAjPpzG8fY3kF0KIiIEIhkUIETEQwbAIISIGIhgWIUTEQATDIoSIGIhgWIQQEQMRDIsQImIggmERQkQMRDAsQoiIgQiGRQgRMRDBsAghIgYiGBYhRMRABMMihIgYiGBcGJiOHTRZjZAAAAAASUVORK5CYII=","comp/line2.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAECAYAAACOXx+WAAAAG0lEQVQYV2NkoDJgpLJ5DIxtra3/qWko1V0IAJvgApS1libIAAAAAElFTkSuQmCC","view/create.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAkCAYAAAC9itu8AAAAdElEQVQ4T2NkwAIWLFjwH5t4QkICIyM2CXQxmAHka/j///9mXDYxMjL6YtgwBDUg+w8crIT8MBQ0oEca55JvWNPS9xgu4tISzADyNfz///8MnrRkgmHDENSALWng9fRQ0DA40xLecglbWhpqGoZCMUNKUQkANAHAJVkE5XwAAAAASUVORK5CYII=","view/rendertime.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAkCAYAAAC9itu8AAABeUlEQVQ4T+2Uv0tCURSAvyNdcwiXBlsaaomWFgeHlqAtCPsDJHwIiUtDSxERtErtmQ6CjkHo4FpDBQ0tbVFR0BYE0eQvOnFF7T17QlOTd3m88873OD8+rtA9uVzOBIPBlIisAwvd8B1QajQahXQ63bIx6QHFYrEEJHrv7qeqZhzHOfYA+Xw+Yow5B+YHoGwymdxW1QAQEFWNAk8i8uEDuZM3gUcLZIEJYNcNqWrVcZyd7p9t8jLwYIFTYBx47UHlcjmcSCQ+B5JtpU0LnAFj3br7kE+yTalb4BCYczVqoT3AjteW4T73FlgFNgY+1IGQz4hPLGCAI2DGbweu2Auw1Vmcqk4C+8DsEOgZOBCR9/6mVdU2vgIsAdOuIVwANRFpezatuahpTYVSop1m+y6pasm8NQqSvvW61KwslkSHuCRkgvErr0taiUXaal1Sr0siWRO/9HfpF+RN9nfpB/qqmrXrv7mktVhYVm5GLo1cct9LI5e8d84/3UvfAgdlKH0EO7MAAAAASUVORK5CYII=","view/cache.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAAkCAYAAABSSLCCAAAAcElEQVQ4T2NcsGDB/4SEBEYGBgYGYtmMxCpENhhsA6mA8f///5tHNTEwkBcQpIYcSD15kUtWigi51vR/jVYdOGUQy2YkViGywWSnvTOkhiAonkY1gZIRqSEHTntkRe4g10RWQIyWe5Bgo2O5R7dkBADztyP+yFzirAAAAABJRU5ErkJggg==","comp/clip_selectBox.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAAAoCAYAAAAIeF9DAAAAsElEQVRoQ+3ZQQ0AMQzEwAuqEgh/Sj2pKObhIrBsrfLonHPu12MMTEGYFg+kIFaPgmA9ClIQzQDG0w0pCGYAw2khBcEMYDgtpCCYAQynhRQEM4DhtJCCYAYwnBZSEMwAhtNCCoIZwHBmd/tTh6IUBIrx/tRbiFWkIFaPFoL1KEhBNAMYTzekIJgBDKeFFAQzgOG0kIJgBjCcFlIQzACG00IKghnAcFpIQTADGE4LwYL8U/BE1dCJ3PsAAAAASUVORK5CYII=","comp/label.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAASCAYAAACQCxruAAAAmElEQVRoQ+3aMQqAQBBDUef+hx4Zq1mrbPnhWylECHmghVZ397OOqqp97TlugdNzgEXFIaaFuwROt0LmBEay5aXb920+FjIpMJItLy1wvhUyKTCSLS8tcL4VMikwki0vLXC+FTIpMJItLy1wvhUyKTCSLS89wPP1Qeh8M0zy+84gMMbruqjA15OxbtjAu7mPa5bj0fb/A8cLgD4n/wQKNiIAAAAASUVORK5CYII=","comp/clip_tree_arrow.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAQCAYAAAArij59AAAAwUlEQVQoU5WRPRKCMBCFWUt6vYQeB06RUDpoBbFDa7yDwm30FGi9dHnOMiQDBgvT5c3b7+0PRVEUlVV9A3NmzL6T//SRfMz5CgCdtVafjlmzaHAigAbM2tE8YVo1pf0yvABoc9D3wACgBbMKIgD4qqDJsqqlMV8VGL5n/88geCJKlijSMBXFZUNx/CSi9WwX1r7R99thzKKqkxXRbMUWSE2u2sEwHsxHCbrMVSq6N4xRD9HAvJstylEkarhurlqnfQC58YP5+CvQNwAAAABJRU5ErkJggg==","view/bg_panel.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAMUlEQVRYR+3QQREAAAjDMGZk/l2CDD6pgl7SduexGCBAgAABAgQIECBAgAABAgS+BQ4oyStBhXcy5AAAAABJRU5ErkJggg==","view/bg_top.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAMUlEQVRYR+3QQREAAAjDMKZp/rWBDD6pgl7SduexGCBAgAABAgQIECBAgAABAgS+BQ6WyDMhXMLeQgAAAABJRU5ErkJggg==","view/clickselect.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAqCAYAAACDdWrxAAACfElEQVRIS8WVO2iTYRSGn5OWqpMOurg0VRBdVVCsg7GgDjpZECyirl4GEYfSgBlaB5VSpApdxCJIoeKgg7dKC21ALahIiyiKKUjxAiI4qCH1lRP/hPhfAnHpGZPv+c4573nP95ukO/xHmINmtq8RtswsPiipB/gAPAFem5nCbcSWKukIsD84/A2YBh4DL8ysWLkk0qOkDcD5GLF+Ac+Ap35ZHGjAdWB5gtJvgZFYVSWdBHaFwBlg1Mw8K0ngFiAbAm+a2XBij/6HpBbgBrAEmAVeAZ1AFU40QDCWrcBZL0/S4Vq4HtgB7DWzU5XyauDBMhhWz70ryVVdb2ZuhGpI2g1MODjfiMFrxZk3s9WNwJ6snHFxQUlXgXfAPeC5mf2O2Y5oqZLcMceCw1+AseCSSTP7mSiOpM3A7RixfvgYgAd+WUQcSSnfPWBlgtIvgf5YVSVdBA6GQF/mS2bmWcvbERmHJF+payFw0MzO1TWApKXBViwL3h5/Pk4AVTjRAMFY9njJXl6wLccrcD3wAHDUzBwuRw18JtbkbkFJruomM7sf2o4u4Jals/mFRgxeFcfBQm97UyOwM+WMiwums/k3QnMps+HWpuLIRC5TCrcRW2pbT35MRiY4XDRsVmiU5uJQIZfxb0k5Ij229eQPySJ287MLGO8Rd1M0XY6AO3LjzYVSy3fAH+VICL4a6o9VtTWbnzbYGKI+IrtQ6Ns2EFuq/5jOTnWD9f4DikeFvvbqhyg2Yzo3voJSy2fAjfEJMYPRQQ2caAAfC7AW2WkvrzU79dCwnRW4Hjgg6JrrbV9VKbkKw1Csyd2Ca7on1y2krHOub3t16//2n79SarbsH7BKtfejoCjmAAAAAElFTkSuQmCC","view/resize.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAqCAYAAACDdWrxAAABeUlEQVRIS+2UvUpdURCFvxXRKJpIEBURsVAIiiBoaaGCjY2VLyH4MBaCPoWlnQlpI6SxsQmkURQL5eK/6JK57iuRnMPZtxAkuOFUhzWz96xvjcg8tluAT5LOQqJMHba/AgPAD0nOEtruAOaB6Lon6U+ucAoYTLe7Bb5XCm1/BCaAXqAVOAHyOkYn27PA5/TGWmXHxvBeT2i7TVIM4MUp7ZhGPlY3V/pVKUxEjAIjyac74LIAjK70PwCoyfYXYDJwyqDoHtiRdFOfql0naBgIrILF/ZIi1yH6h1XbYXCPpKOq7s34GEX7JB00m445YBzYlPSQ1dF2N7CaWN2W9DNXuJxAj1uGVeuVQtvh32LyuR34DexWCv+CfAXoBzYkHb8Boe1OSRcFkBdfNY18IQiUtFUpTJjNAPEFHVfAaQFyjZ3zNBzbQ8BSWkZViEbk1uIpjXR8AKbT7jwEvpVUqEk6L0pHLN5hSWWxeq7XjI/v6Sgz0vZ7Ov7DdDwCkcb1m86tSukAAAAASUVORK5CYII=","view/clickanalyse.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAqCAYAAACDdWrxAAAC7UlEQVRIS5WWT2hUZxTFfyfGFolkoUVKrHQiEaX+IfgHa54UQzUqpWYhLbQU6ULNwgYXuog6yiiTgK2LgtAu6yqbFkpRBEURQzJEBN200NqKkxoDLnQhFUrizJU7vje8SSbzZr7FwDy+c75z7z3nfU80uMxMDin9JC0zewvYAHwIrAH65wWaWQuwOdy8CVgUHnBd0sUKoJktBbYC24B1QHMVNeck3ZWZrYhtXpUg/3/gS0kzDnT2/cDqpFqBUUnnK5pjZutDgo01Tr0g6XbVrprZypBgO9AUU/EK+ErSyzLQzC5XkTkCfBR7fl/Smeh/qasOlPRp9DAkOgp8H5P9o6SriUAnMrOzgNdswNeSntcL9IYNAQ8kHYuXU5Y6u8ZIupldAO5I+nkOsNb8wjk/ljTZKFCSvMbSMrPSiOpNx9uAz3UP4IbfWSsdrcDH4eZuYHF46LCk47PT8S6wG9gbJmRhlfoPSLrhJvdERJs7E+S73dZKmnagsx8JB50UEHdY3+x0dIUEO2qcekTSr/OlY21I4N5dEJMwA6yX9CKejqkqGn8DemPPb0v6YrZXpyS1xYbsRD3AtZjsk5IuJQKdyMyGAa/ZnbNR0tN6gd6wXwAP8SfV0jGnxki6mV1xyf4ubdTkPue/Jf3TEJCMNZFRMQLtyNwqvaTrSkdHZry1MFM8bLLPgY5U8/SyeYHvncotb5b1A/t8c2QGg3sT2WBLBbD95PiGogr9Ej0Gbap8r4ZJ5kR+MPhW7WdGd5npEFaa15IE+YWW5uklf2S6/1N7OnfasG+Ad5KiAfyVzwYfVDQnlc71YTaA8Ntrvtq/y2eDgapdTZ0a60UMhjdvmcCgWDClJge7npSBqfRYYY5M6U/M/NqO1mQ+G7xf4VUH5rNBOXtviLQfzH0afizop0fZroOJQCdKpcfyUKrZFhTpfDgU/F4nMNcH9gPwLJ8Nls3xarUaI+mp9NhTg5GJbPBZQyb3OReayP17rutmHPga1PpCOk+zrlEAAAAASUVORK5CYII=","view/res.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAoCAYAAAD6xArmAAADwUlEQVRIS+3WT2gcdRQH8O/b2SwNC7l4MAEPvbilUkoPOUmLjSDrZn4hxYKH/kGwyB4tQogiu/N+GymyoWguhVBQKKkHQTHsW9fUQwqKp4AgtMXkInhILl4CkoTdmSe/6XZp2pntLli8uMedt9/3mze/33yW8Jw+9Jxy0TeYmV8FcFVVTxPRiwA6AP5U1TvZbHapUqn8nrawxGBVJWvtNVWdJ6K05h1V/dhaW08KT/wRM1sAVQCRqn5JRLdyudw9Iora7faJKIrKqnrBNSWiahAEC0+GHwpm5utEdD+KopsuBMDbzPxt0oqstRdV9Za7lslkzlar1Z8erzsUHATBJhG93C34fmJi4ly5XG6nzTEIgjoRzanqkrX2amowM98F8Fq3wK34PWb+Ii14cXExv7e3V6hWq78+axQrANwt/kVEl5j5h0G2IzMfUdWCtfa3R/VPzvhTAG8AOM/MfwwYehTANwB+ZOYPE4ODIDhJRJvMvD9IqLW2GEXRbSJ6AcBtZr6UGPzoS2Y+lc/nt+bm5v5Oa2CtvaKqywC8bs06M7+eGszMn7nTBqDOzPNpwcvLyyPb29vfAZh2Naq6Za0tpAbXarUzURS53eGKL1trv0oKZ+a3AHytqplMJlOOoui4tfaDvqOw1lZUtabubBOtqOqN0dHRB/v7++62XwHwDoB33dkAUGPmoO92e/yitXZeVT8BkE1acbdpPQiCj4hIBw52hQsLC8c6nc77AN4E8FK3yQ4R/Qzgc2b+Je0ZDPU+fjiZp1eXFD5U8CB7u+/DGybgXxnFMA3/m1GISGwegNMAeuYBuON53lKpVBrePBG5RkTuSPc1b2ZmZnDzRKRnHoDYvIODg3u5XM69/E8AKAO40G1aNcb0N6/ZbF5X1fsAbjpInXnGmETzGo3GRdew+0DPGmPSzRORTQA988bHx89NTk6mmtdoNGLziGjJ9/1085rN5l1VPWSeMSbVvLW1tXwYhoXp6en+5olIbB6A2Dzf9wcyb319/cju7m5hdnY22TwRic3zPO98qVQayLxWq3U0DMPYPGNMsnmrq6snx8bGNqempgYyT0SKzjoAsXnGmP7mNZvNU9lsdqtYLKaaJyJXABwyzxiTbp6IxOYRUd33/VTzNjY2RnZ2dnrmAdgyxqSbJyJnAMTmEdFl3/cTzROR2DzHk6qWiei4Maa/eSJScZY99FRXPM+7MTIy8iAMQ6/dbsfmEVHPPGPM4OaJiBtDqnmuqfuL4Pv+8Oa1Wq1jYRg+ZR6A2DxjzP/mPRupfwAf56Q4urCh6QAAAABJRU5ErkJggg==","view/tab_panel.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAABICAYAAADyMAW8AAAAcUlEQVRYR+3WsQ3AMAhE0TCMeyTvP1tShRQo7lxYegxA8fUPLuac97VhwuKXKhTlFxRQ9GPDClawYvGEDwxIZu7pFRZXr4ACinY1ghWsYMX/NxWQr22edyvGGHt6hcV1NqGAon8QVrCCFYteISDnBuQB3xJuQcDkEngAAAAASUVORK5CYII=","view/btn_close.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAqCAYAAACz+XvQAAACmUlEQVRIS7WWS0/bUBCFz7mJmyZxENm06mNVoVZC7LqGn9FNqy55/BSWSEhs2/4uuqFVoA150JLKJvGdaiIH2TfXNoKQpeP5PHPO3GMTK/5xxTwsAUWkBeBZ+qAByb/Zh4pIA8CL9NqY5Dj7vw9YA/ABwDsAfwB8ITnUIhF5CuATgNcAfgH4RnJSCkwLl6AA/lXBtLZQQxFxoTr6q6LOFl2WmuJAtcY7ZuXIixsczfRyTlPfhpSN7BpwBeBtFdQLFJE2gI8AXi7GBBBl3Fdnv5L87XbpWxuFfQbw3NXM0dQLLdrDIH3ylGTiLLYB8CS9lpCc3tmU+xzL1Z9lEXl/n06KavjowCiK1uM4fqMd1Ov1s3a7fZntZjabtSeTiQYHgiC4aLVavZwpbofT6TQYDAaH1tod3bMwDHc7nc5PLZrNZmG/3z8WkS1jzGm32z1oNBqjUqD+6YM2m81xFWyeNkUaulAAlyKyWdTZbdqUmZKFakEVrLRDV7P5zY6m3rQp6tA1AMC5tXY7he51Op0fdwbGcdwdDodHWc2MMdcL9wGM1tbW9sMw/L6UNm6HChuNRifW2g1XM0dTL3TJZS1KkkTDFbVaLQqCIJcm6k0URRpxuvg39Xo9rtzDh5zt1Z/lXq+32rR5dKC1dt0YM08bAGd65BxN1ZB52ojIBcl82rgdWmsDkocAdgDoW22X5DxtSIZJkhyT3AJwCuCAZD5tfCP7oMaYcRVs/tAiDT1QHX2zqLPbtCkzxYFqjXfM3GKXAR3NtC6nqTccioAeA84BbCuU5B4Af9r4gCLSBXCU1UxErjPuj0Rk3xiznDYuMIWdANhwNXM09UKXXNai9LtQ9y4yxuS/XUijr9L0lXBDMp82j370HhJdWvsftiHJYFPSIqEAAAAASUVORK5CYII=","comp/combobox.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFsAAABCCAYAAAA476rKAAACfElEQVR4Xu3bMYsTURQF4PMmExgIWkgEU5hskyJYxGYKY5VS7NzCylL8Bftj3NbKQjuxTBWbaUwhKdIYLCJotlACA5m8kQTZZZkkeN9dbuNJOXPPu/DN5ZHkMa7dbpfgx0TAEdvEedeE2HbWxDa0JjaxLQUMe3HPJrahQECrNE3RarUOJheLBbIsq9znZAdgJ0mC4XCIer1eSa/Xa4xGI+R5TuwA272RTqeDfr9fuTeZTDCfz/dmONkK/cFggGazebnCcrnEeDw+uCKxFdiNRmO3nURRBO/9bvtYrVbEVpgejXa7XfR6PUynU8xms6O1nGzlU3DO7fbu7V5dlsf/0yO2ElsSJ7ZES1lLbCWgJE5siZaylthKQEmc2BItZS2xlYCSOLElWspaYisBJXFiS7SUtcRWAkrixJZoKWuJrQSUxIkt0VLWElsJKIkTW6L1t5an6wFooRGerofKBeZ4uh4IFxrj6XqoXECOp+sBaJoIT9c1esIsT9eFYFbl/J5tJc13agyliU1sWwHDbtyziW0oYNiKk22JfXJ6xnfXjcDdFttnb43a/b9tovQ5iG30/IltBL1tQ2xiGwoYtuJkE9tQILBV/ugl4rh2MF1sPJJP59fuc7IDsTe37mHz8Bki+MoKHhFqn9+j9vs7sQN9K7G89xRx837levHzG5Lph8p1TrZK3iF//ApxdLVI4YFk/BpA9Uc5sVXYwObOCfyDJ3AoUcIh+vIRtYuve1clthJ7G8/7p4hv30Xx6weSybuDKxL7BrARxcjTF0iyN4AviH0Tpto1ONlaQUGe2AIsbSmxtYKCPLEFWNpSYmsFBXliC7C0pZfY2oWY/zeBP8uaLni/AFTVAAAAAElFTkSuQmCC","comp/textinput.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFsAAAAWCAYAAACv8OArAAAAZElEQVRYR+3UQQkAMAwEwcZI/LtsoSL2NTGwMByZ3b3HJQIDO3H+EdidNezQGjbsUiBs+dmwQ4EwZdmwQ4EwZdmwQ4EwZdmwQ4EwZdmwQ4EwZdmwQ4EwZdmwQ4EwZdmwQ4Ew9QBe0R29X9x+dwAAAABJRU5ErkJggg==","comp/vscroll.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAhCAYAAAA/F0BXAAAAOklEQVRIS2N8+OzVf2YWFgYmJiYGcgHjqCEYQTcaJpipaTRMRsOEmDJmNJ2MppPRdEJMCIymE2JCCQAYonwDuu2VMAAAAABJRU5ErkJggg==","comp/vscroll$down.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAzCAYAAABxCePHAAAC/klEQVRIS+2WS0wTURSG/zszBcrLFVvjio0LiAqRRDAmGpRodFE1MQQQkOKGqBujRo3ExLjB4MaKgDzUaGQhvoJGYwAjYoioERcuDGxYEIwPkBY6nWvObXuLnXZaSklYOIu5M/fxzZn/nvPPsInJKa5qGhRFQaIH+w8xSbcymtTd+gBFYXAdyjM9sf7ORxgGR0t5/j9jpkhq2t5B0xQwBrgqNsnJ9V0j4BzQdQNtNYXWkKz0NDiaXkBTFTCFoaWmCHVtQ+AGh+4z0HNiO2bmPNYQGiXQvkuPoaqqiIgi8Pl8eHBqtwlA86MKS6Cy8z1gjIFzjqcXHBEBlpBgRNuOd+HVlYqogJiQIChcg/BtW5k8SaSSkxPJ5PRPTttHfkI7kcghIpn8NYfp33NLXp+TnYG1OWvA3ox9499nPSjdkCsgHJxOIjc43VMrugL9dEUD4Oj/PA4CsUfDX/jOjbmisHTDCCzi4t4QgLDrQF+qTYOmqhgYGw9BvLpv0ZNjQwieaU9b7ZCDriFhSt3VBSZNartHA6aUJ7SK+jqO5n5pSp1HiqSw1e3Di0ypwBpiU1XsudwnTanraDEqrg2GmZLbGkJh2jQVZY29JlPqPe03JX/uxLE7Nk3DjjP3pCn1Ne7HrNsjdYoLQsmWYtNQ3NCBgeZKzLrn/foEoogbQgvSUmz4454P7VQikGhpHzGSZdVOUqqYTGli6gemZ9yJ+0lSTalk/TrxtQOYaBnESbTinokev4UG+p+9/xoyJQKQn8x7vf7JjEFZ1FJBBvuC12RINIdAwtkIQuksnxgHhKBUZ6scQtLSNyiWJpav47z9STjbjfJ8k5iVN0eEs911bhZjUTWpbR+RztZ6uFBERNCq1rfS2e43lFhDsjPscDS9lM7W4dyCquuvpbM9PFkq0iHm7mSl2yP+bj05uxdeXZe5FHOL6Xdr17nQ79bziwew4NXFqwUTMiaEtKBPwtZjnRi8WgXPglfqsyQITc60pwpAeNpH1GRZtRM0pWVVcTJM6S+dYaRsIf025wAAAABJRU5ErkJggg==","comp/vscroll$bar.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAA/CAYAAAAGyyO8AAABYElEQVRYR+2Wv0sDMRTH30tarCg6dRWnQnFT6OiqoP+tk+Cig+AiHayDiNSlg+jgD47K1US+Lwm5s4o/mkElN1xy73KfcF/efTi+Ht3Y0X1Btw8FffdoLy3QSnuZ+HhwZe+exrS13hGGJYsTWSszN0rJ1zHDDbJ0eDYkgHjv5Nxub3TIGEsTY/xDVq6NAN7MfW2u2aCG1nQ0GEZIOXmp7Pw5BPDF+VaGIGQfbM6k0ng5kw8/wF/eJzP5JInZkjg2CSS8zk6vCys7Wb8r5qqsncAP+pdR1Lu9rvgVT4uYg+3F+PCtAzjzu/taKdKKBSS2/wkEMBg/Q+rB50zqzZb7ZPoD/GeZ1HySxGxJHJsEEl5nc22VmCFalpFJTjLKNUtFxlDfP72IogYAP8PPZekWM5OqjErFWpjjbxprABJRA/JYjOOOX4Bgo6bWGYKsfMg5k+lmy5n8uUxm8kkSs6Vw7Cstibc9Fv5vWQAAAABJRU5ErkJggg==","comp/vscroll$up.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAAzCAYAAABxCePHAAADF0lEQVRIS92WTUhUURTHz31vPv0KKmkXrtxUGNomkCANLdCUpEatJFuIClIEFRl9kGH0BYWQElLpotGKEJXAtKQooYUFpi1axLQZMCyyZJqv926cM2/uTM288emoUHfx3v16v3fuuef+72Hume/c7/cBAwaLKWaLBZjLPc0Zk0CSJGBs4SDOObDP7i9ckuXkIbLJRJDFFrJk2SGNvZNwy7ExoZEJLWnqfQ+4SlUFaHNs0gXpQhq6x0GWGe0Y7oCicGivyYsLigup7XgFJlkCJjFwNm2HqrZR4CqHoKLC3fr8GFAMpPLqEJhMoZjpay6Bnx4vpKfYoLx1kCwKBlXoOV78BygGsudCH1nwtNVBgHBBUFFzL1n0+Gx5YghOxhINiAbFG1uZODESxf+bJShKrulv8HUusp1G/IBz1qTZIGvdamBjU584Aopzs+lbDhwfFFgc2/imLq0fazgAHF5MumBtuh3YwJsPfGdeNqgY1qqqfcSprRLgr7rWZzWbwCTL8HLKFYEEgkrUn+eHIDzNbltBSG33O+jcnxNZmrYcw5Yc7hoXotRenRPyz0IgBzrGYkTp9qEtxiEV10eEKD08Wgh7bzwTonSvIV/soK5jd53rE6I0eGY3/PL5wWYxQ+nFgShRKqK6LqTwhJNEafRKNQHCcWK3WmDHqR5NlMoSQzAWUV+9vkBMsKXYLCSbs3Oe+SGqqupGrIL3h3YclifYkjo7yZ7izIzUUGrhnvXAzA+PURkR8xCwPnMVsCUVpW0bsiCUKOH9S0980JvaLJSQUTal9Q+9/RgRJQSgnvgCgdBkxkCKektSpC9cR0HCOQgiZUMI3njijwYg+COzLP9rkLr7E3Dn4Gbhp7BPDC+n0TkhlK2zJpccuSBIfVdsutVdt9U4pLbjtVC2B0cKYN/N50LZHh0rFGGguztV14aFsvWfLiVhSrVboaSlXyjbk/NlBNKFVLT0k7INX3KAx+sXfkBlKzjpJItGLlcmhmSkptAB83h9MTuCICxBRUkMwUmY5+uFPY7LmJ7GW05SZycsSos9xUsmSr8BfgGeWI6+BgEAAAAASUVORK5CYII=","comp/button.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAE0AAABFCAYAAAAPWmvdAAABA0lEQVR4Xu3ZMRGDUBRFwXwfKSgxFhfRgAbUxEakkCEO3qmX+p9m5w7NW9v7cz18I4EFbeT1fwxtbgYtmEGDVgRC458GLQiExNKgBYGQWBq0IBASS4MWBEJiadCCQEgsDVoQCImlQQsCIbE0aEEgJJZW0Pbj64Q3hFvQhmL3CQ8atLlAKCwNWhAIiaVBCwIhsTRoQSAklgYtCITE0qAFgZBYGrQgEBJLgxYEQmJp0IJASCwNWhAIiaUVtOfrdMIbwi1oQ7H7hAcN2lwgFJYGLQiExNKgBYGQWBq0IBASS4MWBEJiadCCQEgsDVoQCImlQQsCIbE0aEEgJJYGLQiExNIC2g/MxaMp6CSauwAAAABJRU5ErkJggg==","view/bg_tool.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAMklEQVRYR+3QQREAAAjDMCYG/DsEGXxSBb2ke7YeiwECBAgQIECAAAECBAgQIEDgW+AAAeIuAVS/mngAAAAASUVORK5CYII=","comp/minBtn.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAA8CAYAAAB1odqiAAAArUlEQVRYR+3X0QmAMAwE0GQN19B9nM193CmiIH7ZXOAoRc/fpjl8jVDdOj/eOc8USBcXqUjLAtDQRMSOdHb3JatTYCZUXodIy10bGxTI1Lx6/YA0Ima6W2tKFcjmdpGKtCow7NBAdxozy+804Gfx/cDqbLzWDzs0ekNY4B9nOMEehMKTVIEEyKeFSKmc18+MppRtipJuYPCa1SkwEyqvo6Tlxm8bFEijvBt9n/QA/fOPydLHcUIAAAAASUVORK5CYII=","view/zoom_out.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAoCAYAAAD6xArmAAACy0lEQVRIS92WQU8TQRTH/28oQkj0CL0QOMAJQkz4DkS6A+GA+A00Hrhj0uy8NiTwEdBPAOrB0Fnq3U8g6gkOSjxUjpCQCu08M5u2qaVAt7YmOqfNZPa3b9/+Z35L6NOgPnHx98Gbm5sTlUplA0AGQBpACcBBKpXazmaz3+5607YVM/MjEXlNRPdbASJyTkRrzPz+Nvg1MDNPAvgI4AGA10qpvHPuSCk17ZwLAazV4HPM/PUmeDvwSwBPAbxl5sf+RmYWZo7XMvOehwPYYebnScAnAMaVUrNhGH5pBefz+Rnn3GcAJ8w8kQT8E8A9AEMA/HXrqM9fMrO/bjvataJvFdd7/IaZfS9/67ExZpeIngB4xczPklQ8KSKHPmoispdKpXKjo6PHp6enU5VKxXhoV6moVXhnjpVS5wDOwjD81K7qG7e033lXV1cviMjvvDEAP0TkYHBwcKtarT4UkXcALolo1RhTaIV3dVYYY9aIyOfZDw9fMcYUm+FdgWvtYgCmBisrpRbCMPxQh3cNbgM3zJzvCdhDcrncuojMA8gy8/eegTvO8U0Lk87/UY9ve9h/BI6iyJ+1GyLScB4RHQDYDoKgO+dFURSfFQCuOQ9A7LwgCJI5r1gsTlar1YbznHP5crl8NDw8PK2Uip3n4QMDA3OLi4udO89a23Ce1jp2nrVWtNbxh7bWxs4jop0gCDp3XhRFJyIy7pybXV5ejp3XDN7f359RSsXO01p37jxrbey8i4uLoZGRkWvOa5q/1Fp37rx+VtxwntY6dl5zK6Io2hWR2Hla686dV0vFoY+aP8xFJJdOp49LpdIUEZkaNHkqfIWd5JiIzkXkLAiCZM7zO09EYueJyBgRxc4joi0ADeeJyOrS0lJvnBdFkf8xbDhPKbWSyWR647xCocC+53XnAVjQWvfGeS1wo7XunfOstesA5pVS2Uwm8w877xeHf444cscwYAAAAABJRU5ErkJggg==","view/refresh2.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAA/CAYAAAAPIIPGAAAEIElEQVRYR+2XTUhjVxTH/+fGpBrGT/xoBQdFFMMQLNLNbLooLbaFzqKMUhCSZwsuhGG6KCNd6DuRLgqzmGVxUd8LUrpoYWZTKO1yNi2F1oVtceEHflSLqNEav8bklPuqgsl75sUPSsucTQj33v895+R/7y+XcA1B16CJ/6GoYRiDItKfzWZjExMTv5/XtoLlx2Kxm0qp1wH0AHgTwC4RfWRZ1mdewp6ig4ODN9Lp9CMieh+AchH41Lbtj92EXUUHBgaCh4eH3wJ4zSObGSLqtSzrZ9+ihmF8CODR8YIflFL3MplMNxF9IiJWIBC4Pz4+/ldR5RuG8QuAlwGsAWi3bTsVj8dvAWhOJpPfFPK2a/mGYewDeAHAV7Zt9+aK9PX1VYRCoVcApNxa4CX6J4B6AE9t2341V9QwjO8AvAFg27btytxxL9EvAbynJxNRj2VZX58sjMfjd4joyT9D9NiyrHf9iup+/gggBCALQPfxVwARAO8cWywD4LZt2z/5EtWT+vv774rIBIBSlx/mmT5dyWTyC9+WOpkYi8XalVIPRKQbwItEpHv9PRE9tCzrt6IsVcgyhcYLnv1CAkWXfxFBxzEXXXipq+8imz7P9CJdO3+N754y86A+vYFAIDY8PHw58DHzTQB54DNNs3jwMfONY6R4go+Z/YNvbGwsuLKyci74APQys3/wMfMZ8InIPaVUt4g44AuHw/eHhoaKAx8znwEfM6dGR0dviUizaZoXA59pmvtE5ICPmfPAx8wVABzwubXA1VLM7IBPRJ4mEok88DHzKfiY2R/4mPkUfCLSk0gkTsHHzHdE5Immnog8TiQS/sDHzK7gE5EIEZ2CTyl1e2RkxD/4TNO8S0Su4BORZ0qpftM0iwefaZrtAB4QkQM+AA74ADxk5ufgc78CfV99xdy61yMajUbfAvA5gJeKycZj7gqADygajf5xRYIn+6xoUbmCDM9I/LuidXV1qK2txdzcHPb39ZPAOwpmGgqFUFFRgerqauczm81iaWkJa2v64eLhU6+eKqXQ1NTkZOcWq6urWF5edh1zzZSI0NbWhvLyctdFBwcHmJ2dxe7urn/R+vp6J0sd6XQaCwsLqKysRGNjI9bX17G4uIhMRr8jiig/EokgHA7j6OgIU1NTjkBZWRl0f7e2tgo60LX8rq4u/UjC5uamU2ZuBAIBZ1O9mVsLXEU7OztRUlKCnZ0dTE9P54nqfmsnaNHJycm8cVfRlpYW1NTUOJN1pjrjk6iqqkJra6vzNZVKYWZmxp+oLq2jo8NpgQ7dx729PZSWlkKL6hARpwr9Q+aGp/m12Zubm6H9mhtacH5+HhsbG/4tdTJTZ9bQ0OD0LxgMOm7Y3t6GNv55R7XgMS3oH5cJ/y3Rq775V3X5bx8zSv8DuWzoa2vgb5tumbHGlerDAAAAAElFTkSuQmCC","view/settings2.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAA/CAYAAAAPIIPGAAAD2ElEQVRYR+1Xz08bRxT+ZjAGYQoH4rS9IBJBQJEsUC8VKNdQtamUE0fLayqhKHeOaGbFkT8gFVLZtXzk1qqKSs4NUg8RXCIQVoOQ2jRFHHCwBRj2VW+zttY/14BXVaPOyR7NfPN9771536xACEOEgImPDHRhYaHv/Pz8kEMVjUbjq6urxVZhayo/lUo9chzndTabfWMYxkMAGx7QrG3bL5LJ5B0p5f1MJvNz7QENQdPp9LdE9CMAZrcHYAaoxJ8AvARwD8AtAI9t2/7JD9wQdH5+/q7jOLzx04DqeCelnFlbW/s9EJQXGIbxq8eQ//4mhPieiJjlEwBf8qQQYtOyLFZRNeqYJpPJWCQSeUBEzz3JrwqFwvT6+vo575ybm4vGYrFNAF8AICnlbKlU2sxms4Uych2oYRh5AJ9UFggxb1mW5aeSTqfTRLTmm3tv2/bAVUCfWpb1zA9qGAaHwD/XGjQU+WVGHU0Ug4ZSUjXFnwMwXVP8nP1RAPG2i5/Z+q9pKpWaFUL8wvNE9FUmk9m48jWtLWavofztNZTb124oN2neH1mTvmoo/pcfHDGtdZ9nLbw4rrW+nvGZpvlISvl6aWnpjWmaD4nINT4hxKxS6sXy8vIdx3HuK6XaMz6ttWt8QohDInKNTwjhJtWzlJdCiHtEdEtK+VgpFWx8Wuu7RMQbWxofEb0TQsxordszPq11Q+MjoidCCNf4AGxqrYONb2VlJVYsFh84jvPck/yKW5/W2jU+rXWUwdj4OBQcYzbCxcXF5sanlMoLIaqMTylVZXymaVYZHxG9N02zufE1AH2qlKoyPqUUh6AyFwgaivzyVehoorxkdL6k/MUPIEdE0/7i5zcUGx8Rxdsufmbrv6ZKqSrjM01z48rXtLbFeA3FNT4At6/dUIJ7V/MV/6HOn0gkvgbwA4DPbyLZ2/sWwHcikUj82SHAMqe3DMrv+I6Ofw9USonJyUlXzfb2NhzHaamsKdPBwUGcnp7i7OwMAwMDGBsbc4H29vaQz+fR09OD3t5eHB8f1x3QEJQBR0dHcXFx4QL39/dXbTw5OXEBI5EIcrlcHXBDUGYxPj6O7u7uljJLpRJ2d3ddNf7RVD6DlhkWCgUcHrof0YjH44jFYu5vnt/Z2QmWz0lhsHIMi8Wiu/HDF6T7mMDExAT6+vjR8iHGHA5/8uqYTk1Noaurq3L6/v4+jo6OqtgMDQ1hZGSkMnd5eYmtra3K/0DQg4ODivTyLg7B8PBw+6ChyC8f39FEMWgoJRVK8TPbjl/T2mruWEO5SYMNo/P/xaDfeB712U3YeXv/ALDwD+TbY8Dbd9BBAAAAAElFTkSuQmCC","view/setting.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAkCAYAAAC9itu8AAACAklEQVQ4T5XUS4iOcRTH8c9xCeVeiiiXhSJRJFIusRO2lEtZKFlgY6GxZDUrk2TFwii22JJLlERRLKRQJmXBkHIb8+hM/2d6ememed93957n93v+55zf9/mHll9VVTNxopTPR8T3piTyT1VVs7AL9zEd+4roOn5gK25HxLfacAjL8A8TWw6ta28jorc2LMLhIu7Ds2Jah4XlRVci4mNUVTUDadiLFF/G5GL4iyOYjxsYMnQ1BDfxujk0VmJPecFAO4bV2Nk05Bqzz3Za6ut86JJDx2vN4Hbj3hjBbcOt4eCaQZXUj5daT4pGoNFimI1zpdYVEf2jsTQX+5MX5NaOFdFFJHzJ2bWI+FJv6SRWYACTWliqa68ioqc2LMWpwtJ7PCymzVhSWOqOiHeZdPachqNIcXdBJV/2B6cLa5cwZLjQYOkqnuNsOeEM1uJgE43xDBsaH9QQfJ21VNBoHfpBaWHLiKGLoeO1ZnAHkpcxgkvOeoeDa0FjTnNLEfF1PJamYkcR3YmIX6OxNA35Kb7BFKwvoqf4jeV4GRE/azQ2Yh4GMaGFpbr2OSKe1Ibse1MRJ84fimkxMqc0Pc55MrjsOYvZRoofNW6/vPUSwEQ+2+tPQ14h9fX4Ap+aQ2MB1pQTB9sx5K24qmnorKWCRvtDF0PHa+0suBaW0ry91O5mus3n/wHmQwUTIH+tVgAAAABJRU5ErkJggg==","view/refresh.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAkCAYAAAC9itu8AAACiElEQVQ4T4WVS4iPYRTGf4/7/X6XcivXcktEUhTKQkqyYCOKjWyUhezFThbIlJ3LYrIRkoWGUhhhTMko4zJujYRpxgxHj9737/P3zfh239c57/uc5/zO+UQ3T0QsBRYCtZI+5jBVx0fEcGA6MA+YCXQCVyXddWwlISL6ARuARcXvhQPrJF3/nRARvYHtwLRuFLYCFyW15ITl6XTHvwIuJzlrgHrgiqSOiqSI2ANMAL4BxyW1R8RYYKSkp8Vb8w2HgD7AE0kXSozoD0wC2nPCAWAw0CyppiRhBzAD6MgJW4D5KdDFNeSkiJgFbEvONeYE698N2K0ArPsDMAZwguN+AmeKfZgLbAb6llj7A7gk6eFfnY6I0cDKpNc1tQFNwG1JvvFPp0sKXQ2sAGokveuJpVHAHGBJ4ul76vLNapbs9dYk6R8oU7driyztA2Z3w5L1n5LUnBPWptMd/xw4l+RscsHAeeNSZMloTAG+AIcltUXERPdB0qMylk4klu5LOlni2ABgqm3Oko4BQ4Fnko6WJOxPzlXg2wV4hv2czuOYhmsBsDf1rD7fYP0HkyyzZN0twHjACZmlI0WWFgM7e2DprKQ71SyNA9YDBnFYcq0RuOZ5/h9LdsVS6yV97YmlgYDn2X3wjUa7QdKLapY8015ePrWMJVtembhewLI0YWU4eZvck/Q525pXo4M/AY+TLMP40u+SuooseVjsitm/IakzItz5QcXhKSZsBCyrpdjlwuZwfSO8mLOkdYAHqFXSrRKWvErtXFdOcJcnp0AX96ZwuldQ5uxtTrD+VUmWWXqfujwk8eQ4f68rsuRG+d/gZVb9eIk9kPS6miXvIv91rNc12TXPc5MkTyO/AFhJCujHqZlCAAAAAElFTkSuQmCC","comp/checkbox.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA4AAAAqCAYAAACDdWrxAAABbUlEQVRIS+2TP0gCURzHv88GRYsrExyOo5cEQVEtWdQQpE4N0R+HxmirXXCrKYigqMF2IRqCQByaLJqNIFpyUIzu4rIwpExODy88ITD/cJ603Rsf7/OGz+/zI5TSEAE20cZRgBMySKni8XrbwICrWAwG2ESZIadFS53J0R25brCyHZNud1vbcRuPV7fDAOu9GXJatNSZHN2R6wb/PfJCrxOZCR8Gbk6hWc6Xg8PrcgBETMIVPdIGSjYG/NoOSHcfkLqDK3qsBSRIrgRAuBF1quUPEUPhYGMwb2dhywrqQ3F0Dt++jSokJMBdhmDO52pB2WwFP7OK8rgH9os99IgppNf3QWwMFP4RNHKALrmoflIj53l6CaWpRcBkgiIkYHl6gDTrh5JJg57v/kJ1YOUixw7jfWELxMpAKUmAXAR7tg3LZ7am3IbjKDBOvPiDqkUmcoj+9H1d7k3nmHdweBubB70ON9wRzQH8pVVQb+Q/zZAEfpwDCU4AAAAASUVORK5CYII=","comp/btn_close.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABwAAAA8CAYAAAB1odqiAAAE6UlEQVRYR+3Y30+bVRgH8G/T0t/0Jy0USrIsC0E2GMKAVYcRpmSbEzIGZhqyxCxeceGVF3pjvJl/wYyJWZYY4hZBFnBuBBUW2ewYAxlsSMiyLKH8aEt/0vZtSxvM+562We15C6jlxr53zfO8z+ec5z2nOTmCk598tY19fAQs+Hlvz76QX1zpAwd+1NMNXzieU1QtFeKbvn4CXvqgC95wLKegRirC1e8GCPjh+53wMnRwedkG54aLG4yhSI/ycnPawHaKJ5M1MhGuXR8k4MX3OnjBx3NPcLX3DPfepSu3odfrYC4r5X7bVlbhcrnT4kdrjlA7xYLffj9EwJ6udnhCW9TEJ08XUgWTqE6n5XLdbk9G7MjhKmodrbwAfQPDBLxw7h1ecH3dDq/Xm1GYrZqceXIgGo0GJSXFvOCNmz8RsLv9NNyhKO+icTqc8Pl8acDLyWyr1Wo1DEYDbw2dXIz+4TsE7DzbBneQH2SruDZc8Pv9GSiLqVQq6Iv0WVe5TiHG4K1RAnaceguuYCTrCx63G4FAgAoqlUpodbqs7+sVEgyN/ELAs20t2Ajwgz6vF6FgMGtL5QoF1BoNL1qklODW6DgBT518gxcM+P1gQqFdLRqZXA6lSkVFWXDk198I2NZyAs7NMDXR7XRmYBKZjMuNMEzmljHQF46hUIrR8XsEbG228IJ+T/rGFkskkMoVHBgOBRGNRNI2vkpL/5YsODZhJeCbJ47D4WeoM4wyDLai5PsWiCUQJ2aXTN4pnswzqmS4e+8BAZstDbxg1qW3hyALTlinCPh6Uz1C0Rg2w/S/tz3UpaYWSgsgF4twf3IagvOXr297PR5YGuv+bd2s71sfzkCj1ULQe+3u9vraGlg0lw+LlZhMEIzUNu7vmYYFmz/9LJeTS9We+PIymaGl6wLizo2cokJDEawDNxLg+W7EHTkGjUWw/tBPwOMdnYg7nNQZep4/Q2B9jYspS0zQHjyUlrdTPJksNBrwYGiQgE3vtiNup4O2SSuOzk5y7z2ubYKyuBiaAwe5394XzxGw29Pi5iYLdeDCYgMmfxxOgKfPIG53UBNt049SBVNo4g864HRmxMz1x3hAIybv3CZg49ttiK/bqYneFRuCLldGYTY5OfPkQBR6PTRl6cfIVEtLivHw51ECNrS2Ir62zrtKfWtrCHo8acDLyWyrFVot1CYTbw2hqQRTY2MJsLk5K8hW8TkcCPp8GSiHqdVQG41ZtxUHTkwQ8NhrFsRXyUrke3wuF0L+TSooVxVCrc9+iBKWmvDodysB65saEFtZ5cX8Hi+YQDBrS2VKBVRa/jONqKwU05NTBKyrexWxlRUquOnfBBNidrVoZHIZClWF1DqisjLMzPxBwNraasRsdHDD6c7ApDIJVzTMRDJiRQb6EUNkLsPs7DwBa6qrELPZqCNzu/1pG1siEUOhkHK5wWAYkUg0La7T0U9tIrMZc/MLBKw+XImtZTrIMBFEouQkIBEXQJaYXXJ0O8WTeQXlZsw/XSRg1SsVvGDWpbuHIAsu/LlEwMrKCsQDAcQ93j2U2H2qUKuBUKnE4uISBF9f/Hj7wJwVhyordl/hH2Q+W1zCixoLOdNUj98Ei+byYbH5lnPkmJhL6O+18/c0/1m38/c0qVbm72nYVuTvadgu5O9pUtsif0+Tv6dhF8P/657mLz4NfQVdLmZiAAAAAElFTkSuQmCC","comp/textarea.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFsAAAAXCAYAAABkrDOOAAAA4klEQVRoQ+3ZvQrCMBiF4e9rU+sPOErRqxDRe/KG9Fp0EAc3VzuIg1ML4uDmlkaaquDenMUTyJoDD+8W3ZyKlaoshSeogHOy1m1euOmoI1EU+auqQUf/8XHnnBzLp3jsWdaVJEnEGEPsADXU2Ifro8Gej/uSpqnHruvmaVegqirZX+4N9mIy8Nh13XEct7vE18RaK7vzjdiIFoiNUH5vEJvYQAHgFMsmNlAAOMWyiQ0UAE6xbGIDBYBTLJvYQAHgFMsmNlAAOMWyiQ0UAE79lM2fmrDy358a/q6Hhf68ng175QueKdEXxUGVVwAAAABJRU5ErkJggg==","view/re.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAoCAYAAAD6xArmAAACpklEQVRIS+WWPUgcQRiG3+8O70QEUwTB1EJgsTGdRRrhOMjOtEtSRbBIBMFKuCtkZleES2uRQoWQJggKKW7Of7GyTRvBLkVShhS73OXMfWGOU85Es7uXs0m2XeZh+OZ95xnCHX10R1ykBvu+P5fP59+VSqVvf9pUarBS6jWAR0Q0rbWOboP3BCaiOQAHAKTW+vtN8L8BW96W4zjPPM/78Ss8FlypVEYajYbHzALAJIAHALJdoDWl1Esi4m74rWBmpiAI5pk5AHAvJj0VrXU5Fmyhvu+/AfA8YRxfaa1LsWDf92eZeSMJlJnXtdYvEo1Ca30G4GEH/ImI1lqt1nE+nz9vNBrLnVTY39uO4zxNdHgrKytjzWbzs13FzKfDw8PFxcXF8HL3Nscd8BEAN3HcgiCYbLVaHyyIiGaUUm+7R9JzQZRSo0T0BUCGmRd831/tBttK53K5zXK5/DV1pZVSG0Q0C2BXa/0kySEmKojWeoiZD4hoKpvNTiwtLX1MC7+1IFrrQWZeJaJxx3EKN5186lF0LwiC4DEz31dKvU+z69i7Ig0stnm9wv4zsDGm7bxCodBf5xlj2s5j5mkpZf+c1wHPEdFBGIbS87z+OO8S3EnAVhRFvTnv8PBwpF6ve0QkiGiSmX9znuu66ZxXq9XmAcQ6j5krUspkzqvVaqmcJ4SId54xxl6ZiZwHYN113WTOq1arZ0R05TwAa5lM5rher5/ncrllAPYl1HZeFEXJnLe3tzd2cXHRdh6A04GBgWKxWLxyXlcqjqIochPHbWdn58p5AGaEENec13NB9vf3R5vNZtt5RLTguu4159lKA9gUQqR3njHGHpx9tOxKKfvnvGq1OmQrC2AKwIQQon/OOzk5GQzD0I5hPIqi/jvPGNN2npTyH3feTzoJOzgswwlqAAAAAElFTkSuQmCC","view/search.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABUAAAAqCAYAAABcOxDuAAABX0lEQVRIS+3VsUrEQBAG4H9HiDZiJQg+gJVaiKAoWClYXWeZ7D6CtbWFr5Ai2ayQxkLQRgsLGwtBUQsRC6sDCxHxEIvIZSRwxRGSu83pNUe23c0H+89kR2AISwzBxAiinuctCSH2AawD+AFwRkR7QRC85CO0ur5SaoOZzwGM54A3IlrJw1aolPIewEJJUY+01jvde31RKeUMgNceXdLSWk9VQl3XnSWiZhnKzF9RFE1WQrPDUsonAHNFsBDiJAzDRmXUdd1tIjoFMJaDW0KI1TAMH61RpdQ0Mx8z8zMzHxLRAYBlAG0Al2ma7hpjHqxbqgNeAJgHcKW1XutEMeE4Ttv3/axXC1dh9XPgbZqmW8aYd9t3ohCVUt4BWARwkyTJZhzHH7Zgdq4MvQbw7ThOw/f9zypgKVoVsS7UX+C+v+kgeI0Oklrvb0Yw03rwlZW8Hnz14OvqjXrw1e/pPyfwCww91CttlMG7AAAAAElFTkSuQmCC","view/save.png":"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABYAAAAoCAYAAAD6xArmAAAA1klEQVRIS+2VzQ3DIAyFwxwdoMMAA/VQ8ZByyEBhmA7QOVxxKLIaOcIoSZUfrlifHw/wM91Ky6zE7SZgANTaDEDhzYJ5odSMC7nA5U7+b4X2dVQr3ic4hHCTlMcY33xPZUUGcwBvdEJwjcfGGIQQ4rd2qenWA3hyAUuABwCP31NtN+i1v02qP4DicRybM885J2ceB/NCyUupfuLxBS4WbmKF9rNUv4p9gq21d0l5SunF91RWZDAH8EYnBNd4nDPPWitnXst0I6Leez+feVowEQ3e+wNk3ge7C/Qp3GfwkgAAAABJRU5ErkJggg=="};},'base64',function(){return this.base64=new Base64Atlas(Base64AtlasManager.dataO);}
+	]);
+	return Base64AtlasManager;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.DebugTxt
+var DebugTxt=(function(){
+	function DebugTxt(){}
+	__class(DebugTxt,'laya.debug.tools.DebugTxt');
+	DebugTxt.init=function(){
+		if (DebugTxt._txt)return;
+		DebugTxt._txt=new Text();
+		DebugTxt._txt.pos(100,100);
+		DebugTxt._txt.color="#ff00ff";
+		DebugTxt._txt.zOrder=999;
+		DebugTxt._txt.fontSize=24;
+		DebugTxt._txt.text="debugTxt inited";
+		Laya.stage.addChild(DebugTxt._txt);
+	}
+
+	DebugTxt.getArgArr=function(arg){
+		var rst;
+		rst=[];
+		var i=0,len=arg.length;
+		for(i=0;i<len;i++){
+			rst.push(arg[i]);
+		}
+		return rst;
+	}
+
+	DebugTxt.dTrace=function(__arg){
+		var arg=arguments;
+		arg=DebugTxt.getArgArr(arg);
+		var str;
+		str=arg.join(" ");
+		if (DebugTxt._txt){
+			DebugTxt._txt.text=str+"\n"+DebugTxt._txt.text;
+		}
+	}
+
+	DebugTxt.getTimeStr=function(){
+		var dateO=/*__JS__ */new Date();
+		return dateO.toTimeString();
+	}
+
+	DebugTxt.traceTime=function(msg){
+		DebugTxt.dTrace(DebugTxt.getTimeStr());
+		DebugTxt.dTrace(msg);
+	}
+
+	DebugTxt.show=function(__arg){
+		var arg=arguments;
+		arg=DebugTxt.getArgArr(arg);
+		var str;
+		str=arg.join(" ");
+		if (DebugTxt._txt){
+			DebugTxt._txt.text=str;
+		}
+	}
+
+	DebugTxt._txt=null;
+	DebugTxt.I=null;
+	return DebugTxt;
+})()
+
+
+/**
+*
+*@author ww
+*@version 1.0
+*
+*@created 2015-11-27 上午9:58:59
+*/
+//class laya.debug.tools.JsonTool
+var JsonTool=(function(){
+	function JsonTool(){}
+	__class(JsonTool,'laya.debug.tools.JsonTool');
+	JsonTool.getJsonString=function(obj,singleLine,split,depth,Width){
+		(singleLine===void 0)&& (singleLine=true);
+		(split===void 0)&& (split="\n");
+		(depth===void 0)&& (depth=0);
+		(Width===void 0)&& (Width=4);
+		var preStr="";
+		preStr=JsonTool.getEmptyStr(depth*Width);
+		var rst;
+		var keyValues;
+		keyValues={};
+		var tKey;
+		var tValue;
+		var type;
+		var keys;
+		keys=[];
+		for(tKey in obj){
+			keys.push(tKey);
+			tValue=obj[tKey];
+			if(JsonTool.singleLineKey[tKey]){
+				keyValues[tKey]=JsonTool.getValueStr(tValue,true,split,depth+1,Width);
+				}else{
+				keyValues[tKey]=JsonTool.getValueStr(tValue,singleLine,split,depth+1,Width);
+			}
+		};
+		var i=0,len=0;
+		len=keys.length;
+		keys.sort();
+		keys=keys.reverse();
+		var keyPreStr;
+		keyPreStr=JsonTool.getEmptyStr((depth+1)*Width);
+		if(singleLine){
+			split="";
+			preStr="";
+			keyPreStr="";
+		};
+		var keyValueStrArr;
+		keyValueStrArr=[];
+		for(i=0;i<len;i++){
+			tKey=keys[i];
+			keyValueStrArr.push(keyPreStr+JsonTool.wrapValue(tKey)+":"+keyValues[tKey]);
+		}
+		rst="{"+split+keyValueStrArr.join(","+split)+split+preStr+"}";
+		return rst;
+	}
+
+	JsonTool.wrapValue=function(value,wraper){
+		(wraper===void 0)&& (wraper="\"");
+		return wraper+value+wraper;
+	}
+
+	JsonTool.getArrStr=function(arr,singleLine,split,depth,Width){
+		(singleLine===void 0)&& (singleLine=true);
+		(split===void 0)&& (split="\n");
+		(depth===void 0)&& (depth=0);
+		(Width===void 0)&& (Width=4);
+		var rst;
+		var i=0,len=0;
+		len=arr.length;
+		var valueStrArr;
+		valueStrArr=[];
+		for(i=0;i<len;i++){
+			valueStrArr.push(JsonTool.getValueStr(arr[i],singleLine,split,depth+1,Width));
+		};
+		var preStr="";
+		preStr=JsonTool.getEmptyStr((depth+1)*Width);
+		if(singleLine){
+			split="";
+			preStr="";
+		}
+		rst="["+split+preStr+valueStrArr.join(","+split+preStr)+"]";
+		return rst;
+	}
+
+	JsonTool.quote=function(string){
+		JsonTool.escapable.lastIndex=0;
+		return JsonTool.escapable.test(string)? '"'+string.replace(JsonTool.escapable,function(a){
+			var c=JsonTool.meta[a];
+			return typeof c==='string' ? c :
+			'\\u'+('0000'+a.charCodeAt(0).toString(16)).slice(-4);
+		})+'"' :'"'+string+'"';
+	}
+
+	JsonTool.getValueStr=function(tValue,singleLine,split,depth,Width){
+		(singleLine===void 0)&& (singleLine=true);
+		(split===void 0)&& (split="\n");
+		(depth===void 0)&& (depth=0);
+		(Width===void 0)&& (Width=0);
+		var rst;
+		if((typeof tValue=='string')){
+			rst=JsonTool.quote(tValue);
+			}else if(tValue==null){
+			rst="null";
+			}else if((typeof tValue=='number')|| ((typeof tValue=='number')&& Math.floor(tValue)==tValue)|| (typeof tValue=='boolean')){
+			rst=tValue;
+			}else if((tValue instanceof Array)){
+			rst=JsonTool.getArrStr(tValue,singleLine,split,depth,Width);
+			}else if((typeof tValue=='object')){
+			rst=JsonTool.getJsonString(tValue,singleLine,split,depth,Width);
+			}else{
+			rst=tValue;
+		}
+		return rst;
+	}
+
+	JsonTool.getEmptyStr=function(width){
+		if(!JsonTool.emptyDic.hasOwnProperty(width)){
+			var i=0;
+			var len=0;
+			len=width;
+			var rst;
+			rst="";
+			for(i=0;i<len;i++){
+				rst+=" ";
+			}
+			JsonTool.emptyDic[width]=rst;
+		}
+		return JsonTool.emptyDic[width];
+	}
+
+	JsonTool.emptyDic={};
+	__static(JsonTool,
+	['singleLineKey',function(){return this.singleLineKey={
+			"props":true
+		};},'escapable',function(){return this.escapable=/[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g;},'meta',function(){return this.meta = {   
+		'\b':'\\b',
+		'\t':'\\t',
+		'\n':'\\n',
+		'\f':'\\f',
+		'\r':'\\r',
+		'"' :'\\"',
+		'\\':'\\\\'
+};}
+
+
+]);
+return JsonTool;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.layout.LayoutFuns
+var LayoutFuns=(function(){
+	function LayoutFuns(){}
+	__class(LayoutFuns,'laya.debug.tools.layout.LayoutFuns');
+	LayoutFuns.sameWidth=function(totalWidth,items,data,sX){
+		(sX===void 0)&& (sX=0);
+		var dWidth=0;
+		if (data && data.dWidth)
+			dWidth=data.dWidth;
+		var perWidth=NaN;
+		perWidth=(totalWidth-(items.length-1)*dWidth)/ items.length;
+		var tItem;
+		var i=0,len=0;
+		var tX=NaN;
+		tX=sX;
+		len=items.length;
+		for (i=0;i < len;i++){
+			tItem=items[i];
+			tItem.x=tX;
+			tItem.width=perWidth;
+			tX+=dWidth+perWidth;
+		}
+	}
+
+	LayoutFuns.getSameWidthLayout=function(items,dWidth){
+		var data;
+		data={};
+		data.dWidth=dWidth;
+		return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.sameWidth);
+	}
+
+	LayoutFuns.getLayouter=function(items,data,fun){
+		var layouter;
+		layouter=new Layouter();
+		layouter.items=items;
+		layouter.data=data;
+		layouter.layoutFun=fun;
+		return layouter;
+	}
+
+	LayoutFuns.sameDis=function(totalWidth,items,data,sX){
+		(sX===void 0)&& (sX=0);
+		var dWidth=NaN;
+		dWidth=totalWidth;
+		var tItem;
+		var i=0,len=0;
+		len=items.length;
+		LayoutFuns.prepareForLayoutWidth(totalWidth,items);
+		for (i=0;i < len;i++){
+			tItem=items[i];
+			dWidth-=tItem.width;
+		}
+		if (items.length > 1)
+			dWidth=dWidth / (items.length-1);
+		var tX=NaN;
+		tX=sX;
+		len=items.length;
+		for (i=0;i < len;i++){
+			tItem=items[i];
+			tItem.x=tX;
+			tX+=dWidth+tItem.width;
+		}
+	}
+
+	LayoutFuns.getSameDisLayout=function(items,rateSame){
+		(rateSame===void 0)&& (rateSame=false);
+		var data;
+		data={};
+		if (rateSame){
+			var i=0,len=0;
+			len=items.length;
+			var tItem;
+			var totalWidth=NaN;
+			totalWidth=0;
+			for (i=0;i < len;i++){
+				tItem=items[i];
+				totalWidth+=tItem.width;
+			}
+			totalWidth=tItem.x+tItem.width;
+			for (i=0;i < len;i++){
+				tItem=items[i];
+				LayoutFuns.setItemRate(tItem,tItem.width / totalWidth);
+			}
+		}
+		return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.sameDis);
+	}
+
+	LayoutFuns.fullFill=function(totalWidth,items,data,sX){
+		(sX===void 0)&& (sX=0);
+		var dL=0,dR=0;
+		if (data){
+			if (data.dL)
+				dL=data.dL;
+			if (data.dR)
+				dR=data.dR;
+		};
+		var item;
+		var i=0,len=0;
+		len=items.length;
+		for (i=0;i < len;i++){
+			item=items[i];
+			item.x=sX+dL;
+			item.width=totalWidth-dL-dR;
+		}
+	}
+
+	LayoutFuns.getFullFillLayout=function(items,dL,dR){
+		(dL===void 0)&& (dL=0);
+		(dR===void 0)&& (dR=0);
+		var data;
+		data={};
+		data.dL=dL;
+		data.dR=dR;
+		return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.fullFill);
+	}
+
+	LayoutFuns.fixPos=function(totalWidth,items,data,sX){
+		(sX===void 0)&& (sX=0);
+		var dLen=0;
+		var poss=[];
+		var isRate=false;
+		if (data){
+			if (data.dLen)
+				dLen=data.dLen;
+			if (data.poss)
+				poss=data.poss;
+			if (data.isRate)
+				isRate=data.isRate;
+		};
+		var item;
+		var i=0,len=0;
+		len=poss.length;
+		var tX=NaN;
+		tX=sX;
+		var tValue=NaN;
+		var preItem;
+		preItem=null;
+		for (i=0;i < len;i++){
+			item=items[i];
+			tValue=sX+poss[i];
+			if (isRate){
+				tValue=sX+poss[i] *totalWidth;
+			}
+			item.x=tValue;
+			if (preItem){
+				preItem.width=item.x-dLen-preItem.x;
+			}
+			preItem=item;
+		};
+		var lastItem;
+		lastItem=items[items.length-1];
+		lastItem.width=sX+totalWidth-dLen-lastItem.x;
+	}
+
+	LayoutFuns.getFixPos=function(items,dLen,isRate,poss){
+		(dLen===void 0)&& (dLen=0);
+		(isRate===void 0)&& (isRate=false);
+		var data;
+		data={};
+		var layout;
+		layout=LayoutFuns.getLayouter(items,data,LayoutFuns.fixPos);
+		var i=0,len=0;
+		var sX=NaN;
+		var totalWidth=NaN;
+		sX=layout.x;
+		totalWidth=layout.width;
+		if (!poss){
+			poss=[];
+			len=items.length;
+			var tValue=NaN;
+			for (i=0;i < len;i++){
+				tValue=items[i].x-sX;
+				if (isRate){
+					tValue=tValue / totalWidth;
+				}
+				else{
+				}
+				poss.push(tValue);
+			}
+		}
+		data.dLen=dLen;
+		data.poss=poss;
+		data.isRate=isRate;
+		return layout;
+	}
+
+	LayoutFuns.clearItemsRelativeInfo=function(items){
+		var i=0,len=0;
+		len=items.length;
+		for (i=0;i < len;i++){
+			LayoutFuns.clearItemRelativeInfo(items[i]);
+		}
+	}
+
+	LayoutFuns.clearItemRelativeInfo=function(item){
+		var Nan="NaN";
+		item.getLayout().left=Nan;
+		item.getLayout().right=Nan;
+	}
+
+	LayoutFuns.prepareForLayoutWidth=function(totalWidth,items){
+		var i=0,len=0;
+		len=items.length;
+		for (i=0;i < len;i++){
+			LayoutFuns.prepareItemForLayoutWidth(totalWidth,items[i]);
+		}
+	}
+
+	LayoutFuns.getSumWidth=function(items){
+		var sum=NaN;
+		sum=0;
+		var i=0,len=0;
+		len=items.length;
+		for (i=0;i < len;i++){
+			sum+=items[i].width;
+		}
+		return sum;
+	}
+
+	LayoutFuns.prepareItemForLayoutWidth=function(totalWidth,item){
+		if (LayoutFuns.getItemRate(item)> 0){
+			item.width=totalWidth *LayoutFuns.getItemRate(item);
+		}
+	}
+
+	LayoutFuns.setItemRate=function(item,rate){
+		item["layoutRate"]=rate;
+	}
+
+	LayoutFuns.getItemRate=function(item){
+		return item["layoutRate"] ? item["layoutRate"] :-1;
+	}
+
+	LayoutFuns.setItemFreeSize=function(item,free){
+		(free===void 0)&& (free=true);
+		item["layoutFreeSize"]=free;
+	}
+
+	LayoutFuns.isItemFreeSize=function(item){
+		return item["layoutFreeSize"];
+	}
+
+	LayoutFuns.lockedDis=function(totalWidth,items,data,sX){
+		(sX===void 0)&& (sX=0);
+		var dists;
+		dists=data.dists;
+		var sumDis=NaN;
+		sumDis=data.sumDis;
+		var sumWidth=NaN;
+		var i=0,len=0;
+		var tItem;
+		var preItem;
+		LayoutFuns.prepareForLayoutWidth(totalWidth,items);
+		sumWidth=LayoutFuns.getSumWidth(items);
+		var dWidth=NaN;
+		dWidth=totalWidth-sumDis-sumWidth;
+		var freeItem;
+		freeItem=LayoutFuns.getFreeItem(items);
+		if(freeItem){
+			freeItem.width+=dWidth;
+		}
+		preItem=items[0];
+		preItem.x=sX;
+		len=items.length;
+		for(i=1;i<len;i++){
+			tItem=items[i];
+			tItem.x=preItem.x+preItem.width+dists[i-1];
+			preItem=tItem;
+		}
+	}
+
+	LayoutFuns.getFreeItem=function(items){
+		var i=0,len=0;
+		len=items.length;
+		for (i=0;i < len;i++){
+			if(LayoutFuns.isItemFreeSize(items[i])){
+				return items[i];
+			}
+		}
+		return null;
+	}
+
+	LayoutFuns.getLockedDis=function(items){
+		var data;
+		data={};
+		var dists;
+		var i=0,len=0;
+		var tItem;
+		var preItem;
+		var sumDis=NaN;
+		sumDis=0;
+		var tDis=NaN;
+		preItem=items[0];
+		dists=[];
+		len=items.length;
+		for(i=1;i<len;i++){
+			tItem=items[i];
+			tDis=tItem.x-preItem.x-preItem.width;
+			dists.push(tDis);
+			sumDis+=tDis;
+			preItem=tItem;
+		}
+		data.dists=dists;
+		data.sumDis=sumDis;
+		return LayoutFuns.getLayouter(items,data,laya.debug.tools.layout.LayoutFuns.lockedDis);
+	}
+
+	LayoutFuns.RateSign="layoutRate";
+	LayoutFuns.FreeSizeSign="layoutFreeSize";
+	return LayoutFuns;
+})()
+
+
+/**
+*本类用于监控对象 set get 函数的调用
+*@author ww
+*@version 1.0
+*
+*@created 2015-10-23 下午2:52:48
+*/
+//class laya.debug.tools.hook.VarHook
+var VarHook=(function(){
+	function VarHook(){}
+	__class(VarHook,'laya.debug.tools.hook.VarHook');
+	VarHook.hookVar=function(obj,name,setHook,getHook){
+		if(!setHook)setHook=[];
+		if(!getHook)getHook=[];
+		var preO=obj;
+		var preValue=obj[name];
+		var des;
+		des=ClassTool.getOwnPropertyDescriptor(obj,name);
+		var ndes={};
+		var mSet=function (value){
+			console.log("var hook set "+name+":",value);
+			preValue=value;
+		};
+		var mGet=function (){
+			console.log("var hook get"+name+":",preValue);
+			return preValue;
+		}
+		if(des){
+			ndes.set=mSet;
+			ndes.get=mGet;
+			ndes.enumerable=des.enumerable;
+			setHook.push(ndes.set);
+			getHook.push(ndes.get);
+			FunHook.hookFuns(ndes,"set",setHook);
+			FunHook.hookFuns(ndes,"get",getHook,getHook.length-1);
+			ClassTool.defineProperty(obj,name,ndes);
+			return;
+		}
+		while(!des&&obj["__proto__"]){
+			obj=obj["__proto__"];
+			des=ClassTool.getOwnPropertyDescriptor(obj,name);
+		}
+		if (des){
+			ndes.set=des.set?des.set:mSet;
+			ndes.get=des.get?des.get:mGet;
+			ndes.enumerable=des.enumerable;
+			setHook.push(ndes.set);
+			getHook.push(ndes.get);
+			FunHook.hookFuns(ndes,"set",setHook);
+			FunHook.hookFuns(ndes,"get",getHook,getHook.length-1);
+			ClassTool.defineProperty(preO,name,ndes);
+		}
+		if(!des){
+			console.log("get des fail add directly");
+			ndes.set=mSet;
+			ndes.get=mGet;
+			setHook.push(ndes.set);
+			getHook.push(ndes.get);
+			FunHook.hookFuns(ndes,"set",setHook);
+			FunHook.hookFuns(ndes,"get",getHook,getHook.length-1);
+			ClassTool.defineProperty(obj,name,ndes);
+		}
+	}
+
+	VarHook.getLocFun=function(msg,level){
+		(msg===void 0)&& (msg="");
+		(level===void 0)&& (level=0);
+		level+=1;
+		var rst;
+		rst=function (){
+			FunHook.traceLoc(level,msg);
+		}
+		return rst;
+	}
+
+	return VarHook;
+})()
+
+
+/**
+*本类用于监控对象值变化
+*@author ww
+*@version 1.0
+*
+*@created 2015-10-23 下午4:18:27
+*/
+//class laya.debug.tools.Watcher
+var Watcher=(function(){
+	function Watcher(){}
+	__class(Watcher,'laya.debug.tools.Watcher');
+	Watcher.watch=function(obj,name,funs){
+		VarHook.hookVar(obj,name,funs);
+	}
+
+	Watcher.traceChange=function(obj,name,sign){
+		(sign===void 0)&& (sign="var changed:");
+		VarHook.hookVar(obj,name,[Watcher.getTraceValueFun(name),VarHook.getLocFun(sign)]);
+	}
+
+	Watcher.debugChange=function(obj,name){
+		VarHook.hookVar(obj,name,[VarHook.getLocFun("debug loc"),FunHook.debugHere]);
+	}
+
+	Watcher.differChange=function(obj,name,sign,msg){
+		(msg===void 0)&& (msg="");
+		VarHook.hookVar(obj,name,[Watcher.getDifferFun(obj,name,sign,msg)]);
+	}
+
+	Watcher.getDifferFun=function(obj,name,sign,msg){
+		(msg===void 0)&& (msg="");
+		var rst;
+		rst=function (){
+			DifferTool.differ(sign,obj[name],msg);
+		}
+		return rst;
+	}
+
+	Watcher.traceValue=function(value){
+		console.log("value:",value);
+	}
+
+	Watcher.getTraceValueFun=function(name){
+		var rst;
+		rst=function (value){
+			console.log("set "+name+" :",value);
+		}
+		return rst;
+	}
+
+	return Watcher;
 })()
 
 
@@ -7784,303 +5682,160 @@ var ByteEx=(function(){
 *...
 *@author ww
 */
-//class laya.debug.tools.ColorTool
-var ColorTool=(function(){
-	function ColorTool(){
-		this.red=NaN;
-		this.green=NaN;
-		this.blue=NaN;
-	}
-
-	__class(ColorTool,'laya.debug.tools.ColorTool');
-	ColorTool.toHexColor=function(color){
-		return Utils.toHexColor(color);
-	}
-
-	ColorTool.getRGBByRGBStr=function(str){
-		str.charAt(0)=='#' && (str=str.substr(1));
-		var color=/*__JS__ */parseInt(str,16);
-		var flag=(str.length==8);
-		var _color;
-		_color=[((0x00FF0000 & color)>> 16),((0x0000FF00 & color)>> 8),(0x000000FF & color)];
-		return _color;
-	}
-
-	ColorTool.getColorBit=function(value){
-		var rst;
-		rst=Math.floor(value).toString(16);
-		rst=rst.length > 1 ? rst :"0"+rst;
-		return rst;
-	}
-
-	ColorTool.getRGBStr=function(rgb){
-		return "#"+ColorTool.getColorBit(rgb[0])+ColorTool.getColorBit(rgb[1])+ColorTool.getColorBit(rgb[2]);
-	}
-
-	ColorTool.traseHSB=function(hsb){
-		console.log("hsb:",hsb[0],hsb[1],hsb[2]);
-	}
-
-	ColorTool.rgb2hsb=function(rgbR,rgbG,rgbB){
-		var rgb=[rgbR,rgbG,rgbB];
-		rgb.sort(MathTools.sortNumSmallFirst);
-		var max=rgb[2];
-		var min=rgb[0];
-		var hsbB=max / 255.0;
-		var hsbS=max==0 ? 0 :(max-min)/ max;
-		var hsbH=0;
-		if(max==min){
-			hsbH=1;
+//class laya.debug.tools.VisibleAnalyser
+var VisibleAnalyser=(function(){
+	function VisibleAnalyser(){}
+	__class(VisibleAnalyser,'laya.debug.tools.VisibleAnalyser');
+	VisibleAnalyser.analyseTarget=function(node){
+		var isInstage=false;
+		isInstage=node.displayedInStage;
+		var gRec;
+		gRec=NodeUtils.getGRec(node);
+		var stageRec=new Rectangle();
+		stageRec.setTo(0,0,Laya.stage.width,Laya.stage.height);
+		var isInVisibleRec=false;
+		var visibleRec;
+		visibleRec=stageRec.intersection(gRec);
+		if (visibleRec.width > 0 && visibleRec.height > 0){
+			isInVisibleRec=true;
 		}
-		else
-		if (rgbR==0 && rgbG==0&&rgbB==0){
-		}else
-		if (max==rgbR && rgbG >=rgbB){
-			hsbH=(rgbG-rgbB)*60 / (max-min)+0;
-		}
-		else if (max==rgbR && rgbG < rgbB){
-			hsbH=(rgbG-rgbB)*60 / (max-min)+360;
-		}
-		else if (max==rgbG){
-			hsbH=(rgbB-rgbR)*60 / (max-min)+120;
-		}
-		else if (max==rgbB){
-			hsbH=(rgbR-rgbG)*60 / (max-min)+240;
-		}
-		return [hsbH,hsbS,hsbB];
-	}
-
-	ColorTool.hsb2rgb=function(h,s,v){
-		var r=0,g=0,b=0;
-		var i=Math.floor((h / 60)% 6);
-		var f=(h / 60)-i;
-		var p=v *(1-s);
-		var q=v *(1-f *s);
-		var t=v *(1-(1-f)*s);
-		switch (i){
-			case 0:
-				r=v;
-				g=t;
-				b=p;
-				break ;
-			case 1:
-				r=q;
-				g=v;
-				b=p;
-				break ;
-			case 2:
-				r=p;
-				g=v;
-				b=t;
-				break ;
-			case 3:
-				r=p;
-				g=q;
-				b=v;
-				break ;
-			case 4:
-				r=t;
-				g=p;
-				b=v;
-				break ;
-			case 5:
-				r=v;
-				g=p;
-				b=q;
-				break ;
-			default :
-				break ;
-			}
-		return [Math.floor(r *255.0),Math.floor(g *255.0),Math.floor(b *255.0)];
-	}
-
-	return ColorTool;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.enginehook.RenderSpriteHook
-var RenderSpriteHook=(function(){
-	function RenderSpriteHook(){
-		/**@private */
-		//this._next=null;
-		/**@private */
-		//this._fun=null;
-	}
-
-	__class(RenderSpriteHook,'laya.debug.tools.enginehook.RenderSpriteHook');
-	var __proto=RenderSpriteHook.prototype;
-	__proto._canvas=function(sprite,context,x,y){
-		var _cacheStyle=sprite._cacheStyle;
-		var _next=this._next;
-		var _repaint;
-		if (!_cacheStyle.enableCanvasRender){
-			RenderSpriteHook._oldCanvas.call(this,sprite,context,x,y);
-			return;
-		}
-		if (sprite._needRepaint()|| (!_cacheStyle.canvas)){
-			_repaint=true;
-			}else{
-			_repaint=false;
+		else{
+			isInVisibleRec=false;
 		};
-		var preTime;
-		preTime=Browser.now();
-		RenderSpriteHook._oldCanvas.call(this,sprite,context,x,y);
-		if (_repaint){
-			CacheAnalyser.I.reCacheCanvas(sprite,Browser.now()-preTime);
-			}else{
-			CacheAnalyser.I.renderCanvas(sprite,Browser.now()-preTime);
+		var gAlpha=NaN;
+		gAlpha=NodeUtils.getGAlpha(node);
+		var gVisible=false;
+		gVisible=NodeUtils.getGVisible(node);
+		var msg;
+		msg="";
+		msg+="isInstage:"+isInstage+"\n";
+		msg+="isInVisibleRec:"+isInVisibleRec+"\n";
+		msg+="gVisible:"+gVisible+"\n";
+		msg+="gAlpha:"+gAlpha+"\n";
+		if (isInstage && isInVisibleRec && gVisible && gAlpha > 0){
+			if (Render.isWebGL){
+				VisibleAnalyser.anlyseRecVisible(node);
+			}
+			msg+="coverRate:"+VisibleAnalyser.coverRate+"\n";
+			if (VisibleAnalyser._coverList.length > 0){
+				Laya.timer.once(1000,null,VisibleAnalyser.showListLater);
+			}
 		}
+		console.log(msg);
 	}
 
-	RenderSpriteHook.init=function(){
-		if (RenderSpriteHook._oldCanvas)return;
-		RenderSpriteHook._oldCanvas=RenderSprite["prototype"]["_canvas"];
-		RenderSprite["prototype"]["_canvas"]=RenderSpriteHook["prototype"]["_canvas"];
+	VisibleAnalyser.showListLater=function(){}
+	VisibleAnalyser.isCoverByBrother=function(node){
+		var parent=node.parent;
+		if (!parent)
+			return;
+		var _childs;
+		_childs=parent._children;
+		var index=0;
+		index=_childs.indexOf(node);
+		if (index < 0)
+			return;
+		var i=0,len=0;
+		var canvas;
+		var rec;
+		rec=parent.getSelfBounds();
+		if (rec.width <=0 || rec.height <=0)
+			return;
 	}
 
-	RenderSpriteHook.IMAGE=0x01;
-	RenderSpriteHook.FILTERS=0x02;
-	RenderSpriteHook.ALPHA=0x04;
-	RenderSpriteHook.TRANSFORM=0x08;
-	RenderSpriteHook.CANVAS=0x10;
-	RenderSpriteHook.BLEND=0x20;
-	RenderSpriteHook.CLIP=0x40;
-	RenderSpriteHook.STYLE=0x80;
-	RenderSpriteHook.GRAPHICS=0x100;
-	RenderSpriteHook.CUSTOM=0x200;
-	RenderSpriteHook.ENABLERENDERMERGE=0x400;
-	RenderSpriteHook.CHILDS=0x800;
-	RenderSpriteHook.INIT=0x11111;
-	RenderSpriteHook.renders=[];
-	RenderSpriteHook._oldCanvas=null;
-	RenderSpriteHook.I=null;
-	RenderSpriteHook._preCreateFun=null;
-	return RenderSpriteHook;
-})()
-
-
-/**
-*...
-*@author ww
-*/
-//class laya.debug.tools.resizer.SimpleResizer
-var SimpleResizer=(function(){
-	function SimpleResizer(){}
-	__class(SimpleResizer,'laya.debug.tools.resizer.SimpleResizer');
-	SimpleResizer.setResizeAble=function(clickItem,tar,minWidth,minHeight){
-		(minWidth===void 0)&& (minWidth=150);
-		(minHeight===void 0)&& (minHeight=150);
-		clickItem.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",null,SimpleResizer.onMouseDown,[tar,minWidth,minHeight]);
-	}
-
-	SimpleResizer.onMouseDown=function(tar,minWidth,minHeight,e){
-		SimpleResizer.clearEvents();
-		if (!tar)return;
-		SimpleResizer.preMousePoint.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
-		SimpleResizer.preTarSize.setTo(tar.width,tar.height);
-		SimpleResizer.preScale.setTo(1,1);
-		var rTar;
-		rTar=tar;
-		while (rTar&&rTar!=Laya.stage){
-			SimpleResizer.preScale.x *=rTar.scaleX;
-			SimpleResizer.preScale.y *=rTar.scaleY;
-			rTar=rTar.parent;
+	VisibleAnalyser.anlyseRecVisible=function(node){
+		VisibleAnalyser.isNodeWalked=false;
+		VisibleAnalyser._analyseTarget=node;
+		if (!VisibleAnalyser.mainCanvas)
+			VisibleAnalyser.mainCanvas=CanvasTools.createCanvas(Laya.stage.width,Laya.stage.height);
+		CanvasTools.clearCanvas(VisibleAnalyser.mainCanvas);
+		VisibleAnalyser.tColor=1;
+		VisibleAnalyser.resetCoverList();
+		WalkTools.walkTargetEX(Laya.stage,VisibleAnalyser.recVisibleWalker,null,VisibleAnalyser.filterFun);
+		if (!VisibleAnalyser.isTarRecOK){
+			VisibleAnalyser.coverRate=0;
 		}
-		Laya.stage.on(/*laya.events.Event.MOUSE_UP*/"mouseup",null,SimpleResizer.onMouseMoveEnd);
-		Laya.timer.loop(100,null,SimpleResizer.onMouseMoving,[tar,minWidth,minHeight]);
+		else{
+			VisibleAnalyser.coverRate=CanvasTools.getDifferRate(VisibleAnalyser.preImageData,VisibleAnalyser.tarImageData);
+		}
+		console.log("coverRate:",VisibleAnalyser.coverRate);
 	}
 
-	SimpleResizer.onMouseMoving=function(tar,minWidth,minHeight,e){
-		var tWidth=(Laya.stage.mouseX-SimpleResizer.preMousePoint.x)/ SimpleResizer.preScale.x+SimpleResizer.preTarSize.x;
-		var tHeight=(Laya.stage.mouseY-SimpleResizer.preMousePoint.y)/SimpleResizer.preScale.y+SimpleResizer.preTarSize.y;
-		tar.width=tWidth > minWidth?tWidth:minWidth;
-		tar.height=tHeight>minHeight?tHeight:minHeight;
+	VisibleAnalyser.getRecArea=function(rec){
+		return rec.width *rec.height;
 	}
 
-	SimpleResizer.onMouseMoveEnd=function(e){
-		SimpleResizer.clearEvents();
+	VisibleAnalyser.addCoverNode=function(node,coverRate){
+		var data;
+		data={};
+		data.path=node;
+		data.label=ClassTool.getNodeClassAndName(node)+":"+coverRate;
+		data.coverRate=coverRate;
+		VisibleAnalyser._coverList.push(data);
+		console.log("coverByNode:",node,coverRate);
 	}
 
-	SimpleResizer.clearEvents=function(){
-		Laya.timer.clear(null,SimpleResizer.onMouseMoving);
-		Laya.stage.off(/*laya.events.Event.MOUSE_UP*/"mouseup",null,SimpleResizer.onMouseMoveEnd);
+	VisibleAnalyser.resetCoverList=function(){
+		VisibleAnalyser._coverList.length=0;
 	}
 
-	__static(SimpleResizer,
-	['preMousePoint',function(){return this.preMousePoint=new Point();},'preTarSize',function(){return this.preTarSize=new Point();},'preScale',function(){return this.preScale=new Point();}
-	]);
-	return SimpleResizer;
-})()
-
-
-/**
-*
-*@author ww
-*@version 1.0
-*
-*@created 2017-3-2 下午12:11:59
-*/
-//class laya.debug.tools.CallLaterTool
-var CallLaterTool=(function(){
-	function CallLaterTool(){
-		this._getHandler=null;
-		this._indexHandler=null;
-		this._pool=null;
-		this._laters=null;
-	}
-
-	__class(CallLaterTool,'laya.debug.tools.CallLaterTool');
-	var __proto=CallLaterTool.prototype;
-	/**
-	*延迟执行。
-	*@param caller 执行域(this)。
-	*@param method 定时器回调函数。
-	*@param args 回调参数。
-	*/
-	__proto.callLater=function(caller,method,args){
-		if (this._getHandler(caller,method)==null){
-			CallLaterTool.oldCallLater.call(this,caller,method,args);
-			if(CallLaterTool._isRecording){
-				CallLaterTool._recordedCallLaters.push(this._laters[this._laters.length-1]);
+	VisibleAnalyser.recVisibleWalker=function(node){
+		if (node==VisibleAnalyser._analyseTarget){
+			VisibleAnalyser.isNodeWalked=true;
+			VisibleAnalyser.tarRec.copyFrom(NodeUtils.getGRec(node));
+			console.log("tarRec:",VisibleAnalyser.tarRec.toString());
+			if (VisibleAnalyser.tarRec.width > 0 && VisibleAnalyser.tarRec.height > 0){
+				VisibleAnalyser.isTarRecOK=true;
+				VisibleAnalyser.tColor++;
+				CanvasTools.fillCanvasRec(VisibleAnalyser.mainCanvas,VisibleAnalyser.tarRec,ColorTool.toHexColor(VisibleAnalyser.tColor));
+				VisibleAnalyser.preImageData=CanvasTools.getImageDataFromCanvasByRec(VisibleAnalyser.mainCanvas,VisibleAnalyser.tarRec);
+				VisibleAnalyser.tarImageData=CanvasTools.getImageDataFromCanvasByRec(VisibleAnalyser.mainCanvas,VisibleAnalyser.tarRec);
+			}
+			else{
+				console.log("tarRec Not OK:",VisibleAnalyser.tarRec);
+			}
+		}
+		else{
+			if (VisibleAnalyser.isTarRecOK){
+				var tRec;
+				tRec=NodeUtils.getGRec(node);
+				VisibleAnalyser.interRec=VisibleAnalyser.tarRec.intersection(tRec,VisibleAnalyser.interRec);
+				if (VisibleAnalyser.interRec && VisibleAnalyser.interRec.width > 0 && VisibleAnalyser.interRec.height > 0){
+					VisibleAnalyser.tColor++;
+					CanvasTools.fillCanvasRec(VisibleAnalyser.mainCanvas,tRec,ColorTool.toHexColor(VisibleAnalyser.tColor));
+					VisibleAnalyser.tImageData=CanvasTools.getImageDataFromCanvasByRec(VisibleAnalyser.mainCanvas,VisibleAnalyser.tarRec);
+					var dRate=NaN;
+					dRate=CanvasTools.getDifferRate(VisibleAnalyser.preImageData,VisibleAnalyser.tImageData);
+					VisibleAnalyser.preImageData=VisibleAnalyser.tImageData;
+					VisibleAnalyser.addCoverNode(node,dRate);
+				}
 			}
 		}
 	}
 
-	CallLaterTool.initCallLaterRecorder=function(){
-		if(CallLaterTool.oldCallLater)return;
-		CallLaterTool.oldCallLater=Laya.timer["callLater"];
-		Laya.timer["callLater"]=CallLaterTool["prototype"]["callLater"];
+	VisibleAnalyser.filterFun=function(node){
+		if (node.visible==false)
+			return false;
+		if (node.alpha < 0)
+			return false;
+		if (DebugInfoLayer.I.isDebugItem(node))return false;
+		return true;
 	}
 
-	CallLaterTool.beginRecordCallLater=function(){
-		CallLaterTool.initCallLaterRecorder();
-		CallLaterTool._isRecording=true;
-	}
-
-	CallLaterTool.runRecordedCallLaters=function(){
-		CallLaterTool._isRecording=false;
-		var timer;
-		timer=Laya.timer;
-		var laters=timer["_laters"];
-		laters=CallLaterTool._recordedCallLaters;
-		for (var i=0,n=laters.length-1;i <=n;i++){
-			var handler=laters[i];
-			if(CallLaterTool._recordedCallLaters.indexOf(handler)<0)continue ;
-			handler.method!==null && handler.run(false);
-			timer["_recoverHandler"](handler);
-			laters.splice(i,1);
-		}
-		CallLaterTool._recordedCallLaters.length=0;
-	}
-
-	CallLaterTool._recordedCallLaters=[];
-	CallLaterTool._isRecording=false;
-	CallLaterTool.oldCallLater=null;
-	return CallLaterTool;
+	VisibleAnalyser.isNodeWalked=false;
+	VisibleAnalyser._analyseTarget=null;
+	VisibleAnalyser.isTarRecOK=false;
+	VisibleAnalyser.mainCanvas=null;
+	VisibleAnalyser.preImageData=null;
+	VisibleAnalyser.tImageData=null;
+	VisibleAnalyser.tarImageData=null;
+	VisibleAnalyser.coverRate=NaN;
+	VisibleAnalyser.tColor=0;
+	VisibleAnalyser._coverList=[];
+	__static(VisibleAnalyser,
+	['tarRec',function(){return this.tarRec=new Rectangle();},'interRec',function(){return this.interRec=new Rectangle();}
+	]);
+	return VisibleAnalyser;
 })()
 
 
@@ -8174,38 +5929,129 @@ var Base64Tool=(function(){
 
 
 /**
-*...
+*
 *@author ww
+*@version 1.0
+*
+*@created 2015-10-29 上午9:45:33
 */
-//class laya.debug.tools.Base64ImageTool
-var Base64ImageTool=(function(){
-	function Base64ImageTool(){}
-	__class(Base64ImageTool,'laya.debug.tools.Base64ImageTool');
-	Base64ImageTool.getCanvasPic=function(img){
-		img=img.bitmap;
-		var canvas=Browser.createElement("canvas");
-		var ctx=canvas.getContext('2d');
-		canvas.height=img.height;
-		canvas.width=img.width;
-		ctx.drawImage(img.bitmap,0,0);
-		return canvas;
+//class laya.debug.tools.IDTools
+var IDTools=(function(){
+	function IDTools(){
+		this.tID=1;
 	}
 
-	Base64ImageTool.getBase64Pic=function(img){
-		return Base64ImageTool.getCanvasPic(img).toDataURL("image/png");
+	__class(IDTools,'laya.debug.tools.IDTools');
+	var __proto=IDTools.prototype;
+	__proto.getID=function(){
+		return this.tID++;
 	}
 
-	Base64ImageTool.getPreloads=function(base64Data){
-		var rst;
-		rst=[];
-		var key;
-		for (key in base64Data){
-			rst.push({url:base64Data[key],type:/*laya.net.Loader.IMAGE*/"image" });
+	IDTools.getAID=function(){
+		return IDTools._ID.getID();
+	}
+
+	IDTools.idObjE=function(obj,sign){
+		(sign===void 0)&& (sign="default");
+		if (obj["_M_id_"])return obj;
+		if(!sign){
+			sign="default";
 		}
-		return rst;
+		if(!IDTools._idDic[sign]){
+			IDTools._idDic[sign]=new IDTools();
+		}
+		obj["_M_id_"]=IDTools._idDic[sign].getAID();
+		return obj;
 	}
 
-	return Base64ImageTool;
+	IDTools.setObjID=function(obj,id){
+		obj["_M_id_"]=id;
+		return obj;
+	}
+
+	IDTools.idObj=function(obj){
+		if (obj["_M_id_"])return obj;
+		obj["_M_id_"]=IDTools.getAID();
+		return obj;
+	}
+
+	IDTools.getObjID=function(obj){
+		if(!obj)return-1;
+		return obj["_M_id_"];
+	}
+
+	IDTools.idSign="_M_id_";
+	__static(IDTools,
+	['_ID',function(){return this._ID=new IDTools();},'_idDic',function(){return this._idDic={"default":new IDTools()};}
+	]);
+	return IDTools;
+})()
+
+
+/**
+*
+*@author ww
+*@version 1.0
+*
+*@created 2017-3-2 下午12:11:59
+*/
+//class laya.debug.tools.CallLaterTool
+var CallLaterTool=(function(){
+	function CallLaterTool(){
+		this._getHandler=null;
+		this._indexHandler=null;
+		this._pool=null;
+		this._laters=null;
+	}
+
+	__class(CallLaterTool,'laya.debug.tools.CallLaterTool');
+	var __proto=CallLaterTool.prototype;
+	/**
+	*延迟执行。
+	*@param caller 执行域(this)。
+	*@param method 定时器回调函数。
+	*@param args 回调参数。
+	*/
+	__proto.callLater=function(caller,method,args){
+		if (this._getHandler(caller,method)==null){
+			CallLaterTool.oldCallLater.call(this,caller,method,args);
+			if(CallLaterTool._isRecording){
+				CallLaterTool._recordedCallLaters.push(this._laters[this._laters.length-1]);
+			}
+		}
+	}
+
+	CallLaterTool.initCallLaterRecorder=function(){
+		if(CallLaterTool.oldCallLater)return;
+		CallLaterTool.oldCallLater=Laya.timer["callLater"];
+		Laya.timer["callLater"]=CallLaterTool["prototype"]["callLater"];
+	}
+
+	CallLaterTool.beginRecordCallLater=function(){
+		CallLaterTool.initCallLaterRecorder();
+		CallLaterTool._isRecording=true;
+	}
+
+	CallLaterTool.runRecordedCallLaters=function(){
+		CallLaterTool._isRecording=false;
+		var timer;
+		timer=Laya.timer;
+		var laters=timer["_laters"];
+		laters=CallLaterTool._recordedCallLaters;
+		for (var i=0,n=laters.length-1;i <=n;i++){
+			var handler=laters[i];
+			if(CallLaterTool._recordedCallLaters.indexOf(handler)<0)continue ;
+			handler.method!==null && handler.run(false);
+			timer["_recoverHandler"](handler);
+			laters.splice(i,1);
+		}
+		CallLaterTool._recordedCallLaters.length=0;
+	}
+
+	CallLaterTool._recordedCallLaters=[];
+	CallLaterTool._isRecording=false;
+	CallLaterTool.oldCallLater=null;
+	return CallLaterTool;
 })()
 
 
@@ -8267,29 +6113,483 @@ var Base64Atlas=(function(){
 
 
 /**
-*...
+*
 *@author ww
+*@version 1.0
+*
+*@created 2015-9-29 下午12:53:31
 */
-//class laya.debug.tools.TouchDebugTools
-var TouchDebugTools=(function(){
-	function TouchDebugTools(){}
-	__class(TouchDebugTools,'laya.debug.tools.TouchDebugTools');
-	TouchDebugTools.getTouchIDs=function(events){
+//class laya.debug.tools.CommonTools
+var CommonTools=(function(){
+	function CommonTools(){}
+	__class(CommonTools,'laya.debug.tools.CommonTools');
+	CommonTools.bind=function(fun,scope){
 		var rst;
-		rst=[];
-		var i=0,len=0;
-		len=events.length;
-		for (i=0;i < len;i++){
-			rst.push(events[i].identifier||0);
-		}
+		/*__JS__ */rst=fun.bind(scope);
 		return rst;
 	}
 
-	TouchDebugTools.traceTouchIDs=function(msg,events){
-		DebugTxt.dTrace(msg+":"+TouchDebugTools.getTouchIDs(events).join(","));
+	CommonTools.insertP=function(tar,x,y,scaleX,scaleY,rotation){
+		var nSp;
+		nSp=new Sprite();
+		tar.parent.addChild(nSp);
+		nSp.x=x;
+		nSp.y=y;
+		nSp.scaleX=scaleX;
+		nSp.scaleY=scaleY;
+		nSp.rotation=rotation;
+		nSp.addChild(tar);
+		CommonTools.count++;
+		nSp.name="insertP:"+CommonTools.count;
 	}
 
-	return TouchDebugTools;
+	CommonTools.insertChild=function(tar,x,y,scaleX,scaleY,rotation,color){
+		(color===void 0)&& (color="#ff00ff");
+		var nSp;
+		nSp=new Sprite();
+		tar.addChild(nSp);
+		nSp.x=x;
+		nSp.y=y;
+		nSp.scaleX=scaleX;
+		nSp.scaleY=scaleY;
+		nSp.rotation=rotation;
+		nSp.graphics.drawRect(0,0,20,20,color);
+		nSp.name="child:"+tar.numChildren;
+		return nSp;
+	}
+
+	CommonTools.createSprite=function(width,height,color){
+		(color===void 0)&& (color="#ff0000");
+		var sp;
+		sp=new Sprite();
+		sp.graphics.drawRect(0,0,width,height,color);
+		sp.size(width,height);
+		return sp;
+	}
+
+	CommonTools.createBtn=function(txt,width,height){
+		(width===void 0)&& (width=100);
+		(height===void 0)&& (height=40);
+		var sp;
+		sp=new Sprite();
+		sp.size(width,height);
+		sp.graphics.drawRect(0,0,sp.width,sp.height,"#ff0000");
+		sp.graphics.fillText(txt,sp.width *0.5,sp.height *0.5,null,"#ffff00","center");
+		return sp;
+	}
+
+	CommonTools.count=0;
+	return CommonTools;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.ClickSelectTool
+var ClickSelectTool=(function(){
+	function ClickSelectTool(){
+		this.completeHandler=null;
+		this.tSelectTar=null;
+		this._selectTip=new Sprite();
+		this._selectTip.setSelfBounds(new Rectangle(0,0,0,0));
+		Notice.listen(/*laya.debug.tools.DisplayHook.ITEM_CLICKED*/"ItemClicked",this,this.itemClicked);
+	}
+
+	__class(ClickSelectTool,'laya.debug.tools.ClickSelectTool');
+	var __proto=ClickSelectTool.prototype;
+	__proto.beginClickSelect=function(complete){
+		this.completeHandler=complete;
+		ClickSelectTool.isClickSelectState=true;
+		this.clickSelectChange();
+	}
+
+	__proto.clickSelectChange=function(){
+		if (!Browser.onPC)return;
+		this.tSelectTar=null;
+		this.clearSelectTip();
+		if (ClickSelectTool.isClickSelectState){
+			Laya.timer.loop(200,this,this.updateSelectTar,null,true);
+			}else{
+			Laya.timer.clear(this,this.updateSelectTar);
+		}
+	}
+
+	__proto.clearSelectTip=function(){
+		this._selectTip.removeSelf();
+	}
+
+	__proto.updateSelectTar=function(){
+		this.clearSelectTip();
+		this.tSelectTar=DisplayHook.instance.getDisUnderMouse();
+		if (!this.tSelectTar){
+			return;
+		}
+		if (DebugInfoLayer.I.isDebugItem(this.tSelectTar))return;
+		var g;
+		g=this._selectTip.graphics;
+		g.clear();
+		var rec;
+		rec=NodeUtils.getGRec(this.tSelectTar);
+		DebugInfoLayer.I.popLayer.addChild(this._selectTip);
+		g.drawRect(0,0,rec.width,rec.height,null,DebugConsts.CLICK_SELECT_COLOR,2);
+		this._selectTip.pos(rec.x,rec.y);
+	}
+
+	__proto.itemClicked=function(tar){
+		if (!ClickSelectTool.isClickSelectState)return;
+		if (ClickSelectTool.ignoreDebugTool){
+			if (DebugInfoLayer.I.isDebugItem(tar))return;
+		}
+		DebugTool.showDisBound(tar);
+		if (this.completeHandler){
+			this.completeHandler.runWith(tar);
+		}
+		ClickSelectTool.isClickSelectState=false;
+		this.clickSelectChange();
+	}
+
+	__getset(1,ClickSelectTool,'I',function(){
+		if (!ClickSelectTool._I)ClickSelectTool._I=new ClickSelectTool();
+		return ClickSelectTool._I;
+	});
+
+	ClickSelectTool._I=null;
+	ClickSelectTool.isClickSelectState=false;
+	ClickSelectTool.ignoreDebugTool=false;
+	return ClickSelectTool;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.enginehook.ClassCreateHook
+var ClassCreateHook=(function(){
+	function ClassCreateHook(){
+		this.createInfo={};
+	}
+
+	__class(ClassCreateHook,'laya.debug.tools.enginehook.ClassCreateHook');
+	var __proto=ClassCreateHook.prototype;
+	__proto.hookClass=function(clz){
+		var _$this=this;
+		if (ClassCreateHook.isInited)return;
+		ClassCreateHook.isInited=true;
+		var createFun=function (sp){
+			_$this.classCreated(sp,clz);
+		}
+		FunHook.hook(clz,"call",createFun);
+	}
+
+	__proto.classCreated=function(clz,oClass){
+		var key;
+		key=ClassTool.getNodeClassAndName(clz);
+		var depth=0;
+		var tClz;
+		tClz=clz;
+		while (tClz && tClz !=oClass){
+			tClz=tClz.__super;
+			depth++;
+		}
+		if (!ClassCreateHook.I.createInfo[key]){
+			ClassCreateHook.I.createInfo[key]=0;
+		}
+		ClassCreateHook.I.createInfo[key]=ClassCreateHook.I.createInfo[key]+1;
+		RunProfile.run(key,depth+6);
+	}
+
+	__proto.getClassCreateInfo=function(clz){
+		var key;
+		key=ClassTool.getClassName(clz);
+		return RunProfile.getRunInfo(key);
+	}
+
+	ClassCreateHook.isInited=false;
+	__static(ClassCreateHook,
+	['I',function(){return this.I=new ClassCreateHook();}
+	]);
+	return ClassCreateHook;
+})()
+
+
+/**
+*
+*@author ww
+*@version 1.0
+*
+*@created 2015-12-23 下午12:00:48
+*/
+//class laya.debug.tools.RecInfo
+var RecInfo=(function(){
+	function RecInfo(){
+		this.oX=0;
+		this.oY=0;
+		this.hX=1;
+		this.hY=0;
+		this.vX=0;
+		this.vY=1;
+	}
+
+	__class(RecInfo,'laya.debug.tools.RecInfo');
+	var __proto=RecInfo.prototype;
+	__proto.initByPoints=function(oPoint,ePoint,vPoint){
+		this.oX=oPoint.x;
+		this.oY=oPoint.y;
+		this.hX=ePoint.x;
+		this.hY=ePoint.y;
+		this.vX=vPoint.x;
+		this.vY=vPoint.y;
+	}
+
+	__getset(0,__proto,'rotation',function(){
+		return this.rotationRad/Math.PI*180;
+	});
+
+	__getset(0,__proto,'width',function(){
+		return Math.sqrt((this.hX-this.oX)*(this.hX-this.oX)+(this.hY-this.oY)*(this.hY-this.oY));
+	});
+
+	__getset(0,__proto,'x',function(){
+		return this.oX;
+	});
+
+	__getset(0,__proto,'rotationRadV',function(){
+		var dx=this.vX-this.oX;
+		var dy=this.vY-this.oY;
+		return Math.atan2(dy,dx);
+	});
+
+	__getset(0,__proto,'y',function(){
+		return this.oY;
+	});
+
+	__getset(0,__proto,'rotationRad',function(){
+		var dx=this.hX-this.oX;
+		var dy=this.hY-this.oY;
+		return Math.atan2(dy,dx);
+	});
+
+	__getset(0,__proto,'height',function(){
+		return Math.sqrt((this.vX-this.oX)*(this.vX-this.oX)+(this.vY-this.oY)*(this.vY-this.oY));
+	});
+
+	__getset(0,__proto,'rotationV',function(){
+		return this.rotationRadV/Math.PI*180;
+	});
+
+	RecInfo.createByPoints=function(oPoint,ePoint,vPoint){
+		var rst;
+		rst=new RecInfo();
+		rst.initByPoints(oPoint,ePoint,vPoint);
+		return rst;
+	}
+
+	RecInfo.getGlobalPoints=function(sprite,x,y){
+		return sprite.localToGlobal(new Point(x,y));
+	}
+
+	RecInfo.getGlobalRecInfo=function(sprite,x0,y0,x1,y1,x2,y2){
+		(x0===void 0)&& (x0=0);
+		(y0===void 0)&& (y0=0);
+		(x1===void 0)&& (x1=1);
+		(y1===void 0)&& (y1=0);
+		(x2===void 0)&& (x2=0);
+		(y2===void 0)&& (y2=1);
+		return RecInfo.createByPoints(RecInfo.getGlobalPoints(sprite,x0,y0),RecInfo.getGlobalPoints(sprite,x1,y1),RecInfo.getGlobalPoints(sprite,x2,y2));
+	}
+
+	return RecInfo;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.DebugConsts
+var DebugConsts=(function(){
+	function DebugConsts(){}
+	__class(DebugConsts,'laya.debug.tools.DebugConsts');
+	DebugConsts.CLICK_SELECT_COLOR="#ff0000";
+	DebugConsts.CANVAS_REC_COLOR="#FF00FF";
+	DebugConsts.RECACHE_REC_COLOR="#00ff00";
+	DebugConsts.SPRITE_REC_COLOR="#ff0000";
+	DebugConsts.SPRITE_REC_LINEWIDTH=2;
+	return DebugConsts;
+})()
+
+
+/**
+*
+*@author ww
+*@version 1.0
+*
+*@created 2015-11-9 下午3:26:01
+*/
+//class laya.debug.tools.LayoutTools
+var LayoutTools=(function(){
+	function LayoutTools(){}
+	__class(LayoutTools,'laya.debug.tools.LayoutTools');
+	LayoutTools.layoutToXCount=function(items,xCount,dx,dY,sx,sy){
+		(xCount===void 0)&& (xCount=1);
+		(dx===void 0)&& (dx=0);
+		(dY===void 0)&& (dY=0);
+		(sx===void 0)&& (sx=0);
+		(sy===void 0)&& (sy=0);
+		var tX=NaN,tY=NaN;
+		var tItem;
+		var i=0,len=0;
+		var tCount=0;
+		var maxHeight=0;
+		tCount=0;
+		maxHeight=0;
+		tX=sx;
+		tY=sy;
+		len=items.length;
+		for (i=0;i < len;i++){
+			tItem=items[i];
+			tItem.x=tX;
+			tItem.y=tY;
+			if (tItem.height > maxHeight){
+				maxHeight=tItem.height;
+			}
+			tCount++;
+			if (tCount >=xCount){
+				tCount=tCount % xCount;
+				tItem.y+=maxHeight+dY;
+				maxHeight=0;
+				}else{
+				tX+=tItem.width+dx;
+			}
+		}
+	}
+
+	LayoutTools.layoutToWidth=function(items,width,dX,dY,sx,sy){
+		var tX=NaN,tY=NaN;
+		var tItem;
+		var i=0,len=0;
+		tX=sx;
+		tY=sy;
+		len=items.length;
+		for(i=0;i<len;i++){
+			tItem=items[i];
+			if(tX+tItem.width+dX>width){
+				tX=sx;
+				tY+=dY+tItem.height;
+				}else{
+			}
+			tItem.x=tX;
+			tItem.y=tY;
+			tX+=dX+tItem.width;
+		}
+	}
+
+	return LayoutTools;
+})()
+
+
+/**
+*
+*@author ww
+*@version 1.0
+*
+*@created 2015-12-24 下午4:20:25
+*/
+//class laya.debug.tools.DisEditor
+var DisEditor=(function(){
+	function DisEditor(){
+		this.tar=null;
+		this.rec=new Sprite();
+		this.rootContainer=new Sprite();
+	}
+
+	__class(DisEditor,'laya.debug.tools.DisEditor');
+	var __proto=DisEditor.prototype;
+	__proto.setTarget=function(target){
+		this.tar=target;
+		var g;
+		g=this.rec.graphics;
+		g.clear();
+		var bounds;
+		bounds=this.tar.getSelfBounds();
+		g.drawRect(bounds.x,bounds.y,bounds.width,bounds.height,null,"#00ff00");
+		this.createSameDisChain();
+		Laya.stage.addChild(this.rootContainer);
+	}
+
+	__proto.createSameDisChain=function(){
+		var tParent;
+		var cpParent;
+		var preTar;
+		preTar=this.rec;
+		tParent=this.tar;
+		while(tParent&&tParent!=Laya.stage){
+			cpParent=new Sprite();
+			cpParent.addChild(preTar);
+			cpParent.x=tParent.x;
+			cpParent.y=tParent.y;
+			cpParent.scaleX=tParent.scaleX;
+			cpParent.scaleY=tParent.scaleY;
+			cpParent.rotation=tParent.rotation;
+			cpParent.scrollRect=tParent.scrollRect;
+			preTar=cpParent;
+			tParent=tParent.parent;
+		}
+		this.rootContainer.removeChildren();
+		this.rootContainer.addChild(preTar);
+	}
+
+	return DisEditor;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.TimeTool
+var TimeTool=(function(){
+	function TimeTool(){}
+	__class(TimeTool,'laya.debug.tools.TimeTool');
+	TimeTool.getTime=function(sign,update){
+		(update===void 0)&& (update=true);
+		if (!TimeTool.timeDic[sign]){
+			TimeTool.timeDic[sign]=0;
+		};
+		var tTime=NaN;
+		tTime=Browser.now();
+		var rst=NaN;
+		rst=tTime-TimeTool.timeDic[sign];
+		TimeTool.timeDic[sign]=tTime;
+		return rst;
+	}
+
+	TimeTool.runAllCallLater=function(){
+		if(TimeTool._deep>0)debugger;
+		TimeTool._deep++;
+		var timer;
+		timer=Laya.timer;
+		var laters=timer["_laters"];
+		for (var i=0,n=laters.length-1;i <=n;i++){
+			var handler=laters[i];
+			if(handler){
+				handler.method!==null && handler.run(false);
+				timer["_recoverHandler"](handler);
+				}else{
+				debugger;
+			}
+			i===n && (n=laters.length-1);
+		}
+		laters.length=0;
+		TimeTool._deep--;
+	}
+
+	TimeTool.timeDic={};
+	TimeTool._deep=0;
+	return TimeTool;
 })()
 
 
@@ -8418,92 +6718,1792 @@ var FunHook=(function(){
 *@author ww
 *@version 1.0
 *
-*@created 2015-9-29 下午12:53:31
+*@created 2015-10-23 下午2:24:04
 */
-//class laya.debug.tools.CommonTools
-var CommonTools=(function(){
-	function CommonTools(){}
-	__class(CommonTools,'laya.debug.tools.CommonTools');
-	CommonTools.bind=function(fun,scope){
+//class laya.debug.tools.ClassTool
+var ClassTool=(function(){
+	function ClassTool(){}
+	__class(ClassTool,'laya.debug.tools.ClassTool');
+	ClassTool.defineProperty=function(obj,name,des){
+		/*__JS__ */Object.defineProperty(obj,name,des);;
+	}
+
+	ClassTool.getOwnPropertyDescriptor=function(obj,name){
 		var rst;
-		/*__JS__ */rst=fun.bind(scope);
+		/*__JS__ */rst=Object.getOwnPropertyDescriptor(obj,name);;
 		return rst;
 	}
 
-	CommonTools.insertP=function(tar,x,y,scaleX,scaleY,rotation){
-		var nSp;
-		nSp=new Sprite();
-		tar.parent.addChild(nSp);
-		nSp.x=x;
-		nSp.y=y;
-		nSp.scaleX=scaleX;
-		nSp.scaleY=scaleY;
-		nSp.rotation=rotation;
-		nSp.addChild(tar);
-		CommonTools.count++;
-		nSp.name="insertP:"+CommonTools.count;
+	ClassTool.getOwnPropertyDescriptors=function(obj){
+		var rst;
+		/*__JS__ */rst=Object.getOwnPropertyDescriptors(obj);;
+		return rst;
 	}
 
-	CommonTools.insertChild=function(tar,x,y,scaleX,scaleY,rotation,color){
-		(color===void 0)&& (color="#ff00ff");
-		var nSp;
-		nSp=new Sprite();
-		tar.addChild(nSp);
-		nSp.x=x;
-		nSp.y=y;
-		nSp.scaleX=scaleX;
-		nSp.scaleY=scaleY;
-		nSp.rotation=rotation;
-		nSp.graphics.drawRect(0,0,20,20,color);
-		nSp.name="child:"+tar.numChildren;
-		return nSp;
+	ClassTool.getOwnPropertyNames=function(obj){
+		var rst;
+		/*__JS__ */rst=Object.getOwnPropertyNames(obj);;
+		return rst;
 	}
 
-	CommonTools.createSprite=function(width,height,color){
-		(color===void 0)&& (color="#ff0000");
-		var sp;
-		sp=new Sprite();
-		sp.graphics.drawRect(0,0,width,height,color);
-		sp.size(width,height);
-		return sp;
+	ClassTool.getObjectGetSetKeys=function(obj,rst){
+		if (!rst)rst=[];
+		var keys;
+		keys=laya.debug.tools.ClassTool.getOwnPropertyNames(obj);
+		var key;
+		for (key in keys){
+			key=keys[key];
+			if (key.indexOf("_$get_")>=0){
+				key=key.replace("_$get_","");
+				rst.push(key);
+			}
+		}
+		if (obj["__proto__"]){
+			ClassTool.getObjectGetSetKeys(obj["__proto__"],rst);
+		}
+		return rst;
 	}
 
-	CommonTools.createBtn=function(txt,width,height){
-		(width===void 0)&& (width=100);
-		(height===void 0)&& (height=40);
-		var sp;
-		sp=new Sprite();
-		sp.size(width,height);
-		sp.graphics.drawRect(0,0,sp.width,sp.height,"#ff0000");
-		sp.graphics.fillText(txt,sp.width *0.5,sp.height *0.5,null,"#ffff00","center");
-		return sp;
+	ClassTool.getObjectDisplayAbleKeys=function(obj,rst){
+		if (!rst)rst=[];
+		var key;
+		var tValue;
+		var tType;
+		for (key in obj){
+			tValue=obj[key];
+			tType=typeof(tValue);
+			if (key.charAt(0)=="_")continue ;
+			rst.push(key);
+		}
+		ClassTool.getObjectGetSetKeys(obj,rst);
+		rst=ObjectTools.getNoSameArr(rst);
+		return rst;
 	}
 
-	CommonTools.count=0;
-	return CommonTools;
+	ClassTool.getClassName=function(tar){
+		if ((typeof tar=='function'))return tar.name;
+		return tar["constructor"].name;
+	}
+
+	ClassTool.getNodeClassAndName=function(tar){
+		if (!tar)return "null";
+		var rst;
+		if (tar.name){
+			rst=ClassTool.getClassName(tar)+"("+tar.name+")";
+			}else{
+			rst=ClassTool.getClassName(tar);
+		}
+		return rst;
+	}
+
+	ClassTool.getClassNameByClz=function(clz){
+		return clz["name"];
+	}
+
+	ClassTool.getClassByName=function(className){
+		var rst;
+		rst=Laya._runScript(className);
+		return rst;
+	}
+
+	ClassTool.createObjByName=function(className){
+		var clz;
+		clz=ClassTool.getClassByName(className);
+		return new clz();
+	}
+
+	__static(ClassTool,
+	['displayTypes',function(){return this.displayTypes={"boolean":true,"number":true,"string":true };}
+	]);
+	return ClassTool;
 })()
 
 
 /**
-*本类调用原生watch接口，仅火狐有效
+*本类用于调整对象的宽高以及坐标
+*@author ww
+*/
+//class laya.debug.tools.resizer.DisResizer
+var DisResizer=(function(){
+	function DisResizer(){}
+	__class(DisResizer,'laya.debug.tools.resizer.DisResizer');
+	DisResizer.init=function(){
+		if (DisResizer._up)return;
+		DisResizer._up=new AutoFillRec("T");
+		DisResizer._up.height=2;
+		DisResizer._up.type=0;
+		DisResizer._down=new AutoFillRec("T");
+		DisResizer._down.height=2;
+		DisResizer._down.type=0;
+		DisResizer._left=new AutoFillRec("R");
+		DisResizer._left.width=2;
+		DisResizer._left.type=1;
+		DisResizer._right=new AutoFillRec("R");
+		DisResizer._right.width=2;
+		DisResizer._right.type=1;
+		DisResizer._barList=[DisResizer._up,DisResizer._down,DisResizer._left,DisResizer._right];
+		DisResizer.addEvent();
+	}
+
+	DisResizer.stageDown=function(e){
+		var target;
+		target=e.target;
+		if (DisResizer._tar && DisControlTool.isInTree(DisResizer._tar,target)){
+			return;
+		}
+		DisResizer.clear();
+	}
+
+	DisResizer.clear=function(){
+		DisResizer._tar=null;
+		Laya.stage.off(/*laya.events.Event.MOUSE_UP*/"mouseup",null,DisResizer.stageDown);
+		DisControlTool.removeItems(DisResizer._barList);
+		DisResizer.clearDragEvents();
+	}
+
+	DisResizer.addEvent=function(){
+		var i=0,len=0;
+		var tBar;
+		len=DisResizer._barList.length;
+		for (i=0;i < len;i++){
+			tBar=DisResizer._barList[i];
+			tBar.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",null,DisResizer.barDown);
+		}
+	}
+
+	DisResizer.barDown=function(e){
+		DisResizer.clearDragEvents();
+		DisResizer.tBar=e.target;
+		if (!DisResizer.tBar)return;
+		var area;
+		area=new Rectangle();
+		if (DisResizer.tBar.type==0){
+			area.x=DisResizer.tBar.x;
+			area.width=0;
+			area.y=DisResizer.tBar.y-200;
+			area.height=400;
+			}else{
+			area.x=DisResizer.tBar.x-200;
+			area.width=400;
+			area.y=0;
+			area.height=0;
+		};
+		var option;
+		option={};
+		option.area=area;
+		DisResizer.tBar.record();
+		DisResizer.tBar.startDrag(area);
+		DisResizer.tBar.on(/*laya.events.Event.DRAG_MOVE*/"dragmove",null,DisResizer.draging);
+		DisResizer.tBar.on(/*laya.events.Event.DRAG_END*/"dragend",null,DisResizer.dragEnd);
+	}
+
+	DisResizer.draging=function(e){
+		console.log("draging");
+		if (!DisResizer.tBar)return;
+		if (!DisResizer._tar)return;
+		switch(DisResizer.tBar){
+			case DisResizer._left:
+				DisResizer._tar.x+=DisResizer.tBar.getDx();
+				DisResizer._tar.width-=DisResizer.tBar.getDx();
+				DisResizer._up.width-=DisResizer.tBar.getDx();
+				DisResizer._down.width-=DisResizer.tBar.getDx();
+				DisResizer._right.x-=DisResizer.tBar.getDx();
+				DisResizer.tBar.x-=DisResizer.tBar.getDx();
+				break ;
+			case DisResizer._right:
+				DisResizer._tar.width+=DisResizer.tBar.getDx();
+				DisResizer._up.width+=DisResizer.tBar.getDx();
+				DisResizer._down.width+=DisResizer.tBar.getDx();
+				break ;
+			case DisResizer._up:
+				DisResizer._tar.y+=DisResizer.tBar.getDy();
+				DisResizer._tar.height-=DisResizer.tBar.getDy();
+				DisResizer._right.height-=DisResizer.tBar.getDy();
+				DisResizer._left.height-=DisResizer.tBar.getDy();
+				DisResizer._down.y-=DisResizer.tBar.getDy();
+				DisResizer.tBar.y-=DisResizer.tBar.getDy();
+				break ;
+			case DisResizer._down:
+				DisResizer._tar.height+=DisResizer.tBar.getDy();
+				DisResizer._right.height+=DisResizer.tBar.getDy();
+				DisResizer._left.height+=DisResizer.tBar.getDy();
+				break ;
+			}
+		DisResizer.tBar.record();
+	}
+
+	DisResizer.dragEnd=function(e){
+		console.log("dragEnd");
+		DisResizer.clearDragEvents();
+		DisResizer.updates();
+	}
+
+	DisResizer.clearDragEvents=function(){
+		if (!DisResizer.tBar)return;
+		DisResizer.tBar.off(/*laya.events.Event.DRAG_MOVE*/"dragmove",null,DisResizer.draging);
+		DisResizer.tBar.off(/*laya.events.Event.DRAG_END*/"dragend",null,DisResizer.dragEnd);
+	}
+
+	DisResizer.setUp=function(dis,force){
+		(force===void 0)&& (force=false);
+		if (force && dis==DisResizer._tar){
+			return;
+		};
+		DisControlTool.removeItems(DisResizer._barList);
+		if (DisResizer._tar==dis){
+			DisResizer._tar=null;
+			DisResizer.clearDragEvents();
+			if(!force)
+				return;
+		}
+		DisResizer._tar=dis;
+		DisResizer.updates();
+		DisControlTool.addItems(DisResizer._barList,dis);
+		Laya.stage.off(/*laya.events.Event.MOUSE_UP*/"mouseup",null,DisResizer.stageDown);
+		Laya.stage.on(/*laya.events.Event.MOUSE_UP*/"mouseup",null,DisResizer.stageDown);
+	}
+
+	DisResizer.updates=function(){
+		var dis;
+		dis=DisResizer._tar;
+		if(!dis)return;
+		var bounds;
+		bounds=new Rectangle(0,0,dis.width,dis.height);
+		DisResizer._up.x=bounds.x;
+		DisResizer._up.y=bounds.y;
+		DisResizer._up.width=bounds.width;
+		DisResizer._down.x=bounds.x;
+		DisResizer._down.y=bounds.y+bounds.height-2;
+		DisResizer._down.width=bounds.width;
+		DisResizer._left.x=bounds.x;
+		DisResizer._left.y=bounds.y;
+		DisResizer._left.height=bounds.height;
+		DisResizer._right.x=bounds.x+bounds.width-2;
+		DisResizer._right.y=bounds.y;
+		DisResizer._right.height=bounds.height;
+	}
+
+	DisResizer.Side=2;
+	DisResizer.Vertical=1;
+	DisResizer.Horizon=0;
+	DisResizer._up=null;
+	DisResizer._down=null;
+	DisResizer._left=null;
+	DisResizer._right=null;
+	DisResizer._barList=null;
+	DisResizer._tar=null;
+	DisResizer.barWidth=2;
+	DisResizer.useGetBounds=false;
+	DisResizer.tBar=null;
+	return DisResizer;
+})()
+
+
+/**
+*
 *@author ww
 *@version 1.0
 *
-*@created 2015-10-26 上午9:48:18
+*@created 2015-9-24 下午3:00:38
 */
-//class laya.debug.tools.exp.Watch
-var Watch=(function(){
-	function Watch(){}
-	__class(Watch,'laya.debug.tools.exp.Watch');
-	Watch.watch=function(obj,name,callBack){
-		/*__JS__ */obj.watch(name,callBack);
+//class laya.debug.DebugTool
+var DebugTool=(function(){
+	function DebugTool(){}
+	__class(DebugTool,'laya.debug.DebugTool');
+	__getset(1,DebugTool,'target',function(){
+		return DebugTool._target;
+		},function(v){
+		DebugTool._target=v;
+	});
+
+	__getset(1,DebugTool,'isThisShow',function(){
+		return false;
+	});
+
+	/**
+	*设置是否显示帧率信息
+	*@param value 是否显示true|false
+	*/
+	__getset(1,DebugTool,'showStatu',null,function(value){
+		if (value){
+			Stat.show();
+		}
+		else {
+			Stat.hide();
+			DebugTool.clearDebugLayer();
+		}
+	});
+
+	/**
+	*是否自动显示点击对象的边框
+	*@param value
+	*/
+	__getset(1,DebugTool,'showBound',function(){
+		return DebugTool._showBound;
+		},function(value){
+		DebugTool._showBound=value;
+		if (!DebugTool._showBound){
+			DebugTool.clearDebugLayer();
+		}
+	});
+
+	DebugTool.getMenuShowEvent=function(){
+		if (Browser.onMobile){
+			return /*laya.events.Event.DOUBLE_CLICK*/"doubleclick";
+		}
+		else {
+			return /*laya.events.Event.RIGHT_CLICK*/"rightclick";
+		}
 	}
 
-	Watch.unwatch=function(obj,name,callBack){
-		/*__JS__ */obj.unwatch(name,callBack);
+	DebugTool.initBasicFunctions=function(){
+		DisplayHook.initMe();
+		if (!DebugTool.debugLayer){
+			DebugInfoLayer.init();
+			DebugTool.debugLayer=DebugInfoLayer.I.graphicLayer;
+			DebugTool.debugLayer.mouseEnabled=false;
+			DebugTool.debugLayer.mouseThrough=true;
+			DebugTool.showStatu=true;
+			Laya.stage.on(/*laya.events.Event.KEY_DOWN*/"keydown",null,DebugTool.keyHandler);
+			DebugExport.export();
+		}
 	}
 
-	return Watch;
+	DebugTool.dTrace=function(str){
+		if (DebugTool._traceFun !=null){
+			DebugTool._traceFun(str);
+		}
+		console.log(str);
+	}
+
+	DebugTool.keyHandler=function(e){
+		var key;
+		key=String.fromCharCode(e.keyCode);
+		if (!e.altKey)
+			return;
+		switch (e.keyCode){
+			case 38:
+				DebugTool.showParent();
+				break ;
+			case 40:
+				DebugTool.showChild();
+				break ;
+			case 37:
+				DebugTool.showBrother(DebugTool.target,1);
+				break ;
+			case 39:
+				DebugTool.showBrother(DebugTool.target,-1);
+				break ;
+			}
+		DebugTool.dealCMDKey(key);
+	}
+
+	DebugTool.dealCMDKey=function(key){
+		switch (key){
+			case "上":
+				DebugTool.showParent();
+				break ;
+			case "下":
+				DebugTool.showChild();
+				break ;
+			case "左":
+				DebugTool.showBrother(DebugTool.target,1);
+				break ;
+			case "右":
+				DebugTool.showBrother(DebugTool.target,-1);
+				break ;
+			case "B":
+				DebugTool.showAllBrother();
+				break ;
+			case "C":
+				DebugTool.showAllChild();
+				break ;
+			case "E":
+				DebugTool.traceDisMouseEnable();
+				break ;
+			case "S":
+				DebugTool.traceDisSizeChain();
+				break ;
+			case "D":
+				DisControlTool.downDis(DebugTool.target);
+				break ;
+			case "U":
+				DisControlTool.upDis(DebugTool.target);
+				break ;
+			case "N":
+				DebugTool.getNodeInfo();
+				break ;
+			case "M":
+				DebugTool.showAllUnderMosue();
+				break ;
+			case "I":
+				break ;
+			case "O":
+				break ;
+			case "L":
+				DisController.I.switchType();
+				break ;
+			case "Q":
+				DebugTool.showNodeInfo();
+				break ;
+			case "F":
+				DebugTool.showToolPanel();
+				break ;
+			case "P":
+				DebugTool.showToolFilter();
+				break ;
+			case "V":
+				DebugTool.selectNodeUnderMouse();
+				break ;
+			case "A":
+				break ;
+			case "K":
+				NodeUtils.traceStage();
+				break ;
+			case "T":
+				DebugTool.switchNodeTree();
+				break ;
+			case "R":
+				break ;
+			case "X":
+				break ;
+			case "mCMD":
+				DebugTool.traceCMD();
+				break ;
+			case "allCMD":
+				DebugTool.traceCMDR();
+				break ;
+			}
+	}
+
+	DebugTool.switchNodeTree=function(){}
+	DebugTool.analyseMouseHit=function(){
+		if (DebugTool.target)
+			MouseEventAnalyser.analyseNode(DebugTool.target);
+	}
+
+	DebugTool.selectNodeUnderMouse=function(){
+		DisplayHook.instance.selectDisUnderMouse();
+		DebugTool.showDisBound();
+		return;
+	}
+
+	DebugTool.showToolPanel=function(){}
+	DebugTool.showToolFilter=function(){}
+	DebugTool.showNodeInfo=function(){
+		if (NodeInfoPanel.I.isWorkState){
+			NodeInfoPanel.I.recoverNodes();
+		}
+		else {
+			NodeInfoPanel.I.showDisInfo(DebugTool.target);
+		}
+	}
+
+	DebugTool.switchDisController=function(){
+		if (DisController.I.target){
+			DisController.I.target=null;
+		}
+		else {
+			if (DebugTool.target){
+				DisController.I.target=DebugTool.target;
+			}
+		}
+	}
+
+	DebugTool.showParent=function(sprite){
+		if (!sprite)
+			sprite=DebugTool.target;
+		if (!sprite){
+			console.log("no targetAvalible");
+			return null;
+		}
+		DebugTool.target=sprite.parent;
+		DebugTool.autoWork();
+	}
+
+	DebugTool.showChild=function(sprite){
+		if (!sprite)
+			sprite=DebugTool.target;
+		if (!sprite){
+			console.log("no targetAvalible");
+			return null;
+		}
+		if (sprite.numChildren > 0){
+			DebugTool.target=sprite.getChildAt(0);
+			DebugTool.autoWork();
+		}
+	}
+
+	DebugTool.showAllChild=function(sprite){
+		if (!sprite)
+			sprite=DebugTool.target;
+		if (!sprite){
+			console.log("no targetAvalible");
+			return null;
+		}
+		DebugTool.selectedNodes=DisControlTool.getAllChild(sprite);
+		DebugTool.showSelected();
+	}
+
+	DebugTool.showAllUnderMosue=function(){
+		DebugTool.selectedNodes=DisControlTool.getObjectsUnderGlobalPoint(Laya.stage);
+		DebugTool.showSelected();
+	}
+
+	DebugTool.showParentChain=function(sprite){
+		if (!sprite)
+			return;
+		DebugTool.selectedNodes=[];
+		var tar;
+		tar=sprite.parent;
+		while (tar){
+			DebugTool.selectedNodes.push(tar);
+			tar=tar.parent;
+		}
+		DebugTool.showSelected();
+	}
+
+	DebugTool.showAllBrother=function(sprite){
+		if (!sprite)
+			sprite=DebugTool.target;
+		if (!sprite){
+			console.log("no targetAvalible");
+			return null;
+		}
+		if (!sprite.parent)
+			return;
+		DebugTool.selectedNodes=DisControlTool.getAllChild(sprite.parent);
+		DebugTool.showSelected();
+	}
+
+	DebugTool.showBrother=function(sprite,dID){
+		(dID===void 0)&& (dID=1);
+		if (!sprite)
+			sprite=DebugTool.target;
+		if (!sprite){
+			console.log("no targetAvalible");
+			return null;
+		};
+		var p;
+		p=sprite.parent;
+		if (!p)
+			return;
+		var n=0;
+		n=p.getChildIndex(sprite);
+		n+=dID;
+		if (n < 0)
+			n+=p.numChildren;
+		if (n >=p.numChildren)
+			n-=p.numChildren;
+		DebugTool.target=p.getChildAt(n);
+		DebugTool.autoWork();
+	}
+
+	DebugTool.clearDebugLayer=function(){
+		if (DebugTool.debugLayer.graphics)
+			DebugTool.debugLayer.graphics.clear();
+	}
+
+	DebugTool.showSelected=function(){
+		if (!DebugTool.autoShowSelected)
+			return;
+		if (!DebugTool.selectedNodes || DebugTool.selectedNodes.length < 1)
+			return;
+		console.log("selected:",DebugTool.selectedNodes);
+		var i=0;
+		var len=0;
+		len=DebugTool.selectedNodes.length;
+		DebugTool.clearDebugLayer();
+		for (i=0;i < len;i++){
+			DebugTool.showDisBound(DebugTool.selectedNodes[i],false);
+		}
+	}
+
+	DebugTool.getClassCreateInfo=function(className){
+		return RunProfile.getRunInfo(className);
+	}
+
+	DebugTool.autoWork=function(){
+		if (!DebugTool.isThisShow)
+			return;
+		if (DebugTool.showBound)
+			DebugTool.showDisBound();
+		if (DebugTool.autoTraceSpriteInfo && DebugTool.target){
+			TraceTool.traceSpriteInfo(DebugTool.target,DebugTool.autoTraceBounds,DebugTool.autoTraceSize,DebugTool.autoTraceTree);
+		}
+		if (!DebugTool.target)
+			return;
+		if (DebugTool.autoTraceCMD){
+			DebugTool.traceCMD();
+		}
+		if (DebugTool.autoTraceCMDR){
+			DebugTool.traceCMDR();
+		}
+		if (DebugTool.autoTraceEnable){
+			DebugTool.traceDisMouseEnable(DebugTool.target);
+		}
+	}
+
+	DebugTool.traceDisMouseEnable=function(tar){
+		console.log("----------------traceDisMouseEnable--------------------");
+		if (!tar)
+			tar=DebugTool.target;
+		if (!tar){
+			console.log("no targetAvalible");
+			return null;
+		};
+		var strArr;
+		strArr=[];
+		DebugTool.selectedNodes=[];
+		while (tar){
+			strArr.push(ClassTool.getNodeClassAndName(tar)+": mouseEnabled:"+tar.mouseEnabled+" hitFirst:"+tar.hitTestPrior);
+			DebugTool.selectedNodes.push(tar);
+			tar=tar.parent;
+		}
+		console.log(strArr.join("\n"));
+		DebugTool.showSelected();
+		return strArr.join("\n");
+	}
+
+	DebugTool.traceDisSizeChain=function(tar){
+		console.log("---------------------traceDisSizeChain-------------------");
+		if (!tar)
+			tar=DebugTool.target;
+		if (!tar){
+			console.log("no targetAvalible");
+			return null;
+		}
+		DebugTool.selectedNodes=[];
+		var strArr;
+		strArr=[];
+		while (tar){
+			strArr.push(ClassTool.getNodeClassAndName(tar)+": x:"+tar.x+" y:"+tar.y+" w:"+tar.width+" h:"+tar.height+" scaleX:"+tar.scaleX+" scaleY:"+tar.scaleY);
+			DebugTool.selectedNodes.push(tar);
+			tar=tar.parent;
+		}
+		console.log(strArr.join("\n"));
+		DebugTool.showSelected();
+		return strArr.join("\n");
+	}
+
+	DebugTool.showDisBound=function(sprite,clearPre,color){
+		(clearPre===void 0)&& (clearPre=true);
+		(color===void 0)&& (color="#ff0000");
+		if (!sprite)
+			sprite=DebugTool.target;
+		if (!sprite){
+			console.log("no targetAvalible");
+			return null;
+		}
+		if (clearPre)
+			DebugTool.clearDebugLayer();
+		var pointList;
+		pointList=sprite._getBoundPointsM(true);
+		if (!pointList || pointList.length < 1)
+			return;
+		pointList=GrahamScan.pListToPointList(pointList,true);
+		WalkTools.walkArr(pointList,sprite.localToGlobal,sprite);
+		pointList=GrahamScan.pointListToPlist(pointList);
+		DebugTool._disBoundRec=Rectangle._getWrapRec(pointList,DebugTool._disBoundRec);
+		DebugTool.debugLayer.graphics.drawRect(DebugTool._disBoundRec.x,DebugTool._disBoundRec.y,DebugTool._disBoundRec.width,DebugTool._disBoundRec.height,null,color);
+		DebugInfoLayer.I.setTop();
+	}
+
+	DebugTool.showDisBoundToSprite=function(sprite,graphicSprite,color,lineWidth){
+		(color===void 0)&& (color="#ff0000");
+		(lineWidth===void 0)&& (lineWidth=1);
+		var pointList;
+		pointList=sprite._getBoundPointsM(true);
+		if (!pointList || pointList.length < 1)
+			return;
+		pointList=GrahamScan.pListToPointList(pointList,true);
+		WalkTools.walkArr(pointList,sprite.localToGlobal,sprite);
+		pointList=GrahamScan.pointListToPlist(pointList);
+		DebugTool._disBoundRec=Rectangle._getWrapRec(pointList,DebugTool._disBoundRec);
+		graphicSprite.graphics.drawRect(DebugTool._disBoundRec.x,DebugTool._disBoundRec.y,DebugTool._disBoundRec.width,DebugTool._disBoundRec.height,null,color,lineWidth);
+	}
+
+	DebugTool.getNodeInfo=function(){
+		DebugTool.counter.reset();
+		WalkTools.walkTarget(Laya.stage,DebugTool.addNodeInfo);
+		console.log("node info:");
+		DebugTool.counter.traceSelf();
+		return DebugTool.counter.data;
+	}
+
+	DebugTool.findByClass=function(className){
+		DebugTool._classList=[];
+		DebugTool._tFindClass=className;
+		WalkTools.walkTarget(Laya.stage,DebugTool.addClassNode);
+		DebugTool.selectedNodes=DebugTool._classList;
+		DebugTool.showSelected();
+		return DebugTool._classList;
+	}
+
+	DebugTool.addClassNode=function(node){
+		var type;
+		type=node["constructor"].name;
+		if (type==DebugTool._tFindClass){
+			DebugTool._classList.push(node);
+		}
+	}
+
+	DebugTool.traceCMD=function(sprite){
+		if (!sprite)
+			sprite=DebugTool.target;
+		if (!sprite){
+			console.log("no targetAvalible");
+			return null;
+		}
+		console.log("self CMDs:");
+		console.log(sprite.graphics.cmds);
+		var renderSprite;
+		renderSprite=RenderSprite.renders[sprite._renderType];
+		console.log("renderSprite:",renderSprite);
+		DebugTool._rSpList.length=0;
+		while (renderSprite && renderSprite["_sign"] > 0){
+			DebugTool._rSpList.push(DebugTool.cmdToTypeO[renderSprite["_sign"]]);
+			renderSprite=renderSprite._next;
+		}
+		console.log("fun:",DebugTool._rSpList.join(","));
+		DebugTool.counter.reset();
+		DebugTool.addCMDs(sprite.graphics.cmds);
+		DebugTool.counter.traceSelf();
+		return DebugTool.counter.data;
+	}
+
+	DebugTool.addCMDs=function(cmds){
+		WalkTools.walkArr(cmds,DebugTool.addCMD);
+	}
+
+	DebugTool.addCMD=function(cmd){
+		DebugTool.counter.add(cmd.callee);
+	}
+
+	DebugTool.traceCMDR=function(sprite){
+		if (!sprite)
+			sprite=DebugTool.target;
+		if (!sprite){
+			console.log("no targetAvalible");
+			return 0;
+		}
+		DebugTool.counter.reset();
+		WalkTools.walkTarget(sprite,DebugTool.getCMdCount);
+		console.log("cmds include children");
+		DebugTool.counter.traceSelf();
+		return DebugTool.counter.data;
+	}
+
+	DebugTool.getCMdCount=function(target){
+		if (!target)
+			return 0;
+		if (! (target instanceof laya.display.Sprite ))
+			return 0;
+		if (!target.graphics.cmds)
+			return 0;
+		DebugTool.addCMDs(target.graphics.cmds);
+		var rst=target.graphics.cmds.length;
+		return rst;
+	}
+
+	DebugTool.addNodeInfo=function(node){
+		var type;
+		type=node["constructor"].name;
+		DebugTool.counter.add(type);
+	}
+
+	DebugTool.find=function(filter,ifShowSelected){
+		(ifShowSelected===void 0)&& (ifShowSelected=true);
+		var rst;
+		rst=DebugTool.findTarget(Laya.stage,filter);
+		DebugTool.selectedNodes=rst;
+		if (DebugTool.selectedNodes){
+			DebugTool.target=DebugTool.selectedNodes[0];
+		}
+		if (ifShowSelected)
+			DebugTool.showSelected();
+		return rst;
+	}
+
+	DebugTool.findByName=function(name){
+		DebugTool.nameFilter.name=name;
+		return DebugTool.find(DebugTool.nameFilter);
+	}
+
+	DebugTool.findNameStartWith=function(startStr){
+		DebugTool.nameFilter.name=DebugTool.getStartWithFun(startStr);
+		return DebugTool.find(DebugTool.nameFilter);
+	}
+
+	DebugTool.findNameHas=function(hasStr,showSelected){
+		(showSelected===void 0)&& (showSelected=true);
+		DebugTool.nameFilter.name=DebugTool.getHasFun(hasStr);
+		return DebugTool.find(DebugTool.nameFilter,showSelected);
+	}
+
+	DebugTool.getStartWithFun=function(startStr){
+		var rst=function (str){
+			if (!str)
+				return false;
+			if (str.indexOf(startStr)==0)
+				return true;
+			return false;
+		};
+		return rst;
+	}
+
+	DebugTool.getHasFun=function(hasStr){
+		var rst=function (str){
+			if (!str)
+				return false;
+			if (str.indexOf(hasStr)>=0)
+				return true;
+			return false;
+		};
+		return rst;
+	}
+
+	DebugTool.findTarget=function(target,filter){
+		var rst=[];
+		if (DebugTool.isFit(target,filter))
+			rst.push(target);
+		var i=0;
+		var len=0;
+		var tChild;
+		len=target.numChildren;
+		for (i=0;i < len;i++){
+			tChild=target.getChildAt(i);
+			if ((tChild instanceof laya.display.Sprite )){
+				rst=rst.concat(DebugTool.findTarget(tChild,filter));
+			}
+		}
+		return rst;
+	}
+
+	DebugTool.findClassHas=function(target,str){
+		var rst=[];
+		if (ClassTool.getClassName(target).indexOf(str)>=0)
+			rst.push(target);
+		var i=0;
+		var len=0;
+		var tChild;
+		len=target.numChildren;
+		for (i=0;i < len;i++){
+			tChild=target.getChildAt(i);
+			if ((tChild instanceof laya.display.Sprite )){
+				rst=rst.concat(DebugTool.findClassHas(tChild,str));
+			}
+		}
+		return rst;
+	}
+
+	DebugTool.isFit=function(tar,filter){
+		if (!tar)
+			return false;
+		if (!filter)
+			return true;
+		if ((typeof filter=='function')){
+			return (filter)(tar);
+		};
+		var key;
+		for (key in filter){
+			if ((typeof (filter[key])=='function')){
+				if (!filter[key](tar[key]))
+					return false;
+			}
+			else {
+				if (tar[key] !=filter[key])
+					return false;
+			}
+		}
+		return true;
+	}
+
+	DebugTool.log=function(__args){
+		var args=arguments;
+		var arr;
+		arr=DTrace.getArgArr(args);
+		if (DebugTool._logFun !=null){
+			DebugTool._logFun(arr.join(" "));
+		}
+	}
+
+	DebugTool.enableCacheAnalyse=false;
+	DebugTool.enableNodeCreateAnalyse=true;
+	DebugTool._traceFun=null;
+	DebugTool.debugLayer=null;
+	DebugTool._target=null;
+	DebugTool.selectedNodes=[];
+	DebugTool.autoShowSelected=true;
+	DebugTool._showBound=true;
+	DebugTool._disBoundRec=null;
+	DebugTool.autoTraceEnable=false;
+	DebugTool.autoTraceBounds=false;
+	DebugTool.autoTraceSize=false;
+	DebugTool.autoTraceTree=true;
+	DebugTool.autoTraceCMD=true;
+	DebugTool.autoTraceCMDR=false;
+	DebugTool.autoTraceSpriteInfo=true;
+	DebugTool._classList=null;
+	DebugTool._tFindClass=null;
+	DebugTool._rSpList=[];
+	DebugTool._logFun=null;
+	__static(DebugTool,
+	['text',function(){return this.text=new Stat();},'cmdToTypeO',function(){return this.cmdToTypeO={
+	};},'counter',function(){return this.counter=new CountTool();},'nameFilter',function(){return this.nameFilter={"name":"name"};}
+
+	]);
+	return DebugTool;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.MouseEventAnalyser
+var MouseEventAnalyser=(function(){
+	function MouseEventAnalyser(){}
+	__class(MouseEventAnalyser,'laya.debug.tools.MouseEventAnalyser');
+	MouseEventAnalyser.analyseNode=function(node){
+		DebugTool.showDisBound(node,true);
+		var _node;
+		_node=node;
+		ObjectTools.clearObj(MouseEventAnalyser.infoO);
+		ObjectTools.clearObj(MouseEventAnalyser.nodeO);
+		ObjectTools.clearObj(MouseEventAnalyser.hitO);
+		var nodeList;
+		nodeList=[];
+		while (node){
+			IDTools.idObj(node);
+			MouseEventAnalyser.nodeO[IDTools.getObjID(node)]=node;
+			nodeList.push(node);
+			node=node.parent;
+		}
+		MouseEventAnalyser.check(Laya.stage,Laya.stage.mouseX,Laya.stage.mouseY,null);
+		var canStr;
+		if (MouseEventAnalyser.hitO[IDTools.getObjID(_node)]){
+			console.log("can hit");
+			canStr="can hit";
+		}
+		else{
+			console.log("can't hit");
+			canStr="can't hit";
+		};
+		var i=0,len=0;
+		nodeList=nodeList.reverse();
+		len=nodeList.length;
+		var rstTxts;
+		rstTxts=["[分析对象]:"+ClassTool.getNodeClassAndName(_node)+":"+canStr];
+		for (i=0;i < len;i++){
+			node=nodeList[i];
+			if (MouseEventAnalyser.hitO[IDTools.getObjID(node)]){
+				console.log("can hit:",ClassTool.getNodeClassAndName(node));
+				console.log("原因:",MouseEventAnalyser.infoO[IDTools.getObjID(node)]);
+				rstTxts.push("can hit:"+" "+ClassTool.getNodeClassAndName(node));
+				rstTxts.push("原因:"+" "+MouseEventAnalyser.infoO[IDTools.getObjID(node)]);
+			}
+			else{
+				console.log("can't hit:"+ClassTool.getNodeClassAndName(node));
+				console.log("原因:",MouseEventAnalyser.infoO[IDTools.getObjID(node)] ? MouseEventAnalyser.infoO[IDTools.getObjID(node)] :"鼠标事件在父级已停止派发");
+				rstTxts.push("can't hit:"+" "+ClassTool.getNodeClassAndName(node));
+				rstTxts.push("原因:"+" "+(MouseEventAnalyser.infoO[IDTools.getObjID(node)] ? MouseEventAnalyser.infoO[IDTools.getObjID(node)] :"鼠标事件在父级已停止派发"));
+			}
+		};
+		var rstStr;
+		rstStr=rstTxts.join("\n");
+	}
+
+	MouseEventAnalyser.check=function(sp,mouseX,mouseY,callBack){
+		IDTools.idObj(sp);
+		var isInAnlyseChain=false;
+		isInAnlyseChain=MouseEventAnalyser.nodeO[IDTools.getObjID(sp)];
+		MouseEventAnalyser._point.setTo(mouseX,mouseY);
+		sp.fromParentPoint(MouseEventAnalyser._point);
+		mouseX=MouseEventAnalyser._point.x;
+		mouseY=MouseEventAnalyser._point.y;
+		var scrollRect=sp.scrollRect;
+		if (scrollRect){
+			MouseEventAnalyser._rect.setTo(scrollRect.x,scrollRect.y,scrollRect.width,scrollRect.height);
+			var isHit=MouseEventAnalyser._rect.contains(mouseX,mouseY);
+			if (!isHit){
+				if (isInAnlyseChain){
+					MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="scrollRect没有包含鼠标"+MouseEventAnalyser._rect.toString()+":"+mouseX+","+mouseY;
+				}
+				return false;
+			}
+		};
+		var i=0,len=0;
+		var cList;
+		cList=sp._children;
+		len=cList.length;
+		var child;
+		var childInChain;
+		childInChain=null;
+		for (i=0;i < len;i++){
+			child=cList[i];
+			IDTools.idObj(child);
+			if (MouseEventAnalyser.nodeO[IDTools.getObjID(child)]){
+				childInChain=child;
+				break ;
+			}
+		};
+		var coverByOthers=false;
+		coverByOthers=childInChain ? true :false;
+		var flag=false;
+		if (sp.hitTestPrior && !sp.mouseThrough && !MouseEventAnalyser.hitTest(sp,mouseX,mouseY)){
+			MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="hitTestPrior=true，宽高区域不包含鼠标:"+":"+mouseX+","+mouseY+" size:"+sp.width+","+sp.height;
+			return false;
+		}
+		for (i=sp._children.length-1;i >-1;i--){
+			child=sp._children[i];
+			if (child==childInChain){
+				if (!childInChain.mouseEnabled){
+					MouseEventAnalyser.infoO[IDTools.getObjID(childInChain)]="mouseEnabled=false";
+				}
+				if (!childInChain.visible){
+					MouseEventAnalyser.infoO[IDTools.getObjID(childInChain)]="visible=false";
+				}
+				coverByOthers=false;
+			}
+			if (child.mouseEnabled && child.visible){
+				flag=MouseEventAnalyser.check(child,mouseX ,mouseY,callBack);
+				if (flag){
+					MouseEventAnalyser.hitO[IDTools.getObjID(sp)]=true;
+					MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="子对象被击中";
+					if (child==childInChain){
+						MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="子对象被击中,"+"击中对象在分析链中";
+					}
+					else{
+						MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="子对象被击中,"+"击中对象不在分析链中";
+						if (coverByOthers){
+							MouseEventAnalyser.infoO[IDTools.getObjID(childInChain)]="被兄弟节点挡住,兄弟节点信息:"+ClassTool.getNodeClassAndName(child)+","+child.getBounds().toString();
+							DebugTool.showDisBound(child,false,"#ffff00");
+						}
+					}
+					return true;
+				}
+				else{
+					if (child==childInChain){
+						coverByOthers=false;
+					}
+				}
+			}
+		};
+		var mHitRect=new Rectangle();
+		var graphicHit=false;
+		graphicHit=sp.getGraphicBounds().contains(mouseX,mouseY);
+		if (sp.width > 0 && sp.height > 0){
+			var hitRect=MouseEventAnalyser._rect;
+			if (!sp.mouseThrough){
+				if (sp.hitArea)
+					hitRect=sp.hitArea;
+				else
+				hitRect.setTo(0,0,sp.width,sp.height);
+				mHitRect.copyFrom(hitRect);
+				isHit=hitRect.contains(mouseX,mouseY);
+			}
+			else{
+				isHit=graphicHit;
+				mHitRect.copyFrom(sp.getGraphicBounds());
+			}
+			if (isHit){
+				MouseEventAnalyser.hitO[IDTools.getObjID(sp)]=true;
+			}
+			}else{
+		}
+		if (!isHit){
+			if (graphicHit){
+				MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="子对象未包含鼠标，实际绘图区域包含鼠标，设置的宽高区域不包含鼠标:"+":"+mouseX+","+mouseY+" hitRec:"+mHitRect.toString()+" graphicBounds:"+sp.getGraphicBounds().toString()+"，设置mouseThrough=true或将宽高设置到实际绘图区域可解决问题";
+				}else{
+				MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="子对象未包含鼠标，实际绘图区域不包含鼠标，设置的宽高区域不包含鼠标:"+":"+mouseX+","+mouseY+" hitRec:"+mHitRect.toString()+" graphicBounds:"+sp.getGraphicBounds().toString();
+			}
+		}
+		else{
+			MouseEventAnalyser.infoO[IDTools.getObjID(sp)]="自身区域被击中";
+		}
+		return isHit;
+	}
+
+	MouseEventAnalyser.hitTest=function(sp,mouseX,mouseY){
+		var isHit=false;
+		if ((sp.hitArea instanceof laya.utils.HitArea )){
+			return sp.hitArea.isHit(mouseX,mouseY);
+		}
+		if (sp.width > 0 && sp.height > 0 || sp.mouseThrough || sp.hitArea){
+			var hitRect=MouseEventAnalyser._rect;
+			if (!sp.mouseThrough){
+				if (sp.hitArea)hitRect=sp.hitArea;
+				else hitRect.setTo(0,0,sp.width,sp.height);
+				isHit=hitRect.contains(mouseX,mouseY);
+				}else {
+				isHit=sp.getGraphicBounds().contains(mouseX,mouseY);
+			}
+		}
+		return isHit;
+	}
+
+	MouseEventAnalyser.infoO={};
+	MouseEventAnalyser.nodeO={};
+	MouseEventAnalyser.hitO={};
+	__static(MouseEventAnalyser,
+	['_matrix',function(){return this._matrix=new Matrix();},'_point',function(){return this._point=new Point();},'_rect',function(){return this._rect=new Rectangle();}
+	]);
+	return MouseEventAnalyser;
+})()
+
+
+/**
+*全局时间速率控制类
+*@author ww
+*/
+//class laya.debug.tools.TimerControlTool
+var TimerControlTool=(function(){
+	function TimerControlTool(){}
+	__class(TimerControlTool,'laya.debug.tools.TimerControlTool');
+	TimerControlTool.now=function(){
+		if (TimerControlTool._timeRate !=1)return TimerControlTool.getRatedNow();
+		return Date.now();
+	}
+
+	TimerControlTool.getRatedNow=function(){
+		var dTime=NaN;
+		dTime=TimerControlTool.getNow()-TimerControlTool._startTime;
+		return dTime *TimerControlTool._timeRate+TimerControlTool._startTime;
+	}
+
+	TimerControlTool.getNow=function(){
+		return Date.now();
+	}
+
+	TimerControlTool.setTimeRate=function(rate){
+		if (TimerControlTool._browerNow==null)TimerControlTool._browerNow=Browser["now"];
+		TimerControlTool._startTime=TimerControlTool.getNow();
+		TimerControlTool._timeRate=rate;
+		if (rate !=1){
+			Browser["now"]=TimerControlTool.now;
+			}else{
+			if(TimerControlTool._browerNow!=null)
+				Browser["now"]=TimerControlTool._browerNow;
+		}
+	}
+
+	TimerControlTool.recoverRate=function(){
+		TimerControlTool.setTimeRate(1);
+	}
+
+	TimerControlTool._startTime=NaN;
+	TimerControlTool._timeRate=1;
+	TimerControlTool._browerNow=null;
+	return TimerControlTool;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.resizer.SimpleResizer
+var SimpleResizer=(function(){
+	function SimpleResizer(){}
+	__class(SimpleResizer,'laya.debug.tools.resizer.SimpleResizer');
+	SimpleResizer.setResizeAble=function(clickItem,tar,minWidth,minHeight){
+		(minWidth===void 0)&& (minWidth=150);
+		(minHeight===void 0)&& (minHeight=150);
+		clickItem.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",null,SimpleResizer.onMouseDown,[tar,minWidth,minHeight]);
+	}
+
+	SimpleResizer.onMouseDown=function(tar,minWidth,minHeight,e){
+		SimpleResizer.clearEvents();
+		if (!tar)return;
+		SimpleResizer.preMousePoint.setTo(Laya.stage.mouseX,Laya.stage.mouseY);
+		SimpleResizer.preTarSize.setTo(tar.width,tar.height);
+		SimpleResizer.preScale.setTo(1,1);
+		var rTar;
+		rTar=tar;
+		while (rTar&&rTar!=Laya.stage){
+			SimpleResizer.preScale.x *=rTar.scaleX;
+			SimpleResizer.preScale.y *=rTar.scaleY;
+			rTar=rTar.parent;
+		}
+		Laya.stage.on(/*laya.events.Event.MOUSE_UP*/"mouseup",null,SimpleResizer.onMouseMoveEnd);
+		Laya.timer.loop(100,null,SimpleResizer.onMouseMoving,[tar,minWidth,minHeight]);
+	}
+
+	SimpleResizer.onMouseMoving=function(tar,minWidth,minHeight,e){
+		var tWidth=(Laya.stage.mouseX-SimpleResizer.preMousePoint.x)/ SimpleResizer.preScale.x+SimpleResizer.preTarSize.x;
+		var tHeight=(Laya.stage.mouseY-SimpleResizer.preMousePoint.y)/SimpleResizer.preScale.y+SimpleResizer.preTarSize.y;
+		tar.width=tWidth > minWidth?tWidth:minWidth;
+		tar.height=tHeight>minHeight?tHeight:minHeight;
+	}
+
+	SimpleResizer.onMouseMoveEnd=function(e){
+		SimpleResizer.clearEvents();
+	}
+
+	SimpleResizer.clearEvents=function(){
+		Laya.timer.clear(null,SimpleResizer.onMouseMoving);
+		Laya.stage.off(/*laya.events.Event.MOUSE_UP*/"mouseup",null,SimpleResizer.onMouseMoveEnd);
+	}
+
+	__static(SimpleResizer,
+	['preMousePoint',function(){return this.preMousePoint=new Point();},'preTarSize',function(){return this.preTarSize=new Point();},'preScale',function(){return this.preScale=new Point();}
+	]);
+	return SimpleResizer;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.ColorTool
+var ColorTool=(function(){
+	function ColorTool(){
+		this.red=NaN;
+		this.green=NaN;
+		this.blue=NaN;
+	}
+
+	__class(ColorTool,'laya.debug.tools.ColorTool');
+	ColorTool.toHexColor=function(color){
+		return Utils.toHexColor(color);
+	}
+
+	ColorTool.getRGBByRGBStr=function(str){
+		str.charAt(0)=='#' && (str=str.substr(1));
+		var color=/*__JS__ */parseInt(str,16);
+		var flag=(str.length==8);
+		var _color;
+		_color=[((0x00FF0000 & color)>> 16),((0x0000FF00 & color)>> 8),(0x000000FF & color)];
+		return _color;
+	}
+
+	ColorTool.getColorBit=function(value){
+		var rst;
+		rst=Math.floor(value).toString(16);
+		rst=rst.length > 1 ? rst :"0"+rst;
+		return rst;
+	}
+
+	ColorTool.getRGBStr=function(rgb){
+		return "#"+ColorTool.getColorBit(rgb[0])+ColorTool.getColorBit(rgb[1])+ColorTool.getColorBit(rgb[2]);
+	}
+
+	ColorTool.traseHSB=function(hsb){
+		console.log("hsb:",hsb[0],hsb[1],hsb[2]);
+	}
+
+	ColorTool.rgb2hsb=function(rgbR,rgbG,rgbB){
+		var rgb=[rgbR,rgbG,rgbB];
+		rgb.sort(MathTools.sortNumSmallFirst);
+		var max=rgb[2];
+		var min=rgb[0];
+		var hsbB=max / 255.0;
+		var hsbS=max==0 ? 0 :(max-min)/ max;
+		var hsbH=0;
+		if(max==min){
+			hsbH=1;
+		}
+		else
+		if (rgbR==0 && rgbG==0&&rgbB==0){
+		}else
+		if (max==rgbR && rgbG >=rgbB){
+			hsbH=(rgbG-rgbB)*60 / (max-min)+0;
+		}
+		else if (max==rgbR && rgbG < rgbB){
+			hsbH=(rgbG-rgbB)*60 / (max-min)+360;
+		}
+		else if (max==rgbG){
+			hsbH=(rgbB-rgbR)*60 / (max-min)+120;
+		}
+		else if (max==rgbB){
+			hsbH=(rgbR-rgbG)*60 / (max-min)+240;
+		}
+		return [hsbH,hsbS,hsbB];
+	}
+
+	ColorTool.hsb2rgb=function(h,s,v){
+		var r=0,g=0,b=0;
+		var i=Math.floor((h / 60)% 6);
+		var f=(h / 60)-i;
+		var p=v *(1-s);
+		var q=v *(1-f *s);
+		var t=v *(1-(1-f)*s);
+		switch (i){
+			case 0:
+				r=v;
+				g=t;
+				b=p;
+				break ;
+			case 1:
+				r=q;
+				g=v;
+				b=p;
+				break ;
+			case 2:
+				r=p;
+				g=v;
+				b=t;
+				break ;
+			case 3:
+				r=p;
+				g=q;
+				b=v;
+				break ;
+			case 4:
+				r=t;
+				g=p;
+				b=v;
+				break ;
+			case 5:
+				r=v;
+				g=p;
+				b=q;
+				break ;
+			default :
+				break ;
+			}
+		return [Math.floor(r *255.0),Math.floor(g *255.0),Math.floor(b *255.0)];
+	}
+
+	return ColorTool;
+})()
+
+
+/**
+*本类用于操作html对象
+*@author ww
+*/
+//class laya.debug.tools.JSTools
+var JSTools=(function(){
+	function JSTools(){}
+	__class(JSTools,'laya.debug.tools.JSTools');
+	JSTools.showToBody=function(el,x,y){
+		(x===void 0)&& (x=0);
+		(y===void 0)&& (y=0);
+		Browser.document.body.appendChild(el);
+		var style;
+		style=el.style;
+		style.position="absolute";
+		style.top=y+"px";
+		style.left=x+"px";
+	}
+
+	JSTools.showToParent=function(el,x,y,parent){
+		(x===void 0)&& (x=0);
+		(y===void 0)&& (y=0);
+		parent.appendChild(el);
+		var style;
+		style=el.style;
+		style.position="absolute";
+		style.top=y+"px";
+		style.left=x+"px";
+	}
+
+	JSTools.addToBody=function(el){
+		Browser.document.body.appendChild(el);
+	}
+
+	JSTools.setPos=function(el,x,y){
+		var style;
+		style=el.style;
+		style.top=y+"px";
+		style.left=x+"px";
+	}
+
+	JSTools.setSize=function(el,width,height){
+		var style;
+		style=el.style;
+		style.width=width+"px";
+		style.height=height+"px";
+	}
+
+	JSTools.setTransform=function(el,mat){
+		var style;
+		style=el.style;
+		style.transformOrigin=style.webkitTransformOrigin=style.msTransformOrigin=style.mozTransformOrigin=style.oTransformOrigin="0px 0px 0px";
+		style.transform=style.webkitTransform=style.msTransform=style.mozTransform=style.oTransform="matrix("+mat.toString()+")";
+	}
+
+	JSTools.noMouseEvent=function(el){
+		var style;
+		style=el.style;
+		style["pointer-events"]="none";
+	}
+
+	JSTools.setMouseEnable=function(el,enable){
+		var style;
+		style=el.style;
+		style["pointer-events"]=enable?"auto":"none";
+	}
+
+	JSTools.setZIndex=function(el,zIndex){
+		var style;
+		style=el.style;
+		style["z-index"]=zIndex;
+	}
+
+	JSTools.showAboveSprite=function(el,sprite,dx,dy){
+		(dx===void 0)&& (dx=0);
+		(dy===void 0)&& (dy=0);
+		var pos;
+		pos=new Point();
+		pos=sprite.localToGlobal(pos);
+		pos.x+=dx;
+		pos.y+=dy;
+		pos.x+=Laya.stage.offset.x;
+		pos.y+=Laya.stage.offset.y;
+		JSTools.showToBody(el,pos.x,pos.y);
+	}
+
+	JSTools.removeElement=function(el){
+		Browser.removeElement(el);
+	}
+
+	JSTools.isElementInDom=function(el){
+		return el && el.parentNode;
+	}
+
+	JSTools.getImageSpriteByFile=function(file,width,height){
+		(width===void 0)&& (width=0);
+		(height===void 0)&& (height=0);
+		var reader;
+		/*__JS__ */reader=new FileReader();;
+		reader.readAsDataURL(file);
+		var sprite;
+		sprite=new Sprite();
+		reader.onload=function (e){
+			var txt;
+			txt=new Texture();
+			txt.load(reader.result);
+			sprite.graphics.drawTexture(txt,0,0,width,height);
+		}
+		return sprite;
+	}
+
+	JSTools.getPixelRatio=function(){
+		if (JSTools._pixelRatio > 0)return JSTools._pixelRatio;
+		var canvas=Browser.createElement("canvas");
+		var context=canvas.getContext('2d');
+		var devicePixelRatio=Browser.window.devicePixelRatio || 1;
+		var backingStoreRatio=context.webkitBackingStorePixelRatio ||
+		context.mozBackingStorePixelRatio ||
+		context.msBackingStorePixelRatio ||
+		context.oBackingStorePixelRatio ||
+		context.backingStorePixelRatio || 1;
+		var ratio=devicePixelRatio / backingStoreRatio;
+		console.log("pixelRatioc:",ratio);
+		JSTools._pixelRatio=ratio;
+		return ratio;
+	}
+
+	JSTools._pixelRatio=-1;
+	return JSTools;
+})()
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.tools.GetSetProfile
+var GetSetProfile=(function(){
+	function GetSetProfile(){}
+	__class(GetSetProfile,'laya.debug.tools.GetSetProfile');
+	GetSetProfile.removeNoDisplayKeys=function(arr){
+		var i=0;
+		for (i=arr.length-1;i >=0;i--){
+			if (GetSetProfile.noDisplayKeys[arr[i]]){
+				arr.splice(i,1);
+			}
+		}
+	}
+
+	GetSetProfile.getClassCount=function(className){
+		return GetSetProfile.countDic[className];
+	}
+
+	GetSetProfile.addClassCount=function(className){
+		if (!GetSetProfile.countDic[className]){
+			GetSetProfile.countDic[className]=1;
+		}
+		else {
+			GetSetProfile.countDic[className]=GetSetProfile.countDic[className]+1;
+		}
+	}
+
+	GetSetProfile.init=function(){
+		if (GetSetProfile._inited)
+			return;
+		GetSetProfile._inited=true;
+		var createFun=function (sp){
+			GetSetProfile.classCreated(sp);
+		}
+		FunHook.hook(Node,"call",null,createFun);
+		GetSetProfile.handlerO={};
+		GetSetProfile.handlerO["get"]=function (target,key,receiver){
+			console.log("get",target,key,receiver);
+			return /*__JS__ */Reflect.get(target,key,receiver);
+		};
+		GetSetProfile.handlerO["set"]=function (target,key,value,receiver){
+			console.log("set",target,key,value,receiver);
+			return /*__JS__ */Reflect.set(target,key,value,receiver);
+		}
+	}
+
+	GetSetProfile.classCreated=function(obj,oClas){
+		if (GetSetProfile.fromMe)
+			return;
+		var className;
+		className=ClassTool.getClassName(obj);
+		GetSetProfile.addClassCount(className);
+		GetSetProfile.addClassCount("ALL");
+		IDTools.idObj(obj);
+		var classDes;
+		classDes=GetSetProfile.hookClassDic[className];
+		if (!classDes){
+			GetSetProfile.profileClass(obj["constructor"]);
+			classDes=GetSetProfile.hookClassDic[className];
+			if (!classDes)
+				return;
+		}
+		GetSetProfile.hookObj2(obj,classDes);
+	}
+
+	GetSetProfile.hookObj=function(obj,keys){
+		var handler=GetSetProfile.handlerO;
+		/*__JS__ */new Proxy(obj,handler);
+	}
+
+	GetSetProfile.hookObj2=function(obj,keys){
+		var i=0,len=0;
+		len=keys.length;
+		for (i=0;i < len;i++){
+			GetSetProfile.hookVar(obj,keys[i]);
+		}
+	}
+
+	GetSetProfile.profileClass=function(clz){
+		var className;
+		className=ClassTool.getClassName(clz);
+		GetSetProfile.fromMe=true;
+		var tO=new clz();
+		GetSetProfile.fromMe=false;
+		var keys;
+		keys=ClassTool.getObjectDisplayAbleKeys(tO);
+		keys=ObjectTools.getNoSameArr(keys);
+		var i=0,len=0;
+		len=keys.length;
+		var tV;
+		var key;
+		for (i=len-1;i >=0;i--){
+			key=keys[i];
+			tV=tO[key];
+			if ((typeof tV=='function')){
+				keys.splice(i,1);
+			}
+		}
+		len=keys.length;
+		GetSetProfile.removeNoDisplayKeys(keys);
+		GetSetProfile.hookClassDic[className]=keys;
+	}
+
+	GetSetProfile.hookPrototype=function(tO,key){
+		console.log("hook:",key);
+		try {
+			GetSetProfile.hookVar(tO,key);
+		}
+		catch (e){
+			console.log("fail",key);
+		}
+	}
+
+	GetSetProfile.reportCall=function(obj,name,type){
+		IDTools.idObj(obj);
+		var objID=0;
+		objID=IDTools.getObjID(obj);
+		var className;
+		className=ClassTool.getClassName(obj);
+		GetSetProfile.recordInfo(className,name,type,objID);
+		GetSetProfile.recordInfo("ALL",name,type,objID);
+	}
+
+	GetSetProfile.recordInfo=function(className,name,type,objID){
+		var propCallsDic;
+		if (!GetSetProfile.infoDic[className]){
+			GetSetProfile.infoDic[className]={};
+		}
+		propCallsDic=GetSetProfile.infoDic[className];
+		var propCalls;
+		if (!propCallsDic[name]){
+			propCallsDic[name]={};
+		}
+		propCalls=propCallsDic[name];
+		var propCallO;
+		if (!propCalls[type]){
+			propCalls[type]={};
+		}
+		propCallO=propCalls[type];
+		if (!propCallO[objID]){
+			propCallO[objID]=1;
+			if (!propCallO["objCount"]){
+				propCallO["objCount"]=1;
+			}
+			else {
+				propCallO["objCount"]=propCallO["objCount"]+1;
+			}
+		}
+		else {
+			propCallO[objID]=propCallO[objID]+1;
+		}
+		if (!propCallO["count"]){
+			propCallO["count"]=1;
+		}
+		else {
+			propCallO["count"]=propCallO["count"]+1;
+		}
+	}
+
+	GetSetProfile.showInfo=function(){
+		var rstO;
+		rstO={};
+		var rstO1;
+		rstO1={};
+		var arr;
+		arr=[];
+		var arr1;
+		arr1=[];
+		var className;
+		var keyName;
+		var type;
+		for (className in GetSetProfile.infoDic){
+			var tClassO;
+			var tClassO1;
+			tClassO=GetSetProfile.infoDic[className];
+			rstO[className]=tClassO1={};
+			for (keyName in tClassO){
+				var tKeyO;
+				var tKeyO1;
+				tKeyO=tClassO[keyName];
+				tClassO1[keyName]=tKeyO1={};
+				for(type in tKeyO){
+					var tDataO;
+					var tDataO1;
+					tDataO=tKeyO[type];
+					tDataO["rate"]=tDataO["objCount"] / GetSetProfile.getClassCount(className);
+					tKeyO1[type]=tDataO["rate"];
+					var tSKey;
+					tSKey=className+"_"+keyName+"_"+type;
+					rstO1[tSKey]=tDataO["rate"];
+					if (className=="ALL"){
+						if (type=="get"){
+							arr.push([tSKey,tDataO["rate"],tDataO["count"]]);
+							}else{
+							arr1.push([tSKey,tDataO["rate"],tDataO["count"]]);
+						}
+					}
+				}
+			}
+		}
+		console.log(GetSetProfile.infoDic);
+		console.log(GetSetProfile.countDic);
+		console.log(rstO);
+		console.log(rstO1);
+		console.log("nodeCount:",GetSetProfile.getClassCount("ALL"));
+		console.log("sort by rate");
+		GetSetProfile.showStaticInfo(arr,arr1,"1");
+		console.log("sort by count");
+		GetSetProfile.showStaticInfo(arr,arr1,"2");
+	}
+
+	GetSetProfile.showStaticInfo=function(arr,arr1,sortKey){
+		console.log("get:");
+		GetSetProfile.showStaticArray(arr,sortKey);
+		console.log("set:");
+		GetSetProfile.showStaticArray(arr1,sortKey);
+	}
+
+	GetSetProfile.showStaticArray=function(arr,sortKey){
+		(sortKey===void 0)&& (sortKey="1");
+		arr.sort(MathUtil.sortByKey(sortKey,true,true));
+		var i=0,len=0;
+		len=arr.length;
+		var tArr;
+		for (i=0;i < len;i++){
+			tArr=arr[i];
+			console.log(tArr[0],Math.floor(tArr[1]*100),tArr[2]);
+		}
+	}
+
+	GetSetProfile.hookVar=function(obj,name,setHook,getHook){
+		if (!setHook)
+			setHook=[];
+		if (!getHook)
+			getHook=[];
+		var preO=obj;
+		var preValue;
+		var newKey="___@"+newKey;
+		var des;
+		des=ClassTool.getOwnPropertyDescriptor(obj,name);
+		var ndes={};
+		var mSet=function (value){
+			preValue=value;
+		};
+		var mGet=function (){
+			return preValue;
+		};
+		var mSet1=function (value){
+			var _t=/*__JS__ */this;
+			GetSetProfile.reportCall(_t,name,"set");
+		};
+		var mGet1=function (){
+			var _t=/*__JS__ */this;
+			GetSetProfile.reportCall(_t,name,"get");
+			return preValue;
+		}
+		getHook.push(mGet1);
+		setHook.push(mSet1);
+		while (!des && obj["__proto__"]){
+			obj=obj["__proto__"];
+			des=ClassTool.getOwnPropertyDescriptor(obj,name);
+		}
+		if (des){
+			ndes.set=des.set ? des.set :mSet;
+			ndes.get=des.get ? des.get :mGet;
+			if (!des.get){
+				preValue=preO[name];
+			}
+			ndes.enumerable=des.enumerable;
+			setHook.push(ndes.set);
+			getHook.push(ndes.get);
+			FunHook.hookFuns(ndes,"set",setHook);
+			FunHook.hookFuns(ndes,"get",getHook,getHook.length-1);
+			ClassTool.defineProperty(preO,name,ndes);
+		}
+		if (!des){
+			ndes.set=mSet;
+			ndes.get=mGet;
+			preValue=preO[name];
+			setHook.push(ndes.set);
+			getHook.push(ndes.get);
+			FunHook.hookFuns(ndes,"set",setHook);
+			FunHook.hookFuns(ndes,"get",getHook,getHook.length-1);
+			ClassTool.defineProperty(preO,name,ndes);
+		}
+	}
+
+	GetSetProfile._inited=false;
+	GetSetProfile.handlerO=null;
+	GetSetProfile.ALL="ALL";
+	GetSetProfile.countDic={};
+	GetSetProfile.fromMe=false;
+	GetSetProfile.hookClassDic={};
+	GetSetProfile.infoDic={};
+	__static(GetSetProfile,
+	['noDisplayKeys',function(){return this.noDisplayKeys={"conchModel":true};}
+	]);
+	return GetSetProfile;
 })()
 
 
@@ -8837,6 +8837,142 @@ var DragBox=(function(_super){
 
 
 /**
+*
+*@author ww
+*@version 1.0
+*
+*@created 2015-12-30 下午1:59:34
+*/
+//class laya.debug.tools.comps.Arrow extends laya.display.Sprite
+var Arrow=(function(_super){
+	function Arrow(){
+		Arrow.__super.call(this);
+		this.drawMe();
+	}
+
+	__class(Arrow,'laya.debug.tools.comps.Arrow',_super);
+	var __proto=Arrow.prototype;
+	__proto.drawMe=function(){
+		var g;
+		g=this.graphics;
+		g.clear();
+		g.drawLine(0,0,-1,-1,"#ff0000");
+		g.drawLine(0,0,1,-1,"#ff0000");
+	}
+
+	return Arrow;
+})(Sprite)
+
+
+/**
+*...
+*@author ww
+*/
+//class laya.debug.view.nodeInfo.DebugInfoLayer extends laya.display.Sprite
+var DebugInfoLayer=(function(_super){
+	function DebugInfoLayer(){
+		this.nodeRecInfoLayer=null;
+		this.lineLayer=null;
+		this.txtLayer=null;
+		this.popLayer=null;
+		this.graphicLayer=null;
+		this.cacheViewLayer=null;
+		DebugInfoLayer.__super.call(this);
+		this.nodeRecInfoLayer=new Sprite();
+		this.lineLayer=new Sprite();
+		this.txtLayer=new Sprite();
+		this.popLayer=new Sprite();
+		this.graphicLayer=new Sprite();
+		this.cacheViewLayer=new Sprite();
+		this.nodeRecInfoLayer.name="nodeRecInfoLayer";
+		this.lineLayer.name="lineLayer";
+		this.txtLayer.name="txtLayer";
+		this.popLayer.name="popLayer";
+		this.graphicLayer.name="graphicLayer";
+		this.cacheViewLayer.name="cacheViewLayer";
+		this.addChild(this.lineLayer);
+		this.addChild(this.cacheViewLayer);
+		this.addChild(this.nodeRecInfoLayer);
+		this.addChild(this.txtLayer);
+		this.addChild(this.popLayer);
+		this.addChild(this.graphicLayer);
+		DebugInfoLayer.I=this;
+		this.zOrder=999;
+		Laya.stage.on(/*laya.events.Event.DOUBLE_CLICK*/"doubleclick",this,this.setTop);
+	}
+
+	__class(DebugInfoLayer,'laya.debug.view.nodeInfo.DebugInfoLayer',_super);
+	var __proto=DebugInfoLayer.prototype;
+	__proto.setTop=function(){
+		DisControlTool.setTop(this);
+	}
+
+	__proto.isDebugItem=function(sprite){
+		return DisControlTool.isInTree(this,sprite);
+	}
+
+	DebugInfoLayer.init=function(){
+		if (!DebugInfoLayer.I){
+			new DebugInfoLayer();
+			Laya.stage.addChild(DebugInfoLayer.I);
+		}
+	}
+
+	DebugInfoLayer.I=null;
+	return DebugInfoLayer;
+})(Sprite)
+
+
+/**
+*自动根据大小填充自己全部区域的显示对象
+*@author ww
+*/
+//class laya.debug.tools.resizer.AutoFillRec extends laya.display.Sprite
+var AutoFillRec=(function(_super){
+	function AutoFillRec(type){
+		this.type=0;
+		this.preX=NaN;
+		this.preY=NaN;
+		AutoFillRec.__super.call(this);
+	}
+
+	__class(AutoFillRec,'laya.debug.tools.resizer.AutoFillRec',_super);
+	var __proto=AutoFillRec.prototype;
+	__proto.changeSize=function(){
+		var g=this.graphics;
+		g.clear();
+		g.drawRect(0,0,this.width,this.height,"#33c5f5");
+	}
+
+	__proto.record=function(){
+		this.preX=this.x;
+		this.preY=this.y;
+	}
+
+	__proto.getDx=function(){
+		return this.x-this.preX;
+	}
+
+	__proto.getDy=function(){
+		return this.y-this.preY;
+	}
+
+	//super(type);
+	__getset(0,__proto,'width',_super.prototype._$get_width,function(value){
+		Laya.superSet(Sprite,this,'width',value);
+		this.changeSize();
+	});
+
+	__getset(0,__proto,'height',_super.prototype._$get_height,function(value){
+		Laya.superSet(Sprite,this,'height',value);
+		this.changeSize();
+	});
+
+	return AutoFillRec;
+})(Sprite)
+
+
+/**
 *...
 *@author ww
 */
@@ -8896,137 +9032,6 @@ var NodeRecInfo=(function(_super){
 
 
 /**
-*
-*@author ww
-*@version 1.0
-*
-*@created 2015-12-30 下午2:37:05
-*/
-//class laya.debug.tools.comps.Axis extends laya.display.Sprite
-var Axis=(function(_super){
-	function Axis(){
-		this._target=null;
-		this._lenType=
-		[
-		["width","height"],
-		["scaleX","scaleY"]];
-		this._type=1;
-		this.xAxis=new ArrowLine("X");
-		this.yAxis=new ArrowLine("Y");
-		this.controlBox=new Rect();
-		this._point=new Point();
-		this.oPoint=new Point();
-		this.myRotationChanger=ValueChanger.create(this,"rotation");
-		this.targetRotationChanger=ValueChanger.create(null,"rotation");
-		this.stageMouseRotationChanger=new ValueChanger();
-		Axis.__super.call(this);
-		this.mouseEnabled=true;
-		this.size(1,1);
-		this.initMe();
-		this.xAxis.rotationControl.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",this,this.controlMouseDown);
-		this.yAxis.rotationControl.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",this,this.controlMouseDown);
-		this.controlBox.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",this,this.controlBoxMouseDown);
-		this.on(/*laya.events.Event.DRAG_MOVE*/"dragmove",this,this.dragging);
-	}
-
-	__class(Axis,'laya.debug.tools.comps.Axis',_super);
-	var __proto=Axis.prototype;
-	__proto.updateChanges=function(){
-		if(this._target){
-			var params;
-			params=this._lenType[this._type];
-			this.xAxis.targetChanger=ValueChanger.create(this._target,params[0]);
-			this.yAxis.targetChanger=ValueChanger.create(this._target,params[1]);
-		}
-	}
-
-	__proto.switchType=function(){
-		this._type++;
-		this._type=this._type%this._lenType.length;
-		this.type=this._type;
-	}
-
-	__proto.controlBoxMouseDown=function(e){
-		this.startDrag();
-	}
-
-	__proto.dragging=function(){
-		if (this._target){
-			this._point.setTo(this.x,this.y);
-			DisControlTool.transPoint(this.parent,this._target.parent,this._point);
-			this._target.pos(this._point.x,this._point.y);
-		}
-	}
-
-	__proto.initMe=function(){
-		this.addChild(this.xAxis);
-		this.addChild(this.yAxis);
-		this.yAxis.rotation=90;
-		this.addChild(this.controlBox);
-		this.controlBox.posTo(0,0);
-	}
-
-	__proto.clearMoveEvents=function(){
-		Laya.stage.off(/*laya.events.Event.MOUSE_MOVE*/"mousemove",this,this.stageMouseMove);
-		Laya.stage.off(/*laya.events.Event.MOUSE_UP*/"mouseup",this,this.stageMouseUp);
-	}
-
-	__proto.controlMouseDown=function(e){
-		this.targetRotationChanger.target=this.target;
-		this.clearMoveEvents();
-		this.oPoint.setTo(0,0);
-		this.myRotationChanger.record();
-		this.oPoint=this.localToGlobal(this.oPoint);
-		this.stageMouseRotationChanger.value=this.getStageMouseRatation();
-		this.stageMouseRotationChanger.record();
-		this.targetRotationChanger.record();
-		Laya.stage.on(/*laya.events.Event.MOUSE_MOVE*/"mousemove",this,this.stageMouseMove);
-		Laya.stage.on(/*laya.events.Event.MOUSE_UP*/"mouseup",this,this.stageMouseUp);
-	}
-
-	__proto.getStageMouseRatation=function(){
-		return MathUtil.getRotation(this.oPoint.x,this.oPoint.y,Laya.stage.mouseX,Laya.stage.mouseY);
-	}
-
-	__proto.stageMouseMove=function(e){
-		this.stageMouseRotationChanger.value=this.getStageMouseRatation();
-		var dRotation=NaN;
-		dRotation=-this.stageMouseRotationChanger.dValue;
-		if(this.target){
-			this.targetRotationChanger.showValueByAdd(dRotation);
-			}else{
-			this.myRotationChanger.showValueByAdd(dRotation);
-		}
-	}
-
-	__proto.stageMouseUp=function(e){
-		this.noticeChange();
-		this.clearMoveEvents();
-	}
-
-	__proto.noticeChange=function(){
-		console.log("rotate:",-this.stageMouseRotationChanger.dValue);
-	}
-
-	__getset(0,__proto,'target',function(){
-		return this._target;
-		},function(tar){
-		this._target=tar;
-		this.updateChanges();
-	});
-
-	__getset(0,__proto,'type',function(){
-		return this._type;
-		},function(lenType){
-		this._type=lenType;
-		this.updateChanges();
-	});
-
-	return Axis;
-})(Sprite)
-
-
-/**
 *...
 *@author ww
 */
@@ -9081,40 +9086,6 @@ var AutoSizeRec=(function(_super){
 	});
 
 	return AutoSizeRec;
-})(Sprite)
-
-
-/**
-*
-*@author ww
-*@version 1.0
-*
-*@created 2015-12-30 下午3:23:06
-*/
-//class laya.debug.tools.comps.Rect extends laya.display.Sprite
-var Rect=(function(_super){
-	function Rect(){
-		this.recWidth=10;
-		Rect.__super.call(this);
-		this.drawMe();
-	}
-
-	__class(Rect,'laya.debug.tools.comps.Rect',_super);
-	var __proto=Rect.prototype;
-	__proto.drawMe=function(){
-		var g;
-		g=this.graphics;
-		g.clear();
-		g.drawRect(0,0,this.recWidth,this.recWidth,"#22ff22");
-		this.size(this.recWidth,this.recWidth);
-	}
-
-	__proto.posTo=function(x,y){
-		this.x=x-this.recWidth*0.5;
-		this.y=y-this.recWidth*0.5;
-	}
-
-	return Rect;
 })(Sprite)
 
 
@@ -9368,34 +9339,6 @@ var NodeInfosItem=(function(_super){
 *@author ww
 *@version 1.0
 *
-*@created 2015-12-30 下午1:59:34
-*/
-//class laya.debug.tools.comps.Arrow extends laya.display.Sprite
-var Arrow=(function(_super){
-	function Arrow(){
-		Arrow.__super.call(this);
-		this.drawMe();
-	}
-
-	__class(Arrow,'laya.debug.tools.comps.Arrow',_super);
-	var __proto=Arrow.prototype;
-	__proto.drawMe=function(){
-		var g;
-		g=this.graphics;
-		g.clear();
-		g.drawLine(0,0,-1,-1,"#ff0000");
-		g.drawLine(0,0,1,-1,"#ff0000");
-	}
-
-	return Arrow;
-})(Sprite)
-
-
-/**
-*
-*@author ww
-*@version 1.0
-*
 *@created 2015-12-30 下午2:03:32
 */
 //class laya.debug.tools.comps.ArrowLine extends laya.display.Sprite
@@ -9492,110 +9435,167 @@ var ArrowLine=(function(_super){
 
 
 /**
-*...
+*
 *@author ww
+*@version 1.0
+*
+*@created 2015-12-30 下午2:37:05
 */
-//class laya.debug.view.nodeInfo.DebugInfoLayer extends laya.display.Sprite
-var DebugInfoLayer=(function(_super){
-	function DebugInfoLayer(){
-		this.nodeRecInfoLayer=null;
-		this.lineLayer=null;
-		this.txtLayer=null;
-		this.popLayer=null;
-		this.graphicLayer=null;
-		this.cacheViewLayer=null;
-		DebugInfoLayer.__super.call(this);
-		this.nodeRecInfoLayer=new Sprite();
-		this.lineLayer=new Sprite();
-		this.txtLayer=new Sprite();
-		this.popLayer=new Sprite();
-		this.graphicLayer=new Sprite();
-		this.cacheViewLayer=new Sprite();
-		this.nodeRecInfoLayer.name="nodeRecInfoLayer";
-		this.lineLayer.name="lineLayer";
-		this.txtLayer.name="txtLayer";
-		this.popLayer.name="popLayer";
-		this.graphicLayer.name="graphicLayer";
-		this.cacheViewLayer.name="cacheViewLayer";
-		this.addChild(this.lineLayer);
-		this.addChild(this.cacheViewLayer);
-		this.addChild(this.nodeRecInfoLayer);
-		this.addChild(this.txtLayer);
-		this.addChild(this.popLayer);
-		this.addChild(this.graphicLayer);
-		DebugInfoLayer.I=this;
-		this.zOrder=999;
-		Laya.stage.on(/*laya.events.Event.DOUBLE_CLICK*/"doubleclick",this,this.setTop);
+//class laya.debug.tools.comps.Axis extends laya.display.Sprite
+var Axis=(function(_super){
+	function Axis(){
+		this._target=null;
+		this._lenType=
+		[
+		["width","height"],
+		["scaleX","scaleY"]];
+		this._type=1;
+		this.xAxis=new ArrowLine("X");
+		this.yAxis=new ArrowLine("Y");
+		this.controlBox=new Rect();
+		this._point=new Point();
+		this.oPoint=new Point();
+		this.myRotationChanger=ValueChanger.create(this,"rotation");
+		this.targetRotationChanger=ValueChanger.create(null,"rotation");
+		this.stageMouseRotationChanger=new ValueChanger();
+		Axis.__super.call(this);
+		this.mouseEnabled=true;
+		this.size(1,1);
+		this.initMe();
+		this.xAxis.rotationControl.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",this,this.controlMouseDown);
+		this.yAxis.rotationControl.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",this,this.controlMouseDown);
+		this.controlBox.on(/*laya.events.Event.MOUSE_DOWN*/"mousedown",this,this.controlBoxMouseDown);
+		this.on(/*laya.events.Event.DRAG_MOVE*/"dragmove",this,this.dragging);
 	}
 
-	__class(DebugInfoLayer,'laya.debug.view.nodeInfo.DebugInfoLayer',_super);
-	var __proto=DebugInfoLayer.prototype;
-	__proto.setTop=function(){
-		DisControlTool.setTop(this);
-	}
-
-	__proto.isDebugItem=function(sprite){
-		return DisControlTool.isInTree(this,sprite);
-	}
-
-	DebugInfoLayer.init=function(){
-		if (!DebugInfoLayer.I){
-			new DebugInfoLayer();
-			Laya.stage.addChild(DebugInfoLayer.I);
+	__class(Axis,'laya.debug.tools.comps.Axis',_super);
+	var __proto=Axis.prototype;
+	__proto.updateChanges=function(){
+		if(this._target){
+			var params;
+			params=this._lenType[this._type];
+			this.xAxis.targetChanger=ValueChanger.create(this._target,params[0]);
+			this.yAxis.targetChanger=ValueChanger.create(this._target,params[1]);
 		}
 	}
 
-	DebugInfoLayer.I=null;
-	return DebugInfoLayer;
+	__proto.switchType=function(){
+		this._type++;
+		this._type=this._type%this._lenType.length;
+		this.type=this._type;
+	}
+
+	__proto.controlBoxMouseDown=function(e){
+		this.startDrag();
+	}
+
+	__proto.dragging=function(){
+		if (this._target){
+			this._point.setTo(this.x,this.y);
+			DisControlTool.transPoint(this.parent,this._target.parent,this._point);
+			this._target.pos(this._point.x,this._point.y);
+		}
+	}
+
+	__proto.initMe=function(){
+		this.addChild(this.xAxis);
+		this.addChild(this.yAxis);
+		this.yAxis.rotation=90;
+		this.addChild(this.controlBox);
+		this.controlBox.posTo(0,0);
+	}
+
+	__proto.clearMoveEvents=function(){
+		Laya.stage.off(/*laya.events.Event.MOUSE_MOVE*/"mousemove",this,this.stageMouseMove);
+		Laya.stage.off(/*laya.events.Event.MOUSE_UP*/"mouseup",this,this.stageMouseUp);
+	}
+
+	__proto.controlMouseDown=function(e){
+		this.targetRotationChanger.target=this.target;
+		this.clearMoveEvents();
+		this.oPoint.setTo(0,0);
+		this.myRotationChanger.record();
+		this.oPoint=this.localToGlobal(this.oPoint);
+		this.stageMouseRotationChanger.value=this.getStageMouseRatation();
+		this.stageMouseRotationChanger.record();
+		this.targetRotationChanger.record();
+		Laya.stage.on(/*laya.events.Event.MOUSE_MOVE*/"mousemove",this,this.stageMouseMove);
+		Laya.stage.on(/*laya.events.Event.MOUSE_UP*/"mouseup",this,this.stageMouseUp);
+	}
+
+	__proto.getStageMouseRatation=function(){
+		return MathUtil.getRotation(this.oPoint.x,this.oPoint.y,Laya.stage.mouseX,Laya.stage.mouseY);
+	}
+
+	__proto.stageMouseMove=function(e){
+		this.stageMouseRotationChanger.value=this.getStageMouseRatation();
+		var dRotation=NaN;
+		dRotation=-this.stageMouseRotationChanger.dValue;
+		if(this.target){
+			this.targetRotationChanger.showValueByAdd(dRotation);
+			}else{
+			this.myRotationChanger.showValueByAdd(dRotation);
+		}
+	}
+
+	__proto.stageMouseUp=function(e){
+		this.noticeChange();
+		this.clearMoveEvents();
+	}
+
+	__proto.noticeChange=function(){
+		console.log("rotate:",-this.stageMouseRotationChanger.dValue);
+	}
+
+	__getset(0,__proto,'target',function(){
+		return this._target;
+		},function(tar){
+		this._target=tar;
+		this.updateChanges();
+	});
+
+	__getset(0,__proto,'type',function(){
+		return this._type;
+		},function(lenType){
+		this._type=lenType;
+		this.updateChanges();
+	});
+
+	return Axis;
 })(Sprite)
 
 
 /**
-*自动根据大小填充自己全部区域的显示对象
+*
 *@author ww
+*@version 1.0
+*
+*@created 2015-12-30 下午3:23:06
 */
-//class laya.debug.tools.resizer.AutoFillRec extends laya.display.Sprite
-var AutoFillRec=(function(_super){
-	function AutoFillRec(type){
-		this.type=0;
-		this.preX=NaN;
-		this.preY=NaN;
-		AutoFillRec.__super.call(this);
+//class laya.debug.tools.comps.Rect extends laya.display.Sprite
+var Rect=(function(_super){
+	function Rect(){
+		this.recWidth=10;
+		Rect.__super.call(this);
+		this.drawMe();
 	}
 
-	__class(AutoFillRec,'laya.debug.tools.resizer.AutoFillRec',_super);
-	var __proto=AutoFillRec.prototype;
-	__proto.changeSize=function(){
-		var g=this.graphics;
+	__class(Rect,'laya.debug.tools.comps.Rect',_super);
+	var __proto=Rect.prototype;
+	__proto.drawMe=function(){
+		var g;
+		g=this.graphics;
 		g.clear();
-		g.drawRect(0,0,this.width,this.height,"#33c5f5");
+		g.drawRect(0,0,this.recWidth,this.recWidth,"#22ff22");
+		this.size(this.recWidth,this.recWidth);
 	}
 
-	__proto.record=function(){
-		this.preX=this.x;
-		this.preY=this.y;
+	__proto.posTo=function(x,y){
+		this.x=x-this.recWidth*0.5;
+		this.y=y-this.recWidth*0.5;
 	}
 
-	__proto.getDx=function(){
-		return this.x-this.preX;
-	}
-
-	__proto.getDy=function(){
-		return this.y-this.preY;
-	}
-
-	//super(type);
-	__getset(0,__proto,'width',_super.prototype._$get_width,function(value){
-		Laya.superSet(Sprite,this,'width',value);
-		this.changeSize();
-	});
-
-	__getset(0,__proto,'height',_super.prototype._$get_height,function(value){
-		Laya.superSet(Sprite,this,'height',value);
-		this.changeSize();
-	});
-
-	return AutoFillRec;
+	return Rect;
 })(Sprite)
 
 
