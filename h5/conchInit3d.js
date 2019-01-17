@@ -8,6 +8,7 @@ var id = GetQueryString("id") || 0;
 
 var list = [
 	"advancedModule/AStarFindPath",
+	"advancedModule/GarbageCollection",
 	"advancedModule/Laya3DCombineHtml",
 	"advancedModule/GarbageCollection",
 	"advancedModule/PBRDemo",
