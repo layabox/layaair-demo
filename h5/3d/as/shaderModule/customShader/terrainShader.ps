@@ -23,7 +23,7 @@ varying vec2 v_Texcoord0;
 void main()
 {
 	#ifdef CUSTOM_DETAIL_NUM1
-		vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord);
+		vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);
 		vec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScale1);
 		gl_FragColor.xyz = color1.xyz * splatAlpha.r;
 	#endif
