@@ -51,7 +51,7 @@ var list = [
 	"shaderModule/Shader_Simple",
 	"shaderModule/Shader_Terrain",
 	"skyModule/Sky_Procedural",
-	"skyModule/SkyDomeSample",
+	"skyModule/Sky_SkyBox",
 	"sprite3dModule/Sprite3DClone",
 	"sprite3dModule/Sprite3DLoad",
 	"sprite3dModule/Sprite3DTransform",	
