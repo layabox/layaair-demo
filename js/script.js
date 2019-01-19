@@ -358,7 +358,7 @@ $(document).ready(function()
 		kael_QR.init(qr_container,
 		{
 			text: url,
-			size: 150
+			size: 250
 		});
 	}
 

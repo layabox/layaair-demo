@@ -479,7 +479,7 @@ section .demo-boxS {
 
 .modal-content {
     margin: 120px auto 0;
-    width: 210px;
+    width: 310px;
     background-clip: padding-box;
     background-color: #FFFFFF;
     border: 1px solid rgba(0, 0, 0, 0);
