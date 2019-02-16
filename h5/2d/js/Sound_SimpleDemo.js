@@ -60,7 +60,7 @@ class Sound_SimpleDemo {
 	// 播放音乐
 	onPlayMusic() {
 		console.log("播放音乐");
-		Laya.SoundManager.playMusic("res/sounds/bgm.mp3", 1, new Laya.Handler(this, this.onComplete));
+		Laya.SoundManager.playSound("res/sounds/bgm.mp3", 1, new Laya.Handler(this, this.onComplete));
 	}
 
 	onComplete() {
