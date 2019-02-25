@@ -24,8 +24,8 @@ class GarbageCollection{
 			});
 		}
 		_addButton(x, y, width, height, text, clickFun){
-			Laya.loader.load(["../../../../res/threeDimen/ui/button.png"], Laya.Handler.create(this, function() {
-				var changeActionButton = Laya.stage.addChild(new Laya.Button("../../../../res/threeDimen/ui/button.png", text));
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, function() {
+				var changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", text));
 				changeActionButton.size(width, height);
 				changeActionButton.labelBold = true;
 				changeActionButton.labelSize = 30;
@@ -36,7 +36,7 @@ class GarbageCollection{
 			}));
 		}
 		_loadScene(){
-			Laya.Scene3D.load("../../../../res/threeDimen/scene/ParticleScene/Example_01.ls", Laya.Handler.create(this, function(scene) {
+			Laya.Scene3D.load("res/threeDimen/scene/ParticleScene/Example_01.ls", Laya.Handler.create(this, function(scene) {
 				this._scene = Laya.stage.addChildAt(scene, 0);
 				var camera = this._scene.addChild(new Laya.Camera(0, 0.1, 100));
 				camera.transform.translate(new Laya.Vector3(0, 1, 0));
