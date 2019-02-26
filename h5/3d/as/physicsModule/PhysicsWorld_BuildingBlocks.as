@@ -132,8 +132,8 @@ package physicsModule {
 		}
 		
 		public function onMouseDown():void {
-			posX = point.elements[0] = MouseManager.instance.mouseX;
-			posY = point.elements[1] = MouseManager.instance.mouseY;
+			posX = point.x = MouseManager.instance.mouseX;
+			posY = point.y = MouseManager.instance.mouseY;
 			camera.viewportPointToRay(point, ray);
 			scene.physicsSimulation.rayCast(ray, _outHitResult);
 			if (_outHitResult.succeeded) {

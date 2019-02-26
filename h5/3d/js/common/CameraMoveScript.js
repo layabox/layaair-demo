@@ -33,9 +33,9 @@ class CameraMoveScript extends Laya.Script3D{
 			var offsetX = Laya.stage.mouseX - this.lastMouseX;
 			var offsetY = Laya.stage.mouseY - this.lastMouseY;
 				
-			var yprElem = this.yawPitchRoll.elements;
-			yprElem[0] -= offsetX * this.rotaionSpeed * elapsedTime;
-			yprElem[1] -= offsetY * this.rotaionSpeed * elapsedTime;
+			var yprElem = this.yawPitchRoll;
+			yprElem.x -= offsetX * this.rotaionSpeed * elapsedTime;
+			yprElem.y -= offsetY * this.rotaionSpeed * elapsedTime;
 			this.updateRotation();
 		}
 		this.lastMouseX = Laya.stage.mouseX;
@@ -61,35 +61,33 @@ class CameraMoveScript extends Laya.Script3D{
      * 向前移动。
      */
     moveForward(distance) {
-        this._tempVector3.elements[0] = 0;
-        this._tempVector3.elements[1] = 0;
-        this._tempVector3.elements[2] = distance;
+        this._tempVector3.x = 0;
+        this._tempVector3.y = 0;
+        this._tempVector3.z = distance;
         this.camera.transform.translate(this._tempVector3);
     }
     /**
      * 向右移动。
      */
     moveRight(distance) {
-        this._tempVector3.elements[1] = 0;
-        this._tempVector3.elements[2] = 0;
-        this._tempVector3.elements[0] = distance;
+        this._tempVector3.y = 0;
+        this._tempVector3.z = 0;
+        this._tempVector3.x = distance;
         this.camera.transform.translate(this._tempVector3);
     }
     /**
      * 向上移动。
      */
     moveVertical(distance) {
-        this._tempVector3.elements[0] = this._tempVector3.elements[2] = 0;
-        this._tempVector3.elements[1] = distance;
+        this._tempVector3.x = this._tempVector3.z = 0;
+        this._tempVector3.y = distance;
         this.camera.transform.translate(this._tempVector3, false);
     }
 
     updateRotation() {
-        var yprElem = this.yawPitchRoll.elements;
-        if (Math.abs(yprElem[1]) < 1.50) {
-            Laya.Quaternion.createFromYawPitchRoll(yprElem[0], yprElem[1], yprElem[2], this.tempRotationZ);
+        if (Math.abs(this.yawPitchRoll.y) < 1.50) {
+            Laya.Quaternion.createFromYawPitchRoll(this.yawPitchRoll.x, this.yawPitchRoll.y, this.yawPitchRoll.z, this.tempRotationZ);
             this.tempRotationZ.cloneTo(this.camera.transform.localRotation);
-            //？
             this.camera.transform.localRotation = this.camera.transform.localRotation;
         }
     }

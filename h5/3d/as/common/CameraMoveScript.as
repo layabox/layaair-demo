@@ -36,9 +36,8 @@ package common {
 		 * @private
 		 */
 		protected function _updateRotation():void {
-			var yprElem:Float32Array = yawPitchRoll.elements;
-			if (Math.abs(yprElem[1]) < 1.50) {
-				Quaternion.createFromYawPitchRoll(yprElem[0], yprElem[1], yprElem[2], tempRotationZ);
+			if (Math.abs(yawPitchRoll.y) < 1.50) {
+				Quaternion.createFromYawPitchRoll(yawPitchRoll.x, yawPitchRoll.y, yawPitchRoll.z, tempRotationZ);
 				tempRotationZ.cloneTo(camera.transform.localRotation);
 				camera.transform.localRotation = camera.transform.localRotation;
 			}
@@ -71,9 +70,9 @@ package common {
 				var offsetX:Number = Laya.stage.mouseX - lastMouseX;
 				var offsetY:Number = Laya.stage.mouseY - lastMouseY;
 				
-				var yprElem:Float32Array = yawPitchRoll.elements;
-				yprElem[0] -= offsetX * rotaionSpeed * elapsedTime;
-				yprElem[1] -= offsetY * rotaionSpeed * elapsedTime;
+				var yprElem:Vector3 = yawPitchRoll;
+				yprElem.x -= offsetX * rotaionSpeed * elapsedTime;
+				yprElem.y -= offsetY * rotaionSpeed * elapsedTime;
 				_updateRotation();
 			}
 			lastMouseX = Laya.stage.mouseX;
@@ -110,8 +109,8 @@ package common {
 		 * @param distance 移动距离。
 		 */
 		public function moveForward(distance:Number):void {
-			_tempVector3.elements[0] = _tempVector3.elements[1] = 0;
-			_tempVector3.elements[2] = distance;
+			_tempVector3.x = _tempVector3.y = 0;
+			_tempVector3.z = distance;
 			camera.transform.translate(_tempVector3);
 		}
 		
@@ -120,8 +119,8 @@ package common {
 		 * @param distance 移动距离。
 		 */
 		public function moveRight(distance:Number):void {
-			_tempVector3.elements[1] = _tempVector3.elements[2] = 0;
-			_tempVector3.elements[0] = distance;
+			_tempVector3.y = _tempVector3.z = 0;
+			_tempVector3.x = distance;
 			camera.transform.translate(_tempVector3);
 		}
 		
@@ -130,8 +129,8 @@ package common {
 		 * @param distance 移动距离。
 		 */
 		public function moveVertical(distance:Number):void {
-			_tempVector3.elements[0] = _tempVector3.elements[2] = 0;
-			_tempVector3.elements[1] = distance;
+			_tempVector3.x = _tempVector3.z = 0;
+			_tempVector3.y = distance;
 			camera.transform.translate(_tempVector3, false);
 		}
 	

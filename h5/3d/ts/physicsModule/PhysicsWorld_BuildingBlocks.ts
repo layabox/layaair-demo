@@ -104,17 +104,14 @@ class PhysicsWorld_BuildingBlocks
     }
     public addMouseEvent():void
     {
-        //Laya.stage.on(Event.MOUSE_DOWN, this, onMouseDown);
-        //Laya.stage.on(Event.MOUSE_UP, this, onMouseUp);
-        //Laya.stage.on(Event.MOUSE_OUT, this, onMouseOut);
         Laya.stage.on(Laya.Event.MOUSE_DOWN,this,this.onMouseDown);
         Laya.stage.on(Laya.Event.MOUSE_UP,this,this.onMouseUp);
         Laya.stage.on(Laya.Event.MOUSE_OUT,this,onmouseout);
     }
     public onMouseDown():void
     {
-        this.posX = this.point.elements[0] = Laya.MouseManager.instance.mouseX;
-        this.posY = this.point.elements[1] = Laya.MouseManager.instance.mouseY;
+        this.posX = this.point.x= Laya.MouseManager.instance.mouseX;
+        this.posY = this.point.y = Laya.MouseManager.instance.mouseY;
         this.camera.viewportPointToRay(this.point, this.ray);
         this.scene.physicsSimulation.rayCast(this.ray, this._outHitResult);
         if (this._outHitResult.succeeded) {

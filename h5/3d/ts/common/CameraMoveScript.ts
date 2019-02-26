@@ -72,9 +72,9 @@ class CameraMoveScript extends Laya.Script3D {
 		 */
         public moveForward(distance:number):void 
         {
-            this._tempVector3.elements[0] =0;
-            this._tempVector3.elements[1] = 0;
-            this._tempVector3.elements[2] = distance;
+            this._tempVector3.x =0;
+            this._tempVector3.y 0;
+            this._tempVector3.z = distance;
 			this.camera.transform.translate(this._tempVector3);
 		}
 		
@@ -83,9 +83,9 @@ class CameraMoveScript extends Laya.Script3D {
 		 */
         public moveRight(distance:number):void
         {
-            this._tempVector3.elements[1] = 0;
-            this._tempVector3.elements[2] = 0;
-			this._tempVector3.elements[0] = distance;
+            this._tempVector3.y = 0;
+            this._tempVector3.z = 0;
+			this._tempVector3.x = distance;
             this.camera.transform.translate(this._tempVector3);
 		}
 		
@@ -94,8 +94,8 @@ class CameraMoveScript extends Laya.Script3D {
 		 */
         public moveVertical(distance:number):void 
         {
-			this._tempVector3.elements[0] = this._tempVector3.elements[2] = 0;
-			this._tempVector3.elements[1] = distance;
+			this._tempVector3.x = this._tempVector3.z = 0;
+			this._tempVector3.y = distance;
 			this.camera.transform.translate(this._tempVector3, false);
 		}
 
@@ -118,9 +118,8 @@ class CameraMoveScript extends Laya.Script3D {
 				var offsetX:number = Laya.stage.mouseX - this.lastMouseX;
 				var offsetY:number = Laya.stage.mouseY - this.lastMouseY;
 				
-				var yprElem:Float32Array = this.yawPitchRoll.elements;
-				yprElem[0] -= offsetX * this.rotaionSpeed * elapsedTime;
-				yprElem[1] -= offsetY * this.rotaionSpeed * elapsedTime;
+				this.yawPitchRoll.x -= offsetX * this.rotaionSpeed * elapsedTime;
+				this.yawPitchRoll.y -= offsetY * this.rotaionSpeed * elapsedTime;
 				//调用旋转方法
 				this.updateRotation();
 			}
@@ -129,8 +128,7 @@ class CameraMoveScript extends Laya.Script3D {
 		}
 		
 		protected updateRotation():void {
-			var yprElem:Float32Array = this.yawPitchRoll.elements;
-			if (Math.abs(yprElem[1]) < 1.50) {
+			if (Math.abs(this.yawPitchRoll.y) < 1.50) {
 				Laya.Quaternion.createFromYawPitchRoll(yprElem[0], yprElem[1], yprElem[2], this.tempRotationZ);
 				this.tempRotationZ.cloneTo(this.camera.transform.localRotation);
 				//？

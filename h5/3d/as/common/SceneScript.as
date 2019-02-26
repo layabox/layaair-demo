@@ -39,8 +39,8 @@ package common
 		override public function _postRenderUpdate(state:RenderState):void {
 			super._update(state);
 			
-			point.elements[0] = Laya.stage.mouseX;
-            point.elements[1] = Laya.stage.mouseY;
+			point.x = Laya.stage.mouseX;
+            point.y = Laya.stage.mouseY;
             camera.viewportPointToRay(point, ray);
 			
 			phasorSpriter3D.begin(WebGLContext.LINES, camera);

@@ -71,8 +71,8 @@ package editor
 		public function onMouseDown():void {
 			
 			hasSelectedSprite3D = null;
-			point.elements[0] = MouseManager.instance.mouseX;
-			point.elements[1] = MouseManager.instance.mouseY;
+			point.x = MouseManager.instance.mouseX;
+			point.y = MouseManager.instance.mouseY;
 			camera.viewportPointToRay(point, ray);
 			scene.rayCast(ray, _outHitInfo, 100, 0);
 			if (_outHitInfo.distance != -1) {
@@ -89,8 +89,8 @@ package editor
 			
 			Laya.stage.off(Event.MOUSE_MOVE, this, onMouseMove);
 			
-			point.elements[0] = MouseManager.instance.mouseX;
-			point.elements[1] = MouseManager.instance.mouseY;
+			point.x = MouseManager.instance.mouseX;
+			point.y = MouseManager.instance.mouseY;
 			
 			camera.viewportPointToRay(point, ray);
 			scene.rayCast(ray, _outHitInfo, 100, 0);
