@@ -9,6 +9,95 @@
 	var Stat=laya.utils.Stat,Texture=laya.resource.Texture,Timer=laya.utils.Timer,URL=laya.net.URL,Utils=laya.utils.Utils;
 /**
 *@private
+*/
+//class laya.ani.bone.DeformSlotDisplayData
+var DeformSlotDisplayData=(function(){
+	function DeformSlotDisplayData(){
+		this.boneSlot=null;
+		this.slotIndex=-1;
+		this.attachment=null;
+		this.deformData=null;
+		this.frameIndex=0;
+		this.timeList=[];
+		this.vectices=[];
+		this.tweenKeyList=[];
+	}
+
+	__class(DeformSlotDisplayData,'laya.ani.bone.DeformSlotDisplayData');
+	var __proto=DeformSlotDisplayData.prototype;
+	__proto.binarySearch1=function(values,target){
+		var low=0;
+		var high=values.length-2;
+		if (high==0)
+			return 1;
+		var current=high >>> 1;
+		while (true){
+			if (values[Math.floor(current+1)] <=target)
+				low=current+1;
+			else
+			high=current;
+			if (low==high)
+				return low+1;
+			current=(low+high)>>> 1;
+		}
+		return 0;
+	}
+
+	//TODO:coverage
+	__proto.apply=function(time,boneSlot,alpha){
+		(alpha===void 0)&& (alpha=1);
+		time+=0.05;
+		if (this.timeList.length <=0){
+			return;
+		};
+		var i=0;
+		var n=0;
+		var tTime=this.timeList[0];
+		if (time < tTime){
+			return;
+		};
+		var tVertexCount=this.vectices[0].length;
+		var tVertices=[];
+		var tFrameIndex=this.binarySearch1(this.timeList,time);
+		this.frameIndex=tFrameIndex;
+		if (time >=this.timeList[this.timeList.length-1]){
+			var lastVertices=this.vectices[this.vectices.length-1];
+			if (alpha < 1){
+				for (i=0;i < tVertexCount;i++){
+					tVertices[i]+=(lastVertices[i]-tVertices[i])*alpha;
+				}
+				}else {
+				for (i=0;i < tVertexCount;i++){
+					tVertices[i]=lastVertices[i];
+				}
+			}
+			this.deformData=tVertices;
+			return;
+		};
+		var tTweenKey=this.tweenKeyList[this.frameIndex];
+		var tPrevVertices=this.vectices[this.frameIndex-1];
+		var tNextVertices=this.vectices[this.frameIndex];
+		var tPreFrameTime=this.timeList[this.frameIndex-1];
+		var tFrameTime=this.timeList[this.frameIndex];
+		if (this.tweenKeyList[tFrameIndex-1]){
+			alpha=(time-tPreFrameTime)/ (tFrameTime-tPreFrameTime);
+			}else {
+			alpha=0;
+		};
+		var tPrev=NaN;
+		for (i=0;i < tVertexCount;i++){
+			tPrev=tPrevVertices[i];
+			tVertices[i]=tPrev+(tNextVertices[i]-tPrev)*alpha;
+		}
+		this.deformData=tVertices;
+	}
+
+	return DeformSlotDisplayData;
+})()
+
+
+/**
+*@private
 *@author ...
 */
 //class laya.ani.KeyFramesContent
@@ -32,25 +121,906 @@ var KeyFramesContent=(function(){
 
 /**
 *@private
+*...
+*@author ww
 */
-//class laya.ani.bone.PathConstraintData
-var PathConstraintData=(function(){
-	function PathConstraintData(){
-		this.name=null;
-		this.target=null;
-		this.positionMode=null;
-		this.spacingMode=null;
-		this.rotateMode=null;
-		this.offsetRotation=NaN;
-		this.position=NaN;
-		this.spacing=NaN;
-		this.rotateMix=NaN;
-		this.translateMix=NaN;
-		this.bones=[];
+//class laya.ani.math.BezierLerp
+var BezierLerp=(function(){
+	function BezierLerp(){}
+	__class(BezierLerp,'laya.ani.math.BezierLerp');
+	BezierLerp.getBezierRate=function(t,px0,py0,px1,py1){
+		var key=BezierLerp._getBezierParamKey(px0,py0,px1,py1);
+		var vKey=key *100+t;
+		if (BezierLerp._bezierResultCache[vKey])return BezierLerp._bezierResultCache[vKey];
+		var points=BezierLerp._getBezierPoints(px0,py0,px1,py1,key);
+		var i=0,len=0;
+		len=points.length;
+		for (i=0;i < len;i+=2){
+			if (t <=points[i]){
+				BezierLerp._bezierResultCache[vKey]=points[i+1];
+				return points[i+1];
+			}
+		}
+		BezierLerp._bezierResultCache[vKey]=1;
+		return 1;
 	}
 
-	__class(PathConstraintData,'laya.ani.bone.PathConstraintData');
-	return PathConstraintData;
+	BezierLerp._getBezierParamKey=function(px0,py0,px1,py1){
+		return (((px0 *100+py0)*100+px1)*100+py1)*100;
+	}
+
+	BezierLerp._getBezierPoints=function(px0,py0,px1,py1,key){
+		if (BezierLerp._bezierPointsCache[key])return BezierLerp._bezierPointsCache[key];
+		var controlPoints;
+		controlPoints=[0,0,px0,py0,px1,py1,1,1];
+		var bz;
+		bz=new Bezier();
+		var points;
+		points=bz.getBezierPoints(controlPoints,100,3);
+		BezierLerp._bezierPointsCache[key]=points;
+		return points;
+	}
+
+	BezierLerp._bezierResultCache={};
+	BezierLerp._bezierPointsCache={};
+	return BezierLerp;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.Transform
+var Transform=(function(){
+	function Transform(){
+		this.skX=0;
+		this.skY=0;
+		this.scX=1;
+		this.scY=1;
+		this.x=0;
+		this.y=0;
+		this.skewX=0;
+		this.skewY=0;
+		this.mMatrix=null;
+	}
+
+	__class(Transform,'laya.ani.bone.Transform');
+	var __proto=Transform.prototype;
+	//TODO:coverage
+	__proto.initData=function(data){
+		if (data.x !=undefined){
+			this.x=data.x;
+		}
+		if (data.y !=undefined){
+			this.y=data.y;
+		}
+		if (data.skX !=undefined){
+			this.skX=data.skX;
+		}
+		if (data.skY !=undefined){
+			this.skY=data.skY;
+		}
+		if (data.scX !=undefined){
+			this.scX=data.scX;
+		}
+		if (data.scY !=undefined){
+			this.scY=data.scY;
+		}
+	}
+
+	//TODO:coverage
+	__proto.getMatrix=function(){
+		var tMatrix;
+		if (this.mMatrix){
+			tMatrix=this.mMatrix;
+			}else {
+			tMatrix=this.mMatrix=new Matrix();
+		}
+		tMatrix.identity();
+		tMatrix.scale(this.scX,this.scY);
+		if (this.skewX || this.skewY){
+			this.skew(tMatrix,this.skewX *Math.PI / 180,this.skewY *Math.PI / 180);
+		}
+		tMatrix.rotate(this.skX *Math.PI / 180);
+		tMatrix.translate(this.x,this.y);
+		return tMatrix;
+	}
+
+	//TODO:coverage
+	__proto.skew=function(m,x,y){
+		var sinX=Math.sin(y);
+		var cosX=Math.cos(y);
+		var sinY=Math.sin(x);
+		var cosY=Math.cos(x);
+		m.setTo(m.a *cosY-m.b *sinX,
+		m.a *sinY+m.b *cosX,
+		m.c *cosY-m.d *sinX,
+		m.c *sinY+m.d *cosX,
+		m.tx *cosY-m.ty *sinX,
+		m.tx *sinY+m.ty *cosX);
+		return m;
+	}
+
+	return Transform;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.TfConstraint
+var TfConstraint=(function(){
+	function TfConstraint(data,bones){
+		this._data=null;
+		this._bones=null;
+		this.target=null;
+		this.rotateMix=NaN;
+		this.translateMix=NaN;
+		this.scaleMix=NaN;
+		this.shearMix=NaN;
+		this._temp=__newvec(2,0);
+		this._data=data;
+		if (this._bones==null){
+			this._bones=[];
+		}
+		this.target=bones[data.targetIndex];
+		var j=0,n=0;
+		for (j=0,n=data.boneIndexs.length;j < n;j++){
+			this._bones.push(bones[data.boneIndexs[j]]);
+		}
+		this.rotateMix=data.rotateMix;
+		this.translateMix=data.translateMix;
+		this.scaleMix=data.scaleMix;
+		this.shearMix=data.shearMix;
+	}
+
+	__class(TfConstraint,'laya.ani.bone.TfConstraint');
+	var __proto=TfConstraint.prototype;
+	//TODO:coverage
+	__proto.apply=function(){
+		var tTfBone;
+		var ta=this.target.resultMatrix.a,tb=this.target.resultMatrix.b,tc=this.target.resultMatrix.c,td=this.target.resultMatrix.d;
+		for (var j=0,n=this._bones.length;j < n;j++){
+			tTfBone=this._bones[j];
+			if (this.rotateMix > 0){
+				var a=tTfBone.resultMatrix.a,b=tTfBone.resultMatrix.b,c=tTfBone.resultMatrix.c,d=tTfBone.resultMatrix.d;
+				var r=Math.atan2(tc,ta)-Math.atan2(c,a)+this._data.offsetRotation *Math.PI / 180;
+				if (r > Math.PI)
+					r-=Math.PI *2;
+				else if (r <-Math.PI)r+=Math.PI *2;
+				r *=this.rotateMix;
+				var cos=Math.cos(r),sin=Math.sin(r);
+				tTfBone.resultMatrix.a=cos *a-sin *c;
+				tTfBone.resultMatrix.b=cos *b-sin *d;
+				tTfBone.resultMatrix.c=sin *a+cos *c;
+				tTfBone.resultMatrix.d=sin *b+cos *d;
+			}
+			if (this.translateMix){
+				this._temp[0]=this._data.offsetX;
+				this._temp[1]=this._data.offsetY;
+				this.target.localToWorld(this._temp);
+				tTfBone.resultMatrix.tx+=(this._temp[0]-tTfBone.resultMatrix.tx)*this.translateMix;
+				tTfBone.resultMatrix.ty+=(this._temp[1]-tTfBone.resultMatrix.ty)*this.translateMix;
+				tTfBone.updateChild();
+			}
+			if (this.scaleMix > 0){
+				var bs=Math.sqrt(tTfBone.resultMatrix.a *tTfBone.resultMatrix.a+tTfBone.resultMatrix.c *tTfBone.resultMatrix.c);
+				var ts=Math.sqrt(ta *ta+tc *tc);
+				var s=bs > 0.00001 ? (bs+(ts-bs+this._data.offsetScaleX)*this.scaleMix)/ bs :0;
+				tTfBone.resultMatrix.a *=s;
+				tTfBone.resultMatrix.c *=s;
+				bs=Math.sqrt(tTfBone.resultMatrix.b *tTfBone.resultMatrix.b+tTfBone.resultMatrix.d *tTfBone.resultMatrix.d);
+				ts=Math.sqrt(tb *tb+td *td);
+				s=bs > 0.00001 ? (bs+(ts-bs+this._data.offsetScaleY)*this.scaleMix)/ bs :0;
+				tTfBone.resultMatrix.b *=s;
+				tTfBone.resultMatrix.d *=s;
+			}
+			if (this.shearMix > 0){
+				b=tTfBone.resultMatrix.b,d=tTfBone.resultMatrix.d;
+				var by=Math.atan2(d,b);
+				r=Math.atan2(td,tb)-Math.atan2(tc,ta)-(by-Math.atan2(tTfBone.resultMatrix.c,tTfBone.resultMatrix.a));
+				if (r > Math.PI)
+					r-=Math.PI *2;
+				else if (r <-Math.PI)r+=Math.PI *2;
+				r=by+(r+this._data.offsetShearY *Math.PI / 180)*this.shearMix;
+				s=Math.sqrt(b *b+d *d);
+				tTfBone.resultMatrix.b=Math.cos(r)*s;
+				tTfBone.resultMatrix.d=Math.sin(r)*s;
+			}
+		}
+	}
+
+	return TfConstraint;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.BoneSlot
+var BoneSlot=(function(){
+	function BoneSlot(){
+		/**插槽名称 */
+		this.name=null;
+		/**插槽绑定的骨骼名称 */
+		this.parent=null;
+		/**插糟显示数据数据的名称 */
+		this.attachmentName=null;
+		/**原始数据的索引 */
+		this.srcDisplayIndex=-1;
+		/**判断对象是否是原对象 */
+		this.type="src";
+		/**模板的指针 */
+		this.templet=null;
+		/**当前插槽对应的数据 */
+		this.currSlotData=null;
+		/**当前插槽显示的纹理 */
+		this.currTexture=null;
+		/**显示对象对应的数据 */
+		this.currDisplayData=null;
+		/**显示皮肤的索引 */
+		this.displayIndex=-1;
+		/**@private */
+		this.originalIndex=-1;
+		/**用户自定义的皮肤 */
+		this._diyTexture=null;
+		this._parentMatrix=null;
+		this._resultMatrix=null;
+		/**索引替换表 */
+		this._replaceDic={};
+		/**当前diyTexture的动画纹理 */
+		this._curDiyUV=null;
+		this._curDiyVS=null;
+		/**实时模式下，复用使用 */
+		this._skinSprite=null;
+		/**@private 变形动画数据 */
+		this.deformData=null;
+		this._mVerticleArr=null;
+		this._preGraphicVerticle=null;
+		this._preGraphicMatrix=null;
+	}
+
+	__class(BoneSlot,'laya.ani.bone.BoneSlot');
+	var __proto=BoneSlot.prototype;
+	/**
+	*设置要显示的插槽数据
+	*@param slotData
+	*@param disIndex
+	*@param freshIndex 是否重置纹理
+	*/
+	__proto.showSlotData=function(slotData,freshIndex){
+		(freshIndex===void 0)&& (freshIndex=true);
+		this.currSlotData=slotData;
+		if(freshIndex)
+			this.displayIndex=this.srcDisplayIndex;
+		this.currDisplayData=null;
+		this.currTexture=null;
+	}
+
+	/**
+	*通过名字显示指定对象
+	*@param name
+	*/
+	__proto.showDisplayByName=function(name){
+		if (this.currSlotData){
+			this.showDisplayByIndex(this.currSlotData.getDisplayByName(name));
+		}
+	}
+
+	/**
+	*替换贴图名
+	*@param tarName 要替换的贴图名
+	*@param newName 替换后的贴图名
+	*/
+	__proto.replaceDisplayByName=function(tarName,newName){
+		if (!this.currSlotData)return;
+		var preIndex=0;
+		preIndex=this.currSlotData.getDisplayByName(tarName);
+		var newIndex=0;
+		newIndex=this.currSlotData.getDisplayByName(newName);
+		this.replaceDisplayByIndex(preIndex,newIndex);
+	}
+
+	/**
+	*替换贴图索引
+	*@param tarIndex 要替换的索引
+	*@param newIndex 替换后的索引
+	*/
+	__proto.replaceDisplayByIndex=function(tarIndex,newIndex){
+		if (!this.currSlotData)return;
+		this._replaceDic[tarIndex]=newIndex;
+		if (this.originalIndex==tarIndex){
+			this.showDisplayByIndex(tarIndex);
+		}
+	}
+
+	/**
+	*指定显示对象
+	*@param index
+	*/
+	__proto.showDisplayByIndex=function(index){
+		this.originalIndex=index;
+		if (this._replaceDic[index]!=null)index=this._replaceDic[index];
+		if (this.currSlotData && index >-1 && index < this.currSlotData.displayArr.length){
+			this.displayIndex=index;
+			this.currDisplayData=this.currSlotData.displayArr[index];
+			if (this.currDisplayData){
+				var tName=this.currDisplayData.name;
+				this.currTexture=this.templet.getTexture(tName);
+				if (this.currTexture && this.currDisplayData.type==0 && this.currDisplayData.uvs){
+					this.currTexture=this.currDisplayData.createTexture(this.currTexture);
+				}
+			}
+			}else {
+			this.displayIndex=-1;
+			this.currDisplayData=null;
+			this.currTexture=null;
+		}
+	}
+
+	/**
+	*替换皮肤
+	*@param _texture
+	*/
+	__proto.replaceSkin=function(_texture){
+		this._diyTexture=_texture;
+		if (this._curDiyUV)this._curDiyUV.length=0;
+		if (this.currDisplayData&&this._diyTexture==this.currDisplayData.texture){
+			this._diyTexture=null;
+		}
+	}
+
+	//TODO:coverage
+	__proto.setParentMatrix=function(parentMatrix){
+		this._parentMatrix=parentMatrix;
+	}
+
+	//TODO:coverage
+	__proto.getSaveVerticle=function(tArr){
+		if (BoneSlot.useSameMatrixAndVerticle&&this._preGraphicVerticle && BoneSlot.isSameArr(tArr,this._preGraphicVerticle)){
+			tArr=this._preGraphicVerticle;
+			}else{
+			tArr=Utils.copyArray([],tArr);
+			this._preGraphicVerticle=tArr;
+		}
+		return tArr;
+	}
+
+	//TODO:coverage
+	__proto.getSaveMatrix=function(tResultMatrix){
+		if (BoneSlot.useSameMatrixAndVerticle&&this._preGraphicMatrix && BoneSlot.isSameMatrix(tResultMatrix,this._preGraphicMatrix)){
+			tResultMatrix=this._preGraphicMatrix;
+			}else{
+			var newMatrix=tResultMatrix.clone();
+			tResultMatrix=newMatrix;
+			this._preGraphicMatrix=tResultMatrix;
+		}
+		return tResultMatrix;
+	}
+
+	/**
+	*把纹理画到Graphics上
+	*@param graphics
+	*@param noUseSave
+	*/
+	__proto.draw=function(graphics,boneMatrixArray,noUseSave,alpha){
+		(noUseSave===void 0)&& (noUseSave=false);
+		(alpha===void 0)&& (alpha=1);
+		if ((this._diyTexture==null && this.currTexture==null)|| this.currDisplayData==null){
+			if (!(this.currDisplayData && this.currDisplayData.type==3)){
+				return;
+			}
+		};
+		var tTexture=this.currTexture;
+		if (this._diyTexture)tTexture=this._diyTexture;
+		var tSkinSprite;
+		switch (this.currDisplayData.type){
+			case 0:
+				if (graphics){
+					var tCurrentMatrix=this.getDisplayMatrix();
+					if (this._parentMatrix){
+						var tRotateKey=false;
+						if (tCurrentMatrix){
+							Matrix.mul(tCurrentMatrix,this._parentMatrix,Matrix.TEMP);
+							var tResultMatrix;
+							if (noUseSave){
+								if (this._resultMatrix==null)this._resultMatrix=new Matrix();
+								tResultMatrix=this._resultMatrix;
+								}else {
+								tResultMatrix=BoneSlot._tempResultMatrix;
+							}
+							if ((!Render.isWebGL && this.currDisplayData.uvs)|| (Render.isWebGL && this._diyTexture && this.currDisplayData.uvs)){
+								var tTestMatrix=BoneSlot._tempMatrix;
+								tTestMatrix.identity();
+								if (this.currDisplayData.uvs[1] > this.currDisplayData.uvs[5]){
+									tTestMatrix.d=-1;
+								}
+								if (this.currDisplayData.uvs[0] > this.currDisplayData.uvs[4]
+									&& this.currDisplayData.uvs[1] > this.currDisplayData.uvs[5]){
+									tRotateKey=true;
+									tTestMatrix.rotate(-Math.PI/2);
+								}
+								Matrix.mul(tTestMatrix,Matrix.TEMP,tResultMatrix);
+								}else {
+								Matrix.TEMP.copyTo(tResultMatrix);
+							}
+							if (!noUseSave){
+								tResultMatrix=this.getSaveMatrix(tResultMatrix);
+							}
+							tResultMatrix._checkTransform();
+							if (tRotateKey){
+								graphics.drawTexture(tTexture,-this.currDisplayData.height / 2,-this.currDisplayData.width / 2,this.currDisplayData.height,this.currDisplayData.width,tResultMatrix);
+								}else {
+								graphics.drawTexture(tTexture,-this.currDisplayData.width / 2,-this.currDisplayData.height / 2,this.currDisplayData.width,this.currDisplayData.height,tResultMatrix);
+							}
+						}
+					}
+				}
+				break ;
+			case 1:
+				if (noUseSave){
+					if (this._skinSprite==null){
+						this._skinSprite=BoneSlot.createSkinMesh();
+					}
+					tSkinSprite=this._skinSprite;
+					}else {
+					tSkinSprite=BoneSlot.createSkinMesh();
+				}
+				if (tSkinSprite==null){
+					return;
+				};
+				var tIBArray;
+				var tRed=1;
+				var tGreed=1;
+				var tBlue=1;
+				var tAlpha=1;
+				if (this.currDisplayData.bones==null){
+					var tVertices=this.currDisplayData.weights;
+					if (this.deformData){
+						tVertices=this.deformData;
+					};
+					var tUVs;
+					if (this._diyTexture){
+						if (!this._curDiyUV){
+							this._curDiyUV=[];
+						}
+						if (this._curDiyUV.length==0){
+							this._curDiyUV=UVTools.getRelativeUV(this.currTexture.uv,this.currDisplayData.uvs,this._curDiyUV);
+							this._curDiyUV=UVTools.getAbsoluteUV(this._diyTexture.uv,this._curDiyUV,this._curDiyUV);
+						}
+						tUVs=this._curDiyUV;
+						}else{
+						tUVs=this.currDisplayData.uvs;
+					}
+					this._mVerticleArr=tVertices;
+					var tTriangleNum=this.currDisplayData.triangles.length / 3;
+					tIBArray=this.currDisplayData.triangles;
+					if (this.deformData){
+						if (!noUseSave){
+							this._mVerticleArr=this.getSaveVerticle(this._mVerticleArr);
+						}
+					}
+					tSkinSprite.init2(tTexture,tIBArray,this._mVerticleArr,tUVs);
+					var tCurrentMatrix2=this.getDisplayMatrix();
+					if (this._parentMatrix){
+						if (tCurrentMatrix2){
+							Matrix.mul(tCurrentMatrix2,this._parentMatrix,Matrix.TEMP);
+							var tResultMatrix2;
+							if (noUseSave){
+								if (this._resultMatrix==null)this._resultMatrix=new Matrix();
+								tResultMatrix2=this._resultMatrix;
+								}else {
+								tResultMatrix2=BoneSlot._tempResultMatrix;
+							}
+							Matrix.TEMP.copyTo(tResultMatrix2);
+							if (!noUseSave){
+								tResultMatrix2=this.getSaveMatrix(tResultMatrix2);
+							}
+							tSkinSprite.transform=tResultMatrix2;
+						}
+					}
+					}else {
+					this.skinMesh(boneMatrixArray,tSkinSprite,alpha);
+				}
+				graphics.drawSkin(tSkinSprite);
+				break ;
+			case 2:
+				if (noUseSave){
+					if (this._skinSprite==null){
+						this._skinSprite=BoneSlot.createSkinMesh();
+					}
+					tSkinSprite=this._skinSprite;
+					}else {
+					tSkinSprite=BoneSlot.createSkinMesh();
+				}
+				if (tSkinSprite==null){
+					return;
+				}
+				this.skinMesh(boneMatrixArray,tSkinSprite,alpha);
+				graphics.drawSkin(tSkinSprite);
+				break ;
+			case 3:
+				break ;
+			}
+	}
+
+	/**
+	*显示蒙皮动画
+	*@param boneMatrixArray 当前帧的骨骼矩阵
+	*/
+	__proto.skinMesh=function(boneMatrixArray,skinSprite,alpha){
+		var tTexture=this.currTexture;
+		var tBones=this.currDisplayData.bones;
+		var tUvs;
+		if (this._diyTexture){
+			tTexture=this._diyTexture;
+			if (!this._curDiyUV){
+				this._curDiyUV=[];
+			}
+			if (this._curDiyUV.length==0){
+				this._curDiyUV=UVTools.getRelativeUV(this.currTexture.uv,this.currDisplayData.uvs,this._curDiyUV);
+				this._curDiyUV=UVTools.getAbsoluteUV(this._diyTexture.uv,this._curDiyUV,this._curDiyUV);
+			}
+			tUvs=this._curDiyUV;
+			}else{
+			tUvs=this.currDisplayData.uvs;
+		};
+		var tWeights=this.currDisplayData.weights;
+		var tTriangles=this.currDisplayData.triangles;
+		var tIBArray;
+		var tRx=0;
+		var tRy=0;
+		var nn=0;
+		var tMatrix;
+		var tX=NaN;
+		var tY=NaN;
+		var tB=0;
+		var tWeight=0;
+		var tVertices;
+		var i=0,j=0,n=0;
+		var tRed=1;
+		var tGreed=1;
+		var tBlue=1;
+		var tAlpha=alpha;
+		BoneSlot._tempVerticleArr.length=0;
+		tVertices=BoneSlot._tempVerticleArr;
+		if (this.deformData && this.deformData.length > 0){
+			var f=0;
+			for (i=0,n=tBones.length;i < n;){
+				nn=tBones[i++]+i;
+				tRx=0,tRy=0;
+				for (;i < nn;i++){
+					tMatrix=boneMatrixArray[tBones[i]]
+					tX=tWeights[tB]+this.deformData[f++];
+					tY=tWeights[tB+1]+this.deformData[f++];
+					tWeight=tWeights[tB+2];
+					tRx+=(tX *tMatrix.a+tY *tMatrix.c+tMatrix.tx)*tWeight;
+					tRy+=(tX *tMatrix.b+tY *tMatrix.d+tMatrix.ty)*tWeight;
+					tB+=3;
+				}
+				tVertices.push(tRx,tRy);
+			}
+			}else {
+			for (i=0,n=tBones.length;i < n;){
+				nn=tBones[i++]+i;
+				tRx=0,tRy=0;
+				for (;i < nn;i++){
+					tMatrix=boneMatrixArray[tBones[i]]
+					tX=tWeights[tB];
+					tY=tWeights[tB+1];
+					tWeight=tWeights[tB+2];
+					tRx+=(tX *tMatrix.a+tY *tMatrix.c+tMatrix.tx)*tWeight;
+					tRy+=(tX *tMatrix.b+tY *tMatrix.d+tMatrix.ty)*tWeight;
+					tB+=3;
+				}
+				tVertices.push(tRx,tRy);
+			}
+		}
+		this._mVerticleArr=tVertices;
+		tIBArray=tTriangles;
+		this._mVerticleArr=this.getSaveVerticle(this._mVerticleArr);
+		skinSprite.init2(tTexture,tIBArray,this._mVerticleArr,tUvs);
+	}
+
+	/**
+	*画骨骼的起始点，方便调试
+	*@param graphics
+	*/
+	__proto.drawBonePoint=function(graphics){
+		if (graphics && this._parentMatrix){
+			graphics.drawCircle(this._parentMatrix.tx,this._parentMatrix.ty,5,"#ff0000");
+		}
+	}
+
+	//TODO:coverage
+	__proto.getDisplayMatrix=function(){
+		if (this.currDisplayData){
+			return this.currDisplayData.transform.getMatrix();
+		}
+		return null;
+	}
+
+	/**
+	*得到插糟的矩阵
+	*@return
+	*/
+	__proto.getMatrix=function(){
+		return this._resultMatrix;
+	}
+
+	/**
+	*用原始数据拷贝出一个
+	*@return
+	*/
+	__proto.copy=function(){
+		var tBoneSlot=new BoneSlot();
+		tBoneSlot.type="copy";
+		tBoneSlot.name=this.name;
+		tBoneSlot.attachmentName=this.attachmentName;
+		tBoneSlot.srcDisplayIndex=this.srcDisplayIndex;
+		tBoneSlot.parent=this.parent;
+		tBoneSlot.displayIndex=this.displayIndex;
+		tBoneSlot.templet=this.templet;
+		tBoneSlot.currSlotData=this.currSlotData;
+		tBoneSlot.currTexture=this.currTexture;
+		tBoneSlot.currDisplayData=this.currDisplayData;
+		return tBoneSlot;
+	}
+
+	BoneSlot.createSkinMesh=function(){
+		return new SkinMeshForGraphic();
+	}
+
+	BoneSlot.isSameArr=function(arrA,arrB){
+		if (arrA.length !=arrB.length)return false;
+		var i=0,len=0;
+		len=arrA.length;
+		for (i=0;i < len;i++){
+			if (arrA[i] !=arrB[i])return false;
+		}
+		return true;
+	}
+
+	BoneSlot.isSameMatrix=function(mtA,mtB){
+		return mtA.a==mtB.a && mtA.b==mtB.b && mtA.c==mtB.c && mtA.d==mtB.d && Math.abs(mtA.tx-mtB.tx)<0.00001 && Math.abs(mtA.ty-mtB.ty)<0.00001;
+	}
+
+	BoneSlot.useSameMatrixAndVerticle=true;
+	BoneSlot._tempVerticleArr=[];
+	__static(BoneSlot,
+	['_tempMatrix',function(){return this._tempMatrix=new Matrix();},'_tempResultMatrix',function(){return this._tempResultMatrix=new Matrix();}
+	]);
+	return BoneSlot;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.EventData
+var EventData=(function(){
+	function EventData(){
+		this.name=null;
+		this.intValue=0;
+		this.floatValue=NaN;
+		this.stringValue=null;
+		this.time=NaN;
+	}
+
+	__class(EventData,'laya.ani.bone.EventData');
+	return EventData;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.canvasmesh.MeshData
+var MeshData=(function(){
+	function MeshData(){
+		/**
+		*纹理
+		*/
+		this.texture=null;
+		/**
+		*uv数据
+		*/
+		this.uvs=[0,0,1,0,1,1,0,1];
+		/**
+		*顶点数据
+		*/
+		this.vertices=[0,0,100,0,100,100,0,100];
+		/**
+		*顶点索引
+		*/
+		this.indexes=[0,1,3,3,1,2];
+		/**
+		*uv变换矩阵
+		*/
+		this.uvTransform=null;
+		/**
+		*是否有uv变化矩阵
+		*/
+		this.useUvTransform=false;
+		/**
+		*扩展像素,用来去除黑边
+		*/
+		this.canvasPadding=1;
+	}
+
+	__class(MeshData,'laya.ani.bone.canvasmesh.MeshData');
+	var __proto=MeshData.prototype;
+	//TODO:coverage
+	__proto.getBounds=function(){
+		return Rectangle._getWrapRec(this.vertices);
+	}
+
+	return MeshData;
+})()
+
+
+//TODO:coverage
+//class laya.ani.bone.TfConstraintData
+var TfConstraintData=(function(){
+	function TfConstraintData(){
+		this.name=null;
+		this.targetIndex=0;
+		this.rotateMix=NaN;
+		this.translateMix=NaN;
+		this.scaleMix=NaN;
+		this.shearMix=NaN;
+		this.offsetRotation=NaN;
+		this.offsetX=NaN;
+		this.offsetY=NaN;
+		this.offsetScaleX=NaN;
+		this.offsetScaleY=NaN;
+		this.offsetShearY=NaN;
+		this.boneIndexs=[];
+	}
+
+	__class(TfConstraintData,'laya.ani.bone.TfConstraintData');
+	return TfConstraintData;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.DeformAniData
+var DeformAniData=(function(){
+	function DeformAniData(){
+		this.skinName=null;
+		this.deformSlotDataList=[];
+	}
+
+	__class(DeformAniData,'laya.ani.bone.DeformAniData');
+	return DeformAniData;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.DeformSlotData
+var DeformSlotData=(function(){
+	function DeformSlotData(){
+		this.deformSlotDisplayList=[];
+	}
+
+	__class(DeformSlotData,'laya.ani.bone.DeformSlotData');
+	return DeformSlotData;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.SlotData
+var SlotData=(function(){
+	function SlotData(){
+		this.name=null;
+		this.displayArr=[];
+	}
+
+	__class(SlotData,'laya.ani.bone.SlotData');
+	var __proto=SlotData.prototype;
+	__proto.getDisplayByName=function(name){
+		var tDisplay;
+		for (var i=0,n=this.displayArr.length;i < n;i++){
+			tDisplay=this.displayArr[i];
+			if (tDisplay.attachmentName==name){
+				return i;
+			}
+		}
+		return-1;
+	}
+
+	return SlotData;
+})()
+
+
+/**
+*@private
+*/
+//class laya.ani.bone.SkinSlotDisplayData
+var SkinSlotDisplayData=(function(){
+	function SkinSlotDisplayData(){
+		this.name=null;
+		this.attachmentName=null;
+		this.type=0;
+		this.transform=null;
+		this.width=NaN;
+		this.height=NaN;
+		this.texture=null;
+		this.bones=null;
+		this.uvs=null;
+		this.weights=null;
+		this.triangles=null;
+		this.vertices=null;
+		this.lengths=null;
+		this.verLen=0;
+	}
+
+	__class(SkinSlotDisplayData,'laya.ani.bone.SkinSlotDisplayData');
+	var __proto=SkinSlotDisplayData.prototype;
+	__proto.createTexture=function(currTexture){
+		if (this.texture)return this.texture;
+		this.texture=new Texture(currTexture.bitmap,this.uvs);
+		if (this.uvs[0] > this.uvs[4]
+			&& this.uvs[1] > this.uvs[5]){
+			this.texture.width=currTexture.height;
+			this.texture.height=currTexture.width;
+			this.texture.offsetX=-currTexture.offsetX;
+			this.texture.offsetY=-currTexture.offsetY;
+			this.texture.sourceWidth=currTexture.sourceHeight;
+			this.texture.sourceHeight=currTexture.sourceWidth;
+			}else {
+			this.texture.width=currTexture.width;
+			this.texture.height=currTexture.height;
+			this.texture.offsetX=-currTexture.offsetX;
+			this.texture.offsetY=-currTexture.offsetY;
+			this.texture.sourceWidth=currTexture.sourceWidth;
+			this.texture.sourceHeight=currTexture.sourceHeight;
+		}
+		if (!Render.isWebGL){
+			if (this.uvs[1] > this.uvs[5]){
+				this.texture.offsetY=this.texture.sourceHeight-this.texture.height-this.texture.offsetY;
+			}
+		}
+		return this.texture;
+	}
+
+	__proto.destory=function(){
+		if (this.texture)this.texture.destroy();
+	}
+
+	return SkinSlotDisplayData;
+})()
+
+
+/**
+*@private
+*@author ...
+*/
+//class laya.ani.AnimationNodeContent
+var AnimationNodeContent=(function(){
+	function AnimationNodeContent(){
+		this.name=null;
+		this.parentIndex=0;
+		this.parent=null;
+		this.keyframeWidth=0;
+		this.lerpType=0;
+		this.interpolationMethod=null;
+		this.childs=null;
+		this.keyFrame=null;
+		//=new Vector.<KeyFramesContent>;
+		this.playTime=NaN;
+		this.extenData=null;
+		this.dataOffset=0;
+	}
+
+	__class(AnimationNodeContent,'laya.ani.AnimationNodeContent');
+	return AnimationNodeContent;
 })()
 
 
@@ -289,21 +1259,6 @@ var AnimationParser01=(function(){
 	}
 
 	return AnimationParser01;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.DeformAniData
-var DeformAniData=(function(){
-	function DeformAniData(){
-		this.skinName=null;
-		this.deformSlotDataList=[];
-	}
-
-	__class(DeformAniData,'laya.ani.bone.DeformAniData');
-	return DeformAniData;
 })()
 
 
@@ -628,59 +1583,24 @@ var IkConstraint=(function(){
 /**
 *@private
 */
-//class laya.ani.bone.SkinSlotDisplayData
-var SkinSlotDisplayData=(function(){
-	function SkinSlotDisplayData(){
+//class laya.ani.bone.PathConstraintData
+var PathConstraintData=(function(){
+	function PathConstraintData(){
 		this.name=null;
-		this.attachmentName=null;
-		this.type=0;
-		this.transform=null;
-		this.width=NaN;
-		this.height=NaN;
-		this.texture=null;
-		this.bones=null;
-		this.uvs=null;
-		this.weights=null;
-		this.triangles=null;
-		this.vertices=null;
-		this.lengths=null;
-		this.verLen=0;
+		this.target=null;
+		this.positionMode=null;
+		this.spacingMode=null;
+		this.rotateMode=null;
+		this.offsetRotation=NaN;
+		this.position=NaN;
+		this.spacing=NaN;
+		this.rotateMix=NaN;
+		this.translateMix=NaN;
+		this.bones=[];
 	}
 
-	__class(SkinSlotDisplayData,'laya.ani.bone.SkinSlotDisplayData');
-	var __proto=SkinSlotDisplayData.prototype;
-	__proto.createTexture=function(currTexture){
-		if (this.texture)return this.texture;
-		this.texture=new Texture(currTexture.bitmap,this.uvs);
-		if (this.uvs[0] > this.uvs[4]
-			&& this.uvs[1] > this.uvs[5]){
-			this.texture.width=currTexture.height;
-			this.texture.height=currTexture.width;
-			this.texture.offsetX=-currTexture.offsetX;
-			this.texture.offsetY=-currTexture.offsetY;
-			this.texture.sourceWidth=currTexture.sourceHeight;
-			this.texture.sourceHeight=currTexture.sourceWidth;
-			}else {
-			this.texture.width=currTexture.width;
-			this.texture.height=currTexture.height;
-			this.texture.offsetX=-currTexture.offsetX;
-			this.texture.offsetY=-currTexture.offsetY;
-			this.texture.sourceWidth=currTexture.sourceWidth;
-			this.texture.sourceHeight=currTexture.sourceHeight;
-		}
-		if (!Render.isWebGL){
-			if (this.uvs[1] > this.uvs[5]){
-				this.texture.offsetY=this.texture.sourceHeight-this.texture.height-this.texture.offsetY;
-			}
-		}
-		return this.texture;
-	}
-
-	__proto.destory=function(){
-		if (this.texture)this.texture.destroy();
-	}
-
-	return SkinSlotDisplayData;
+	__class(PathConstraintData,'laya.ani.bone.PathConstraintData');
+	return PathConstraintData;
 })()
 
 
@@ -688,506 +1608,33 @@ var SkinSlotDisplayData=(function(){
 *@private
 *@author ...
 */
-//class laya.ani.AnimationNodeContent
-var AnimationNodeContent=(function(){
-	function AnimationNodeContent(){
+//class laya.ani.AnimationContent
+var AnimationContent=(function(){
+	function AnimationContent(){
+		this.nodes=null;
 		this.name=null;
-		this.parentIndex=0;
-		this.parent=null;
-		this.keyframeWidth=0;
-		this.lerpType=0;
-		this.interpolationMethod=null;
-		this.childs=null;
-		this.keyFrame=null;
-		//=new Vector.<KeyFramesContent>;
 		this.playTime=NaN;
-		this.extenData=null;
-		this.dataOffset=0;
+		this.bone3DMap=null;
+		this.totalKeyframeDatasLength=0;
 	}
 
-	__class(AnimationNodeContent,'laya.ani.AnimationNodeContent');
-	return AnimationNodeContent;
+	__class(AnimationContent,'laya.ani.AnimationContent');
+	return AnimationContent;
 })()
 
 
 /**
 *@private
 */
-//class laya.ani.bone.BoneSlot
-var BoneSlot=(function(){
-	function BoneSlot(){
-		/**插槽名称 */
-		this.name=null;
-		/**插槽绑定的骨骼名称 */
-		this.parent=null;
-		/**插糟显示数据数据的名称 */
-		this.attachmentName=null;
-		/**原始数据的索引 */
-		this.srcDisplayIndex=-1;
-		/**判断对象是否是原对象 */
-		this.type="src";
-		/**模板的指针 */
-		this.templet=null;
-		/**当前插槽对应的数据 */
-		this.currSlotData=null;
-		/**当前插槽显示的纹理 */
-		this.currTexture=null;
-		/**显示对象对应的数据 */
-		this.currDisplayData=null;
-		/**显示皮肤的索引 */
-		this.displayIndex=-1;
-		/**@private */
-		this.originalIndex=-1;
-		/**用户自定义的皮肤 */
-		this._diyTexture=null;
-		this._parentMatrix=null;
-		this._resultMatrix=null;
-		/**索引替换表 */
-		this._replaceDic={};
-		/**当前diyTexture的动画纹理 */
-		this._curDiyUV=null;
-		this._curDiyVS=null;
-		/**实时模式下，复用使用 */
-		this._skinSprite=null;
-		/**@private 变形动画数据 */
-		this.deformData=null;
-		this._mVerticleArr=null;
-		this._preGraphicVerticle=null;
-		this._preGraphicMatrix=null;
+//class laya.ani.bone.DrawOrderData
+var DrawOrderData=(function(){
+	function DrawOrderData(){
+		this.time=NaN;
+		this.drawOrder=[];
 	}
 
-	__class(BoneSlot,'laya.ani.bone.BoneSlot');
-	var __proto=BoneSlot.prototype;
-	/**
-	*设置要显示的插槽数据
-	*@param slotData
-	*@param disIndex
-	*@param freshIndex 是否重置纹理
-	*/
-	__proto.showSlotData=function(slotData,freshIndex){
-		(freshIndex===void 0)&& (freshIndex=true);
-		this.currSlotData=slotData;
-		if(freshIndex)
-			this.displayIndex=this.srcDisplayIndex;
-		this.currDisplayData=null;
-		this.currTexture=null;
-	}
-
-	/**
-	*通过名字显示指定对象
-	*@param name
-	*/
-	__proto.showDisplayByName=function(name){
-		if (this.currSlotData){
-			this.showDisplayByIndex(this.currSlotData.getDisplayByName(name));
-		}
-	}
-
-	/**
-	*替换贴图名
-	*@param tarName 要替换的贴图名
-	*@param newName 替换后的贴图名
-	*/
-	__proto.replaceDisplayByName=function(tarName,newName){
-		if (!this.currSlotData)return;
-		var preIndex=0;
-		preIndex=this.currSlotData.getDisplayByName(tarName);
-		var newIndex=0;
-		newIndex=this.currSlotData.getDisplayByName(newName);
-		this.replaceDisplayByIndex(preIndex,newIndex);
-	}
-
-	/**
-	*替换贴图索引
-	*@param tarIndex 要替换的索引
-	*@param newIndex 替换后的索引
-	*/
-	__proto.replaceDisplayByIndex=function(tarIndex,newIndex){
-		if (!this.currSlotData)return;
-		this._replaceDic[tarIndex]=newIndex;
-		if (this.originalIndex==tarIndex){
-			this.showDisplayByIndex(tarIndex);
-		}
-	}
-
-	/**
-	*指定显示对象
-	*@param index
-	*/
-	__proto.showDisplayByIndex=function(index){
-		this.originalIndex=index;
-		if (this._replaceDic[index]!=null)index=this._replaceDic[index];
-		if (this.currSlotData && index >-1 && index < this.currSlotData.displayArr.length){
-			this.displayIndex=index;
-			this.currDisplayData=this.currSlotData.displayArr[index];
-			if (this.currDisplayData){
-				var tName=this.currDisplayData.name;
-				this.currTexture=this.templet.getTexture(tName);
-				if (this.currTexture && this.currDisplayData.type==0 && this.currDisplayData.uvs){
-					this.currTexture=this.currDisplayData.createTexture(this.currTexture);
-				}
-			}
-			}else {
-			this.displayIndex=-1;
-			this.currDisplayData=null;
-			this.currTexture=null;
-		}
-	}
-
-	/**
-	*替换皮肤
-	*@param _texture
-	*/
-	__proto.replaceSkin=function(_texture){
-		this._diyTexture=_texture;
-		if (this._curDiyUV)this._curDiyUV.length=0;
-		if (this.currDisplayData&&this._diyTexture==this.currDisplayData.texture){
-			this._diyTexture=null;
-		}
-	}
-
-	//TODO:coverage
-	__proto.setParentMatrix=function(parentMatrix){
-		this._parentMatrix=parentMatrix;
-	}
-
-	//TODO:coverage
-	__proto.getSaveVerticle=function(tArr){
-		if (BoneSlot.useSameMatrixAndVerticle&&this._preGraphicVerticle && BoneSlot.isSameArr(tArr,this._preGraphicVerticle)){
-			tArr=this._preGraphicVerticle;
-			}else{
-			tArr=Utils.copyArray([],tArr);
-			this._preGraphicVerticle=tArr;
-		}
-		return tArr;
-	}
-
-	//TODO:coverage
-	__proto.getSaveMatrix=function(tResultMatrix){
-		if (BoneSlot.useSameMatrixAndVerticle&&this._preGraphicMatrix && BoneSlot.isSameMatrix(tResultMatrix,this._preGraphicMatrix)){
-			tResultMatrix=this._preGraphicMatrix;
-			}else{
-			var newMatrix=tResultMatrix.clone();
-			tResultMatrix=newMatrix;
-			this._preGraphicMatrix=tResultMatrix;
-		}
-		return tResultMatrix;
-	}
-
-	/**
-	*把纹理画到Graphics上
-	*@param graphics
-	*@param noUseSave
-	*/
-	__proto.draw=function(graphics,boneMatrixArray,noUseSave,alpha){
-		(noUseSave===void 0)&& (noUseSave=false);
-		(alpha===void 0)&& (alpha=1);
-		if ((this._diyTexture==null && this.currTexture==null)|| this.currDisplayData==null){
-			if (!(this.currDisplayData && this.currDisplayData.type==3)){
-				return;
-			}
-		};
-		var tTexture=this.currTexture;
-		if (this._diyTexture)tTexture=this._diyTexture;
-		var tSkinSprite;
-		switch (this.currDisplayData.type){
-			case 0:
-				if (graphics){
-					var tCurrentMatrix=this.getDisplayMatrix();
-					if (this._parentMatrix){
-						var tRotateKey=false;
-						if (tCurrentMatrix){
-							Matrix.mul(tCurrentMatrix,this._parentMatrix,Matrix.TEMP);
-							var tResultMatrix;
-							if (noUseSave){
-								if (this._resultMatrix==null)this._resultMatrix=new Matrix();
-								tResultMatrix=this._resultMatrix;
-								}else {
-								tResultMatrix=BoneSlot._tempResultMatrix;
-							}
-							if ((!Render.isWebGL && !Render.isConchApp && this.currDisplayData.uvs)|| ((Render.isWebGL || Render.isConchApp)&& this._diyTexture && this.currDisplayData.uvs)){
-								var tTestMatrix=BoneSlot._tempMatrix;
-								tTestMatrix.identity();
-								if (this.currDisplayData.uvs[1] > this.currDisplayData.uvs[5]){
-									tTestMatrix.d=-1;
-								}
-								if (this.currDisplayData.uvs[0] > this.currDisplayData.uvs[4]
-									&& this.currDisplayData.uvs[1] > this.currDisplayData.uvs[5]){
-									tRotateKey=true;
-									tTestMatrix.rotate(-Math.PI/2);
-								}
-								Matrix.mul(tTestMatrix,Matrix.TEMP,tResultMatrix);
-								}else {
-								Matrix.TEMP.copyTo(tResultMatrix);
-							}
-							if (!noUseSave){
-								tResultMatrix=this.getSaveMatrix(tResultMatrix);
-							}
-							tResultMatrix._checkTransform();
-							if (tRotateKey){
-								graphics.drawTexture(tTexture,-this.currDisplayData.height / 2,-this.currDisplayData.width / 2,this.currDisplayData.height,this.currDisplayData.width,tResultMatrix);
-								}else {
-								graphics.drawTexture(tTexture,-this.currDisplayData.width / 2,-this.currDisplayData.height / 2,this.currDisplayData.width,this.currDisplayData.height,tResultMatrix);
-							}
-						}
-					}
-				}
-				break ;
-			case 1:
-				if (noUseSave){
-					if (this._skinSprite==null){
-						this._skinSprite=BoneSlot.createSkinMesh();
-					}
-					tSkinSprite=this._skinSprite;
-					}else {
-					tSkinSprite=BoneSlot.createSkinMesh();
-				}
-				if (tSkinSprite==null){
-					return;
-				};
-				var tIBArray;
-				var tRed=1;
-				var tGreed=1;
-				var tBlue=1;
-				var tAlpha=1;
-				if (this.currDisplayData.bones==null){
-					var tVertices=this.currDisplayData.weights;
-					if (this.deformData){
-						tVertices=this.deformData;
-					};
-					var tUVs;
-					if (this._diyTexture){
-						if (!this._curDiyUV){
-							this._curDiyUV=[];
-						}
-						if (this._curDiyUV.length==0){
-							this._curDiyUV=UVTools.getRelativeUV(this.currTexture.uv,this.currDisplayData.uvs,this._curDiyUV);
-							this._curDiyUV=UVTools.getAbsoluteUV(this._diyTexture.uv,this._curDiyUV,this._curDiyUV);
-						}
-						tUVs=this._curDiyUV;
-						}else{
-						tUVs=this.currDisplayData.uvs;
-					}
-					this._mVerticleArr=tVertices;
-					var tTriangleNum=this.currDisplayData.triangles.length / 3;
-					tIBArray=this.currDisplayData.triangles;
-					if (this.deformData){
-						if (!noUseSave){
-							this._mVerticleArr=this.getSaveVerticle(this._mVerticleArr);
-						}
-					}
-					tSkinSprite.init2(tTexture,tIBArray,this._mVerticleArr,tUVs);
-					var tCurrentMatrix2=this.getDisplayMatrix();
-					if (this._parentMatrix){
-						if (tCurrentMatrix2){
-							Matrix.mul(tCurrentMatrix2,this._parentMatrix,Matrix.TEMP);
-							var tResultMatrix2;
-							if (noUseSave){
-								if (this._resultMatrix==null)this._resultMatrix=new Matrix();
-								tResultMatrix2=this._resultMatrix;
-								}else {
-								tResultMatrix2=BoneSlot._tempResultMatrix;
-							}
-							Matrix.TEMP.copyTo(tResultMatrix2);
-							if (!noUseSave){
-								tResultMatrix2=this.getSaveMatrix(tResultMatrix2);
-							}
-							tSkinSprite.transform=tResultMatrix2;
-						}
-					}
-					}else {
-					this.skinMesh(boneMatrixArray,tSkinSprite,alpha);
-				}
-				graphics.drawSkin(tSkinSprite);
-				break ;
-			case 2:
-				if (noUseSave){
-					if (this._skinSprite==null){
-						this._skinSprite=BoneSlot.createSkinMesh();
-					}
-					tSkinSprite=this._skinSprite;
-					}else {
-					tSkinSprite=BoneSlot.createSkinMesh();
-				}
-				if (tSkinSprite==null){
-					return;
-				}
-				this.skinMesh(boneMatrixArray,tSkinSprite,alpha);
-				graphics.drawSkin(tSkinSprite);
-				break ;
-			case 3:
-				break ;
-			}
-	}
-
-	/**
-	*显示蒙皮动画
-	*@param boneMatrixArray 当前帧的骨骼矩阵
-	*/
-	__proto.skinMesh=function(boneMatrixArray,skinSprite,alpha){
-		var tTexture=this.currTexture;
-		var tBones=this.currDisplayData.bones;
-		var tUvs;
-		if (this._diyTexture){
-			tTexture=this._diyTexture;
-			if (!this._curDiyUV){
-				this._curDiyUV=[];
-			}
-			if (this._curDiyUV.length==0){
-				this._curDiyUV=UVTools.getRelativeUV(this.currTexture.uv,this.currDisplayData.uvs,this._curDiyUV);
-				this._curDiyUV=UVTools.getAbsoluteUV(this._diyTexture.uv,this._curDiyUV,this._curDiyUV);
-			}
-			tUvs=this._curDiyUV;
-			}else{
-			tUvs=this.currDisplayData.uvs;
-		};
-		var tWeights=this.currDisplayData.weights;
-		var tTriangles=this.currDisplayData.triangles;
-		var tIBArray;
-		var tRx=0;
-		var tRy=0;
-		var nn=0;
-		var tMatrix;
-		var tX=NaN;
-		var tY=NaN;
-		var tB=0;
-		var tWeight=0;
-		var tVertices;
-		var i=0,j=0,n=0;
-		var tRed=1;
-		var tGreed=1;
-		var tBlue=1;
-		var tAlpha=alpha;
-		BoneSlot._tempVerticleArr.length=0;
-		tVertices=BoneSlot._tempVerticleArr;
-		if (this.deformData && this.deformData.length > 0){
-			var f=0;
-			for (i=0,n=tBones.length;i < n;){
-				nn=tBones[i++]+i;
-				tRx=0,tRy=0;
-				for (;i < nn;i++){
-					tMatrix=boneMatrixArray[tBones[i]]
-					tX=tWeights[tB]+this.deformData[f++];
-					tY=tWeights[tB+1]+this.deformData[f++];
-					tWeight=tWeights[tB+2];
-					tRx+=(tX *tMatrix.a+tY *tMatrix.c+tMatrix.tx)*tWeight;
-					tRy+=(tX *tMatrix.b+tY *tMatrix.d+tMatrix.ty)*tWeight;
-					tB+=3;
-				}
-				tVertices.push(tRx,tRy);
-			}
-			}else {
-			for (i=0,n=tBones.length;i < n;){
-				nn=tBones[i++]+i;
-				tRx=0,tRy=0;
-				for (;i < nn;i++){
-					tMatrix=boneMatrixArray[tBones[i]]
-					tX=tWeights[tB];
-					tY=tWeights[tB+1];
-					tWeight=tWeights[tB+2];
-					tRx+=(tX *tMatrix.a+tY *tMatrix.c+tMatrix.tx)*tWeight;
-					tRy+=(tX *tMatrix.b+tY *tMatrix.d+tMatrix.ty)*tWeight;
-					tB+=3;
-				}
-				tVertices.push(tRx,tRy);
-			}
-		}
-		this._mVerticleArr=tVertices;
-		tIBArray=tTriangles;
-		this._mVerticleArr=this.getSaveVerticle(this._mVerticleArr);
-		skinSprite.init2(tTexture,tIBArray,this._mVerticleArr,tUvs);
-	}
-
-	/**
-	*画骨骼的起始点，方便调试
-	*@param graphics
-	*/
-	__proto.drawBonePoint=function(graphics){
-		if (graphics && this._parentMatrix){
-			graphics.drawCircle(this._parentMatrix.tx,this._parentMatrix.ty,5,"#ff0000");
-		}
-	}
-
-	//TODO:coverage
-	__proto.getDisplayMatrix=function(){
-		if (this.currDisplayData){
-			return this.currDisplayData.transform.getMatrix();
-		}
-		return null;
-	}
-
-	/**
-	*得到插糟的矩阵
-	*@return
-	*/
-	__proto.getMatrix=function(){
-		return this._resultMatrix;
-	}
-
-	/**
-	*用原始数据拷贝出一个
-	*@return
-	*/
-	__proto.copy=function(){
-		var tBoneSlot=new BoneSlot();
-		tBoneSlot.type="copy";
-		tBoneSlot.name=this.name;
-		tBoneSlot.attachmentName=this.attachmentName;
-		tBoneSlot.srcDisplayIndex=this.srcDisplayIndex;
-		tBoneSlot.parent=this.parent;
-		tBoneSlot.displayIndex=this.displayIndex;
-		tBoneSlot.templet=this.templet;
-		tBoneSlot.currSlotData=this.currSlotData;
-		tBoneSlot.currTexture=this.currTexture;
-		tBoneSlot.currDisplayData=this.currDisplayData;
-		return tBoneSlot;
-	}
-
-	BoneSlot.createSkinMesh=function(){
-		return new SkinMeshForGraphic();
-	}
-
-	BoneSlot.isSameArr=function(arrA,arrB){
-		if (arrA.length !=arrB.length)return false;
-		var i=0,len=0;
-		len=arrA.length;
-		for (i=0;i < len;i++){
-			if (arrA[i] !=arrB[i])return false;
-		}
-		return true;
-	}
-
-	BoneSlot.isSameMatrix=function(mtA,mtB){
-		return mtA.a==mtB.a && mtA.b==mtB.b && mtA.c==mtB.c && mtA.d==mtB.d && Math.abs(mtA.tx-mtB.tx)<0.00001 && Math.abs(mtA.ty-mtB.ty)<0.00001;
-	}
-
-	BoneSlot.useSameMatrixAndVerticle=true;
-	BoneSlot._tempVerticleArr=[];
-	__static(BoneSlot,
-	['_tempMatrix',function(){return this._tempMatrix=new Matrix();},'_tempResultMatrix',function(){return this._tempResultMatrix=new Matrix();}
-	]);
-	return BoneSlot;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.IkConstraintData
-var IkConstraintData=(function(){
-	function IkConstraintData(){
-		this.name=null;
-		this.targetBoneName=null;
-		this.bendDirection=1;
-		this.mix=1;
-		this.isSpine=true;
-		this.targetBoneIndex=-1;
-		this.boneNames=[];
-		this.boneIndexs=[];
-	}
-
-	__class(IkConstraintData,'laya.ani.bone.IkConstraintData');
-	return IkConstraintData;
+	__class(DrawOrderData,'laya.ani.bone.DrawOrderData');
+	return DrawOrderData;
 })()
 
 
@@ -1248,29 +1695,208 @@ var UVTools=(function(){
 /**
 *@private
 */
-//class laya.ani.bone.DrawOrderData
-var DrawOrderData=(function(){
-	function DrawOrderData(){
-		this.time=NaN;
-		this.drawOrder=[];
+//class laya.ani.bone.Bone
+var Bone=(function(){
+	function Bone(){
+		this.name=null;
+		this.root=null;
+		this.parentBone=null;
+		this.length=10;
+		this.transform=null;
+		this.inheritScale=true;
+		this.inheritRotation=true;
+		this.rotation=NaN;
+		this.resultRotation=NaN;
+		this.d=-1;
+		this._tempMatrix=null;
+		this._sprite=null;
+		this.resultTransform=new Transform();
+		this.resultMatrix=new Matrix();
+		this._children=[];
 	}
 
-	__class(DrawOrderData,'laya.ani.bone.DrawOrderData');
-	return DrawOrderData;
+	__class(Bone,'laya.ani.bone.Bone');
+	var __proto=Bone.prototype;
+	__proto.setTempMatrix=function(matrix){
+		this._tempMatrix=matrix;
+		var i=0,n=0;
+		var tBone;
+		for (i=0,n=this._children.length;i < n;i++){
+			tBone=this._children[i];
+			tBone.setTempMatrix(this._tempMatrix);
+		}
+	}
+
+	//TODO:coverage
+	__proto.update=function(pMatrix){
+		this.rotation=this.transform.skX;
+		var tResultMatrix;
+		if (pMatrix){
+			tResultMatrix=this.resultTransform.getMatrix();
+			Matrix.mul(tResultMatrix,pMatrix,this.resultMatrix);
+			this.resultRotation=this.rotation;
+		}
+		else {
+			this.resultRotation=this.rotation+this.parentBone.resultRotation;
+			if (this.parentBone){
+				if (this.inheritRotation && this.inheritScale){
+					tResultMatrix=this.resultTransform.getMatrix();
+					Matrix.mul(tResultMatrix,this.parentBone.resultMatrix,this.resultMatrix);
+				}
+				else {
+					var temp=0;
+					var parent=this.parentBone;
+					var tAngle=NaN;
+					var cos=NaN;
+					var sin=NaN;
+					var tParentMatrix=this.parentBone.resultMatrix;
+					tResultMatrix=this.resultTransform.getMatrix();
+					var worldX=tParentMatrix.a *tResultMatrix.tx+tParentMatrix.c *tResultMatrix.ty+tParentMatrix.tx;
+					var worldY=tParentMatrix.b *tResultMatrix.tx+tParentMatrix.d *tResultMatrix.ty+tParentMatrix.ty;
+					var tTestMatrix=new Matrix();
+					if (this.inheritRotation){
+						tAngle=Math.atan2(parent.resultMatrix.b,parent.resultMatrix.a);
+						cos=Math.cos(tAngle),sin=Math.sin(tAngle);
+						tTestMatrix.setTo(cos,sin,-sin,cos,0,0);
+						Matrix.mul(this._tempMatrix,tTestMatrix,Matrix.TEMP);
+						Matrix.TEMP.copyTo(tTestMatrix);
+						tResultMatrix=this.resultTransform.getMatrix();
+						Matrix.mul(tResultMatrix,tTestMatrix,this.resultMatrix);
+						if (this.resultTransform.scX *this.resultTransform.scY < 0){
+							this.resultMatrix.rotate(Math.PI*0.5);
+						}
+						this.resultMatrix.tx=worldX;
+						this.resultMatrix.ty=worldY;
+					}
+					else if (this.inheritScale){
+						tResultMatrix=this.resultTransform.getMatrix();
+						Matrix.TEMP.identity();
+						Matrix.TEMP.d=this.d;
+						Matrix.mul(tResultMatrix,Matrix.TEMP,this.resultMatrix);
+						this.resultMatrix.tx=worldX;
+						this.resultMatrix.ty=worldY;
+					}
+					else {
+						tResultMatrix=this.resultTransform.getMatrix();
+						Matrix.TEMP.identity();
+						Matrix.TEMP.d=this.d;
+						Matrix.mul(tResultMatrix,Matrix.TEMP,this.resultMatrix);
+						this.resultMatrix.tx=worldX;
+						this.resultMatrix.ty=worldY;
+					}
+				}
+			}
+			else {
+				tResultMatrix=this.resultTransform.getMatrix();
+				tResultMatrix.copyTo(this.resultMatrix);
+			}
+		};
+		var i=0,n=0;
+		var tBone;
+		for (i=0,n=this._children.length;i < n;i++){
+			tBone=this._children[i];
+			tBone.update();
+		}
+	}
+
+	//TODO:coverage
+	__proto.updateChild=function(){
+		var i=0,n=0;
+		var tBone;
+		for (i=0,n=this._children.length;i < n;i++){
+			tBone=this._children[i];
+			tBone.update();
+		}
+	}
+
+	//TODO:coverage
+	__proto.setRotation=function(rd){
+		if (this._sprite){
+			this._sprite.rotation=rd *180 / Math.PI;
+		}
+	}
+
+	//TODO:coverage
+	__proto.updateDraw=function(x,y){
+		if (!Bone.ShowBones || Bone.ShowBones[this.name]){
+			if (this._sprite){
+				this._sprite.x=x+this.resultMatrix.tx;
+				this._sprite.y=y+this.resultMatrix.ty;
+			}
+			else {
+				this._sprite=new Sprite();
+				this._sprite.graphics.drawCircle(0,0,5,"#ff0000");
+				this._sprite.graphics.drawLine(0,0,this.length,0,"#00ff00");
+				this._sprite.graphics.fillText(this.name,0,0,"20px Arial","#00ff00","center");
+				Laya.stage.addChild(this._sprite);
+				this._sprite.x=x+this.resultMatrix.tx;
+				this._sprite.y=y+this.resultMatrix.ty;
+			}
+		};
+		var i=0,n=0;
+		var tBone;
+		for (i=0,n=this._children.length;i < n;i++){
+			tBone=this._children[i];
+			tBone.updateDraw(x,y);
+		}
+	}
+
+	__proto.addChild=function(bone){
+		this._children.push(bone);
+		bone.parentBone=this;
+	}
+
+	//TODO:coverage
+	__proto.findBone=function(boneName){
+		if (this.name==boneName){
+			return this;
+		}
+		else {
+			var i=0,n=0;
+			var tBone;
+			var tResult;
+			for (i=0,n=this._children.length;i < n;i++){
+				tBone=this._children[i];
+				tResult=tBone.findBone(boneName);
+				if (tResult){
+					return tResult;
+				}
+			}
+		}
+		return null;
+	}
+
+	//TODO:coverage
+	__proto.localToWorld=function(local){
+		var localX=local[0];
+		var localY=local[1];
+		local[0]=localX *this.resultMatrix.a+localY *this.resultMatrix.c+this.resultMatrix.tx;
+		local[1]=localX *this.resultMatrix.b+localY *this.resultMatrix.d+this.resultMatrix.ty;
+	}
+
+	Bone.ShowBones={};
+	return Bone;
 })()
 
 
 /**
 *@private
 */
-//class laya.ani.AnimationState
-var AnimationState=(function(){
-	function AnimationState(){}
-	__class(AnimationState,'laya.ani.AnimationState');
-	AnimationState.stopped=0;
-	AnimationState.paused=1;
-	AnimationState.playing=2;
-	return AnimationState;
+//class laya.ani.bone.IkConstraintData
+var IkConstraintData=(function(){
+	function IkConstraintData(){
+		this.name=null;
+		this.targetBoneName=null;
+		this.bendDirection=1;
+		this.mix=1;
+		this.isSpine=true;
+		this.targetBoneIndex=-1;
+		this.boneNames=[];
+		this.boneIndexs=[];
+	}
+
+	__class(IkConstraintData,'laya.ani.bone.IkConstraintData');
+	return IkConstraintData;
 })()
 
 
@@ -1782,356 +2408,6 @@ var PathConstraint=(function(){
 /**
 *@private
 */
-//class laya.ani.bone.SlotData
-var SlotData=(function(){
-	function SlotData(){
-		this.name=null;
-		this.displayArr=[];
-	}
-
-	__class(SlotData,'laya.ani.bone.SlotData');
-	var __proto=SlotData.prototype;
-	__proto.getDisplayByName=function(name){
-		var tDisplay;
-		for (var i=0,n=this.displayArr.length;i < n;i++){
-			tDisplay=this.displayArr[i];
-			if (tDisplay.attachmentName==name){
-				return i;
-			}
-		}
-		return-1;
-	}
-
-	return SlotData;
-})()
-
-
-/**
-*@private
-*@author ...
-*/
-//class laya.ani.AnimationContent
-var AnimationContent=(function(){
-	function AnimationContent(){
-		this.nodes=null;
-		this.name=null;
-		this.playTime=NaN;
-		this.bone3DMap=null;
-		this.totalKeyframeDatasLength=0;
-	}
-
-	__class(AnimationContent,'laya.ani.AnimationContent');
-	return AnimationContent;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.canvasmesh.MeshData
-var MeshData=(function(){
-	function MeshData(){
-		/**
-		*纹理
-		*/
-		this.texture=null;
-		/**
-		*uv数据
-		*/
-		this.uvs=[0,0,1,0,1,1,0,1];
-		/**
-		*顶点数据
-		*/
-		this.vertices=[0,0,100,0,100,100,0,100];
-		/**
-		*顶点索引
-		*/
-		this.indexes=[0,1,3,3,1,2];
-		/**
-		*uv变换矩阵
-		*/
-		this.uvTransform=null;
-		/**
-		*是否有uv变化矩阵
-		*/
-		this.useUvTransform=false;
-		/**
-		*扩展像素,用来去除黑边
-		*/
-		this.canvasPadding=1;
-	}
-
-	__class(MeshData,'laya.ani.bone.canvasmesh.MeshData');
-	var __proto=MeshData.prototype;
-	//TODO:coverage
-	__proto.getBounds=function(){
-		return Rectangle._getWrapRec(this.vertices);
-	}
-
-	return MeshData;
-})()
-
-
-/**
-*@private
-*...
-*@author ww
-*/
-//class laya.ani.math.BezierLerp
-var BezierLerp=(function(){
-	function BezierLerp(){}
-	__class(BezierLerp,'laya.ani.math.BezierLerp');
-	BezierLerp.getBezierRate=function(t,px0,py0,px1,py1){
-		var key=BezierLerp._getBezierParamKey(px0,py0,px1,py1);
-		var vKey=key *100+t;
-		if (BezierLerp._bezierResultCache[vKey])return BezierLerp._bezierResultCache[vKey];
-		var points=BezierLerp._getBezierPoints(px0,py0,px1,py1,key);
-		var i=0,len=0;
-		len=points.length;
-		for (i=0;i < len;i+=2){
-			if (t <=points[i]){
-				BezierLerp._bezierResultCache[vKey]=points[i+1];
-				return points[i+1];
-			}
-		}
-		BezierLerp._bezierResultCache[vKey]=1;
-		return 1;
-	}
-
-	BezierLerp._getBezierParamKey=function(px0,py0,px1,py1){
-		return (((px0 *100+py0)*100+px1)*100+py1)*100;
-	}
-
-	BezierLerp._getBezierPoints=function(px0,py0,px1,py1,key){
-		if (BezierLerp._bezierPointsCache[key])return BezierLerp._bezierPointsCache[key];
-		var controlPoints;
-		controlPoints=[0,0,px0,py0,px1,py1,1,1];
-		var bz;
-		bz=new Bezier();
-		var points;
-		points=bz.getBezierPoints(controlPoints,100,3);
-		BezierLerp._bezierPointsCache[key]=points;
-		return points;
-	}
-
-	BezierLerp._bezierResultCache={};
-	BezierLerp._bezierPointsCache={};
-	return BezierLerp;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.Transform
-var Transform=(function(){
-	function Transform(){
-		this.skX=0;
-		this.skY=0;
-		this.scX=1;
-		this.scY=1;
-		this.x=0;
-		this.y=0;
-		this.skewX=0;
-		this.skewY=0;
-		this.mMatrix=null;
-	}
-
-	__class(Transform,'laya.ani.bone.Transform');
-	var __proto=Transform.prototype;
-	//TODO:coverage
-	__proto.initData=function(data){
-		if (data.x !=undefined){
-			this.x=data.x;
-		}
-		if (data.y !=undefined){
-			this.y=data.y;
-		}
-		if (data.skX !=undefined){
-			this.skX=data.skX;
-		}
-		if (data.skY !=undefined){
-			this.skY=data.skY;
-		}
-		if (data.scX !=undefined){
-			this.scX=data.scX;
-		}
-		if (data.scY !=undefined){
-			this.scY=data.scY;
-		}
-	}
-
-	//TODO:coverage
-	__proto.getMatrix=function(){
-		var tMatrix;
-		if (this.mMatrix){
-			tMatrix=this.mMatrix;
-			}else {
-			tMatrix=this.mMatrix=new Matrix();
-		}
-		tMatrix.identity();
-		tMatrix.scale(this.scX,this.scY);
-		if (this.skewX || this.skewY){
-			this.skew(tMatrix,this.skewX *Math.PI / 180,this.skewY *Math.PI / 180);
-		}
-		tMatrix.rotate(this.skX *Math.PI / 180);
-		tMatrix.translate(this.x,this.y);
-		return tMatrix;
-	}
-
-	//TODO:coverage
-	__proto.skew=function(m,x,y){
-		var sinX=Math.sin(y);
-		var cosX=Math.cos(y);
-		var sinY=Math.sin(x);
-		var cosY=Math.cos(x);
-		m.setTo(m.a *cosY-m.b *sinX,
-		m.a *sinY+m.b *cosX,
-		m.c *cosY-m.d *sinX,
-		m.c *sinY+m.d *cosX,
-		m.tx *cosY-m.ty *sinX,
-		m.tx *sinY+m.ty *cosX);
-		return m;
-	}
-
-	return Transform;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.EventData
-var EventData=(function(){
-	function EventData(){
-		this.name=null;
-		this.intValue=0;
-		this.floatValue=NaN;
-		this.stringValue=null;
-		this.time=NaN;
-	}
-
-	__class(EventData,'laya.ani.bone.EventData');
-	return EventData;
-})()
-
-
-//TODO:coverage
-//class laya.ani.bone.TfConstraintData
-var TfConstraintData=(function(){
-	function TfConstraintData(){
-		this.name=null;
-		this.targetIndex=0;
-		this.rotateMix=NaN;
-		this.translateMix=NaN;
-		this.scaleMix=NaN;
-		this.shearMix=NaN;
-		this.offsetRotation=NaN;
-		this.offsetX=NaN;
-		this.offsetY=NaN;
-		this.offsetScaleX=NaN;
-		this.offsetScaleY=NaN;
-		this.offsetShearY=NaN;
-		this.boneIndexs=[];
-	}
-
-	__class(TfConstraintData,'laya.ani.bone.TfConstraintData');
-	return TfConstraintData;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.TfConstraint
-var TfConstraint=(function(){
-	function TfConstraint(data,bones){
-		this._data=null;
-		this._bones=null;
-		this.target=null;
-		this.rotateMix=NaN;
-		this.translateMix=NaN;
-		this.scaleMix=NaN;
-		this.shearMix=NaN;
-		this._temp=__newvec(2,0);
-		this._data=data;
-		if (this._bones==null){
-			this._bones=[];
-		}
-		this.target=bones[data.targetIndex];
-		var j=0,n=0;
-		for (j=0,n=data.boneIndexs.length;j < n;j++){
-			this._bones.push(bones[data.boneIndexs[j]]);
-		}
-		this.rotateMix=data.rotateMix;
-		this.translateMix=data.translateMix;
-		this.scaleMix=data.scaleMix;
-		this.shearMix=data.shearMix;
-	}
-
-	__class(TfConstraint,'laya.ani.bone.TfConstraint');
-	var __proto=TfConstraint.prototype;
-	//TODO:coverage
-	__proto.apply=function(){
-		var tTfBone;
-		var ta=this.target.resultMatrix.a,tb=this.target.resultMatrix.b,tc=this.target.resultMatrix.c,td=this.target.resultMatrix.d;
-		for (var j=0,n=this._bones.length;j < n;j++){
-			tTfBone=this._bones[j];
-			if (this.rotateMix > 0){
-				var a=tTfBone.resultMatrix.a,b=tTfBone.resultMatrix.b,c=tTfBone.resultMatrix.c,d=tTfBone.resultMatrix.d;
-				var r=Math.atan2(tc,ta)-Math.atan2(c,a)+this._data.offsetRotation *Math.PI / 180;
-				if (r > Math.PI)
-					r-=Math.PI *2;
-				else if (r <-Math.PI)r+=Math.PI *2;
-				r *=this.rotateMix;
-				var cos=Math.cos(r),sin=Math.sin(r);
-				tTfBone.resultMatrix.a=cos *a-sin *c;
-				tTfBone.resultMatrix.b=cos *b-sin *d;
-				tTfBone.resultMatrix.c=sin *a+cos *c;
-				tTfBone.resultMatrix.d=sin *b+cos *d;
-			}
-			if (this.translateMix){
-				this._temp[0]=this._data.offsetX;
-				this._temp[1]=this._data.offsetY;
-				this.target.localToWorld(this._temp);
-				tTfBone.resultMatrix.tx+=(this._temp[0]-tTfBone.resultMatrix.tx)*this.translateMix;
-				tTfBone.resultMatrix.ty+=(this._temp[1]-tTfBone.resultMatrix.ty)*this.translateMix;
-				tTfBone.updateChild();
-			}
-			if (this.scaleMix > 0){
-				var bs=Math.sqrt(tTfBone.resultMatrix.a *tTfBone.resultMatrix.a+tTfBone.resultMatrix.c *tTfBone.resultMatrix.c);
-				var ts=Math.sqrt(ta *ta+tc *tc);
-				var s=bs > 0.00001 ? (bs+(ts-bs+this._data.offsetScaleX)*this.scaleMix)/ bs :0;
-				tTfBone.resultMatrix.a *=s;
-				tTfBone.resultMatrix.c *=s;
-				bs=Math.sqrt(tTfBone.resultMatrix.b *tTfBone.resultMatrix.b+tTfBone.resultMatrix.d *tTfBone.resultMatrix.d);
-				ts=Math.sqrt(tb *tb+td *td);
-				s=bs > 0.00001 ? (bs+(ts-bs+this._data.offsetScaleY)*this.scaleMix)/ bs :0;
-				tTfBone.resultMatrix.b *=s;
-				tTfBone.resultMatrix.d *=s;
-			}
-			if (this.shearMix > 0){
-				b=tTfBone.resultMatrix.b,d=tTfBone.resultMatrix.d;
-				var by=Math.atan2(d,b);
-				r=Math.atan2(td,tb)-Math.atan2(tc,ta)-(by-Math.atan2(tTfBone.resultMatrix.c,tTfBone.resultMatrix.a));
-				if (r > Math.PI)
-					r-=Math.PI *2;
-				else if (r <-Math.PI)r+=Math.PI *2;
-				r=by+(r+this._data.offsetShearY *Math.PI / 180)*this.shearMix;
-				s=Math.sqrt(b *b+d *d);
-				tTfBone.resultMatrix.b=Math.cos(r)*s;
-				tTfBone.resultMatrix.d=Math.sin(r)*s;
-			}
-		}
-	}
-
-	return TfConstraint;
-})()
-
-
-/**
-*@private
-*/
 //class laya.ani.bone.SkinData
 var SkinData=(function(){
 	function SkinData(){
@@ -2147,290 +2423,14 @@ var SkinData=(function(){
 /**
 *@private
 */
-//class laya.ani.bone.DeformSlotDisplayData
-var DeformSlotDisplayData=(function(){
-	function DeformSlotDisplayData(){
-		this.boneSlot=null;
-		this.slotIndex=-1;
-		this.attachment=null;
-		this.deformData=null;
-		this.frameIndex=0;
-		this.timeList=[];
-		this.vectices=[];
-		this.tweenKeyList=[];
-	}
-
-	__class(DeformSlotDisplayData,'laya.ani.bone.DeformSlotDisplayData');
-	var __proto=DeformSlotDisplayData.prototype;
-	__proto.binarySearch1=function(values,target){
-		var low=0;
-		var high=values.length-2;
-		if (high==0)
-			return 1;
-		var current=high >>> 1;
-		while (true){
-			if (values[Math.floor(current+1)] <=target)
-				low=current+1;
-			else
-			high=current;
-			if (low==high)
-				return low+1;
-			current=(low+high)>>> 1;
-		}
-		return 0;
-	}
-
-	//TODO:coverage
-	__proto.apply=function(time,boneSlot,alpha){
-		(alpha===void 0)&& (alpha=1);
-		time+=0.05;
-		if (this.timeList.length <=0){
-			return;
-		};
-		var i=0;
-		var n=0;
-		var tTime=this.timeList[0];
-		if (time < tTime){
-			return;
-		};
-		var tVertexCount=this.vectices[0].length;
-		var tVertices=[];
-		var tFrameIndex=this.binarySearch1(this.timeList,time);
-		this.frameIndex=tFrameIndex;
-		if (time >=this.timeList[this.timeList.length-1]){
-			var lastVertices=this.vectices[this.vectices.length-1];
-			if (alpha < 1){
-				for (i=0;i < tVertexCount;i++){
-					tVertices[i]+=(lastVertices[i]-tVertices[i])*alpha;
-				}
-				}else {
-				for (i=0;i < tVertexCount;i++){
-					tVertices[i]=lastVertices[i];
-				}
-			}
-			this.deformData=tVertices;
-			return;
-		};
-		var tTweenKey=this.tweenKeyList[this.frameIndex];
-		var tPrevVertices=this.vectices[this.frameIndex-1];
-		var tNextVertices=this.vectices[this.frameIndex];
-		var tPreFrameTime=this.timeList[this.frameIndex-1];
-		var tFrameTime=this.timeList[this.frameIndex];
-		if (this.tweenKeyList[tFrameIndex-1]){
-			alpha=(time-tPreFrameTime)/ (tFrameTime-tPreFrameTime);
-			}else {
-			alpha=0;
-		};
-		var tPrev=NaN;
-		for (i=0;i < tVertexCount;i++){
-			tPrev=tPrevVertices[i];
-			tVertices[i]=tPrev+(tNextVertices[i]-tPrev)*alpha;
-		}
-		this.deformData=tVertices;
-	}
-
-	return DeformSlotDisplayData;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.DeformSlotData
-var DeformSlotData=(function(){
-	function DeformSlotData(){
-		this.deformSlotDisplayList=[];
-	}
-
-	__class(DeformSlotData,'laya.ani.bone.DeformSlotData');
-	return DeformSlotData;
-})()
-
-
-/**
-*@private
-*/
-//class laya.ani.bone.Bone
-var Bone=(function(){
-	function Bone(){
-		this.name=null;
-		this.root=null;
-		this.parentBone=null;
-		this.length=10;
-		this.transform=null;
-		this.inheritScale=true;
-		this.inheritRotation=true;
-		this.rotation=NaN;
-		this.resultRotation=NaN;
-		this.d=-1;
-		this._tempMatrix=null;
-		this._sprite=null;
-		this.resultTransform=new Transform();
-		this.resultMatrix=new Matrix();
-		this._children=[];
-	}
-
-	__class(Bone,'laya.ani.bone.Bone');
-	var __proto=Bone.prototype;
-	__proto.setTempMatrix=function(matrix){
-		this._tempMatrix=matrix;
-		var i=0,n=0;
-		var tBone;
-		for (i=0,n=this._children.length;i < n;i++){
-			tBone=this._children[i];
-			tBone.setTempMatrix(this._tempMatrix);
-		}
-	}
-
-	//TODO:coverage
-	__proto.update=function(pMatrix){
-		this.rotation=this.transform.skX;
-		var tResultMatrix;
-		if (pMatrix){
-			tResultMatrix=this.resultTransform.getMatrix();
-			Matrix.mul(tResultMatrix,pMatrix,this.resultMatrix);
-			this.resultRotation=this.rotation;
-		}
-		else {
-			this.resultRotation=this.rotation+this.parentBone.resultRotation;
-			if (this.parentBone){
-				if (this.inheritRotation && this.inheritScale){
-					tResultMatrix=this.resultTransform.getMatrix();
-					Matrix.mul(tResultMatrix,this.parentBone.resultMatrix,this.resultMatrix);
-				}
-				else {
-					var temp=0;
-					var parent=this.parentBone;
-					var tAngle=NaN;
-					var cos=NaN;
-					var sin=NaN;
-					var tParentMatrix=this.parentBone.resultMatrix;
-					tResultMatrix=this.resultTransform.getMatrix();
-					var worldX=tParentMatrix.a *tResultMatrix.tx+tParentMatrix.c *tResultMatrix.ty+tParentMatrix.tx;
-					var worldY=tParentMatrix.b *tResultMatrix.tx+tParentMatrix.d *tResultMatrix.ty+tParentMatrix.ty;
-					var tTestMatrix=new Matrix();
-					if (this.inheritRotation){
-						tAngle=Math.atan2(parent.resultMatrix.b,parent.resultMatrix.a);
-						cos=Math.cos(tAngle),sin=Math.sin(tAngle);
-						tTestMatrix.setTo(cos,sin,-sin,cos,0,0);
-						Matrix.mul(this._tempMatrix,tTestMatrix,Matrix.TEMP);
-						Matrix.TEMP.copyTo(tTestMatrix);
-						tResultMatrix=this.resultTransform.getMatrix();
-						Matrix.mul(tResultMatrix,tTestMatrix,this.resultMatrix);
-						if (this.resultTransform.scX *this.resultTransform.scY < 0){
-							this.resultMatrix.rotate(Math.PI*0.5);
-						}
-						this.resultMatrix.tx=worldX;
-						this.resultMatrix.ty=worldY;
-					}
-					else if (this.inheritScale){
-						tResultMatrix=this.resultTransform.getMatrix();
-						Matrix.TEMP.identity();
-						Matrix.TEMP.d=this.d;
-						Matrix.mul(tResultMatrix,Matrix.TEMP,this.resultMatrix);
-						this.resultMatrix.tx=worldX;
-						this.resultMatrix.ty=worldY;
-					}
-					else {
-						tResultMatrix=this.resultTransform.getMatrix();
-						Matrix.TEMP.identity();
-						Matrix.TEMP.d=this.d;
-						Matrix.mul(tResultMatrix,Matrix.TEMP,this.resultMatrix);
-						this.resultMatrix.tx=worldX;
-						this.resultMatrix.ty=worldY;
-					}
-				}
-			}
-			else {
-				tResultMatrix=this.resultTransform.getMatrix();
-				tResultMatrix.copyTo(this.resultMatrix);
-			}
-		};
-		var i=0,n=0;
-		var tBone;
-		for (i=0,n=this._children.length;i < n;i++){
-			tBone=this._children[i];
-			tBone.update();
-		}
-	}
-
-	//TODO:coverage
-	__proto.updateChild=function(){
-		var i=0,n=0;
-		var tBone;
-		for (i=0,n=this._children.length;i < n;i++){
-			tBone=this._children[i];
-			tBone.update();
-		}
-	}
-
-	//TODO:coverage
-	__proto.setRotation=function(rd){
-		if (this._sprite){
-			this._sprite.rotation=rd *180 / Math.PI;
-		}
-	}
-
-	//TODO:coverage
-	__proto.updateDraw=function(x,y){
-		if (!Bone.ShowBones || Bone.ShowBones[this.name]){
-			if (this._sprite){
-				this._sprite.x=x+this.resultMatrix.tx;
-				this._sprite.y=y+this.resultMatrix.ty;
-			}
-			else {
-				this._sprite=new Sprite();
-				this._sprite.graphics.drawCircle(0,0,5,"#ff0000");
-				this._sprite.graphics.drawLine(0,0,this.length,0,"#00ff00");
-				this._sprite.graphics.fillText(this.name,0,0,"20px Arial","#00ff00","center");
-				Laya.stage.addChild(this._sprite);
-				this._sprite.x=x+this.resultMatrix.tx;
-				this._sprite.y=y+this.resultMatrix.ty;
-			}
-		};
-		var i=0,n=0;
-		var tBone;
-		for (i=0,n=this._children.length;i < n;i++){
-			tBone=this._children[i];
-			tBone.updateDraw(x,y);
-		}
-	}
-
-	__proto.addChild=function(bone){
-		this._children.push(bone);
-		bone.parentBone=this;
-	}
-
-	//TODO:coverage
-	__proto.findBone=function(boneName){
-		if (this.name==boneName){
-			return this;
-		}
-		else {
-			var i=0,n=0;
-			var tBone;
-			var tResult;
-			for (i=0,n=this._children.length;i < n;i++){
-				tBone=this._children[i];
-				tResult=tBone.findBone(boneName);
-				if (tResult){
-					return tResult;
-				}
-			}
-		}
-		return null;
-	}
-
-	//TODO:coverage
-	__proto.localToWorld=function(local){
-		var localX=local[0];
-		var localY=local[1];
-		local[0]=localX *this.resultMatrix.a+localY *this.resultMatrix.c+this.resultMatrix.tx;
-		local[1]=localX *this.resultMatrix.b+localY *this.resultMatrix.d+this.resultMatrix.ty;
-	}
-
-	Bone.ShowBones={};
-	return Bone;
+//class laya.ani.AnimationState
+var AnimationState=(function(){
+	function AnimationState(){}
+	__class(AnimationState,'laya.ani.AnimationState');
+	AnimationState.stopped=0;
+	AnimationState.paused=1;
+	AnimationState.playing=2;
+	return AnimationState;
 })()
 
 
