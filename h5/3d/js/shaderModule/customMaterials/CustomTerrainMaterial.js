@@ -66,19 +66,19 @@ class CustomTerrainMaterial extends Laya.BaseMaterial{
     } 
 
     setDiffuseScale1(scale1) {
-        this._shaderValues.setVector(CustomTerrainMaterial.DIFFUSESCALE1, scale1);
+        this._shaderValues.setVector2(CustomTerrainMaterial.DIFFUSESCALE1, scale1);
     }
     setDiffuseScale2(scale2) {
-        this._shaderValues.setVector(CustomTerrainMaterial.DIFFUSESCALE2, scale2);
+        this._shaderValues.setVector2(CustomTerrainMaterial.DIFFUSESCALE2, scale2);
     }
     setDiffuseScale3(scale3) {
-        this._shaderValues.setVector(CustomTerrainMaterial.DIFFUSESCALE3, scale3);
+        this._shaderValues.setVector2(CustomTerrainMaterial.DIFFUSESCALE3, scale3);
     }
     setDiffuseScale4(scale4) {
-        this._shaderValues.setVector(CustomTerrainMaterial.DIFFUSESCALE4, scale4);
+        this._shaderValues.setVector2(CustomTerrainMaterial.DIFFUSESCALE4, scale4);
     }
     setDiffuseScale5(scale5) {
-        this._shaderValues.setVector(CustomTerrainMaterial.DIFFUSESCALE5, scale5);
+        this._shaderValues.setVector2(CustomTerrainMaterial.DIFFUSESCALE5, scale5);
     }
 
     _setDetailNum(value) {

@@ -12,11 +12,12 @@ class CustomMaterial extends Laya.BaseMaterial{
     }
     //设置marginalColor（边缘光照颜色）
     set marginalColor(value){
-        this._shaderValues.setVector(CustomMaterial.MARGINALCOLOR, value);
+        this._shaderValues.setVector3(CustomMaterial.MARGINALCOLOR, value);
     }
 
 }
 //ES6可以定义静态属性，这些属性是CustomMaterial的属性，不属于CustomMaterial实例的属性。ES7提案将支持在class中使用static定义静态属性
 CustomMaterial.DIFFUSETEXTURE = Laya.Shader3D.propertyNameToID("u_texture");
 CustomMaterial.MARGINALCOLOR = Laya.Shader3D.propertyNameToID("u_marginalColor");
+
 
