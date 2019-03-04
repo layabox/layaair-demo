@@ -18,7 +18,8 @@ class GarbageCollection{
 					break;
 				case 1: 
 					(e.target).label = "加载场景";
-					this._garbageCollection();
+					if(this.scene)//_scene不为空表示场景已加载完成
+						this._garbageCollection();
 					break;
 				}
 			});
