@@ -14,12 +14,13 @@ class BlinnPhongMaterialLoad {
         
         var directionLight:Laya.DirectionLight = scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
         directionLight.color = new Laya.Vector3(0.6, 0.6, 0.6);
-        directionLight.direction = new Laya.Vector3(1, -1, -1);
         
-        Laya.Mesh.load("../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm", Laya.Handler.create(this, function(mesh:Laya.Mesh):void {
+        Laya.Mesh.load("../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm", Laya.Handler.create(this, function(mesh:Laya.Mesh):void {
             var layaMonkey:Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(mesh)) as Laya.MeshSprite3D;
             //加载材质
-            layaMonkey.meshRenderer.material = Laya.BlinnPhongMaterial.load("../../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
+            Laya.BaseMaterial.load("../res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat",  Laya.Handler.create(null, function(mat: Laya.BaseMaterial):void {
+				layaMonkey.meshRenderer.material = mat;
+			}));
             layaMonkey.transform.localScale = new Laya.Vector3(0.3, 0.3, 0.3);
             layaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
             

@@ -1,3 +1,4 @@
+import CameraMoveScript from "./common/CameraMoveScript"
 class SpotLightDemo {
     private _quaternion:Laya.Quaternion = new Laya.Quaternion();
     private _direction:Laya.Vector3 = new Laya.Vector3();
@@ -25,9 +26,9 @@ class SpotLightDemo {
     
      
         
-        Laya.Sprite3D.load("../../res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, function(sprite:Laya.Sprite3D):void {
+        Laya.Sprite3D.load("../res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, function(sprite:Laya.Sprite3D):void {
             scene.addChild(sprite) as Laya.Sprite3D;
-            Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(layaMonkey:Laya.Sprite3D):void {
+            Laya.Sprite3D.load("../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(layaMonkey:Laya.Sprite3D):void {
                 scene.addChild(layaMonkey) as Laya.Sprite3D;
                 var aniSprite3d:Laya.Sprite3D = layaMonkey.getChildAt(0) as Laya.Sprite3D;
                 var animator:Laya.Animator = aniSprite3d.getComponent(Laya.Animator) as Laya.Animator;

@@ -1,3 +1,4 @@
+import CameraMoveScript from "./common/CameraMoveScript"
 class PointLightDemo {
     private _temp_position:Laya.Vector3 = new Laya.Vector3();
     private _temp_quaternion:Laya.Quaternion = new Laya.Quaternion();
@@ -21,10 +22,10 @@ class PointLightDemo {
 			pointLight.transform.position = new Laya.Vector3(0.4, 0.4, 0.0);
 			pointLight.range = 3.0;
 			
-            Laya.Sprite3D.load("../../res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, function(sprite:Laya.Sprite3D):void {
+            Laya.Sprite3D.load("../res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, function(sprite:Laya.Sprite3D):void {
 				var grid:Laya.Sprite3D = scene.addChild(sprite) as Laya.Sprite3D;
 				
-				Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(layaMonkey:Laya.Sprite3D):void {
+				Laya.Sprite3D.load("../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(layaMonkey:Laya.Sprite3D):void {
 					scene.addChild(layaMonkey);
 					var aniSprite3d:Laya.Sprite3D = layaMonkey.getChildAt(0) as Laya.Sprite3D;
 					var animator:Laya.Animator = aniSprite3d.getComponent(Laya.Animator) as Laya.Animator;
@@ -44,9 +45,9 @@ class PointLightDemo {
 						Laya.Vector3.transformQuat(pointLight.transform.position, this._temp_quaternion, this._temp_position);
 						pointLight.transform.position = this._temp_position;
 					});
-				}))
+				}));
 			
-			}))
+			}));
     }
 }
 new PointLightDemo;

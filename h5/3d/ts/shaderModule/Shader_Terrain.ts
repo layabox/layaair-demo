@@ -1,3 +1,5 @@
+import CameraMoveScript from "./common/CameraMoveScript"
+import CustomTerrainMaterial from "./customMaterials/CustomTerrainMaterial"
 class Shader_Terrain {
     constructor() {
         Laya3D.init(0, 0);
@@ -14,34 +16,31 @@ class Shader_Terrain {
         camera.transform.translate(new Laya.Vector3(-28, 20, -18), false);
         camera.addComponent(CameraMoveScript);
         
-        Laya.Mesh.load("../../res/threeDimen/skinModel/Terrain/terrain_New-Part-01.lm", Laya.Handler.create(this, function(mesh:Laya.Mesh):void {
+        Laya.Mesh.load("../res/threeDimen/skinModel/Terrain/terrain_New-Part-01.lm", Laya.Handler.create(this, function(mesh:Laya.Mesh):void {
             var terrain:Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(mesh)) as Laya.MeshSprite3D;
             var customMaterial:CustomTerrainMaterial = new CustomTerrainMaterial();
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/Terrain/splatAlphaTexture.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+            Laya.Texture2D.load("../res/threeDimen/skinModel/Terrain/splatAlphaTexture.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
                 customMaterial.splatAlphaTexture = tex;
             }));
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/Terrain/ground_01.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+            Laya.Texture2D.load("../res/threeDimen/skinModel/Terrain/ground_01.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
                 customMaterial.diffuseTexture1 = tex;
             }));
             
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/Terrain/ground_02.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+            Laya.Texture2D.load("../res/threeDimen/skinModel/Terrain/ground_02.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
                 customMaterial.diffuseTexture2 = tex;
             }));
             
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/Terrain/ground_03.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+            Laya.Texture2D.load("../res/threeDimen/skinModel/Terrain/ground_03.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
                 customMaterial.diffuseTexture3 = tex;
             }));
             
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/Terrain/ground_04.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+            Laya.Texture2D.load("../res/threeDimen/skinModel/Terrain/ground_04.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
                 customMaterial.diffuseTexture4 = tex;
             }))
             customMaterial.setDiffuseScale1(new Laya.Vector2(27.92727, 27.92727));
             customMaterial.setDiffuseScale2(new Laya.Vector2(13.96364, 13.96364));
             customMaterial.setDiffuseScale3(new Laya.Vector2(18.61818, 18.61818));
             customMaterial.setDiffuseScale4(new Laya.Vector2(13.96364, 13.96364));
-            customMaterial.ambientColor = new Laya.Vector3(1, 1, 1);
-            customMaterial.diffuseColor = new Laya.Vector3(1, 1, 1);
-            customMaterial.specularColor = new Laya.Vector4(1, 1, 1, 8);
             terrain.meshRenderer.sharedMaterial = customMaterial;
         }))
     
@@ -59,9 +58,9 @@ class Shader_Terrain {
             'a_Texcoord0': Laya.VertexMesh.MESH_TEXTURECOORDINATE0
         };
         var uniformMap:Object = {
-            'u_MvpMatrix':  Laya.Shader3D.PERIOD_SPRITE], 
-            'u_WorldMat': Laya.Shader3D.PERIOD_SPRITE], 
-            'u_CameraPos': Laya.Shader3D.PERIOD_CAMERA], 
+            'u_MvpMatrix':  Laya.Shader3D.PERIOD_SPRITE, 
+            'u_WorldMat': Laya.Shader3D.PERIOD_SPRITE, 
+            'u_CameraPos': Laya.Shader3D.PERIOD_CAMERA, 
             'u_SplatAlphaTexture':  Laya.Shader3D.PERIOD_MATERIAL, 
             'u_DiffuseTexture1':  Laya.Shader3D.PERIOD_MATERIAL, 
             'u_DiffuseTexture2':  Laya.Shader3D.PERIOD_MATERIAL, 
@@ -75,7 +74,7 @@ class Shader_Terrain {
             'u_DiffuseScale5': Laya.Shader3D.PERIOD_MATERIAL
         };
         
-        var vs:String = "attribute vec4 a_Position;\n"+
+        var vs:string = "attribute vec4 a_Position;\n"+
         "attribute vec2 a_Texcoord0;\n"+
         "attribute vec3 a_Normal;\n"+
         "uniform mat4 u_MvpMatrix;\n"+
@@ -85,7 +84,7 @@ class Shader_Terrain {
           "gl_Position = u_MvpMatrix * a_Position;\n"+
           "v_Texcoord0 = a_Texcoord0;\n"+
        "}";
-        var ps:String ="#ifdef FSHIGHPRECISION\n"+
+        var ps:string ="#ifdef FSHIGHPRECISION\n"+
         "precision highp float;\n"+
         "#else\n"+
         "precision mediump float;\n"+

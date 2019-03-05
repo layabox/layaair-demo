@@ -22,13 +22,13 @@ class Sprite3DTransform {
         camera.transform.translate(new Laya.Vector3(0, 0.5, 1));
         camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
         
-        Laya.loader.create("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, this.onComplete));
+        Laya.loader.create("../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, this.onComplete));
     }
     
     public onComplete():void
     {
         
-        this.layaMonkey1 = this.scene.addChild(Laya.Loader.getRes("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
+        this.layaMonkey1 = this.scene.addChild(Laya.Loader.getRes("../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
         this.layaMonkey2 = Laya.Sprite3D.instantiate(this.layaMonkey1, this.scene, false, new Laya.Vector3(0, 0, 0));
         this.layaMonkey3 = this.scene.addChild(Laya.Sprite3D.instantiate(this.layaMonkey1, null, false, new Laya.Vector3(0.6, 0, 0))) as Laya.Sprite3D;
         

@@ -11,7 +11,7 @@ class Particle_BurningGround {
         camera.transform.translate(new Laya.Vector3(0, 2, 4));
         camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
         
-        Laya.Sprite3D.load("../../res/threeDimen/particle/ETF_Burning_Ground.lh",Laya.Handler.create(this,function(sprite:Laya.Sprite3D):void{
+        Laya.Sprite3D.load("../res/threeDimen/particle/ETF_Burning_Ground.lh",Laya.Handler.create(this,function(sprite:Laya.Sprite3D):void{
             scene.addChild(sprite) as Laya.Sprite3D;
         }))
     }

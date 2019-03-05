@@ -13,7 +13,7 @@ class AnimationLayerBlend
 		Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
 		Laya.Stat.show();
 			
-        Laya.Scene3D.load("../../res/threeDimen/scene/LayaScene_Sniper/Sniper.ls", Laya.Handler.create(this, this.sceneLoaded));
+        Laya.Scene3D.load("../res/threeDimen/scene/LayaScene_Sniper/Sniper.ls", Laya.Handler.create(this, this.sceneLoaded));
     }
     private sceneLoaded(scene:Laya.Scene3D):void {
         
@@ -76,8 +76,8 @@ class AnimationLayerBlend
     
     private addButton(x:number, y:number, width:number, height:number, text:string, size:number, clickFun:Function):void {
         var thiss = this;
-        Laya.loader.load(["../../res/threeDimen/ui/button.png"], Laya.Handler.create(null, function():void {
-        var changeActionButton:Laya.Button = Laya.stage.addChild(new Laya.Button("../../res/threeDimen/ui/button.png", text)) as Laya.Button;
+        Laya.loader.load(["../res/threeDimen/ui/button.png"], Laya.Handler.create(null, function():void {
+        var changeActionButton:Laya.Button = Laya.stage.addChild(new Laya.Button("../res/threeDimen/ui/button.png", text)) as Laya.Button;
         changeActionButton.size(width, height);
         changeActionButton.labelBold = true;
         changeActionButton.labelSize = size;

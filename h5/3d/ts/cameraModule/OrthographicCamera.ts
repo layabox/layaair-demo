@@ -7,7 +7,7 @@ class OrthographicCamera {
             Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
             Laya.Stat.show();
             
-            var dialog:Laya.Image = Laya.stage.addChild(new Laya.Image("../../res/cartoon2/background.jpg")) as Laya.Image;
+            var dialog:Laya.Image = Laya.stage.addChild(new Laya.Image("../res/cartoon2/background.jpg")) as Laya.Image;
             
             var scene:Laya.Scene3D = Laya.stage.addChild(new Laya.Scene3D()) as Laya.Scene3D;
             
@@ -20,7 +20,7 @@ class OrthographicCamera {
             
             var directionLight:Laya.DirectionLight = scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
             
-            Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(layaMonkey:Laya.Sprite3D):void {
+            Laya.Sprite3D.load("../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(layaMonkey:Laya.Sprite3D):void {
 				scene.addChild(layaMonkey);
 				layaMonkey.transform.localScale = new Laya.Vector3(0.3, 0.3, 0.3);
 				//转换2D屏幕坐标系统到3D正交投影下的坐标系统
@@ -32,9 +32,8 @@ class OrthographicCamera {
 					layaMonkey.transform.position = this._translate;
 				});
 			
-			}))
+			}));
         
-        }
     }
 }
 new OrthographicCamera;

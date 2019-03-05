@@ -1,12 +1,12 @@
 class TouchScript extends Laya.Script3D {
-	public header:String;
-	public subText:String = "";
+	public header:string;
+	public subText:string = "";
 	public count:number = 0;
 	public text:Laya.Text;
 	
      public onUpdate():void {
 		if (this.count === 24) {
-			var t:String = this.text.text;
+			var t:string = this.text.text;
 			var index:number = t.indexOf("\n");
 			t = t.slice(index + 1, t.length);
 			this.text.text = t;
@@ -69,9 +69,9 @@ class TouchScriptSample {
 			directionLight.color = new Laya.Vector3(1, 1, 1);
 			directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
 			
-			var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(20, 20, 10, 10))) as Laya.MeshSprite3D;
+			var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(20, 20, 10, 10))) as Laya.MeshSprite3D;
 			var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-			Laya.Texture2D.load("../../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
+			Laya.Texture2D.load("../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
 			planeMat.tilingOffset = new Laya.Vector4(2, 2, 0, 0);
@@ -92,14 +92,14 @@ class TouchScriptSample {
     }
     public addBox():void {
         var mat1:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("../../res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
+        Laya.Texture2D.load("../res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
             mat1.albedoTexture = tex;
         }));
         
         var sX:number = Math.random() * 0.75 + 0.25;
         var sY:number = Math.random() * 0.75 + 0.25;
         var sZ:number = Math.random() * 0.75 + 0.25;
-        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ))) as Laya.MeshSprite3D;
+        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(sX, sY, sZ))) as Laya.MeshSprite3D;
         box.meshRenderer.material = mat1;
         box.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         box.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
@@ -109,20 +109,20 @@ class TouchScriptSample {
         rigidBody.colliderShape = boxShape;
         rigidBody.mass = 10;
         
-        var script:Laya.TouchScript = box.addComponent(TouchScript) as TouchScript;
+        var script:TouchScript = box.addComponent(TouchScript) as TouchScript;
         script.header = "BOX: ";
         script.text = this.text;
     }
     
     public addCapsule():void {
         var mat3:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("../../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+        Laya.Texture2D.load("../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
             mat3.albedoTexture = tex;
         }));
         
         var raidius:number = Math.random() * 0.2 + 0.2;
         var height:number = Math.random() * 0.5 + 0.8;
-        var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height))) as Laya.MeshSprite3D;
+        var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCapsule(raidius, height))) as Laya.MeshSprite3D;
         capsule.meshRenderer.material = mat3;
         capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);

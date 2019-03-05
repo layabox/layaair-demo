@@ -26,6 +26,6 @@ class CustomMaterial extends Laya.BaseMaterial {
      * 边缘光照颜色。
      */
     public set marginalColor(value: Laya.Vector3) {
-        this._shaderValues.setVector(CustomMaterial.MARGINALCOLOR, value);
+        this._shaderValues.setVector3(CustomMaterial.MARGINALCOLOR, value);
     }
 }

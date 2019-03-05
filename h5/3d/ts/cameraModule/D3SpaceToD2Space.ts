@@ -21,14 +21,14 @@ class D3SpaceToD2Space {
         
         var completeHandler:Laya.Handler = Laya.Handler.create(this, this.onComplete);
         
-        Laya.loader.create("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", completeHandler);
+        Laya.loader.create("../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", completeHandler);
     }
     public onComplete(): void {
        
-			Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(layaMonkey3D:Laya.Sprite3D):void {
+			Laya.Sprite3D.load("../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(layaMonkey3D:Laya.Sprite3D):void {
 				this.layaMonkey3D = layaMonkey3D;
 				this.scene.addChild(layaMonkey3D);
-				this.layaMonkey2D = Laya.stage.addChild(new Laya.Image("../../res/threeDimen/monkey.png")) as Laya.Image;
+				this.layaMonkey2D = Laya.stage.addChild(new Laya.Image("../res/threeDimen/monkey.png")) as Laya.Image;
 				Laya.timer.frameLoop(1, this, this.animate);
 			}))
     }

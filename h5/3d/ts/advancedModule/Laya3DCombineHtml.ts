@@ -3,10 +3,10 @@ class Laya3DCombineHtml {
         var div = Laya.Browser.window.document.createElement("div");
         div.innerHTML = "<h1 style='color: red;'>此内容来源于HTML网页, 可直接在html代码中书写 - h1标签</h1>";
         document.body.appendChild(div);
-        //1.开启第四个参数
+		//1.开启第四个参数
         var config3D:Laya.Config3D = new Laya.Config3D();
 		config3D.isAlpha = true;
-        Laya3D.init(0, 0,config3D);
+        Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         //2.设置舞台背景色为空
@@ -21,13 +21,10 @@ class Laya3DCombineHtml {
         camera.clearColor = null;
 
         var directionLight: Laya.DirectionLight = scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
-        directionLight.direction = new Laya.Vector3(0, -0.8, -1);
         directionLight.color = new Laya.Vector3(0.7, 0.6, 0.6);
-
-        //var layaMonkey: Laya.Sprite3D = scene.addChild(Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Laya.Sprite3D;
-        Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh",Laya.Handler.create(null,function(layaMonkey:Laya.Sprite3D):void{
+        Laya.Sprite3D.load("../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh",Laya.Handler.create(null,function(layaMonkey:Laya.Sprite3D):void{
             scene.addChild(layaMonkey);
-        }))
+        }));
     }
 }
 new Laya3DCombineHtml;

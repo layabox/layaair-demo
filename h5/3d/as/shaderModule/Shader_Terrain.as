@@ -64,9 +64,6 @@ package shaderModule {
 				customMaterial.setDiffuseScale2(new Vector2(13.96364, 13.96364));
 				customMaterial.setDiffuseScale3(new Vector2(18.61818, 18.61818));
 				customMaterial.setDiffuseScale4(new Vector2(13.96364, 13.96364));
-				customMaterial.ambientColor = new Vector3(1, 1, 1);
-				customMaterial.diffuseColor = new Vector3(1, 1, 1);
-				customMaterial.specularColor = new Vector4(1, 1, 1, 8);
 				terrain.meshRenderer.sharedMaterial = customMaterial;
 			}))
 		

@@ -25,9 +25,6 @@ class Shader_Terrain{
             this.customMaterial.setDiffuseScale2(new Laya.Vector2(13.96364, 13.96364));
             this.customMaterial.setDiffuseScale3(new Laya.Vector2(18.61818, 18.61818));
             this.customMaterial.setDiffuseScale4(new Laya.Vector2(13.96364, 13.96364));
-            this.customMaterial.ambientColor = new Laya.Vector3(1, 1, 1);
-            this.customMaterial.diffuseColor = new Laya.Vector3(1, 1, 1);
-            this.customMaterial.specularColor = new Laya.Vector4(1, 1, 1, 8);
             terrain.meshRenderer.sharedMaterial = this.customMaterial;
     }
     loadSplatAlphaTexture(tex){

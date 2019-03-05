@@ -46,7 +46,7 @@ class PhysicsWorldBaseCollider{
     }
 
     loopfun(){
-        var random = Math.floor(Math.random() * 3) % 3;
+        var random = Math.floor(Math.random() * 5) % 5;
         switch (random) {
             case 0:
                 this.addBox();
@@ -56,6 +56,13 @@ class PhysicsWorldBaseCollider{
                 break;
             case 2:
                 this.addCapsule();
+                break;
+            case 3:
+                this.addCone();
+                break;
+            case 4:
+                this.addCylinder();
+                break;  
             default:
                 break;
         }
@@ -116,6 +123,54 @@ class PhysicsWorldBaseCollider{
         var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;
+        rigidBody.mass = 10;
+    }
+    addCone() {
+        var mat4 = new Laya.BlinnPhongMaterial();
+        Laya.Texture2D.load("../../../../res/threeDimen/Physics/steel2.jpg", Laya.Handler.create(this, function(tex) {
+            mat4.albedoTexture = tex;
+        }));
+        var raidius = Math.random() * 0.2 + 0.2;
+        var height = Math.random() * 0.5 + 0.8;
+        //创建圆锥MeshSprite3D
+        var cone = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCone(raidius, height));
+        this.scene.addChild(cone);
+        //设置材质
+        cone.meshRenderer.material = mat4;
+        //设置位置
+        cone.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        //创建刚体碰撞器
+        var rigidBody = cone.addComponent(Laya.Rigidbody3D);
+        //创建球型碰撞器
+        var coneShape = new Laya.ConeColliderShape(raidius, height);
+        //设置刚体碰撞器的形状
+        rigidBody.colliderShape = coneShape;
+        //设置刚体碰撞器的质量
+        rigidBody.mass = 10;	
+    }
+    addCylinder() {
+        var mat5 = new Laya.BlinnPhongMaterial();
+        Laya.Texture2D.load("../../../../res/threeDimen/Physics/steel.jpg", Laya.Handler.create(this, function(tex) {
+            mat5.albedoTexture = tex;
+        }));
+        var raidius = Math.random() * 0.2 + 0.2;
+        var height = Math.random() * 0.5 + 0.8;
+        //创建圆锥MeshSprite3D
+        var cylinder = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCylinder(raidius, height));
+        this.scene.addChild(cylinder);
+        //设置材质
+        cylinder.meshRenderer.material = mat5;
+        //设置位置
+        cylinder.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        //设置圆柱MeshSprite3D的欧拉角
+        cylinder.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        //创建刚体碰撞器
+        var rigidBody = cylinder.addComponent(Laya.Rigidbody3D);
+        //创建球型碰撞器
+        var cylinderShape = new Laya.CylinderColliderShape(raidius, height);
+        //设置刚体碰撞器的形状
+        rigidBody.colliderShape = cylinderShape;
+        //设置刚体碰撞器的质量
         rigidBody.mass = 10;
     }
 

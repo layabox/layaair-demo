@@ -1,3 +1,4 @@
+import CameraMoveScript from "./common/CameraMoveScript"
 class Sprite3DLoad {
     constructor() {
         Laya3D.init(0, 0);
@@ -13,7 +14,7 @@ class Sprite3DLoad {
         camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
         camera.addComponent(CameraMoveScript);
         
-        Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(null, function(sprite:Laya.Sprite3D):void {
+        Laya.Sprite3D.load("../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(null, function(sprite:Laya.Sprite3D):void {
             scene.addChild(sprite);
         }));
     }

@@ -1,3 +1,5 @@
+#include "Lighting.glsl";
+
 attribute vec4 a_Position;
 attribute vec2 a_Texcoord;
 attribute vec3 a_Normal;
@@ -45,4 +47,5 @@ void main()
 			v_PositionWorld=(u_WorldMat*a_Position).xyz;
 		#endif
 	#endif
+	gl_Position=remapGLPositionZ(gl_Position);
 }

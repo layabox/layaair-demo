@@ -7,7 +7,7 @@ class ScriptSample {
       
        	//预加载所有资源
 			var resource:Array<any> = [
-                {url: "../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", type: Laya3D.HIERARCHY, priority: 1}];
+                {url: "../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", type: Laya3D.HIERARCHY, priority: 1}];
 			//加载函数
 			Laya.loader.create(resource, Laya.Handler.create(this, this.onComplete));
     }
@@ -21,8 +21,8 @@ class ScriptSample {
         var directionLight:Laya.DirectionLight = scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
         directionLight.color = new Laya.Vector3(0.6, 0.6, 0.6);
         
-        var monkey:Laya.Sprite3D = Laya.Loader.getRes("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh");
-        var scripts:MonkeyScript =monkey.addComponent(MonkeyScript) as MonkeyScript;
+        var monkey:Laya.Sprite3D = Laya.Loader.getRes("../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh");
+        var scripts:MonkeyScript =monkey.addComponent(MonkeyScript);
         scene.addChild(monkey);
     }
    

@@ -21,9 +21,9 @@ class PhysicsWorld_Character
 			directionLight.color = new Laya.Vector3(1, 1, 1);
 			directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
 			
-			var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(20, 20, 10, 10))) as Laya.MeshSprite3D;
+			var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(20, 20, 10, 10))) as Laya.MeshSprite3D;
 			var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-			Laya.Texture2D.load("../../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+			Laya.Texture2D.load("../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
 			planeMat.tilingOffset = new Laya.Vector4(2, 2, 0, 0);
@@ -42,7 +42,7 @@ class PhysicsWorld_Character
     }
     public addCharacter():void {
        
-        Laya.Sprite3D.load("../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(monkey:Laya.Sprite3D):void {
+        Laya.Sprite3D.load("../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(monkey:Laya.Sprite3D):void {
             this.scene.addChild(monkey);
             monkey.transform.localScale = new Laya.Vector3(1, 1, 1);
             var character:Laya.CharacterController = monkey.addComponent(Laya.CharacterController);
@@ -66,14 +66,14 @@ class PhysicsWorld_Character
     
     public addBox():void {
         var mat1:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("../../res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
+        Laya.Texture2D.load("../res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
             mat1.albedoTexture = tex;
         }));
         
         var sX:number = Math.random() * 0.75 + 0.25;
         var sY:number = Math.random() * 0.75 + 0.25;
         var sZ:number = Math.random() * 0.75 + 0.25;
-        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ))) as Laya.MeshSprite3D;
+        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(sX, sY, sZ))) as Laya.MeshSprite3D;
         box.meshRenderer.material = mat1;
         box.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         box.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
@@ -86,13 +86,13 @@ class PhysicsWorld_Character
     
     public addCapsule():void {
         var mat3:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("../../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
+        Laya.Texture2D.load("../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
             mat3.albedoTexture = tex;
         }));
         
         var raidius:number = Math.random() * 0.2 + 0.2;
         var height:number = Math.random() * 0.5 + 0.8;
-        var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height))) as Laya.MeshSprite3D;
+        var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCapsule(raidius, height))) as Laya.MeshSprite3D;
         capsule.meshRenderer.material = mat3;
         capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);

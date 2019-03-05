@@ -1,12 +1,13 @@
+import CameraMoveScript from "./common/CameraMoveScript"
 class BlinnPhong_SpecularMap {
     private scene:Laya.Scene3D;
     private rotation:Laya.Vector3 = new Laya.Vector3(0, 0.01, 0);
     private specularMapUrl:Array<string> = [
-        "../../res/threeDimen/skinModel/dude/Assets/dude/headS.png", 
-        "../../res/threeDimen/skinModel/dude/Assets/dude/jacketS.png", 
-        "../../res/threeDimen/skinModel/dude/Assets/dude/pantsS.png", 
-        "../../res/threeDimen/skinModel/dude/Assets/dude/upBodyS.png",
-        "../../res/threeDimen/skinModel/dude/Assets/dude/upBodyS.png"
+        "../res/threeDimen/skinModel/dude/Assets/dude/headS.png", 
+        "../res/threeDimen/skinModel/dude/Assets/dude/jacketS.png", 
+        "../res/threeDimen/skinModel/dude/Assets/dude/pantsS.png", 
+        "../res/threeDimen/skinModel/dude/Assets/dude/upBodyS.png",
+        "../res/threeDimen/skinModel/dude/Assets/dude/upBodyS.png"
     ];
     constructor() {
         Laya3D.init(0, 0);
@@ -22,16 +23,15 @@ class BlinnPhong_SpecularMap {
             camera.addComponent(CameraMoveScript);
             
             var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
-            directionLight.direction = new Laya.Vector3(0, -0.8, -1);
             directionLight.color = new Laya.Vector3(1, 1, 1);
             
            // var completeHandler:Laya.Handler = Laya.Handler.create(this, this.onComplete);
             
-            Laya.loader.create("../../res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, this.onComplete));
+            Laya.loader.create("../res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, this.onComplete));
     }
     public onComplete():void {
             
-        Laya.Sprite3D.load("../../res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, function(sprite:Laya.Sprite3D):void {
+        Laya.Sprite3D.load("../res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, function(sprite:Laya.Sprite3D):void {
             var dude1:Laya.Sprite3D = this.scene.addChild(sprite) as Laya.Sprite3D;
             dude1.transform.position = new Laya.Vector3(-1.5, 0, 0);
             

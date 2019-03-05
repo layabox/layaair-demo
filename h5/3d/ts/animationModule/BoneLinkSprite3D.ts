@@ -1,3 +1,4 @@
+import CameraMoveScript from "./common/CameraMoveScript"
 class BoneLinkSprite3D
 {
     private scene:Laya.Scene3D; 
@@ -30,9 +31,9 @@ class BoneLinkSprite3D
 			
 			//预加载所有资源
 			var resource:Array<any> = [
-				{url: "../../res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", clas: Laya3D.HIERARCHY, priority: 1}, 
-				{url: "../../res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh", clas: Laya3D.HIERARCHY, priority: 1}, 
-				{url: "../../res/threeDimen/skinModel/BoneLinkScene/PangZi.lh", clas: Laya3D.HIERARCHY, priority: 1}
+				{url: "../res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", clas: Laya3D.HIERARCHY, priority: 1}, 
+				{url: "../res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh", clas: Laya3D.HIERARCHY, priority: 1}, 
+				{url: "../res/threeDimen/skinModel/BoneLinkScene/PangZi.lh", clas: Laya3D.HIERARCHY, priority: 1}
 			];
 			
 			Laya.loader.create(resource, Laya.Handler.create(this, this.onLoadFinish));
@@ -56,7 +57,7 @@ class BoneLinkSprite3D
 			this.role = this.scene.addChild(new Laya.Sprite3D()) as Laya.Sprite3D;
 			
 			//初始化胖子
-			this.pangzi = this.role.addChild(Laya.Loader.getRes("../../res/threeDimen/skinModel/BoneLinkScene/PangZi.lh")) as Laya.Sprite3D;
+			this.pangzi = this.role.addChild(Laya.Loader.getRes("../res/threeDimen/skinModel/BoneLinkScene/PangZi.lh")) as Laya.Sprite3D;
 			//获取动画组件
 			this.animator = this.pangzi.getChildAt(0).getComponent(Laya.Animator) as Laya.Animator;
 			
@@ -77,7 +78,7 @@ class BoneLinkSprite3D
 			state2.clip.islooping = true;
 			this.animator.addState(state2);
 			
-			this.dragon1 = Laya.Loader.getRes("../../res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh");
+			this.dragon1 = Laya.Loader.getRes("../res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh");
 			this.dragon1.transform.localScale = this._dragonScale;
 			this.aniSprte3D1 = this.dragon1.getChildAt(0) as Laya.Sprite3D;
 			this.dragonAnimator1 = this.aniSprte3D1.getComponent(Laya.Animator) as Laya.Animator;
@@ -90,7 +91,7 @@ class BoneLinkSprite3D
 			state3.clip.islooping = true;
 			this.dragonAnimator1.addState(state3);
 			
-			this.dragon2 = Laya.Loader.getRes("../../res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh");
+			this.dragon2 = Laya.Loader.getRes("../res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh");
 			this.dragon2.transform.localScale = this._dragonScale;
 			this.aniSprte3D2 = this.dragon2.getChildAt(0) as Laya.Sprite3D;
 			this.dragonAnimator2 = this.aniSprte3D2.getComponent(Laya.Animator) as Laya.Animator;
@@ -108,9 +109,9 @@ class BoneLinkSprite3D
 		
 		private loadUI():void {
 			
-			Laya.loader.load(["../../res/threeDimen/ui/button.png"],Laya.Handler.create(this, function():void {
+			Laya.loader.load(["../res/threeDimen/ui/button.png"],Laya.Handler.create(this, function():void {
 				
-				this.changeActionButton = Laya.stage.addChild(new Laya.Button("../../res/threeDimen/ui/button.png", "乘骑坐骑")) as Laya.Button;
+				this.changeActionButton = Laya.stage.addChild(new Laya.Button("../res/threeDimen/ui/button.png", "乘骑坐骑")) as Laya.Button;
 				this.changeActionButton.size(160, 40);
 				this.changeActionButton.labelBold = true;
 				this.changeActionButton.labelSize = 30;

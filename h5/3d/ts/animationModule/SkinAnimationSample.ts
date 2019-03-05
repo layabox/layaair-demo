@@ -1,3 +1,4 @@
+import CameraMoveScript from "./common/CameraMoveScript"
 class SkinAnimationSample
 {
     private changeActionButton:Laya.Button;
@@ -22,11 +23,11 @@ class SkinAnimationSample
 			directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
 			directionLight.color = new Laya.Vector3(1, 1, 1);
 			
-			Laya.Sprite3D.load("../../res/threeDimen/skinModel/Zombie/Plane.lh", Laya.Handler.create(null, function(plane:Laya.Sprite3D):void {
+			Laya.Sprite3D.load("../res/threeDimen/skinModel/Zombie/Plane.lh", Laya.Handler.create(null, function(plane:Laya.Sprite3D):void {
 				scene.addChild(plane);
 			}));
 			
-			Laya.Sprite3D.load("../../res/threeDimen/skinModel/Zombie/Zombie.lh", Laya.Handler.create(this, function(zombie:Laya.Sprite3D):void {
+			Laya.Sprite3D.load("../res/threeDimen/skinModel/Zombie/Zombie.lh", Laya.Handler.create(this, function(zombie:Laya.Sprite3D):void {
 				scene.addChild(zombie);
 				this.zombieAnimator = (zombie.getChildAt(0) as Laya.Sprite3D).getComponent(Laya.Animator) as Laya.Animator;//获取Animator动画组件
 				this.loadUI();
@@ -34,9 +35,9 @@ class SkinAnimationSample
     }
     private loadUI():void {
 			
-        Laya.loader.load(["../../res/threeDimen/ui/button.png"], Laya.Handler.create(this, function():void {
+        Laya.loader.load(["../res/threeDimen/ui/button.png"], Laya.Handler.create(this, function():void {
             debugger;
-            this.changeActionButton = Laya.stage.addChild(new Laya.Button("../../res/threeDimen/ui/button.png", "切换动作")) as Laya.Button;
+            this.changeActionButton = Laya.stage.addChild(new Laya.Button("../res/threeDimen/ui/button.png", "切换动作")) as Laya.Button;
             this.changeActionButton.size(160, 40);
             this.changeActionButton.labelBold = true;
             this.changeActionButton.labelSize = 30;

@@ -1,3 +1,4 @@
+import CameraMoveScript from "./common/CameraMoveScript"
 class PhysicsWorld_CompoundCollider
 {
     private  scene:Laya.Scene3D;
@@ -21,9 +22,9 @@ class PhysicsWorld_CompoundCollider
 			directionLight.color = new Laya.Vector3(1, 1, 1);
 			directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
 			
-			var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(13, 13, 10, 10))) as Laya.MeshSprite3D;
+			var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(13, 13, 10, 10))) as Laya.MeshSprite3D;
 			var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-			Laya.Texture2D.load("../../res/threeDimen/Physics/grass.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+			Laya.Texture2D.load("../res/threeDimen/Physics/grass.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
 			planeMat.tilingOffset = new Laya.Vector4(10, 10, 0, 0);
@@ -58,12 +59,12 @@ class PhysicsWorld_CompoundCollider
     
     public addTable():void {
         var mat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("../../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+        Laya.Texture2D.load("../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
             mat.albedoTexture = tex;
         }));
         mat.shininess = 1;
         
-        Laya.Mesh.load("../../res/threeDimen/Physics/table.lm", Laya.Handler.create(this, function(mesh:Laya.Mesh):void {
+        Laya.Mesh.load("../res/threeDimen/Physics/table.lm", Laya.Handler.create(this, function(mesh:Laya.Mesh):void {
             var table:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(mesh)) as Laya.MeshSprite3D;
             table.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10,Math.random() * 4 - 2);
             table.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
@@ -102,11 +103,11 @@ class PhysicsWorld_CompoundCollider
     
     public addObject():void {
         var mat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("../../res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
+        Laya.Texture2D.load("../res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
             mat.albedoTexture = tex;
         }));
         
-        Laya.Mesh.load("../../res/threeDimen/Physics/object.lm", Laya.Handler.create(this, function(mesh:Laya.Mesh):void {
+        Laya.Mesh.load("../res/threeDimen/Physics/object.lm", Laya.Handler.create(this, function(mesh:Laya.Mesh):void {
 				
             var object:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(mesh)) as Laya.MeshSprite3D;
             object.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 5, Math.random() * 4 - 2);
@@ -129,7 +130,7 @@ class PhysicsWorld_CompoundCollider
             compoundShape.addChildShape(sphereShape);
             
             rigidBody.colliderShape = compoundShape;
-        }))
+        }));
     }
 }
 new PhysicsWorld_CompoundCollider;

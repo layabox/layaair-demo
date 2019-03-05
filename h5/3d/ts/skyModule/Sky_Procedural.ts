@@ -1,6 +1,7 @@
+import CameraMoveScript from "./common/CameraMoveScript"
 class Sky_Procedural{
-	var directionLight:Laya.DirectionLight;
-	var rotation:Laya.Vector3;
+	private directionLight:Laya.DirectionLight;
+	private rotation:Laya.Vector3;
 	constructor(){
 						//初始化3D配置
 			Laya.Shader3D.debugMode = true;
@@ -10,15 +11,15 @@ class Sky_Procedural{
 			Laya.Stat.show();
 			
 			//初始化3D场景
-			var scene:Laya.Scene3D = Laya.stage.addChild(new Laya.Scene3D());
+			var scene:Laya.Scene3D = Laya.stage.addChild(new Laya.Scene3D()) as Laya.Scene3D;
 			
 			//初始化相机并设置清除标记为天空
-			var camera = scene.addChild(new Laya.Camera(0, 0.1, 100));
+			var camera:Laya.Camera = scene.addChild(new Laya.Camera(0, 0.1, 100)) as Laya.Camera;
 			camera.addComponent(CameraMoveScript);
 			camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
 			
 			//初始化平行光
-			this.directionLight = scene.addChild(new Laya.DirectionLight()) ;
+			this.directionLight = scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
 			this.directionLight.transform.worldMatrix.setForward(new Laya.Vector3(1.0, -1.0, -1.0));
 			this.rotation = new Laya.Vector3(-0.01, 0, 0);
 

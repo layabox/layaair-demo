@@ -33,7 +33,7 @@ package shaderModule.customMaterials {
 		 * @param value 边缘光照颜色。
 		 */
 		public function set marginalColor(value:Vector3):void {
-			_shaderValues.setVector(MARGINALCOLOR, value);
+			_shaderValues.setVector3(MARGINALCOLOR, value);
 		}
 		
 		

@@ -1,3 +1,5 @@
+import CameraMoveScript from "./common/CameraMoveScript"
+import CustomMaterial from "./customMaterials/CustomMaterial"
 class Shader_GlowingEdge {
     private rotation:Laya.Vector3 = new Laya.Vector3(0, 0.01, 0);
     constructor() {
@@ -17,33 +19,32 @@ class Shader_GlowingEdge {
         
         var directionLight:Laya.DirectionLight = scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
         directionLight.color = new Laya.Vector3(1, 1, 1);
-        directionLight.direction = new Laya.Vector3(1, -1, 0);
         
-        Laya.Sprite3D.load("../../res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, function(dude:Laya.Sprite3D):void {
+        Laya.Sprite3D.load("../res/threeDimen/skinModel/dude/dude.lh", Laya.Handler.create(this, function(dude:Laya.Sprite3D):void {
             scene.addChild(dude);
             
             var customMaterial1:CustomMaterial = new CustomMaterial();
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/head.png", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
+            Laya.Texture2D.load("../res/threeDimen/skinModel/dude/Assets/dude/head.png", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
                 customMaterial1.diffuseTexture = tex;
             }));
             customMaterial1.marginalColor = new Laya.Vector3(1, 0.7, 0);
             
             var customMaterial2:CustomMaterial = new CustomMaterial();
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/jacket.png", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
+            Laya.Texture2D.load("../res/threeDimen/skinModel/dude/Assets/dude/jacket.png", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
                 customMaterial2.diffuseTexture = tex;
             }));
             customMaterial2.marginalColor = new Laya.Vector3(1, 0.7, 0);
             
             var customMaterial3:CustomMaterial = new CustomMaterial();
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/pants.png",Laya.Handler.create(this,function(tex:Laya.Texture2D):void{
+            Laya.Texture2D.load("../res/threeDimen/skinModel/dude/Assets/dude/pants.png",Laya.Handler.create(this,function(tex:Laya.Texture2D):void{
                 customMaterial3.diffuseTexture = tex;
             }));
             customMaterial3.marginalColor = new Laya.Vector3(1, 0.7, 0);
             
             var customMaterial4:CustomMaterial = new CustomMaterial();
-            Laya.Texture2D.load("../../res/threeDimen/skinModel/dude/Assets/dude/upBodyC.png",Laya.Handler.create(this,function(tex:Laya.Texture2D):void{
+            Laya.Texture2D.load("../res/threeDimen/skinModel/dude/Assets/dude/upBodyC.png",Laya.Handler.create(this,function(tex:Laya.Texture2D):void{
                 customMaterial4.diffuseTexture =tex ;
-            }))
+            }));
            
            
             customMaterial4.marginalColor = new Laya.Vector3(1, 0.7, 0);
@@ -58,12 +59,12 @@ class Shader_GlowingEdge {
             dude.transform.position = new Laya.Vector3(0, 0.5, 0);
             dude.transform.scale = new Laya.Vector3(0.2, 0.2, 0.2);
             dude.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
-        });
+        }));
         
-        var earth:Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(0.5, 128, 128))) as Laya.MeshSprite3D;
+        var earth:Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(0.5, 128, 128))) as Laya.MeshSprite3D;
         
         var customMaterial:CustomMaterial = new CustomMaterial();
-        Laya.Texture2D.load("../../res/threeDimen/texture/earth.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void{
+        Laya.Texture2D.load("../res/threeDimen/texture/earth.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void{
             customMaterial.diffuseTexture = tex;
         }));
         customMaterial.marginalColor = new Laya.Vector3(0.0, 0.3, 1.0);

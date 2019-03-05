@@ -146,23 +146,23 @@ package shaderModule.customMaterials {
 		}
 		
 		public function setDiffuseScale1(scale1:Vector2):void {
-			_shaderValues.setVector(DIFFUSESCALE1, scale1);
+			_shaderValues.setVector2(DIFFUSESCALE1, scale1);
 		}
 		
 		public function setDiffuseScale2(scale2:Vector2):void {
-			_shaderValues.setVector(DIFFUSESCALE2, scale2);
+			_shaderValues.setVector2(DIFFUSESCALE2, scale2);
 		}
 		
 		public function setDiffuseScale3(scale3:Vector2):void {
-			_shaderValues.setVector(DIFFUSESCALE3, scale3);
+			_shaderValues.setVector2(DIFFUSESCALE3, scale3);
 		}
 		
 		public function setDiffuseScale4(scale4:Vector2):void {
-			_shaderValues.setVector(DIFFUSESCALE4, scale4);
+			_shaderValues.setVector2(DIFFUSESCALE4, scale4);
 		}
 		
 		public function setDiffuseScale5(scale5:Vector2):void {
-			_shaderValues.setVector(DIFFUSESCALE5, scale5);
+			_shaderValues.setVector2(DIFFUSESCALE5, scale5);
 		}
 		
 		private function _setDetailNum(value:int):void {

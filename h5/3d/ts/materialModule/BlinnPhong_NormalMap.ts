@@ -2,9 +2,9 @@ class BlinnPhong_NormalMap {
     private scene:Laya.Scene3D;
     private rotation:Laya.Vector3 = new Laya.Vector3(0, 0.01, 0);
     private normalMapUrl:Array<string> = [
-        "../../res/threeDimen/staticModel/lizard/Assets/Lizard/lizardeye_norm.png", 
-        "../../res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_norm.png", 
-        "../../res/threeDimen/staticModel/lizard/Assets/Lizard/rock_norm.png"
+        "../res/threeDimen/staticModel/lizard/Assets/Lizard/lizardeye_norm.png", 
+        "../res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_norm.png", 
+        "../res/threeDimen/staticModel/lizard/Assets/Lizard/rock_norm.png"
     ];
     constructor() {
         Laya3D.init(0, 0);
@@ -22,10 +22,10 @@ class BlinnPhong_NormalMap {
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(0.0, -0.8, -1.0));
         directionLight.color = new Laya.Vector3(1, 1, 1);
         
-        Laya.loader.create("../../res/threeDimen/staticModel/lizard/lizard.lh", Laya.Handler.create(this, this.onComplete), this, Laya3D.HIERARCHY);
+        Laya.loader.create("../res/threeDimen/staticModel/lizard/lizard.lh", Laya.Handler.create(this, this.onComplete), null, Laya3D.HIERARCHY);
     }
-    public function onComplete(s:any):void {
-        Laya.Sprite3D.load("../../res/threeDimen/staticModel/lizard/lizard.lh", Laya.Handler.create(this, function(sprite:Laya.Sprite3D):void {
+    public onComplete(s:any):void {
+        Laya.Sprite3D.load("../res/threeDimen/staticModel/lizard/lizard.lh", Laya.Handler.create(this, function(sprite:Laya.Sprite3D):void {
             var monster1:Laya.Sprite3D = this.scene.addChild(sprite) as Laya.Sprite3D;
             monster1.transform.position = new Laya.Vector3(-0.6, 0, 0);
             monster1.transform.localScale = new Laya.Vector3(0.075, 0.075, 0.075);

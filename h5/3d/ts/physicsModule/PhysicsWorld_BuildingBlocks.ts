@@ -31,10 +31,10 @@ class PhysicsWorld_BuildingBlocks
         directionLight.color = new Laya.Vector3(1,1,1);
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1,-1,1));
 
-        var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(13,13,10,10))) as Laya.MeshSprite3D;
+        var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(13,13,10,10))) as Laya.MeshSprite3D;
        var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
 
-        Laya.Texture2D.load("../../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+        Laya.Texture2D.load("../res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
         planeMat.tilingOffset = new Laya.Vector4(2,2,0,0);
@@ -65,11 +65,11 @@ class PhysicsWorld_BuildingBlocks
     public addVerticalBox(x:number, y:number, z:number):void
     {
         var mat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("../../res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+        Laya.Texture2D.load("../res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
             mat.albedoTexture = tex;
         }));
         
-        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(0.5, 0.33, 2))) as Laya.MeshSprite3D;
+        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(0.5, 0.33, 2))) as Laya.MeshSprite3D;
         box.meshRenderer.material = mat;
         box.meshRenderer.castShadow = true;
         box.meshRenderer.receiveShadow = true;
@@ -85,11 +85,11 @@ class PhysicsWorld_BuildingBlocks
     public addHorizontalBox(x:number, y:number, z:number):void
     {
             var mat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-			Laya.Texture2D.load("../../res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+			Laya.Texture2D.load("../res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
 				mat.albedoTexture = tex;
 			}));
 			
-			var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(2, 0.33, 0.5))) as Laya.MeshSprite3D;
+			var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(2, 0.33, 0.5))) as Laya.MeshSprite3D;
 			box.meshRenderer.material = mat;
 			box.meshRenderer.castShadow = true;
 			box.meshRenderer.receiveShadow = true;
