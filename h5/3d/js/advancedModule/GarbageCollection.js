@@ -18,7 +18,8 @@ class GarbageCollection{
 					break;
 				case 1: 
 					(e.target).label = "加载场景";
-					if(this.scene)//_scene不为空表示场景已加载完成
+					debugger;
+					if(this._scene)//_scene不为空表示场景已加载完成
 						this._garbageCollection();
 					break;
 				}
@@ -46,6 +47,7 @@ class GarbageCollection{
 		}
 		_garbageCollection(){
 			this._scene.destroy();//销毁场景
+			this._scene = null;
 			Laya.Resource.destroyUnusedResources();//销毁无用资源(没有被场景树引用,并且没有加资源锁的)
 		}
 	}
