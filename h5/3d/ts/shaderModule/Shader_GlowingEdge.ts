@@ -92,7 +92,8 @@ class Shader_GlowingEdge {
             'u_DirectionLight.Direction': Laya.Shader3D.PERIOD_SCENE, 
             'u_DirectionLight.Color': Laya.Shader3D.PERIOD_SCENE
         };
-        var vs:string ="attribute vec4 a_Position;\n"+
+        var vs:string = '#include "Lighting.glsl";\n' +
+        "attribute vec4 a_Position;\n"+
         "attribute vec2 a_Texcoord;\n"+
         "attribute vec3 a_Normal;\n"+
         "uniform mat4 u_MvpMatrix;\n"+
@@ -132,6 +133,7 @@ class Shader_GlowingEdge {
         "v_PositionWorld=(u_WorldMat*a_Position).xyz;\n"+
         "#endif\n"+
         "#endif\n"+
+        "gl_Position=remapGLPositionZ(gl_Position);\n" + 
         "}";
         var ps:string = "#ifdef FSHIGHPRECISION\n"+
         "precision highp float;\n"+
