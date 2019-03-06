@@ -65,7 +65,8 @@ class Shader_Terrain{
             'u_DiffuseScale4': Laya.Shader3D.PERIOD_MATERIAL,
             'u_DiffuseScale5': Laya.Shader3D.PERIOD_MATERIAL
         };
-        var vs = "attribute vec4 a_Position;\n" +
+        var vs = '#include "Lighting.glsl";\n' +
+            "attribute vec4 a_Position;\n" +
             "attribute vec2 a_Texcoord0;\n" +
             "attribute vec3 a_Normal;\n" +
             "uniform mat4 u_MvpMatrix;\n" +
@@ -74,6 +75,7 @@ class Shader_Terrain{
             "{\n" +
             "gl_Position = u_MvpMatrix * a_Position;\n" +
             "v_Texcoord0 = a_Texcoord0;\n" +
+            "gl_Position=remapGLPositionZ(gl_Position);\n" + 
             "}";
         var ps = "#ifdef FSHIGHPRECISION\n" +
             "precision highp float;\n" +
@@ -95,7 +97,7 @@ class Shader_Terrain{
             "void main()\n" +
             "{\n" +
             "#ifdef CUSTOM_DETAIL_NUM1\n" +
-            "vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord);\n" +
+            "vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\n" +
             "vec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScale1);\n" +
             "gl_FragColor.xyz = color1.xyz * splatAlpha.r;\n" +
             "#endif\n" +

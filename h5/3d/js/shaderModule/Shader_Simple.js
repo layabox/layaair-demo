@@ -33,7 +33,8 @@ class ShaderSimple{
             'u_MvpMatrix': Laya.Shader3D.PERIOD_SPRITE,
             'u_WorldMat': Laya.Shader3D.PERIOD_SPRITE
         };
-        var vs = "attribute vec4 a_Position;\n" +
+        var vs = '#include "Lighting.glsl";\n' +
+            "attribute vec4 a_Position;\n" +
             "uniform mat4 u_MvpMatrix;\n" +
             "uniform mat4 u_WorldMat;\n" +
             "attribute vec3 a_Normal;\n" +
@@ -43,6 +44,7 @@ class ShaderSimple{
             "gl_Position = u_MvpMatrix * a_Position;\n" +
             "mat3 worldMat=mat3(u_WorldMat);\n" +
             "v_Normal=worldMat*a_Normal;\n" +
+            "gl_Position=remapGLPositionZ(gl_Position);\n" +
             "}";
         var ps = "#ifdef FSHIGHPRECISION\n" +
             "precision highp float;\n" +
