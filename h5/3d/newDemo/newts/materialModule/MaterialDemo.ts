@@ -1,5 +1,5 @@
 import CameraMoveScript from "./common/CameraMoveScript"
-class ChangeMaterial{
+class MaterialDemo{
 	private sphere:Laya.MeshSprite3D;
 	private pbrStandardMaterial:Laya.PBRStandardMaterial;
 	private pbrTexture:Laya.Texture2D;

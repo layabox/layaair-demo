@@ -1,4 +1,4 @@
-class ChangeMaterial{
+class MaterialDemo{
     constructor(){
         //初始化引擎
 		Laya3D.init(0, 0);
