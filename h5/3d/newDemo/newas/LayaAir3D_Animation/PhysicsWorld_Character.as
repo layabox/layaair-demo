@@ -53,7 +53,7 @@ package OfficialExample.LayaAir3D_Physics {
 			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(20, 20, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
 			//加载纹理
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("../../../../res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
 			//设置材质
@@ -79,7 +79,7 @@ package OfficialExample.LayaAir3D_Physics {
 		public function addCharacter():void {
 			var _this:PhysicsWorld_Character = this;
 			//加载精灵
-			Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(null, function(monkey:Sprite3D):void {
+			Sprite3D.load("../../../../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(null, function(monkey:Sprite3D):void {
 				scene.addChild(monkey);
 				//设置精灵的缩放
 				monkey.transform.localScale = new Vector3(1, 1, 1);
@@ -108,7 +108,7 @@ package OfficialExample.LayaAir3D_Physics {
 		
 		public function addBox():void {
 			var mat1:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("../../../../res/threeDimen/Physics/rocks.jpg", Handler.create(null, function(tex:Texture2D):void {
 				mat1.albedoTexture = tex;
 			}));
 			
@@ -128,7 +128,7 @@ package OfficialExample.LayaAir3D_Physics {
 		
 		public function addCapsule():void {
 			var mat3:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("../../../../res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
 				mat3.albedoTexture = tex;
 			}));
 			
