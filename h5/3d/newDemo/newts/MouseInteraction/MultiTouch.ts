@@ -69,6 +69,7 @@ class MonkeyScript extends Laya.Script3D{
 	private disVector2:Laya.Vector2;
 	private isTwoTouch:boolean;
 	private first:boolean;
+	private twoFirst:boolean;
     constructor(){
 		super();
         this._scene = null;
@@ -80,7 +81,8 @@ class MonkeyScript extends Laya.Script3D{
 	    this.disVector1 = new Laya.Vector2(0, 0);
 	    this.disVector2 = new Laya.Vector2(0, 0);
 	    this.isTwoTouch = false;
-	    this.first = true;
+		this.first = true;
+		this.twoFirst = true;
     }
     onStart(){
         this._scene =  this.owner.parent as Laya.Scene3D;
@@ -121,12 +123,12 @@ class MonkeyScript extends Laya.Script3D{
 			var touch = this._scene.input.getTouch(0);
 			var touch2 = this._scene.input.getTouch(1);
 			//是否为新一次触碰，并未发生移动
-			if (this.first){
+			if (this.twoFirst){
 				//获取触碰点的位置
 				this.disVector1.x = touch.position.x - touch2.position.x;
 				this.disVector1.y = touch.position.y - touch2.position.y;
 				this.distance = Laya.Vector2.scalarLength(this.disVector1);
-				this.first = false;
+				this.twoFirst = false;
 			}
 			else{
 				this.disVector2.x = touch.position.x - touch2.position.x;
@@ -140,6 +142,7 @@ class MonkeyScript extends Laya.Script3D{
 		else if (0 === touchCount){
 			this._text.text = "触控点归零";
 			this.first = true;
+			this.twoFirst = true;
 			this.lastPosition.x = 0;
 			this.lastPosition.y = 0;
 			this.isTwoTouch = false;

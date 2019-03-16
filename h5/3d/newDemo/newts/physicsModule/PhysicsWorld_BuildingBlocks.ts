@@ -12,6 +12,8 @@ class PhysicsWorld_BuildingBlocks
         private posY:number;
         private delX:number;
         private delY:number;
+        private ZERO:Laya.Vector3 = new Laya.Vector3(0,0,0);
+        private ONE:Laya.Vector3 = new Laya.Vector3(0,0,0);
     constructor()
     {
 
@@ -118,10 +120,10 @@ class PhysicsWorld_BuildingBlocks
             var collider:Laya.Rigidbody3D = this._outHitResult.collider as Laya.Rigidbody3D;
             this.hasSelectedSprite = collider.owner as Laya.Sprite3D;
             this.hasSelectedRigidBody = collider;
-            collider.angularFactor = Laya.Vector3.ZERO;
-            collider.angularVelocity = Laya.Vector3.ZERO;
-            collider.linearFactor = Laya.Vector3.ZERO;
-            collider.linearVelocity = Laya.Vector3.ZERO;
+            collider.angularFactor = this.ZERO;
+            collider.angularVelocity = this.ZERO;
+            collider.linearFactor = this.ZERO;
+            collider.linearVelocity = this.ZERO;
         }
         Laya.stage.on(Laya.Event.MOUSE_MOVE, this, this.onMouseMove);
     }
@@ -139,8 +141,8 @@ class PhysicsWorld_BuildingBlocks
     {
         Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onMouseMove);
         if (this.hasSelectedSprite) {
-            this.hasSelectedRigidBody.angularFactor = Laya.Vector3.ONE;
-            this.hasSelectedRigidBody.linearFactor = Laya.Vector3.ONE;
+            this.hasSelectedRigidBody.angularFactor = this.ONE;
+            this.hasSelectedRigidBody.linearFactor = this.ONE;
             this.hasSelectedSprite = null;
         }
     }
@@ -148,8 +150,8 @@ class PhysicsWorld_BuildingBlocks
     {
         Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onMouseMove);
 			if (this.hasSelectedSprite) {
-				this.hasSelectedRigidBody.angularFactor = Laya.Vector3.ONE;
-				this.hasSelectedRigidBody.linearFactor = Laya.Vector3.ONE;
+				this.hasSelectedRigidBody.angularFactor = this.ONE;
+				this.hasSelectedRigidBody.linearFactor = this.ONE;
 				this.hasSelectedSprite = null;
 			}
     }

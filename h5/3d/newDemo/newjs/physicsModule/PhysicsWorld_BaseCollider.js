@@ -127,7 +127,7 @@ class PhysicsWorldBaseCollider{
     }
     addCone() {
         var mat4 = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("../../../../res/threeDimen/Physics/steel2.jpg", Laya.Handler.create(this, function(tex) {
+        Laya.Texture2D.load("../res/threeDimen/Physics/steel2.jpg", Laya.Handler.create(this, function(tex) {
             mat4.albedoTexture = tex;
         }));
         var raidius = Math.random() * 0.2 + 0.2;
@@ -150,7 +150,7 @@ class PhysicsWorldBaseCollider{
     }
     addCylinder() {
         var mat5 = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("../../../../res/threeDimen/Physics/steel.jpg", Laya.Handler.create(this, function(tex) {
+        Laya.Texture2D.load("../res/threeDimen/Physics/steel.jpg", Laya.Handler.create(this, function(tex) {
             mat5.albedoTexture = tex;
         }));
         var raidius = Math.random() * 0.2 + 0.2;

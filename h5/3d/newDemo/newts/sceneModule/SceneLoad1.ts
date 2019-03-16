@@ -10,7 +10,7 @@ class SceneLoad {
             Laya.stage.addChild(scene) as Laya.Scene3D;
             var camera:Laya.Camera = scene.getChildByName("Camera") as Laya.Camera;
             camera.addComponent(CameraMoveScript);
-        }))
+        }));
     }
 }
 new SceneLoad;

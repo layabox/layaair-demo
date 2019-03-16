@@ -7,6 +7,9 @@ class PhysicsWorldBuildingBlocks{
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
+
+        this.ZERO = Laya.Vector3(0.0,0.0,0.0);
+        this.ONE = Laya.Vector3(1.0,1.0,1.0);
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.translate(new Laya.Vector3(4.5, 6, 4.5));
@@ -92,10 +95,10 @@ class PhysicsWorldBuildingBlocks{
             var collider = this._outHitResult.collider;
             this.hasSelectedSprite = collider.owner;
             this.hasSelectedRigidBody = collider;
-            collider.angularFactor = Laya.Vector3.ZERO;
-            collider.angularVelocity = Laya.Vector3.ZERO;
-            collider.linearFactor = Laya.Vector3.ZERO;
-            collider.linearVelocity = Laya.Vector3.ZERO;
+            collider.angularFactor = this.ZERO;
+            collider.angularVelocity = this.ZERO;
+            collider.linearFactor = this.ZERO;
+            collider.linearVelocity = this.ZERO;
         }
         Laya.stage.on(Laya.Event.MOUSE_MOVE, this, this.onMouseMove);
     }
@@ -112,8 +115,8 @@ class PhysicsWorldBuildingBlocks{
     onMouseUp() {
         Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onMouseMove);
         if (this.hasSelectedSprite) {
-            this.hasSelectedRigidBody.angularFactor = Laya.Vector3.ONE;
-            this.hasSelectedRigidBody.linearFactor = Laya.Vector3.ONE;
+            this.hasSelectedRigidBody.angularFactor = this.ONE;
+            this.hasSelectedRigidBody.linearFactor = this.ONE;
             this.hasSelectedSprite = null;
         }
     }
@@ -121,8 +124,8 @@ class PhysicsWorldBuildingBlocks{
     onMouseOut() {
         Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onMouseMove);
         if (this.hasSelectedSprite) {
-            this.hasSelectedRigidBody.angularFactor = Laya.Vector3.ONE;
-            this.hasSelectedRigidBody.linearFactor = Laya.Vector3.ONE;
+            this.hasSelectedRigidBody.angularFactor = this.ONE;
+            this.hasSelectedRigidBody.linearFactor = this.ONE;
             this.hasSelectedSprite = null;
         }
     }
