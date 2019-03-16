@@ -8,6 +8,12 @@ class Scene2DPlayer3D {
 		private pos = new Laya.Vector3(310, 500, 0);
 		private _translate = new Laya.Vector3(0, 0, 0);
 		private _layaMonkey:Laya.Sprite3D;
+		private _translate:Laya.Vector3 = new Laya.Vector3(0, 0, 0);
+		private _translate2:Laya.Vector3 = new Laya.Vector3(5, -10, 1);
+		private _translateW:Laya.Vector3 = new Laya.Vector3(0, 0, -0.2);
+		private _translateS:Laya.Vector3 = new Laya.Vector3(0, 0, 0.2);
+		private _translateA:Laya.Vector3 = new Laya.Vector3(-0.2, 0, 0);
+		private _translateD:Laya.Vector3 = new Laya.Vector3(0.2, 0, 0);
 		
 		constructor() {
 			
@@ -47,10 +53,10 @@ class Scene2DPlayer3D {
 		
 		}
 		private onKeyDown():void {
-			Laya.KeyBoardManager.hasKeyDown(87) && this._layaMonkey.transform.translate(new Laya.Vector3(0, 0, -0.2));//W
-			Laya.KeyBoardManager.hasKeyDown(83) && this._layaMonkey.transform.translate(new Laya.Vector3(0, 0, 0.2));//S
-			Laya.KeyBoardManager.hasKeyDown(65) && this._layaMonkey.transform.translate(new Laya.Vector3(-0.2, 0, 0));//A
-			Laya.KeyBoardManager.hasKeyDown(68) && this._layaMonkey.transform.translate(new Laya.Vector3(0.2, 0, 0));//D
+			Laya.KeyBoardManager.hasKeyDown(87) && this._layaMonkey.transform.translate(this._translateW);//W
+			Laya.KeyBoardManager.hasKeyDown(83) && this._layaMonkey.transform.translate(this._translateS);//S
+			Laya.KeyBoardManager.hasKeyDown(65) && this._layaMonkey.transform.translate(this._translateA);//A
+			Laya.KeyBoardManager.hasKeyDown(68) && this._layaMonkey.transform.translate(this._translateD);//D
 		}
 	}
 new Scene2DPlayer3D;

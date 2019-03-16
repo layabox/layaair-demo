@@ -71,10 +71,6 @@ class TransformDemo{
         var scale = new Laya.Vector3(0.1, 0.1, 0.1);
         layaMonkey_clone3.transform.localScale = scale;
          
-         //!!!!!!
-         //Quaternion.createFromYawPitchRoll(0.025, 0, 0, _temp_quaternion);
-         //Vector3.transformQuat(pointLight.transform.position, _temp_quaternion, _temp_position);
-         //pointLight.transform.position = _temp_position;
     }
 }
 //激活启动类

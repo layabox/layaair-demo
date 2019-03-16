@@ -39,7 +39,7 @@ class SkinAnimationSample{
         this.changeActionButton.on(Laya.Event.CLICK, this, function () {
                 //根据名称播放动画
                 this.zombieAnimator.play(this.clipName[++this.curStateIndex % this.clipName.length]);
-                });
+            });
 
      }
 }

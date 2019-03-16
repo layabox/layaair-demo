@@ -1,7 +1,8 @@
 import CameraMoveScript from "./common/CameraMoveScript"
 class PhysicsWorld_ContinueCollisionDetection
 {
-    private scene:Laya.Scene3D;
+	private scene:Laya.Scene3D;
+	private tmpVector:Laya.Vector3;
     constructor()
     {
             Laya3D.init(0, 0);
@@ -18,6 +19,8 @@ class PhysicsWorld_ContinueCollisionDetection
 			camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
 			camera.addComponent(CameraMoveScript);
 			camera.clearColor = null;
+
+			this.tmpVector = new Laya.Vector3(0,0,0);
 			
 			//方向光
 			var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
@@ -51,8 +54,9 @@ class PhysicsWorld_ContinueCollisionDetection
         
         var radius:number = Math.random() * 0.2 + 0.2;
         var sphere:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(radius))) as Laya.MeshSprite3D;
-        sphere.meshRenderer.material = mat2;
-        sphere.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+		sphere.meshRenderer.material = mat2;
+		this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        sphere.transform.position = this.tmpVector;
         
         var rigidBody:Laya.Rigidbody3D = sphere.addComponent(Laya.Rigidbody3D);
         var sphereShape:Laya.SphereColliderShape = new Laya.SphereColliderShape(radius);

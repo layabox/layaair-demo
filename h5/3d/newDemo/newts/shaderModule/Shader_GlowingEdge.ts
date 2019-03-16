@@ -248,8 +248,6 @@ class Shader_GlowingEdge {
         customShader.addSubShader(subShader);
         //为SubShader添加ShaderPass
         subShader.addShaderPass(vs,ps);
-        //SubShader添加第二个ShaderPass
-	    subShader.addShaderPass(vsOutline,psOutline);
     }
 }
 new Shader_GlowingEdge;

@@ -2,7 +2,11 @@ class PhysicsWorld_Character
 {
     private scene:Laya.Scene3D;
 	private camera:Laya.Camera;
-	private kinematicSphere:Laya.Sprite3D;
+    private kinematicSphere:Laya.Sprite3D;
+    private translateW:Laya.Vector3 = new Laya.Vector3(0, 0, -0.2);
+	private translateS:Laya.Vector3 = new Laya.Vector3(0, 0, 0.2);
+	private translateA:Laya.Vector3 = new Laya.Vector3(-0.2, 0, 0);
+	private translateD:Laya.Vector3 = new Laya.Vector3(0.2, 0, 0);
     constructor()
     {
             Laya3D.init(0, 0);
@@ -57,10 +61,10 @@ class PhysicsWorld_Character
     
     private onKeyDown():void {
         var character:Laya.CharacterController = this.kinematicSphere.getComponent(Laya.CharacterController) as Laya.CharacterController;
-        Laya.KeyBoardManager.hasKeyDown(87) && character.move(new Laya.Vector3(0, 0, -0.2));//W
-        Laya.KeyBoardManager.hasKeyDown(83) && character.move(new Laya.Vector3(0, 0, 0.2));//S
-        Laya.KeyBoardManager.hasKeyDown(65) && character.move(new Laya.Vector3(-0.2, 0, 0));//A
-        Laya.KeyBoardManager.hasKeyDown(68) && character.move(new Laya.Vector3(0.2, 0, 0));//D
+        Laya.KeyBoardManager.hasKeyDown(87) && character.move(this.translateW);//W
+        Laya.KeyBoardManager.hasKeyDown(83) && character.move(this.translateS);//S
+        Laya.KeyBoardManager.hasKeyDown(65) && character.move(this.translateA);//A
+        Laya.KeyBoardManager.hasKeyDown(68) && character.move(this.translateD);//D
         Laya.KeyBoardManager.hasKeyDown(69) && character.jump();//E
     }
     

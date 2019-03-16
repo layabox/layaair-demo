@@ -164,7 +164,8 @@ class MouseInteraction{
 new MouseInteraction();
 
 class SceneScript extends Laya.Script3D{
-	private box :Laya.MeshSprite3D;
+    private box :Laya.MeshSprite3D;
+    private _albedoColor:Laya.Vector4 = new Laya.Vector4(0.0,0.0,0.0,1.0)
     constructor(){
         super();
         this.box  = null;
@@ -180,6 +181,6 @@ class SceneScript extends Laya.Script3D{
     }
     //当产生碰撞
     onCollisionEnter(collision) {
-        (this.box.meshRenderer.sharedMaterial as Laya.BlinnPhongMaterial).albedoColor = new Laya.Vector4(0.0,0.0,0.0,1.0);
+        (this.box.meshRenderer.sharedMaterial as Laya.BlinnPhongMaterial).albedoColor = _albedoColor;
     }
 }

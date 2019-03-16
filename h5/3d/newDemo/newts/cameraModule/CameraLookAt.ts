@@ -12,7 +12,10 @@ class CameraLookAt
         Laya3D.init(1000, 500);            
         //适配模式
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
-        Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+		Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+		
+		//初始化变量
+		this.upVector = new Laya.Vector3(0, 1, 0);
         //开启统计信息
         Laya.Stat.show();            
 		//预加载所有资源
@@ -96,15 +99,15 @@ class CameraLookAt
 				this.index++;
 				if (this.index % 3 === 1 ){
 					//摄像机捕捉模型目标
-					this.camera.transform.lookAt(this.box.transform.position, new Laya.Vector3(0, 1, 0));
+					this.camera.transform.lookAt(this.box.transform.position, this.upVector);
 				}
 				else if (this.index % 3 === 2){
 					//摄像机捕捉模型目标
-					this.camera.transform.lookAt(this.cylinder.transform.position, new Laya.Vector3(0, 1, 0));
+					this.camera.transform.lookAt(this.cylinder.transform.position, this.upVector);
 				}
 				else{
 					//摄像机捕捉模型目标
-					this.camera.transform.lookAt(this.capsule.transform.position, new Laya.Vector3(0, 1, 0));
+					this.camera.transform.lookAt(this.capsule.transform.position, this.upVector);
 				}
 			});
 					

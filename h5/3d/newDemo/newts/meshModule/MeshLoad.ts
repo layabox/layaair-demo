@@ -2,6 +2,7 @@ class MeshLoad {
     private sprite3D:Laya.Sprite3D;
     private lineSprite3D:Laya.Sprite3D;
     private rotation:Laya.Vector3 = new Laya.Vector3(0, 0.01, 0);
+    private var curStateIndex:number = 0;
     
      constructor() {
         
@@ -45,8 +46,7 @@ class MeshLoad {
         }));
     
     }
-    
-    private var curStateIndex:number = 0;
+
     
     private loadUI():void {
         Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, function():void {

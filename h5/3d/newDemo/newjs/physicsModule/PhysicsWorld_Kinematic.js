@@ -9,6 +9,15 @@ class PhysicsWorldKinematic{
         this.camera.transform.translate(new Laya.Vector3(0, 8, 20));
         this.camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
         this.camera.clearColor = null;
+
+        this.translateW = new Laya.Vector3(0, 0, -0.2);
+		this.translateS = new Laya.Vector3(0, 0, 0.2);
+		this.translateA = new Laya.Vector3(-0.2, 0, 0);
+		this.translateD = new Laya.Vector3(0.2, 0, 0);
+		this.translateQ = new Laya.Vector3(-0.01, 0, 0);
+        this.translateE = new Laya.Vector3(0.01, 0, 0);
+        this.tmpVector = new Laya.Vector3(0, 0, 0);
+
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
@@ -49,12 +58,12 @@ class PhysicsWorldKinematic{
         Laya.timer.frameLoop(1, this, this.onKeyDown);
     }
     onKeyDown() {
-        Laya.KeyBoardManager.hasKeyDown(87) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0, -0.2)); //W
-        Laya.KeyBoardManager.hasKeyDown(83) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0, 0.2)); //S
-        Laya.KeyBoardManager.hasKeyDown(65) && this.kinematicSphere.transform.translate(new Laya.Vector3(-0.2, 0, 0)); //A
-        Laya.KeyBoardManager.hasKeyDown(68) && this.kinematicSphere.transform.translate(new Laya.Vector3(0.2, 0, 0)); //D
-        Laya.KeyBoardManager.hasKeyDown(81) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0.2, 0)); //Q
-        Laya.KeyBoardManager.hasKeyDown(69) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, -0.2, 0)); //E
+        Laya.KeyBoardManager.hasKeyDown(87) && kinematicSphere.transform.translate(this.translateW);//W
+		Laya.KeyBoardManager.hasKeyDown(83) && kinematicSphere.transform.translate(this.translateS);//S
+		Laya.KeyBoardManager.hasKeyDown(65) && kinematicSphere.transform.translate(this.translateA);//A
+		Laya.KeyBoardManager.hasKeyDown(68) && kinematicSphere.transform.translate(this.translateD);//D
+		Laya.KeyBoardManager.hasKeyDown(81) && plane.transform.translate(this.translateQ);//Q
+		Laya.KeyBoardManager.hasKeyDown(69) && plane.transform.translate(this.translateE);//E
     }
     addBox() {
         var mat1 = new Laya.BlinnPhongMaterial();
@@ -66,8 +75,10 @@ class PhysicsWorldKinematic{
         var sZ = Math.random() * 0.75 + 0.25;
         var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         box.meshRenderer.material = mat1;
-        box.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-        box.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+        box.transform.position = this.tmpVector;
+        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        box.transform.rotationEuler = this.tmpVector;
         var rigidBody = box.addComponent(Laya.Rigidbody3D);
         var boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
         rigidBody.colliderShape = boxShape;
@@ -82,8 +93,10 @@ class PhysicsWorldKinematic{
         var height = Math.random() * 0.5 + 0.8;
         var capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = mat3;
-        capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-        capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+        capsule.transform.position = this.tmpVector;
+        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        capsule.transform.rotationEuler = this.tmpVector;
         var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;

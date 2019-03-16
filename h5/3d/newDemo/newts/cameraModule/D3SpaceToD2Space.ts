@@ -16,7 +16,7 @@ class D3SpaceToD2Space {
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100)) as Laya.Camera;
         this.camera.transform.translate(new Laya.Vector3(0, 0.35, 1));
         this.camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
-        
+        this.scale = new Laya.Vector3(0.1,0.1,0.1);
         var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
         
         var completeHandler:Laya.Handler = Laya.Handler.create(this, this.onComplete);
@@ -37,7 +37,7 @@ class D3SpaceToD2Space {
 
             this._position.x = Math.sin(this.scaleDelta += 0.01);
             this.layaMonkey3D.transform.position = this._position;
-            this.layaMonkey3D.transform.scale = new Laya.Vector3(0.1,0.1,0.1);
+            this.layaMonkey3D.transform.scale = this.scale;
             //转换坐标
             this.camera.viewport.project(this.layaMonkey3D.transform.position, this.camera.projectionViewMatrix, this._outPos);
             //赋值给2D

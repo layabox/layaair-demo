@@ -20,7 +20,11 @@ class Scene2DPlayer3D {
             Laya.stage.addChild(scene);
             //初始化变量
             this.pos = new Laya.Vector3(310, 500, 0);
-		    this._translate = new Laya.Vector3(0, 0, 0);
+			this._translate = new Laya.Vector3(0, 0, 0);
+			this._translateW = new Laya.Vector3(0, 0, -0.2);
+			this._translateS = new Laya.Vector3(0, 0, 0.2);
+			this._translateA = new Laya.Vector3(-0.2, 0, 0);
+			this._translateD = new Laya.Vector3(0.2, 0, 0);
 		    this._layaMonkey = null;
 			
             var camera = new Laya.Camera(0, 0.1, 1000);
@@ -48,10 +52,10 @@ class Scene2DPlayer3D {
 		
 		}
 		onKeyDown() {
-			Laya.KeyBoardManager.hasKeyDown(87) && this._layaMonkey.transform.translate(new Laya.Vector3(0, 0, -0.2));//W
-			Laya.KeyBoardManager.hasKeyDown(83) && this._layaMonkey.transform.translate(new Laya.Vector3(0, 0, 0.2));//S
-			Laya.KeyBoardManager.hasKeyDown(65) && this._layaMonkey.transform.translate(new Laya.Vector3(-0.2, 0, 0));//A
-			Laya.KeyBoardManager.hasKeyDown(68) && this._layaMonkey.transform.translate(new Laya.Vector3(0.2, 0, 0));//D
+			Laya.KeyBoardManager.hasKeyDown(87) && this._layaMonkey.transform.translate(this._translateW);//W
+			Laya.KeyBoardManager.hasKeyDown(83) && this._layaMonkey.transform.translate(this._translateS);//S
+			Laya.KeyBoardManager.hasKeyDown(65) && this._layaMonkey.transform.translate(this._translateA);//A
+			Laya.KeyBoardManager.hasKeyDown(68) && this._layaMonkey.transform.translate(this._translateD);//D
 		}
 	}
 new Scene2DPlayer3D;

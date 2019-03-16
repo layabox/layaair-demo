@@ -4,6 +4,13 @@ class PhysicsWorldCharacter{
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
+        //初始化变量
+        this.translateW = new Laya.Vector3(0, 0, -0.2);
+		this.translateS = new Laya.Vector3(0, 0, 0.2);
+		this.translateA = new Laya.Vector3(-0.2, 0, 0);
+        this.translateD = new Laya.Vector3(0.2, 0, 0);
+        this.tmpVector = new Laya.Vector3(0, 0, 0);
+
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.translate(new Laya.Vector3(0, 8, 20));
@@ -43,10 +50,10 @@ class PhysicsWorldCharacter{
     }
     onKeyDown() {
         var character = this.kinematicSphere.getComponent(Laya.CharacterController);
-        Laya.KeyBoardManager.hasKeyDown(87) && character.move(new Laya.Vector3(0, 0, -0.2)); //W
-        Laya.KeyBoardManager.hasKeyDown(83) && character.move(new Laya.Vector3(0, 0, 0.2)); //S
-        Laya.KeyBoardManager.hasKeyDown(65) && character.move(new Laya.Vector3(-0.2, 0, 0)); //A
-        Laya.KeyBoardManager.hasKeyDown(68) && character.move(new Laya.Vector3(0.2, 0, 0)); //D
+        Laya.KeyBoardManager.hasKeyDown(87) && character.move(this.translateW);//W
+        Laya.KeyBoardManager.hasKeyDown(83) && character.move(this.translateS);//S
+        Laya.KeyBoardManager.hasKeyDown(65) && character.move(this.translateA);//A
+        Laya.KeyBoardManager.hasKeyDown(68) && character.move(this.translateD);//D
         Laya.KeyBoardManager.hasKeyDown(69) && character.jump(); //E
     }
     addBox() {
@@ -59,8 +66,10 @@ class PhysicsWorldCharacter{
         var sZ = Math.random() * 0.75 + 0.25;
         var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         box.meshRenderer.material = mat1;
-        box.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-        box.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+        box.transform.position = this.tmpVector;
+        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        box.transform.rotationEuler = this.tmpVector;
         var rigidBody = box.addComponent(Laya.Rigidbody3D);
         var boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
         rigidBody.colliderShape = boxShape;
@@ -75,8 +84,10 @@ class PhysicsWorldCharacter{
         var height = Math.random() * 0.5 + 0.8;
         var capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = mat3;
-        capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-        capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+        capsule.transform.position = this.tmpVector;
+        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        capsule.transform.rotationEuler = this.tmpVector;
         var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;

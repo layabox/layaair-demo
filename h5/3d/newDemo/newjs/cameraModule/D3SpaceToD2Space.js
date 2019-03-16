@@ -3,6 +3,7 @@ class D3SpaceToD2Space{
         this._position = new Laya.Vector3();
         this._outPos = new Laya.Vector3();
         this.scaleDelta = 0;
+        this.scale = new Laya.Vector3(0.1, 0.1, 0.1);
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -28,7 +29,7 @@ class D3SpaceToD2Space{
     animate(){
         this._position.x = Math.sin(this.scaleDelta += 0.01);
         this.layaMonkey3D.transform.position = this._position;
-        this.layaMonkey3D.transform.scale = new Laya.Vector3(0.1, 0.1, 0.1);
+        this.layaMonkey3D.transform.scale = this.scale;
         //转换坐标
         this.camera.viewport.project(this.layaMonkey3D.transform.position, this.camera.projectionViewMatrix, this._outPos);
         //赋值给2D

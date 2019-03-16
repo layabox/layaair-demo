@@ -8,7 +8,9 @@ class CameraLookAt
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         //开启统计信息
-        Laya.Stat.show();            
+		Laya.Stat.show(); 
+		//初始化变量
+		this.upVector = new Laya.Vector3(0, 1, 0);        
 		//预加载所有资源
 		var resource = [  
 			{url: "res/threeDimen/texture/layabox.png", clas: Laya.Texture2D, priority: 1, constructParams: [64, 64, 1, true, true]},
@@ -90,15 +92,15 @@ class CameraLookAt
 				this.index++;
 				if (this.index % 3 === 1 ){
 					//摄像机捕捉模型目标
-					this.camera.transform.lookAt(this.box.transform.position, new Laya.Vector3(0, 1, 0));
+					this.camera.transform.lookAt(this.box.transform.position, this.upVector);
 				}
 				else if (this.index % 3 === 2){
 					//摄像机捕捉模型目标
-					this.camera.transform.lookAt(this.cylinder.transform.position, new Laya.Vector3(0, 1, 0));
+					this.camera.transform.lookAt(this.cylinder.transform.position, this.upVector);
 				}
 				else{
 					//摄像机捕捉模型目标
-					this.camera.transform.lookAt(this.capsule.transform.position, new Laya.Vector3(0, 1, 0));
+					this.camera.transform.lookAt(this.capsule.transform.position, this.upVector);
 				}
 			});
 					

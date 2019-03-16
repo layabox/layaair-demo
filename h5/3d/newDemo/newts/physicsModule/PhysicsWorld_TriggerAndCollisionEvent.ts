@@ -33,7 +33,14 @@ class PhysicsWorld_TriggerAndCollisionEvent
 {
     private scene:Laya.Scene3D;
 	private camera:Laya.Camera;
-	private kinematicSphere:Laya.Sprite3D;
+    private kinematicSphere:Laya.Sprite3D;
+    private translateW:Laya.Vector3 = new Laya.Vector3(0, 0, -0.2);
+	private translateS:Laya.Vector3 = new Laya.Vector3(0, 0, 0.2);
+	private translateA:Laya.Vector3 = new Laya.Vector3(-0.2, 0, 0);
+    private translateD:Laya.Vector3 = new Laya.Vector3(0.2, 0, 0);
+    private translateQ:Laya.Vector3 = new Laya.Vector3(-0.01, 0, 0);
+    private translateE:Laya.Vector3 = new Laya.Vector3(0.01, 0, 0);
+    private tmpVector:Laya.Vector3 = new Laya.Vector3(0, 0, 0);
     constructor()
     {
         Laya3D.init(0, 0);
@@ -93,12 +100,13 @@ class PhysicsWorld_TriggerAndCollisionEvent
     }
     
     private onKeyDown():void {
-        Laya.KeyBoardManager.hasKeyDown(87) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0, -0.2));//W
-        Laya.KeyBoardManager.hasKeyDown(83) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0, 0.2));//S
-        Laya.KeyBoardManager.hasKeyDown(65) && this.kinematicSphere.transform.translate(new Laya.Vector3(-0.2, 0, 0));//A
-        Laya.KeyBoardManager.hasKeyDown(68) && this.kinematicSphere.transform.translate(new Laya.Vector3(0.2, 0, 0));//D
-        Laya.KeyBoardManager.hasKeyDown(81) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0.2, 0));//Q
-        Laya.KeyBoardManager.hasKeyDown(69) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, -0.2, 0));//E
+
+        Laya.KeyBoardManager.hasKeyDown(87) && this.kinematicSphere.transform.translate(this.translateW);//W
+	    Laya.KeyBoardManager.hasKeyDown(83) && this.kinematicSphere.transform.translate(this.translateS);//S
+	    Laya.KeyBoardManager.hasKeyDown(65) && this.kinematicSphere.transform.translate(this.translateA);//A
+	    Laya.KeyBoardManager.hasKeyDown(68) && this.kinematicSphere.transform.translate(this.translateD);//D
+	    Laya.KeyBoardManager.hasKeyDown(81) && this.kinematicSphere.transform.translate(this.translateQ);//Q
+	    Laya.KeyBoardManager.hasKeyDown(69) && this.kinematicSphere.transform.translate(this.translateE);//E
     }
     
     public addBoxAndTrigger():void {
@@ -134,8 +142,10 @@ class PhysicsWorld_TriggerAndCollisionEvent
         var height:number = Math.random() * 0.5 + 0.8;
         var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCapsule(raidius, height))) as Laya.MeshSprite3D;
         capsule.meshRenderer.material = mat3;
-        capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-        capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+        capsule.transform.position =  this.tmpVector;
+        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        capsule.transform.rotationEuler = this.tmpVector;
         
         var rigidBody:Laya.Rigidbody3D = capsule.addComponent(Laya.Rigidbody3D);//Rigidbody3D可与StaticCollider和RigidBody3D产生碰撞
         var sphereShape:Laya.CapsuleColliderShape = new Laya.CapsuleColliderShape(raidius, height);
@@ -155,7 +165,8 @@ class PhysicsWorld_TriggerAndCollisionEvent
         var radius:number = Math.random() * 0.2 + 0.2;
         var sphere:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(radius))) as Laya.MeshSprite3D;
         sphere.meshRenderer.material = mat2;
-        sphere.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        sphere.transform.position = this.tmpVector;
         
         var rigidBody:Laya.Rigidbody3D = sphere.addComponent(Laya.Rigidbody3D);
         var sphereShape:Laya.SphereColliderShape = new Laya.SphereColliderShape(radius);

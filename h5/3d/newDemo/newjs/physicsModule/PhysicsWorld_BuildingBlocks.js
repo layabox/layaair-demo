@@ -8,8 +8,9 @@ class PhysicsWorldBuildingBlocks{
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
 
-        this.ZERO = Laya.Vector3(0.0,0.0,0.0);
-        this.ONE = Laya.Vector3(1.0,1.0,1.0);
+        this.ZERO = new Laya.Vector3(0.0,0.0,0.0);
+        this.ONE = new Laya.Vector3(1.0,1.0,1.0);
+        this.tmpVector = Laya.Vector3(0.0,0.0,0.0)
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.translate(new Laya.Vector3(4.5, 6, 4.5));
@@ -106,7 +107,8 @@ class PhysicsWorldBuildingBlocks{
         this.delX = Laya.MouseManager.instance.mouseX - this.posX;
         this.delY = Laya.MouseManager.instance.mouseY - this.posY;
         if (this.hasSelectedSprite) {
-            this.hasSelectedRigidBody.linearVelocity = new Laya.Vector3(this.delX / 4, 0, this.delY / 4);
+            this.tmpVector.setValue(this.delX / 4, 0, this.delY / 4);
+            this.hasSelectedRigidBody.linearVelocity = this.tmpVector;
         }
         this.posX = Laya.MouseManager.instance.mouseX;
         this.posY = Laya.MouseManager.instance.mouseY;

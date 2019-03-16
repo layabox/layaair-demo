@@ -4,6 +4,15 @@ class PhysicsWorld_CollisionFiflter
     private  scene:Laya.Scene3D;
     private  camera:Laya.Camera;
     private  kinematicSphere:Laya.Sprite3D;
+
+    private translateW:Laya.Vector3 = new Laya.Vector3(0, 0, -0.2);
+	private translateS:Laya.Vector3 = new Laya.Vector3(0, 0, 0.2);
+	private translateA:Laya.Vector3 = new Laya.Vector3(-0.2, 0, 0);
+    private translateD:Laya.Vector3 = new Laya.Vector3(0.2, 0, 0);
+    private translateQ:Laya.Vector3 = new Laya.Vector3(-0.01, 0, 0);
+    private translateE:Laya.Vector3 = new Laya.Vector3(0.01, 0, 0);
+    private tmpVector:Laya.Vector3 = new Laya.Vector3(0, 0, 0);
+    
     constructor()
     {
         Laya3D.init(0, 0);
@@ -65,12 +74,12 @@ class PhysicsWorld_CollisionFiflter
     }
     
     private onKeyDown():void {
-        Laya.KeyBoardManager.hasKeyDown(87) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0, -0.2));//W
-        Laya.KeyBoardManager.hasKeyDown(83) && this.kinematicSphere.transform.translate(new Laya.Vector3(0, 0, 0.2));//S
-        Laya.KeyBoardManager.hasKeyDown(65) && this.kinematicSphere.transform.translate(new Laya.Vector3(-0.2, 0, 0));//A
-        Laya.KeyBoardManager.hasKeyDown(68) && this.kinematicSphere.transform.translate(new Laya.Vector3(0.2, 0, 0));//D
-        Laya.KeyBoardManager.hasKeyDown(81) && this.plane.transform.translate(new Laya.Vector3(-0.01, 0, 0));;//Q
-        Laya.KeyBoardManager.hasKeyDown(69) && this.plane.transform.translate(new Laya.Vector3(0.01, 0, 0));;//E
+        Laya.KeyBoardManager.hasKeyDown(87) && character.move(this.translateW);//W
+        Laya.KeyBoardManager.hasKeyDown(83) && character.move(this.translateS);//S
+        Laya.KeyBoardManager.hasKeyDown(65) && character.move(this.translateA);//A
+        Laya.KeyBoardManager.hasKeyDown(68) && character.move(this.translateD);//D
+        Laya.KeyBoardManager.hasKeyDown(81) && this.plane.transform.translate(this.translateQ);;//Q
+        Laya.KeyBoardManager.hasKeyDown(69) && this.plane.transform.translate(this.translateE);;//E
     }
     
     public addBox():void {
@@ -85,8 +94,10 @@ class PhysicsWorld_CollisionFiflter
         var sZ:number = Math.random() * 0.75 + 0.25;
         var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(sX, sY, sZ))) as Laya.MeshSprite3D;
         box.meshRenderer.material = mat1;
-        box.transform.position = new Laya.Vector3(Math.random() * 16 - 8, sY / 2, Math.random() * 16 - 8);
-        box.transform.rotationEuler = new Laya.Vector3(0, Math.random() * 360, 0);
+        this.tmpVector.setValue(Math.random() * 16 - 8, sY / 2, Math.random() * 16 - 8);
+        box.transform.position = this.tmpVector;
+        this.tmpVector.setValue(0, Math.random() * 360, 0);
+        box.transform.rotationEuler = this.tmpVector;
         
         var rigidBody:Laya.Rigidbody3D = box.addComponent(Laya.Rigidbody3D);
         var boxShape:Laya.BoxColliderShape = new Laya.BoxColliderShape(sX, sY, sZ);
@@ -105,8 +116,10 @@ class PhysicsWorld_CollisionFiflter
         var height:number = Math.random() * 0.5 + 0.8;
         var capsule:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCapsule(raidius, height))) as Laya.MeshSprite3D;
         capsule.meshRenderer.material = mat3;
-        capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-        capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+        capsule.transform.position = this.tmpVector;
+        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        capsule.transform.rotationEuler = this.tmpVector;
         
         var rigidBody:Laya.Rigidbody3D = capsule.addComponent(Laya.Rigidbody3D);
         var sphereShape:Laya.CapsuleColliderShape = new Laya.CapsuleColliderShape(raidius, height);

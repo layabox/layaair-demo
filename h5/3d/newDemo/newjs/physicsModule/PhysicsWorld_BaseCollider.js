@@ -6,6 +6,7 @@ class PhysicsWorldBaseCollider{
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
+        this.tmpVector = new Laya.Vector3(0, 0, 0);
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
         //初始化照相机
         var camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
@@ -83,9 +84,11 @@ class PhysicsWorldBaseCollider{
         //将box的模型赋予材质
         box.meshRenderer.material = mat1;
         //设置掉落位置
-        box.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        box.transform.position = this.tmpVector;
         //设置旋转角度
-        box.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        box.transform.rotationEuler = this.tmpVector;
         //添加刚体组件
         var rigidBody = box.addComponent(Laya.Rigidbody3D);
         var boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
@@ -102,7 +105,8 @@ class PhysicsWorldBaseCollider{
         var radius = Math.random() * 0.2 + 0.2;
         var sphere = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius)));
         sphere.meshRenderer.material = mat2;
-        sphere.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        sphere.transform.position = this.tmpVector;
         var rigidBody = sphere.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.SphereColliderShape(radius);
         rigidBody.colliderShape = sphereShape;
@@ -118,8 +122,10 @@ class PhysicsWorldBaseCollider{
         var height = Math.random() * 0.5 + 0.8;
         var capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = mat3;
-        capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-        capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        capsule.transform.position = this.tmpVector;
+        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        capsule.transform.rotationEuler = this.tmpVector;
         var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;
@@ -138,7 +144,8 @@ class PhysicsWorldBaseCollider{
         //设置材质
         cone.meshRenderer.material = mat4;
         //设置位置
-        cone.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        cone.transform.position = this.tmpVector;
         //创建刚体碰撞器
         var rigidBody = cone.addComponent(Laya.Rigidbody3D);
         //创建球型碰撞器
@@ -161,9 +168,11 @@ class PhysicsWorldBaseCollider{
         //设置材质
         cylinder.meshRenderer.material = mat5;
         //设置位置
-        cylinder.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        cylinder.transform.position = this.tmpVector;
         //设置圆柱MeshSprite3D的欧拉角
-        cylinder.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        cylinder.transform.rotationEuler = this.tmpVector;
         //创建刚体碰撞器
         var rigidBody = cylinder.addComponent(Laya.Rigidbody3D);
         //创建球型碰撞器

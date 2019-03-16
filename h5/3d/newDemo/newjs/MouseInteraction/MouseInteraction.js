@@ -88,10 +88,6 @@ class MouseInteraction{
             layaMonkey_clone2.name = "三熊";
             layaMonkey_clone3.name = "小小熊";
             
-            //staticLayaMonkey.addComponent(SceneScript);
-            //layaMonkey_clone1.addComponent(SceneScript);
-            //layaMonkey_clone2.addComponent(SceneScript);
-            //layaMonkey_clone3.addComponent(SceneScript);
             //平移
             layaMonkey_clone1.transform.translate(new Laya.Vector3(1.5, 0, 0.0));
             layaMonkey_clone2.transform.translate(new Laya.Vector3( -1.5, 0, 0.0));
@@ -159,6 +155,7 @@ class SceneScript extends Laya.Script3D{
     constructor(){
         super();
         this.box  = null;
+        this.albedoColor = new Laya.Vector4(0.0,0.0,0.0,1.0);
     }
     onAwake(){
         this.box = this.owner;
@@ -174,7 +171,7 @@ class SceneScript extends Laya.Script3D{
     }
     //当产生碰撞
     onCollisionEnter(collision) {
-        box.meshRenderer.sharedMaterial.albedoColor = new Laya.Vector4(0.0,0.0,0.0,1.0);
+        box.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
         // box.removeSelf();
     }
 }

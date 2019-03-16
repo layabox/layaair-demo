@@ -14,6 +14,8 @@ class PhysicsWorld_BuildingBlocks
         private delY:number;
         private ZERO:Laya.Vector3 = new Laya.Vector3(0,0,0);
         private ONE:Laya.Vector3 = new Laya.Vector3(0,0,0);
+        private tmpVector:Laya.Vector3;
+
     constructor()
     {
 
@@ -29,6 +31,8 @@ class PhysicsWorld_BuildingBlocks
         this.camera.transform.rotate(new Laya.Vector3(-30,45,0),true,false);
         this.camera.clearColor =new Laya.Vector4(0.5,0.5,0.5,1.0);
        
+        this.tmpVector = new Laya.Vector3(0,0,0);
+
         var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
         directionLight.color = new Laya.Vector3(1,1,1);
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1,-1,1));
@@ -94,8 +98,9 @@ class PhysicsWorld_BuildingBlocks
 			var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(2, 0.33, 0.5))) as Laya.MeshSprite3D;
 			box.meshRenderer.material = mat;
 			box.meshRenderer.castShadow = true;
-			box.meshRenderer.receiveShadow = true;
-			box.transform.position = new Laya.Vector3(x, y, z);
+            box.meshRenderer.receiveShadow = true;
+            this.tmpVector.setValue(x, y, z);
+			box.transform.position = this.tmpVector;
 			
 			var rigidBody:Laya.Rigidbody3D = box.addComponent(Laya.Rigidbody3D) as Laya.Rigidbody3D;
 			rigidBody.mass = 10;
@@ -132,7 +137,8 @@ class PhysicsWorld_BuildingBlocks
         this.delX = Laya.MouseManager.instance.mouseX - this.posX;
 		this.delY = Laya.MouseManager.instance.mouseY - this.posY;
 			if (this.hasSelectedSprite) {
-				this.hasSelectedRigidBody.linearVelocity = new Laya.Vector3(this.delX / 4, 0, this.delY / 4);
+                this.tmpVector.setValue(this.delX / 4, 0, this.delY / 4);
+				this.hasSelectedRigidBody.linearVelocity = this.tmpVector;
 			}
 			this.posX = Laya.MouseManager.instance.mouseX;
 			this.posY = Laya.MouseManager.instance.mouseY;

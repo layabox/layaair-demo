@@ -67,6 +67,8 @@ class MonkeyScript extends Laya.Script3D{
 	    this.isTwoTouch = false;
 			this.first = true;
 			this.twoFirst = true;
+			this.rotate = new Laya.Vector3(0,0,0);
+			this.translate = new Laya.Vector3(0,0,0);
     }
     onStart(){
         this._scene =  this.owner.parent;
@@ -97,7 +99,8 @@ class MonkeyScript extends Laya.Script3D{
 				this.lastPosition.x = touch._position.x;
 				this.lastPosition.y = touch._position.y;
 				//根据移动的距离进行旋转
-				this.owner.transform.rotate(new Laya.Vector3(1 * deltaY /2, 1 * deltaX / 2, 0), true, false);
+				this.rotate.setValue(1 * deltaY /2, 1 * deltaX / 2, 0);
+				this.owner.transform.rotate(this.rotate, true, false);
 			}
 		}
 		else if (2 === touchCount){
@@ -119,7 +122,8 @@ class MonkeyScript extends Laya.Script3D{
 				this.disVector2.y = touch.position.y - touch2.position.y;
 				var distance2 = Laya.Vector2.scalarLength(this.disVector2);
 				//根据移动的距离进行缩放
-				this._camera.transform.translate(new Laya.Vector3(0, 0, -0.01 * (distance2 - this.distance)));
+				this.translate.setValue(0, 0, -0.01 * (distance2 - this.distance));
+				this._camera.transform.translate(this.translate);
 				this.distance = distance2;
 			}	
 		}

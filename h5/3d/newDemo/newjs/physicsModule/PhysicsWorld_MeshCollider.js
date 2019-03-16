@@ -11,6 +11,8 @@ class PhysicsWorldMeshCollider{
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         camera.addComponent(CameraMoveScript);
         camera.clearColor = null;
+
+        this.tmpVector = new Laya.Vector3(0,0,0);
         //方向光
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(0.0, -0.8, -1.0));
@@ -80,8 +82,10 @@ class PhysicsWorldMeshCollider{
         var sZ = Math.random() * 0.75 + 0.25;
         var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         box.meshRenderer.material = mat1;
-        box.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-        box.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        box.transform.position = this.tmpVector;
+        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        box.transform.rotationEuler = this.tmpVector;
         var rigidBody = box.addComponent(Laya.Rigidbody3D);
         var boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
         rigidBody.colliderShape = boxShape;
@@ -95,7 +99,8 @@ class PhysicsWorldMeshCollider{
         var radius = Math.random() * 0.2 + 0.2;
         var sphere = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius)));
         sphere.meshRenderer.material = mat2;
-        sphere.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        sphere.transform.position = this.tmpVector;
         var rigidBody = sphere.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.SphereColliderShape(radius);
         rigidBody.colliderShape = sphereShape;
@@ -110,8 +115,10 @@ class PhysicsWorldMeshCollider{
         var height = Math.random() * 0.5 + 0.8;
         var capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = mat3;
-        capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-        capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        capsule.transform.position = this.tmpVector;
+        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        capsule.transform.rotationEuler = this.tmpVector;
         var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;

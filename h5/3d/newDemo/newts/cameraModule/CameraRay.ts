@@ -8,6 +8,10 @@ class CameraRay {
 	private posX:number = 0.0;
 	private posY:number = 0.0;
 	private point:Laya.Vector2 = new Laya.Vector2();
+
+	private tmpVector:Laya.Vector3;
+	private albedoColor:Laya.Vector4;	
+
 	constructor() {
 		//初始化引擎
 		Laya3D.init(0, 0);
@@ -26,6 +30,10 @@ class CameraRay {
 		this.camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
 		this.camera.addComponent(CameraMoveScript);
 		this.camera.clearColor = null;
+
+		//初始化变量
+		this.tmpVector = new Laya.Vector3(0, 0, 0)
+		this.albedoColor = new Laya.Vector4(1.0, 0.0, 0.0, 1.0);	
 		
 		//方向光
 		var directionLight = new Laya.DirectionLight();
@@ -104,9 +112,11 @@ class CameraRay {
 		this.scene.addChild(box);
 		//设置材质
 		box.meshRenderer.material = mat1;
-		box.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+		this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+		box.transform.position = this.tmpVector;
 		//设置欧拉角
-		box.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+		this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+		box.transform.rotationEuler = this.tmpVector;
 		//创建刚体碰撞器
 		var rigidBody = box.addComponent(Laya.Rigidbody3D) as Laya.Rigidbody3D;
 		//创建盒子形状碰撞器
@@ -130,7 +140,8 @@ class CameraRay {
 		this.scene.addChild(sphere);
 		//设置材质
 		sphere.meshRenderer.material = mat2;
-		sphere.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+		this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+		sphere.transform.position = this.tmpVector;
 		
 		//添加刚体碰撞器
 		var rigidBody = sphere.addComponent(Laya.Rigidbody3D) as Laya.Rigidbody3D;
@@ -155,9 +166,11 @@ class CameraRay {
 		this.scene.addChild(capsule);
 		//设置材质
 		capsule.meshRenderer.material = mat3;
-		capsule.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+		this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+		capsule.transform.position = this.tmpVector;
 		//设置胶囊MeshSprite3D的欧拉角
-		capsule.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+		this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+		capsule.transform.rotationEuler = this.tmpVector;
 		
 		//创建刚体碰撞器
 		var rigidBody = capsule.addComponent(Laya.Rigidbody3D) as Laya.Rigidbody3D;
@@ -181,7 +194,8 @@ class CameraRay {
 		//设置材质
 		cone.meshRenderer.material = mat4;
 		//设置位置
-		cone.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+		this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+		cone.transform.position = this.tmpVector;
 		//创建刚体碰撞器
 		var rigidBody = cone.addComponent(Laya.Rigidbody3D) as Laya.Rigidbody3D;
 		//创建球型碰撞器
@@ -204,9 +218,11 @@ class CameraRay {
 		//设置材质
 		cylinder.meshRenderer.material = mat5;
 		//设置位置
-		cylinder.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+		this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+		cylinder.transform.position = this.tmpVector;
 		//设置圆柱MeshSprite3D的欧拉角
-		cylinder.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+		this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+		cylinder.transform.rotationEuler = this.tmpVector;
 		//创建刚体碰撞器
 		var rigidBody = cylinder.addComponent(Laya.Rigidbody3D) as Laya.Rigidbody3D;
 		//创建球型碰撞器
@@ -234,7 +250,7 @@ class CameraRay {
 
 			for (var i = 0; i <  this.outs.length; i++)
 				//将射线碰撞到的物体设置为红色
-				((this.outs[i].collider.owner as Laya.MeshSprite3D).meshRenderer.sharedMaterial as Laya.BlinnPhongMaterial).albedoColor = new Laya.Vector4(1.0, 0.0, 0.0, 1.0);		
+				((this.outs[i].collider.owner as Laya.MeshSprite3D).meshRenderer.sharedMaterial as Laya.BlinnPhongMaterial).albedoColor = this.albedoColor;		
 		}
 
 	}
