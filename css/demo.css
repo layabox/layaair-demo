@@ -536,3 +536,7 @@ section .demo-boxS {
 .demo_category > a:link {
     /*color: black !important;*/
 }
+
+.libs-link {
+	cursor: pointer;
+}
