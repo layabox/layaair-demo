@@ -298,37 +298,63 @@ $(document).ready(function()
 		var 
 			html = "",
 			lib,
-			libFullName;
+			libFullName,
+			d3FullName;
 		for (var i = 0, len = libs.length; i < len; i++) {
 			if (!!html) {
 				html += " | ";
 			}
 			lib = libs[i];
 			libFullName = getLibFullName(lib);
-			if (!libFullName || libFullName === "#") {
-				html += lib;
-			} else {
+			d3FullName = get3DFullName(lib);
+			if (libFullName) {
 				html += '<span class="libs-link" data-lib="' + libFullName + '">' + lib + '</span>';
+			} else if (d3FullName) {
+				html += '<span class="d3-link" data-d3="' + d3FullName + '">' + lib + '</span>';
+			} else {
+				html += lib;
 			}
-			
 		}
 		refLibs.innerHTML = html;
 		refLibs.addEventListener("click", function(e) {
 			var target = e.target;
 			if (target.className === "libs-link") {
 				var lib = target.getAttribute("data-lib");
-				showLibCode(lib);
+				showLibCode("h5/libs/" + lib);
+			} else if (target.className === "d3-link") {
+				var d3 = target.getAttribute("data-d3");
+				showLibCode("h5/3d/js/common/" + d3);
 			}
 		}, false);
 	}
 
 	function showLibCode(libPath) {
-		ReadFile("h5/libs/" + libPath, "text", function(code) { // successFunc
-			console.error("success");
+		ReadFile(libPath, "text", function(code) { // successFunc
 			OnCodeLoaded(code);
 		}, function() { // errorFunc
 			console.error("error");
 		}); // url, dataType, callback, errorFunc
+	}
+
+	function get3DFullName(d3Name) {
+		var d3Path;
+		switch(d3Name) {
+			case "CameraMoveScript.js":
+				d3Path = "CameraMoveScript.js";
+				break;
+			case "Tool.js":
+				d3Path = "Tool.js";
+				break;
+			case "TriggerCollisionScript.js":
+				d3Path = "TriggerCollisionScript.js";
+				break;
+			case "VRCameraMoveScript.js":
+				d3Path = "VRCameraMoveScript.js";
+				break;
+			default:
+				d3Path = "";
+		}
+		return d3Path;
 	}
 
 	function getLibFullName(libName) {
@@ -403,7 +429,7 @@ $(document).ready(function()
 			case "LayaRender":
 				libPath = "LayaRender.js";
 				break;
-			case "LayaUISample.max.all":
+			case "UI code":
 				libPath = "LayaUISample.max.all.js";
 				break;
 			case "load_demo":
