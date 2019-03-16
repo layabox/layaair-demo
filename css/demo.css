@@ -537,6 +537,7 @@ section .demo-boxS {
     /*color: black !important;*/
 }
 
-.libs-link {
+.libs-link,
+.d3-link {
 	cursor: pointer;
 }
