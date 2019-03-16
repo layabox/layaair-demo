@@ -289,6 +289,148 @@ $(document).ready(function()
 
 		descDiv.innerHTML = descriptions[demo];
 		refLibs.innerHTML = libraries[demo].replace(/,/g, ' | ');
+		addLinkFunc();
+	}
+
+	function addLinkFunc() {
+		var innerHTML = refLibs.innerHTML;
+		var libs = innerHTML.split(" | ");
+		var 
+			html = "",
+			lib,
+			libFullName;
+		for (var i = 0, len = libs.length; i < len; i++) {
+			if (!!html) {
+				html += " | ";
+			}
+			lib = libs[i];
+			libFullName = getLibFullName(lib);
+			if (!libFullName || libFullName === "#") {
+				html += lib;
+			} else {
+				html += '<span class="libs-link" data-lib="' + libFullName + '">' + lib + '</span>';
+			}
+			
+		}
+		refLibs.innerHTML = html;
+		refLibs.addEventListener("click", function(e) {
+			var target = e.target;
+			if (target.className === "libs-link") {
+				var lib = target.getAttribute("data-lib");
+				showLibCode(lib);
+			}
+		}, false);
+	}
+
+	function showLibCode(libPath) {
+		ReadFile("h5/libs/" + libPath, "text", function(code) { // successFunc
+			console.error("success");
+			OnCodeLoaded(code);
+		}, function() { // errorFunc
+			console.error("error");
+		}); // url, dataType, callback, errorFunc
+	}
+
+	function getLibFullName(libName) {
+		var libPath;
+		switch(libName) {
+			case "box2d":
+				libPath = "box2d.js";
+				break;
+			case "bytebuffer":
+				libPath = "bytebuffer.js";
+				break;
+			case "domparserinone":
+				libPath = "domparserinone.js";
+				break;
+			case "ani":
+				libPath = "laya.ani.js";
+				break;
+			case "core":
+				libPath = "laya.core.js";
+				break;
+			case "d3":
+				libPath = "laya.d3.js";
+				break;
+			case "d3Plugin":
+				libPath = "laya.d3Plugin.js";
+				break;
+			case "debugtool":
+				libPath = "laya.debugtool.js";
+				break;
+			case "device":
+				libPath = "laya.device.js";
+				break;
+			case "filter":
+				libPath = "laya.filter.js";
+				break;
+			case "html":
+				libPath = "laya.html.js";
+				break;
+			case "particle":
+				libPath = "laya.particle.js";
+				break;
+			case "pathfinding":
+				libPath = "laya.pathfinding.js";
+				break;
+			case "physics":
+				libPath = "laya.physics.js";
+				break;
+			case "physics3D":
+				libPath = "laya.physics3D.js";
+				break;
+			case "physics3D.runtime":
+				libPath = "laya.physics3D.runtime.js";
+				break;
+			case "physics3D.wasm":
+				libPath = "laya.physics3D.wasm.js";
+				break;
+			case "physicsRender":
+				libPath = "laya.physicsRender.js";
+				break;
+			case "tiledmap":
+				libPath = "laya.tiledmap.js";
+				break;
+			case "ui":
+				libPath = "laya.ui.js";
+				break;
+			case "webgl":
+				libPath = "laya.webgl.js";
+				break;
+			case "wxmini":
+				libPath = "laya.wxmini.js";
+				break;
+			case "LayaRender":
+				libPath = "LayaRender.js";
+				break;
+			case "LayaUISample.max.all":
+				libPath = "LayaUISample.max.all.js";
+				break;
+			case "load_demo":
+				libPath = "laya.load_demo.js";
+				break;
+			case "matter-RenderLaya":
+				libPath = "matter-RenderLaya.js";
+				break;
+			case "matter":
+				libPath = "matter.js";
+				break;
+			case "MousePickingScene":
+				libPath = "MousePickingScene.js";
+				break;
+			case "OESVertexArrayObject-polyfill":
+				libPath = "OESVertexArrayObject-polyfill.js";
+				break;
+			case "protobuf":
+				libPath = "protobuf.js";
+				break;
+			case "worker":
+				libPath = "worker.js";
+				break;
+			default:
+				libPath = "";
+		}
+		return libPath;
 	}
 
 	function resetCode(e)
