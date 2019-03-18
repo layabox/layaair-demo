@@ -22,7 +22,7 @@ class PhysicsWorld_BaseCollider
         camera.transform.rotate(new Laya.Vector3(-15,0,0),true,false);
         camera.addComponent(CameraMoveScript);
         //camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SOLIDCOLOR;
-        camera.clearColor = null;
+        //camera.clearColor = null;
         this.tmpVector = new Laya.Vector3(0,0,0);
         //方向光
         var directionlight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight())as Laya.DirectionLight;

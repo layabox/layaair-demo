@@ -8,11 +8,20 @@ class TransformDemo{
         Laya.Stat.show();
 			
 		//创建场景
-		this._scene = Laya.stage.addChild(new Laya.Scene3D());
-            
+        this._scene = Laya.stage.addChild(new Laya.Scene3D());
+        //初始化变量
+        this._position = new Laya.Vector3(-0.6, 0, 0);
+		this._rotate = new Laya.Vector3(0, 1, 0);
+		this._scale = new Laya.Vector3();
+		this.scaleDelta = 0;
+        this.scaleValue = 0;
+        this.layaMonkey_clone1 =null;
+        this.layaMonkey_clone2 =null;
+        this.layaMonkey_clone3 =null;
 		//添加相机
         var camera = (this._scene.addChild(new Laya.Camera(0, 0.1, 100)));
-        camera.transform.translate(new Laya.Vector3(0, 0.7, 1.2));
+        //camera.transform.translate(new Laya.Vector3(0, 0.7, 1.2));
+        camera.transform.translate(new Laya.Vector3(0, 0.8, 5));
         camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
 		camera.addComponent(CameraMoveScript);
 			
@@ -58,20 +67,35 @@ class TransformDemo{
         staticLayaMonkey.meshRenderer.castShadow = true;
          
         //克隆sprite3d
-        var layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
-        var layaMonkey_clone2 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
-        var layaMonkey_clone3 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
+        this.layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
+        this.layaMonkey_clone2 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
+        this.layaMonkey_clone3 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
         //平移
-        layaMonkey_clone1.transform.translate(new Laya.Vector3(1.5, 0, 0.0));
-        layaMonkey_clone2.transform.translate(new Laya.Vector3( -1.5, 0, 0.0));
-        layaMonkey_clone3.transform.translate(new Laya.Vector3( 2.5, 0, 0.0));
+        this.layaMonkey_clone1.transform.translate(new Laya.Vector3(1.5, 0, 0.0));
+        this.layaMonkey_clone2.transform.translate(new Laya.Vector3( -1.5, 0, 0.0));
+        this.layaMonkey_clone3.transform.translate(new Laya.Vector3( 2.5, 0, 0.0));
         //旋转
-        layaMonkey_clone2.transform.rotate(new Laya.Vector3(0, 60, 0), false, false);
+        this.layaMonkey_clone2.transform.rotate(new Laya.Vector3(0, 60, 0), false, false);
         //缩放
         var scale = new Laya.Vector3(0.1, 0.1, 0.1);
-        layaMonkey_clone3.transform.localScale = scale;
+        this.layaMonkey_clone3.transform.localScale = scale;
          
+        //设置定时器执行,定时重复执行(基于帧率)
+		Laya.timer.frameLoop(1, this, this.animate);
     }
+
+    animate() {
+        this.scaleValue = Math.sin(this.scaleDelta += 0.1);
+        
+        this._position.y = this.scaleValue / 2;
+        this.layaMonkey_clone1.transform.position = this._position;
+        
+        this.layaMonkey_clone2.transform.rotate(this._rotate, false, false);
+        
+        this._scale.x = this._scale.y = this._scale.z = Math.abs(this.scaleValue) / 5;
+        this.layaMonkey_clone3.transform.localScale = this._scale;
+    }
+
 }
 //激活启动类
 new TransformDemo();

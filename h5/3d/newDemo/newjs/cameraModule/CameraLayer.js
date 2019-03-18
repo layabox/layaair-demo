@@ -64,7 +64,7 @@ class CameraLayer{
         //设置蒙版(所属图层)
         layaMonkey_clone1.layer = 2;
         layaMonkey_clone2.layer = 3;
-        layaMonkey_clone3.layer = 4;
+        layaMonkey_clone3.layer = 0;
         //平移
         layaMonkey_clone1.transform.translate(new Laya.Vector3(1.5, 0, 0.0));
         layaMonkey_clone2.transform.translate(new Laya.Vector3( -1.5, 0, 0.0));

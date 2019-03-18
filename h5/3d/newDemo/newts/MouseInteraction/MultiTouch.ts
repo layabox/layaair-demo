@@ -151,3 +151,4 @@ class MonkeyScript extends Laya.Script3D{
    onLateUpdate() {
 	}
 }
+new MultiTouch;

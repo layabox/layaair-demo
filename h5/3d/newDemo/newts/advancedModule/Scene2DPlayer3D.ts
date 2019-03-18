@@ -8,7 +8,6 @@ class Scene2DPlayer3D {
 		private pos = new Laya.Vector3(310, 500, 0);
 		private _translate = new Laya.Vector3(0, 0, 0);
 		private _layaMonkey:Laya.Sprite3D;
-		private _translate:Laya.Vector3 = new Laya.Vector3(0, 0, 0);
 		private _translate2:Laya.Vector3 = new Laya.Vector3(5, -10, 1);
 		private _translateW:Laya.Vector3 = new Laya.Vector3(0, 0, -0.2);
 		private _translateS:Laya.Vector3 = new Laya.Vector3(0, 0, 0.2);

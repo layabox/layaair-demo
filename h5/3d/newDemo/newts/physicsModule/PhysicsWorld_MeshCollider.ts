@@ -17,7 +17,7 @@ class PhysicsWorld_MeshCollider
         camera.transform.translate(new Laya.Vector3(0, 6, 9.5));
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         camera.addComponent(CameraMoveScript);
-        camera.clearColor = null;
+        //camera.clearColor = null;
         
         //方向光
         var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;

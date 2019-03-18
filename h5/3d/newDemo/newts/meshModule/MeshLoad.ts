@@ -1,8 +1,11 @@
+
+import CameraMoveScript from "./common/CameraMoveScript"
+import Tool from "./common/Tool"
 class MeshLoad {
     private sprite3D:Laya.Sprite3D;
     private lineSprite3D:Laya.Sprite3D;
     private rotation:Laya.Vector3 = new Laya.Vector3(0, 0.01, 0);
-    private var curStateIndex:number = 0;
+    private curStateIndex:number = 0;
     
      constructor() {
         
@@ -27,7 +30,7 @@ class MeshLoad {
             var layaMonkey:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(mesh)) as Laya.MeshSprite3D;
             layaMonkey.transform.localScale = new Laya.Vector3(0.3, 0.3, 0.3);
             layaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
-            var layaMonkeyLineSprite3D:Laya.PixelLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(5000)) as Laya.PixelLineSprite3D;
+            var layaMonkeyLineSprite3D:Laya.PixelLineSprite3D = this.lineSprite3D.addChild(Laya.PixelLineSprite3D(5000)) as Laya.PixelLineSprite3D;
             Tool.linearModel(layaMonkey, layaMonkeyLineSprite3D, Laya.Color.GREEN);
             
             var plane:Laya.MeshSprite3D = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(6, 6, 10, 10))) as Laya.MeshSprite3D;

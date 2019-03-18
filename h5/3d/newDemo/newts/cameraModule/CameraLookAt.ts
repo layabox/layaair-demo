@@ -5,7 +5,8 @@ class CameraLookAt
 	private camera:Laya.Camera;
 	private box:Laya.MeshSprite3D;
 	private capsule:Laya.MeshSprite3D;
-	private cylinder:Laya.MeshSprite3D;
+    private cylinder:Laya.MeshSprite3D;
+    private upVector:Laya.Vector3 = new Laya.Vector3(0, 1, 0);
 	constructor() 
 	{
 		//初始化引擎
@@ -14,8 +15,6 @@ class CameraLookAt
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
 		Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
 		
-		//初始化变量
-		this.upVector = new Laya.Vector3(0, 1, 0);
         //开启统计信息
         Laya.Stat.show();            
 		//预加载所有资源
@@ -38,7 +37,8 @@ class CameraLookAt
 			
 		//相机设置清楚标记,使用固定颜色
 		this.camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SOLIDCOLOR;
-		this.camera.clearColor = new Laya.Vector4(0, 0.2, 0.6, 1);
+		//使用默认颜色
+		//this.camera.clearColor = new Laya.Vector4(0, 0.2, 0.6, 1);
 		//设置摄像机视野范围（角度）
 		this.camera.fieldOfView = 60;
 		//为相机添加视角控制组件(脚本)
@@ -87,8 +87,8 @@ class CameraLookAt
 			
 		Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, function():void {
 				
-			var changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "切换目标")) as Laya.Button;
-			changeActionButton.size(160, 40);
+			var changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "切换注视目标")) as Laya.Button;
+			changeActionButton.size(200, 40);
 			changeActionButton.labelBold = true;
 			changeActionButton.labelSize = 30;
 			changeActionButton.sizeGrid = "4,4,4,4";
@@ -96,6 +96,7 @@ class CameraLookAt
 			changeActionButton.pos(Laya.stage.width / 2 - changeActionButton.width * Laya.Browser.pixelRatio / 2 , Laya.stage.height - 100 * Laya.Browser.pixelRatio);
 				
 			changeActionButton.on(Laya.Event.CLICK, this, function():void{
+				debugger;
 				this.index++;
 				if (this.index % 3 === 1 ){
 					//摄像机捕捉模型目标

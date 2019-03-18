@@ -29,7 +29,7 @@ class PhysicsWorld_BuildingBlocks
         this.camera = this.scene.addChild(new Laya.Camera(0,0.1,100)) as Laya.Camera;
         this.camera.transform.translate(new Laya.Vector3(4.5,6,4.5));
         this.camera.transform.rotate(new Laya.Vector3(-30,45,0),true,false);
-        this.camera.clearColor =new Laya.Vector4(0.5,0.5,0.5,1.0);
+        //this.camera.clearColor =new Laya.Vector4(0.5,0.5,0.5,1.0);
        
         this.tmpVector = new Laya.Vector3(0,0,0);
 

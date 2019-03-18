@@ -2,8 +2,9 @@ import CameraMoveScript from "./common/CameraMoveScript"
 class EnvironmentalReflection {
 		
     private rotation:Laya.Vector3 = new Laya.Vector3(0, 0.01, 0);
-    private sprite3D:Laya.Sprite3D = null;
+    private sprite3D:Laya.Sprite3D;
     private scene:Laya.Scene3D = null;
+    private teapot:Laya.MeshSprite3D = null;
     constructor() {
         
         Laya3D.init(0, 0);
@@ -40,36 +41,30 @@ class EnvironmentalReflection {
             //设置曝光强度
             var exposureNumber:Number = 0;
             mat.exposure = 0.6 + 1;
-            /*Laya.timer.frameLoop(1, this, function():void {
-                mat.exposure = Math.sin(exposureNumber += 0.01) + 1;
-                mat.rotation += 0.01;
-            });*/
         }));
         //创建平行光
         var directionLight = new Laya.DirectionLight();
         scene.addChild(directionLight);
         directionLight.color = new Laya.Vector3(1, 1, 1);
         
-        //添加一个精灵
-        this.sprite3D = new Laya.Sprite3D();
-        scene.addChild(this.sprite3D );
-        //添加一个求形MeshSprite3D
-        var sphere = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(0.25, 20, 20));
-        this.sprite3D.addChild(sphere);
-        sphere.transform.position = new Laya.Vector3(0, 1.75, 2);
-        
-        //实例PBR材质
-        var pbrMat = new Laya.PBRStandardMaterial();
-        //开启该材质的反射
-        pbrMat.enableReflection = true;
-        //设置材质的金属度，尽量高点，反射效果更明显
-        pbrMat.metallic = 1;
-        
-        //加载纹理
-        Laya.Texture2D.load("res/threeDimen/pbr/jinshu.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
-            pbrMat.albedoTexture = tex;
-            sphere.meshRenderer.material = pbrMat;
-        }));
+		//添加一个精灵
+		this.sprite3D = new Laya.Sprite3D();
+        scene.addChild(this.sprite3D);
+        //加载Mesh
+		Laya.Mesh.load("res/threeDimen/staticModel/teapot/teapot-Teapot001.lm", Laya.Handler.create(this, function(mesh:Laya.Mesh):void {
+			this.teapot = this.sprite3D.addChild(new Laya.MeshSprite3D(mesh)) as Laya.MeshSprite3D;
+			this.teapot.transform.position = new Laya.Vector3(0, 1.75, 2);
+			this.teapot.transform.rotate(new Laya.Vector3(-90, 0, 0), false, false);
+			this.sprite3D.addChild(this.teapot);
+			//实例PBR材质
+			var pbrMat = new Laya.PBRStandardMaterial();
+			//开启该材质的反射
+			pbrMat.enableReflection = true;
+			//设置材质的金属度，尽量高点，反射效果更明显
+			pbrMat.metallic = 1;
+			this.teapot.meshRenderer.material = pbrMat;
+		}));
+    
     }
 }
 new EnvironmentalReflection;

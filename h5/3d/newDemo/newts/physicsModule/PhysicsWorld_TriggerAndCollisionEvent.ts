@@ -53,7 +53,7 @@ class PhysicsWorld_TriggerAndCollisionEvent
 			this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100)) as Laya.Camera;
 			this.camera.transform.translate(new Laya.Vector3(0, 8, 18));
 			this.camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
-			this.camera.clearColor = null;
+			//this.camera.clearColor = null;
 			
 			var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
 			directionLight.color = new Laya.Vector3(1, 1, 1);

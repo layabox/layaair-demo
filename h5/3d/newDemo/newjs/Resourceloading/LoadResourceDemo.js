@@ -74,11 +74,11 @@ class LoadResourceDemo{
     PreloadingRes(){
         //预加载所有资源
 		var resource = [
-            {url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene3D, priority: 1},  
-            {url: "res/threeDimen/skyBox/skyBox3/skyBox3.lmat", clas: Laya.BaseMaterial, priority: 1, constructParams: [512, 512, 1, true, true]},
-            {url: "res/threeDimen/Physics/wood.jpg", clas: Laya.Texture2D, priority: 1, constructParams: [64, 64, 1, true, true]},
-            {url: "res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm", clas: Laya.Mesh, priority: 1, constructParams: [32, 32, 1, true, true]},
-            {url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1, constructParams: [1024, 512, 1, true, true]},];
+            {url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls"},  
+            {url: "res/threeDimen/skyBox/skyBox3/skyBox3.lmat"},
+            {url: "res/threeDimen/Physics/wood.jpg"},
+            {url: "res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm"},
+            {url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"},];
             Laya.loader.create(resource, Laya.Handler.create(this, this.onPreLoadFinish));	
     }
     onPreLoadFinish(){

@@ -15,7 +15,7 @@ class PhysicsWorldBuildingBlocks{
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.translate(new Laya.Vector3(4.5, 6, 4.5));
         this.camera.transform.rotate(new Laya.Vector3(-30, 45, 0), true, false);
-        this.camera.clearColor = new Laya.Vector4(0.5, 0.5, 0.5, 1.0);
+        //this.camera.clearColor = new Laya.Vector4(0.5, 0.5, 0.5, 1.0);
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1, -1, 1));

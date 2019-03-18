@@ -26,7 +26,7 @@ class PhysicsWorld_CollisionFiflter
         this.camera.transform.translate(new Laya.Vector3(0, 8, 18));
         this.camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
         
-        this.camera.clearColor = null;
+        //this.camera.clearColor = null;
         
         var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
         directionLight.color = new Laya.Vector3(1, 1, 1);
@@ -74,12 +74,12 @@ class PhysicsWorld_CollisionFiflter
     }
     
     private onKeyDown():void {
-        Laya.KeyBoardManager.hasKeyDown(87) && character.move(this.translateW);//W
-        Laya.KeyBoardManager.hasKeyDown(83) && character.move(this.translateS);//S
-        Laya.KeyBoardManager.hasKeyDown(65) && character.move(this.translateA);//A
-        Laya.KeyBoardManager.hasKeyDown(68) && character.move(this.translateD);//D
-        Laya.KeyBoardManager.hasKeyDown(81) && this.plane.transform.translate(this.translateQ);;//Q
-        Laya.KeyBoardManager.hasKeyDown(69) && this.plane.transform.translate(this.translateE);;//E
+        Laya.KeyBoardManager.hasKeyDown(87) && this.kinematicSphere.transform.translate(this.translateW);//W
+        Laya.KeyBoardManager.hasKeyDown(83) && this.kinematicSphere.transform.translate(this.translateS);//S
+        Laya.KeyBoardManager.hasKeyDown(65) && this.kinematicSphere.transform.translate(this.translateA);//A
+        Laya.KeyBoardManager.hasKeyDown(68) && this.kinematicSphere.transform.translate(this.translateD);//D
+        Laya.KeyBoardManager.hasKeyDown(81) && this.plane.transform.translate(this.translateQ);//Q
+        Laya.KeyBoardManager.hasKeyDown(69) && this.plane.transform.translate(this.translateE);//E
     }
     
     public addBox():void {

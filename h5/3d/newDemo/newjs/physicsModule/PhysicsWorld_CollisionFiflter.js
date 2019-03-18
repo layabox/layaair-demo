@@ -8,7 +8,8 @@ class PhysicsWorldCollisionFiflter{
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.translate(new Laya.Vector3(0, 8, 18));
         this.camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
-        this.camera.clearColor = null;
+        //使用默认颜色
+        //this.camera.clearColor = null;
 
         //初始化变量
         this.translateW = new Laya.Vector3(0, 0, -0.2);

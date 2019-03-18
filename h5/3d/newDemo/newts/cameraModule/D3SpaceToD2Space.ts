@@ -6,6 +6,7 @@ class D3SpaceToD2Space {
     private _position:Laya.Vector3 = new Laya.Vector3();
     private _outPos:Laya.Vector3 = new Laya.Vector3();
     private scaleDelta:number = 0;
+    private scale:Laya.Vector3 = new Laya.Vector3(0.1,0.1,0.1);
     constructor() {
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
@@ -16,7 +17,6 @@ class D3SpaceToD2Space {
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100)) as Laya.Camera;
         this.camera.transform.translate(new Laya.Vector3(0, 0.35, 1));
         this.camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
-        this.scale = new Laya.Vector3(0.1,0.1,0.1);
         var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
         
         var completeHandler:Laya.Handler = Laya.Handler.create(this, this.onComplete);

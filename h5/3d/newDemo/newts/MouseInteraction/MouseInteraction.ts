@@ -15,17 +15,7 @@ class MouseInteraction{
 			Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
 			//显示性能面板
             Laya.Stat.show();
-			
-            //显示文本显示框
-            this.text = new Laya.Text();
-			this.text.overflow = Laya.Text.HIDDEN;
-			this.text.color = "#FFFFFF";
-			this.text.font = "Impact";
-			this.text.fontSize = 20;
-			this.text.borderColor = "#FFFF00";
-			this.text.x = Laya.stage.width / 2;
-            Laya.stage.addChild(this.text);
-			
+				
 			
 			//创建场景
 			this._scene = new Laya.Scene3D();
@@ -137,6 +127,14 @@ class MouseInteraction{
             
             //设置文本显示框位置
             this.text.x = Laya.stage.width / 2 -50 ;
+            //显示文本显示框
+            this.text = new Laya.Text();
+			this.text.overflow = Laya.Text.HIDDEN;
+			this.text.color = "#FFFFFF";
+			this.text.font = "Impact";
+			this.text.fontSize = 20;
+			this.text.x = Laya.stage.width / 2;
+            Laya.stage.addChild(this.text);
             
             //添加鼠标事件
             this.addMouseEvent();
@@ -181,6 +179,6 @@ class SceneScript extends Laya.Script3D{
     }
     //当产生碰撞
     onCollisionEnter(collision) {
-        (this.box.meshRenderer.sharedMaterial as Laya.BlinnPhongMaterial).albedoColor = _albedoColor;
+        (this.box.meshRenderer.sharedMaterial as Laya.BlinnPhongMaterial).albedoColor = this._albedoColor;
     }
 }

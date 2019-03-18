@@ -20,7 +20,8 @@ class CameraRay {
 		this.camera.transform.translate(new Laya.Vector3(0, 6, 9.5));
 		this.camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
 		this.camera.addComponent(CameraMoveScript);
-		this.camera.clearColor = null;
+		//使用默认颜色
+		//this.camera.clearColor = null;
 		
 		//方向光
 		var directionLight = new Laya.DirectionLight();
@@ -50,41 +51,14 @@ class CameraRay {
 		planeStaticCollider.friction = 2;
 		//物理碰撞体设置弹力
 		planeStaticCollider.restitution = 0.3;
-		
-		//随机生成精灵
-		this.randomAddPhysicsSprite();
+
 		//添加鼠标事件
 		this.addMouseEvent();
 		//射线初始化（必须初始化）
 		this._ray = new Laya.Ray(new Laya.Vector3(0, 0, 0), new Laya.Vector3(0, 0, 0));
 	}
 	
-	randomAddPhysicsSprite() {
-		Laya.timer.loop(1000, this, function() {
-			var random = Math.floor(Math.random() * 5) % 5;
-			switch (random) {
-			case 0: 
-				this.addBox();
-				break;
-			case 1: 
-				this.addSphere();
-				break;
-			case 2: 
-				this.addCapsule();
-				break;
-			case 3:
-				this.addCone();
-				break;
-			case 4:
-				this.addCylinder();
-				break;
-			default: 
-				break;
-			}
-		});
-	}
-	
-	addBox() {
+	addBoxXYZ(x, y, z) {
 		var mat1 = new Laya.BlinnPhongMaterial();
 		Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(null, function(tex) {
 			mat1.albedoTexture = tex;
@@ -99,7 +73,7 @@ class CameraRay {
 		this.scene.addChild(box);
 		//设置材质
 		box.meshRenderer.material = mat1;
-		this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+		this.tmpVector.setValue(x, y, z);
 		box.transform.position = this.tmpVector;
 		//设置欧拉角
 		this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
@@ -111,112 +85,6 @@ class CameraRay {
 		//设置盒子的碰撞形状
 		rigidBody.colliderShape = boxShape; 
 		//设置刚体的质量
-		rigidBody.mass = 10;
-	}
-	
-	addSphere() {
-		var mat2 = new Laya.BlinnPhongMaterial();
-		Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function(tex) {
-			mat2.albedoTexture = tex;
-		}));
-		
-		//随机生成半径大小
-		var radius = Math.random() * 0.2 + 0.2;
-		//创建球型MeshSprite3D
-		var sphere = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(radius));
-		this.scene.addChild(sphere);
-		//设置材质
-		sphere.meshRenderer.material = mat2;
-		this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-		sphere.transform.position = this.tmpVector;
-		
-		//添加刚体碰撞器
-		var rigidBody = sphere.addComponent(Laya.Rigidbody3D);
-		//创建球型碰撞器
-		var sphereShape = new Laya.SphereColliderShape(radius);
-		//设置刚体碰撞器的形状
-		rigidBody.colliderShape = sphereShape;
-		//设置刚体的质量
-		rigidBody.mass = 10;
-	}
-	
-	addCapsule() {
-		var mat3 = new Laya.BlinnPhongMaterial();
-		Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex) {
-			mat3.albedoTexture = tex;
-		}));
-		
-		var raidius = Math.random() * 0.2 + 0.2;
-		var height = Math.random() * 0.5 + 0.8;
-		//创建胶囊MeshSprite3D
-		var capsule = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCapsule(raidius, height));
-		this.scene.addChild(capsule);
-		//设置材质
-		capsule.meshRenderer.material = mat3;
-		this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-		capsule.transform.position = this.tmpVector;
-		//设置胶囊MeshSprite3D的欧拉角
-		this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-		capsule.transform.rotationEuler = this.tmpVector;
-		
-		//创建刚体碰撞器
-		var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
-		//创建球型碰撞器
-		var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
-		//设置刚体碰撞器的形状
-		rigidBody.colliderShape = sphereShape;
-		//设置刚体碰撞器的质量
-		rigidBody.mass = 10;
-	}
-	addCone() {
-		var mat4 = new Laya.BlinnPhongMaterial();
-		Laya.Texture2D.load("res/threeDimen/Physics/steel2.jpg", Laya.Handler.create(null, function(tex) {
-			mat4.albedoTexture = tex;
-		}));
-		var raidius = Math.random() * 0.2 + 0.2;
-		var height = Math.random() * 0.5 + 0.8;
-		//创建圆锥MeshSprite3D
-		var cone = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCone(raidius, height));
-		this.scene.addChild(cone);
-		//设置材质
-		cone.meshRenderer.material = mat4;
-		//设置位置
-		this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-		cone.transform.position = this.tmpVector;
-		//创建刚体碰撞器
-		var rigidBody = cone.addComponent(Laya.Rigidbody3D);
-		//创建球型碰撞器
-		var coneShape = new Laya.ConeColliderShape(raidius, height);
-		//设置刚体碰撞器的形状
-		rigidBody.colliderShape = coneShape;
-		//设置刚体碰撞器的质量
-		rigidBody.mass = 10;	
-	}
-	addCylinder() {
-		var mat5 = new Laya.BlinnPhongMaterial();
-		Laya.Texture2D.load("res/threeDimen/Physics/steel.jpg", Laya.Handler.create(null, function(tex) {
-			mat5.albedoTexture = tex;
-		}));
-		var raidius = Math.random() * 0.2 + 0.2;
-		var height = Math.random() * 0.5 + 0.8;
-		//创建圆锥MeshSprite3D
-		var cylinder = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCylinder(raidius, height));
-		this.scene.addChild(cylinder);
-		//设置材质
-		cylinder.meshRenderer.material = mat5;
-		//设置位置
-		this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-		cylinder.transform.position = this.tmpVector;
-		//设置圆柱MeshSprite3D的欧拉角
-		this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-		cylinder.transform.rotationEuler = this.tmpVector;
-		//创建刚体碰撞器
-		var rigidBody = cylinder.addComponent(Laya.Rigidbody3D);
-		//创建球型碰撞器
-		var cylinderShape = new Laya.CylinderColliderShape(raidius, height);
-		//设置刚体碰撞器的形状
-		rigidBody.colliderShape = cylinderShape;
-		//设置刚体碰撞器的质量
 		rigidBody.mass = 10;
 	}
 	
@@ -236,8 +104,8 @@ class CameraRay {
 		{
 
 			for (var i = 0; i <  this.outs.length; i++)
-				//将射线碰撞到的物体设置为红色
-				this.outs[i].collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;		
+				//在射线击中的位置添加一个立方体
+				this.addBoxXYZ(this.outs[i].point.x, this.outs[i].point.y, this.outs[i].point.z );			
 		}
 
 	}

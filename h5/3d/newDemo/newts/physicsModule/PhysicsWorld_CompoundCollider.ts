@@ -19,7 +19,7 @@ class PhysicsWorld_CompoundCollider
 			this.camera.transform.translate(new Laya.Vector3(5.2, 4, 5.2));
 			this.camera.transform.rotate(new Laya.Vector3(-25, 45, 0), true, false);
 			this.camera.addComponent(CameraMoveScript);
-			this.camera.clearColor = null;
+			//this.camera.clearColor = null;
 			
 			var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
 			directionLight.color = new Laya.Vector3(1, 1, 1);

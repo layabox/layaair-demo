@@ -20,7 +20,7 @@ class CustomMesh {
 		camera.transform.translate(new Laya.Vector3(0, 2, 5));
 		camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
 		camera.addComponent(CameraMoveScript);
-		camera.clearColor = new Laya.Vector4(0.2, 0.2, 0.2, 1.0);
+		//camera.clearColor = new Laya.Vector4(0.2, 0.2, 0.2, 1.0);
 			
 		var directionLight = new Laya.DirectionLight();
 		scene.addChild(directionLight);

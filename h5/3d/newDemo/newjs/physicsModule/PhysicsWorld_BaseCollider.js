@@ -13,8 +13,9 @@ class PhysicsWorldBaseCollider{
         camera.transform.translate(new Laya.Vector3(0, 6, 9.5));
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         camera.addComponent(CameraMoveScript);
-        //camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SOLIDCOLOR;
-        camera.clearColor = null;
+        camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SOLIDCOLOR;
+        //使用默认颜色
+        //camera.clearColor = null;
         //方向光
         var directionlight = this.scene.addChild(new Laya.DirectionLight());
         directionlight.diffuseColor = new Laya.Vector3(0.6, 0.6, 0.6);

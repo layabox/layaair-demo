@@ -74,4 +74,4 @@ class MaterialDemo{
 }
 
 //激活启动类
-new ChangeMaterial();
+new MaterialDemo();

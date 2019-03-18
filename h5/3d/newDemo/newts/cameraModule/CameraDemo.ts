@@ -14,8 +14,8 @@ class CameraDemo
             Laya.Stat.show();            
 			//预加载所有资源
 			var resource = [  
-				{url: "res/threeDimen/texture/layabox.png", clas: Laya.Texture2D, priority: 1, constructParams: [64, 64, 1, true, true]},
-				{url: "res/threeDimen/skyBox/skyBox3/skyBox3.lmat", clas: Laya.BaseMaterial, priority: 1, constructParams: [512, 512, 1, true, true]}, ];
+				{url: "res/threeDimen/texture/layabox.png"},
+				{url: "res/threeDimen/skyBox/skyBox2/skyBox2.lmat"}, ];
 			Laya.loader.create(resource, Laya.Handler.create(this, this.onPreLoadFinish));	
 		}
 		
@@ -32,7 +32,8 @@ class CameraDemo
 			
 			//相机设置清楚标记,使用固定颜色
 			this.camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SOLIDCOLOR;
-			this.camera.clearColor = new Laya.Vector4(0, 0.2, 0.6, 1);
+			//使用默认颜色
+			//this.camera.clearColor = new Laya.Vector4(0, 0.2, 0.6, 1);
 			//设置摄像机视野范围（角度）
 			this.camera.fieldOfView = 60;
 			//为相机添加视角控制组件(脚本)
@@ -108,7 +109,7 @@ class CameraDemo
 						//设置相机的清除标识为天空盒
 						this.camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
 						//使用加载天空盒材质
-						var skyboxMaterial = Laya.Loader.getRes("res/threeDimen/skyBox/skyBox3/skyBox3.lmat") as Laya.BaseMaterial;
+						var skyboxMaterial = Laya.Loader.getRes("res/threeDimen/skyBox/skyBox2/skyBox2.lmat") as Laya.BaseMaterial;
 						//获取相机的天空渲染器
 						var skyRenderer = this.camera.skyRenderer;
 						//设置相机的天空渲染器的mesh
