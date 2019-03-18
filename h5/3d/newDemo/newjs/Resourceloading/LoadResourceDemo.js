@@ -22,35 +22,46 @@ class LoadResourceDemo{
 				Laya.stage.addChild(scene);
 				//获取场景相机
 				var camera = scene.getChildByName("Main Camera");
+				//设置相机清楚标记，使用天空
 				camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
+				//调整相机的位置
+				camera.transform.translate(new Laya.Vector3(0, 45, -60));
+				camera.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
+				//相机视角控制组件(脚本)
 				camera.addComponent(CameraMoveScript);
+
 				//添加光照
 				var directionLight = this._scene.addChild(new Laya.DirectionLight());
 				directionLight.color = new Laya.Vector3(1, 1, 1);
 				directionLight.transform.rotate(new Laya.Vector3( -3.14 / 3, 0, 0));
-				
-				//材质加载
-				Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox3/skyBox3.lmat", Laya.Handler.create(this, function(mat) {
-					camera.skyboxMaterial = mat;
-				}));
+			
 				
 				(scene.getChildByName('Scenes').getChildByName('HeightMap')).active = false;
 				(scene.getChildByName('Scenes').getChildByName('Area') ).active = false;
 				this.sprite3D = this._scene.addChild(new Laya.Sprite3D());
 				
-				//创建内置立方体
-				var box = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(10, 10, 10)));
-				box.transform.translate(new Laya.Vector3(10, 10, -8));
-				//创建BlinnPhongMaterial材质
-				var boxMat = new Laya.BlinnPhongMaterial();
-				//加载纹理
-				Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function(tex) {
-					boxMat.albedoTexture = tex;
+				///材质加载
+				Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Laya.Handler.create(null, function(mat) {
+					//获取相机的天空渲染器
+					var skyRenderer = camera.skyRenderer;
+					//创建天空盒的mesh
+					skyRenderer.mesh = Laya.SkyBox.instance;
+					//设置天空盒材质
+					skyRenderer.material = mat;
 				}));
-				//设置纹理平铺和偏移
-				boxMat.tilingOffset = new Laya.Vector4(2, 2, 0, 0);
-				//设置材质
-				box.meshRenderer.material = boxMat;
+
+				//加载纹理
+				Laya.Texture2D.load("res/threeDimen/texture/earth.png", Laya.Handler.create(this, function(tex) {
+					//使用纹理
+					var earth1 = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(5, 32, 32)));
+					earth1.transform.translate(new Laya.Vector3(10, 20, -8));
+			
+					var earthMat = new Laya.BlinnPhongMaterial();
+					earthMat.albedoTexture = tex;
+					earthMat.albedoIntensity = 1;
+					earth1.meshRenderer.material = earthMat;
+				}));
+				
 				
 				//加载Mesh
 				Laya.Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm", Laya.Handler.create(this, function(mesh) {
@@ -58,14 +69,12 @@ class LoadResourceDemo{
 				    layaMonkey.transform.localScale = new Laya.Vector3(4, 4, 4);
 				    layaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
 				    layaMonkey.transform.translate(new Laya.Vector3(0, 0, 7));
-				    layaMonkey.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
 				}));
 				//加载精灵
 				Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(sp) {
 				    var layaMonkey2 = scene.addChild(sp);
 				    layaMonkey2.transform.localScale = new Laya.Vector3(4, 4, 4);
 				    layaMonkey2.transform.translate(new Laya.Vector3(-10, 13, 0));
-				    layaMonkey2.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
 				}));
 	
 			}));
@@ -75,8 +84,8 @@ class LoadResourceDemo{
         //预加载所有资源
 		var resource = [
             {url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls"},  
-            {url: "res/threeDimen/skyBox/skyBox3/skyBox3.lmat"},
-            {url: "res/threeDimen/Physics/wood.jpg"},
+            {url: "res/threeDimen/skyBox/skyBox2/skyBox2.lmat"},
+            {url: "res/threeDimen/texture/earth.png"},
             {url: "res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm"},
             {url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"},];
             Laya.loader.create(resource, Laya.Handler.create(this, this.onPreLoadFinish));	
@@ -88,7 +97,10 @@ class LoadResourceDemo{
 			//获取相机
 			var camera = this._scene.getChildByName("Main Camera");
 			//设置相机清楚标记，使用天空
-			camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
+			camera.clearFlag =Laya.BaseCamera.CLEARFLAG_SKY;
+			//调整相机的位置
+			camera.transform.translate(new Laya.Vector3(0, 45, -60));
+			camera.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
 			//相机视角控制组件(脚本)
 			camera.addComponent(CameraMoveScript);
 			
@@ -110,19 +122,18 @@ class LoadResourceDemo{
 			
 			
 			//使用纹理
-			var box = this._scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(10, 10, 10)));
-			box.transform.translate(new Laya.Vector3(10, 10, -8));
-			var boxMat = new Laya.BlinnPhongMaterial();
-			boxMat.albedoTexture = Laya.Loader.getRes("res/threeDimen/Physics/wood.jpg");
-			boxMat.tilingOffset = new Laya.Vector4(2, 2, 0, 0);
-			box.meshRenderer.material = boxMat;
+			var earth1 = this._scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(5, 32, 32)));
+			earth1.transform.translate(new Laya.Vector3(10, 20, -8));
 			
-			//创建一个精灵
-			this.sprite3D = this._scene.addChild(new Laya.Sprite3D());
+			var earthMat = new Laya.BlinnPhongMaterial();
+			earthMat.albedoTexture = Laya.Loader.getRes("res/threeDimen/texture/earth.png");
+			earthMat.albedoIntensity = 1;
+			earth1.meshRenderer.material = earthMat;
+
 			//获取Mesh资源
 			var mesh = Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm");
 			//为精灵设置Mesh资源
-			var layaMonkey = this.sprite3D.addChild(new Laya.MeshSprite3D(mesh));
+			var layaMonkey = this._scene.addChild(new Laya.MeshSprite3D(mesh));
 			layaMonkey.transform.localScale = new Laya.Vector3(4, 4, 4);
 			layaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
 			layaMonkey.transform.translate(new Laya.Vector3(0, 0, 7));
