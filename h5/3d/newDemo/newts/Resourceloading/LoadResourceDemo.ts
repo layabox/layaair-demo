@@ -15,10 +15,10 @@ class LoadResourceDemo{
 		Laya.Stat.show();
 			
 		//加载资源
-		this.LoadRes();
+		//this.LoadRes();
 			
 		//批量预加载方式
-		//this.PreloadingRes();
+		this.PreloadingRes();
     }
     LoadRes(){
         //场景加载
@@ -103,7 +103,7 @@ class LoadResourceDemo{
 						this.pangziAnimator.addState(state1);
 						//播放动作
 						this.pangziAnimator.play("hello");
-					}));
+					}));	
 				}));
 	
 			}));
@@ -184,7 +184,7 @@ class LoadResourceDemo{
 			this.pangzi.transform.translate(new Laya.Vector3(-20, 13, 0));
 			//获取动画组件
 			this.pangziAnimator = this.pangzi.getChildAt(0).getComponent(Laya.Animator) as Laya.Animator;
-			
+
 			var pangAni = Laya.Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/Assets/Model3D/PangZi-Take 001.lani") as Laya.AnimationClip;
 			//创建动作状态
 			var state1 = new Laya.AnimatorState();
