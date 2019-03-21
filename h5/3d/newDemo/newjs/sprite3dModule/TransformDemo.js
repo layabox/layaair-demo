@@ -10,17 +10,25 @@ class TransformDemo{
 		//创建场景
         this._scene = Laya.stage.addChild(new Laya.Scene3D());
         //初始化变量
-        this._position = new Laya.Vector3(-0.6, 0, 0);
-		this._rotate = new Laya.Vector3(0, 1, 0);
+        this._position = new Laya.Vector3(0, 0, 0);
+        this._position1 = new Laya.Vector3(0, 0, 0);
+        this._rotate = new Laya.Vector3(0, 1, 0);
+        this._rotate1 = new Laya.Vector3(0, 1, 0);
 		this._scale = new Laya.Vector3();
 		this.scaleDelta = 0;
         this.scaleValue = 0;
         this.layaMonkey_clone1 =null;
         this.layaMonkey_clone2 =null;
         this.layaMonkey_clone3 =null;
+
+        this.clone1Transform = null;
+        this.clone2Transform = null ;
+        this.clone3Transform = null ;
+
+
+
 		//添加相机
         var camera = (this._scene.addChild(new Laya.Camera(0, 0.1, 100)));
-        //camera.transform.translate(new Laya.Vector3(0, 0.7, 1.2));
         camera.transform.translate(new Laya.Vector3(0, 0.8, 5));
         camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
 		camera.addComponent(CameraMoveScript);
@@ -58,36 +66,51 @@ class TransformDemo{
         //设置材质
         staticLayaMonkey.meshRenderer.material = Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
         //设置位置
-        staticLayaMonkey.transform.position = new Laya.Vector3(0, 0, 0.5);
+        var staticMonkeyTrans = staticLayaMonkey.transform;
+        var staticMonkeypos = staticMonkeyTrans.position;
+        staticMonkeypos.setValue(0, 0, 0.5);
+        staticMonkeyTrans.position = staticMonkeypos;
         //设置缩放
-        staticLayaMonkey.transform.localScale = new Laya.Vector3(0.3, 0.3, 0.3);
+        var staticMonkeyScale = staticMonkeyTrans.localScale;
+        staticMonkeyScale.setValue(0.3, 0.3, 0.3);
+        staticMonkeyTrans.localScale = staticMonkeyScale;
         //设置旋转
         staticLayaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
         //产生阴影
         staticLayaMonkey.meshRenderer.castShadow = true;
+
          
         //克隆sprite3d
-        this.layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
-        this.layaMonkey_clone2 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
-        this.layaMonkey_clone3 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
+        this.layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, this._position1);
+        this.layaMonkey_clone2 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, this._position1);
+        this.layaMonkey_clone3 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, this._position1);
+
+        //得到三个transform
+        this.clone1Transform = this.layaMonkey_clone1.transform;
+        this.clone2Transform = this.layaMonkey_clone2.transformull ;
+        this.clone3Transform = this.layaMonkey_clone3.transform ;
         //平移
-        this.layaMonkey_clone1.transform.translate(new Laya.Vector3(1.5, 0, 0.0));
-        this.layaMonkey_clone2.transform.translate(new Laya.Vector3( -1.5, 0, 0.0));
-        this.layaMonkey_clone3.transform.translate(new Laya.Vector3( 2.5, 0, 0.0));
+        this._position1.setValue(-1.5, 0, 0.0);
+        this.clone2Transform.translate(this._position1);
+        this._position1.setValue(1.0, 0, 0.0);
+        this.clone3Transform.translate(this._position1);
         //旋转
-        this.layaMonkey_clone2.transform.rotate(new Laya.Vector3(0, 60, 0), false, false);
+        this._rotate1.setValue(0, 60, 0);
+        this.clone2Transform.rotate(this._rotate1, false, false);
         //缩放
-        var scale = new Laya.Vector3(0.1, 0.1, 0.1);
-        this.layaMonkey_clone3.transform.localScale = scale;
-         
+        var scale = this.clone3Transform.localScale;
+        scale.setValue(0.1,0.1,0.1);
+        this.clone3Transform.localScale = scale;
+
+        staticLayaMonkey.removeSelf(); 
+
         //设置定时器执行,定时重复执行(基于帧率)
 		Laya.timer.frameLoop(1, this, this.animate);
     }
 
     animate() {
         this.scaleValue = Math.sin(this.scaleDelta += 0.1);
-        
-        this._position.y = this.scaleValue / 2;
+        this._position.y = Math.max(0, this.scaleValue / 2);
         this.layaMonkey_clone1.transform.position = this._position;
         
         this.layaMonkey_clone2.transform.rotate(this._rotate, false, false);
