@@ -1,5 +1,4 @@
-package OfficialExample.LayaAir3D_Texture 
-{
+package LayaAir3D_Texture {
 	import common.CameraMoveScript;
 	import laya.d3.core.BufferState;
 	import laya.d3.core.Camera;
@@ -22,15 +21,15 @@ package OfficialExample.LayaAir3D_Texture
 	import laya.webgl.WebGLContext;
 	import laya.webgl.resource.BaseTexture;
 	import laya.webgl.resource.Texture2D;
+	
 	/**
 	 * ...
 	 * @author ...
 	 */
-	public class TextureDemo 
-	{
+	public class TextureDemo {
 		private var sprite3D:Sprite3D;
-		public function TextureDemo() 
-		{
+		
+		public function TextureDemo() {
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
@@ -61,14 +60,13 @@ package OfficialExample.LayaAir3D_Texture
 				//在V方向使用WARPMODE_REPEAT
 				texture.wrapModeV = BaseTexture.WARPMODE_REPEAT;
 				//设置过滤方式
-				texture._setFilterMode(BaseTexture.FILTERMODE_BILINEAR);
+				texture.filterMode = BaseTexture.FILTERMODE_BILINEAR;
 				//设置各向异性等级
 				texture.anisoLevel = 2;
 				mat.albedoTexture = texture;
 				box.meshRenderer.material = mat;
 			}));
-			
-			
+		
 		}
 		
 		public static function _createMesh(vertexDeclaration:VertexDeclaration, vertices:Float32Array, indices:Uint16Array):Mesh {
@@ -159,7 +157,6 @@ package OfficialExample.LayaAir3D_Texture
 			20, 23, 22, 22, 21, 20]);
 			return _createMesh(vertexDeclaration, vertices, indices);
 		}
-		
-		
+	
 	}
 }

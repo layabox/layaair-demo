@@ -1,4 +1,4 @@
-package OfficialExample.LayaAi3D_Advance {
+package LayaAi3D_Advance {
 	import PathFinding.core.Grid;
 	import PathFinding.core.Heuristic;
 	import laya.d3.component.Animator;
@@ -31,6 +31,8 @@ package OfficialExample.LayaAi3D_Advance {
 		private var _upVector3:Vector3 = new Vector3(0, 1, 0);
 		private var _tarPosition:Vector3 = new Vector3(0, 0, 0);
 		private var _finalPosition:Vector3 = new Vector3(0, 0, 0); 
+		private var _rotation:Vector3 = new Vector3(-45, 180, 0);
+		private var _rotation2:Vector3 = new Vector3(0, 180, 0);
 		private var _quaternion:Quaternion = new Quaternion();
 		private var index:int = 0;
 		private var curPathIndex:int = 0;
@@ -51,10 +53,10 @@ package OfficialExample.LayaAi3D_Advance {
 			
 			//预加载所有资源
 			var resource:Array = [
-			{url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Scene3D, priority: 1}, 
-			{url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Sprite3D, priority: 1}, 
-			{url: "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Texture2D, priority: 1, constructParams: [1024, 1024, 1, false, true]}, 
-			{url: "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Texture2D, priority: 1, constructParams: [64, 64, 1, false, true]}];
+			{ "res/threeDimen/scene/TerrainScene/XunLongShi.ls"}, 
+			{ "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"}, 
+			{ "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png",}, 
+			{ "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png",}];
 			
 			Laya.loader.create(resource, Handler.create(this, onLoadFinish));
 		}
@@ -92,7 +94,9 @@ package OfficialExample.LayaAi3D_Advance {
 			
 			//初始化小猴子
 			layaMonkey = moveSprite3D.addChild(Loader.getRes("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh")) as Sprite3D;
-			layaMonkey.transform.localScale = new Vector3(0.5, 0.5, 0.5);
+			
+			var tmpLocalScale:Vector3 = layaMonkey.transform.localScale;
+			tmpLocalScale.setValue(0.5, 0.5, 0.5);
 			var aniSprite3d:Sprite3D = layaMonkey.getChildAt(0) as Sprite3D;
 			
 			//获取动画组件
@@ -121,8 +125,9 @@ package OfficialExample.LayaAi3D_Advance {
 			
 			//初始化相机
 			var moveCamera:Camera = moveSprite3D.addChild(new Camera()) as Camera;
-			moveCamera.transform.localPosition = new Vector3(0, 7, -7);
-			moveCamera.transform.rotate(new Vector3(-45, 180, 0), true, false);
+			var tmpLocalPosition:Vector3 = moveCamera.transform.localPosition;
+			tmpLocalPosition.setValue(0, 7, -7);
+			moveCamera.transform.rotate(_rotation, true, false);
 			
 			//设置鼠标弹起事件响应
 			Laya.stage.on(Event.MOUSE_UP, this, function():void {
@@ -153,7 +158,7 @@ package OfficialExample.LayaAi3D_Advance {
 				//调整方向
 				layaMonkey.transform.lookAt(_tarPosition, _upVector3, false);
 				//因为资源规格,这里需要旋转180度
-				layaMonkey.transform.rotate(new Vector3(0, 180, 0), false, false);
+				layaMonkey.transform.rotate(_rotation2, false, false);
 				//调整位置
 				Tween.to(_finalPosition, {x: _position.x, y: _position.y, z: _position.z}, 40);
 				moveSprite3D.transform.position = _finalPosition;

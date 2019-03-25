@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Scene {
+package LayaAir3D_Scene3D {
 	import common.CameraMoveScript;
 	import laya.d3.core.BaseCamera;
 	import laya.d3.core.Camera;
@@ -17,12 +17,15 @@ package OfficialExample.LayaAir3D_Scene {
 	import laya.utils.Handler;
 	import laya.utils.Stat;
 	import laya.webgl.resource.Texture2D;
+	import laya.d3.resource.models.Mesh;
 	
 	public class EnvironmentalReflection {
 		
 		private var rotation:Vector3 = new Vector3(0, 0.01, 0);
 		private var sprite3D:Sprite3D;
 		private var scene:Scene3D = null;
+		private var teapot:MeshSprite3D = null;
+		
 		public function EnvironmentalReflection() {
 			
 			Laya3D.init(0, 0);
@@ -35,11 +38,11 @@ package OfficialExample.LayaAir3D_Scene {
 			Laya.stage.addChild(scene);
 			//设置场景的反射模式(全局有效)
 			scene.reflectionMode = Scene3D.REFLECTIONMODE_CUSTOM;
-			
+			scene.reflectionIntensity = 1.0;
 			//初始化照相机
 			var camera:Camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
 			camera.transform.translate(new Vector3(0, 2, 3));
-			camera.transform.rotate(new Vector3( -15, 0, 0), true, false);
+			camera.transform.rotate(new Vector3(-15, 0, 0), true, false);
 			//为相机添加视角控制组件(脚本)
 			camera.addComponent(CameraMoveScript);
 			//设置相机的清除标识为天空盒
@@ -60,13 +63,14 @@ package OfficialExample.LayaAir3D_Scene {
 			}));
 			//创建平行光
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.color = new Vector3(1, 1, 1);
-			
-			//添加一个精灵
-			sprite3D = scene.addChild(new Sprite3D()) as Sprite3D;
-			//添加一个求形MeshSprite3D
-			var sphere:MeshSprite3D = sprite3D.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(0.25, 20, 20))) as MeshSprite3D;
-			sphere.transform.position = new Vector3(0, 1.75, 2);
+			directionLight.color = new Vector3(0.6, 0.6, 0.6);
+		
+			//加载Mesh
+			Mesh.load("res/threeDimen/staticModel/teapot/teapot-Teapot001.lm", Handler.create(null, function(mesh:Mesh):void {
+				teapot = scene.addChild(new MeshSprite3D(mesh)) as MeshSprite3D;
+				teapot.transform.position = new Vector3(0, 1.75, 2);
+				teapot.transform.rotate(new Vector3(-90, 0, 0), false, false);
+			}));
 			
 			//实例PBR材质
 			var pbrMat:PBRStandardMaterial = new PBRStandardMaterial();
@@ -77,8 +81,8 @@ package OfficialExample.LayaAir3D_Scene {
 			
 			//加载纹理
 			Texture2D.load("res/threeDimen/pbr/jinshu.jpg", Handler.create(null, function(tex:Texture2D):void {
-				pbrMat.albedoTexture = tex;
-				sphere.meshRenderer.material = pbrMat;
+				//pbrMat.albedoTexture = tex;
+				teapot.meshRenderer.material = pbrMat;
 			}));
 		}
 	}

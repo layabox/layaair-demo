@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Physics {
+package LayaAir3D_Physics {
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.Sprite3D;
@@ -49,7 +49,7 @@ package OfficialExample.LayaAir3D_Physics {
 			//创建相机
 			camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
 			camera.transform.translate(new Vector3(4.5, 6, 4.5));
-			camera.transform.rotate(new Vector3( -30, 45, 0), true, false);
+			camera.transform.rotate(new Vector3(-30, 45, 0), true, false);
 			//相机的清除颜色为空
 			camera.clearColor = null;
 			
@@ -112,7 +112,9 @@ package OfficialExample.LayaAir3D_Physics {
 			box.meshRenderer.castShadow = true;
 			//接收阴影
 			box.meshRenderer.receiveShadow = true;
-			box.transform.position = new Vector3(x, y, z);
+			var pos:Vector3 = box.transform.position;
+			pos.setValue(x, y, z);
+			box.transform.position = pos;
 			
 			//创建刚体碰撞器
 			var rigidBody:Rigidbody3D = box.addComponent(Rigidbody3D) as Rigidbody3D;
@@ -138,7 +140,9 @@ package OfficialExample.LayaAir3D_Physics {
 			box.meshRenderer.material = mat;
 			box.meshRenderer.castShadow = true;
 			box.meshRenderer.receiveShadow = true;
-			box.transform.position = new Vector3(x, y, z);
+			var pos:Vector3 = box.transform.position;
+			pos.setValue(x, y, z);
+			box.transform.position = pos;
 			
 			var rigidBody:Rigidbody3D = box.addComponent(Rigidbody3D) as Rigidbody3D;
 			rigidBody.mass = 10;
@@ -168,13 +172,13 @@ package OfficialExample.LayaAir3D_Physics {
 				hasSelectedSprite = collider.owner as Sprite3D;
 				hasSelectedRigidBody = collider;
 				//设置刚体的角因子
-				collider.angularFactor = Vector3.ZERO;
+				collider.angularFactor = Vector3._ZERO;
 				//设置刚体的角速度
-				collider.angularVelocity = Vector3.ZERO;
+				collider.angularVelocity = Vector3._ZERO;
 				//设置刚体的线性因子
-				collider.linearFactor = Vector3.ZERO;
+				collider.linearFactor = Vector3._ZERO;
 				//设置刚体的线速度
-				collider.linearVelocity = Vector3.ZERO;
+				collider.linearVelocity = Vector3._ZERO;
 			}
 			Laya.stage.on(Event.MOUSE_MOVE, this, onMouseMove);
 		}
@@ -184,7 +188,9 @@ package OfficialExample.LayaAir3D_Physics {
 			delX = MouseManager.instance.mouseX - posX;
 			delY = MouseManager.instance.mouseY - posY;
 			if (hasSelectedSprite) {
-				hasSelectedRigidBody.linearVelocity = new Vector3(delX / 4, 0, delY / 4);
+				var linearVelocity:Vector3 = hasSelectedRigidBody.linearVelocity;
+				linearVelocity.setValue(delX / 4, 0, delY / 4);
+				hasSelectedRigidBody.linearVelocity = linearVelocity;
 			}
 			posX = MouseManager.instance.mouseX;
 			posY = MouseManager.instance.mouseY;
@@ -193,8 +199,8 @@ package OfficialExample.LayaAir3D_Physics {
 		public function onMouseUp():void {
 			Laya.stage.off(Event.MOUSE_MOVE, this, onMouseMove);
 			if (hasSelectedSprite) {
-				hasSelectedRigidBody.angularFactor = Vector3.ONE;
-				hasSelectedRigidBody.linearFactor = Vector3.ONE;
+				hasSelectedRigidBody.angularFactor = Vector3._ONE;
+				hasSelectedRigidBody.linearFactor = Vector3._ONE;
 				hasSelectedSprite = null;
 			}
 		}
@@ -202,8 +208,8 @@ package OfficialExample.LayaAir3D_Physics {
 		public function onMouseOut():void {
 			Laya.stage.off(Event.MOUSE_MOVE, this, onMouseMove);
 			if (hasSelectedSprite) {
-				hasSelectedRigidBody.angularFactor = Vector3.ONE;
-				hasSelectedRigidBody.linearFactor = Vector3.ONE;
+				hasSelectedRigidBody.angularFactor = Vector3._ONE;
+				hasSelectedRigidBody.linearFactor = Vector3._ONE;
 				hasSelectedSprite = null;
 			}
 		}

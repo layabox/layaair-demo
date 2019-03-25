@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Material {
+package LayaAir3D_Material {
 	import common.CameraMoveScript;
 	import laya.d3.core.BaseCamera;
 	import laya.d3.core.Camera;

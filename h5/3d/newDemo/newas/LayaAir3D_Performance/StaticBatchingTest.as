@@ -1,41 +1,36 @@
-package OfficialExample.LayaAir3D_Performance 
-{
+package LayaAir3D_Performance {
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
-	import laya.d3.core.MeshSprite3D;
-	import laya.d3.core.Sprite3D;
 	import laya.d3.core.RenderableSprite3D;
-	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
-	import laya.display.Stage;
-	import laya.utils.Handler;
-	import laya.utils.Stat;
 	import laya.d3.graphics.StaticBatchManager;
+	import laya.display.Stage;
+	import laya.events.Event;
 	import laya.ui.Button;
 	import laya.utils.Browser;
-	import laya.events.Event;
+	import laya.utils.Handler;
+	import laya.utils.Stat;
+	
 	/**
 	 * ...
 	 * @author ...
 	 */
-	public class StaticBatchingTest 
-	{
+	public class StaticBatchingTest {
 		private var curStateIndex:int = 0;
 		private var changeActionButton:Button;
 		private var planeSprite:RenderableSprite3D;
-		private	var cubeSprite:RenderableSprite3D;
-		private	var sphereSprite:RenderableSprite3D;
-		private	var capsuleSprite:RenderableSprite3D;
-		private	var cylinderSprite:RenderableSprite3D;
-		private var renderableSprite3Ds:Vector.<RenderableSprite3D>  = new Vector.<RenderableSprite3D>;
+		private var cubeSprite:RenderableSprite3D;
+		private var sphereSprite:RenderableSprite3D;
+		private var capsuleSprite:RenderableSprite3D;
+		private var cylinderSprite:RenderableSprite3D;
+		private var renderableSprite3Ds:Vector.<RenderableSprite3D> = new Vector.<RenderableSprite3D>;
 		
-		public function StaticBatchingTest() 
-		{
+		public function StaticBatchingTest() {
 			Laya3D.init(0, 0);
 			Stat.show();
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
-		
+			
 			Scene3D.load("res/threeDimen/scene/StaticBatching/staticBatching.ls", Handler.create(null, function(scene:Scene3D):void {
 				Laya.stage.addChild(scene) as Scene3D;
 				var camera:Camera = scene.getChildByName("Main Camera") as Camera;
@@ -64,10 +59,9 @@ package OfficialExample.LayaAir3D_Performance
 				
 				//生成按钮
 				loadUI();
-				
+			
 			}));
-			
-			
+		
 		}
 		
 		private function loadUI():void {
@@ -81,19 +75,19 @@ package OfficialExample.LayaAir3D_Performance
 				changeActionButton.scale(Browser.pixelRatio, Browser.pixelRatio);
 				changeActionButton.pos(Laya.stage.width / 2 - changeActionButton.width * Browser.pixelRatio / 2, Laya.stage.height - 100 * Browser.pixelRatio);
 				
-				changeActionButton.on(Event.CLICK, this, function():void{
-						//精灵设置开启静态合并
-						planeSprite._isStatic = true;
-						cubeSprite._isStatic = true;
-						sphereSprite._isStatic = true;
-						capsuleSprite._isStatic = true;
-						cylinderSprite._isStatic = true;
-						//进行静态合并
-						StaticBatchManager.combine(null, renderableSprite3Ds);				
-				});	
+				changeActionButton.on(Event.CLICK, this, function():void {
+					//精灵设置开启静态合并
+					planeSprite._isStatic = true;
+					cubeSprite._isStatic = true;
+					sphereSprite._isStatic = true;
+					capsuleSprite._isStatic = true;
+					cylinderSprite._isStatic = true;
+					//进行静态合并
+					StaticBatchManager.combine(null, renderableSprite3Ds);
+				});
 			}));
 		}
-		
+	
 	}
 
 }

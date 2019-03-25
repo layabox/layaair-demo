@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Mesh {
+package LayaAir3D_Mesh {
 	import common.Tool;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;

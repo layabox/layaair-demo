@@ -1,9 +1,8 @@
-package OfficialExample.LayaAir3D_Material {
+package LayaAir3D_Material {
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.material.BaseMaterial;
-	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Quaternion;
 	import laya.d3.math.Vector3;
@@ -33,7 +32,7 @@ package OfficialExample.LayaAir3D_Material {
 			camera.transform.rotate(new Vector3(-15, 0, 0), true, false);
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.color = new Vector3(0.6, 0.6, 0.6);
+			directionLight.color.setValue(0.6, 0.6, 0.6);
 			
 			Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm", Handler.create(null, function(mesh:Mesh):void {
 				var layaMonkey:MeshSprite3D = scene.addChild(new MeshSprite3D(mesh)) as MeshSprite3D;

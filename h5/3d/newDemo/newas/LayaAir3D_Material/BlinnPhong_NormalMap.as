@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Material {
+package LayaAir3D_Material {
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.Sprite3D;
@@ -7,7 +7,6 @@ package OfficialExample.LayaAir3D_Material {
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
 	import laya.display.Stage;
-	import laya.net.Loader;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
 	import laya.webgl.resource.Texture2D;
@@ -31,7 +30,7 @@ package OfficialExample.LayaAir3D_Material {
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			directionLight.transform.worldMatrix.setForward(new Vector3(0.0, -0.8, -1.0));
-			directionLight.color = new Vector3(1, 1, 1);
+			directionLight.color.setValue(1, 1, 1);
 			
 			Laya.loader.create("res/threeDimen/staticModel/lizard/lizard.lh", Handler.create(this, onComplete), null, Laya3D.HIERARCHY);
 		}

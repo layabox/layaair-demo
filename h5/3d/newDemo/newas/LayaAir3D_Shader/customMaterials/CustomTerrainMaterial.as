@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Shader.customMaterials {
+package LayaAir3D_Shader.customMaterials {
 	import laya.d3.core.material.BaseMaterial;
 	import laya.d3.math.Vector2;
 	import laya.d3.shader.Shader3D;

@@ -1,7 +1,8 @@
-package OfficialExample.LayaAir3D_Physics {
+package LayaAir3D_Physics {
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
+	import laya.d3.core.Transform3D;
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
@@ -26,7 +27,9 @@ package OfficialExample.LayaAir3D_Physics {
 	 * @author wzy
 	 */
 	public class PhysicsWorld_MeshCollider {
+		
 		private var scene:Scene3D;
+		private var tmpVector:Vector3 = new Vector3(0, 0, 0);
 		
 		public function PhysicsWorld_MeshCollider() {
 			Laya3D.init(0, 0);
@@ -56,7 +59,7 @@ package OfficialExample.LayaAir3D_Physics {
 			var albedo:Texture2D = Loader.getRes("res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_diff.png");
 			var normal:Texture2D = Loader.getRes("res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_norm.png");
 			var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
-			mat.specularColor = new Vector4(0.5,0.5,0.5,0.5);
+			mat.specularColor = new Vector4(0.5, 0.5, 0.5, 0.5);
 			mat.albedoTexture = albedo;
 			mat.normalTexture = normal;
 			
@@ -72,9 +75,17 @@ package OfficialExample.LayaAir3D_Physics {
 			lizardCollider.restitution = 0.3;
 			
 			var lizard1:MeshSprite3D = scene.addChild(new MeshSprite3D(mesh)) as MeshSprite3D;
-			lizard1.transform.localPosition = new Vector3(3, 0, 0);
-			lizard1.transform.localRotationEuler = new Vector3(0, 80, 0);
-			lizard1.transform.localScale = new Vector3(0.01, 0.01, 0.01);
+			var transform:Transform3D = lizard1.transform;
+			var localPosition:Vector3 = transform.localPosition;
+			var localRotationEuler:Vector3 = transform.localRotationEuler;
+			var localScale:Vector3 = transform.localScale;
+			localPosition.setValue(3, 0, 0);
+			localRotationEuler.setValue(0, 80, 0);
+			localScale.setValue(0.01, 0.01, 0.01);
+			transform.localPosition = localPosition;
+			transform.localRotationEuler = localRotationEuler;
+			transform.localScale = localScale;
+			
 			lizard1.meshRenderer.material = mat;
 			var lizardCollider1:PhysicsCollider = lizard1.addComponent(PhysicsCollider);
 			var meshShape1:MeshColliderShape = new MeshColliderShape();
@@ -116,8 +127,13 @@ package OfficialExample.LayaAir3D_Physics {
 			var sZ:int = Math.random() * 0.75 + 0.25;
 			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(sX, sY, sZ))) as MeshSprite3D;
 			box.meshRenderer.material = mat1;
-			box.transform.position = new Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-			box.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			var transform:Transform3D = box.transform;
+			var pos:Vector3 = transform.position;
+			pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			transform.position = pos;
+			var rotationEuler:Vector3 = transform.rotationEuler;
+			rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			transform.rotationEuler = rotationEuler;
 			
 			var rigidBody:Rigidbody3D = box.addComponent(Rigidbody3D);
 			var boxShape:BoxColliderShape = new BoxColliderShape(sX, sY, sZ);
@@ -134,7 +150,9 @@ package OfficialExample.LayaAir3D_Physics {
 			var radius:Number = Math.random() * 0.2 + 0.2;
 			var sphere:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(radius))) as MeshSprite3D;
 			sphere.meshRenderer.material = mat2;
-			sphere.transform.position = new Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			var pos:Vector3 = sphere.transform.position;
+			pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			sphere.transform.position = pos;
 			
 			var rigidBody:Rigidbody3D = sphere.addComponent(Rigidbody3D);
 			var sphereShape:SphereColliderShape = new SphereColliderShape(radius);
@@ -152,8 +170,13 @@ package OfficialExample.LayaAir3D_Physics {
 			var height:int = Math.random() * 0.5 + 0.8;
 			var capsule:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createCapsule(raidius, height))) as MeshSprite3D;
 			capsule.meshRenderer.material = mat3;
-			capsule.transform.position = new Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-			capsule.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			var transform:Transform3D = capsule.transform;
+			var pos:Vector3 = transform.position;
+			pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			transform.position = pos;
+			var rotationEuler:Vector3 = transform.rotationEuler;
+			rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			transform.rotationEuler = rotationEuler;
 			
 			var rigidBody:Rigidbody3D = capsule.addComponent(Rigidbody3D);
 			var sphereShape:CapsuleColliderShape = new CapsuleColliderShape(raidius, height);

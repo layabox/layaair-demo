@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Animation {
+package LayaAir3D_Animation {
 	import common.CameraMoveScript;
 	import laya.d3.component.Animator;
 	import laya.d3.core.Camera;
@@ -6,6 +6,7 @@ package OfficialExample.LayaAir3D_Animation {
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
+	import laya.d3.math.Vector4;
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.ui.Button;
@@ -22,6 +23,9 @@ package OfficialExample.LayaAir3D_Animation {
 		private var zombieAnimator:Animator;
 		private var curStateIndex:int = 0;
 		private var clipName:Array = ["idle", "fallingback", "idle", "walk", "Take 001"];
+		private var _translate:Vector3 = new Vector3(0, 1.5, 4);
+		private var _rotation:Vector3 = new Vector3( -15, 0, 0);
+		private var _forward:Vector3 = new Vector3(-1.0, -1.0, -1.0);
 		
 		public function SkinAnimationSample() {
 			Laya3D.init(0, 0);
@@ -32,19 +36,19 @@ package OfficialExample.LayaAir3D_Animation {
 			var scene:Scene3D = Laya.stage.addChild(new Scene3D()) as Scene3D;
 			
 			var camera:Camera = (scene.addChild(new Camera(0, 0.1, 1000))) as Camera;
-			camera.transform.translate(new Vector3(0, 1.5, 4));
-			camera.transform.rotate(new Vector3(-15, 0, 0), true, false);
+			camera.transform.translate(_translate);
+			camera.transform.rotate(_rotation, true, false);
 			camera.addComponent(CameraMoveScript);
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.transform.worldMatrix.setForward(new Vector3(-1.0, -1.0, -1.0));
-			directionLight.color = new Vector3(1, 1, 1);
+			directionLight.transform.worldMatrix.setForward(_forward);
+			directionLight.color.setValue(1, 1, 1);
 			
-			Sprite3D.load("../../../../res/threeDimen/skinModel/Zombie/Plane.lh", Handler.create(null, function(plane:Sprite3D):void {
+			Sprite3D.load("res/threeDimen/skinModel/Zombie/Plane.lh", Handler.create(null, function(plane:Sprite3D):void {
 				scene.addChild(plane);
 			}));
 			
-			Sprite3D.load("../../../../res/threeDimen/skinModel/Zombie/Zombie.lh", Handler.create(null, function(zombie:Sprite3D):void {
+			Sprite3D.load("res/threeDimen/skinModel/Zombie/Zombie.lh", Handler.create(null, function(zombie:Sprite3D):void {
 				scene.addChild(zombie);
 				zombieAnimator = (zombie.getChildAt(0) as Sprite3D).getComponent(Animator) as Animator;//获取Animator动画组件
 				loadUI();
@@ -53,9 +57,9 @@ package OfficialExample.LayaAir3D_Animation {
 		
 		private function loadUI():void {
 			
-			Laya.loader.load(["../../../../res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
 				
-				changeActionButton = Laya.stage.addChild(new Button("../../../../res/threeDimen/ui/button.png", "切换动作")) as Button;
+				changeActionButton = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "切换动作")) as Button;
 				changeActionButton.size(160, 40);
 				changeActionButton.labelBold = true;
 				changeActionButton.labelSize = 30;

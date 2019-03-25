@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Sky {
+package LayaAir3D_Sky {
 	import common.CameraMoveScript;
 	import laya.d3.core.BaseCamera;
 	import laya.d3.core.Camera;
@@ -11,7 +11,6 @@ package OfficialExample.LayaAir3D_Sky {
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	
 	
 	public class Sky_SkyBox {
 		

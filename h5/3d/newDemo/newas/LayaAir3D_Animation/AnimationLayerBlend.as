@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Animation {
+package LayaAir3D_Animation {
 	import laya.d3.component.Animator;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.shader.Shader3D;

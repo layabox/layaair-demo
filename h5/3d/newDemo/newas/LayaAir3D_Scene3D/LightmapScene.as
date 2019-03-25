@@ -1,7 +1,6 @@
-package OfficialExample.LayaAir3D_Scene {
+package LayaAir3D_Scene3D {
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
-	import laya.d3.core.Sprite3D;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
 	import laya.display.Stage;

@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Mesh {
+package LayaAir3D_Mesh {
 	import common.CameraMoveScript;
 	import common.Tool;
 	import laya.d3.core.Camera;
@@ -82,7 +82,6 @@ package OfficialExample.LayaAir3D_Mesh {
 			cone.transform.position = new Vector3(-2.0, 0.375, 0.6);
 			var coneLineSprite3D:PixelLineSprite3D = lineSprite3D.addChild(new PixelLineSprite3D(500)) as PixelLineSprite3D;
 			Tool.linearModel(cone, coneLineSprite3D, Color.GREEN);
-		
 			
 			//平面
 			var plane:MeshSprite3D = sprite3D.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(6, 6, 10, 10))) as MeshSprite3D;

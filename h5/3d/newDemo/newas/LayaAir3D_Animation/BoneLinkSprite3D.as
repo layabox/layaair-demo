@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Animation
+package LayaAir3D_Animation
 {
 	import common.CameraMoveScript;
 	import laya.d3.component.Animator;
@@ -37,6 +37,9 @@ package OfficialExample.LayaAir3D_Animation
 		private var _rotation:Quaternion = new Quaternion( -0.5, -0.5, 0.5, -0.5);
 		private var _position:Vector3 = new Vector3( -0.2, 0.0, 0.0);
 		private var _scale:Vector3 = new Vector3( 0.75, 0.75, 0.75);
+		private var _translate:Vector3 = new Vector3(0, 3, 5);
+		private var _rotation2:Vector3 = new Vector3( -15, 0, 0);
+		private var _forward:Vector3 = new Vector3( -1.0, -1.0, -1.0);
 		private var changeActionButton:Button;
 		private var curStateIndex:int = 0;
 		
@@ -54,9 +57,9 @@ package OfficialExample.LayaAir3D_Animation
 			
 			//预加载所有资源
 			var resource:Array = [
-				{url: "res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", type: Laya3D.HIERARCHY, priority: 1}, 
-				{url: "res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh", type: Laya3D.HIERARCHY, priority: 1}, 
-				{url: "res/threeDimen/skinModel/BoneLinkScene/PangZi.lh", type: Laya3D.HIERARCHY, priority: 1}
+				"res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", 
+				"res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh", 
+				"res/threeDimen/skinModel/BoneLinkScene/PangZi.lh"
 			];
 			
 			Laya.loader.create(resource, Handler.create(this, onLoadFinish));
@@ -66,16 +69,16 @@ package OfficialExample.LayaAir3D_Animation
 		{
 			//初始化场景
 			scene = Laya.stage.addChild(new Scene3D()) as Scene3D;
-			scene.ambientColor = new Vector3(0.5, 0.5, 0.5);
+			scene.ambientColor.setValue(0.5, 0.5, 0.5);
 			
 			//初始化相机
 			var camera:Camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
-			camera.transform.translate(new Vector3(0, 3, 5));
-			camera.transform.rotate(new Vector3( -15, 0, 0), true, false);
+			camera.transform.translate(_translate);
+			camera.transform.rotate(_rotation2, true, false);
 			camera.addComponent(CameraMoveScript);
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.transform.worldMatrix.setForward(new Vector3(-1.0, -1.0, -1.0));
+			directionLight.transform.worldMatrix.setForward(_forward);
 			
 			//初始化角色精灵
 			role = scene.addChild(new Sprite3D()) as Sprite3D;

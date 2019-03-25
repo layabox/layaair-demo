@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Physics {
+package LayaAir3D_Physics {
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
@@ -35,6 +35,11 @@ package OfficialExample.LayaAir3D_Physics {
 		private var hitResult:HitResult = new HitResult();
 		private var hitResults:Vector.<HitResult> = new Vector.<HitResult>();
 		private var debugSprites:Vector.<Sprite3D> = new Vector.<Sprite3D>();
+		//创建射线的起始点
+		private var from:Vector3 = new Vector3(0, 1, 10);
+		private	var to:Vector3 = new Vector3(0, 1, -5);
+		private var _albedoColor:Vector4 = new Vector4(1.0, 1.0, 1.0, 0.5);
+		private var _position:Vector3 = new Vector3(0, 0, 0);
 		
 		public function PhysicsWorld_RayShapeCast() {
 			//初始化引擎
@@ -44,7 +49,7 @@ package OfficialExample.LayaAir3D_Physics {
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			//显示性能面板
 			Stat.show();
-			
+			var test:Boolean = Laya3D._enbalePhysics;
 			//创建场景
 			scene = Laya.stage.addChild(new Scene3D()) as Scene3D;
 			
@@ -68,7 +73,9 @@ package OfficialExample.LayaAir3D_Physics {
 				planeMat.albedoTexture = tex;
 			}));
 			//设置材质
-			planeMat.tilingOffset = new Vector4(2, 2, 0, 0);
+			var tilingOffset:Vector4 = planeMat.tilingOffset;
+			tilingOffset.setValue(2, 2, 0, 0);
+			planeMat.tilingOffset = tilingOffset;
 			plane.meshRenderer.material = planeMat;
 			
 			//为地面创建物理碰撞器
@@ -129,9 +136,7 @@ package OfficialExample.LayaAir3D_Physics {
 					debugSprites.length = 0;
 				}
 				
-				//创建射线的起始点
-				var from:Vector3 = new Vector3(0, 1, 10);
-				var to:Vector3 = new Vector3(0, 1, -5);
+				
 				switch (castType) {
 				case 0: 
 					//创建线性射线
@@ -162,13 +167,12 @@ package OfficialExample.LayaAir3D_Physics {
 						//创建BlinnPhong材质
 						var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
 						//设置材质的颜色
-						mat.albedoColor = new Vector4(1.0, 1.0, 1.0, 0.5);
+						mat.albedoColor = _albedoColor;
 						//设置材质的渲染模式
 						mat.renderMode = BlinnPhongMaterial.RENDERMODE_TRANSPARENT;
 						boxSprite.meshRenderer.material = mat;
-						var position:Vector3 = new Vector3();
-						Vector3.lerp(from, to, i / 20, position);
-						boxSprite.transform.localPosition = position;
+						Vector3.lerp(from, to, i / 20, _position);
+						boxSprite.transform.localPosition = _position;
 						debugSprites.push(boxSprite);
 					}
 					//使用盒型碰撞器进行形状检测
@@ -190,12 +194,11 @@ package OfficialExample.LayaAir3D_Physics {
 					for (i = 0; i < 41; i++) {
 						var sphereSprite:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(0.5))) as MeshSprite3D;
 						var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
-						mat.albedoColor = new Vector4(1.0, 1.0, 1.0, 0.5);
+						mat.albedoColor = _albedoColor;
 						mat.renderMode = BlinnPhongMaterial.RENDERMODE_TRANSPARENT;
 						sphereSprite.meshRenderer.material = mat;
-						var position:Vector3 = new Vector3();
-						Vector3.lerp(from, to, i / 40, position);
-						sphereSprite.transform.localPosition = position;
+						Vector3.lerp(from, to, i / 40, _position);
+						sphereSprite.transform.localPosition = _position;
 						debugSprites.push(sphereSprite);
 					}
 					//使用球型碰撞器进行形状检测
@@ -216,12 +219,11 @@ package OfficialExample.LayaAir3D_Physics {
 					for (i = 0; i < 41; i++) {
 						var capsuleSprite:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createCapsule(0.25, 1.0))) as MeshSprite3D;
 						var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
-						mat.albedoColor = new Vector4(1.0, 1.0, 1.0, 0.5);
+						mat.albedoColor = _albedoColor;
 						mat.renderMode = BlinnPhongMaterial.RENDERMODE_TRANSPARENT;
 						capsuleSprite.meshRenderer.material = mat;
-						var position:Vector3 = new Vector3();
-						Vector3.lerp(from, to, i / 40, position);
-						capsuleSprite.transform.localPosition = position;
+						Vector3.lerp(from, to, i / 40, _position);
+						capsuleSprite.transform.localPosition = _position;
 						debugSprites.push(capsuleSprite);
 					}
 					//使用胶囊碰撞器进行形状检测
@@ -267,8 +269,14 @@ package OfficialExample.LayaAir3D_Physics {
 			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(sX, sY, sZ))) as MeshSprite3D;
 			//设置盒子的材质
 			box.meshRenderer.material = mat1;
-			box.transform.position = new Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-			box.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			var transform:Transform3D = box.transform;
+			var pos:Vector3 = transform.position;
+			pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+			transform.position = pos;
+			var rotationEuler:Vector3 = transform.rotationEuler;
+			rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			transform.rotationEuler = rotationEuler;
+			
 			//创建刚体碰撞器
 			var rigidBody:Rigidbody3D = box.addComponent(Rigidbody3D);
 			//创建盒型碰撞器
@@ -292,8 +300,13 @@ package OfficialExample.LayaAir3D_Physics {
 			var capsule:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createCapsule(raidius, height))) as MeshSprite3D;
 			//为胶囊精灵设置材质
 			capsule.meshRenderer.material = mat3;
-			capsule.transform.position = new Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-			capsule.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			var transform:Transform3D = capsule.transform;
+			var pos:Vector3 = transform.position;
+			pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+			transform.position = pos;
+			var rotationEuler:Vector3 = transform.rotationEuler;
+			rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			transform.rotationEuler = rotationEuler;
 			//创建刚体碰撞器
 			var rigidBody:Rigidbody3D = capsule.addComponent(Rigidbody3D);
 			//创建胶囊型碰撞器

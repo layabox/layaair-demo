@@ -1,7 +1,8 @@
-package OfficialExample.LayaAir3D_Physics {
+package LayaAir3D_Physics {
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.Sprite3D;
+	import laya.d3.core.Transform3D;
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
@@ -24,6 +25,12 @@ package OfficialExample.LayaAir3D_Physics {
 		private var scene:Scene3D;
 		private var camera:Camera;
 		private var kinematicSphere:Sprite3D;
+		private var translateW:Vector3 = new Vector3(0, 0, -0.2);
+		private var translateS:Vector3 = new Vector3(0, 0, 0.2);
+		private var translateA:Vector3 = new Vector3(-0.2, 0, 0);
+		private var translateD:Vector3 = new Vector3(0.2, 0, 0);
+		private var translateQ:Vector3 = new Vector3(-0.01, 0, 0);
+		private var translateE:Vector3 = new Vector3(0.01, 0, 0);
 		
 		public function PhysicsWorld_Kinematic() {
 			Laya3D.init(0, 0, null);
@@ -66,12 +73,16 @@ package OfficialExample.LayaAir3D_Physics {
 			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(null, function(tex:Texture2D):void {
 				mat2.albedoTexture = tex;
 			}));
-			mat2.albedoColor = new Vector4(1.0, 0.0, 0.0, 1.0);
+			var albedoColor:Vector4 = mat2.albedoColor;
+			albedoColor.setValue(1.0, 0.0, 0.0, 1.0);
+			mat2.albedoColor = albedoColor;
 			
 			var radius:Number = 0.8;
 			var sphere:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(radius))) as MeshSprite3D;
 			sphere.meshRenderer.material = mat2;
-			sphere.transform.position = new Vector3(0, 0.8, 0);
+			var pos:Vector3 = sphere.transform.position;
+			pos.setValue(0, 0.8, 0);
+			sphere.transform.position = pos;
 			//创建刚体碰撞器
 			var rigidBody:Rigidbody3D = sphere.addComponent(Rigidbody3D);
 			//创建球型碰撞器
@@ -87,12 +98,12 @@ package OfficialExample.LayaAir3D_Physics {
 		}
 		
 		private function onKeyDown():void {
-			KeyBoardManager.hasKeyDown(87) && kinematicSphere.transform.translate(new Vector3(0, 0, -0.2));//W
-			KeyBoardManager.hasKeyDown(83) && kinematicSphere.transform.translate(new Vector3(0, 0, 0.2));//S
-			KeyBoardManager.hasKeyDown(65) && kinematicSphere.transform.translate(new Vector3(-0.2, 0, 0));//A
-			KeyBoardManager.hasKeyDown(68) && kinematicSphere.transform.translate(new Vector3(0.2, 0, 0));//D
-			KeyBoardManager.hasKeyDown(81) && kinematicSphere.transform.translate(new Vector3(0, 0.2, 0));//Q
-			KeyBoardManager.hasKeyDown(69) && kinematicSphere.transform.translate(new Vector3(0, -0.2, 0));//E
+			KeyBoardManager.hasKeyDown(87) && kinematicSphere.transform.translate(translateW);//W
+			KeyBoardManager.hasKeyDown(83) && kinematicSphere.transform.translate(translateS);//S
+			KeyBoardManager.hasKeyDown(65) && kinematicSphere.transform.translate(translateA);//A
+			KeyBoardManager.hasKeyDown(68) && kinematicSphere.transform.translate(translateD);//D
+			KeyBoardManager.hasKeyDown(81) && plane.transform.translate(translateQ);//Q
+			KeyBoardManager.hasKeyDown(69) && plane.transform.translate(translateE);//E
 		}
 		
 		public function addBox():void {
@@ -107,8 +118,13 @@ package OfficialExample.LayaAir3D_Physics {
 			var sZ:int = Math.random() * 0.75 + 0.25;
 			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(sX, sY, sZ))) as MeshSprite3D;
 			box.meshRenderer.material = mat1;
-			box.transform.position = new Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-			box.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			var transform:Transform3D = box.transform;
+			var pos:Vector3 = transform.position;
+			pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+			transform.position = pos;
+			var rotationEuler:Vector3 = transform.rotationEuler;
+			rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			transform.rotationEuler = rotationEuler;
 			
 			var rigidBody:Rigidbody3D = box.addComponent(Rigidbody3D);
 			var boxShape:BoxColliderShape = new BoxColliderShape(sX, sY, sZ);
@@ -126,8 +142,13 @@ package OfficialExample.LayaAir3D_Physics {
 			var height:int = Math.random() * 0.5 + 0.8;
 			var capsule:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createCapsule(raidius, height))) as MeshSprite3D;
 			capsule.meshRenderer.material = mat3;
-			capsule.transform.position = new Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-			capsule.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			var transform:Transform3D = capsule.transform;
+			var pos:Vector3 = transform.position;
+			pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+			transform.position = pos;
+			var rotationEuler:Vector3 = transform.rotationEuler;
+			rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			transform.rotationEuler = rotationEuler;
 			
 			var rigidBody:Rigidbody3D = capsule.addComponent(Rigidbody3D);
 			var sphereShape:CapsuleColliderShape = new CapsuleColliderShape(raidius, height);

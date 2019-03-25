@@ -1,11 +1,10 @@
-package OfficialExample.LayaAir3D_Mesh 
-{
+package LayaAir3D_Mesh {
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
-	import laya.d3.core.material.PBRStandardMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.resource.models.Mesh;
+	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.net.Loader;
@@ -13,14 +12,12 @@ package OfficialExample.LayaAir3D_Mesh
 	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.webgl.resource.Texture2D;
-	import laya.d3.resource.models.PrimitiveMesh;
+	
 	/**
 	 * ...
 	 * @author ...
 	 */
-	public class ChangeMesh 
-	{
+	public class ChangeMesh {
 		private var sphere:MeshSprite3D;
 		private var changeActionButton:Button;
 		private var index:int = 0;
@@ -30,9 +27,7 @@ package OfficialExample.LayaAir3D_Mesh
 		private var cylinder:Mesh;
 		private var cone:Mesh;
 		
-		
-		public function ChangeMesh() 
-		{
+		public function ChangeMesh() {
 			//初始化引擎
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
@@ -40,17 +35,16 @@ package OfficialExample.LayaAir3D_Mesh
 			//显示性能面板
 			Stat.show();
 			//预加载所有资源
-			var resource:Array = [
-				{url: "res/threeDimen/scene/ChangeMaterialDemo/Conventional/scene.ls", clas: Scene3D, priority: 1}];
-			Laya.loader.create(resource, Handler.create(this, onPreLoadFinish));	
-			
+			var resource:Array = ["res/threeDimen/scene/ChangeMaterialDemo/Conventional/scene.ls"}];
+			Laya.loader.create(resource, Handler.create(this, onPreLoadFinish));
+		
 		}
 		
-		public function onPreLoadFinish(){
+		public function onPreLoadFinish() {
 			//初始化3D场景
 			var scene:Scene3D = Laya.stage.addChild(Loader.getRes("res/threeDimen/scene/ChangeMaterialDemo/Conventional/scene.ls")) as Scene3D;
 			//获取相机
-			var camera:Camera =  scene.getChildByName("Main Camera") as Camera;
+			var camera:Camera = scene.getChildByName("Main Camera") as Camera;
 			//为相机添加视角控制组件(脚本)
 			camera.addComponent(CameraMoveScript);
 			//获取球型精灵
@@ -64,7 +58,7 @@ package OfficialExample.LayaAir3D_Mesh
 			cone = PrimitiveMesh.createCone(0.25, 0.75);
 			//加载UI
 			loadUI();
-			
+		
 		}
 		
 		private function loadUI():void {
@@ -79,34 +73,30 @@ package OfficialExample.LayaAir3D_Mesh
 				changeActionButton.scale(Browser.pixelRatio, Browser.pixelRatio);
 				changeActionButton.pos(Laya.stage.width / 2 - changeActionButton.width * Browser.pixelRatio / 2, Laya.stage.height - 100 * Browser.pixelRatio);
 				
-				changeActionButton.on(Event.CLICK, this, function():void{
+				changeActionButton.on(Event.CLICK, this, function():void {
 					debugger;
 					index++;
-					if (index % 5 === 1 ){
+					if (index % 5 === 1) {
 						//切换mesh
 						sphere.meshFilter.sharedMesh = box;
-					}
-					else if (index % 5 === 2){
+					} else if (index % 5 === 2) {
 						//切换mesh
 						sphere.meshFilter.sharedMesh = capsule;
-					}
-					else if(index % 5 === 3){
+					} else if (index % 5 === 3) {
 						//切换mesh
 						sphere.meshFilter.sharedMesh = cylinder;
-					}
-					else if(index % 5 === 3){
+					} else if (index % 5 === 3) {
 						//切换mesh
 						sphere.meshFilter.sharedMesh = cone;
-					}
-					else{
+					} else {
 						//切换mesh
 						sphere.meshFilter.sharedMesh = sphereMesh;
 					}
 				});
-				
+			
 			}));
 		}
-		
+	
 	}
 
 }

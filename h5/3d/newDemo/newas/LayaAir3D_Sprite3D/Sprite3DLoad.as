@@ -1,13 +1,13 @@
-package OfficialExample.LayaAir3D_Sprite3D {
+package LayaAir3D_Sprite3D {
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
 	import laya.display.Stage;
+	import laya.net.WorkerLoader;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.net.WorkerLoader;
 	
 	public class Sprite3DLoad {
 		public function Sprite3DLoad() {
@@ -16,9 +16,6 @@ package OfficialExample.LayaAir3D_Sprite3D {
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			Stat.show();
 			
-			//开启多线程
-			WorkerLoader.workerPath = "libs/worker.js";
-			WorkerLoader.enable = true;
 			var scene:Scene3D = Laya.stage.addChild(new Scene3D()) as Scene3D;
 			scene.ambientColor = new Vector3(1, 1, 1);
 			

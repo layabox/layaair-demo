@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Camera 
+package LayaAir3D_Camera 
 {
 	import common.CameraMoveScript;
 	import laya.d3.core.BaseCamera;
@@ -34,10 +34,18 @@ package OfficialExample.LayaAir3D_Camera
 		private var box:MeshSprite3D;
 		private var capsule:MeshSprite3D;
 		private var cylinder:MeshSprite3D;
+		private var _translate = new Vector3(0, 0.7, 5);
+		private var _rotation:Vector3 = new Vector3( -15, 0, 0);
+		private var _rotation2:Vector3 = new Vector3( -3.14 / 3, 0, 0);
+		private var _rotation3:Vector3 = new Vector3(0, 45, 0);
+		private var _position:Vector3 = new Vector3(1.5, 0.0, 2);
+		private var _position2:Vector3 = new Vector3( -1.5, 0.0, 2);
+		private var _position3:Vector3 = new Vector3(0.0, 0.0, 2);
+		private var _up:Vector3 = new Vector3(0, 1, 0);
 		public function CameraLookAt() 
 		{
 			//初始化引擎
-            Laya3D.init(1000, 500);            
+            Laya3D.init(0, 0);            
             //适配模式
             Laya.stage.scaleMode = Stage.SCALE_FULL;
             Laya.stage.screenMode = Stage.SCREEN_NONE;
@@ -45,8 +53,8 @@ package OfficialExample.LayaAir3D_Camera
             Stat.show();            
 			//预加载所有资源
 			var resource:Array = [  
-				{url: "res/threeDimen/texture/layabox.png", clas: Texture2D, priority: 1, constructParams: [64, 64, 1, true, true]},
-				{url: "res/threeDimen/skyBox/skyBox3/skyBox3.lmat", clas: BaseMaterial, priority: 1, constructParams: [512, 512, 1, true, true]}, ];
+				"res/threeDimen/texture/layabox.png",
+				"res/threeDimen/skyBox/skyBox3/skyBox3.lmat", ];
 			Laya.loader.create(resource, Handler.create(this, onPreLoadFinish));	
 		}
 		
@@ -58,12 +66,13 @@ package OfficialExample.LayaAir3D_Camera
 			
 			//创建相机，构造函数的三个参数为相机横纵比，近距裁剪，远距裁剪
 			camera = new Camera(0, 0.1, 100);
-			camera.transform.translate(new Vector3(0, 0.7, 5));
-			camera.transform.rotate(new Vector3( -15, 0, 0), true, false);
+			camera.transform.translate(_translate);
+			camera.transform.rotate(_rotation, true, false);
 			
 			//相机设置清楚标记,使用固定颜色
 			camera.clearFlag = BaseCamera.CLEARFLAG_SOLIDCOLOR;
-			camera.clearColor = new Vector4(0, 0.2, 0.6, 1);
+			//使用默认的背景颜色
+			//camera.clearColor = new Vector4(0, 0.2, 0.6, 1);
 			//设置摄像机视野范围（角度）
 			camera.fieldOfView = 60;
 			//为相机添加视角控制组件(脚本)
@@ -73,25 +82,25 @@ package OfficialExample.LayaAir3D_Camera
 			//添加平行光
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			//设置平行光颜色
-            directionLight.color = new Vector3(1, 1, 1);
-            directionLight.transform.rotate(new Vector3( -3.14 / 3, 0, 0));
+            directionLight.color.setValue(1, 1, 1);
+            directionLight.transform.rotate(_rotation2);
 			
 			var sprite:Sprite3D = new Sprite3D;
 			scene.addChild(sprite);
 			
 			//正方体
 			box = sprite.addChild(new MeshSprite3D(PrimitiveMesh.createBox(0.5, 0.5, 0.5))) as MeshSprite3D;
-			box.transform.position = new Vector3(1.5, 0.0, 2);
-			box.transform.rotate(new Vector3(0, 45, 0), false, false);
+			box.transform.position = _position;
+			box.transform.rotate(_rotation3, false, false);
 			
 			//胶囊体
 			capsule = new MeshSprite3D(PrimitiveMesh.createCapsule(0.25, 1, 10, 20));
-			capsule.transform.position = new Vector3(-1.5, 0.0, 2);
+			capsule.transform.position = _position2;
 			sprite.addChild(capsule); 
 			
 			//圆柱
 			cylinder = new MeshSprite3D(PrimitiveMesh.createCylinder(0.25, 1, 20));
-			cylinder.transform.position = new Vector3(0.0, 0.0, 2);
+			cylinder.transform.position = _position3;
 			sprite.addChild(cylinder);
 			
 			//创建linnPhong材质
@@ -110,8 +119,8 @@ package OfficialExample.LayaAir3D_Camera
 			
 			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
 				
-				var changeActionButton:Button = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "切换目标")) as Button;
-				changeActionButton.size(160, 40);
+				var changeActionButton:Button = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "切换注视目标")) as Button;
+				changeActionButton.size(200, 40);
 				changeActionButton.labelBold = true;
 				changeActionButton.labelSize = 30;
 				changeActionButton.sizeGrid = "4,4,4,4";
@@ -122,15 +131,15 @@ package OfficialExample.LayaAir3D_Camera
 					index++;
 					if (index % 3 === 1 ){
 						//摄像机捕捉模型目标
-						camera.transform.lookAt(box.transform.position, new Vector3(0, 1, 0));
+						camera.transform.lookAt(box.transform.position, _up);
 					}
 					else if (index % 3 === 2){
 						//摄像机捕捉模型目标
-						camera.transform.lookAt(cylinder.transform.position, new Vector3(0, 1, 0));
+						camera.transform.lookAt(cylinder.transform.position, _up);
 					}
 					else{
 						//摄像机捕捉模型目标
-						camera.transform.lookAt(capsule.transform.position, new Vector3(0, 1, 0));
+						camera.transform.lookAt(capsule.transform.position, _up);
 					}
 				});
 					

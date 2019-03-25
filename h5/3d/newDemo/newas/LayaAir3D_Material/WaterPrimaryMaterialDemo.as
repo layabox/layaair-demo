@@ -1,5 +1,4 @@
-package OfficialExample.LayaAir3D_Material 
-{
+package LayaAir3D_Material {
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
@@ -17,30 +16,11 @@ package OfficialExample.LayaAir3D_Material
 			Stat.show();
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
-		
-			
-			if(Browser.onAndroid){
-				Scene3D.load("res/threeDimen/scene/LayaScene_water/Android/Default.ls", Handler.create(null, function(scene:Scene3D):void {
-				Laya.stage.addChild(scene) as Scene3D;
-				var camera:Camera = scene.getChildByName("Main Camera") as Camera;
-				camera.addComponent(CameraMoveScript);
-				}));
-			}
-			else if(Browser.onIOS){
-				Scene3D.load("res/threeDimen/scene/LayaScene_water/IOS/Default.ls", Handler.create(null, function(scene:Scene3D):void {
-				Laya.stage.addChild(scene) as Scene3D;
-				var camera:Camera = scene.getChildByName("Main Camera") as Camera;
-				camera.addComponent(CameraMoveScript);
-				}));
-			}
-			else{
-				Scene3D.load("res/threeDimen/scene/LayaScene_water/Conventional/Default.ls", Handler.create(null, function(scene:Scene3D):void {
-				Laya.stage.addChild(scene) as Scene3D;
-				var camera:Camera = scene.getChildByName("Main Camera") as Camera;
-				camera.addComponent(CameraMoveScript);
-				}));
-			}
-		
+			Scene3D.load("res/threeDimen/scene/LayaScene_water/Conventional/Default.ls", Handler.create(null, function(scene:Scene3D):void {
+					Laya.stage.addChild(scene) as Scene3D;
+					var camera:Camera = scene.getChildByName("Main Camera") as Camera;
+					camera.addComponent(CameraMoveScript);
+			}));
 		}
 	
 	}

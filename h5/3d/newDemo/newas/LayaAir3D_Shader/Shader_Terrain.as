@@ -1,4 +1,5 @@
-package OfficialExample.LayaAir3D_Shader {
+package LayaAir3D_Shader {
+	import OfficialExample.LayaAir3D_Shader.customMaterials.CustomTerrainMaterial;
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
@@ -7,7 +8,6 @@ package OfficialExample.LayaAir3D_Shader {
 	import laya.d3.graphics.Vertex.VertexMesh;
 	import laya.d3.math.Vector2;
 	import laya.d3.math.Vector3;
-	import laya.d3.math.Vector4;
 	import laya.d3.resource.models.Mesh;
 	import laya.d3.shader.Shader3D;
 	import laya.d3.shader.SubShader;
@@ -15,7 +15,6 @@ package OfficialExample.LayaAir3D_Shader {
 	import laya.utils.Handler;
 	import laya.utils.Stat;
 	import laya.webgl.resource.Texture2D;
-	import shaderModule.customMaterials.CustomTerrainMaterial;
 	
 	/**
 	 * ...
@@ -72,30 +71,13 @@ package OfficialExample.LayaAir3D_Shader {
 		private function initShader():void {
 			
 			CustomTerrainMaterial.__init__();
-			var attributeMap:Object = {
-				'a_Position': VertexMesh.MESH_POSITION0, 
-				'a_Normal': VertexMesh.MESH_NORMAL0, 
-				'a_Texcoord0': VertexMesh.MESH_TEXTURECOORDINATE0};
-			var uniformMap:Object = {
-				'u_MvpMatrix': Shader3D.PERIOD_SPRITE, 
-				'u_WorldMat': Shader3D.PERIOD_SPRITE, 
-				'u_CameraPos': Shader3D.PERIOD_CAMERA, 
-				'u_SplatAlphaTexture': Shader3D.PERIOD_MATERIAL, 
-				'u_DiffuseTexture1': Shader3D.PERIOD_MATERIAL, 
-				'u_DiffuseTexture2': Shader3D.PERIOD_MATERIAL, 
-				'u_DiffuseTexture3': Shader3D.PERIOD_MATERIAL, 
-				'u_DiffuseTexture4':Shader3D.PERIOD_MATERIAL, 
-				'u_DiffuseTexture5': Shader3D.PERIOD_MATERIAL, 
-				'u_DiffuseScale1': Shader3D.PERIOD_MATERIAL, 
-				'u_DiffuseScale2':Shader3D.PERIOD_MATERIAL, 
-				'u_DiffuseScale3': Shader3D.PERIOD_MATERIAL, 
-				'u_DiffuseScale4': Shader3D.PERIOD_MATERIAL, 
-				'u_DiffuseScale5': Shader3D.PERIOD_MATERIAL};
+			var attributeMap:Object = {'a_Position': VertexMesh.MESH_POSITION0, 'a_Normal': VertexMesh.MESH_NORMAL0, 'a_Texcoord0': VertexMesh.MESH_TEXTURECOORDINATE0};
+			var uniformMap:Object = {'u_MvpMatrix': Shader3D.PERIOD_SPRITE, 'u_WorldMat': Shader3D.PERIOD_SPRITE, 'u_CameraPos': Shader3D.PERIOD_CAMERA, 'u_SplatAlphaTexture': Shader3D.PERIOD_MATERIAL, 'u_DiffuseTexture1': Shader3D.PERIOD_MATERIAL, 'u_DiffuseTexture2': Shader3D.PERIOD_MATERIAL, 'u_DiffuseTexture3': Shader3D.PERIOD_MATERIAL, 'u_DiffuseTexture4': Shader3D.PERIOD_MATERIAL, 'u_DiffuseTexture5': Shader3D.PERIOD_MATERIAL, 'u_DiffuseScale1': Shader3D.PERIOD_MATERIAL, 'u_DiffuseScale2': Shader3D.PERIOD_MATERIAL, 'u_DiffuseScale3': Shader3D.PERIOD_MATERIAL, 'u_DiffuseScale4': Shader3D.PERIOD_MATERIAL, 'u_DiffuseScale5': Shader3D.PERIOD_MATERIAL};
 			
 			var vs:String = __INCLUDESTR__("customShader/terrainShader.vs");
 			var ps:String = __INCLUDESTR__("customShader/terrainShader.ps");
 			var customTerrianShader:Shader3D = Shader3D.add("CustomTerrainShader");
-			var subShader:SubShader =new SubShader(attributeMap, uniformMap, RenderableSprite3D.shaderDefines, CustomTerrainMaterial.shaderDefines);
+			var subShader:SubShader = new SubShader(attributeMap, uniformMap, RenderableSprite3D.shaderDefines, CustomTerrainMaterial.shaderDefines);
 			customTerrianShader.addSubShader(subShader);
 			subShader.addShaderPass(vs, ps);
 		}

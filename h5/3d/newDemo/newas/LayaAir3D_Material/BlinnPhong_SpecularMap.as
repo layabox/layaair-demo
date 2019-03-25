@@ -1,10 +1,9 @@
-package OfficialExample.LayaAir3D_Material {
+package LayaAir3D_Material {
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.SkinnedMeshSprite3D;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.light.DirectionLight;
-	import laya.d3.core.material.BaseMaterial;
 	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
@@ -37,7 +36,7 @@ package OfficialExample.LayaAir3D_Material {
 			camera.addComponent(CameraMoveScript);
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.color = new Vector3(1, 1, 1);
+			directionLight.color.setValue(1, 1, 1);
 			
 			Laya.loader.create("res/threeDimen/skinModel/dude/dude.lh", Handler.create(this, onComplete));
 		}

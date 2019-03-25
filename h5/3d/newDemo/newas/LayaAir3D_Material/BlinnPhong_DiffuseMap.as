@@ -1,9 +1,9 @@
-package OfficialExample.LayaAir3D_Material {
+package LayaAir3D_Material {
 	import laya.d3.core.BaseCamera;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.light.DirectionLight;
-	import laya.d3.core.material.BlinnPhongMaterial;
+	import laya.d3.core.material.EffectMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
 	import laya.d3.resource.models.PrimitiveMesh;
@@ -11,11 +11,9 @@ package OfficialExample.LayaAir3D_Material {
 	import laya.utils.Handler;
 	import laya.utils.Stat;
 	import laya.webgl.resource.Texture2D;
-	import laya.d3.core.material.UnlitMaterial;
-	import laya.d3.core.material.EffectMaterial;
 	
 	public class BlinnPhong_DiffuseMap {
-		
+			
 		private var rotation:Vector3 = new Vector3(0, 0.01, 0);
 		
 		public function BlinnPhong_DiffuseMap() {
@@ -33,7 +31,7 @@ package OfficialExample.LayaAir3D_Material {
 			camera.clearFlag = BaseCamera.CLEARFLAG_SKY;
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.color = new Vector3(1, 1, 1);
+			directionLight.color.setValue(1, 1, 1);
 			
 			var earth1:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere())) as MeshSprite3D;
 			earth1.transform.position = new Vector3(-0.6, 0, 0);

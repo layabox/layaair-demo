@@ -1,4 +1,5 @@
-package shaderModule {
+package LayaAir3D_Shader {
+	import OfficialExample.LayaAir3D_Shader.customMaterials.CustomMaterial;
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
@@ -12,7 +13,6 @@ package shaderModule {
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import shaderModule.customMaterials.CustomMaterial;
 	
 	/**
 	 * ...
@@ -53,16 +53,12 @@ package shaderModule {
 		
 		private function initShader():void {
 			
-			var attributeMap:Object = {
-				'a_Position': VertexMesh.MESH_POSITION0, 
-				'a_Normal': VertexMesh.MESH_NORMAL0};
-			var uniformMap:Object = {
-				'u_MvpMatrix': Shader3D.PERIOD_SPRITE, 
-				'u_WorldMat': Shader3D.PERIOD_SPRITE};
+			var attributeMap:Object = {'a_Position': VertexMesh.MESH_POSITION0, 'a_Normal': VertexMesh.MESH_NORMAL0};
+			var uniformMap:Object = {'u_MvpMatrix': Shader3D.PERIOD_SPRITE, 'u_WorldMat': Shader3D.PERIOD_SPRITE};
 			var vs:String = __INCLUDESTR__("customShader/simpleShader.vs");
 			var ps:String = __INCLUDESTR__("customShader/simpleShader.ps");
 			var customShader:Shader3D = Shader3D.add("CustomShader");
-			var subShader:SubShader =new SubShader(attributeMap, uniformMap);
+			var subShader:SubShader = new SubShader(attributeMap, uniformMap);
 			customShader.addSubShader(subShader);
 			subShader.addShaderPass(vs, ps);
 		}

@@ -1,6 +1,4 @@
-package OfficialExample.LayaAir3D_Sprite3D 
-{
-	import laya.d3.component.Script3D;
+package LayaAir3D_Sprite3D {
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.light.DirectionLight;
@@ -54,7 +52,8 @@ import laya.d3.core.Sprite3D;
 import laya.d3.math.Vector3;
 
 class MonkeyScript extends Script3D {
-	private var rotation:Vector3 = new Vector3(0, 0.01, 0); 	
+	private var rotation:Vector3 = new Vector3(0, 0.01, 0);
+	
 	public function MonkeyScript():void {
 		this._enabled = false;
 	}
@@ -62,10 +61,12 @@ class MonkeyScript extends Script3D {
 	override public function onAwake():void {
 		trace("onAwake");
 	}
+	
 	override public function onEnable():void {
 		debugger;
 		trace(this._enabled);
 	}
+	
 	override public function onStart():void {
 		trace("onStart");
 	}

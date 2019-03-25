@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Trail 
+package LayaAir3D_Trail 
 {
 	import laya.d3.core.BaseCamera;
 	import laya.d3.core.Camera;
@@ -23,7 +23,7 @@ package OfficialExample.LayaAir3D_Trail
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			Stat.show();
-			Scene3D.load("res/threeDimen/TrailTest/Trail.ls", Handler.create(this, function(scene:Scene3D):void {
+			Scene3D.load("../../../../res/threeDimen/TrailTest/Trail.ls", Handler.create(this, function(scene:Scene3D):void {
 				Laya.stage.addChild(scene) as Scene3D;
 				var camera:Camera = scene.getChildByName("Main Camera") as Camera;
 				camera.addComponent(CameraMoveScript);

@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Trail {
+package LayaAir3D_Trail {
 	import laya.d3.core.BaseCamera;
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;
@@ -24,7 +24,7 @@ package OfficialExample.LayaAir3D_Trail {
 			//加载相机
 			var camera:Camera = (scene.addChild(new Camera(0, 0.1, 1000))) as Camera;
 			camera.transform.translate(new Vector3(0, 8, 10));
-			camera.transform.rotate(new Vector3( -45, 0, 0), true, false);
+			camera.transform.rotate(new Vector3(-45, 0, 0), true, false);
 			//设置相机清除标识为固定颜色
 			camera.clearFlag = BaseCamera.CLEARFLAG_SOLIDCOLOR;
 			

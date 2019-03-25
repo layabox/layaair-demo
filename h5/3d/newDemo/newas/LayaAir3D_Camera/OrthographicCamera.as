@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Camera {
+package LayaAir3D_Camera {
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.light.DirectionLight;

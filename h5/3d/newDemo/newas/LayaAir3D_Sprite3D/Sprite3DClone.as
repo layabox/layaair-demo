@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Sprite3D {
+package LayaAir3D_Sprite3D {
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.scene.Scene3D;
@@ -36,7 +36,7 @@ package OfficialExample.LayaAir3D_Sprite3D {
 			//克隆sprite3d
 			var layaMonkey_clone1:Sprite3D = Sprite3D.instantiate(layaMonkey, scene, false, new Vector3(0.6, 0, 0));
 			//克隆sprite3d
-			var layaMonkey_clone2:Sprite3D = scene.addChild(Sprite3D.instantiate(layaMonkey, null, false, new Vector3( -0.6, 0, 0))) as Sprite3D;
+			var layaMonkey_clone2:Sprite3D = scene.addChild(Sprite3D.instantiate(layaMonkey, null, false, new Vector3(-0.6, 0, 0))) as Sprite3D;
 		}
 	}
 }

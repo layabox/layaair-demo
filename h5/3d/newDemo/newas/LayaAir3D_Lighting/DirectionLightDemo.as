@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Lighting {
+package LayaAir3D_Lighting {
 	import common.CameraMoveScript;
 	import laya.d3.component.Animator;
 	import laya.d3.component.AnimatorState;
@@ -41,7 +41,7 @@ package OfficialExample.LayaAir3D_Lighting {
 			//创建方向光
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			//方向光的颜色
-			directionLight.color = new Vector3(1, 1, 1);
+			directionLight.color.setValue(1, 1, 1);
 			directionLight.transform.worldMatrix.setForward(new Vector3(-1.0, -1.0, -1.0));
 			
 			//加载地面

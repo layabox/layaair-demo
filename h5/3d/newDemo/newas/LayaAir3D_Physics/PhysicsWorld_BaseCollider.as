@@ -1,5 +1,6 @@
-package OfficialExample.LayaAir3D_Physics {
+package LayaAir3D_Physics {
 	import common.CameraMoveScript;
+	import laya.ani.bone.Transform;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.light.DirectionLight;
@@ -19,6 +20,7 @@ package OfficialExample.LayaAir3D_Physics {
 	import laya.utils.Handler;
 	import laya.utils.Stat;
 	import laya.webgl.resource.Texture2D;
+	import laya.d3.core.Transform3D;
 	
 	/**
 	 * ...
@@ -26,6 +28,7 @@ package OfficialExample.LayaAir3D_Physics {
 	 */
 	public class PhysicsWorld_BaseCollider {
 		private var scene:Scene3D;
+		private var tmpVector:Vector3 = new Vector3(0, 0, 0);
 		
 		public function PhysicsWorld_BaseCollider() {
 			//初始化引擎
@@ -56,7 +59,9 @@ package OfficialExample.LayaAir3D_Physics {
 				planeMat.albedoTexture = tex;
 			}));
 			//设置纹理平铺和偏移
-			planeMat.tilingOffset = new Vector4(10, 10, 0, 0);
+			var tilingOffset:Vector4 = planeMat.tilingOffset;
+			tilingOffset.setValue(5, 5, 0, 0);
+			planeMat.tilingOffset = tilingOffset;
 			//设置材质
 			plane.meshRenderer.material = planeMat;
 			
@@ -88,10 +93,10 @@ package OfficialExample.LayaAir3D_Physics {
 				case 2: 
 					addCapsule();
 					break;
-				case 3:
+				case 3: 
 					addCone();
 					break;
-				case 4:
+				case 4: 
 					addCylinder();
 					break;
 				default: 
@@ -114,15 +119,20 @@ package OfficialExample.LayaAir3D_Physics {
 			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(sX, sY, sZ))) as MeshSprite3D;
 			//设置材质
 			box.meshRenderer.material = mat1;
-			box.transform.position = new Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			var transform:Transform3D = box.transform;
+			var pos:Vector3 = transform.position;
+			pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			transform.position = pos;
 			//设置欧拉角
-			box.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			var rotationEuler:Vector3 = transform.rotationEuler;
+			rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			transform.rotationEuler = rotationEuler;
 			//创建刚体碰撞器
 			var rigidBody:Rigidbody3D = box.addComponent(Rigidbody3D);
 			//创建盒子形状碰撞器
 			var boxShape:BoxColliderShape = new BoxColliderShape(sX, sY, sZ);
 			//设置盒子的碰撞形状
-			rigidBody.colliderShape = boxShape; 
+			rigidBody.colliderShape = boxShape;
 			//设置刚体的质量
 			rigidBody.mass = 10;
 		}
@@ -139,7 +149,9 @@ package OfficialExample.LayaAir3D_Physics {
 			var sphere:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(radius))) as MeshSprite3D;
 			//设置材质
 			sphere.meshRenderer.material = mat2;
-			sphere.transform.position = new Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			var pos:Vector3 = sphere.transform.position;
+			pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			sphere.transform.position = pos;
 			
 			//添加刚体碰撞器
 			var rigidBody:Rigidbody3D = sphere.addComponent(Rigidbody3D);
@@ -163,9 +175,14 @@ package OfficialExample.LayaAir3D_Physics {
 			var capsule:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createCapsule(raidius, height))) as MeshSprite3D;
 			//设置材质
 			capsule.meshRenderer.material = mat3;
-			capsule.transform.position = new Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			var transform:Transform3D = capsule.transform;
+			var pos:Vector3 = transform.position;
+			pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			transform.position = pos;
 			//设置胶囊MeshSprite3D的欧拉角
-			capsule.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			var rotationEuler:Vector3 = transform.rotationEuler;
+			rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			transform.rotationEuler = rotationEuler;
 			
 			//创建刚体碰撞器
 			var rigidBody:Rigidbody3D = capsule.addComponent(Rigidbody3D);
@@ -176,6 +193,7 @@ package OfficialExample.LayaAir3D_Physics {
 			//设置刚体碰撞器的质量
 			rigidBody.mass = 10;
 		}
+		
 		public function addCone():void {
 			var mat4:BlinnPhongMaterial = new BlinnPhongMaterial();
 			Texture2D.load("res/threeDimen/Physics/steel2.jpg", Handler.create(null, function(tex:Texture2D):void {
@@ -189,7 +207,9 @@ package OfficialExample.LayaAir3D_Physics {
 			//设置材质
 			cone.meshRenderer.material = mat4;
 			//设置位置
-			cone.transform.position = new Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			var pos:Vector3 = cone.transform.position;
+			pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2); 
+			cone.transform.position = pos;
 			//创建刚体碰撞器
 			var rigidBody:Rigidbody3D = cone.addComponent(Rigidbody3D);
 			//创建球型碰撞器
@@ -197,8 +217,9 @@ package OfficialExample.LayaAir3D_Physics {
 			//设置刚体碰撞器的形状
 			rigidBody.colliderShape = coneShape;
 			//设置刚体碰撞器的质量
-			rigidBody.mass = 10;	
+			rigidBody.mass = 10;
 		}
+		
 		public function addCylinder():void {
 			var mat5:BlinnPhongMaterial = new BlinnPhongMaterial();
 			Texture2D.load("res/threeDimen/Physics/steel.jpg", Handler.create(null, function(tex:Texture2D):void {
@@ -212,9 +233,14 @@ package OfficialExample.LayaAir3D_Physics {
 			//设置材质
 			cylinder.meshRenderer.material = mat5;
 			//设置位置
-			cylinder.transform.position = new Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			var transform:Transform3D = cylinder.transform;
+			var pos:Vector3 = transform.position;
+			pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			transform.position = pos;
 			//设置圆柱MeshSprite3D的欧拉角
-			cylinder.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			var rotationEuler:Vector3 = transform.rotationEuler;
+			rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			transform.rotationEuler = rotationEuler;
 			//创建刚体碰撞器
 			var rigidBody:Rigidbody3D = cylinder.addComponent(Rigidbody3D);
 			//创建球型碰撞器

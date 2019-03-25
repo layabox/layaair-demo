@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Lighting {
+package LayaAir3D_Lighting {
 	import common.CameraMoveScript;
 	import laya.d3.component.Animator;
 	import laya.d3.component.AnimatorState;

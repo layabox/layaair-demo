@@ -1,7 +1,8 @@
-package OfficialExample.LayaAir3D_Physics {
+package LayaAir3D_Physics {
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.Sprite3D;
+	import laya.d3.core.Transform3D;
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
@@ -24,6 +25,10 @@ package OfficialExample.LayaAir3D_Physics {
 		private var scene:Scene3D;
 		private var camera:Camera;
 		private var kinematicSphere:Sprite3D;
+		private var translateW:Vector3 = new Vector3(0, 0, -0.2);
+		private var translateS:Vector3 = new Vector3(0, 0, 0.2);
+		private var translateA:Vector3 = new Vector3(-0.2, 0, 0);
+		private var translateD:Vector3 = new Vector3(0.2, 0, 0);
 		
 		public function PhysicsWorld_Character() {
 			//初始化引擎
@@ -44,7 +49,7 @@ package OfficialExample.LayaAir3D_Physics {
 			camera.clearColor = null;
 			
 			//创建平行光
-			var directionLight = new DirectionLight()；
+			var directionLight = new DirectionLight();
 			scene.addChild(directionLight);
 			directionLight.color = new Vector3(1, 1, 1);
 			directionLight.transform.worldMatrix.setForward(new Vector3(-1.0, -1.0, 1.0));
@@ -57,15 +62,17 @@ package OfficialExample.LayaAir3D_Physics {
 				planeMat.albedoTexture = tex;
 			}));
 			//设置材质
-			planeMat.tilingOffset = new Vector4(2, 2, 0, 0);
+			var tilingOffset:Vector3 = planeMat.tilingOffset;
+			tilingOffset.setValue(2, 2, 0, 0);
+			planeMat.tilingOffset = tilingOffset;
 			plane.meshRenderer.material = planeMat;
 			
 			//创建物理碰撞器
-			var rigidBody:PhysicsCollider = plane.addComponent(PhysicsCollider) as PhysicsCollider;
+			var physicsCollider:PhysicsCollider = plane.addComponent(PhysicsCollider) as PhysicsCollider;
 			//创建盒型碰撞器
 			var boxShape:BoxColliderShape = new BoxColliderShape(20, 0, 20);
 			//为物理碰撞器设置盒型碰撞器
-			rigidBody.colliderShape = boxShape;
+			physicsCollider.colliderShape = boxShape;
 			
 			for (var i:int = 0; i < 60; i++) {
 				addBox();
@@ -88,7 +95,9 @@ package OfficialExample.LayaAir3D_Physics {
 				//创建胶囊碰撞器
 				var sphereShape:CapsuleColliderShape = new CapsuleColliderShape(1.0, 3.4);
 				//设置Shape的本地偏移
-				sphereShape.localOffset = new Vector3(0, 1.7, 0);
+				var localOffset:Vector3 = sphereShape.localOffset;
+				localOffset.setValue(0, 1.7, 0);
+				sphereShape.localOffset = localOffset;
 				//设置角色控制器的碰撞形状
 				character.colliderShape = sphereShape;
 				_this.kinematicSphere = monkey;
@@ -99,10 +108,10 @@ package OfficialExample.LayaAir3D_Physics {
 		
 		private function onKeyDown():void {
 			var character:CharacterController = kinematicSphere.getComponent(CharacterController) as CharacterController;
-			KeyBoardManager.hasKeyDown(87) && character.move(new Vector3(0, 0, -0.2));//W
-			KeyBoardManager.hasKeyDown(83) && character.move(new Vector3(0, 0, 0.2));//S
-			KeyBoardManager.hasKeyDown(65) && character.move(new Vector3(-0.2, 0, 0));//A
-			KeyBoardManager.hasKeyDown(68) && character.move(new Vector3(0.2, 0, 0));//D
+			KeyBoardManager.hasKeyDown(87) && character.move(translateW);//W
+			KeyBoardManager.hasKeyDown(83) && character.move(translateS);//S
+			KeyBoardManager.hasKeyDown(65) && character.move(translateA);//A
+			KeyBoardManager.hasKeyDown(68) && character.move(translateD);//D
 			KeyBoardManager.hasKeyDown(69) && character.jump();//E
 		}
 		
@@ -117,8 +126,13 @@ package OfficialExample.LayaAir3D_Physics {
 			var sZ:int = Math.random() * 0.75 + 0.25;
 			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(sX, sY, sZ))) as MeshSprite3D;
 			box.meshRenderer.material = mat1;
-			box.transform.position = new Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-			box.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			var transform:Transform3D = box.transform;
+			var pos:Vector3 = transform.position;
+			pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+			transform.position = pos;
+			var rotationEuler:Vector3 = transform.rotationEuler;
+			rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			transform.rotationEuler = rotationEuler;
 			
 			var rigidBody:Rigidbody3D = box.addComponent(Rigidbody3D);
 			var boxShape:BoxColliderShape = new BoxColliderShape(sX, sY, sZ);
@@ -136,8 +150,13 @@ package OfficialExample.LayaAir3D_Physics {
 			var height:int = Math.random() * 0.5 + 0.8;
 			var capsule:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createCapsule(raidius, height))) as MeshSprite3D;
 			capsule.meshRenderer.material = mat3;
-			capsule.transform.position = new Vector3(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-			capsule.transform.rotationEuler = new Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			var transform:Transform3D = capsule.transform;
+			var pos:Vector3 = transform.position;
+			pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+			transform.position = pos;
+			var rotationEuler:Vector3 = transform.rotationEuler;
+			rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+			transform.rotationEuler = rotationEuler;
 			
 			var rigidBody:Rigidbody3D = capsule.addComponent(Rigidbody3D);
 			var sphereShape:CapsuleColliderShape = new CapsuleColliderShape(raidius, height);

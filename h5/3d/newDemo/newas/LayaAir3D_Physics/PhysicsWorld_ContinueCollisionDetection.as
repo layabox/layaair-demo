@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Physics {
+package LayaAir3D_Physics {
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
@@ -23,7 +23,7 @@ package OfficialExample.LayaAir3D_Physics {
 	 */
 	public class PhysicsWorld_ContinueCollisionDetection {
 		private var scene:Scene3D;
-		
+		private var tmpVector:Vector3 = new Vector3(0, 0, 0);
 		public function PhysicsWorld_ContinueCollisionDetection() {
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
@@ -42,7 +42,7 @@ package OfficialExample.LayaAir3D_Physics {
 			
 			//方向光
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.color = new Vector3(0.6, 0.6, 0.6);
+			directionLight.color.setValue(0.6, 0.6, 0.6);
 			directionLight.transform.worldMatrix.setForward(new Vector3(-1.0, -1.0, -1.0));
 			
 			//平面
@@ -51,7 +51,9 @@ package OfficialExample.LayaAir3D_Physics {
 			Texture2D.load("res/threeDimen/Physics/grass.png", Handler.create(null, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
-			planeMat.tilingOffset = new Vector4(10, 10, 0, 0);
+			var tilingOffset:Vector3 = planeMat.tilingOffset;
+			tilingOffset.setValue(10, 10, 0, 0);
+			planeMat.tilingOffset = tilingOffset;
 			plane.meshRenderer.material = planeMat;
 			
 			var planeStaticCollider:PhysicsCollider = plane.addComponent(PhysicsCollider);
@@ -73,7 +75,9 @@ package OfficialExample.LayaAir3D_Physics {
 			var radius:Number = Math.random() * 0.2 + 0.2;
 			var sphere:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(radius))) as MeshSprite3D;
 			sphere.meshRenderer.material = mat2;
-			sphere.transform.position = new Vector3(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			var pos:Vector3 = sphere.transform.position;
+			pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+			sphere.transform.position = pos;
 			
 			var rigidBody:Rigidbody3D = sphere.addComponent(Rigidbody3D);
 			var sphereShape:SphereColliderShape = new SphereColliderShape(radius);
