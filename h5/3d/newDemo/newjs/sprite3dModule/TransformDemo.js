@@ -87,8 +87,8 @@ class TransformDemo{
 
         //得到三个transform
         this.clone1Transform = this.layaMonkey_clone1.transform;
-        this.clone2Transform = this.layaMonkey_clone2.transformull ;
-        this.clone3Transform = this.layaMonkey_clone3.transform ;
+        this.clone2Transform = this.layaMonkey_clone2.transform;
+        this.clone3Transform = this.layaMonkey_clone3.transform;
         //平移
         this._position1.setValue(-1.5, 0, 0.0);
         this.clone2Transform.translate(this._position1);
