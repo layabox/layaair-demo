@@ -1,5 +1,5 @@
 package LayaAir3D_Shader {
-	import OfficialExample.LayaAir3D_Shader.customMaterials.CustomTerrainMaterial;
+	import LayaAir3D_Shader.customMaterials.CustomTerrainMaterial;
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
