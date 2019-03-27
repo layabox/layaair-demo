@@ -45,7 +45,7 @@ class CameraRay {
 		var plane = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(10, 10, 10, 10));
 		this.scene.addChild(plane);
 		var planeMat = new Laya.BlinnPhongMaterial();
-		Laya.Texture2D.load("../res/threeDimen/Physics/grass.png", Laya.Handler.create(null, function(tex):void {
+		Laya.Texture2D.load("res/threeDimen/Physics/grass.png", Laya.Handler.create(null, function(tex):void {
 			planeMat.albedoTexture = tex;
 		}));
 		//设置纹理平铺和偏移
@@ -71,7 +71,7 @@ class CameraRay {
 
 	public addBoxXYZ(x, y, z):void {
 		var mat1 = new Laya.BlinnPhongMaterial();
-		Laya.Texture2D.load("../res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(null, function(tex) {
+		Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(null, function(tex) {
 			mat1.albedoTexture = tex;
 		}));
 		

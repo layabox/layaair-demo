@@ -26,8 +26,7 @@ class ScriptSample{
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         //预加载所有资源
         var resource = [
-            { url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", type: Laya3D.HIERARCHY, priority: 1 }
-        ];
+            "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"];
         //加载函数
         Laya.loader.create(resource, Laya.Handler.create(this, this.onComplete));
     }

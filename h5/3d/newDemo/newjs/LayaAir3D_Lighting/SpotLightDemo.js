@@ -1,7 +1,7 @@
 class SpotLightDemo{
     constructor(){
-        this._quaternion = new Laya.Quaternion();
-        this._direction = new Laya.Vector3();
+        this.quaternion = new Laya.Quaternion();
+        this.direction = new Laya.Vector3();
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -39,10 +39,10 @@ class SpotLightDemo{
     }
 
     onFrameLoop(){    
-        Laya.Quaternion.createFromYawPitchRoll(0.025, 0, 0, this._quaternion);
-        this.spotLight.transform.worldMatrix.getForward(this._direction);
-        Laya.Vector3.transformQuat(this._direction, this._quaternion, this._direction);
-        this.spotLight.transform.worldMatrix.setForward(this._direction);
+        Laya.Quaternion.createFromYawPitchRoll(0.025, 0, 0, this.quaternion);
+        this.spotLight.transform.worldMatrix.getForward(this.direction);
+        Laya.Vector3.transformQuat(this.direction, this.quaternion, this.direction);
+        this.spotLight.transform.worldMatrix.setForward(this.direction);
     }
 }
 

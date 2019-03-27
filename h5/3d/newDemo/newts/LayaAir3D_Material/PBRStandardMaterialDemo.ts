@@ -14,8 +14,8 @@ class PBRStandardMaterialDemo
             camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
             Laya.BaseMaterial.load("res/threeDimen/skyBox/DawnDusk/SkyBox.lmat", Laya.Handler.create(this, function(skyMaterial:Laya.SkyBoxMaterial):void {
                 var skyRenderer:Laya.SkyRenderer = camera.skyRenderer;
-					skyRenderer.mesh = Laya.SkyBox.instance;
-					skyRenderer.material = mat;
+				skyRenderer.mesh = Laya.SkyBox.instance;
+				skyRenderer.material = mat;
             }));
             
             //实例PBR材质

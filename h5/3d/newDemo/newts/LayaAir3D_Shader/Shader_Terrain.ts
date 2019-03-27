@@ -19,7 +19,7 @@ class Shader_Terrain {
         Laya.Mesh.load("res/threeDimen/skinModel/Terrain/terrain_New-Part-01.lm", Laya.Handler.create(this, function(mesh:Laya.Mesh):void {
             var terrain:Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(mesh)) as Laya.MeshSprite3D;
             var customMaterial:CustomTerrainMaterial = new CustomTerrainMaterial();
-            Laya.Texture2D.load("../res/threeDimen/skinModel/Terrain/splatAlphaTexture.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+            Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/splatAlphaTexture.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
                 customMaterial.splatAlphaTexture = tex;
             }));
             Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_01.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {

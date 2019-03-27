@@ -9,7 +9,7 @@ class ParticleScene{
                 var camera = scene.addChild(new Laya.Camera(0, 0.1, 100));
                 camera.transform.translate(new Laya.Vector3(0, 1, 0));
                 camera.addComponent(CameraMoveScript);
-            }));
+        }));
     }
 }
 

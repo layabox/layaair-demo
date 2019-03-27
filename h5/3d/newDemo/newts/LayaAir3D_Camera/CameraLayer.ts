@@ -90,7 +90,7 @@ class CameraLayer{
     loadUI(){
         this.layerIndex = 0;
         Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, function() {   
-            this.changeActionButton = Laya.stage.addChild(new Laya.Button("../res/threeDimen/ui/button.png", "切换图层"));
+            this.changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "切换图层"));
             this.changeActionButton.size(160, 40);
             this.changeActionButton.labelBold = true;
             this.changeActionButton.labelSize = 30;

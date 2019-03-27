@@ -32,14 +32,14 @@ class Secne3DPlayer2D {
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.rotate(new Laya.Vector3(-3.14/3, 0,0));
         //加载精灵
-        Laya.loader.create("../res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, this.onComplete));
+        Laya.loader.create("res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, this.onComplete));
     }	
 		
 	private onComplete() {
         //加载三维地面
-        var grid = this.scene.addChild(Laya.Loader.getRes("../res/threeDimen/staticModel/grid/plane.lh")) as Laya.Sprite3D;
+        var grid = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh")) as Laya.Sprite3D;
         //加载二维猴子
-        this.layaMonkey2D = Laya.stage.addChild(new Laya.Image("../res/threeDimen/monkey.png")) as Laya.Image;
+        this.layaMonkey2D = Laya.stage.addChild(new Laya.Image("res/threeDimen/monkey.png")) as Laya.Image;
         //开启定时器循环
         Laya.timer.frameLoop(1, this, this.animate);
     }

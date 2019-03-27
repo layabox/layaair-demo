@@ -23,30 +23,11 @@ class AnimatorDemo
 		//开启统计信息
 		Laya.Stat.show();
 		
-		
-		this.textName.overflow = Laya.Text.HIDDEN;
-		this.textName.color = "#FFFFFF";
-		this.textName.font = "Impact";
-		this.textName.fontSize = 20;
-		this.textName.borderColor = "#FFFF00";
-		this.textName.x = Laya.stage.width / 2;
-		this.textName.text = "当前动作状态名称：";
-		Laya.stage.addChild(this.textName);
-		
-		this.text.overflow = Laya.Text.HIDDEN;
-		this.text.color = "#FFFFFF";
-		this.text.font = "Impact";
-		this.text.fontSize = 20;
-		this.text.borderColor = "#FFFF00";
-		this.text.x = Laya.stage.width / 2;
-		this.text.text = "当前动作状态进度：";
-		Laya.stage.addChild(this.text);
-		
 		//预加载所有资源
 		var resource = [
-			{url: "res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", type: Laya3D.HIERARCHY, priority: 1}, 
-			{url: "res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh", type: Laya3D.HIERARCHY, priority: 1}, 
-			{url: "res/threeDimen/skinModel/BoneLinkScene/PangZi.lh", type: Laya3D.HIERARCHY, priority: 1}
+			"res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", 
+			"res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh", 
+			"res/threeDimen/skinModel/BoneLinkScene/PangZi.lh"
 		];
 		
 		Laya.loader.create(resource, Laya.Handler.create(this, this.onLoadFinish));
@@ -150,6 +131,24 @@ class AnimatorDemo
 		this.textName.x = Laya.stage.width / 2 -50 ;
 		this.text.x = Laya.stage.width / 2 -50 ;
 		this.text.y = 50;
+		this.textName.overflow = Laya.Text.HIDDEN;
+		this.textName.color = "#FFFFFF";
+		this.textName.font = "Impact";
+		this.textName.fontSize = 20;
+		this.textName.borderColor = "#FFFF00";
+		this.textName.x = Laya.stage.width / 2;
+		this.textName.text = "当前动作状态名称：";
+		Laya.stage.addChild(this.textName);
+		
+		this.text.overflow = Laya.Text.HIDDEN;
+		this.text.color = "#FFFFFF";
+		this.text.font = "Impact";
+		this.text.fontSize = 20;
+		this.text.borderColor = "#FFFF00";
+		this.text.x = Laya.stage.width / 2;
+		this.text.text = "当前动作状态进度：";
+		Laya.stage.addChild(this.text);
+		
 		
 		
 		Laya.timer.frameLoop(1, this, this.onFrame);

@@ -10,10 +10,10 @@ package LayaAir3D_Animation {
 	import laya.utils.Stat;
 	
 	public class AnimationLayerBlend {
-		private var motionCross:Boolean = false;
-		private var blendType:int = 0;
-		private var motionIndex:int = 0;
-		private var motions:Array = ["run", "run_2", "attack", "attack_1", "attack_2", "dead", "idle_2", "idle_3", "idle_4", "idle4", "reload", "replace", "replace_2", "stop"];
+		private var _motionCross:Boolean = false;
+		private var _blendType:int = 0;
+		private var _motionIndex:int = 0;
+		private var _motions:Array = ["run", "run_2", "attack", "attack_1", "attack_2", "dead", "idle_2", "idle_3", "idle_4", "idle4", "reload", "replace", "replace_2", "stop"];
 		
 		public function AnimationLayerBlend() {
 			//初始化引擎
@@ -33,17 +33,17 @@ package LayaAir3D_Animation {
 			var animator:Animator = scene.getChildAt(2).getComponent(Animator);
 			
 			addButton(100, 100, 160, 30, "动画过渡:否", 20, function(e:Event):void {
-				motionCross = !motionCross;
-				if (motionCross)
+				_motionCross = !_motionCross;
+				if (_motionCross)
 					(e.target as Button).label = "动画过渡:是";
 				else
 					(e.target as Button).label = "动画过渡:否";
 			});
 			
 			addButton(100, 160, 160, 30, "混合模式:全身", 20, function(e:Event):void {
-				blendType++;
-				(blendType === 3) && (blendType = 0);
-				switch (blendType) {
+				_blendType++;
+				(_blendType === 3) && (_blendType = 0);
+				switch (_blendType) {
 				case 0: 
 					(e.target as Button).label = "混合模式:全身";
 					break;
@@ -57,39 +57,39 @@ package LayaAir3D_Animation {
 			});
 			
 			addButton(100, 220, 260, 40, "切换动作:attack_2", 28, function(e:Event):void {
-				switch (blendType) {
+				switch (_blendType) {
 				case 0: 
-					if (motionCross) {
+					if (_motionCross) {
 						//在当前动画状态和目标动画状态之间进行融合过渡播放
 						//第三个参数为layerIndex 层索引使用混合模式，混合了0层和1层的动画
-						animator.crossFade(motions[motionIndex], 0.2, 0);
-						animator.crossFade(motions[motionIndex], 0.2, 1);
+						animator.crossFade(_motions[_motionIndex], 0.2, 0);
+						animator.crossFade(_motions[_motionIndex], 0.2, 1);
 					} else {
 						//使用普通模式播放
-						animator.play(motions[motionIndex], 0);
-						animator.play(motions[motionIndex], 1);
+						animator.play(_motions[_motionIndex], 0);
+						animator.play(_motions[_motionIndex], 1);
 					}
 					break;
 				case 1: 
-					if (motionCross)
+					if (_motionCross)
 						//在当前动画状态和目标动画状态之间进行融合过渡播放
 						//第三个参数为layerIndex 层索引，没有使用混合模式，仅仅是使用0层的动画
-						animator.crossFade(motions[motionIndex], 0.2, 0);
+						animator.crossFade(_motions[_motionIndex], 0.2, 0);
 					else
-						animator.play(motions[motionIndex], 0);
+						animator.play(_motions[_motionIndex], 0);
 					break;
 				case 2: 
-					if (motionCross)
+					if (_motionCross)
 						//在当前动画状态和目标动画状态之间进行融合过渡播放
 						//第三个参数为layerIndex 层索引，没有使用混合模式，仅仅是使用1层的动画
-						animator.crossFade(motions[motionIndex], 0.2, 1);
+						animator.crossFade(_motions[_motionIndex], 0.2, 1);
 					else
-						animator.play(motions[motionIndex], 1);
+						animator.play(_motions[_motionIndex], 1);
 					break;
 				}
-				(e.target as Button).label = "切换动作:" + motions[motionIndex];
-				motionIndex++;
-				(motionIndex === motions.length) && (motionIndex = 0);
+				(e.target as Button).label = "切换动作:" + _motions[_motionIndex];
+				_motionIndex++;
+				(_motionIndex === _motions.length) && (_motionIndex = 0);
 			});
 		}
 		

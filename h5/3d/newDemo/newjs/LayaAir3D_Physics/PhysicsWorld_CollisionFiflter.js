@@ -8,8 +8,6 @@ class PhysicsWorldCollisionFiflter{
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.translate(new Laya.Vector3(0, 8, 18));
         this.camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
-        //使用默认颜色
-        //this.camera.clearColor = null;
 
         //初始化变量
         this.translateW = new Laya.Vector3(0, 0, -0.2);
@@ -18,7 +16,6 @@ class PhysicsWorldCollisionFiflter{
 		this.translateD = new Laya.Vector3(0.2, 0, 0);
 		this.translateQ = new Laya.Vector3(-0.01, 0, 0);
         this.translateE = new Laya.Vector3(0.01, 0, 0);
-        this.tmpVector = new Laya.Vector3(0, 0, 0);
 
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
@@ -81,10 +78,15 @@ class PhysicsWorldCollisionFiflter{
         var sZ = Math.random() * 0.75 + 0.25;
         var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         box.meshRenderer.material = mat1;
-        this.tmpVector.setValue(Math.random() * 16 - 8, sY / 2, Math.random() * 16 - 8);
-        box.transform.position = this.tmpVector;
-        this.tmpVector.setValue(0, Math.random() * 360, 0);
-        box.transform.rotationEuler = this.tmpVector;
+
+        var transform = box.transform;
+        var pos = transform.position;
+        pos.setValue(Math.random() * 16 - 8, sY / 2, Math.random() * 16 - 8);
+        transform.position = pos;
+        var rotationEuler = transform.rotationEuler;
+        rotationEuler.setValue(0, Math.random() * 360, 0);
+        box.transform.rotationEuler = rotationEuler;
+
         var rigidBody = box.addComponent(Laya.Rigidbody3D);
         var boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
         rigidBody.colliderShape = boxShape;
@@ -100,10 +102,15 @@ class PhysicsWorldCollisionFiflter{
         var height = Math.random() * 0.5 + 0.8;
         var capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = mat3;
-        this.tmpVector.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-        capsule.transform.position = this.tmpVector;
-        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-        capsule.transform.rotationEuler = this.tmpVector;
+
+        var transform = capsule.transform;
+        var pos = transform.position;
+        pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+        transform.position = pos;
+        var rotationEuler = transform.rotationEuler;
+        rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        box.transform.rotationEuler = rotationEuler;
+
         var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;
@@ -119,8 +126,9 @@ class PhysicsWorldCollisionFiflter{
         var radius = Math.random() * 0.2 + 0.2;
         var sphere = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(radius)));
         sphere.meshRenderer.material = mat2;
-        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-        sphere.transform.position = this.tmpVector;
+        var pos = sphere.transform.position;
+        pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        sphere.transform.position = pos;
         var rigidBody = sphere.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.SphereColliderShape(radius);
         rigidBody.colliderShape = sphereShape;
@@ -130,7 +138,7 @@ class PhysicsWorldCollisionFiflter{
     //添加圆锥
     addCone() {
         var mat4 = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("../../../../res/threeDimen/Physics/steel2.jpg", Laya.Handler.create(this, function(tex) {
+        Laya.Texture2D.load("res/threeDimen/Physics/steel2.jpg", Laya.Handler.create(this, function(tex) {
             mat4.albedoTexture = tex;
         }));
         var raidius = Math.random() * 0.2 + 0.2;
@@ -141,8 +149,9 @@ class PhysicsWorldCollisionFiflter{
         //设置材质
         cone.meshRenderer.material = mat4;
         //设置位置
-        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-        cone.transform.position = this.tmpVector;
+        var pos = cone.transform.position;
+        pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        cone.transform.position = pos;
         //创建刚体碰撞器
         var rigidBody = cone.addComponent(Laya.Rigidbody3D);
         //创建球型碰撞器
@@ -156,7 +165,7 @@ class PhysicsWorldCollisionFiflter{
     //添加圆柱
     addCylinder() {
         var mat5 = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("../../../../res/threeDimen/Physics/steel.jpg", Laya.Handler.create(this, function(tex) {
+        Laya.Texture2D.load("res/threeDimen/Physics/steel.jpg", Laya.Handler.create(this, function(tex) {
             mat5.albedoTexture = tex;
         }));
         var raidius = Math.random() * 0.2 + 0.2;
@@ -166,12 +175,15 @@ class PhysicsWorldCollisionFiflter{
         this.scene.addChild(cylinder);
         //设置材质
         cylinder.meshRenderer.material = mat5;
-        //设置位置
-        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-        cylinder.transform.position = this.tmpVector;
-        //设置圆柱MeshSprite3D的欧拉角
-        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-        cylinder.transform.rotationEuler = this.tmpVector;
+
+        var transform = cylinder.transform;
+        var pos = transform.position;
+        pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        transform.position = pos;
+        var rotationEuler = transform.rotationEuler;
+        rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        box.transform.rotationEuler = rotationEuler;
+
         //创建刚体碰撞器
         var rigidBody = cylinder.addComponent(Laya.Rigidbody3D);
         //创建球型碰撞器

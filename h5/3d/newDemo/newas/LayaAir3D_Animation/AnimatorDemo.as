@@ -22,15 +22,15 @@ package LayaAir3D_Animation {
 	 */
 	public class AnimatorDemo {
 		
-		private var scene:Scene3D;
-		private var animator:Animator;
-		private var changeActionButton:Button;
-		private var changeActionButton2:Button;
-		private var PlayStopIndex:int = 0;
-		private var curStateIndex:int = 0;
-		private var text:Text = new Text();
-		private var textName:Text = new Text();
-		private var curActionName:String = null;
+		private var _scene:Scene3D;
+		private var _animator:Animator;
+		private var _changeActionButton:Button;
+		private var _changeActionButton2:Button;
+		private var _PlayStopIndex:int = 0;
+		private var _curStateIndex:int = 0;
+		private var _text:Text = new Text();
+		private var _textName:Text = new Text();
+		private var _curActionName:String = null;
 		
 		private var _translate:Vector3 = new Vector3(0, 3, 5);
 		private var _rotation:Vector3 = new Vector3( -15, 0, 0);
@@ -55,25 +55,25 @@ package LayaAir3D_Animation {
 		
 		private function onLoadFinish():void {
 			//初始化场景
-			scene = Laya.stage.addChild(new Scene3D()) as Scene3D;
-			scene.ambientColor.setValue(0.5, 0.5, 0.5);
+			_scene = Laya.stage.addChild(new Scene3D()) as Scene3D;
+			_scene.ambientColor.setValue(0.5, 0.5, 0.5);
 			
 			//初始化相机
-			var camera:Camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
+			var camera:Camera = _scene.addChild(new Camera(0, 0.1, 100)) as Camera;
 			camera.transform.translate(_translate);
 			camera.transform.rotate(_rotation, true, false);
 			camera.addComponent(CameraMoveScript);
 			
-			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
+			var directionLight:DirectionLight = _scene.addChild(new DirectionLight()) as DirectionLight;
 			directionLight.transform.worldMatrix.setForward(_forward);
 			
 			//初始化角色精灵
-			var role:Sprite3D = scene.addChild(new Sprite3D()) as Sprite3D;
+			var role:Sprite3D = _scene.addChild(new Sprite3D()) as Sprite3D;
 			debugger;
 			//初始化胖子
 			var pangzi:Sprite3D = role.addChild(Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/PangZi.lh")) as Sprite3D;
 			//获取动画组件
-			animator = pangzi.getChildAt(0).getComponent(Animator) as Animator;
+			_animator = pangzi.getChildAt(0).getComponent(Animator) as Animator;
 			debugger;
 			//创建动作状态
 			var state1:AnimatorState = new AnimatorState();
@@ -84,85 +84,85 @@ package LayaAir3D_Animation {
 			//动作播放结束时间
 			state1.clipEnd = 346 / 581;
 			//设置动作
-			state1.clip = animator.getDefaultState().clip;
+			state1.clip = _animator.getDefaultState().clip;
 			//循环模式
 			state1.clip.islooping = true;
 			//为动画状态添加动画状态脚本
 			state1.addScript(AnimatorStateScriptDemo);
 			//为动画组件添加一个动作状态
-			animator.addState(state1);
+			_animator.addState(state1);
 			
 			var state2:AnimatorState = new AnimatorState();
 			state2.name = "ride";
 			state2.clipStart = 0 / 581;
 			state2.clipEnd = 33 / 581;
-			state2.clip = animator.getDefaultState().clip;
+			state2.clip = _animator.getDefaultState().clip;
 			state2.clip.islooping = true;
 			state2.addScript(AnimatorStateScriptDemo);
-			animator.addState(state2);
-			animator.speed = 0.0;
+			_animator.addState(state2);
+			_animator.speed = 0.0;
 			
 			var state3:AnimatorState = new AnimatorState();
 			state3.name = "动作状态三";
 			state3.clipStart = 34 / 581;
 			state3.clipEnd = 100 / 581;
-			state3.clip = animator.getDefaultState().clip;
+			state3.clip = _animator.getDefaultState().clip;
 			state3.clip.islooping = true;
 			state3.addScript(AnimatorStateScriptDemo);
-			animator.addState(state3);
-			animator.speed = 0.0;
+			_animator.addState(state3);
+			_animator.speed = 0.0;
 			
 			var state4:AnimatorState = new AnimatorState();
 			state4.name = "动作状态四";
 			state4.clipStart = 101 / 581;
 			state4.clipEnd = 200 / 581;
-			state4.clip = animator.getDefaultState().clip;
+			state4.clip = _animator.getDefaultState().clip;
 			state4.clip.islooping = true;
 			state4.addScript(AnimatorStateScriptDemo);
-			animator.addState(state4);
-			animator.speed = 0.0;
+			_animator.addState(state4);
+			_animator.speed = 0.0;
 			
 			var state5:AnimatorState = new AnimatorState();
 			state5.name = "动作状态五";
 			state5.clipStart = 201 / 581;
 			state5.clipEnd = 295 / 581;
-			state5.clip = animator.getDefaultState().clip;
+			state5.clip = _animator.getDefaultState().clip;
 			state5.clip.islooping = true;
 			state5.addScript(AnimatorStateScriptDemo);
-			animator.addState(state5);
-			animator.speed = 0.0;
+			_animator.addState(state5);
+			_animator.speed = 0.0;
 			
 			var state6:AnimatorState = new AnimatorState();
 			state6.name = "动作状态六";
 			state6.clipStart = 345 / 581;
 			state6.clipEnd = 581 / 581;
-			state6.clip = animator.getDefaultState().clip;
+			state6.clip = _animator.getDefaultState().clip;
 			state6.clip.islooping = true;
 			state6.addScript(AnimatorStateScriptDemo);
-			animator.addState(state6);
-			animator.speed = 0.0;
+			_animator.addState(state6);
+			_animator.speed = 0.0;
 			
 			loadUI();
-			textName.x = Laya.stage.width / 2 - 50;
-			text.x = Laya.stage.width / 2 - 50;
-			text.y = 50;
-			textName.overflow = Text.HIDDEN;
-			textName.color = "#FFFFFF";
-			textName.font = "Impact";
-			textName.fontSize = 20;
-			textName.borderColor = "#FFFF00";
-			textName.x = Laya.stage.width / 2;
-			textName.text = "当前动作状态名称：";
-			Laya.stage.addChild(textName);
+			_textName.x = Laya.stage.width / 2 - 50;
+			_textName.overflow = Text.HIDDEN;
+			_textName.color = "#FFFFFF";
+			_textName.font = "Impact";
+			_textName.fontSize = 20;
+			_textName.borderColor = "#FFFF00";
+			_textName.x = Laya.stage.width / 2;
+			_textName.text = "当前动作状态名称：";
+			Laya.stage.addChild(_textName);
 			
-			text.overflow = Text.HIDDEN;
-			text.color = "#FFFFFF";
-			text.font = "Impact";
-			text.fontSize = 20;
-			text.borderColor = "#FFFF00";
-			text.x = Laya.stage.width / 2;
-			text.text = "当前动作状态进度：";
-			Laya.stage.addChild(text);
+			_text.x = Laya.stage.width / 2 - 50;
+			_text.y = 50;
+			_text.overflow = Text.HIDDEN;
+			_text.color = "#FFFFFF";
+			_text.font = "Impact";
+			_text.fontSize = 20;
+			_text.borderColor = "#FFFF00";
+			_text.x = Laya.stage.width / 2;
+			_text.text = "当前动作状态进度：";
+			Laya.stage.addChild(_text);
 			
 			Laya.timer.frameLoop(1, this, onFrame);
 		
@@ -172,82 +172,82 @@ package LayaAir3D_Animation {
 			
 			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
 				
-				changeActionButton = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "播放动画")) as Button;
-				changeActionButton.size(160, 40);
-				changeActionButton.labelBold = true;
-				changeActionButton.labelSize = 30;
-				changeActionButton.sizeGrid = "4,4,4,4";
-				changeActionButton.scale(Browser.pixelRatio, Browser.pixelRatio);
-				changeActionButton.pos(Laya.stage.width / 2 - changeActionButton.width * Browser.pixelRatio / 2 - 100, Laya.stage.height - 100 * Browser.pixelRatio);
+				_changeActionButton = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "播放动画")) as Button;
+				_changeActionButton.size(160, 40);
+				_changeActionButton.labelBold = true;
+				_changeActionButton.labelSize = 30;
+				_changeActionButton.sizeGrid = "4,4,4,4";
+				_changeActionButton.scale(Browser.pixelRatio, Browser.pixelRatio);
+				_changeActionButton.pos(Laya.stage.width / 2 - _changeActionButton.width * Browser.pixelRatio / 2 - 100, Laya.stage.height - 100 * Browser.pixelRatio);
 				
-				changeActionButton.on(Event.CLICK, this, function():void {
+				_changeActionButton.on(Event.CLICK, this, function():void {
 					
-					PlayStopIndex++;
-					if (changeActionButton.label === "暂停动画") {
-						changeActionButton.label = "播放动画";
+					_PlayStopIndex++;
+					if (_changeActionButton.label === "暂停动画") {
+						_changeActionButton.label = "播放动画";
 						//暂停动画
-						animator.speed = 0.0;
-					} else if (changeActionButton.label === "播放动画") {
-						changeActionButton.label = "暂停动画";
-						animator.play(curActionName);
+						_animator.speed = 0.0;
+					} else if (_changeActionButton.label === "播放动画") {
+						_changeActionButton.label = "暂停动画";
+						_animator.play(_curActionName);
 						//播放动画
-						animator.speed = 1.0;
+						_animator.speed = 1.0;
 					}
 				});
 				
-				changeActionButton2 = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "切换动作状态")) as Button;
-				changeActionButton2.size(200, 40);
-				changeActionButton2.labelBold = true;
-				changeActionButton2.labelSize = 30;
-				changeActionButton2.sizeGrid = "4,4,4,4";
-				changeActionButton2.scale(Browser.pixelRatio, Browser.pixelRatio);
-				changeActionButton2.pos(Laya.stage.width / 2 - changeActionButton2.width * Browser.pixelRatio / 2 + 100, Laya.stage.height - 100 * Browser.pixelRatio);
+				_changeActionButton2 = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "切换动作状态")) as Button;
+				_changeActionButton2.size(200, 40);
+				_changeActionButton2.labelBold = true;
+				_changeActionButton2.labelSize = 30;
+				_changeActionButton2.sizeGrid = "4,4,4,4";
+				_changeActionButton2.scale(Browser.pixelRatio, Browser.pixelRatio);
+				_changeActionButton2.pos(Laya.stage.width / 2 - _changeActionButton2.width * Browser.pixelRatio / 2 + 100, Laya.stage.height - 100 * Browser.pixelRatio);
 				
-				changeActionButton2.on(Event.CLICK, this, function():void {
+				_changeActionButton2.on(Event.CLICK, this, function():void {
 					
-					curStateIndex++;
-					if (curStateIndex % 6 == 0) {
-						changeActionButton.label = "暂停动画";
-						animator.speed = 0.0;
-						animator.play("hello");
-						curActionName = "hello";
-						textName.text = "当前动作状态名称:" + "hello";
-						animator.speed = 1.0;
-					} else if (curStateIndex % 6 == 1) {
-						changeActionButton.label = "暂停动画";
-						animator.speed = 0.0;
-						animator.play("ride");
-						curActionName = "ride";
-						textName.text = "当前动作状态名称:" + "ride";
-						animator.speed = 1.0;
-					} else if (curStateIndex % 6 == 2) {
-						changeActionButton.label = "暂停动画";
-						animator.speed = 0.0;
-						animator.play("动作状态三");
-						curActionName = "动作状态三";
-						textName.text = "当前动作状态名称:" + "动作状态三";
-						animator.speed = 1.0;
-					} else if (curStateIndex % 6 == 3) {
-						changeActionButton.label = "暂停动画";
-						animator.speed = 0.0;
-						animator.play("动作状态四");
-						curActionName = "动作状态四";
-						textName.text = "当前动作状态名称:" + "动作状态四";
-						animator.speed = 1.0;
-					} else if (curStateIndex % 6 == 4) {
-						changeActionButton.label = "暂停动画";
-						animator.speed = 0.0;
-						animator.play("动作状态五");
-						curActionName = "动作状态五";
-						textName.text = "当前动作状态名称:" + "动作状态五";
-						animator.speed = 1.0;
-					} else if (curStateIndex % 6 == 5) {
-						changeActionButton.label = "暂停动画";
-						animator.speed = 0.0;
-						animator.play("动作状态六");
-						curActionName = "动作状态六";
-						textName.text = "当前动作状态名称:" + "动作状态六";
-						animator.speed = 1.0;
+					_curStateIndex++;
+					if (_curStateIndex % 6 == 0) {
+						_changeActionButton2.label = "暂停动画";
+						_animator.speed = 0.0;
+						_animator.play("hello");
+						_curActionName = "hello";
+						_textName.text = "当前动作状态名称:" + "hello";
+						_animator.speed = 1.0;
+					} else if (_curStateIndex % 6 == 1) {
+						_changeActionButton2.label = "暂停动画";
+						_animator.speed = 0.0;
+						_animator.play("ride");
+						_curActionName = "ride";
+						_textName.text = "当前动作状态名称:" + "ride";
+						_animator.speed = 1.0;
+					} else if (_curStateIndex % 6 == 2) {
+						_changeActionButton2.label = "暂停动画";
+						_animator.speed = 0.0;
+						_animator.play("动作状态三");
+						_curActionName = "动作状态三";
+						_textName.text = "当前动作状态名称:" + "动作状态三";
+						_animator.speed = 1.0;
+					} else if (_curStateIndex % 6 == 3) {
+						_changeActionButton2.label = "暂停动画";
+						_animator.speed = 0.0;
+						_animator.play("动作状态四");
+						_curActionName = "动作状态四";
+						_textName.text = "当前动作状态名称:" + "动作状态四";
+						_animator.speed = 1.0;
+					} else if (_curStateIndex % 6 == 4) {
+						_changeActionButton2.label = "暂停动画";
+						_animator.speed = 0.0;
+						_animator.play("动作状态五");
+						_curActionName = "动作状态五";
+						_textName.text = "当前动作状态名称:" + "动作状态五";
+						_animator.speed = 1.0;
+					} else if (_curStateIndex % 6 == 5) {
+						_changeActionButton2.label = "暂停动画";
+						_animator.speed = 0.0;
+						_animator.play("动作状态六");
+						_curActionName = "动作状态六";
+						_textName.text = "当前动作状态名称:" + "动作状态六";
+						_animator.speed = 1.0;
 					}
 				});
 			
@@ -255,10 +255,10 @@ package LayaAir3D_Animation {
 		}
 		
 		private function onFrame():void {
-			if (animator.speed > 0.0) {
+			if (_animator.speed > 0.0) {
 				//获取播放状态的归一化时间
-				var curNormalizedTime:Number = animator.getCurrentAnimatorPlayState(0).normalizedTime;
-				text.text = "当前动画状态进度：" + curNormalizedTime;
+				var curNormalizedTime:Number = _animator.getCurrentAnimatorPlayState(0).normalizedTime;
+				_text.text = "当前动画状态进度：" + curNormalizedTime;
 			}
 		}
 	

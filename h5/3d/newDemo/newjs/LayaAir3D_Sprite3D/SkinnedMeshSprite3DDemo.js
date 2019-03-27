@@ -32,7 +32,7 @@ class SkinnedMeshSprite3DDemo
 	}
 	onComplete() {
 		//添加父级猴子
-		var dude = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/dude/dude.lh")) as Laya.Sprite3D;
+		var dude = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/dude/dude.lh"));
 		//缩放
 		var scale = new Laya.Vector3(0.1, 0.1, 0.1);
 		dude.transform.localScale = scale;

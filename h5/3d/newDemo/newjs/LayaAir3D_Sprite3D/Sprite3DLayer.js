@@ -1,6 +1,5 @@
 class Sprite3DLayer{
     constructor(){
-        this._scene = null;
 		this.changeActionButton = null;
 		this.layerIndex = null;
         this.camera = null;

@@ -17,7 +17,7 @@ package LayaAi3D_Advance {
 		 * (pos.x pos.y) 屏幕位置
 		 *  pos.z 深度取值范围(-1,1);
 		 * */
-		private var pos:Vector3 = new Vector3(310, 500, 0);
+		private var _pos:Vector3 = new Vector3(310, 500, 0);
 		private var _translate:Vector3 = new Vector3(0, 0, 0);
 		private var _translate2:Vector3 = new Vector3(5, -10, 1);
 		private var _translate3:Vector3 = new Vector3(0, 0, -0.2);
@@ -53,7 +53,7 @@ package LayaAi3D_Advance {
 				var tmpLocalScale:Vector3 = layaMonkey.transform.localScale;
 				tmpLocalScale.setValue(0.3, 0.3, 0.3);
 				//转换2D屏幕坐标系统到3D正交投影下的坐标系统
-				camera.convertScreenCoordToOrthographicCoord(pos, _translate);
+				camera.convertScreenCoordToOrthographicCoord(_pos, _translate);
 				layaMonkey.transform.position = _translate;
 				var tmpRotationEuler:Vector3 = layaMonkey.transform.rotationEuler;
 				tmpRotationEuler.setValue(-30, 0, 0);

@@ -6,41 +6,41 @@ class PhysicsWorld_CompoundCollider
     private tmpVector:Laya.Vector3;
     constructor()
     {
-            Laya3D.init(0, 0);
-			Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
-			Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
-			Laya.Stat.show();
-			
-            this.scene = Laya.stage.addChild(new Laya.Scene3D()) as Laya.Scene3D;
-            
-            this.tmpVector = new Laya.Vector3(0,0,0);
-			
-			this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100)) as Laya.Camera;
-			this.camera.transform.translate(new Laya.Vector3(5.2, 4, 5.2));
-			this.camera.transform.rotate(new Laya.Vector3(-25, 45, 0), true, false);
-			this.camera.addComponent(CameraMoveScript);
-			//this.camera.clearColor = null;
-			
-			var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
-			directionLight.color = new Laya.Vector3(1, 1, 1);
-			directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
-			
-			var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(13, 13, 10, 10))) as Laya.MeshSprite3D;
-			var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-			Laya.Texture2D.load("res/threeDimen/Physics/grass.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
-				planeMat.albedoTexture = tex;
-			}));
-			planeMat.tilingOffset = new Laya.Vector4(10, 10, 0, 0);
-			planeMat.shininess = 1;
-			plane.meshRenderer.material = planeMat;
-			plane.meshRenderer.receiveShadow = true;
-			var staticCollider:Laya.PhysicsCollider = plane.addComponent(Laya.PhysicsCollider) as Laya.PhysicsCollider;
-			var planeShape:Laya.BoxColliderShape = new Laya.BoxColliderShape(13, 0, 13);
-			
-			staticCollider.colliderShape = planeShape;
-			staticCollider.friction = 2;
-			
-			this.randomAddPhysicsSprite();
+        Laya3D.init(0, 0);
+        Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
+        Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+        Laya.Stat.show();
+        
+        this.scene = Laya.stage.addChild(new Laya.Scene3D()) as Laya.Scene3D;
+        
+        this.tmpVector = new Laya.Vector3(0,0,0);
+        
+        this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100)) as Laya.Camera;
+        this.camera.transform.translate(new Laya.Vector3(5.2, 4, 5.2));
+        this.camera.transform.rotate(new Laya.Vector3(-25, 45, 0), true, false);
+        this.camera.addComponent(CameraMoveScript);
+        //this.camera.clearColor = null;
+        
+        var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
+        directionLight.color = new Laya.Vector3(1, 1, 1);
+        directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
+        
+        var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(13, 13, 10, 10))) as Laya.MeshSprite3D;
+        var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
+        Laya.Texture2D.load("res/threeDimen/Physics/grass.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+            planeMat.albedoTexture = tex;
+        }));
+        planeMat.tilingOffset = new Laya.Vector4(10, 10, 0, 0);
+        planeMat.shininess = 1;
+        plane.meshRenderer.material = planeMat;
+        plane.meshRenderer.receiveShadow = true;
+        var staticCollider:Laya.PhysicsCollider = plane.addComponent(Laya.PhysicsCollider) as Laya.PhysicsCollider;
+        var planeShape:Laya.BoxColliderShape = new Laya.BoxColliderShape(13, 0, 13);
+        
+        staticCollider.colliderShape = planeShape;
+        staticCollider.friction = 2;
+        
+        this.randomAddPhysicsSprite();
     }
     public randomAddPhysicsSprite():void {
 			

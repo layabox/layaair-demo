@@ -25,9 +25,9 @@ class AnimatorStateScriptDemo
 		
 		//预加载所有资源
 		var resource = [
-			{url: "res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", type: Laya3D.HIERARCHY, priority: 1}, 
-			{url: "res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh", type: Laya3D.HIERARCHY, priority: 1}, 
-			{url: "res/threeDimen/skinModel/BoneLinkScene/PangZi.lh", type: Laya3D.HIERARCHY, priority: 1}
+			"res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", 
+			"res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh", 
+			"res/threeDimen/skinModel/BoneLinkScene/PangZi.lh"
 		];
 		
 		Laya.loader.create(resource, Laya.Handler.create(this, this.onLoadFinish));

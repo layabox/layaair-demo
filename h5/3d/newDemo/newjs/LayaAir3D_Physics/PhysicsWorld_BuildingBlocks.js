@@ -1,8 +1,5 @@
 class PhysicsWorldBuildingBlocks{
-    constructor(){
-        this.ray = new Laya.Ray(new Laya.Vector3(0, 0, 0), new Laya.Vector3(0, 0, 0));
-        this.point = new Laya.Vector2();
-        this._outHitResult = new Laya.HitResult();
+    constructor(){   
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -11,11 +8,13 @@ class PhysicsWorldBuildingBlocks{
         this.ZERO = new Laya.Vector3(0.0,0.0,0.0);
         this.ONE = new Laya.Vector3(1.0,1.0,1.0);
         this.tmpVector = new Laya.Vector3(0.0,0.0,0.0);
+        this.ray = new Laya.Ray(new Laya.Vector3(0, 0, 0), new Laya.Vector3(0, 0, 0));
+        this.point = new Laya.Vector2();
+        this.outHitResult = new Laya.HitResult();
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.translate(new Laya.Vector3(4.5, 6, 4.5));
         this.camera.transform.rotate(new Laya.Vector3(-30, 45, 0), true, false);
-        //this.camera.clearColor = new Laya.Vector4(0.5, 0.5, 0.5, 1.0);
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1, -1, 1));
@@ -90,9 +89,9 @@ class PhysicsWorldBuildingBlocks{
         this.posX = this.point.x = Laya.MouseManager.instance.mouseX;
         this.posY = this.point.y = Laya.MouseManager.instance.mouseY;
         this.camera.viewportPointToRay(this.point, this.ray);
-        this.scene.physicsSimulation.rayCast(this.ray, this._outHitResult);
-        if (this._outHitResult.succeeded) {
-            var collider = this._outHitResult.collider;
+        this.scene.physicsSimulation.rayCast(this.ray, this.outHitResult);
+        if (this.outHitResult.succeeded) {
+            var collider = this.outHitResult.collider;
             this.hasSelectedSprite = collider.owner;
             this.hasSelectedRigidBody = collider;
             collider.angularFactor = this.ZERO;

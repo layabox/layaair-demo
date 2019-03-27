@@ -17,7 +17,6 @@ class PhysicsWorldTriggerAndCollisionEvent{
 		this.translateD = new Laya.Vector3(0.2, 0, 0);
 		this.translateQ = new Laya.Vector3(-0.01, 0, 0);
         this.translateE = new Laya.Vector3(0.01, 0, 0);
-        this.tmpVector = new Laya.Vector3(0, 0, 0);
 
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
@@ -76,10 +75,15 @@ class PhysicsWorldTriggerAndCollisionEvent{
         var sZ = Math.random() * 0.75 + 0.25;
         var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         box.meshRenderer.material = mat1;
-        this.tmpVector.setValue(Math.random() * 16 - 8, sY / 2, Math.random() * 16 - 8);
-        box.transform.position = this.tmpVector;
-        this.tmpVector.setValue(0, Math.random() * 360, 0);
-        box.transform.rotationEuler = this.tmpVector;
+
+        var transform = box.transform;
+        var pos = transform.position;
+        pos.setValue(Math.random() * 16 - 8, sY / 2, Math.random() * 16 - 8);
+        transform.position = pos;
+        var rotationEuler = transform.rotationEuler;
+        rotationEuler.setValue(Math.random() * 16 - 8, sY / 2, Math.random() * 16 - 8);
+        box.transform.rotationEuler = rotationEuler;
+
         var staticCollider = box.addComponent(Laya.PhysicsCollider); //StaticCollider可与非Kinematic类型RigidBody3D产生碰撞
         var boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
         staticCollider.colliderShape = boxShape;
@@ -97,10 +101,15 @@ class PhysicsWorldTriggerAndCollisionEvent{
         var height = Math.random() * 0.5 + 0.8;
         var capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = mat3;
-        this.tmpVector.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-        capsule.transform.position = this.tmpVector;
-        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-        capsule.transform.rotationEuler = this.tmpVector;
+
+        var transform = capsule.transform;
+        var pos = transform.position;
+        pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+        transform.position = pos;
+        var rotationEuler = transform.rotationEuler;
+        rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        box.transform.rotationEuler = rotationEuler;
+
         var rigidBody = capsule.addComponent(Laya.Rigidbody3D); //Rigidbody3D可与StaticCollider和RigidBody3D产生碰撞
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;
@@ -116,8 +125,9 @@ class PhysicsWorldTriggerAndCollisionEvent{
         var radius = Math.random() * 0.2 + 0.2;
         var sphere = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius)));
         sphere.meshRenderer.material = mat2;
-        this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-        sphere.transform.position = this.tmpVector;
+        var pos = sphere.transform.position;
+        pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        sphere.transform.position = pos;
         var rigidBody = sphere.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.SphereColliderShape(radius);
         rigidBody.colliderShape = sphereShape;

@@ -4,7 +4,6 @@ class AnimationLayerBlend{
         this.blendType = 0;
         this.motionIndex = 0;
         this.motions = ["run", "run_2", "attack", "attack_1", "attack_2", "dead", "idle_2", "idle_3", "idle_4", "idle4", "reload", "replace", "replace_2", "stop"];
-        //Laya.Shader3D.debugMode = true;
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -14,7 +13,6 @@ class AnimationLayerBlend{
     sceneLoaded(scene){
         Laya.stage.addChild(scene);
         this.animator = scene.getChildAt(2).getComponent(Laya.Animator);
-    
         this.addButton(100, 100, 160, 30, "动画过渡:否", 20, this.animationTransition);
         this.addButton(100, 160, 160, 30, "混合模式:全身", 20, this.blendTypeSwitch);
         this.addButton(100, 220, 260, 40, "切换动作:attack_2", 28, this.motionSwitch);

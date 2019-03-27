@@ -11,7 +11,7 @@ class ParticleEternalLight{
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         Laya.Sprite3D.load("res/threeDimen/particle/ETF_Eternal_Light.lh", Laya.Handler.create(this, function (sprite) {
                 scene.addChild(sprite);
-            }));
+        }));
     }
 }
 

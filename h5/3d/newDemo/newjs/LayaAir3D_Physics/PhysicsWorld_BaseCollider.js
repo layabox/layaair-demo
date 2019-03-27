@@ -19,8 +19,6 @@ class PhysicsWorldBaseCollider{
         //方向光
         var directionlight = this.scene.addChild(new Laya.DirectionLight());
         directionlight.diffuseColor = new Laya.Vector3(0.6, 0.6, 0.6);
-        //矩阵前向量变成了-1.0，-1.0，-1.0
-        //不清楚是否识别01
         directionlight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
         //平面加载
         var plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(10, 10, 10, 10)));

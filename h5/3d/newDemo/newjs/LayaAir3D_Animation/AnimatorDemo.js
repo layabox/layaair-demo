@@ -3,26 +3,25 @@ class AnimatorDemo
 	constructor()
 	{
 		//初始化引擎
-		Laya3D.init(0, 0);
-		
+		Laya3D.init(0, 0);	
 		//适配模式
 		Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
 		Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
 		
 		//开启统计信息
-    Laya.Stat.show();
-        
-    this.scene = new Laya.Scene3D();
-		this.animator = null;
-    this.changeActionButton = null;
-	  this.changeActionButton2 = null;
-	  this.PlayStopIndex = 0;
-	  this.curStateIndex = 0;
-	  this.text = new Laya.Text();
-	  this.textName = new Laya.Text();
-	  this.curActionName = null;
-
+    	Laya.Stat.show();
 		
+		//初始化变量
+    	this.scene = new Laya.Scene3D();
+		this.animator = null;
+   		this.changeActionButton = null;
+	  	this.changeActionButton2 = null;
+	  	this.PlayStopIndex = 0;
+	  	this.curStateIndex = 0;
+	  	this.text = new Laya.Text();
+	  	this.textName = new Laya.Text();
+	  	this.curActionName = null;
+	
 		//预加载所有资源
 		var resource = [
 			{url: "res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", type: Laya3D.HIERARCHY, priority: 1}, 

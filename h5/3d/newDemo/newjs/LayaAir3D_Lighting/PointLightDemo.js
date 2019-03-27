@@ -1,7 +1,7 @@
 class PointLightDemo{
     constructor(){
-        this._temp_position = new Laya.Vector3();
-        this._temp_quaternion = new Laya.Quaternion();
+        this.position = new Laya.Vector3();
+        this.quaternion = new Laya.Quaternion();
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -38,9 +38,9 @@ class PointLightDemo{
     }
 
     onFrameLoop(){
-        Laya.Quaternion.createFromYawPitchRoll(0.025, 0, 0, this._temp_quaternion);
-        Laya.Vector3.transformQuat(this.pointLight.transform.position, this._temp_quaternion, this._temp_position);
-        this.pointLight.transform.position = this._temp_position;
+        Laya.Quaternion.createFromYawPitchRoll(0.025, 0, 0, this.quaternion);
+        Laya.Vector3.transformQuat(this.pointLight.transform.position, this.quaternion, this.position);
+        this.pointLight.transform.position = this.position;
     }
 }
 

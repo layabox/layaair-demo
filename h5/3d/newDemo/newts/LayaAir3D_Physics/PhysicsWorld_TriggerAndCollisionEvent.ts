@@ -44,38 +44,38 @@ class PhysicsWorld_TriggerAndCollisionEvent
     constructor()
     {
         Laya3D.init(0, 0);
-			Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
-			Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
-			Laya.Stat.show();
-			
-			this.scene = Laya.stage.addChild(new Laya.Scene3D()) as Laya.Scene3D;
-			
-			this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100)) as Laya.Camera;
-			this.camera.transform.translate(new Laya.Vector3(0, 8, 18));
-			this.camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
-			//this.camera.clearColor = null;
-			
-			var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
-			directionLight.color = new Laya.Vector3(1, 1, 1);
-			directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
-			
-			var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(20, 20, 10, 10))) as Laya.MeshSprite3D;
-			var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-            Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
-				planeMat.albedoTexture = tex;
-			}));
-			planeMat.tilingOffset = new Laya.Vector4(2, 2, 0, 0);
-			plane.meshRenderer.material = planeMat;
-			
-			var staticCollider:Laya.PhysicsCollider = plane.addComponent(Laya.PhysicsCollider) as Laya.PhysicsCollider;
-			var boxShape:Laya.BoxColliderShape = new Laya.BoxColliderShape(20, 0, 20);
-			staticCollider.colliderShape = boxShape;
-			
-			this.addKinematicSphere();
-			for (var i:number = 0; i < 30; i++) {
-				this.addBoxAndTrigger();
-				this.addCapsuleCollision();
-			}
+        Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
+        Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
+        Laya.Stat.show();
+        
+        this.scene = Laya.stage.addChild(new Laya.Scene3D()) as Laya.Scene3D;
+        
+        this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100)) as Laya.Camera;
+        this.camera.transform.translate(new Laya.Vector3(0, 8, 18));
+        this.camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
+        //this.camera.clearColor = null;
+        
+        var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
+        directionLight.color = new Laya.Vector3(1, 1, 1);
+        directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
+        
+        var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(20, 20, 10, 10))) as Laya.MeshSprite3D;
+        var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
+        Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+            planeMat.albedoTexture = tex;
+        }));
+        planeMat.tilingOffset = new Laya.Vector4(2, 2, 0, 0);
+        plane.meshRenderer.material = planeMat;
+        
+        var staticCollider:Laya.PhysicsCollider = plane.addComponent(Laya.PhysicsCollider) as Laya.PhysicsCollider;
+        var boxShape:Laya.BoxColliderShape = new Laya.BoxColliderShape(20, 0, 20);
+        staticCollider.colliderShape = boxShape;
+        
+        this.addKinematicSphere();
+        for (var i:number = 0; i < 30; i++) {
+            this.addBoxAndTrigger();
+            this.addCapsuleCollision();
+        }
     }
     public addKinematicSphere():void {
         var mat2:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
@@ -131,7 +131,7 @@ class PhysicsWorld_TriggerAndCollisionEvent
         var script:TriggerCollisionScript = box.addComponent(TriggerCollisionScript);
         script.kinematicSprite = this.kinematicSphere;
     }
-    //_________________________________________________________________
+    
     public addCapsuleCollision():void {
         var mat3:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {

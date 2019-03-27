@@ -29,8 +29,8 @@ class Secne3DPlayer2D {
         this.camera = null;
         this.layaMonkey3D = null;
         this.layaMonkey2D = null;
-        this._position = new Laya.Vector3();
-        this._outPos = new Laya.Vector3();
+        this.position = new Laya.Vector3();
+        this.outPos = new Laya.Vector3();
         this.scaleDelta = 0;
         //加载精灵
         Laya.loader.create("../res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, this.onComplete));
@@ -47,10 +47,10 @@ class Secne3DPlayer2D {
 		
 	animate() {
         //变换位置
-        this._position.x = Math.sin(this.scaleDelta += 0.01);
+        this.position.x = Math.sin(this.scaleDelta += 0.01);
         //计算位置
-        this.camera.viewport.project(this._position, this.camera.projectionViewMatrix, this._outPos);
-        this.layaMonkey2D.pos(this._outPos.x / Laya.stage.clientScaleX, this._outPos.y / Laya.stage.clientScaleY);
+        this.camera.viewport.project(this.position, this.camera.projectionViewMatrix, this.outPos);
+        this.layaMonkey2D.pos(this.outPos.x / Laya.stage.clientScaleX, this.outPos.y / Laya.stage.clientScaleY);
     }	
 	
 }

@@ -1,24 +1,23 @@
 class PhysicsWorld_BuildingBlocks
 {
    
-        private scene:Laya.Scene3D;
-        private camera: Laya.Camera;
-        private ray:Laya.Ray = new Laya.Ray(new Laya.Vector3(0,0,0),new Laya.Vector3(0,0,0));
-        private point: Laya.Vector2 = new Laya.Vector2();
-        private _outHitResult:Laya.HitResult = new Laya.HitResult();
-        private hasSelectedSprite:Laya.Sprite3D;
-        private hasSelectedRigidBody:Laya.Rigidbody3D;
-        private posX:number;
-        private posY:number;
-        private delX:number;
-        private delY:number;
-        private ZERO:Laya.Vector3 = new Laya.Vector3(0,0,0);
-        private ONE:Laya.Vector3 = new Laya.Vector3(0,0,0);
-        private tmpVector:Laya.Vector3;
+    private scene:Laya.Scene3D;
+    private camera: Laya.Camera;
+    private ray:Laya.Ray = new Laya.Ray(new Laya.Vector3(0,0,0),new Laya.Vector3(0,0,0));
+    private point: Laya.Vector2 = new Laya.Vector2();
+    private _outHitResult:Laya.HitResult = new Laya.HitResult();
+    private hasSelectedSprite:Laya.Sprite3D;
+    private hasSelectedRigidBody:Laya.Rigidbody3D;
+    private posX:number;
+    private posY:number;
+    private delX:number;
+    private delY:number;
+    private ZERO:Laya.Vector3 = new Laya.Vector3(0,0,0);
+    private ONE:Laya.Vector3 = new Laya.Vector3(0,0,0);
+    private tmpVector:Laya.Vector3;
 
     constructor()
     {
-
         Laya3D.init(0,0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -45,7 +44,7 @@ class PhysicsWorld_BuildingBlocks
 			}));
         planeMat.tilingOffset = new Laya.Vector4(2,2,0,0);
         plane.meshRenderer.material = planeMat;
-       plane.meshRenderer.receiveShadow = true;
+        plane.meshRenderer.receiveShadow = true;
         
         var rigidBody: Laya.PhysicsCollider = plane.addComponent(Laya.PhysicsCollider) as Laya.PhysicsCollider; 
         var boxShape:Laya.BoxColliderShape = new Laya.BoxColliderShape(13,0,13);
@@ -90,24 +89,24 @@ class PhysicsWorld_BuildingBlocks
     }
     public addHorizontalBox(x:number, y:number, z:number):void
     {
-            var mat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-			Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
-				mat.albedoTexture = tex;
-			}));
-			
-			var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(2, 0.33, 0.5))) as Laya.MeshSprite3D;
-			box.meshRenderer.material = mat;
-			box.meshRenderer.castShadow = true;
-            box.meshRenderer.receiveShadow = true;
-            this.tmpVector.setValue(x, y, z);
-			box.transform.position = this.tmpVector;
-			
-			var rigidBody:Laya.Rigidbody3D = box.addComponent(Laya.Rigidbody3D) as Laya.Rigidbody3D;
-			rigidBody.mass = 10;
-			rigidBody.friction = 1.0;
-			rigidBody.restitution = 0.2;
-			var boxShape:Laya.BoxColliderShape = new Laya.BoxColliderShape(2, 0.33, 0.5);
-			rigidBody.colliderShape = boxShape;
+        var mat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
+        Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
+            mat.albedoTexture = tex;
+        }));
+        
+        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(2, 0.33, 0.5))) as Laya.MeshSprite3D;
+        box.meshRenderer.material = mat;
+        box.meshRenderer.castShadow = true;
+        box.meshRenderer.receiveShadow = true;
+        this.tmpVector.setValue(x, y, z);
+        box.transform.position = this.tmpVector;
+        
+        var rigidBody:Laya.Rigidbody3D = box.addComponent(Laya.Rigidbody3D) as Laya.Rigidbody3D;
+        rigidBody.mass = 10;
+        rigidBody.friction = 1.0;
+        rigidBody.restitution = 0.2;
+        var boxShape:Laya.BoxColliderShape = new Laya.BoxColliderShape(2, 0.33, 0.5);
+        rigidBody.colliderShape = boxShape;
     }
     public addMouseEvent():void
     {
@@ -136,12 +135,12 @@ class PhysicsWorld_BuildingBlocks
     {
         this.delX = Laya.MouseManager.instance.mouseX - this.posX;
 		this.delY = Laya.MouseManager.instance.mouseY - this.posY;
-			if (this.hasSelectedSprite) {
-                this.tmpVector.setValue(this.delX / 4, 0, this.delY / 4);
-				this.hasSelectedRigidBody.linearVelocity = this.tmpVector;
-			}
-			this.posX = Laya.MouseManager.instance.mouseX;
-			this.posY = Laya.MouseManager.instance.mouseY;
+        if (this.hasSelectedSprite) {
+            this.tmpVector.setValue(this.delX / 4, 0, this.delY / 4);
+            this.hasSelectedRigidBody.linearVelocity = this.tmpVector;
+        }
+        this.posX = Laya.MouseManager.instance.mouseX;
+        this.posY = Laya.MouseManager.instance.mouseY;
     }
     public onMouseUp():void
     {
@@ -155,11 +154,11 @@ class PhysicsWorld_BuildingBlocks
     public onMouseOut():void
     {
         Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onMouseMove);
-			if (this.hasSelectedSprite) {
-				this.hasSelectedRigidBody.angularFactor = this.ONE;
-				this.hasSelectedRigidBody.linearFactor = this.ONE;
-				this.hasSelectedSprite = null;
-			}
+        if (this.hasSelectedSprite) {
+            this.hasSelectedRigidBody.angularFactor = this.ONE;
+            this.hasSelectedRigidBody.linearFactor = this.ONE;
+            this.hasSelectedSprite = null;
+        }
     }
 
 }

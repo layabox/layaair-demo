@@ -9,7 +9,7 @@ class WaterPrimaryMaterialDemo{
             Laya.stage.addChild(scene);
             var camera = scene.getChildByName("Main Camera");
             camera.addComponent(CameraMoveScript);
-            }));
+        }));
     }
 }
 

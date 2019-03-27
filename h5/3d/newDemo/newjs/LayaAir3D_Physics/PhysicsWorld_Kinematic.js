@@ -8,7 +8,6 @@ class PhysicsWorldKinematic{
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.translate(new Laya.Vector3(0, 8, 20));
         this.camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
-        //this.camera.clearColor = null;
 
         this.translateW = new Laya.Vector3(0, 0, -0.2);
 		this.translateS = new Laya.Vector3(0, 0, 0.2);
@@ -53,7 +52,6 @@ class PhysicsWorldKinematic{
         rigidBody.colliderShape = sphereShape;
         rigidBody.mass = 60;
         rigidBody.isKinematic = true;
-        //rigidBody.detectCollisions = false;
         this.kinematicSphere = sphere;
         Laya.timer.frameLoop(1, this, this.onKeyDown);
     }
@@ -75,10 +73,14 @@ class PhysicsWorldKinematic{
         var sZ = Math.random() * 0.75 + 0.25;
         var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         box.meshRenderer.material = mat1;
-        this.tmpVector.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-        box.transform.position = this.tmpVector;
-        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-        box.transform.rotationEuler = this.tmpVector;
+        var transform = box.transform;
+        var pos = transform.position;
+        pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+        transform.position = pos;
+        var rotationEuler = transform.rotationEuler;
+        rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        box.transform.rotationEuler = rotationEuler;
+        
         var rigidBody = box.addComponent(Laya.Rigidbody3D);
         var boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
         rigidBody.colliderShape = boxShape;
@@ -93,10 +95,15 @@ class PhysicsWorldKinematic{
         var height = Math.random() * 0.5 + 0.8;
         var capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = mat3;
-        this.tmpVector.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
-        capsule.transform.position = this.tmpVector;
-        this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-        capsule.transform.rotationEuler = this.tmpVector;
+
+        var transform = capsule.transform;
+        var pos = transform.position;
+        pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
+        transform.position = pos;
+        var rotationEuler = transform.rotationEuler;
+        rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        box.transform.rotationEuler = rotationEuler;
+
         var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;

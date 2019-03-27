@@ -31,8 +31,8 @@ class Sprite3DParent
 
 		//预加载所有资源
 		var resource = [
-		{url: "res/threeDimen/skinModel/LayaMonkey2/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1, constructParams: [1024, 512, 1, true, true]},
-		{url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1, constructParams: [1024, 512, 1, true, true]},];
+		"res/threeDimen/skinModel/LayaMonkey2/LayaMonkey.lh",
+		"res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"];
 		Laya.loader.create(resource, Laya.Handler.create(this, this.onPreLoadFinish));
 	}
 	public onPreLoadFinish() {

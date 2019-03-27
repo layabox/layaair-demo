@@ -11,17 +11,17 @@ class ScriptDemo {
         var scene = Laya.stage.addChild(new Laya.Scene3D());
         
         //初始化变量
-        this._translate = new Laya.Vector3(0, 3, 3);
-        this._rotation = new Laya.Vector3(-30, 0, 0);
-        this._rotation2 = new Laya.Vector3(0, 45, 0);
-        this._forward = new Laya.Vector3(1, -1, 0);
+        this.translate = new Laya.Vector3(0, 3, 3);
+        this.rotation = new Laya.Vector3(-30, 0, 0);
+        this.rotation2 = new Laya.Vector3(0, 45, 0);
+        this.forward = new Laya.Vector3(1, -1, 0);
 
 		//添加照相机
 		var camera = (scene.addChild(new Laya.Camera(0, 0.1, 100)));
 		//移动摄影机位置
-		camera.transform.translate(this._translate);
+		camera.transform.translate(this.translate);
 		//旋转摄影机方向
-		camera.transform.rotate(this._rotation, true, false);
+		camera.transform.rotate(this.rotation, true, false);
 		//设置背景颜色
 		camera.clearColor = null;
 		//添加方向光
@@ -30,11 +30,11 @@ class ScriptDemo {
 		var lightColor = directionLight.color;
 		lightColor.setValue(0.6, 0.6, 0.6);
 		//设置灯光的方向（弧度）
-		directionLight.transform.worldMatrix.setForward(this._forward);
+		directionLight.transform.worldMatrix.setForward(this.forward);
 		//添加自定义模型
 		var box = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(1, 1, 1), "MOs"));
 		//设置模型的旋转
-		box.transform.rotate(this._rotation2, false, false);
+		box.transform.rotate(this.rotation2, false, false);
 		//创建材质
 		var material = new Laya.PBRSpecularMaterial();
 		//加载模型的材质贴图
@@ -68,7 +68,7 @@ class BoxControlScript extends Laya.Script3D {
         super();
         this._box = null;
         this._albedoColor = new Laya.Vector4(1, 0, 0, 1);
-        this._rotation = new Laya.Vector3(0, 0.5, 0);
+        this.rotation = new Laya.Vector3(0, 0.5, 0);
 	}
 	
 	/**
@@ -91,7 +91,7 @@ class BoxControlScript extends Laya.Script3D {
 	 */
 	onUpdate() {
 		//所属脚本对象旋转更新
-		this._box.transform.rotate(this._rotation, false, false)
+		this._box.transform.rotate(this.rotation, false, false)
 	}
 	
 	onDisable() {

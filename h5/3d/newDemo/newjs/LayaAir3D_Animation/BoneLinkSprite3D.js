@@ -1,9 +1,9 @@
 class BoneLinkSprite3D{
     constructor(){
-        this._dragonScale = new Laya.Vector3(1.5, 1.5, 1.5);
-        this._rotation = new Laya.Quaternion(-0.5, -0.5, 0.5, -0.5);
-        this._position = new Laya.Vector3(-0.2, 0.0, 0.0);
-        this._scale = new Laya.Vector3(0.75, 0.75, 0.75);
+        this.dragonScale = new Laya.Vector3(1.5, 1.5, 1.5);
+        this.rotation = new Laya.Quaternion(-0.5, -0.5, 0.5, -0.5);
+        this.position = new Laya.Vector3(-0.2, 0.0, 0.0);
+        this.scale = new Laya.Vector3(0.75, 0.75, 0.75);
         this.curStateIndex = 0;
         //初始化引擎
         Laya3D.init(0, 0);
@@ -14,9 +14,9 @@ class BoneLinkSprite3D{
         Laya.Stat.show();
         //预加载所有资源
         var resource = [
-            { url: "res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", clas: Laya3D.HIERARCHY, priority: 1 },
-            { url: "res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh", clas: Laya3D.HIERARCHY, priority: 1 },
-            { url: "res/threeDimen/skinModel/BoneLinkScene/PangZi.lh", clas: Laya3D.HIERARCHY, priority: 1 }
+            "res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh",
+            "res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh",
+            "res/threeDimen/skinModel/BoneLinkScene/PangZi.lh"
         ];
         Laya.loader.create(resource, Laya.Handler.create(this, this.onLoadFinish));
     }
@@ -53,7 +53,7 @@ class BoneLinkSprite3D{
         state2.clip.islooping = true;
         this.animator.addState(state2);
         this.dragon1 = Laya.Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh");
-        this.dragon1.transform.localScale = this._dragonScale;
+        this.dragon1.transform.localScale = this.dragonScale;
         this.aniSprte3D1 = this.dragon1.getChildAt(0);
         this.dragonAnimator1 = this.aniSprte3D1.getComponent(Laya.Animator);
         var state3 = new Laya.AnimatorState();
@@ -64,7 +64,7 @@ class BoneLinkSprite3D{
         state3.clip.islooping = true;
         this.dragonAnimator1.addState(state3);
         this.dragon2 = Laya.Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh");
-        this.dragon2.transform.localScale = this._dragonScale;
+        this.dragon2.transform.localScale = this.dragonScale;
         this.aniSprte3D2 = this.dragon2.getChildAt(0);
         this.dragonAnimator2 = this.aniSprte3D2.getComponent(Laya.Animator);
         var state4 = new Laya.AnimatorState();
@@ -95,9 +95,9 @@ class BoneLinkSprite3D{
                     this.dragonAnimator1.linkSprite3DToAvatarNode("point", this.role);
                     this.animator.play("ride");
                     this.dragonAnimator1.play("run");
-                    this.pangzi.transform.localRotation = this._rotation;
-                    this.pangzi.transform.localPosition = this._position;
-                    this.pangzi.transform.localScale = this._scale;
+                    this.pangzi.transform.localRotation = this.rotation;
+                    this.pangzi.transform.localPosition = this.position;
+                    this.pangzi.transform.localScale = this.scale;
                 }
                 else if (this.curStateIndex % 3 == 2) {
                     this.changeActionButton.label = "卸下坐骑";
@@ -111,9 +111,9 @@ class BoneLinkSprite3D{
                     this.dragonAnimator2.linkSprite3DToAvatarNode("point", this.role);
                     this.animator.play("ride");
                     this.dragonAnimator2.play("run");
-                    this.pangzi.transform.localRotation = this._rotation;
-                    this.pangzi.transform.localPosition = this._position;
-                    this.pangzi.transform.localScale = this._scale;
+                    this.pangzi.transform.localRotation = this.rotation;
+                    this.pangzi.transform.localPosition = this.position;
+                    this.pangzi.transform.localScale = this.scale;
                 }
                 else {
                     this.changeActionButton.label = "乘骑坐骑";

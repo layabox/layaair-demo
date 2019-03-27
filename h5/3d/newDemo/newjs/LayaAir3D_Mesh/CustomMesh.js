@@ -1,7 +1,5 @@
 class CustomMesh{
-    constructor(){
-        this.curStateIndex = 0;
-        Laya.Shader3D.debugMode = true;
+    constructor(){  
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
@@ -16,6 +14,7 @@ class CustomMesh{
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(1.0, -1.0, -1.0));
         this.sprite3D = scene.addChild(new Laya.Sprite3D());
         this.lineSprite3D = scene.addChild(new Laya.Sprite3D());
+        this.curStateIndex = 0;
       
         this.drawBox();
         this.drawSphere();

@@ -9,17 +9,6 @@ class MultiTouch{
 		Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
 		Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
 			
-		//显示文本显示框
-		this.text = new Laya.Text();
-		this.text.name = "ceshi";
-		this.text.overflow = Laya.Text.HIDDEN;
-		this.text.color = "#FFFFFF";
-		this.text.font = "Impact";
-		this.text.fontSize = 20;
-		this.text.borderColor = "#FFFF00";
-		this.text.x = Laya.stage.width / 2;
-		Laya.stage.addChild(this.text);
-			
 		//预加载所有资源
 		var resource = [{url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", type: Laya3D.HIERARCHY, priority: 1}];
 		Laya.loader.create(resource, Laya.Handler.create(this, this.onComplete));
@@ -54,6 +43,16 @@ class MultiTouch{
 		//设置文本显示框位置
 		this.text.x = Laya.stage.width / 2 -50 ;
 		this.text.text = "触控点归零";
+		//显示文本显示框
+		this.text = new Laya.Text();
+		this.text.name = "ceshi";
+		this.text.overflow = Laya.Text.HIDDEN;
+		this.text.color = "#FFFFFF";
+		this.text.font = "Impact";
+		this.text.fontSize = 20;
+		this.text.borderColor = "#FFFF00";
+		this.text.x = Laya.stage.width / 2;
+		Laya.stage.addChild(this.text);
     }
 }
 //激活启动类

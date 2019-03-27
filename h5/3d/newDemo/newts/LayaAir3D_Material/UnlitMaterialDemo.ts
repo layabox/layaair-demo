@@ -26,7 +26,7 @@ class UnlitMaterialDemo{
         earth2.transform.position = new Laya.Vector3(0.6, 0, 0);
         
         //创建Unlit材质
-        var material = new Laya.UnlitMaterial();
+        var material = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/texture/earth.png", Laya.Handler.create(this, function(texture) {
             //设置反照率贴图
             material.albedoTexture = texture;

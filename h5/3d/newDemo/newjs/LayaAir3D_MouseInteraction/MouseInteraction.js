@@ -8,23 +8,23 @@ class MouseInteraction{
             Laya.Stat.show();
 			
 			//创建场景
-            this._scene = Laya.stage.addChild(new Laya.Scene3D());
+            this.scene = Laya.stage.addChild(new Laya.Scene3D());
 
             //射线初始化（必须初始化）
-            this._ray = new Laya.Ray(new Laya.Vector3(0, 0, 0), new Laya.Vector3(0, 0, 0));
+            this.ray = new Laya.Ray(new Laya.Vector3(0, 0, 0), new Laya.Vector3(0, 0, 0));
             
             //初始化变量
             this.point = new Laya.Vector2();
-            this._outHitResult = new Laya.HitResult(); 
+            this.outHitResult = new Laya.HitResult(); 
             
 			//添加相机
-            this._camera = (this._scene.addChild(new Laya.Camera(0, 0.1, 100)));
-            this._camera.transform.translate(new Laya.Vector3(0, 0.7, 5));
-            this._camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
-			this._camera.addComponent(CameraMoveScript);
+            this.camera = (this.scene.addChild(new Laya.Camera(0, 0.1, 100)));
+            this.camera.transform.translate(new Laya.Vector3(0, 0.7, 5));
+            this.camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
+			this.camera.addComponent(CameraMoveScript);
 			
 			//添加光照
-			var directionLight = this._scene.addChild(new Laya.DirectionLight());
+			var directionLight = this.scene.addChild(new Laya.DirectionLight());
             directionLight.color = new Laya.Vector3(1, 1, 1);
             directionLight.transform.rotate(new Laya.Vector3( -3.14 / 3, 0, 0));
 			
@@ -48,13 +48,13 @@ class MouseInteraction{
 
     onComplete(){
             //加载地面
-            var grid = this._scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
+            var grid = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
             //指定精灵的图层
             grid.layer = 10;
             //地面接收阴影
             (grid.getChildAt(0)).meshRenderer.receiveShadow = true;
             //加载静态小猴子
-            var staticLayaMonkey = this._scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
+            var staticLayaMonkey = this.scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
             //设置材质
             staticLayaMonkey.meshRenderer.material = Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
             //设置位置
@@ -68,9 +68,9 @@ class MouseInteraction{
             
             
             //克隆sprite3d
-            var layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
-            var layaMonkey_clone2 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
-            var layaMonkey_clone3 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
+            var layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, new Laya.Vector3(0.0, 0, 0.5));
+            var layaMonkey_clone2 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, new Laya.Vector3(0.0, 0, 0.5));
+            var layaMonkey_clone3 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, new Laya.Vector3(0.0, 0, 0.5));
             //设置精灵名字
             staticLayaMonkey.name = "大熊";
             layaMonkey_clone1.name = "二熊";
@@ -133,14 +133,14 @@ class MouseInteraction{
             this.point.x = Laya.MouseManager.instance.mouseX;
 			this.point.y = Laya.MouseManager.instance.mouseY;
 			//产生射线
-			this._camera.viewportPointToRay(this.point,this._ray);
+			this.camera.viewportPointToRay(this.point,this.ray);
 			//拿到射线碰撞的物体
-			this._scene.physicsSimulation.rayCast(this._ray,this._outHitResult);
+			this.scene.physicsSimulation.rayCast(this.ray,this.outHitResult);
 			//如果碰撞到物体
-			if (this._outHitResult.succeeded)
+			if (this.outHitResult.succeeded)
 			{
 				//删除碰撞到的物体
-				this.text.text = "点击到了" + this._outHitResult.collider.owner.name ;
+				this.text.text = "点击到了" + this.outHitResult.collider.owner.name ;
 				trace("碰撞到物体！！")
 			}
     }

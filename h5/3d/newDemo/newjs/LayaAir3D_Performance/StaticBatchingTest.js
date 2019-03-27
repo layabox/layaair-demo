@@ -58,14 +58,14 @@ class Performance{
             this.changeActionButton.pos(Laya.stage.width / 2 - this.changeActionButton.width * Laya.Browser.pixelRatio / 2, Laya.stage.height - 100 * Laya.Browser.pixelRatio);
             
             this.changeActionButton.on(Laya.Event.CLICK, this, function(){
-                    //精灵设置开启静态合并
-                    this.planeSprite._isStatic = true;
-                    this.cubeSprite._isStatic = true;
-                    this.sphereSprite._isStatic = true;
-                    this.capsuleSprite._isStatic = true;
-                    this.cylinderSprite._isStatic = true;
-                    //进行静态合并
-                    Laya.StaticBatchManager.combine(null, this.renderableSprite3Ds);				
+				//精灵设置开启静态合并
+				this.planeSprite._isStatic = true;
+				this.cubeSprite._isStatic = true;
+				this.sphereSprite._isStatic = true;
+				this.capsuleSprite._isStatic = true;
+				this.cylinderSprite._isStatic = true;
+				//进行静态合并
+				Laya.StaticBatchManager.combine(null, this.renderableSprite3Ds);				
             });	
         }));
     }

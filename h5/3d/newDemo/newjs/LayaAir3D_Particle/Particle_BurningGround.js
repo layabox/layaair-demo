@@ -11,7 +11,7 @@ class ParticleBurningGround{
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         Laya.Sprite3D.load("res/threeDimen/particle/ETF_Burning_Ground.lh", Laya.Handler.create(this, function (sprite) {
                 scene.addChild(sprite);
-            }));
+        }));
     }
 }
 //激活启动类

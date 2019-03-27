@@ -72,7 +72,7 @@ class Shader_GlowingEdge {
         var earth:Laya.MeshSprite3D = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(0.5, 128, 128))) as Laya.MeshSprite3D;
         
         var customMaterial:CustomMaterial = new CustomMaterial();
-        Laya.Texture2D.load("../res/threeDimen/texture/earth.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void{
+        Laya.Texture2D.load("res/threeDimen/texture/earth.png", Laya.Handler.create(null, function(tex:Laya.Texture2D):void{
             customMaterial.diffuseTexture = tex;
         }));
         customMaterial.marginalColor = new Laya.Vector3(0.0, 0.3, 1.0);

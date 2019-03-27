@@ -12,10 +12,9 @@ package LayaAi3D_Advance {
 	
 	public class Secne3DPlayer2D {
 		
-		private var scene:Scene3D;
-		private var camera:Camera;
-		private var layaMonkey3D:Sprite3D;
-		private var layaMonkey2D:Image;
+		private var _scene:Scene3D;
+		private var _camera:Camera;
+		private var _layaMonkey2D:Image;
 		private var _position:Vector3 = new Vector3();
 		private var _outPos:Vector3 = new Vector3();
 		private var _translate:Vector3 = new Vector3(0, 0.35, 1);
@@ -32,15 +31,15 @@ package LayaAi3D_Advance {
 			Stat.show();
 			
 			//创建场景
-			scene = Laya.stage.addChild(new Scene3D()) as Scene3D;
+			_scene = Laya.stage.addChild(new Scene3D()) as Scene3D;
 			
 			//创建相机
-			camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
-			camera.transform.translate(_translate);
-			camera.transform.rotate(_rotation, true, false);
+			_camera = _scene.addChild(new Camera(0, 0.1, 100)) as Camera;
+			_camera.transform.translate(_translate);
+			_camera.transform.rotate(_rotation, true, false);
 			
 			//创建平行光
-			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
+			var directionLight:DirectionLight = _scene.addChild(new DirectionLight()) as DirectionLight;
 			var tmpColor:Vector3 = directionLight.color;
 			tmpColor.setValue(1, 1, 1);
 			directionLight.transform.rotate(_rotation);
@@ -50,9 +49,9 @@ package LayaAi3D_Advance {
 		
 		public function onComplete():void {
 			//加载三维地面
-			var grid:Sprite3D = scene.addChild(Loader.getRes("res/threeDimen/staticModel/grid/plane.lh")) as Sprite3D;
+			var grid:Sprite3D = _scene.addChild(Loader.getRes("res/threeDimen/staticModel/grid/plane.lh")) as Sprite3D;
 			//加载二维猴子
-			layaMonkey2D = Laya.stage.addChild(new Image("res/threeDimen/monkey.png")) as Image;
+			_layaMonkey2D = Laya.stage.addChild(new Image("res/threeDimen/monkey.png")) as Image;
 			//开启定时器循环
 			Laya.timer.frameLoop(1, this, animate);
 		}
@@ -61,8 +60,8 @@ package LayaAi3D_Advance {
 			//变换位置
 			_position.x = Math.sin(scaleDelta += 0.01);
 			//计算位置
-			camera.viewport.project(_position, camera.projectionViewMatrix, _outPos);
-			layaMonkey2D.pos(_outPos.x / Laya.stage.clientScaleX, _outPos.y / Laya.stage.clientScaleY);
+			_camera.viewport.project(_position, _camera.projectionViewMatrix, _outPos);
+			_layaMonkey2D.pos(_outPos.x / Laya.stage.clientScaleX, _outPos.y / Laya.stage.clientScaleY);
 		}
 	
 	}

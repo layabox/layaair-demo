@@ -9,13 +9,11 @@ class  PhysicsWorldCompoundCollider{
         this.camera.transform.translate(new Laya.Vector3(5.2, 4, 5.2));
         this.camera.transform.rotate(new Laya.Vector3(-25, 45, 0), true, false);
         this.camera.addComponent(CameraMoveScript);
-        //使用默认颜色
-        //this.camera.clearColor = null;
-        //初始化变量
-        this.tmpVector = new Laya.Vector3(0,0,0);
+
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
+
         var plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(13, 13, 10, 10)));
         var planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/grass.png", Laya.Handler.create(null, function (tex) {
@@ -25,6 +23,7 @@ class  PhysicsWorldCompoundCollider{
         planeMat.shininess = 1;
         plane.meshRenderer.material = planeMat;
         plane.meshRenderer.receiveShadow = true;
+
         var staticCollider = plane.addComponent(Laya.PhysicsCollider);
         var planeShape = new Laya.BoxColliderShape(13, 0, 13);
         staticCollider.colliderShape = planeShape;
@@ -55,36 +54,47 @@ class  PhysicsWorldCompoundCollider{
         mat.shininess = 1;
         Laya.Mesh.load("res/threeDimen/Physics/table.lm", Laya.Handler.create(this, function (mesh) {
             var table = this.scene.addChild(new Laya.MeshSprite3D(mesh));
-            this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
-            table.transform.position = this.tmpVector;
-            this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-            table.transform.rotationEuler = this.tmpVector;
-            this.tmpVector.setValue(3, 3, 3);
-            table.transform.scale = this.tmpVector;
+
+            var transform = table.transform;
+            var pos = transform.position;
+            pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+            transform.position = pos;
+            var rotationEuler = transform.rotationEuler;
+            rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+            box.transform.rotationEuler = rotationEuler;
+            var scale = transform.scale;
+            scale.setValue(3, 3, 3);
+            transform.scale = scale;
+
             table.meshRenderer.material = mat;
             var rigidBody = table.addComponent(Laya.Rigidbody3D);
             rigidBody.mass = 10;
             rigidBody.friction = 1;
             var compoundShape = new Laya.CompoundColliderShape();
             var boxShape = new Laya.BoxColliderShape(0.5, 0.4, 0.045);
-            this.tmpVector.setValue(0, 0, 0.125);
-            boxShape.localOffset = this.tmpVector;
+            var boxLocalOffset = boxShape.localOffset;
+            boxLocalOffset.setValue(0, 0, 0.125);
+            boxShape.localOffset = boxLocalOffset;
             compoundShape.addChildShape(boxShape);
             var boxShape1 = new Laya.BoxColliderShape(0.1, 0.1, 0.3);
-            this.tmpVector.setValue(-0.2, -0.148, -0.048);
-            boxShape1.localOffset = this.tmpVector;
+            var boxLocalOffset1 = boxShape1.localOffset;
+            boxLocalOffset1.setValue(-0.2, -0.148, -0.048);
+            boxShape1.localOffset = boxLocalOffset1;
             compoundShape.addChildShape(boxShape1);
             var boxShape2 = new Laya.BoxColliderShape(0.1, 0.1, 0.3);
-            this.tmpVector.setValue(0.2, -0.148, -0.048);
-            boxShape2.localOffset = this.tmpVector;
+            var boxLocalOffset2 = boxShape2.localOffset;
+            boxLocalOffset2.setValue(0.2, -0.148, -0.048);
+            boxShape2.localOffset = boxLocalOffset2;
             compoundShape.addChildShape(boxShape2);
             var boxShape3 = new Laya.BoxColliderShape(0.1, 0.1, 0.3);
-            this.tmpVector.setValue(-0.2, 0.153, -0.048);
-            boxShape3.localOffset = this.tmpVector;
+            var boxLocalOffset3 = boxShape3.localOffset;
+            boxLocalOffset3.setValue(-0.2, 0.153, -0.048);
+            boxShape3.localOffset = boxLocalOffset3;
             compoundShape.addChildShape(boxShape3);
             var boxShape4 = new Laya.BoxColliderShape(0.1, 0.1, 0.3);
-            this.tmpVector.setValue(0.2, 0.153, -0.048);
-            boxShape4.localOffset = this.tmpVector;
+            var boxLocalOffset3 = boxShape4.localOffset;
+            boxLocalOffset3.setValue(0.2, 0.153, -0.048);
+            boxShape4.localOffset = boxLocalOffset3;
             compoundShape.addChildShape(boxShape4);
             rigidBody.colliderShape = compoundShape;
         }));
@@ -105,12 +115,14 @@ class  PhysicsWorldCompoundCollider{
             rigidBody.friction = 0.3;
             var compoundShape = new Laya.CompoundColliderShape();
             var boxShape = new Laya.BoxColliderShape(40, 40, 40);
-            this.tmpVector.setValue(0, 0, -20);
-            boxShape.localOffset = this.tmpVector;
+            var boxLocalOffset = boxShape.localOffset;
+            boxLocalOffset.setValue(0, 0, -20);
+            boxShape.localOffset = boxLocalOffset;
             compoundShape.addChildShape(boxShape);
             var sphereShape = new Laya.SphereColliderShape(25);
-            this.tmpVector.setValue(0, 0, 24);
-            sphereShape.localOffset = this.tmpVector;
+            var sphereLocalOffset = sphereShape.localOffset;
+            sphereLocalOffset.setValue(0, 0, 24);
+            sphereShape.localOffset = sphereLocalOffset;
             compoundShape.addChildShape(sphereShape);
             rigidBody.colliderShape = compoundShape;
         }));

@@ -24,24 +24,22 @@ class D3SpaceToD2Space {
         Laya.loader.create("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", completeHandler);
     }
     public onComplete(): void {
-       
-			Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(layaMonkey3D:Laya.Sprite3D):void {
-				this.layaMonkey3D = layaMonkey3D;
-				this.scene.addChild(layaMonkey3D);
-				this.layaMonkey2D = Laya.stage.addChild(new Laya.Image("res/threeDimen/monkey.png")) as Laya.Image;
-				Laya.timer.frameLoop(1, this, this.animate);
-			}))
+        Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(layaMonkey3D:Laya.Sprite3D):void {
+            this.layaMonkey3D = layaMonkey3D;
+            this.scene.addChild(layaMonkey3D);
+            this.layaMonkey2D = Laya.stage.addChild(new Laya.Image("res/threeDimen/monkey.png")) as Laya.Image;
+            Laya.timer.frameLoop(1, this, this.animate);
+        }))
     }
 
     private animate(): void {
-
-            this._position.x = Math.sin(this.scaleDelta += 0.01);
-            this.layaMonkey3D.transform.position = this._position;
-            this.layaMonkey3D.transform.scale = this.scale;
-            //转换坐标
-            this.camera.viewport.project(this.layaMonkey3D.transform.position, this.camera.projectionViewMatrix, this._outPos);
-            //赋值给2D
-            this.layaMonkey2D.pos(this._outPos.x / Laya.stage.clientScaleX, this._outPos.y / Laya.stage.clientScaleY);
+        this._position.x = Math.sin(this.scaleDelta += 0.01);
+        this.layaMonkey3D.transform.position = this._position;
+        this.layaMonkey3D.transform.scale = this.scale;
+        //转换坐标
+        this.camera.viewport.project(this.layaMonkey3D.transform.position, this.camera.projectionViewMatrix, this._outPos);
+        //赋值给2D
+        this.layaMonkey2D.pos(this._outPos.x / Laya.stage.clientScaleX, this._outPos.y / Laya.stage.clientScaleY);
     }
 }
 new D3SpaceToD2Space;

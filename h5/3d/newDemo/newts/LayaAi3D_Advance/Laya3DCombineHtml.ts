@@ -20,7 +20,7 @@ class Laya3DCombineHtml {
         //3.清除照相机颜色
         camera.clearColor = null;
 
-        var directionLight: Laya.DirectionLight = scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
+        var directionLight:Laya.DirectionLight = scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
         directionLight.color = new Laya.Vector3(0.7, 0.6, 0.6);
         Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh",Laya.Handler.create(null,function(layaMonkey:Laya.Sprite3D):void{
             scene.addChild(layaMonkey);
