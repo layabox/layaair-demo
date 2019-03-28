@@ -11,6 +11,7 @@ package LayaAir3D_Physics {
 	import laya.d3.math.Ray;
 	import laya.d3.math.Vector3;
 	import laya.d3.math.Vector4;
+	import laya.d3.math.Matrix4x4;
 	import laya.d3.physics.HitResult;
 	import laya.d3.physics.PhysicsCollider;
 	import laya.d3.physics.Rigidbody3D;
@@ -64,7 +65,7 @@ package LayaAir3D_Physics {
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			directionLight.color = new Vector3(1, 1, 1);
 			//设置平行光的方向
-			var mat = directionLight.transform.worldMatrix;
+			var mat:Matrix4x4 = directionLight.transform.worldMatrix;
 			mat.setForward(new Vector3(-1.0, -1.0, 1.0));
 			directionLight.transform.worldMatrix=mat;
 			

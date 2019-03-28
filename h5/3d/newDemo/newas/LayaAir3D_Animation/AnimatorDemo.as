@@ -7,6 +7,7 @@ package LayaAir3D_Animation {
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
+	import laya.d3.math.Matrix4x4;
 	import laya.display.Stage;
 	import laya.display.Text;
 	import laya.events.Event;
@@ -65,9 +66,8 @@ package LayaAir3D_Animation {
 			camera.addComponent(CameraMoveScript);
 			
 			var directionLight:DirectionLight = _scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.transform.worldMatrix.setForward(_forward);
 			//设置平行光的方向
-			var mat = directionLight.transform.worldMatrix;
+			var mat:Matrix4x4 = directionLight.transform.worldMatrix;
 			mat.setForward(_forward);
 			directionLight.transform.worldMatrix=mat;
 

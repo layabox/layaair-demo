@@ -9,6 +9,7 @@ package LayaAir3D_Camera {
 	import laya.d3.math.Vector2;
 	import laya.d3.math.Vector3;
 	import laya.d3.math.Vector4;
+	import laya.d3.math.Matrix4x4;
 	import laya.d3.physics.HitResult;
 	import laya.d3.physics.PhysicsCollider;
 	import laya.d3.physics.Rigidbody3D;
@@ -68,7 +69,7 @@ package LayaAir3D_Camera {
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			directionLight.color.setValue(0.6, 0.6, 0.6);
 			//设置平行光的方向
-			var mat = directionLight.transform.worldMatrix;
+			var mat:Matrix4x = directionLight.transform.worldMatrix;
 			mat.setForward(_forward);
 			directionLight.transform.worldMatrix=mat;
 			

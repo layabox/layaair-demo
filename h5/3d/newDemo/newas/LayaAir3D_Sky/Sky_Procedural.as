@@ -6,6 +6,7 @@ package LayaAir3D_Sky {
 	import laya.d3.core.material.SkyProceduralMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
+	import laya.d3.math.Matrix4x4;
 	import laya.d3.resource.models.SkyDome;
 	import laya.d3.resource.models.SkyRenderer;
 	import laya.d3.shader.Shader3D;
@@ -41,7 +42,7 @@ package LayaAir3D_Sky {
 			//初始化平行光
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			//设置平行光的方向
-			var mat = directionLight.transform.worldMatrix;
+			var mat:Matrix4x4 = directionLight.transform.worldMatrix;
 			mat.setForward(new Vector3(-1.0, -1.0, -1.0));
 			directionLight.transform.worldMatrix=mat;
 			var rotation:Vector3 = new Vector3(-0.01, 0, 0);

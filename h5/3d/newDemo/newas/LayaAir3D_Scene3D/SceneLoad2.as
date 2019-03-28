@@ -7,6 +7,7 @@ package LayaAir3D_Scene3D {
 	import laya.d3.core.material.BaseMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
+	import laya.d3.math.Matrix4x4;
 	import laya.d3.resource.models.SkyBox;
 	import laya.d3.resource.models.SkyRenderer;
 	import laya.display.Stage;
@@ -64,7 +65,7 @@ package LayaAir3D_Scene3D {
 				//移动灯光位置
 				light.transform.translate(new Vector3(0, 2, 5));
 				//调整灯光方向
-				var mat = light.transform.worldMatrix;
+				var mat:Matrix4x4 = light.transform.worldMatrix;
 				mat.setForward(new Vector3(0, -5, 1));
 				light.transform.worldMatrix=mat;
 				//设置灯光漫反射颜色

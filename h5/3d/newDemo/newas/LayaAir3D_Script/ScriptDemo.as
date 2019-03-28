@@ -5,11 +5,13 @@ package LayaAir3D_Script {
 	import laya.d3.core.material.PBRSpecularMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
+	import laya.d3.math.Matrix4x4;
 	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
 	import laya.webgl.resource.Texture2D;
+	
 	
 	public class ScriptDemo {
 		private var _translate:Vector3 = new Vector3(0, 3, 3);
@@ -41,7 +43,7 @@ package LayaAir3D_Script {
 			var lightColor:Vector3 = directionLight.color;
 			lightColor.setValue(0.6, 0.6, 0.6);
 			//设置平行光的方向
-			var mat = directionLight.transform.worldMatrix;
+			var mat:Matrix4x4 = directionLight.transform.worldMatrix;
 			mat.setForward(_forward);
 			directionLight.transform.worldMatrix=mat;
 			//添加自定义模型

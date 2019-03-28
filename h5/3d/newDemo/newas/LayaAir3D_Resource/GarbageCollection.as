@@ -1,4 +1,4 @@
-package OfficialExample.LayaAir3D_Resourceloading {
+package LayaAir3D_Resource {
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.scene.Scene3D;
@@ -68,7 +68,7 @@ package OfficialExample.LayaAir3D_Resourceloading {
 		 * @private
 		 */
 		public function loadScene():void {
-			Scene3D.load("res/threeDimen/scene/ParticleScene/Example_01.ls", Handler.create(null, function(scene:Scene3D):void {
+			Scene3D.load("threeDimen/scene/ParticleScene/Example_01.ls", Handler.create(null, function(scene:Scene3D):void {
 				_scene = Laya.stage.addChildAt(scene, 0) as Scene3D;
 				var camera:Camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
 				camera.transform.translate(new Vector3(0, 1, 0));

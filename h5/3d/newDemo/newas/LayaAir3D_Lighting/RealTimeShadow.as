@@ -8,6 +8,7 @@ package LayaAir3D_Lighting {
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Quaternion;
 	import laya.d3.math.Vector3;
+	import laya.d3.math.Matrix4x4;
 	import laya.d3.resource.models.Mesh;
 	import laya.display.Stage;
 	import laya.net.Loader;
@@ -65,9 +66,8 @@ package LayaAir3D_Lighting {
 				directionLight.transform.worldMatrix.getForward(_direction);
 				//根据四元数旋转三维向量
                 Vector3.transformQuat(_direction, _quaternion, _direction);
-				directionLight.transform.worldMatrix.setForward(_direction);
 				//设置平行光的方向
-				var mat = directionLight.transform.worldMatrix;
+				var mat:Matrix4x = directionLight.transform.worldMatrix;
 				mat.setForward(_direction);
 				directionLight.transform.worldMatrix=mat;
             });

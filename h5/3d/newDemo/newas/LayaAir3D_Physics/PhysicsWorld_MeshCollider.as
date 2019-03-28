@@ -8,6 +8,7 @@ package LayaAir3D_Physics {
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
 	import laya.d3.math.Vector4;
+	import laya.d3.math.Matrix4x4;
 	import laya.d3.physics.PhysicsCollider;
 	import laya.d3.physics.Rigidbody3D;
 	import laya.d3.physics.shape.BoxColliderShape;
@@ -49,7 +50,7 @@ package LayaAir3D_Physics {
 			//方向光
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			//设置平行光的方向
-			var mat = directionLight.transform.worldMatrix;
+			var mat:Matrix4x4 = directionLight.transform.worldMatrix;
 			mat.setForward(new Vector3(0.0, -0.8, -1.0));
 			directionLight.transform.worldMatrix=mat;
 			directionLight.color = new Vector3(1, 1, 1);

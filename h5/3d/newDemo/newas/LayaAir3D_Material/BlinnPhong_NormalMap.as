@@ -6,6 +6,7 @@ package LayaAir3D_Material {
 	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
+	import laya.d3.math.Matrix4x4;
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
@@ -30,7 +31,7 @@ package LayaAir3D_Material {
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			//设置平行光的方向
-			var mat = directionLight.transform.worldMatrix;
+			var mat:Matrix4x4 = directionLight.transform.worldMatrix;
 			mat.setForward(new Vector3(0.0, -0.8, -1.0));
 			directionLight.transform.worldMatrix=mat;
 			directionLight.color.setValue(1, 1, 1);
