@@ -29,7 +29,9 @@ class PhysicsWorld_BaseCollider
         directionlight.diffuseColor = new Laya.Vector3(0.6,0.6,0.6);
         //矩阵前向量变成了-1.0，-1.0，-1.0
         //不清楚是否识别01
-        directionlight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0,-1.0,-1.0));
+        var mat = directionLight.transform.worldMatrix;
+        mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+        directionLight.transform.worldMatrix = mat;
         //平面加载
         var plane : Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(10,10,10,10))) as Laya.MeshSprite3D;
         var planeMat: Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();

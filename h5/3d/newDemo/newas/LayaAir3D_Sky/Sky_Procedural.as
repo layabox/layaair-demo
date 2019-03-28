@@ -40,7 +40,10 @@ package LayaAir3D_Sky {
 			
 			//初始化平行光
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.transform.worldMatrix.setForward(new Vector3(1.0, -1.0, -1.0));
+			//设置平行光的方向
+			var mat = directionLight.transform.worldMatrix;
+			mat.setForward(new Vector3(-1.0, -1.0, -1.0));
+			directionLight.transform.worldMatrix=mat;
 			var rotation:Vector3 = new Vector3(-0.01, 0, 0);
 			
 			//旋转平行光,模拟太阳轨迹

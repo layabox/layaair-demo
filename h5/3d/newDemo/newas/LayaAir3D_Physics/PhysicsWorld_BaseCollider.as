@@ -50,7 +50,10 @@ package LayaAir3D_Physics {
 			//方向光
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			directionLight.color = new Vector3(0.6, 0.6, 0.6);
-			directionLight.transform.worldMatrix.setForward(new Vector3(-1.0, -1.0, -1.0));
+			//设置平行光的方向
+			var mat = directionLight.transform.worldMatrix;
+			mat.setForward(new Vector3(-1.0, -1.0, -1.0));
+			directionLight.transform.worldMatrix=mat;
 			
 			//平面
 			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(10, 10, 10, 10))) as MeshSprite3D;

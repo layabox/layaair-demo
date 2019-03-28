@@ -29,7 +29,10 @@ class PhysicsWorld_RayShapeCast
 		
 		var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
 		directionLight.color = new Laya.Vector3(1, 1, 1);
-		directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
+
+		var mat = directionLight.transform.worldMatrix;
+		mat.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
+		directionLight.transform.worldMatrix = mat;
 		
 		var plane:Laya.MeshSprite3D =this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(20, 20, 10, 10))) as Laya.MeshSprite3D;
 		var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();

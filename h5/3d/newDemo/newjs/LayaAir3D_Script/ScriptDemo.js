@@ -30,7 +30,9 @@ class ScriptDemo {
 		var lightColor = directionLight.color;
 		lightColor.setValue(0.6, 0.6, 0.6);
 		//设置灯光的方向（弧度）
-		directionLight.transform.worldMatrix.setForward(this.forward);
+		var mat = directionLight.transform.worldMatrix;
+		mat.setForward(this.forward);
+		directionLight.transform.worldMatrix = mat;
 		//添加自定义模型
 		var box = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(1, 1, 1), "MOs"));
 		//设置模型的旋转

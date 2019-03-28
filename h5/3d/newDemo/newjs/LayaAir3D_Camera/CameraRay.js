@@ -27,7 +27,9 @@ class CameraRay {
 		var directionLight = new Laya.DirectionLight();
 		this.scene.addChild(directionLight);
 		directionLight.color = new Laya.Vector3(0.6, 0.6, 0.6);
-		directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+		var mat = directionLight.transform.worldMatrix;
+		mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+		directionLight.transform.worldMatrix = mat;
 		
 		//平面
 		var plane = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(10, 10, 10, 10));

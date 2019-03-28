@@ -14,7 +14,9 @@ class TextureDemo{
 		camera.addComponent(CameraMoveScript);
 			
 		var directionLight = scene.addChild(new Laya.DirectionLight());
-		directionLight.transform.worldMatrix.setForward(new Laya.Vector3(1.0, -1.0, -1.0));
+		var mat = directionLight.transform.worldMatrix;
+		mat.setForward(new Laya.Vector3(1.0, -1.0, -1.0));
+		directionLight.transform.worldMatrix = mat;
 			
 		this.sprite3D = scene.addChild(new Laya.Sprite3D());
 			

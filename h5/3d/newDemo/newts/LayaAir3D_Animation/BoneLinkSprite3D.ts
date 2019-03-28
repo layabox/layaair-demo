@@ -51,7 +51,10 @@ class BoneLinkSprite3D
 		camera.addComponent(CameraMoveScript);
 		
 		var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
-		directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+		//设置灯光方向
+		var mat = directionLight.transform.worldMatrix;
+		mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+		directionLight.transform.worldMatrix = mat;
 		
 		//初始化角色精灵
 		this.role = this.scene.addChild(new Laya.Sprite3D()) as Laya.Sprite3D;

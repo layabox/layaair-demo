@@ -66,6 +66,11 @@ package LayaAir3D_Animation {
 			
 			var directionLight:DirectionLight = _scene.addChild(new DirectionLight()) as DirectionLight;
 			directionLight.transform.worldMatrix.setForward(_forward);
+			//设置平行光的方向
+			var mat = directionLight.transform.worldMatrix;
+			mat.setForward(_forward);
+			directionLight.transform.worldMatrix=mat;
+
 			
 			//初始化角色精灵
 			var role:Sprite3D = _scene.addChild(new Sprite3D()) as Sprite3D;

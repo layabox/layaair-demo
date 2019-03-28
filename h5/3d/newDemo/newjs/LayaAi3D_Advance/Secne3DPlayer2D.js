@@ -33,14 +33,14 @@ class Secne3DPlayer2D {
         this.outPos = new Laya.Vector3();
         this.scaleDelta = 0;
         //加载精灵
-        Laya.loader.create("../res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, this.onComplete));
+        Laya.loader.create("res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, this.onComplete));
     }	
 		
 	onComplete() {
         //加载三维地面
-        var grid = this.scene.addChild(Laya.Loader.getRes("../res/threeDimen/staticModel/grid/plane.lh"));
+        var grid = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
         //加载二维猴子
-        this.layaMonkey2D = Laya.stage.addChild(new Laya.Image("../res/threeDimen/monkey.png"));
+        this.layaMonkey2D = Laya.stage.addChild(new Laya.Image("res/threeDimen/monkey.png"));
         //开启定时器循环
         Laya.timer.frameLoop(1, this, this.animate);
     }

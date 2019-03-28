@@ -49,7 +49,10 @@ class AnimatorDemo
 		
 		var directionLight = new Laya.DirectionLight();
 		this.scene.addChild(directionLight);
-		directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+		//设置灯光方向
+		var mat = directionLight.transform.worldMatrix;
+		mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+		directionLight.transform.worldMatrix = mat; 
 		
 		//初始化角色精灵
 		var role = new Laya.Sprite3D();

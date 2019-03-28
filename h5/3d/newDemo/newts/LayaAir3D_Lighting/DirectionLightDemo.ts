@@ -18,12 +18,15 @@ class DirectionLightDemo {
 		//方向光
 		var directionLight:Laya.DirectionLight = scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
 		directionLight.color = new Laya.Vector3(1, 1, 1);
-		directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+		//设置灯光方向
+		var mat = directionLight.transform.worldMatrix;
+		mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+		directionLight.transform.worldMatrix = mat;
 		
 		Laya.Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, function(sprite:Laya.Sprite3D):void {
 			var grid:Laya.Sprite3D = scene.addChild(sprite) as Laya.Sprite3D;
 			
-			Laya.Sprite3D.load("../res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(layaMonkey:Laya.Sprite3D):void {
+			Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(layaMonkey:Laya.Sprite3D):void {
 				var layaMonkey:Laya.Sprite3D = scene.addChild(layaMonkey) as Laya.Sprite3D;
 				var aniSprite3d:Laya.Sprite3D = layaMonkey.getChildAt(0) as Laya.Sprite3D;
 				var animator:Laya.Animator = aniSprite3d.getComponent(Laya.Animator) as Laya.Animator;
@@ -42,6 +45,9 @@ class DirectionLightDemo {
 					directionLight.transform.worldMatrix.getForward(this._direction);
 					Laya.Vector3.transformQuat(this._direction, this._quaternion,this._direction);
 					directionLight.transform.worldMatrix.setForward(this._direction);
+					var mat = directionLight.transform.worldMatrix;
+					mat.setForward(this._direction);
+					directionLight.transform.worldMatrix = mat;
 				});
 			}));
 		

@@ -42,7 +42,10 @@ package LayaAir3D_Lighting {
 			//设置聚光灯颜色
 			spotLight.color = new Vector3(1, 1, 0);
 			spotLight.transform.position = new Vector3(0.0, 1.2, 0.0);
-			spotLight.transform.worldMatrix.setForward(new Vector3(0.15, -1.0, 0.0));
+			//设置聚光灯的方向
+			var mat = spotLight.transform.worldMatrix;
+			mat.setForward(new Vector3(0.15, -1.0, 0.0));
+			directionLight.transform.worldMatrix=mat;
 			//设置聚光灯范围
 			spotLight.range = 6.0;
 			//设置聚光灯锥形角度

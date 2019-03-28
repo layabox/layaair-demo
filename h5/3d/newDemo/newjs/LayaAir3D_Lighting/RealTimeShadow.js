@@ -48,7 +48,9 @@ class RealTimeShadow{
         Laya.Quaternion.createFromYawPitchRoll(0.025, 0, 0, this.quaternion);
         this.directionLight.transform.worldMatrix.getForward(this.direction);
         Laya.Vector3.transformQuat(this.direction, this.quaternion, this.direction);
-        this.directionLight.transform.worldMatrix.setForward(this.direction);
+        var mat = this.directionLight.transform.worldMatrix;
+		mat.setForward(this.direction);
+		this.directionLight.transform.worldMatrix = mat;
     }
 }
 

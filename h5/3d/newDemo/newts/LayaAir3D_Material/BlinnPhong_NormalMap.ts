@@ -19,7 +19,9 @@ class BlinnPhong_NormalMap {
         camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
         
         var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
-        directionLight.transform.worldMatrix.setForward(new Laya.Vector3(0.0, -0.8, -1.0));
+        var mat = directionLight.transform.worldMatrix;
+        mat.setForward(new Laya.Vector3(0.0, -0.8, -1.0));
+        directionLight.transform.worldMatrix = mat;
         directionLight.color = new Laya.Vector3(1, 1, 1);
         
         Laya.loader.create("res/threeDimen/staticModel/lizard/lizard.lh", Laya.Handler.create(this, this.onComplete), null, Laya3D.HIERARCHY);

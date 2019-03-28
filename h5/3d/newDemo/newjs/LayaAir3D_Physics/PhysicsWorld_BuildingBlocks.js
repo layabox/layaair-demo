@@ -17,7 +17,9 @@ class PhysicsWorldBuildingBlocks{
         this.camera.transform.rotate(new Laya.Vector3(-30, 45, 0), true, false);
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
-        directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1, -1, 1));
+        var mat = directionLight.transform.worldMatrix;
+        mat.setForward(new Laya.Vector3(-1, -1, 1));
+        directionLight.transform.worldMatrix = mat;
         var plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(13, 13, 10, 10)));
         var planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {

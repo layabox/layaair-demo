@@ -29,7 +29,10 @@ package LayaAir3D_Material {
 			camera.transform.rotate(new Vector3(-30, 0, 0), true, false);
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.transform.worldMatrix.setForward(new Vector3(0.0, -0.8, -1.0));
+			//设置平行光的方向
+			var mat = directionLight.transform.worldMatrix;
+			mat.setForward(new Vector3(0.0, -0.8, -1.0));
+			directionLight.transform.worldMatrix=mat;
 			directionLight.color.setValue(1, 1, 1);
 			
 			Laya.loader.create("res/threeDimen/staticModel/lizard/lizard.lh", Handler.create(this, onComplete), null, Laya3D.HIERARCHY);

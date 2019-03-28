@@ -42,7 +42,10 @@ package LayaAir3D_Lighting {
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			//方向光的颜色
 			directionLight.color.setValue(1, 1, 1);
-			directionLight.transform.worldMatrix.setForward(new Vector3(-1.0, -1.0, -1.0));
+			//设置平行光的方向
+			var mat = directionLight.transform.worldMatrix;
+			mat.setForward(new Vector3(-1.0, -1.0, -1.0));
+			directionLight.transform.worldMatrix=mat;
 			
 			//加载地面
 			Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh", Handler.create(null, function(sprite:Sprite3D):void {

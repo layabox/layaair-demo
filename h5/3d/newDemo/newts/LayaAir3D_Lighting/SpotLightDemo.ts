@@ -20,7 +20,9 @@ class SpotLightDemo {
         var spotLight:Laya.SpotLight = scene.addChild(new Laya.SpotLight()) as Laya.SpotLight;
         spotLight.color = new Laya.Vector3(1, 1, 0);
         spotLight.transform.position = new Laya.Vector3(0.0, 1.2, 0.0);
-        spotLight.transform.worldMatrix.setForward(new Laya.Vector3(0.15, -1.0, 0.0));
+        var mat = spotLight.transform.worldMatrix;
+        mat.setForward(new Laya.Vector3(0.15, -1.0, 0.0));
+        spotLight.transform.worldMatrix = mat;
         spotLight.range = 6.0;
         spotLight.spotAngle = 32;
     
@@ -46,7 +48,9 @@ class SpotLightDemo {
                     Laya.Quaternion.createFromYawPitchRoll(0.025, 0, 0, this._quaternion);
                     spotLight.transform.worldMatrix.getForward(this._direction);
                     Laya.Vector3.transformQuat(this._direction, this._quaternion, this._direction);
-                    spotLight.transform.worldMatrix.setForward(this._direction);
+                    var mat = spotLight.transform.worldMatrix;
+                    mat.setForward(this._direction);
+                    spotLight.transform.worldMatrix = mat;
                 });
             }));
         

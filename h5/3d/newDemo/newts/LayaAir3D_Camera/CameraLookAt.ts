@@ -19,8 +19,8 @@ class CameraLookAt
         Laya.Stat.show();            
 		//预加载所有资源
 		var resource = [  
-			{url: "res/threeDimen/texture/layabox.png", clas: Laya.Texture2D, priority: 1, constructParams: [64, 64, 1, true, true]},
-			{url: "res/threeDimen/skyBox/skyBox3/skyBox3.lmat", clas: Laya.BaseMaterial, priority: 1, constructParams: [512, 512, 1, true, true]}, ];
+			"res/threeDimen/texture/layabox.png", 
+			"res/threeDimen/skyBox/skyBox3/skyBox3.lmat"];
 		Laya.loader.create(resource, Laya.Handler.create(this, this.onPreLoadFinish));	
 	}
 		

@@ -21,7 +21,9 @@ class PhysicsWorld_MeshCollider
         
         //方向光
         var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
-        directionLight.transform.worldMatrix.setForward(new Laya.Vector3(0.0, -0.8, -1.0));
+        var mat = directionLight.transform.worldMatrix;
+        mat.setForward(new Laya.Vector3(0.0, -0.8, -1.0));
+        directionLight.transform.worldMatrix = mat;
         directionLight.color = new Laya.Vector3(1, 1, 1);
         
         Laya.loader.create(["res/threeDimen/staticModel/lizard/Assets/Lizard/lizard-lizard_geo.lm", "res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_diff.png", "res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_norm.png"], Laya.Handler.create(this, this.complete));      

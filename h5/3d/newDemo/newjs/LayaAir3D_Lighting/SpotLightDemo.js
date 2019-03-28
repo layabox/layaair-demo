@@ -15,7 +15,9 @@ class SpotLightDemo{
         this.spotLight = this.scene.addChild(new Laya.SpotLight());
         this.spotLight.color = new Laya.Vector3(1, 1, 0);
         this.spotLight.transform.position = new Laya.Vector3(0.0, 1.2, 0.0);
-        this.spotLight.transform.worldMatrix.setForward(new Laya.Vector3(0.15, -1.0, 0.0));
+        var mat = this.spotLight.transform.worldMatrix;
+        mat.setForward(new Laya.Vector3(0.15, -1.0, 0.0));
+        this.spotLight.transform.worldMatrix = mat;
         this.spotLight.range = 6.0;
         this.spotLight.spotAngle = 32;
         Laya.Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, function (sprite) {
@@ -42,7 +44,10 @@ class SpotLightDemo{
         Laya.Quaternion.createFromYawPitchRoll(0.025, 0, 0, this.quaternion);
         this.spotLight.transform.worldMatrix.getForward(this.direction);
         Laya.Vector3.transformQuat(this.direction, this.quaternion, this.direction);
-        this.spotLight.transform.worldMatrix.setForward(this.direction);
+        var mat = this.spotLight.transform.worldMatrix;
+        mat.setForward(this.direction);
+        this.spotLight.transform.worldMatrix = mat;
+
     }
 }
 

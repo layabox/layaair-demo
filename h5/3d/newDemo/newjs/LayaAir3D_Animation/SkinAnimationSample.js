@@ -12,7 +12,10 @@ class SkinAnimationSample{
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         camera.addComponent(CameraMoveScript);
         var directionLight = scene.addChild(new Laya.DirectionLight());
-        directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+        //设置灯光方向
+        var mat = directionLight.transform.worldMatrix;
+		mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+		directionLight.transform.worldMatrix = mat;
         directionLight.color = new Laya.Vector3(1, 1, 1);
         Laya.Sprite3D.load("res/threeDimen/skinModel/Zombie/Plane.lh", Laya.Handler.create(null, function (plane) {
             scene.addChild(plane);

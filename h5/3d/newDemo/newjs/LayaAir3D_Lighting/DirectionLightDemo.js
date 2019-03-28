@@ -14,7 +14,10 @@ class DirectionLightDemo{
         //方向光
         this.directionLight = this.scene.addChild(new Laya.DirectionLight());
         this.directionLight.color = new Laya.Vector3(1, 1, 1);
-        this.directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+        //设置灯光方向
+        var mat = this.directionLight.transform.worldMatrix;
+		mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+		this.directionLight.transform.worldMatrix = mat;
         Laya.Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, function (sprite) {
             var grid = this.scene.addChild(sprite);
             Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, this.loadSprite3D));
@@ -39,6 +42,9 @@ class DirectionLightDemo{
         this.directionLight.transform.worldMatrix.getForward(this.direction);
         Laya.Vector3.transformQuat(this.direction, this.quaternion, this.direction);
         this.directionLight.transform.worldMatrix.setForward(this.direction);
+        var mat = this.directionLight.transform.worldMatrix;
+        mat.setForward(this.direction);
+        this.directionLight.transform.worldMatrix = mat;
 	}
 }
 

@@ -41,7 +41,10 @@ package LayaAir3D_Animation {
 			camera.addComponent(CameraMoveScript);
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.transform.worldMatrix.setForward(_forward);
+			//设置平行光的方向
+			var mat = directionLight.transform.worldMatrix;
+			mat.setForward(_forward);
+			directionLight.transform.worldMatrix=mat;
 			directionLight.color.setValue(1, 1, 1);
 			
 			Sprite3D.load("res/threeDimen/skinModel/Zombie/Plane.lh", Handler.create(null, function(plane:Sprite3D):void {

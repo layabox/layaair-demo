@@ -48,7 +48,10 @@ package LayaAir3D_Physics {
 			
 			//方向光
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.transform.worldMatrix.setForward(new Vector3(0.0, -0.8, -1.0));
+			//设置平行光的方向
+			var mat = directionLight.transform.worldMatrix;
+			mat.setForward(new Vector3(0.0, -0.8, -1.0));
+			directionLight.transform.worldMatrix=mat;
 			directionLight.color = new Vector3(1, 1, 1);
 			
 			Laya.loader.create(["res/threeDimen/staticModel/lizard/Assets/Lizard/lizard-lizard_geo.lm", "res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_diff.png", "res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_norm.png"], Handler.create(this, complete));

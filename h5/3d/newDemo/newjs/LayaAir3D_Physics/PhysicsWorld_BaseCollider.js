@@ -19,7 +19,9 @@ class PhysicsWorldBaseCollider{
         //方向光
         var directionlight = this.scene.addChild(new Laya.DirectionLight());
         directionlight.diffuseColor = new Laya.Vector3(0.6, 0.6, 0.6);
-        directionlight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+        var mat = directionLight.transform.worldMatrix;
+        mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+        directionLight.transform.worldMatrix = mat;
         //平面加载
         var plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(10, 10, 10, 10)));
         var planeMat = new Laya.BlinnPhongMaterial();

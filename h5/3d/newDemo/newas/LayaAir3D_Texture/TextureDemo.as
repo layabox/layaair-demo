@@ -44,7 +44,10 @@ package LayaAir3D_Texture {
 			camera.clearColor = new Vector4(0.2, 0.2, 0.2, 1.0);
 			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
-			directionLight.transform.worldMatrix.setForward(new Vector3(1.0, -1.0, -1.0));
+			//设置平行光的方向
+			var mat = directionLight.transform.worldMatrix;
+			mat.setForward(new Vector3(-1.0, -1.0, -1.0));
+			directionLight.transform.worldMatrix=mat;
 			
 			sprite3D = scene.addChild(new Sprite3D()) as Sprite3D;
 			

@@ -40,8 +40,10 @@ package LayaAir3D_Script {
 			//设置灯光漫反射颜色
 			var lightColor:Vector3 = directionLight.color;
 			lightColor.setValue(0.6, 0.6, 0.6);
-			//设置灯光的方向（弧度）
-			directionLight.transform.worldMatrix.setForward(_forward);
+			//设置平行光的方向
+			var mat = directionLight.transform.worldMatrix;
+			mat.setForward(_forward);
+			directionLight.transform.worldMatrix=mat;
 			//添加自定义模型
 			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(1, 1, 1), "MOs")) as MeshSprite3D;
 			//设置模型的旋转

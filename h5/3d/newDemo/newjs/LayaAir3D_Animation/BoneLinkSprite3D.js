@@ -30,7 +30,10 @@ class BoneLinkSprite3D{
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         camera.addComponent(CameraMoveScript);
         var directionLight = this.scene.addChild(new Laya.DirectionLight());
-        directionLight.transform.worldMatrix.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
+       //设置灯光方向
+        var mat = directionLight.transform.worldMatrix;
+		mat.(new Laya.Vector3(-1.0, -1.0, -1.0));
+		directionLight.transform.worldMatrix = mat;
         //初始化角色精灵
         this.role = this.scene.addChild(new Laya.Sprite3D());
         //初始化胖子
