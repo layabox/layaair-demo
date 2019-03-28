@@ -67,7 +67,7 @@ package LayaAir3D_Lighting {
 				//根据四元数旋转三维向量
                 Vector3.transformQuat(_direction, _quaternion, _direction);
 				//设置平行光的方向
-				var mat:Matrix4x = directionLight.transform.worldMatrix;
+				var mat:Matrix4x4 = directionLight.transform.worldMatrix;
 				mat.setForward(_direction);
 				directionLight.transform.worldMatrix=mat;
             });

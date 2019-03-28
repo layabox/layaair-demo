@@ -69,7 +69,7 @@ package LayaAir3D_Camera {
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			directionLight.color.setValue(0.6, 0.6, 0.6);
 			//设置平行光的方向
-			var mat:Matrix4x = directionLight.transform.worldMatrix;
+			var mat:Matrix4x4 = directionLight.transform.worldMatrix;
 			mat.setForward(_forward);
 			directionLight.transform.worldMatrix=mat;
 			

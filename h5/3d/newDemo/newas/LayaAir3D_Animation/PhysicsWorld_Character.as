@@ -49,7 +49,7 @@ package OfficialExample.LayaAir3D_Physics {
 			scene.addChild(directionLight);
 			directionLight.color = new Vector3(1, 1, 1);
 			//设置平行光的方向
-			var mat:Matrix4x = directionLight.transform.worldMatrix;
+			var mat:Matrix4x4 = directionLight.transform.worldMatrix;
 			mat.setForward(new Vector3(-1.0, -1.0, 1.0));
 			directionLight.transform.worldMatrix=mat;
 			
