@@ -1,24 +1,21 @@
 package LayaAir3D_Sprite3D 
 {
 	import common.CameraMoveScript;
-	import common.Tool;
 	import laya.d3.core.Camera;
-	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.pixelLine.PixelLineSprite3D;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Color;
+	import laya.d3.math.Vector2;
 	import laya.d3.math.Vector3;
-	import laya.d3.math.Vector4;
-	import laya.d3.resource.models.PrimitiveMesh;
-	import laya.d3.shader.Shader3D;
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.ui.Button;
 	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
+	import laya.d3.math.Ray;
 	public class PixelLineSprite3DDemo 
 	{
 		private var scene:Scene3D;

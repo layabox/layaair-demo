@@ -105,7 +105,7 @@ class CameraRay {
 		if (this.outs.length != 0)
 		{
 
-			for (var i = 0; i <  this.outs.length; i++)
+			for (let i = 0; i <  this.outs.length; i++)
 				//在射线击中的位置添加一个立方体
 				this.addBoxXYZ(this.outs[i].point.x, this.outs[i].point.y, this.outs[i].point.z );			
 		}

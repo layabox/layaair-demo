@@ -104,7 +104,7 @@ class PhysicsWorldKinematic{
         transform.position = pos;
         var rotationEuler = transform.rotationEuler;
         rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-        box.transform.rotationEuler = rotationEuler;
+        transform.rotationEuler = rotationEuler;
 
         var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);

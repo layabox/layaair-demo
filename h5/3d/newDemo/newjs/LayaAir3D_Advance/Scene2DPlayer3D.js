@@ -28,6 +28,7 @@ class Scene2DPlayer3D {
             scene.addChild(camera);
 			camera.transform.rotate(new Laya.Vector3(-45, 0, 0), false, false);
 			camera.transform.translate(new Laya.Vector3(5, -10, 1));
+			camera.clearFlag = Laya.BaseCamera.CLEARFLAG_DEPTHONLY;
 			camera.orthographic = true;
 			//正交投影垂直矩阵尺寸
 			camera.orthographicVerticalSize = 10;

@@ -12,6 +12,7 @@ package LayaAir3D_Shader {
 	import laya.d3.math.Vector3;
 	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.d3.shader.Shader3D;
+	import laya.d3.shader.ShaderPass;
 	import laya.d3.shader.SubShader;
 	import laya.display.Stage;
 	import laya.utils.Handler;
@@ -121,7 +122,8 @@ package LayaAir3D_Shader {
 			var subShader:SubShader = new SubShader(attributeMap, uniformMap, SkinnedMeshSprite3D.shaderDefines);
 			customShader.addSubShader(subShader);
 			//SubShader添加ShaderPass
-			subShader.addShaderPass(vs, ps);
+			var pass:ShaderPass = subShader.addShaderPass(vs, ps) as ShaderPass;
+			debugger;
 		}
 	}
 }

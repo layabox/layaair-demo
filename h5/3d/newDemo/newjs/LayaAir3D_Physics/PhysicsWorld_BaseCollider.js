@@ -17,8 +17,8 @@ class PhysicsWorldBaseCollider{
         //使用默认颜色
         //camera.clearColor = null;
         //方向光
-        var directionlight = this.scene.addChild(new Laya.DirectionLight());
-        directionlight.diffuseColor = new Laya.Vector3(0.6, 0.6, 0.6);
+        var directionLight = this.scene.addChild(new Laya.DirectionLight());
+        directionLight.diffuseColor = new Laya.Vector3(0.6, 0.6, 0.6);
         var mat = directionLight.transform.worldMatrix;
         mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
         directionLight.transform.worldMatrix = mat;

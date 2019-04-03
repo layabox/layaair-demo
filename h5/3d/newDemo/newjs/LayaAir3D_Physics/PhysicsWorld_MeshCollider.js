@@ -17,10 +17,11 @@ class PhysicsWorldMeshCollider{
         mat.setForward(new Laya.Vector3(0.0, -0.8, -1.0));
         directionLight.transform.worldMatrix = mat;
         directionLight.color = new Laya.Vector3(1, 1, 1);
-        Laya.loader.create(
-            ["res/threeDimen/staticModel/lizard/Assets/Lizard/lizard-lizard_geo.lm", 
+        Laya.loader.create([
+            "res/threeDimen/staticModel/lizard/Assets/Lizard/lizard-lizard_geo.lm", 
             "res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_diff.png", 
-            "res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_norm.png"], Laya.Handler.create(this, this.complete));
+            "res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_norm.png"
+        ], Laya.Handler.create(this, this.complete));
 
     }
 
@@ -131,7 +132,7 @@ class PhysicsWorldMeshCollider{
         transform.position = pos;
         var rotationEuler = transform.rotationEuler;
         rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-        box.transform.rotationEuler = rotationEuler;
+        transform.rotationEuler = rotationEuler;
         var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;

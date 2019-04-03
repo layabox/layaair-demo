@@ -137,7 +137,6 @@ package LayaAir3D_Physics {
 			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(null, function(tex:Texture2D):void {
 				mat1.albedoTexture = tex;
 			}));
-			mat1.albedoColor = _albedoColor;
 			
 			//随机生成盒子的位置
 			var sX:int = Math.random() * 0.75 + 0.25;

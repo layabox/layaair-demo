@@ -17,7 +17,7 @@ class Sky_Procedural{
 		
 		//初始化平行光
 		this.directionLight = scene.addChild(new Laya.DirectionLight()) ;
-		mat = this.directionLight.transform.worldMatrix;
+		var mat = this.directionLight.transform.worldMatrix;
 		mat.setForward(new Laya.Vector3(1.0, -1.0, -1.0));
 		this.directionLight.transform.worldMatrix = mat;
 		this.rotation = new Laya.Vector3(-0.01, 0, 0);

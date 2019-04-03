@@ -37,6 +37,7 @@ class MultiTouch{
 		camera.transform.lookAt(monkey.transform.position, new Laya.Vector3(0, 1, 0));
 			
 		//显示文本显示框
+		this.text = new Laya.Text();
 		this.text.x = Laya.stage.width / 2 -50 ;
 		this.text.text = "触控点归零";
 		//显示文本显示框

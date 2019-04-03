@@ -73,16 +73,6 @@ package LayaAir3D_MouseInteraction {
 			//批量预加载资源
 			Laya.loader.create(["res/threeDimen/staticModel/grid/plane.lh", "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"], Handler.create(this, onComplete));
 		
-			//显示文本显示框
-			text.name = "text";
-			text.overflow = Text.HIDDEN;
-			text.color = "#FFFFFF";
-			text.font = "Impact";
-			text.fontSize = 20;
-			//text.borderColor = "#FFFF00";
-			text.x = Laya.stage.width / 2;
-			Laya.stage.addChild(text);
-			
 		}
 		
 		private function onComplete():void {
@@ -115,10 +105,6 @@ package LayaAir3D_MouseInteraction {
 			layaMonkey_clone1.name = "二熊";
 			layaMonkey_clone2.name = "三熊";
 			layaMonkey_clone3.name = "小小熊";
-			staticLayaMonkey.addComponent(SceneScript);
-			layaMonkey_clone1.addComponent(SceneScript);
-			layaMonkey_clone2.addComponent(SceneScript);
-			layaMonkey_clone3.addComponent(SceneScript);
 			
 			//平移
 			tmpVector.setValue(1.5, 0, 0.0);
@@ -168,11 +154,26 @@ package LayaAir3D_MouseInteraction {
 			//添加鼠标事件
 			addMouseEvent();
 		
+			debugger;
+			//显示文本显示框
+			text.name = "text";
+			text.overflow = Text.HIDDEN;
+			text.color = "#FFFFFF";
+			text.font = "Impact";
+			text.fontSize = 20;
+			text.x = Laya.stage.width / 2;
+			Laya.stage.addChild(text);
+			
+			staticLayaMonkey.addComponent(SceneScript);
+			layaMonkey_clone1.addComponent(SceneScript);
+			layaMonkey_clone2.addComponent(SceneScript);
+			layaMonkey_clone3.addComponent(SceneScript);
+			
 		}
 		
 		private function addMouseEvent():void {
 			//鼠标事件监听
-			Laya.stage.on(Event.MOUSE_DOWN, this, onMouseDown);
+			//Laya.stage.on(Event.MOUSE_DOWN, this, onMouseDown);
 		}
 		
 		private function onMouseDown():void {
@@ -213,6 +214,7 @@ class SceneScript extends Script3D {
 	 * 覆写3D对象组件被激活后执行，此时所有节点和组件均已创建完毕，此方法只执行一次
 	 */
 	override public function onAwake():void {
+		debugger;
 		meshSprite = this.owner as MeshSprite3D;
 		text = Laya.stage.getChildByName("text") as Text;
 	}

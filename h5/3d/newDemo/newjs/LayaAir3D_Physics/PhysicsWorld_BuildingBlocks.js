@@ -42,7 +42,7 @@ class PhysicsWorldBuildingBlocks{
     }
 
     addBox(){
-        for (var i = 0; i < 8; i++) {
+        for (let i = 0; i < 8; i++) {
             this.addVerticalBox(-0.65, 0.165 + i * 0.33 * 2, 0);
             this.addVerticalBox(0, 0.165 + i * 0.33 * 2, 0);
             this.addVerticalBox(0.65, 0.165 + i * 0.33 * 2, 0);

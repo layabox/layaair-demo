@@ -11,7 +11,8 @@ class CameraDemo
             Laya.Stat.show();    
             //初始化变量
             this.camera = null;
-            this.index = 0;        
+			this.index = 0;    
+			this.index2 = 0;    
 			//预加载所有资源
 			var resource = [  
 				"res/threeDimen/texture/layabox.png",
@@ -104,8 +105,8 @@ class CameraDemo
 				changeActionButton2.pos(Laya.stage.width / 2 - changeActionButton2.width * Laya.Browser.pixelRatio / 2 + 100, Laya.stage.height - 100 * Laya.Browser.pixelRatio);
 				
 				changeActionButton2.on(Laya.Event.CLICK, this, function(){
-					this.index++;
-					if (this.index % 2 === 1 ){
+					this.index2++;
+					if (this.index2 % 2 === 1 ){
 						//设置相机的清除标识为天空盒
 						this.camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
 						//使用加载天空盒材质

@@ -35,7 +35,7 @@ package LayaAir3D_Mesh {
 			//显示性能面板
 			Stat.show();
 			//预加载所有资源
-			var resource:Array = ["res/threeDimen/scene/ChangeMaterialDemo/Conventional/scene.ls"}];
+			var resource:Array = ["res/threeDimen/scene/ChangeMaterialDemo/Conventional/scene.ls"];
 			Laya.loader.create(resource, Handler.create(this, onPreLoadFinish));
 		
 		}

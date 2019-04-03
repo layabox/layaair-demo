@@ -13,7 +13,7 @@ class AnimationEventByUnity
 		//加载场景
 		Laya.Scene3D.load("res/threeDimen/scene/LayaScene_AnimationEvent/Conventional/layaScene.ls", Laya.Handler.create(this, function(scene) {
 			Laya.stage.addChild(scene);
-			var cube = scene.getChildByName("Cube");
+			let cube = scene.getChildByName("Cube");
 			//添加组件(脚本)
 			cube.addComponent(SceneScript);	
 		}));

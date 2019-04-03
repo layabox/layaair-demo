@@ -105,7 +105,7 @@ package LayaAir3D_Physics {
 			sphere.meshRenderer.material = mat2;
 			var pos:Vector3 = sphere.transform.position;
 			pos.setValue(0, 0.8, 0);
-			transform.position = pos;
+			sphere.transform.position = pos;
 			
 			//创建刚体碰撞器
 			var rigidBody:Rigidbody3D = sphere.addComponent(Rigidbody3D);

@@ -44,7 +44,7 @@ package LayaAir3D_Material {
 				//设置纹理
 				material.texture = texture;
 				//设置材质颜色
-				material.color = new Vector4(0, 0, 0.6, 1);
+				material.color = new Vector4(0.6, 0.6, 0.6, 1);
 			}));
 			earth.meshRenderer.material = material;
 			

@@ -19,7 +19,6 @@ package common {
 			var vertex1:Vector3 = new Vector3();
 			var vertex2:Vector3 = new Vector3();
 			var vertex3:Vector3 = new Vector3();
-			debugger;
 			var lineCount:int = 0;
 			if (sprite3D is MeshSprite3D) {
 				var meshSprite3D:MeshSprite3D = sprite3D as MeshSprite3D;

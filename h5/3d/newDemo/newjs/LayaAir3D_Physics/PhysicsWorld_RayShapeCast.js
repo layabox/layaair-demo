@@ -37,7 +37,7 @@ class PhysicsWorldRayShapeCast{
         var rigidBody = plane.addComponent(Laya.PhysicsCollider);
         var boxCollider = new Laya.BoxColliderShape(20, 0, 20);
         rigidBody.colliderShape = boxCollider;
-        for (var i = 0; i < 60; i++) {
+        for (let i = 0; i < 60; i++) {
             this.addBox();
             this.addCapsule();
         }
@@ -101,7 +101,7 @@ class PhysicsWorldRayShapeCast{
         transform.position = pos;
         var rotationEuler = transform.rotationEuler;
         rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-        box.transform.rotationEuler = rotationEuler;
+        transform.rotationEuler = rotationEuler;
 
 
         var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
@@ -140,103 +140,103 @@ class PhysicsWorldRayShapeCast{
     }
     //检测
     detection(e){ 
-            if (this.hitResult.succeeded)
-                this.hitResult.collider.owner.meshRenderer.sharedMaterial.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 1.0);
-            if (this.hitResults.length > 0) {
-                for (var i = 0, n = this.hitResults.length; i < n; i++)
-                    this.hitResults[i].collider.owner.meshRenderer.sharedMaterial.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 1.0);
-                this.hitResults.length = 0;
-            }
-            if (this.debugSprites.length > 0) {
-                for (i = 0, n = this.debugSprites.length; i < n; i++)
-                    this.debugSprites[i].destroy();
-                this.debugSprites.length = 0;
-            }
-            switch (this.castType) {
-                case 0:
-                    var lineSprite = this.scene.addChild(new Laya.PixelLineSprite3D(1));
-					lineSprite.addLine(this.from, this.to, Laya.Color.RED, Laya.Color.RED);
-                    this.debugSprites.push(lineSprite);
-                    if (this.castAll) {
-                        //射线发射方法
-                        this.scene.physicsSimulation.raycastAllFromTo(this.from, this.to, this.hitResults);
-                        for (i = 0, n = this.hitResults.length; i < n; i++)
-                            this.hitResults[i].collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
-                    }
-                    else {
-                        //射线发射方法
-                        this.scene.physicsSimulation.raycastFromTo(this.from, this.to, this.hitResult);
+        if (this.hitResult.succeeded)
+            this.hitResult.collider.owner.meshRenderer.sharedMaterial.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 1.0);
+        if (this.hitResults.length > 0) {
+            for (var i = 0, n = this.hitResults.length; i < n; i++)
+                this.hitResults[i].collider.owner.meshRenderer.sharedMaterial.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 1.0);
+            this.hitResults.length = 0;
+        }
+        if (this.debugSprites.length > 0) {
+            for (i = 0, n = this.debugSprites.length; i < n; i++)
+                this.debugSprites[i].destroy();
+            this.debugSprites.length = 0;
+        }
+        switch (this.castType) {
+            case 0:
+                var lineSprite = this.scene.addChild(new Laya.PixelLineSprite3D(1));
+                lineSprite.addLine(this.from, this.to, Laya.Color.RED, Laya.Color.RED);
+                this.debugSprites.push(lineSprite);
+                if (this.castAll) {
+                    //射线发射方法
+                    this.scene.physicsSimulation.raycastAllFromTo(this.from, this.to, this.hitResults);
+                    for (i = 0, n = this.hitResults.length; i < n; i++)
+                        this.hitResults[i].collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
+                }
+                else {
+                    //射线发射方法
+                    this.scene.physicsSimulation.raycastFromTo(this.from, this.to, this.hitResult);
+                    this.hitResult.collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
+                }
+                break;
+            case 1:
+                var boxCollider = new Laya.BoxColliderShape(1.0, 1.0, 1.0);
+                for (i = 0; i < 21; i++) {
+                    var boxSprite = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(1.0, 1.0, 1.0)));
+                    var mat = new Laya.BlinnPhongMaterial();
+                    mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 0.5);
+                    mat.renderMode = Laya.BlinnPhongMaterial.RENDERMODE_TRANSPARENT;
+                    //mat.renderMode = 2;
+                    boxSprite.meshRenderer.material = mat;
+                    Laya.Vector3.lerp(this.from, this.to, i / 20, this.tmpVector2);
+                    boxSprite.transform.localPosition = this.tmpVector2;
+                    this.debugSprites.push(boxSprite);
+                }
+                if (this.castAll) {
+                    this.scene.physicsSimulation.shapeCastAll(boxCollider, this.from, this.to, this.hitResults);
+                    for (i = 0, n = this.hitResults.length; i < n; i++)
+                        this.hitResults[i].collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
+                }
+                else {
+                    if (this.scene.physicsSimulation.shapeCast(boxCollider, this.from, this.to, this.hitResult))
                         this.hitResult.collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
-                    }
-                    break;
-                case 1:
-                    var boxCollider = new Laya.BoxColliderShape(1.0, 1.0, 1.0);
-                    for (i = 0; i < 21; i++) {
-                        var boxSprite = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(1.0, 1.0, 1.0)));
-                        var mat = new Laya.BlinnPhongMaterial();
-                        mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 0.5);
-                        mat.renderMode = Laya.BlinnPhongMaterial.RENDERMODE_TRANSPARENT;
-                        //mat.renderMode = 2;
-                        boxSprite.meshRenderer.material = mat;
-                        Laya.Vector3.lerp(this.from, this.to, i / 20, this.tmpVector2);
-                        boxSprite.transform.localPosition = this.tmpVector2;
-                        this.debugSprites.push(boxSprite);
-                    }
-                    if (this.castAll) {
-                        this.scene.physicsSimulation.shapeCastAll(boxCollider, this.from, this.to, this.hitResults);
-                        for (i = 0, n = this.hitResults.length; i < n; i++)
-                            this.hitResults[i].collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
-                    }
-                    else {
-                        if (this.scene.physicsSimulation.shapeCast(boxCollider, from, to, this.hitResult))
-                            this.hitResult.collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
-                    }
-                    break;
-                case 2:
-                    var sphereCollider = new Laya.SphereColliderShape(0.5);
-                    for (i = 0; i < 41; i++) {
-                        var sphereSprite = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(0.5)));
-                        var mat = new Laya.BlinnPhongMaterial();
-                        mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 0.5);
-                        mat.renderMode = 2;
-                        sphereSprite.meshRenderer.material = mat;
-                        Laya.Vector3.lerp(this.from, this.to, i / 40, this.tmpVector2);
-                        sphereSprite.transform.localPosition = this.tmpVector2;
-                        this.debugSprites.push(sphereSprite);
-                    }
-                    if (this.castAll) {
-                        this.scene.physicsSimulation.shapeCastAll(sphereCollider, this.from, this.to, this.hitResults);
-                        for (i = 0, n = this.hitResults.length; i < n; i++)
-                            this.hitResults[i].collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
-                    }
-                    else {
-                        if (this.scene.physicsSimulation.shapeCast(sphereCollider, this.from, this.to, this.hitResult))
-                            this.hitResult.collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
-                    }
-                    break;
-                case 3:
-                    var capsuleCollider = new Laya.CapsuleColliderShape(0.25, 1.0);
-                    for (i = 0; i < 41; i++) {
-                        var capsuleSprite = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(0.25, 1.0)));
-                        var mat = new Laya.BlinnPhongMaterial();
-                        mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 0.5);
-                        mat.renderMode = 2;
-                        capsuleSprite.meshRenderer.material = mat;
-                        Laya.Vector3.lerp(this.from, this.to, i / 40, this.tmpVector2);
-                        capsuleSprite.transform.localPosition = this.tmpVector2;
-                        this.debugSprites.push(capsuleSprite);
-                    }
-                    if (this.castAll) {
-                        this.scene.physicsSimulation.shapeCastAll(capsuleCollider, this.from, this.to, this.hitResults);
-                        for (i = 0, n = this.hitResults.length; i < n; i++)
-                            this.hitResults[i].collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
-                    }
-                    else {
-                        if (this.scene.physicsSimulation.shapeCast(capsuleCollider, this.from, this.to, this.hitResult))
-                            this.hitResult.collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
-                    }
-                    break;
-            }
+                }
+                break;
+            case 2:
+                var sphereCollider = new Laya.SphereColliderShape(0.5);
+                for (i = 0; i < 41; i++) {
+                    var sphereSprite = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(0.5)));
+                    var mat = new Laya.BlinnPhongMaterial();
+                    mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 0.5);
+                    mat.renderMode = 2;
+                    sphereSprite.meshRenderer.material = mat;
+                    Laya.Vector3.lerp(this.from, this.to, i / 40, this.tmpVector2);
+                    sphereSprite.transform.localPosition = this.tmpVector2;
+                    this.debugSprites.push(sphereSprite);
+                }
+                if (this.castAll) {
+                    this.scene.physicsSimulation.shapeCastAll(sphereCollider, this.from, this.to, this.hitResults);
+                    for (i = 0, n = this.hitResults.length; i < n; i++)
+                        this.hitResults[i].collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
+                }
+                else {
+                    if (this.scene.physicsSimulation.shapeCast(sphereCollider, this.from, this.to, this.hitResult))
+                        this.hitResult.collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
+                }
+                break;
+            case 3:
+                var capsuleCollider = new Laya.CapsuleColliderShape(0.25, 1.0);
+                for (i = 0; i < 41; i++) {
+                    var capsuleSprite = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(0.25, 1.0)));
+                    var mat = new Laya.BlinnPhongMaterial();
+                    mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 0.5);
+                    mat.renderMode = 2;
+                    capsuleSprite.meshRenderer.material = mat;
+                    Laya.Vector3.lerp(this.from, this.to, i / 40, this.tmpVector2);
+                    capsuleSprite.transform.localPosition = this.tmpVector2;
+                    this.debugSprites.push(capsuleSprite);
+                }
+                if (this.castAll) {
+                    this.scene.physicsSimulation.shapeCastAll(capsuleCollider, this.from, this.to, this.hitResults);
+                    for (i = 0, n = this.hitResults.length; i < n; i++)
+                        this.hitResults[i].collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
+                }
+                else {
+                    if (this.scene.physicsSimulation.shapeCast(capsuleCollider, this.from, this.to, this.hitResult))
+                        this.hitResult.collider.owner.meshRenderer.sharedMaterial.albedoColor = this.albedoColor;
+                }
+                break;
+        }
     }
 }
 

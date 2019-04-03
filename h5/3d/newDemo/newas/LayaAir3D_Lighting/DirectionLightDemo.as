@@ -4,6 +4,7 @@ package LayaAir3D_Lighting {
 	import laya.d3.component.AnimatorState;
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;
+	import laya.d3.math.Matrix4x4;
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Quaternion;

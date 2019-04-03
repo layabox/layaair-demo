@@ -10,10 +10,10 @@ class LoadResourceDemo{
 		Laya.Stat.show();
 			
 		//加载资源
-		this.LoadRes();
+		//this.LoadRes();
 			
 		//批量预加载方式
-		//this.PreloadingRes();
+		this.PreloadingRes();
     }
     LoadRes(){
         //场景加载
@@ -25,8 +25,8 @@ class LoadResourceDemo{
 				//设置相机清楚标记，使用天空
 				camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
 				//调整相机的位置
-				camera.transform.translate(new Laya.Vector3(0, 45, -60));
-				camera.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
+				camera.transform.translate(new Laya.Vector3(10, 45, -60));
+				camera.transform.rotate(new Laya.Vector3(-10, 170, 0), false, false);
 				//相机视角控制组件(脚本)
 				camera.addComponent(CameraMoveScript);
 
@@ -68,7 +68,7 @@ class LoadResourceDemo{
 				    var layaMonkey = this.sprite3D.addChild(new Laya.MeshSprite3D(mesh));
 				    layaMonkey.transform.localScale = new Laya.Vector3(4, 4, 4);
 				    layaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
-				    layaMonkey.transform.translate(new Laya.Vector3(5, 0, 13));
+				    layaMonkey.transform.translate(new Laya.Vector3(5, 3, 13));
 				}));
 				//加载精灵
 				Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function(sp) {
@@ -128,8 +128,8 @@ class LoadResourceDemo{
 			//设置相机清楚标记，使用天空
 			camera.clearFlag =Laya.BaseCamera.CLEARFLAG_SKY;
 			//调整相机的位置
-			camera.transform.translate(new Laya.Vector3(0, 45, -60));
-			camera.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
+			camera.transform.translate(new Laya.Vector3(10, 45, -60));
+			camera.transform.rotate(new Laya.Vector3(-10, 170, 0), false, false);
 			//相机视角控制组件(脚本)
 			camera.addComponent(CameraMoveScript);
 			
@@ -152,7 +152,7 @@ class LoadResourceDemo{
 			
 			//使用纹理
 			var earth1 = this._scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(5, 32, 32)));
-			earth1.transform.translate(new Laya.Vector3(10, 20, -8));
+			earth1.transform.translate(new Laya.Vector3(17, 20, 0));
 			
 			var earthMat = new Laya.BlinnPhongMaterial();
 			earthMat.albedoTexture = Laya.Loader.getRes("res/threeDimen/texture/earth.png");
@@ -165,7 +165,7 @@ class LoadResourceDemo{
 			var layaMonkey = this._scene.addChild(new Laya.MeshSprite3D(mesh));
 			layaMonkey.transform.localScale = new Laya.Vector3(4, 4, 4);
 			layaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
-			layaMonkey.transform.translate(new Laya.Vector3(0, 3, 7));
+			layaMonkey.transform.translate(new Laya.Vector3(5, 3, 13));
 			
 			//使用精灵
 			var sp = Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh");

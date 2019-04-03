@@ -1,9 +1,11 @@
-package LayaAi3D_Advance {
+package LayaAir3D_Advance {
+	import laya.d3.core.BaseCamera;
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
+	import laya.d3.math.Vector4;
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.ui.Image;
@@ -34,19 +36,23 @@ package LayaAi3D_Advance {
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			Stat.show();
 			
-			var dialog:Image = Laya.stage.addChild(new Image("res/threeDimen/secne.jpg")) as Image;
-			
+			//var dialog:Image = Laya.stage.addChild(new Image("res/threeDimen/secne.jpg")) as Image;
+			var dialog:Image = new Laya.Image("res/threeDimen/secne.jpg");
+            Laya.stage.addChild(dialog);
 			var scene:Scene3D = Laya.stage.addChild(new Scene3D()) as Scene3D;
 			
 			var camera:Camera = scene.addChild(new Camera(0, 0.1, 1000)) as Camera;
 			camera.transform.rotate(_rotation, false, false);
 			camera.transform.translate(_translate2);
 			camera.orthographic = true;
+			camera.clearFlag = BaseCamera.CLEARFLAG_DEPTHONLY;
 			//正交投影垂直矩阵尺寸
 			camera.orthographicVerticalSize = 10;
 			
+			
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			
+		
 			Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(this, function(layaMonkey:Sprite3D):void {
 				scene.addChild(layaMonkey);
 				_layaMonkey = layaMonkey;
@@ -60,7 +66,7 @@ package LayaAi3D_Advance {
 				Laya.timer.frameLoop(1, this, onKeyDown);
 			
 			}));
-		
+			
 		}
 		private function onKeyDown():void {
 			KeyBoardManager.hasKeyDown(87) && _layaMonkey.transform.translate(_translate3);//W

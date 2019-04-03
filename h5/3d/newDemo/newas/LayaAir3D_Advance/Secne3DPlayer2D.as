@@ -1,4 +1,4 @@
-package LayaAi3D_Advance {
+package LayaAir3D_Advance {
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.light.DirectionLight;

@@ -34,7 +34,7 @@ package LayaAir3D_Texture {
 		private function onComplete():void {
 			
 			//加载场景
-			var scene:Scene3D = Laya.stage.addChild(Loader.getRes("/res/threeDimen/scene/CourtyardScene/Courtyard.ls")) as Scene3D;
+			var scene:Scene3D = Laya.stage.addChild(Loader.getRes("res/threeDimen/scene/CourtyardScene/Courtyard.ls")) as Scene3D;
 			//添加相机
 			var camera:Camera = scene.addChild(new Camera(0, 0.1, 1000)) as Camera;
 			camera.transform.translate(new Vector3(57, 2.5, 58));

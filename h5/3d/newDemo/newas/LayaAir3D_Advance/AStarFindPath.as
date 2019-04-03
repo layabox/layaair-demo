@@ -1,4 +1,4 @@
-package LayaAi3D_Advance {
+package LayaAir3D_Advance {
 	import PathFinding.core.Grid;
 	import PathFinding.core.Heuristic;
 	import laya.d3.component.Animator;
@@ -30,7 +30,7 @@ package LayaAi3D_Advance {
 		private var _position:Vector3 = new Vector3(0, 0, 0);
 		private var _upVector3:Vector3 = new Vector3(0, 1, 0);
 		private var _tarPosition:Vector3 = new Vector3(0, 0, 0);
-		private var _finalPosition:Vector3 = new Vector3(0, 0, 0); 
+		private var _finalPosition:Vector3 = new Vector3(0, 0, 0);
 		private var _rotation:Vector3 = new Vector3(-45, 180, 0);
 		private var _rotation2:Vector3 = new Vector3(0, 180, 0);
 		private var _quaternion:Quaternion = new Quaternion();
@@ -52,11 +52,10 @@ package LayaAi3D_Advance {
 			path = new Vector.<Vector3>();
 			
 			//预加载所有资源
-			var resource:Array = [
-			{ "res/threeDimen/scene/TerrainScene/XunLongShi.ls"}, 
-			{ "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"}, 
-			{ "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png",}, 
-			{ "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png",}];
+			var resource = [{url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene3D, priority: 1}, 
+			{url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1},
+			{url: "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [1024, 1024, 1, false, true]}, 
+			{url: "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [64, 64, 1, false, true]}];
 			
 			Laya.loader.create(resource, Handler.create(this, onLoadFinish));
 		}

@@ -34,7 +34,7 @@ package LayaAir3D_Scene3D {
 				camera.addComponent(CameraMoveScript);
 				
 				//设置灯光环境色
-				scene.ambientColor = new Vector3(2.5, 0, 0);
+				//scene.ambientColor = new Vector3(2.5, 0, 0);
 			
 			}));
 		

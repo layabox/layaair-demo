@@ -3,7 +3,7 @@ package LayaAir3D_Material {
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.light.DirectionLight;
-	import laya.d3.core.material.EffectMaterial;
+	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
 	import laya.d3.resource.models.PrimitiveMesh;
@@ -38,10 +38,10 @@ package LayaAir3D_Material {
 			
 			var earth2:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere())) as MeshSprite3D;
 			earth2.transform.position = new Vector3(0.6, 0, 0);
-			var material:EffectMaterial = new EffectMaterial();
+			var material:BlinnPhongMaterial = new BlinnPhongMaterial();
 			//漫反射贴图
 			Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(null, function(texture:Texture2D):void {
-				material.texture = texture;
+				material.albedoTexture = texture;
 			}));
 			earth2.meshRenderer.material = material;
 			

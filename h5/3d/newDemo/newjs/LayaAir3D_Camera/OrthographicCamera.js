@@ -6,15 +6,16 @@ class OrthographicCamera{
         Laya.stage.scaleMode = Laya.Stage.SCALE_FIXED_HEIGHT;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
-        var dialog = Laya.stage.addChild(new Laya.Image("res/cartoon2/background.jpg"));
+        Laya.stage.addChild(new Laya.Image("res/cartoon2/background.jpg"));
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 1000));
         this.camera.transform.rotate(new Laya.Vector3(-45, 0, 0), false, false);
         this.camera.transform.translate(new Laya.Vector3(5, -10, 1));
         this.camera.orthographic = true;
+        this.camera.clearFlag = Laya.BaseCamera.CLEARFLAG_DEPTHONLY;
         //正交投影垂直矩阵尺寸
         this.camera.orthographicVerticalSize = 10;
-        var directionLight = this.scene.addChild(new Laya.DirectionLight());
+        this.scene.addChild(new Laya.DirectionLight());
         Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, this.loadSprite));
     }
 

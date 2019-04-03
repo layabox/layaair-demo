@@ -79,7 +79,6 @@ package LayaAir3D_Animation {
 			var pangzi:Sprite3D = role.addChild(Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/PangZi.lh")) as Sprite3D;
 			//获取动画组件
 			_animator = pangzi.getChildAt(0).getComponent(Animator) as Animator;
-			debugger;
 			//创建动作状态
 			var state1:AnimatorState = new AnimatorState();
 			//动作名称
@@ -212,42 +211,42 @@ package LayaAir3D_Animation {
 					
 					_curStateIndex++;
 					if (_curStateIndex % 6 == 0) {
-						_changeActionButton2.label = "暂停动画";
+						_changeActionButton.label = "暂停动画";
 						_animator.speed = 0.0;
 						_animator.play("hello");
 						_curActionName = "hello";
 						_textName.text = "当前动作状态名称:" + "hello";
 						_animator.speed = 1.0;
 					} else if (_curStateIndex % 6 == 1) {
-						_changeActionButton2.label = "暂停动画";
+						_changeActionButton.label = "暂停动画";
 						_animator.speed = 0.0;
 						_animator.play("ride");
 						_curActionName = "ride";
 						_textName.text = "当前动作状态名称:" + "ride";
 						_animator.speed = 1.0;
 					} else if (_curStateIndex % 6 == 2) {
-						_changeActionButton2.label = "暂停动画";
+						_changeActionButton.label = "暂停动画";
 						_animator.speed = 0.0;
 						_animator.play("动作状态三");
 						_curActionName = "动作状态三";
 						_textName.text = "当前动作状态名称:" + "动作状态三";
 						_animator.speed = 1.0;
 					} else if (_curStateIndex % 6 == 3) {
-						_changeActionButton2.label = "暂停动画";
+						_changeActionButton.label = "暂停动画";
 						_animator.speed = 0.0;
 						_animator.play("动作状态四");
 						_curActionName = "动作状态四";
 						_textName.text = "当前动作状态名称:" + "动作状态四";
 						_animator.speed = 1.0;
 					} else if (_curStateIndex % 6 == 4) {
-						_changeActionButton2.label = "暂停动画";
+						_changeActionButton.label = "暂停动画";
 						_animator.speed = 0.0;
 						_animator.play("动作状态五");
 						_curActionName = "动作状态五";
 						_textName.text = "当前动作状态名称:" + "动作状态五";
 						_animator.speed = 1.0;
 					} else if (_curStateIndex % 6 == 5) {
-						_changeActionButton2.label = "暂停动画";
+						_changeActionButton.label = "暂停动画";
 						_animator.speed = 0.0;
 						_animator.play("动作状态六");
 						_curActionName = "动作状态六";

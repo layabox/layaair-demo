@@ -17,6 +17,7 @@ class OrthographicCamera {
         camera.orthographic = true;
         //正交投影垂直矩阵尺寸
         camera.orthographicVerticalSize = 10;
+        camera.clearFlag = Laya.BaseCamera.CLEARFLAG_DEPTHONLY;
         
         var directionLight:Laya.DirectionLight = scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
         

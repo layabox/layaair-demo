@@ -64,7 +64,7 @@ class  PhysicsWorldCompoundCollider{
             transform.position = pos;
             var rotationEuler = transform.rotationEuler;
             rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-            box.transform.rotationEuler = rotationEuler;
+            transform.rotationEuler = rotationEuler;
             var scale = transform.scale;
             scale.setValue(3, 3, 3);
             transform.scale = scale;

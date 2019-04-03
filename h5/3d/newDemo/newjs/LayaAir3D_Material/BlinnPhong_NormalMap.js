@@ -33,11 +33,11 @@ class BlinnPhong_NormalMap{
         this.monster2 = Laya.Sprite3D.instantiate(this.monster1, this.scene, false, new Laya.Vector3(0.6, 0, 0));
         this.monster2.transform.localScale = new Laya.Vector3(0.075, 0.075, 0.075);
 
-        for (var i = 0; i < this.monster2.getChildByName("lizard").numChildren; i++) {
-                var meshSprite3D = this.monster2.getChildByName("lizard").getChildAt(i);
-                var material = meshSprite3D.meshRenderer.material;
-                //法线贴图
-                Laya.Texture2D.load(this.normalMapUrl[i], Laya.Handler.create(this, this.loadTexture, [material]));
+        for (let i = 0; i < this.monster2.getChildByName("lizard").numChildren; i++) {
+            var meshSprite3D = this.monster2.getChildByName("lizard").getChildAt(i);
+            var material = meshSprite3D.meshRenderer.material;
+            //法线贴图
+            Laya.Texture2D.load(this.normalMapUrl[i], Laya.Handler.create(this, this.loadTexture, [material]));
         }   
 
         Laya.timer.frameLoop(1, this, this.rotateSprite);

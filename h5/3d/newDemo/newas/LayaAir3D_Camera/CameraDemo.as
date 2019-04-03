@@ -28,6 +28,7 @@ package LayaAir3D_Camera {
 	 */
 	public class CameraDemo {
 		private var index:int = 0;
+		private var index2:int = 0;
 		private var camera:Camera;
 		private var _translate:Vector3 = new Vector3(0, 0.7, 5);
 		private var _rotation:Vector3 = new Vector3(-15, 0, 0);
@@ -57,7 +58,7 @@ package LayaAir3D_Camera {
 			camera = new Camera(0, 0.1, 100);
 			camera.transform.translate(_translate);
 			camera.transform.rotate(_rotation, true, false);
-			
+			camera.useOcclusionCulling = false;
 			//相机设置清楚标记,使用固定颜色
 			camera.clearFlag = BaseCamera.CLEARFLAG_SOLIDCOLOR;
 			//使用默认颜色
@@ -127,8 +128,8 @@ package LayaAir3D_Camera {
 				changeActionButton2.pos(Laya.stage.width / 2 - changeActionButton2.width * Browser.pixelRatio / 2 + 100, Laya.stage.height - 100 * Browser.pixelRatio);
 				
 				changeActionButton2.on(Event.CLICK, this, function():void {
-					index++;
-					if (index % 2 === 1) {
+					index2++;
+					if (index2 % 2 === 1) {
 						debugger;
 						//设置相机的清除标识为天空盒
 						camera.clearFlag = BaseCamera.CLEARFLAG_SKY;

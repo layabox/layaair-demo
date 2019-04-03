@@ -34,6 +34,7 @@ class Scene2DPlayer3D {
 			camera.orthographic = true;
 			//正交投影垂直矩阵尺寸
 			camera.orthographicVerticalSize = 10;
+			camera.clearFlag = Laya.BaseCamera.CLEARFLAG_DEPTHONLY;
 			
             var directionLight = new Laya.DirectionLight();
             scene.addChild(directionLight);

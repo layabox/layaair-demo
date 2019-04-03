@@ -30,7 +30,7 @@ package LayaAir3D_Sprite3D {
 			
 			//创建相机
 			var camera:Camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
-			camera.transform.translate(new Vector3(0, 1.5, 1));
+			camera.transform.translate(new Vector3(0, 0.75, 1));
 			camera.transform.rotate(new Vector3(-30, 0, 0), true, false);
 			camera.addComponent(CameraMoveScript);
 			

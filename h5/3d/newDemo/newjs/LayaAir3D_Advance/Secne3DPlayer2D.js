@@ -10,7 +10,7 @@ class Secne3DPlayer2D {
         
         //创建场景
         this.scene = new Laya.Scene3D();
-         Laya.stage.addChild(this.scene);
+        Laya.stage.addChild(this.scene);
         
         //创建相机
         this.camera = new Laya.Camera(0, 0.1, 100);
@@ -25,8 +25,6 @@ class Secne3DPlayer2D {
         directionLight.transform.rotate(new Laya.Vector3(-3.14/3, 0,0));
 
         //初始化变量
-        this.scene = null;
-        this.camera = null;
         this.layaMonkey3D = null;
         this.layaMonkey2D = null;
         this.position = new Laya.Vector3();

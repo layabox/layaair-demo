@@ -17,7 +17,7 @@ class BlinnPhongMaterialLoad{
 
     loadSprite3D(sp){
         this.layaMonkey = this.scene.addChild(new Laya.MeshSprite3D(sp));
-            //加载材质
+        //加载材质
         this.layaMonkey.meshRenderer.material = Laya.BlinnPhongMaterial.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
         this.layaMonkey.transform.localScale = new Laya.Vector3(0.3, 0.3, 0.3);
         this.layaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);

@@ -18,9 +18,9 @@ class AnimationLayerBlend{
         this.addButton(100, 220, 260, 40, "切换动作:attack_2", 28, this.motionSwitch);
     }
     addButton(x, y, width, height, text, size, clickFun){
-        var thiss = this;
+        let thiss = this;
         Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(null, function () {
-        var changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", text));
+        let changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", text));
             changeActionButton.size(width, height);
             changeActionButton.labelBold = true;
             changeActionButton.labelSize = size;

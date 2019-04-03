@@ -24,6 +24,7 @@ package LayaAir3D_Camera {
 	import laya.events.MouseManager;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
+	import laya.display.Text;
 	import laya.webgl.resource.Texture2D;
 	
 	/**
@@ -39,6 +40,7 @@ package LayaAir3D_Camera {
 		private var posX:Number = 0.0;
 		private var posY:Number = 0.0;
 		private var point:Vector2 = new Vector2();
+		private var _text:Text = new Text();
 		
 		private var _translate:Vector3 = new Vector3(0, 6, 9.5);
 		private var _rotation:Vector3 = new Vector3( -15, 0, 0);
@@ -99,6 +101,7 @@ package LayaAir3D_Camera {
 			addMouseEvent();
 			//射线初始化（必须初始化）
 			_ray = new Ray(new Vector3(0, 0, 0), new Vector3(0, 0, 0));
+			
 		}
 		
 		public function addBoxXYZ(x:int, y:int, z:int ):void {

@@ -46,7 +46,7 @@ package LayaAir3D_Lighting {
 			//设置聚光灯的方向
 			var mat:Matrix4x4 = spotLight.transform.worldMatrix;
 			mat.setForward(new Vector3(0.15, -1.0, 0.0));
-			directionLight.transform.worldMatrix=mat;
+			spotLight.transform.worldMatrix=mat;
 			//设置聚光灯范围
 			spotLight.range = 6.0;
 			//设置聚光灯锥形角度
@@ -84,7 +84,7 @@ package LayaAir3D_Lighting {
 						Vector3.transformQuat(_direction, _quaternion, _direction);
 						var mat:Matrix4x4 = spotLight.transform.worldMatrix;
 						mat.setForward(_direction);
-						directionLight.transform.worldMatrix=mat;
+						spotLight.transform.worldMatrix=mat;
 					});
 				}));
 			

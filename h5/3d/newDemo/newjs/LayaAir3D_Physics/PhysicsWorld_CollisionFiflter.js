@@ -33,7 +33,7 @@ class PhysicsWorldCollisionFiflter{
         var boxShape = new Laya.BoxColliderShape(20, 0, 20);
         staticCollider.colliderShape = boxShape;
         this.addKinematicSphere();
-        for (var i = 0; i < 20; i++) {
+        for (let i = 0; i < 20; i++) {
             this.addBox();
 			this.addCapsule();
 			this.addCone();
@@ -111,7 +111,7 @@ class PhysicsWorldCollisionFiflter{
         transform.position = pos;
         var rotationEuler = transform.rotationEuler;
         rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-        box.transform.rotationEuler = rotationEuler;
+        transform.rotationEuler = rotationEuler;
 
         var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
         var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
@@ -184,7 +184,7 @@ class PhysicsWorldCollisionFiflter{
         transform.position = pos;
         var rotationEuler = transform.rotationEuler;
         rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-        box.transform.rotationEuler = rotationEuler;
+        transform.rotationEuler = rotationEuler;
 
         //创建刚体碰撞器
         var rigidBody = cylinder.addComponent(Laya.Rigidbody3D);
