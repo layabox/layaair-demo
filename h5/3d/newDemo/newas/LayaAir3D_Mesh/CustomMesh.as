@@ -8,9 +8,9 @@ package LayaAir3D_Mesh {
 	import laya.d3.core.pixelLine.PixelLineSprite3D;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Color;
+	import laya.d3.math.Matrix4x4;
 	import laya.d3.math.Vector3;
 	import laya.d3.math.Vector4;
-	import laya.d3.math.Matrix4x4;
 	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.d3.shader.Shader3D;
 	import laya.display.Stage;
@@ -69,6 +69,8 @@ package LayaAir3D_Mesh {
 			var sphereLineSprite3D:PixelLineSprite3D = lineSprite3D.addChild(new PixelLineSprite3D(3500)) as PixelLineSprite3D;
 			Tool.linearModel(sphere, sphereLineSprite3D, Color.GREEN);
 			
+			
+			
 			//圆柱体
 			var cylinder:MeshSprite3D = sprite3D.addChild(new MeshSprite3D(PrimitiveMesh.createCylinder(0.25, 1, 20))) as MeshSprite3D;
 			cylinder.transform.position = new Vector3(0, 0.5, 0.6);
@@ -100,7 +102,7 @@ package LayaAir3D_Mesh {
 		
 		private function loadUI():void {
 			
-			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(this, function():void {
 				
 				var changeActionButton:Button = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "正常模式")) as Button;
 				changeActionButton.size(160, 40);

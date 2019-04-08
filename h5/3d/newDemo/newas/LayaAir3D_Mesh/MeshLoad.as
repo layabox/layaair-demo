@@ -54,7 +54,7 @@ package LayaAir3D_Mesh {
 			lineSprite3D = scene.addChild(new Sprite3D()) as Sprite3D;
 			
 			//加载mesh
-			Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm", Handler.create(null, function(mesh:Mesh):void {
+			Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm", Handler.create(this, function(mesh:Mesh):void {
 				var layaMonkey:MeshSprite3D = sprite3D.addChild(new MeshSprite3D(mesh)) as MeshSprite3D;
 				layaMonkey.transform.localScale = new Vector3(0.3, 0.3, 0.3);
 				layaMonkey.transform.rotation = new Quaternion(0.7071068, 0, 0, -0.7071067);
@@ -84,7 +84,7 @@ package LayaAir3D_Mesh {
 		private var curStateIndex:int = 0;
 		
 		private function loadUI():void {
-			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(this, function():void {
 				var changeActionButton:Button = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "正常模式")) as Button;
 				changeActionButton.size(160, 40);
 				changeActionButton.labelBold = true;

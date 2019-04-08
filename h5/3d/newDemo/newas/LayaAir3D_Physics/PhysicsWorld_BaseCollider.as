@@ -59,7 +59,7 @@ package LayaAir3D_Physics {
 			//平面
 			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(10, 10, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/grass.png", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/grass.png", Handler.create(this, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
 			//设置纹理平铺和偏移
@@ -111,7 +111,7 @@ package LayaAir3D_Physics {
 		
 		public function addBox():void {
 			var mat1:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat1.albedoTexture = tex;
 			}));
 			
@@ -143,7 +143,7 @@ package LayaAir3D_Physics {
 		
 		public function addSphere():void {
 			var mat2:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat2.albedoTexture = tex;
 			}));
 			
@@ -169,7 +169,7 @@ package LayaAir3D_Physics {
 		
 		public function addCapsule():void {
 			var mat3:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat3.albedoTexture = tex;
 			}));
 			
@@ -200,7 +200,7 @@ package LayaAir3D_Physics {
 		
 		public function addCone():void {
 			var mat4:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/steel2.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/steel2.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat4.albedoTexture = tex;
 			}));
 			var raidius:int = Math.random() * 0.2 + 0.2;
@@ -226,7 +226,7 @@ package LayaAir3D_Physics {
 		
 		public function addCylinder():void {
 			var mat5:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/steel.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/steel.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat5.albedoTexture = tex;
 			}));
 			var raidius:int = Math.random() * 0.2 + 0.2;

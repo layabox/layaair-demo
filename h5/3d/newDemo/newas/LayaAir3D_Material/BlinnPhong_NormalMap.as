@@ -36,11 +36,11 @@ package LayaAir3D_Material {
 			directionLight.transform.worldMatrix=mat;
 			directionLight.color.setValue(1, 1, 1);
 			
-			Laya.loader.create("res/threeDimen/staticModel/lizard/lizard.lh", Handler.create(this, onComplete), null, Laya3D.HIERARCHY);
+			Laya.loader.create("res/threeDimen/staticModel/lizard/lizard.lh", Handler.create(this, onComplete), this, Laya3D.HIERARCHY);
 		}
 		
 		public function onComplete(s:*):void {
-			Sprite3D.load("res/threeDimen/staticModel/lizard/lizard.lh", Handler.create(null, function(sprite:Sprite3D):void {
+			Sprite3D.load("res/threeDimen/staticModel/lizard/lizard.lh", Handler.create(this, function(sprite:Sprite3D):void {
 				var monster1:Sprite3D = scene.addChild(sprite) as Sprite3D;
 				monster1.transform.position = new Vector3(-0.6, 0, 0);
 				monster1.transform.localScale = new Vector3(0.075, 0.075, 0.075);
@@ -50,12 +50,12 @@ package LayaAir3D_Material {
 					var meshSprite3D:MeshSprite3D = monster2.getChildByName("lizard").getChildAt(i) as MeshSprite3D;
 					var material:BlinnPhongMaterial = meshSprite3D.meshRenderer.material as BlinnPhongMaterial;
 					//法线贴图
-					Texture2D.load(normalMapUrl[i], Handler.create(null, function(mat:BlinnPhongMaterial, texture:Texture2D):void {
+					Texture2D.load(normalMapUrl[i], Handler.create(this, function(mat:BlinnPhongMaterial, texture:Texture2D):void {
 						mat.normalTexture = texture;
 					}, [material]));
 				}
 				
-				Laya.timer.frameLoop(1, null, function():void {
+				Laya.timer.frameLoop(1, this, function():void {
 					monster1.transform.rotate(rotation);
 					monster2.transform.rotate(rotation);
 				});

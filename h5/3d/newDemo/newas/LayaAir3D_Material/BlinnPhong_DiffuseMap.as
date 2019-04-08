@@ -40,12 +40,12 @@ package LayaAir3D_Material {
 			earth2.transform.position = new Vector3(0.6, 0, 0);
 			var material:BlinnPhongMaterial = new BlinnPhongMaterial();
 			//漫反射贴图
-			Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(null, function(texture:Texture2D):void {
+			Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(this, function(texture:Texture2D):void {
 				material.albedoTexture = texture;
 			}));
 			earth2.meshRenderer.material = material;
 			
-			Laya.timer.frameLoop(1, null, function():void {
+			Laya.timer.frameLoop(1, this, function():void {
 				earth1.transform.rotate(rotation, false);
 				earth2.transform.rotate(rotation, false);
 			});

@@ -214,7 +214,6 @@ class SceneScript extends Script3D {
 	 * 覆写3D对象组件被激活后执行，此时所有节点和组件均已创建完毕，此方法只执行一次
 	 */
 	override public function onAwake():void {
-		debugger;
 		meshSprite = this.owner as MeshSprite3D;
 		text = Laya.stage.getChildByName("text") as Text;
 	}

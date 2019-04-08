@@ -113,7 +113,7 @@ package LayaAir3D_Camera
 		
 		private function loadUI():void {
 			layerIndex = 0;
-			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(this, function():void {
 				
 				changeActionButton = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "切换图层")) as Button;
 				changeActionButton.size(160, 40);

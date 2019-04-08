@@ -40,7 +40,7 @@ package LayaAir3D_Material {
 			earth.transform.position = new Vector3(0, 0, 0);
 			//创建EffectMaterial材质
 			var material:EffectMaterial = new EffectMaterial();
-			Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(null, function(texture:Texture2D):void {
+			Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(this, function(texture:Texture2D):void {
 				//设置纹理
 				material.texture = texture;
 				//设置材质颜色
@@ -48,7 +48,7 @@ package LayaAir3D_Material {
 			}));
 			earth.meshRenderer.material = material;
 			
-			Laya.timer.frameLoop(1, null, function():void {
+			Laya.timer.frameLoop(1, this, function():void {
 				earth.transform.rotate(rotation, false);
 			});
 		}

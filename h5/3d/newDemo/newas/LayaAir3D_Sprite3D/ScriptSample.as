@@ -21,7 +21,7 @@ package LayaAir3D_Sprite3D {
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			
 			//预加载所有资源
-			var resource:Array = [{url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", type: Laya3D.HIERARCHY, priority: 1}];
+			var resource:Array = ["res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"];
 			Laya.loader.create(resource, Handler.create(this, onComplete));
 		}
 		

@@ -52,7 +52,7 @@ package LayaAir3D_Camera {
 			camera2.addComponent(CameraMoveScript);
 			//设置相机清除标志，使用天空
 			camera2.clearFlag = BaseCamera.CLEARFLAG_SKY;
-			BaseMaterial.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Handler.create(null, function(mat:SkyBoxMaterial):void {
+			BaseMaterial.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Handler.create(this, function(mat:SkyBoxMaterial):void {
 				var skyRenderer:SkyRenderer = camera2.skyRenderer;
 				skyRenderer.mesh = SkyBox.instance;
 				skyRenderer.material = mat;
@@ -62,7 +62,7 @@ package LayaAir3D_Camera {
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			
 			//加载资源
-			Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(null, function(sp:Sprite3D):void {
+			Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(this, function(sp:Sprite3D):void {
 				var layaMonkey:Sprite3D = scene.addChild(sp) as Sprite3D;
 			}))
 		

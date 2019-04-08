@@ -30,6 +30,8 @@ package LayaAir3D_Physics {
 		private var _outHitResult:HitResult = new HitResult();
 		private var hasSelectedSprite:Sprite3D;
 		private var hasSelectedRigidBody:Rigidbody3D;
+		private var ZERO:Laya.Vector3 = new Laya.Vector3(0,0,0);
+		private var ONE:Laya.Vector3 = new Laya.Vector3(0,0,0);
 		private var posX:Number;
 		private var posY:Number;
 		private var delX:Number;
@@ -54,7 +56,7 @@ package LayaAir3D_Physics {
 			
 			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(13, 13, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
 			
@@ -86,7 +88,7 @@ package LayaAir3D_Physics {
 		public function addHorizontalBox(x:Number, y:Number, z:Number):void {
 			
 			var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat.albedoTexture = tex;
 			}));
 			
@@ -107,7 +109,7 @@ package LayaAir3D_Physics {
 		public function addVerticalBox(x:Number, y:Number, z:Number):void {
 			
 			var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat.albedoTexture = tex;
 			}));
 			
@@ -140,10 +142,10 @@ package LayaAir3D_Physics {
 				var collider:Rigidbody3D = _outHitResult.collider as Rigidbody3D;
 				hasSelectedSprite = collider.owner as Sprite3D;
 				hasSelectedRigidBody = collider;
-				collider.angularFactor = Vector3._ZERO;
-				collider.angularVelocity = Vector3._ZERO;
-				collider.linearFactor = Vector3._ZERO;
-				collider.linearVelocity = Vector3._ZERO;
+				collider.angularFactor = ZERO;
+				collider.angularVelocity = ZERO;
+				collider.linearFactor = ZERO;
+				collider.linearVelocity = ZERO;
 			}
 			Laya.stage.on(Event.MOUSE_MOVE, this, onMouseMove);
 		}
@@ -162,8 +164,8 @@ package LayaAir3D_Physics {
 		public function onMouseUp():void {
 			Laya.stage.off(Event.MOUSE_MOVE, this, onMouseMove);
 			if (hasSelectedSprite) {
-				hasSelectedRigidBody.angularFactor = Vector3.ONE;
-				hasSelectedRigidBody.linearFactor = Vector3.ONE;
+				hasSelectedRigidBody.angularFactor = ONE;
+				hasSelectedRigidBody.linearFactor = ONE;
 				hasSelectedSprite = null;
 			}
 		}
@@ -171,8 +173,8 @@ package LayaAir3D_Physics {
 		public function onMouseOut():void {
 			Laya.stage.off(Event.MOUSE_MOVE, this, onMouseMove);
 			if (hasSelectedSprite) {
-				hasSelectedRigidBody.angularFactor = Vector3._ONE;
-				hasSelectedRigidBody.linearFactor = Vector3._ONE;
+				hasSelectedRigidBody.angularFactor = ONE;
+				hasSelectedRigidBody.linearFactor = ONE;
 				hasSelectedSprite = null;
 			}
 		}

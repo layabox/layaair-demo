@@ -32,7 +32,7 @@ package LayaAir3D_Particle {
 			camera.clearFlag = BaseCamera.CLEARFLAG_SOLIDCOLOR;
 			camera.clearColor = new Color(0, 0, 0, 1);
 			
-			Sprite3D.load("res/threeDimen/particle/ETF_Burning_Ground.lh", Handler.create(null, function(sprite:Sprite3D):void {
+			Sprite3D.load("res/threeDimen/particle/ETF_Burning_Ground.lh", Handler.create(this, function(sprite:Sprite3D):void {
 				scene.addChild(sprite) as Sprite3D;
 			}));
 		

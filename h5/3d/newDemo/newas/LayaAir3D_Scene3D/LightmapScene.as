@@ -19,7 +19,7 @@ package LayaAir3D_Scene3D {
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			Stat.show();
 			
-			Scene3D.load("res/threeDimen/scene/ParticleScene/Example_01.ls", Handler.create(null, function(sprite:Scene3D):void {
+			Scene3D.load("res/threeDimen/scene/ParticleScene/Example_01.ls", Handler.create(this, function(sprite:Scene3D):void {
 				var scene:Scene3D = Laya.stage.addChild(sprite) as Scene3D;
 				var camera:Camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
 				camera.transform.translate(new Vector3(0, 1, 0));

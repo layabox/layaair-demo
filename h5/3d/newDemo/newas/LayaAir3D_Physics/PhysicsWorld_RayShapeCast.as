@@ -73,7 +73,7 @@ package LayaAir3D_Physics {
 			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(20, 20, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
 			//加载纹理
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
 			//设置材质
@@ -247,7 +247,7 @@ package LayaAir3D_Physics {
 		}
 		
 		private function addButton(x:Number, y:Number, width:Number, height:Number, text:String, clickFun:Function):void {
-			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(this, function():void {
 				var changeActionButton:Button = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", text)) as Button;
 				changeActionButton.size(width, height);
 				changeActionButton.labelBold = true;
@@ -261,7 +261,7 @@ package LayaAir3D_Physics {
 		
 		public function addBox():void {
 			var mat1:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat1.albedoTexture = tex;
 			}));
 			
@@ -293,7 +293,7 @@ package LayaAir3D_Physics {
 		
 		public function addCapsule():void {
 			var mat3:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat3.albedoTexture = tex;
 			}));
 			

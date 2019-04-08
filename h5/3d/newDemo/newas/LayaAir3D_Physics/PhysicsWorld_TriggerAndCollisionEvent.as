@@ -68,7 +68,7 @@ package LayaAir3D_Physics {
 			//创建BlinnPhong材质
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
 			//加载纹理
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
 			//设置材质
@@ -93,7 +93,7 @@ package LayaAir3D_Physics {
 			//创建BlinnPhong材质
 			var mat2:BlinnPhongMaterial = new BlinnPhongMaterial();
 			//加载纹理
-			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat2.albedoTexture = tex;
 			}));
 			//设置材质反照率颜色
@@ -135,7 +135,7 @@ package LayaAir3D_Physics {
 		public function addBoxAndTrigger():void {
 			//创建BlinnPhong材质
 			var mat1:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat1.albedoTexture = tex;
 			}));
 			//设置反照率颜色
@@ -174,7 +174,7 @@ package LayaAir3D_Physics {
 		
 		public function addCapsuleCollision():void {
 			var mat3:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat3.albedoTexture = tex;
 			}));
 			
@@ -204,7 +204,7 @@ package LayaAir3D_Physics {
 		
 		public function addSphere():void {
 			var mat2:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat2.albedoTexture = tex;
 			}));
 			

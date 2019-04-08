@@ -48,11 +48,11 @@ package LayaAir3D_Animation {
 			directionLight.transform.worldMatrix=mat;
 			directionLight.color.setValue(1, 1, 1);
 			
-			Sprite3D.load("res/threeDimen/skinModel/Zombie/Plane.lh", Handler.create(null, function(plane:Sprite3D):void {
+			Sprite3D.load("res/threeDimen/skinModel/Zombie/Plane.lh", Handler.create(this, function(plane:Sprite3D):void {
 				scene.addChild(plane);
 			}));
 			
-			Sprite3D.load("res/threeDimen/skinModel/Zombie/Zombie.lh", Handler.create(null, function(zombie:Sprite3D):void {
+			Sprite3D.load("res/threeDimen/skinModel/Zombie/Zombie.lh", Handler.create(this, function(zombie:Sprite3D):void {
 				scene.addChild(zombie);
 				zombieAnimator = (zombie.getChildAt(0) as Sprite3D).getComponent(Animator) as Animator;//获取Animator动画组件
 				loadUI();
@@ -61,7 +61,7 @@ package LayaAir3D_Animation {
 		
 		private function loadUI():void {
 			
-			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(this, function():void {
 				
 				changeActionButton = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "切换动作")) as Button;
 				changeActionButton.size(160, 40);

@@ -22,7 +22,7 @@ package LayaAir3D_Texture {
 			else
 				URL.basePath = "res/threeDimen/scene/LayaScene_TextureGPUCompression/Conventional/";
 			
-			Scene3D.load("scene.ls", Handler.create(null, function(scene:Scene3D):void {
+			Scene3D.load("scene.ls", Handler.create(this, function(scene:Scene3D):void {
 				Laya.stage.addChild(scene) as Scene3D;
 				var camera:Camera = scene.getChildByName("Main Camera") as Camera;
 				camera.addComponent(CameraMoveScript);

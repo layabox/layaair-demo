@@ -38,25 +38,25 @@ package LayaAir3D_Shader {
 			camera.transform.translate(new Vector3(-28, 20, -18), false);
 			camera.addComponent(CameraMoveScript);
 			
-			Mesh.load("res/threeDimen/skinModel/Terrain/terrain_New-Part-01.lm", Handler.create(null, function(mesh:Mesh):void {
+			Mesh.load("res/threeDimen/skinModel/Terrain/terrain_New-Part-01.lm", Handler.create(this, function(mesh:Mesh):void {
 				var terrain:MeshSprite3D = scene.addChild(new MeshSprite3D(mesh)) as MeshSprite3D;
 				var customMaterial:CustomTerrainMaterial = new CustomTerrainMaterial();
-				Texture2D.load("res/threeDimen/skinModel/Terrain/splatAlphaTexture.png", Handler.create(null, function(tex:Texture2D):void {
+				Texture2D.load("res/threeDimen/skinModel/Terrain/splatAlphaTexture.png", Handler.create(this, function(tex:Texture2D):void {
 					customMaterial.splatAlphaTexture = tex;
 				}));
-				Texture2D.load("res/threeDimen/skinModel/Terrain/ground_01.jpg", Handler.create(null, function(tex:Texture2D):void {
+				Texture2D.load("res/threeDimen/skinModel/Terrain/ground_01.jpg", Handler.create(this, function(tex:Texture2D):void {
 					customMaterial.diffuseTexture1 = tex;
 				}));
 				
-				Texture2D.load("res/threeDimen/skinModel/Terrain/ground_02.jpg", Handler.create(null, function(tex:Texture2D):void {
+				Texture2D.load("res/threeDimen/skinModel/Terrain/ground_02.jpg", Handler.create(this, function(tex:Texture2D):void {
 					customMaterial.diffuseTexture2 = tex;
 				}));
 				
-				Texture2D.load("res/threeDimen/skinModel/Terrain/ground_03.jpg", Handler.create(null, function(tex:Texture2D):void {
+				Texture2D.load("res/threeDimen/skinModel/Terrain/ground_03.jpg", Handler.create(this, function(tex:Texture2D):void {
 					customMaterial.diffuseTexture3 = tex;
 				}));
 				
-				Texture2D.load("res/threeDimen/skinModel/Terrain/ground_04.jpg", Handler.create(null, function(tex:Texture2D):void {
+				Texture2D.load("res/threeDimen/skinModel/Terrain/ground_04.jpg", Handler.create(this, function(tex:Texture2D):void {
 					customMaterial.diffuseTexture4 = tex;
 				}))
 				customMaterial.setDiffuseScale1(new Vector2(27.92727, 27.92727));

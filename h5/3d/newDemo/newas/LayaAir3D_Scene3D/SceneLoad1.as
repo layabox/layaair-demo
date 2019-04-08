@@ -17,7 +17,7 @@ package LayaAir3D_Scene3D {
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			
 			//加载场景
-			Scene3D.load("res/threeDimen/scene/LayaScene_dudeScene/Conventional/dudeScene.ls", Handler.create(null, function(scene:Scene3D):void {
+			Scene3D.load("res/threeDimen/scene/LayaScene_dudeScene/Conventional/dudeScene.ls", Handler.create(this, function(scene:Scene3D):void {
 				Laya.stage.addChild(scene) as Scene3D;
 				
 				//获取场景中的相机

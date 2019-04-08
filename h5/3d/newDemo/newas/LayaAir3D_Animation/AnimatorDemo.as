@@ -174,7 +174,7 @@ package LayaAir3D_Animation {
 		
 		private function loadUI():void {
 			
-			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(this, function():void {
 				
 				_changeActionButton = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "播放动画")) as Button;
 				_changeActionButton.size(160, 40);

@@ -16,7 +16,7 @@ package LayaAir3D_Animation {
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 		
-			Scene3D.load("res/threeDimen/scene/LayaScene_RigidbodyAnimation/Conventional/scene.ls", Handler.create(null, function(scene:Scene3D):void {
+			Scene3D.load("res/threeDimen/scene/LayaScene_RigidbodyAnimation/Conventional/scene.ls", Handler.create(this, function(scene:Scene3D):void {
 				Laya.stage.addChild(scene) as Scene3D;
 				var camera:Camera = scene.getChildByName("Main Camera") as Camera;
 				camera.addComponent(CameraMoveScript);

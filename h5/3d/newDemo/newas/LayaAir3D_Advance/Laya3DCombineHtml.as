@@ -36,9 +36,9 @@ package LayaAir3D_Advance
 			var directionLight:DirectionLight = scene.addChild(new DirectionLight()) as DirectionLight;
 			directionLight.color = new Vector3(1, 1, 1);
 			
-			Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh",Handler.create(null,function(layaMonkey:Sprite3D):void{
+			Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh",Handler.create(this,function(layaMonkey:Sprite3D):void{
 				scene.addChild(layaMonkey);
-			}))
+			}));
 		}
 	}
 }

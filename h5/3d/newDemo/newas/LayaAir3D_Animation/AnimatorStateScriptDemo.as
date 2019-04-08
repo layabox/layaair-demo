@@ -145,7 +145,7 @@ package LayaAir3D_Animation {
 		
 		private function loadUI():void {
 			
-			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(this, function():void {
 				changeActionButton = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "切换动作状态")) as Button;
 				changeActionButton.size(200, 40);
 				changeActionButton.labelBold = true;

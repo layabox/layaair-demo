@@ -78,7 +78,7 @@ package LayaAir3D_Camera {
 			//平面
 			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(10, 10, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/grass.png", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/grass.png", Handler.create(this, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
 			//设置纹理平铺和偏移
@@ -106,7 +106,7 @@ package LayaAir3D_Camera {
 		
 		public function addBoxXYZ(x:int, y:int, z:int ):void {
 			var mat1:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat1.albedoTexture = tex;
 			}));
 			

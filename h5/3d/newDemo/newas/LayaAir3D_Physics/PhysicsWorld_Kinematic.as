@@ -54,7 +54,7 @@ package LayaAir3D_Physics {
 			
 			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(20, 20, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
 			planeMat.tilingOffset = new Vector4(2, 2, 0, 0);
@@ -74,7 +74,7 @@ package LayaAir3D_Physics {
 		
 		public function addKinematicSphere():void {
 			var mat2:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat2.albedoTexture = tex;
 			}));
 			var albedoColor:Vector4 = mat2.albedoColor;
@@ -113,7 +113,7 @@ package LayaAir3D_Physics {
 		public function addBox():void {
 			var mat1:BlinnPhongMaterial = new BlinnPhongMaterial();
 			;
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat1.albedoTexture = tex;
 			}));
 			
@@ -138,7 +138,7 @@ package LayaAir3D_Physics {
 		
 		public function addCapsule():void {
 			var mat3:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat3.albedoTexture = tex;
 			}));
 			

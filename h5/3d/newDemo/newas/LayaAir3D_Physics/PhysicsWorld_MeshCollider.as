@@ -122,7 +122,7 @@ package LayaAir3D_Physics {
 		
 		public function addBox():void {
 			var mat1:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat1.albedoTexture = tex;
 			}));
 			
@@ -147,7 +147,7 @@ package LayaAir3D_Physics {
 		
 		public function addSphere():void {
 			var mat2:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat2.albedoTexture = tex;
 			}));
 			
@@ -166,7 +166,7 @@ package LayaAir3D_Physics {
 		
 		public function addCapsule():void {
 			var mat3:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat3.albedoTexture = tex;
 			}));
 			

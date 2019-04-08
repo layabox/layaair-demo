@@ -29,12 +29,12 @@ package LayaAir3D_Material {
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			Stat.show();
 			
-			Scene3D.load("res/threeDimen/scene/PBRMaterialScene/Showcase.ls", Handler.create(null, function(scene:Scene3D):void {
+			Scene3D.load("res/threeDimen/scene/PBRMaterialScene/Showcase.ls", Handler.create(this, function(scene:Scene3D):void {
 				Laya.stage.addChild(scene);
 				var camera:Camera = scene.getChildByName("Main Camera") as Camera;
 				camera.addComponent(CameraMoveScript);
 				camera.clearFlag = BaseCamera.CLEARFLAG_SKY;
-				BaseMaterial.load("res/threeDimen/skyBox/DawnDusk/SkyBox.lmat", Handler.create(null, function(mat:SkyBoxMaterial):void {
+				BaseMaterial.load("res/threeDimen/skyBox/DawnDusk/SkyBox.lmat", Handler.create(this, function(mat:SkyBoxMaterial):void {
 					var skyRenderer:SkyRenderer = camera.skyRenderer;
 					skyRenderer.mesh = SkyBox.instance;
 					skyRenderer.material = mat;
@@ -45,22 +45,22 @@ package LayaAir3D_Material {
 				//albedoTexture:法线贴图：增强模型细节
 				
 				//反射贴图
-				Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_AlbedoTransparency.png', Handler.create(null, function(texture:Texture2D):void {
+				Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_AlbedoTransparency.png', Handler.create(this, function(texture:Texture2D):void {
 					mat.albedoTexture = texture;
 				}));
 				
 				//法线贴图
-				Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_Normal.png', Handler.create(null, function(texture:Texture2D):void {
+				Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_Normal.png', Handler.create(this, function(texture:Texture2D):void {
 					mat.normalTexture = texture;
 				}));
 				
 				//金属光滑度贴图
-				Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_MetallicSmoothness.png', Handler.create(null, function(texture:Texture2D):void {
+				Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_MetallicSmoothness.png', Handler.create(this, function(texture:Texture2D):void {
 					mat.metallicGlossTexture = texture;
 				}));
 				
 				//遮挡贴图
-				Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_Occlusion.png', Handler.create(null, function(texture:Texture2D):void {
+				Texture2D.load('res/threeDimen/scene/PBRMaterialScene/Assets/PBR Barrel/Materials/Textures/Barrel_Occlusion.png', Handler.create(this, function(texture:Texture2D):void {
 					mat.occlusionTexture = texture;
 				}));
 				

@@ -80,7 +80,7 @@ package LayaAir3D_Sprite3D {
 		}
 		
 		private function addButton(x:Number, y:Number, width:Number, height:Number, text:String, size:int, clickFun:Function):void {
-			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(this, function():void {
 				var changeActionButton:Button = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", text)) as Button;
 				changeActionButton.size(width, height);
 				changeActionButton.labelBold = true;

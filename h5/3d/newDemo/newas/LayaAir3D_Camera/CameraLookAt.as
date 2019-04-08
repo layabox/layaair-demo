@@ -117,7 +117,7 @@ package LayaAir3D_Camera
         }
 		private function loadUI():void {
 			
-			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(this, function():void {
 				
 				var changeActionButton:Button = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "切换注视目标")) as Button;
 				changeActionButton.size(200, 40);

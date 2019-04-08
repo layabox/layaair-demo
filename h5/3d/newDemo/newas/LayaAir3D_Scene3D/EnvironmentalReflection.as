@@ -49,7 +49,7 @@ package LayaAir3D_Scene3D {
 			camera.clearFlag = BaseCamera.CLEARFLAG_SKY;
 			
 			//天空盒
-			BaseMaterial.load("res/threeDimen/skyBox/DawnDusk/SkyBox.lmat", Handler.create(null, function(mat:SkyBoxMaterial):void {
+			BaseMaterial.load("res/threeDimen/skyBox/DawnDusk/SkyBox.lmat", Handler.create(this, function(mat:SkyBoxMaterial):void {
 				//获取相机的天空盒渲染体
 				var skyRenderer:SkyRenderer = camera.skyRenderer;
 				//设置天空盒mesh
@@ -66,7 +66,7 @@ package LayaAir3D_Scene3D {
 			directionLight.color = new Vector3(0.6, 0.6, 0.6);
 		
 			//加载Mesh
-			Mesh.load("res/threeDimen/staticModel/teapot/teapot-Teapot001.lm", Handler.create(null, function(mesh:Mesh):void {
+			Mesh.load("res/threeDimen/staticModel/teapot/teapot-Teapot001.lm", Handler.create(this, function(mesh:Mesh):void {
 				teapot = scene.addChild(new MeshSprite3D(mesh)) as MeshSprite3D;
 				teapot.transform.position = new Vector3(0, 1.75, 2);
 				teapot.transform.rotate(new Vector3(-90, 0, 0), false, false);
@@ -80,7 +80,7 @@ package LayaAir3D_Scene3D {
 			pbrMat.metallic = 1;
 			
 			//加载纹理
-			Texture2D.load("res/threeDimen/pbr/jinshu.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/pbr/jinshu.jpg", Handler.create(this, function(tex:Texture2D):void {
 				//pbrMat.albedoTexture = tex;
 				teapot.meshRenderer.material = pbrMat;
 			}));

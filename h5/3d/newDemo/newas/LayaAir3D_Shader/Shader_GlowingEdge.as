@@ -52,32 +52,32 @@ package LayaAir3D_Shader {
 			directionLight.color = new Vector3(1, 1, 1);
 			
 			//加载精灵
-			Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh", Handler.create(null, function(dude:Sprite3D):void {
+			Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh", Handler.create(this, function(dude:Sprite3D):void {
 				scene.addChild(dude);
 				
 				//使用自定义的材质
 				var customMaterial1:CustomMaterial = new CustomMaterial();
 				//加载纹理
-				Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/head.png", Handler.create(null, function(tex:Texture2D):void {
+				Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/head.png", Handler.create(this, function(tex:Texture2D):void {
 					customMaterial1.diffuseTexture = tex;
 				}));
 				//设置边缘颜色
 				customMaterial1.marginalColor = new Vector3(1, 0.7, 0);
 				
 				var customMaterial2:CustomMaterial = new CustomMaterial();
-				Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/jacket.png", Handler.create(null, function(tex:Texture2D):void {
+				Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/jacket.png", Handler.create(this, function(tex:Texture2D):void {
 					customMaterial2.diffuseTexture = tex;
 				}));
 				customMaterial2.marginalColor = new Vector3(1, 0.7, 0);
 				
 				var customMaterial3:CustomMaterial = new CustomMaterial();
-				Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/pants.png", Handler.create(null, function(tex:Texture2D):void {
+				Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/pants.png", Handler.create(this, function(tex:Texture2D):void {
 					customMaterial3.diffuseTexture = tex;
 				}));
 				customMaterial3.marginalColor = new Vector3(1, 0.7, 0);
 				
 				var customMaterial4:CustomMaterial = new CustomMaterial();
-				Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/upBodyC.png", Handler.create(null, function(tex:Texture2D):void {
+				Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/upBodyC.png", Handler.create(this, function(tex:Texture2D):void {
 					customMaterial4.diffuseTexture = tex;
 				}))
 				customMaterial4.marginalColor = new Vector3(1, 0.7, 0);
@@ -98,13 +98,13 @@ package LayaAir3D_Shader {
 			var earth:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(0.5, 128, 128))) as MeshSprite3D;
 			
 			var customMaterial:CustomMaterial = new CustomMaterial();
-			Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(this, function(tex:Texture2D):void {
 				customMaterial.diffuseTexture = tex;
 			}));
 			customMaterial.marginalColor = new Vector3(0.0, 0.3, 1.0);
 			earth.meshRenderer.sharedMaterial = customMaterial;
 			
-			Laya.timer.frameLoop(1, null, function():void {
+			Laya.timer.frameLoop(1, this, function():void {
 				earth.transform.rotate(rotation, true);
 			});
 		}
@@ -122,8 +122,7 @@ package LayaAir3D_Shader {
 			var subShader:SubShader = new SubShader(attributeMap, uniformMap, SkinnedMeshSprite3D.shaderDefines);
 			customShader.addSubShader(subShader);
 			//SubShader添加ShaderPass
-			var pass:ShaderPass = subShader.addShaderPass(vs, ps) as ShaderPass;
-			debugger;
+			subShader.addShaderPass(vs, ps) as ShaderPass;
 		}
 	}
 }

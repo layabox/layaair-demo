@@ -53,7 +53,7 @@ package LayaAir3D_Resource {
 		//加载资源
 		public function LoadRes() {
 			//场景加载
-			Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Handler.create(null, function(scene:Scene3D):void {
+			Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Handler.create(this, function(scene:Scene3D):void {
 				_scene = scene;
 				Laya.stage.addChild(scene);
 				//获取场景相机
@@ -71,7 +71,7 @@ package LayaAir3D_Resource {
 				directionLight.transform.rotate(new Vector3(-1.14 / 3, 0, 0));
 				
 				//材质加载
-				BaseMaterial.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Handler.create(null, function(mat:BaseMaterial):void {
+				BaseMaterial.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Handler.create(this, function(mat:BaseMaterial):void {
 					//获取相机的天空渲染器
 					var skyRenderer:SkyRenderer = camera.skyRenderer;
 					//创建天空盒的mesh
@@ -85,7 +85,7 @@ package LayaAir3D_Resource {
 				sprite3D = _scene.addChild(new Sprite3D()) as Sprite3D;
 				
 				//加载纹理
-				Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(null, function(tex:Texture2D):void {
+				Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(this, function(tex:Texture2D):void {
 					//使用纹理
 					var earth1:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(5, 32, 32))) as MeshSprite3D;
 					earth1.transform.translate(new Vector3(17, 20, 0));
@@ -97,7 +97,7 @@ package LayaAir3D_Resource {
 				}));
 				
 				//加载Mesh
-				Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm", Handler.create(null, function(mesh:Mesh):void {
+				Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm", Handler.create(this, function(mesh:Mesh):void {
 					var layaMonkey:MeshSprite3D = sprite3D.addChild(new MeshSprite3D(mesh)) as MeshSprite3D;
 					var layaMonkeyTrans:Transform = layaMonkey.transform;
 					var layaMonkeyScale:Vector3 = layaMonkeyTrans.localScale;
@@ -107,7 +107,7 @@ package LayaAir3D_Resource {
 					layaMonkey.transform.translate(new Vector3(5, 3, 13));
 				}));
 				//加载精灵
-				Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(null, function(sp:Sprite3D):void {
+				Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(this, function(sp:Sprite3D):void {
 					var layaMonkey2:Sprite3D = scene.addChild(sp) as Sprite3D;
 					var layaMonkey2Trans:Transform = layaMonkey2.transform;
 					var layaMonkey2Scale:Vector3 = layaMonkey2Trans.localScale;
@@ -117,7 +117,7 @@ package LayaAir3D_Resource {
 				}));
 				
 				//加载胖子精灵
-				Sprite3D.load("res/threeDimen/skinModel/BoneLinkScene/PangZiNoAni.lh", Handler.create(null, function(sp:Sprite3D):void {
+				Sprite3D.load("res/threeDimen/skinModel/BoneLinkScene/PangZiNoAni.lh", Handler.create(this, function(sp:Sprite3D):void {
 					pangzi = scene.addChild(sp) as Sprite3D;
 					var pangziTrans:Transform = pangzi.transform;
 					var pangziScale:Vector3 = pangziTrans.localScale;
@@ -127,7 +127,7 @@ package LayaAir3D_Resource {
 					//获取动画组件
 					pangziAnimator = pangzi.getChildAt(0).getComponent(Animator) as Animator;
 					//AnimationClip的加载要放在Avatar加载完成之后
-					AnimationClip.load("res/threeDimen/skinModel/BoneLinkScene/Assets/Model3D/PangZi-Take 001.lani", Handler.create(null, function(aniClip:AnimationClip):void {
+					AnimationClip.load("res/threeDimen/skinModel/BoneLinkScene/Assets/Model3D/PangZi-Take 001.lani", Handler.create(this, function(aniClip:AnimationClip):void {
 						//创建动作状态
 						var state1:AnimatorState = new AnimatorState();
 						//动作名称

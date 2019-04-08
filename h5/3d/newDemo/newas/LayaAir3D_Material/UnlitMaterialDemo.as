@@ -43,7 +43,7 @@ package LayaAir3D_Material {
 			
 			//创建Unlit材质
 			var material:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(null, function(texture:Texture2D):void {
+			Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(this, function(texture:Texture2D):void {
 				//设置反照率贴图
 				material.albedoTexture = texture;
 				//设置反照率强度
@@ -53,7 +53,7 @@ package LayaAir3D_Material {
 			
 			//创建Unlit材质
 			var material2:UnlitMaterial = new UnlitMaterial();
-			Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(null, function(texture:Texture2D):void {
+			Texture2D.load("res/threeDimen/texture/earth.png", Handler.create(this, function(texture:Texture2D):void {
 				//设置反照率贴图
 				material2.albedoTexture = texture;
 				//设置反照率强度
@@ -63,7 +63,7 @@ package LayaAir3D_Material {
 			}));
 			earth2.meshRenderer.material = material2;
 			
-			Laya.timer.frameLoop(1, null, function():void {
+			Laya.timer.frameLoop(1, this, function():void {
 				earth1.transform.rotate(rotation, false);
 				earth2.transform.rotate(rotation, false);
 			});

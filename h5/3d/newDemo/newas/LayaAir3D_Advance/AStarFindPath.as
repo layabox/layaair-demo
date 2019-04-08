@@ -17,6 +17,8 @@ package LayaAir3D_Advance {
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.net.Loader;
+	import laya.ui.Button;
+	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
 	import laya.utils.Tween;
@@ -134,7 +136,6 @@ package LayaAir3D_Advance {
 				//获取每次生成路径
 				_everyPath = pathFingding.findPath(path[curPathIndex % pointCount].x, path[curPathIndex++ % pointCount].z, path[nextPathIndex % pointCount].x, path[nextPathIndex++ % pointCount].z);
 			});
-			
 			//开启定时重复执行
 			Laya.timer.loop(40, this, loopfun);
 		}

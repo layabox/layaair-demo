@@ -49,7 +49,7 @@ package LayaAir3D_Camera {
 		public function onComplete():void {
 			var _this:D3SpaceToD2Space = this;
 			//加载精灵
-			Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(null, function(layaMonkey3D:Sprite3D):void {
+			Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(this, function(layaMonkey3D:Sprite3D):void {
 				_this.layaMonkey3D = layaMonkey3D;
 				scene.addChild(layaMonkey3D);
 				layaMonkey2D = Laya.stage.addChild(new Image("res/threeDimen/monkey.png")) as Image;

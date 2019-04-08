@@ -23,7 +23,7 @@ package LayaAir3D_Scene3D {
 			//显示性能面板
 			Stat.show();
 			
-			Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Handler.create(null, function(scene:Scene3D):void {
+			Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Handler.create(this, function(scene:Scene3D):void {
 				Laya.stage.addChild(scene);
 				//开启雾化效果
 				scene.enableFog = true;
@@ -54,7 +54,7 @@ package LayaAir3D_Scene3D {
 				camera.addComponent(CameraMoveScript);
 				
 				//加载相机天空盒材质
-				BaseMaterial.load("res/threeDimen/skyBox/skyBox3/SkyBox.lmat", Handler.create(null, function(mat:BaseMaterial):void {
+				BaseMaterial.load("res/threeDimen/skyBox/skyBox3/SkyBox.lmat", Handler.create(this, function(mat:BaseMaterial):void {
 					var skyRenderer:SkyRenderer = camera.skyRenderer;
 					skyRenderer.mesh = SkyBox.instance;
 					skyRenderer.material = mat;

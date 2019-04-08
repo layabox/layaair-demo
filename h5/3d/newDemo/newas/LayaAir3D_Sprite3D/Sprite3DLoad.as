@@ -3,6 +3,7 @@ package LayaAir3D_Sprite3D {
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.scene.Scene3D;
+	import laya.d3.math.Matrix4x4;
 	import laya.d3.math.Vector3;
 	import laya.display.Stage;
 	import laya.net.WorkerLoader;
@@ -21,7 +22,7 @@ package LayaAir3D_Sprite3D {
 			
 			var camera:Camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
 			camera.transform.translate(new Vector3(0, 0.5, 1));
-			camera.transform.rotate(new Vector3(-15, 0, 0), true, false);
+			camera.transform.rotate(new Vector3(-15, 0, 2), true, false);
 			camera.addComponent(CameraMoveScript);
 			
 			Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(null, function(sprite:Sprite3D):void {

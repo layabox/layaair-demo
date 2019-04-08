@@ -30,10 +30,11 @@ package LayaAir3D_Advance {
 		private var _rotation:Vector3 = new Vector3( -45, 0, 0);
 		
 		public function Scene2DPlayer3D() {
-			
-			Laya3D.init(1024, 768);
-			Laya.stage.scaleMode = Stage.SCALE_FIXED_HEIGHT;
+			//初始化引擎
+			Laya3D.init(0, 0);
+			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
+			//显示性能面板
 			Stat.show();
 			
 			//var dialog:Image = Laya.stage.addChild(new Image("res/threeDimen/secne.jpg")) as Image;

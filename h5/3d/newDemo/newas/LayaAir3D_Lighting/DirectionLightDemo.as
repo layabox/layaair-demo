@@ -50,10 +50,10 @@ package LayaAir3D_Lighting {
 			directionLight.transform.worldMatrix=mat;
 			
 			//加载地面
-			Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh", Handler.create(null, function(sprite:Sprite3D):void {
+			Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh", Handler.create(this, function(sprite:Sprite3D):void {
 				var grid:Sprite3D = scene.addChild(sprite) as Sprite3D;
 				//加载猴子精灵
-				Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(null, function(layaMonkey:Sprite3D):void {
+				Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Handler.create(this, function(layaMonkey:Sprite3D):void {
 					var layaMonkey:Sprite3D = scene.addChild(layaMonkey) as Sprite3D;
 					var aniSprite3d:Sprite3D = layaMonkey.getChildAt(0) as Sprite3D;
 					
@@ -74,7 +74,7 @@ package LayaAir3D_Lighting {
 					//播放动作
 					animator.play("run");
 					//设置时钟定时执行
-					Laya.timer.frameLoop(1, null, function():void {
+					Laya.timer.frameLoop(1, this, function():void {
 						//从欧拉角生成四元数（顺序为Yaw、Pitch、Roll）
 						Quaternion.createFromYawPitchRoll(0.025, 0, 0, _quaternion);
 						//根据四元数旋转三维向量

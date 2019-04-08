@@ -60,7 +60,7 @@ package LayaAir3D_Lighting {
 			], Handler.create(this, onComplete));
 			
 			//设置时钟定时执行
-            Laya.timer.frameLoop(1, null, function():void {
+            Laya.timer.frameLoop(1, this, function():void {
 				//从欧拉角生成四元数（顺序为Yaw、Pitch、Roll）
                 Quaternion.createFromYawPitchRoll(0.025, 0, 0, _quaternion);
 				directionLight.transform.worldMatrix.getForward(_direction);

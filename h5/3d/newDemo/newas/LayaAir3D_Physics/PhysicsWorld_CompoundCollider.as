@@ -50,7 +50,7 @@ package LayaAir3D_Physics {
 			
 			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(13, 13, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/grass.png", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/grass.png", Handler.create(this, function(tex:Texture2D):void {
 				planeMat.albedoTexture = tex;
 			}));
 			planeMat.tilingOffset = new Vector4(10, 10, 0, 0);
@@ -85,12 +85,12 @@ package LayaAir3D_Physics {
 		
 		public function addTable():void {
 			var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat.albedoTexture = tex;
 			}));
 			mat.shininess = 1;
 			
-			Mesh.load("res/threeDimen/Physics/table.lm", Handler.create(null, function(mesh:Mesh):void {
+			Mesh.load("res/threeDimen/Physics/table.lm", Handler.create(this, function(mesh:Mesh):void {
 				var table:MeshSprite3D = scene.addChild(new MeshSprite3D(mesh)) as MeshSprite3D;
 				table.meshRenderer.material = mat;
 				var transform:Transform3D = table.transform;
@@ -145,10 +145,10 @@ package LayaAir3D_Physics {
 		
 		public function addObject():void {
 			var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(null, function(tex:Texture2D):void {
+			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
 				mat.albedoTexture = tex;
 			}));
-			Mesh.load("res/threeDimen/Physics/object.lm", Handler.create(null, function(mesh:Mesh):void {
+			Mesh.load("res/threeDimen/Physics/object.lm", Handler.create(this, function(mesh:Mesh):void {
 				
 				var object:MeshSprite3D = scene.addChild(new MeshSprite3D(mesh)) as MeshSprite3D;
 				var transform:Transform3D = object.transform;

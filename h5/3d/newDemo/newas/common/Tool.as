@@ -54,9 +54,6 @@ package common {
 					Vector3.transformCoordinate(vertex1, meshSprite3D.transform.worldMatrix, vertex1);
 					Vector3.transformCoordinate(vertex2, meshSprite3D.transform.worldMatrix, vertex2);
 					Vector3.transformCoordinate(vertex3, meshSprite3D.transform.worldMatrix, vertex3);
-					trace(vertex1);
-					trace(vertex2);
-					trace(vertex3);
 					lineSprite3D.addLine(vertex1, vertex2, color, color);
 					lineSprite3D.addLine(vertex2, vertex3, color, color);
 					lineSprite3D.addLine(vertex3, vertex1, color, color);

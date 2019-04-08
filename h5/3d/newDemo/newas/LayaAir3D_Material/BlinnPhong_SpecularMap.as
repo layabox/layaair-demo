@@ -42,7 +42,7 @@ package LayaAir3D_Material {
 		}
 		
 		public function onComplete():void {
-			Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh", Handler.create(null, function(sprite:Sprite3D):void {
+			Sprite3D.load("res/threeDimen/skinModel/dude/dude.lh", Handler.create(this, function(sprite:Sprite3D):void {
 				var dude1:Sprite3D = scene.addChild(sprite) as Sprite3D;
 				dude1.transform.position = new Vector3(-1.5, 0, 0);
 				
@@ -51,12 +51,12 @@ package LayaAir3D_Material {
 				
 				for (var i:int = 0; i < skinnedMeshSprite3d.skinnedMeshRenderer.materials.length; i++) {
 					var material:BlinnPhongMaterial = skinnedMeshSprite3d.skinnedMeshRenderer.materials[i] as BlinnPhongMaterial;
-					Texture2D.load(specularMapUrl[i], Handler.create(null, function(mat:BlinnPhongMaterial, tex:Texture2D):void {
+					Texture2D.load(specularMapUrl[i], Handler.create(this, function(mat:BlinnPhongMaterial, tex:Texture2D):void {
 						mat.specularTexture = tex;//高光贴图
 					}, [material]));
 				}
 				
-				Laya.timer.frameLoop(1, null, function():void {
+				Laya.timer.frameLoop(1, this, function():void {
 					dude1.transform.rotate(rotation);
 					dude2.transform.rotate(rotation);
 				});
