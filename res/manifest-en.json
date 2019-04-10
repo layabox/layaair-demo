@@ -255,126 +255,167 @@
 		}],
 		"3d": [
 			{
-			  "prefix": "sprite3d",
-			  "tr_zhCN": "sprite3d",
-			  "manifest": [
-				[ "Sprite3DLoad", "Sprite3DLoad", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				[ "Sprite3DClone", "Sprite3DClon", "", "core,webgl,ani,d3" ],
-				[ "Sprite3DTransform", "Sprite3DTransform", "", "core,webgl,ani,d3" ]
-			  ]
+				"prefix": "Resource",
+		  		"tr_zhCN": "Resource",
+		  		"manifest": [
+					[ "LoadResourceDemo", "LoadResourceDemo", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+					[ "GarbageCollection", "GarbageCollection", "", "core,webgl,ani,d3" ],
+		  		]
 			},
-			  {
-				  "prefix": "mesh",
-				  "tr_zhCN": "Mesh",
-				  "manifest": [
-					  ["MeshLoad", "Mesh Load", "", "core,webgl,ui,ani,d3,Tool.js"],
-			  [ "CustomMesh", "Custom Mesh ", "", "core,webgl,ui,ani,d3,Tool.js,CameraMoveScript.js" ]
-				  ]
-			  },
-			  {
-				  "prefix": "light",
-				  "tr_zhCN": "light",
-				  "manifest": [
-					  ["DirectionLightDemo", "DirectionLight", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-					  ["PointLightDemo", "PointLight", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-			  [ "SpotLightDemo", "SpotLight", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
-				  ]
-			  },
-			  {
-				  "prefix": "material",
-				  "tr_zhCN": "Material",
-				  "manifest": [
-			  [ "BlinnPhongMaterialLoad", "BlinnPhongMaterialLoad", "", "core,webgl,ani,d3" ],
-			  [ "BlinnPhong_DiffuseMap", "BlinnPhong-diffuse", "", "core,webgl,ani,d3" ],
-			  [ "BlinnPhong_NormalMap", "BlinnPhong-normal", "", "core,webgl,ani,d3" ],
-					  ["BlinnPhong_SpecularMap", "BlinnPhong-Specular", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-			  [ "PBRStandardMaterialDemo", "PBRStandardMaterial", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
-				  ]
-			  },
-			  {
-				  "prefix": "camera",
-				  "tr_zhCN": "camera",
-				  "manifest": [
-					  ["MultiCamera", "Multi camera ", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-					  ["OrthographicCamera", "Orthonormal camera ", "", "core,webgl,ui,ani,d3"],
-					  ["D3SpaceToD2Space", "3D space to 2D space ", "", "core,webgl,ui,ani,d3"]
-				  ]
-			  },
-			  {
-				  "prefix": "sky",
-				  "tr_zhCN": "Sky",
-				  "manifest": [
-					  ["Sky_Procedural", "SkyProcedural", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-					  ["Sky_SkyBox", "SkyBox", "", "core,webgl,ani,d3,CameraMoveScript.js"]
-				  ]
-			  },
-			  {
-				  "prefix": "scene",
-				  "tr_zhCN": "3D scene",
-				  "manifest": [
-					  ["SceneLoad1", "Scene demo1 ", "", "core,webgl,ani,d3,CameraMoveScript.js,physics3D"],
-					  ["SceneLoad2", "Scene demo2", "", "core,webgl,ani,d3,CameraMoveScript.js"]
-				  ]
-			  },
-			  {
-				  "prefix": "animation",
-				  "tr_zhCN": "Animator",
-			"manifest": [
-			  [ "AnimationLayerBlend", "Animation blending ", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-			  [ "BoneLinkSprite3D", "Skinned hanging point ", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-			  [ "SkinAnimationSample", "skinned animation ", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ]
-			]
-			  },
-			  {
-				  "prefix": "particle",
-				  "tr_zhCN": "particle system ",
-				  "manifest": [
-			  [ "Particle_EternalLight", "The light eternity", "", "core,webgl,ani,d3" ],
-			  [ "Particle_BurningGround", "Burning the earth ", "", "core,webgl,ani,d3" ],
-			  [ "Particle_Scene", "Scene and particle ", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
-				  ]
-			  },
-			  {
-				  "prefix": "physics",
-				  "tr_zhCN": "physical system ",
-			"manifest": [
-			  [ "PhysicsWorld_BaseCollider", "Foundation Collider", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-			  [ "PhysicsWorld_BuildingBlocks", "Select an object ", "", "core,webgl,ui,ani,d3,physics3D" ],
-			  [ "PhysicsWorld_Character", "Role Collider ", "", "core,webgl,ui,ani,d3,physics3D" ],
-			  [ "PhysicsWorld_CollisionFiflter", "Collider filter ", "", "core,webgl,ui,ani,d3,physics3D" ],
-			  [ "PhysicsWorld_CompoundCollider", "Collider mixing ", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-			  [ "PhysicsWorld_ContinueCollisionDetection", "Continuous collision detection", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-			  [ "PhysicsWorld_Kinematic", "Rigid Body Collision ", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-			  [ "PhysicsWorld_MeshCollider", "Mesh Collider ", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-			  [ "PhysicsWorld_RayShapeCast", "Ray detection ", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-			  [ "PhysicsWorld_TriggerAndCollisionEvent", "Triggering and collision events", "","core,webgl,ui,ani,d3,CameraMoveScript.js,TriggerCollisionScript.js,physics3D" ]
-	  
-	  
-			]
-			  },
-			  {
-				  "prefix": "shader",
-				  "tr_zhCN": "shader",
-				  "manifest": [
-					  ["Shader_Simple", "simple shader", "", "core,webgl,ani,d3,CameraMoveScript.js,CustomMaterial.js"],
-					  ["Shader_GlowingEdge", "Marginal illumination shader", "", "core,webgl,ani,d3,CustomMaterial.js,CameraMoveScript.js"],
-					  ["Shader_Terrain", "地形shader", "", "core,webgl,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js"]
-				  ]
-			  },
-			  {
-				  "prefix": "advanced",
-				  "tr_zhCN": "Advanced application ",
-			"manifest": [
-			  [ "Laya3DCombineHtml", "Laya3D Mixing with web pages ", "", "core,webgl,ani,d3" ],
-			  [ "GarbageCollection", "Garbage collection ", "", "core,webgl,ani,d3,ui,CameraMoveScript.js" ],
-			  [ "RealTimeShadow", "Real time shadow", "", "core,webgl,ani,d3" ],
-			  [ "RenderTextureDemo", "Render Texture ", "", "core,webgl,ui,ani,d3,CameraMoveScript.js" ],
-			  [ "AStarFindPath", "Path finding navigation ", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
-			  [ "PBRDemo", "PBRRender", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-			  [ "ScriptSample", "Script Compnent", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-			  [ "TouchScriptSample", "Touch detection", "", "core,webgl,ani,d3,CameraMoveScript.js,physics3D" ],
-			  [ "TrailRender", "Trailing effect", "", "core,webgl,ani,d3,CameraMoveScript.js,physics3D" ]
-			]
-			  }]
+			{
+				"prefix": "Scene3D",
+				"tr_zhCN": "Scene3D",
+				"manifest": [
+					[ "SceneLoad1", "SceneLoad1", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+					[ "SceneLoad2", "SceneLoad2", "", "core,webgl,ani,d3" ],
+					[ "EnvironmentalReflection", "EnvironmentalReflection", "", "core,webgl,ani,d3" ],
+					[ "LightmapScene", "LightmapScene", "", "core,webgl,ani,d3" ]
+				]
+			},
+			{
+				"prefix": "Camera",
+				"tr_zhCN": "Camera",
+				"manifest": [
+					["CameraDemo", "CameraDemo", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["CameraLookAt", "CameraLookAt", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["MultiCamera", "MultiCamera", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["CameraRay", "CameraRay", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["CameraLayer", "CameraLayer", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["OrthographicCamera", "OrthographicCamera", "", "core,webgl,ui,ani,d3"],
+					["D3SpaceToD2Space", "D3SpaceToD2Space", "", "core,webgl,ui,ani,d3"],
+					["RenderTargetCamera", "RenderTargetCamera", "", "core,webgl,ui,ani,d3"]
+				]
+			},
+			{
+				"prefix": "Light",
+				"tr_zhCN": "Light",
+				"manifest": [
+					["DirectionLightDemo", "DirectionLight", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["PointLightDemo", "PointLight", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["SpotLightDemo", "SpotLight", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+					["RealTimeShadow", "RealTimeShadow", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
+				]
+			},
+	
+			{
+				"prefix": "Sprite3D",
+				"tr_zhCN": "Sprite3D",
+				"manifest": [
+					["Sprite3DParent", "Sprite3DParent", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["ScriptSample", "ScriptSample", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["Sprite3DClone", "Sprite3DClone", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+					["PixelLineSprite3DDemo", "PixelLineSprite3DDemo", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
+				]
+			},
+			{
+				"prefix": "Mesh",
+				"tr_zhCN": "Mesh",
+				"manifest": [
+					["MeshLoad", "MeshLoad", "", "core,webgl,ui,ani,d3,Tool.js"],
+					["CustomMesh", "CustomMesh", "", "core,webgl,ui,ani,d3,Tool.js,CameraMoveScript.js" ],
+					["ChangeMesh", "ChangeMesh", "", "core,webgl,ui,ani,d3,Tool.js,CameraMoveScript.js" ]
+				]
+			},
+			
+			{
+				"prefix": "Material",
+				"tr_zhCN": "Material",
+				"manifest": [
+					["MaterialDemo", "MaterialDemo", "", "core,webgl,ani,d3" ],
+					["BlinnPhongMaterialLoad", "BlinnPhongMaterialLoad", "", "core,webgl,ani,d3" ],
+					["BlinnPhong_DiffuseMap", "BlinnPhong_DiffuseMap", "", "core,webgl,ani,d3" ],
+					["BlinnPhong_NormalMap", "BlinnPhong_NormalMap", "", "core,webgl,ani,d3" ],
+					["BlinnPhong_SpecularMap", "BlinnPhong_SpecularMap", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["PBRStandardMaterialDemo", "PBRStandardMaterial", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+					["EffectMaterialDemo", "EffectMaterial", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+					["UnlitMaterialDemo", "UnlitMaterial", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+					["WaterPrimaryMaterial", "WaterPrimaryMaterial", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
+				]
+			},
+			{
+				"prefix": "Texture",
+				"tr_zhCN": "Texture",
+				"manifest": [
+					["TextureDemo", "TextureDemo", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["TextureGPUCompression", "TextureGPUCompression", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+				]
+			},
+			{
+				"prefix": "Animation",
+				"tr_zhCN": "Animation",
+		  		"manifest": [
+					["AnimatorDemo", "AnimatorDemo", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["AnimationLayerBlend", "AnimationLayerBlend", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["AnimatorStateScriptDemo", "AnimatorStateScript", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["BoneLinkSprite3D", "BoneLinkSprite3D", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["MaterialAnimation", "MaterialAnimation", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["RigidbodyAnimationDemo", "RigidbodyAnimation", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["CameraAnimation", "CameraAnimation", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ]
+		  		]
+			},
+			{
+				"prefix": "Physics3D",
+				"tr_zhCN": "Physics3D",
+		  		"manifest": [
+					["PhysicsWorld_BaseCollider", "BaseCollider", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["PhysicsWorld_BuildingBlocks", "BuildingBlocks", "", "core,webgl,ui,ani,d3,physics3D" ],
+					["PhysicsWorld_Character", "Character", "", "core,webgl,ui,ani,d3,physics3D" ],
+					["PhysicsWorld_CollisionFiflter", "CollisionFiflter", "", "core,webgl,ui,ani,d3,physics3D" ],
+					["PhysicsWorld_CompoundCollider", "CompoundCollider", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["PhysicsWorld_ContinueCollisionDetection", "ContinueCollisionDetection", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["PhysicsWorld_Kinematic", "Kinematic", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["PhysicsWorld_MeshCollider", "MeshCollider", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["PhysicsWorld_RayShapeCast", "RayShapeCast", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["PhysicsWorld_TriggerAndCollisionEvent", "TriggerAndCollisionEvent", "","core,webgl,ui,ani,d3,CameraMoveScript.js,TriggerCollisionScript.js,physics3D" ]
+		  		]
+			},
+			{
+				"prefix": "MouseInteraction",
+				"tr_zhCN": "MouseInteraction",
+				"manifest": [
+					["MouseInteraction", "MouseInteraction", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["MultiTouch", "MultiTouch", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+				]
+			},
+			{
+				"prefix": "Sky",
+				"tr_zhCN": "Sky",
+				"manifest": [
+					["Sky_SkyBox", "SkyBox", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+					["Sky_Procedural", "Sky_Procedural", "", "core,webgl,ani,d3,CameraMoveScript.js"]		
+				]
+			},
+		
+			{
+				"prefix": "Particle",
+				"tr_zhCN": "Particle",
+				"manifest": [
+					[ "Particle_EternalLight", "EternalLight", "", "core,webgl,ani,d3" ],
+					[ "Particle_BurningGround", "BurningGround", "", "core,webgl,ani,d3" ],
+					[ "Particle_Scene", "ParticleScene", "", "c ore,webgl,ani,d3,CameraMoveScript.js" ]
+				]
+			},
+			
+			{
+				"prefix": "Shader",
+				"tr_zhCN": "Customizeshader",
+				"manifest": [
+					["Shader_Simple", "Shader_Simple", "", "core,webgl,ani,d3,CameraMoveScript.js,CustomMaterial.js"],
+					["Shader_GlowingEdge", "GlowingEdge", "", "core,webgl,ani,d3,CustomMaterial.js,CameraMoveScript.js"],
+					["Shader_Terrain", "Shader_Terrain", "", "core,webgl,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js"],
+					["Shader_CartoonRender", "CartoonRender(Multiple Pass)", "", "core,webgl,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js"]
+				]
+			},
+			{
+				"prefix": "Advanced",
+				"tr_zhCN": "Advanced",
+		  		"manifest": [
+					["Laya3DCombineHtml", "Laya3DCombineHtml", "", "core,webgl,ani,d3" ],
+					["AStarFindPath", "AStarFindPath", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
+					["PBRDemo", "PBRDemo", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+					["Scene2DPlayer3D", "Scene2DPlayer3D", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+					["Secne3DPlayer2D", "Secne3DPlayer2D", "", "core,webgl,ani,d3,CameraMoveScript.js,physics3D" ]
+		  		]
+			}]
 	}
 }

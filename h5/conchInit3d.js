@@ -6,55 +6,123 @@
 
 var id = GetQueryString("id") || 0;
 
-var list = [
-	"advancedModule/AStarFindPath",
-	"advancedModule/Laya3DCombineHtml",
-	"advancedModule/GarbageCollection",
-	"advancedModule/PBRDemo",
-	"advancedModule/RealTimeShadow",
-	"advancedModule/RenderTextureDemo",
-	"advancedModule/ScriptSample",
-	"advancedModule/TouchScriptSample",
-	"advancedModule/TrailRender",
-	"animationModule/AnimationLayerBlend",
-	"animationModule/BoneLinkSprite3D",
-	"animationModule/SkinAnimationSample",
-	"cameraModule/D3SpaceToD2Space",
-	"cameraModule/MultiCamera",
-	"cameraModule/OrthographicCamera",
-	"lightModule/DirectionLightDemo",
-	"lightModule/PointLightDemo",
-	"lightModule/SpotLightDemo",
-	"materialModule/BlinnPhongMaterialLoad",
-	"materialModule/BlinnPhong_DiffuseMap",
-	"materialModule/BlinnPhong_NormalMap",
-	"materialModule/BlinnPhong_SpecularMap",
-	"materialModule/PBRStandardMaterialDemo",
-	"meshModule/CustomMesh",
-	"meshModule/MeshLoad",
-	"particleModule/Particle_BurningGround",
-	"particleModule/Particle_EternalLight",
-	"particleModule/Particle_Scene",
-	"physicsModule/PhysicsWorld_BaseCollider",
-	"physicsModule/PhysicsWorld_BuildingBlocks",
-	"physicsModule/PhysicsWorld_Character",
-	"physicsModule/PhysicsWorld_CollisionFiflter",
-	"physicsModule/PhysicsWorld_CompoundCollider",
-	"physicsModule/PhysicsWorld_ContinueCollisionDetection",
-	"physicsModule/PhysicsWorld_Kinematic",
-	"physicsModule/PhysicsWorld_MeshCollider",
-	"physicsModule/PhysicsWorld_RayShapeCast",
-	"physicsModule/PhysicsWorld_TriggerAndCollisionEvent",
-	"sceneModule/SceneLoad1",
-	"sceneModule/SceneLoad2",
-	"shaderModule/Shader_GlowingEdge",
-	"shaderModule/Shader_Simple",
-	"shaderModule/Shader_Terrain",
-	"skyModule/Sky_Procedural",
-	"skyModule/Sky_SkyBox",
-	"sprite3dModule/Sprite3DClone",
-	"sprite3dModule/Sprite3DLoad",
-	"sprite3dModule/Sprite3DTransform",	
+ var list = [
+	"LayaAir3D_Advance/AStarFindPath",
+	"LayaAir3D_Advance/Laya3DCombineHtml",
+	"LayaAir3D_Advance/Scene2DPlayer3D",
+	"LayaAir3D_Advance/Secne3DPlayer2D",
+
+	"LayaAir3D_Animation/AnimationEventByUnity",
+	"LayaAir3D_Animation/AnimationLayerBlend",
+	"LayaAir3D_Animation/AnimatorDemo",
+	"LayaAir3D_Animation/AnimatorStateScriptDemo",
+	"LayaAir3D_Animation/BoneLinkSprite3D",
+	"LayaAir3D_Animation/CameraAnimation",
+	"LayaAir3D_Animation/MaterialAnimation",
+	"LayaAir3D_Animation/RigidbodyAnimationDemo",
+	"LayaAir3D_Animation/SkinAnimationSample",
+
+	"LayaAir3D_Camera/CameraDemo",
+	"LayaAir3D_Camera/CameraLayer",
+	"LayaAir3D_Camera/CameraLookAt",
+	"LayaAir3D_Camera/CameraRay",
+	"LayaAir3D_Camera/D3SpaceToD2Space",
+	"LayaAir3D_Camera/MultiCamera",
+	"LayaAir3D_Camera/OrthographicCamera",
+	"LayaAir3D_Camera/RenderTargetCamera",
+
+
+
+	"LayaAir3D_Lighting/DirectionLightDemo",
+	"LayaAir3D_Lighting/PointLightDemo",
+	"LayaAir3D_Lighting/SpotLightDemo",
+	"LayaAir3D_Lighting/RealTimeShadow",
+
+
+
+	"LayaAir3D_Material/BlinnPhong_DiffuseMap",
+	"LayaAir3D_Material/BlinnPhong_NormalMap",
+	"LayaAir3D_Material/BlinnPhong_SpecularMap",
+	"LayaAir3D_Material/BlinnPhongMaterialLoad",
+	"LayaAir3D_Material/EffectMaterialDemo",
+	"LayaAir3D_Material/MaterialDemo",
+	"LayaAir3D_Material/PBRStandardMaterialDemo",
+	"LayaAir3D_Material/UnlitMaterialDemo",
+	"LayaAir3D_Material/WaterPrimaryMaterialDemo",
+	
+
+
+	"LayaAir3D_Mesh/MeshLoad",
+	"LayaAir3D_Mesh/CustomMesh",
+	"LayaAir3D_Mesh/ChangeMesh",
+
+
+
+	"LayaAir3D_MouseInteraction/MouseInteraction",
+	"LayaAir3D_MouseInteraction/MultiTouch",
+
+
+
+	"LayaAir3D_Particle/Particle_Scene",
+	"LayaAir3D_Particle/Particle_BurningGround",
+	"LayaAir3D_Particle/Particle_EternalLight",
+
+
+	"LayaAir3D_Performance/StaticBatchingTest",
+
+
+	"LayaAir3D_Physics/PhysicsWorld_BaseCollider",
+	"LayaAir3D_Physics/PhysicsWorld_BuildingBlocks",
+	"LayaAir3D_Physics/PhysicsWorld_Character",
+	"LayaAir3D_Physics/PhysicsWorld_CollisionFiflter",	
+	"LayaAir3D_Physics/PhysicsWorld_CompoundCollider",
+	"LayaAir3D_Physics/PhysicsWorld_ContinueCollisionDetection",
+	"LayaAir3D_Physics/PhysicsWorld_Kinematic",
+	"LayaAir3D_Physics/PhysicsWorld_MeshCollider",
+	"LayaAir3D_Physics/PhysicsWorld_RayShapeCast",
+	"LayaAir3D_Physics/PhysicsWorld_TriggerAndCollisionEvent",
+
+
+	"LayaAir3D_Resource/LoadResourceDemo",
+	"LayaAir3D_Resource/GarbageCollection",	
+
+	"LayaAir3D_Scene3D/SceneLoad1",
+	"LayaAir3D_Scene3D/SceneLoad2",
+	"LayaAir3D_Scene3D/EnvironmentalReflection",
+	"LayaAir3D_Scene3D/LightmapScene",
+
+
+	"LayaAir3D_Script/ScriptDemo",
+
+
+	"LayaAir3D_Shader/Shader_Simple",
+	"LayaAir3D_Shader/Shader_GlowingEdge",
+	"LayaAir3D_Shader/Shader_Terrain",	
+	"LayaAir3D_Shader/Shader_CartoonRender",
+
+
+
+	"LayaAir3D_Sky/Sky_SkyBox",
+	"LayaAir3D_Sky/Sky_Procedural",	
+
+
+	"LayaAir3D_Sprite3D/Sprite3DLoad",
+	"LayaAir3D_Sprite3D/Sprite3DClone",
+	"LayaAir3D_Sprite3D/Sprite3DParent",	
+	"LayaAir3D_Sprite3D/Sprite3DLayer",
+	"LayaAir3D_Sprite3D/TransformDemo",
+	"LayaAir3D_Sprite3D/PixelLineSprite3DDemo",	
+	"LayaAir3D_Sprite3D/SkinnedMeshSprite3DDemo",
+	"LayaAir3D_Sprite3D/ScriptSample",
+
+	"LayaAir3D_Texture/TextureDemo",
+	"LayaAir3D_Texture/TextureGPUCompression",	
+	"LayaAir3D_Texture/RenderTextureDemo",
+
+	"LayaAir3D_Trail/TrailDemo",
+	"LayaAir3D_Trail/TrailRender",	
+
+
  ];
 
  var url="3d/js/"+list[id]+".js";

@@ -18,6 +18,7 @@
 		"3d/js/common/TriggerCollisionScript.js",
 		"3d/js/shaderModule/customMaterials/CustomMaterial.js",
 		"3d/js/shaderModule/customMaterials/CustomTerrainMaterial.js",
+		"3d/js/shaderModule/customMaterials/cartoonMaterial.js",
 		"res/threeDimen/pbrlut.js",
 		"conchInit3d.js"
 	],
