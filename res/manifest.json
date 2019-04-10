@@ -250,7 +250,7 @@
       "tr_zhCN": "Resource",
       "manifest": [
 				[ "LoadResourceDemo", "资源加载", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				[ "GarbageCollection", "释放显存", "", "core,webgl,ani,d3" ],
+				[ "GarbageCollection", "释放显存", "", "core,webgl,ani,d3" ]
       ]
 		},
 		{
@@ -313,9 +313,9 @@
 			"tr_zhCN": "材质",
 			"manifest": [
 				["MaterialDemo", "材质示例", "", "core,webgl,ani,d3" ],
-        ["BlinnPhongMaterialLoad", "BlinnPhong材质加载", "", "core,webgl,ani,d3" ],
-        ["BlinnPhong_DiffuseMap", "BlinnPhong-漫反射贴图", "", "core,webgl,ani,d3" ],
-        ["BlinnPhong_NormalMap", "BlinnPhong-法线贴图", "", "core,webgl,ani,d3" ],
+        		["BlinnPhongMaterialLoad", "BlinnPhong材质加载", "", "core,webgl,ani,d3" ],
+        		["BlinnPhong_DiffuseMap", "BlinnPhong-漫反射贴图", "", "core,webgl,ani,d3" ],
+        		["BlinnPhong_NormalMap", "BlinnPhong-法线贴图", "", "core,webgl,ani,d3" ],
 				["BlinnPhong_SpecularMap", "BlinnPhong-高光贴图", "", "core,webgl,ani,d3,CameraMoveScript.js"],
 				["PBRStandardMaterialDemo", "PBRStandard材质", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
 				["EffectMaterialDemo", "Effect材质", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
@@ -397,16 +397,18 @@
 				["Shader_CartoonRender", "卡通着色（多Pass）", "", "core,webgl,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js"]
 			]
 		},
-		{
-			"prefix": "Advanced",
-			"tr_zhCN": "高级应用",
-      "manifest": [
-				["Laya3DCombineHtml", "Laya3D与网页混合", "", "core,webgl,ani,d3" ],
-        ["AStarFindPath", "寻路导航", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
-        ["PBRDemo", "基于物理渲染", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-        ["Scene2DPlayer3D", "2D场景加3D人物", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				["Secne3DPlayer2D", "3D场景加2D人物", "", "core,webgl,ani,d3,CameraMoveScript.js,physics3D" ]
-      ]
-		}]
+      {
+        "prefix": "Advanced",
+        "tr_zhCN": "高级应用",
+        "manifest": [
+          [ "Laya3DCombineHtml", "Laya3D与网页混合", "", "core,webgl,ani,d3" ],
+          [ "AStarFindPath", "寻路导航", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
+          [ "PBRDemo", "基于物理渲染", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+          [ "Scene2DPlayer3D", "2D场景加3D人物", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
+          [ "Secne3DPlayer2D", "3D场景加2D人物", "", "core,webgl,ani,d3,CameraMoveScript.js,physics3D" ]
+        ]
+      }
+
+		]
 	}
 }
