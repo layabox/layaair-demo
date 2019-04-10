@@ -259,7 +259,7 @@
 		  		"tr_zhCN": "Resource",
 		  		"manifest": [
 					[ "LoadResourceDemo", "LoadResourceDemo", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-					[ "GarbageCollection", "GarbageCollection", "", "core,webgl,ani,d3" ],
+					[ "GarbageCollection", "GarbageCollection", "", "core,webgl,ani,d3" ]
 		  		]
 			},
 			{
