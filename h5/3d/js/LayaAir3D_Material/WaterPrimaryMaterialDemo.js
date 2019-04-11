@@ -1,5 +1,6 @@
 class WaterPrimaryMaterialDemo{
     constructor(){
+        debugger;
         Laya3D.init(0, 0);
         Laya.Stat.show();
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;

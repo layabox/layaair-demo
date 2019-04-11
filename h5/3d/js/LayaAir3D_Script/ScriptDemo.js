@@ -62,7 +62,7 @@ class ScriptDemo {
 	}
 }
 
-new ScriptDemo;
+new ScriptDemo();
 
 
 class BoxControlScript extends Laya.Script3D {

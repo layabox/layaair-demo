@@ -16,8 +16,9 @@
 		"3d/js/common/VRCameraMoveScript.js",
 		"3d/js/common/Tool.js",
 		"3d/js/common/TriggerCollisionScript.js",
-		"3d/js/shaderModule/customMaterials/CustomMaterial.js",
-		"3d/js/shaderModule/customMaterials/CustomTerrainMaterial.js",
+		"3d/js/LayaAir3D_Shader/customMaterials/CustomMaterial.js",
+		"3d/js/LayaAir3D_Shader/customMaterials/CustomTerrainMaterial.js",
+		"3d/js/LayaAir3D_Shader/customMaterials/cartoonMaterial.js",
 		"res/threeDimen/pbrlut.js",
 		"conchInit3d.js"
 	],

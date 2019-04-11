@@ -53,4 +53,4 @@ class Secne3DPlayer2D {
 	
 }
 
-new Secne3DPlayer2D;
+new Secne3DPlayer2D();

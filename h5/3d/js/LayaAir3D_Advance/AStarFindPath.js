@@ -13,14 +13,13 @@ class AStarFindPath{
     Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
     Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
     Laya.Stat.show();
-    this.path = new Array();
+    this.path = [];
     //预加载所有资源
-    //预加载所有资源
-			var resource = [{url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene3D, priority: 1}, 
-			  {url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1},
-			  {url: "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [1024, 1024, 1, false, true]}, 
-			  {url: "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [64, 64, 1, false, true]}];
-  //加载函数
+    var resource = [{url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene3D, priority: 1}, 
+      {url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1},
+      {url: "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [1024, 1024, 1, false, true]}, 
+      {url: "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [64, 64, 1, false, true]}];
+    //加载函数
     Laya.loader.create(resource, Laya.Handler.create(this, this.onLoadFinish));
   }
   onLoadFinish(){

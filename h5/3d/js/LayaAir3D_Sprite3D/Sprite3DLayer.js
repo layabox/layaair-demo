@@ -99,4 +99,4 @@ class Sprite3DLayer{
     }
 }
 //激活启动类
-new Sprite3DLayer;
+new Sprite3DLayer();

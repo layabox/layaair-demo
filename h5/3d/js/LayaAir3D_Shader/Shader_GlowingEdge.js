@@ -55,7 +55,7 @@ class Shader_GlowingEdge {
             //设置边缘颜色
             customMaterial4.marginalColor = new Laya.Vector3(1, 0.7, 0);
             
-            var baseMaterials = new Array();
+            var baseMaterials = [];
             baseMaterials[0] = customMaterial1;
             baseMaterials[1] = customMaterial2;
             baseMaterials[2] = customMaterial3;
@@ -249,4 +249,4 @@ class Shader_GlowingEdge {
         subShader.addShaderPass(vs,ps);
     }
 }
-new Shader_GlowingEdge;
+new Shader_GlowingEdge();

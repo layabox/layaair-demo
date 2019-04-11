@@ -96,4 +96,4 @@ class Shader_CartoonRender {
     }
 }
 
-new Shader_CartoonRender;
+new Shader_CartoonRender();

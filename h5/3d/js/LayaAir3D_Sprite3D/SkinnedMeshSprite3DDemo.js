@@ -41,5 +41,5 @@ class SkinnedMeshSprite3DDemo
 	
 }
 
-new SkinnedMeshSprite3DDemo;
+new SkinnedMeshSprite3DDemo();
 

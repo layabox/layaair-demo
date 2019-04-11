@@ -23,7 +23,7 @@ class Sky_SkyBox{
 
     onFrameLoop(){
       this.scene.skyRenderer.material.exposure = Math.sin(this.exposureNumber += 0.01) + 1;
-		  this.scene.skyRenderer.material.rotation += 0.01;
+      this.scene.skyRenderer.material.rotation += 0.01;
     }
 }
 

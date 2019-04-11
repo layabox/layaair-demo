@@ -60,4 +60,4 @@ class EnvironmentalReflection {
         }));
     }
 }
-new EnvironmentalReflection;
+new EnvironmentalReflection();

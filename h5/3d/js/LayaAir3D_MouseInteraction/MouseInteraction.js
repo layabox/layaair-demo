@@ -165,7 +165,6 @@ class SceneScript extends Laya.Script3D{
         this.text = null;
     }
     onAwake(){
-        debugger;
         this.meshSprite = this.owner;
 		this.text = Laya.stage.getChildByName("text");
     }

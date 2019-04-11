@@ -5,7 +5,7 @@ class Shader_Terrain{
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
         this.initShader();
-        this.scene = Laya.stage.addChild(new Laya.Scene3D);
+        this.scene = Laya.stage.addChild(new Laya.Scene3D());
         var camera = this.scene.addChild(new Laya.Camera(0, 0.1, 1000));
         camera.transform.rotate(new Laya.Vector3(-18, 180, 0), false, false);
         camera.transform.translate(new Laya.Vector3(-28, 20, -18), false);
@@ -138,7 +138,7 @@ class Shader_Terrain{
 			var subShader =new Laya.SubShader(attributeMap, uniformMap, Laya.RenderableSprite3D.shaderDefines, CustomTerrainMaterial.shaderDefines);
 			customTerrianShader.addSubShader(subShader);
 			subShader.addShaderPass(vs, ps);
-    };
+    }
 }
 
 //激活启动类

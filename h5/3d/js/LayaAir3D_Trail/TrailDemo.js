@@ -21,4 +21,4 @@ class TrailDemo
 	}	
 }
 //启动激活类
-new TrailDemo;
+new TrailDemo();

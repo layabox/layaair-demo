@@ -1,5 +1,3 @@
-import CameraMoveScript from "./common/CameraMoveScript"
-import Tool from "./common/Tool"
 class PixelLineSprite3DDemo 
 {
 	constructor() 
@@ -34,11 +32,13 @@ class PixelLineSprite3DDemo
 		sphere.transform.position = new Laya.Vector3(0.0, 0.75, 2);
 		var sphereLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(3500));
 		Tool.linearModel(sphere, sphereLineSprite3D, Laya.Color.GREEN);
-		this.sprite3D.active = false;;
+		this.sprite3D.active = false;
 		this.lineSprite3D.active = true;
+
+		
 	}
 
 	
 }
 
-new PixelLineSprite3DDemo;
+new PixelLineSprite3DDemo();

@@ -1,5 +1,3 @@
-import CameraMoveScript from "./common/CameraMoveScript"
-import Tool from "./common/Tool"
 class PixelLineSprite3DDemo 
 {
 	constructor() 

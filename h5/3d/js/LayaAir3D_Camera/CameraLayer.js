@@ -100,4 +100,4 @@ class CameraLayer{
     }
 }
 //激活启动类
-new CameraLayer;
+new CameraLayer();

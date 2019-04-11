@@ -86,4 +86,4 @@ class RenderTextureDemo
 
 
 //激活启动类
-new RenderTextureDemo;
+new RenderTextureDemo();

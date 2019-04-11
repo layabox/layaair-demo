@@ -84,4 +84,4 @@ class Sprite3DParent
 }
 
 //激活启动类
-new Sprite3DParent;
+new Sprite3DParent();

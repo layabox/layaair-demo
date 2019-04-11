@@ -129,4 +129,4 @@ class CameraDemo
 		
 	}
 
-	new CameraDemo;
+	new CameraDemo();

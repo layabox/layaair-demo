@@ -15,4 +15,4 @@ class LightmapScene {
 	}
 }
 
-new LightmapScene;
+new LightmapScene();

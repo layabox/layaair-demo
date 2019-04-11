@@ -114,4 +114,4 @@ class CameraRay {
 
 }
 //激活启动类
-new CameraRay;
+new CameraRay();

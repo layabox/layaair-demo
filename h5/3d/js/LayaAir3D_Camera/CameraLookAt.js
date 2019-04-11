@@ -111,4 +111,4 @@ class CameraLookAt
 		}));
 	}		
 }
-new CameraLookAt;
+new CameraLookAt();

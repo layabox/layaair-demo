@@ -35,4 +35,4 @@ class TrailRender {
 		}));
 	}
 }
-new TrailRender;
+new TrailRender();
