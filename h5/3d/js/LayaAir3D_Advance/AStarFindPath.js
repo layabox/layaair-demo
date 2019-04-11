@@ -15,7 +15,7 @@ class AStarFindPath{
     Laya.Stat.show();
     this.path = [];
     //预加载所有资源
-    var resource = [{url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene3D, priority: 1}, 
+    let resource = [{url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene3D, priority: 1}, 
       {url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1},
       {url: "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [1024, 1024, 1, false, true]}, 
       {url: "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [64, 64, 1, false, true]}];
@@ -26,25 +26,25 @@ class AStarFindPath{
     //初始化3D场景
     this.scene = Laya.stage.addChild(Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/XunLongShi.ls"));
     //删除原始资源中包含的默认相机
-    var camera = this.scene.getChildByName("Main Camera");
+    let camera = this.scene.getChildByName("Main Camera");
     //删除自身
     camera.removeSelf();
     //根据场景中方块生成路径点
     this.initPath(this.scene);
     //获取可行走区域模型
-    var meshSprite3D = this.scene.getChildByName('Scenes').getChildByName('HeightMap');
+    let meshSprite3D = this.scene.getChildByName('Scenes').getChildByName('HeightMap');
     //使可行走区域模型隐藏
     meshSprite3D.active = false;
     //加载图片
-    var heightMap = Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/HeightMap.png");
+    let heightMap = Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/HeightMap.png");
     //初始化MeshTerrainSprite3D
     this.terrainSprite = Laya.MeshTerrainSprite3D.createFromMeshAndHeightMap(meshSprite3D.meshFilter.sharedMesh, heightMap, 6.574996471405029, 10.000000953674316);
     //更新terrainSprite世界矩阵(为可行走区域世界矩阵)
     this.terrainSprite.transform.worldMatrix = meshSprite3D.transform.worldMatrix;
     //给terrainSprite添加PathFind组件
-    var pathFingding = this.terrainSprite.addComponent(Laya.PathFind);
+    let pathFingding = this.terrainSprite.addComponent(Laya.PathFind);
     pathFingding.setting = { allowDiagonal: true, dontCrossCorners: false, heuristic: PathFinding.core.Heuristic.manhattan, weight: 1 };
-    var aStarMap = Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/AStarMap.png");
+    let aStarMap = Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/AStarMap.png");
     pathFingding.grid = PathFinding.core.Grid.createGridFromAStarMap(aStarMap);
     //初始化移动单元
     this.moveSprite3D = this.scene.addChild(new Laya.Sprite3D());
@@ -52,20 +52,20 @@ class AStarFindPath{
     //初始化小猴子
     this.layaMonkey = this.moveSprite3D.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
     this.layaMonkey.transform.localScale = new Laya.Vector3(0.5, 0.5, 0.5);
-    var aniSprite3d = this.layaMonkey.getChildAt(0);
-    var animator = aniSprite3d.getComponent(Laya.Animator);
-    var state = new Laya.AnimatorState();
+    let aniSprite3d = this.layaMonkey.getChildAt(0);
+    let animator = aniSprite3d.getComponent(Laya.Animator);
+    let state = new Laya.AnimatorState();
     state.name = "run";
     state.clipStart = 40 / 150;
     state.clipEnd = 70 / 150;
     state.clip = animator.getDefaultState().clip;
     animator.addState(state);
     animator.play("run");
-    var mat = this.layaMonkey.getChildAt(0).getChildAt(0).skinnedMeshRenderer.sharedMaterial;
+    let mat = this.layaMonkey.getChildAt(0).getChildAt(0).skinnedMeshRenderer.sharedMaterial;
     mat.albedoIntensity = 8;
     this.layaMonkey.transform.position.cloneTo(this.finalPosition);
     //初始化相机
-    var moveCamera = this.moveSprite3D.addChild(new Laya.Camera());
+    let moveCamera = this.moveSprite3D.addChild(new Laya.Camera());
     camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
     Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox3/skyBox3.lmat", Laya.Handler.create(null, function (mat) {
         camera.skyboxMaterial = mat;
@@ -102,11 +102,11 @@ class AStarFindPath{
     }
   }
   initPath(scene){
-    for (var i = 0; i < this.pointCount; i++) {
-            //as中的String变为了string
-            var str = "path" + i;
-            this.path.push(scene.getChildByName('Scenes').getChildByName('Area').getChildByName(str).transform.localPosition);
-        }
+    for (let i = 0; i < this.pointCount; i++) {
+      //as中的String变为了string
+      let str = "path" + i;
+      this.path.push(scene.getChildByName('Scenes').getChildByName('Area').getChildByName(str).transform.localPosition);
+    }
   }
 
 }

@@ -23,7 +23,7 @@ class AnimatorDemo
 	  	this.curActionName = null;
 	
 		//预加载所有资源
-		var resource = [
+		let resource = [
 			"res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", 
 			"res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh", 
 			"res/threeDimen/skinModel/BoneLinkScene/PangZi.lh"
@@ -39,28 +39,28 @@ class AnimatorDemo
 		this.scene.ambientColor = new Laya.Vector3(0.5, 0.5, 0.5);
 		
 		//初始化相机
-		var camera = new Laya.Camera(0, 0.1, 100);
+		let camera = new Laya.Camera(0, 0.1, 100);
 		this.scene.addChild(camera);
 		camera.transform.translate(new Laya.Vector3(0, 3, 5));
 		camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
 		camera.addComponent(CameraMoveScript);
 		
-		var directionLight = new Laya.DirectionLight();
+		let directionLight = new Laya.DirectionLight();
 		this.scene.addChild(directionLight);
-		var mat = directionLight.transform.worldMatrix;
+		let mat = directionLight.transform.worldMatrix;
 		mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
 		directionLight.transform.worldMatrix = mat;
 		
 		//初始化角色精灵
-		var role = new Laya.Sprite3D();
+		let role = new Laya.Sprite3D();
 		this.scene.addChild(role);
 		
 		//初始化胖子
-		var pangzi = role.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/PangZi.lh"));
+		let pangzi = role.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/PangZi.lh"));
 		//获取动画组件
 		this.animator = pangzi.getChildAt(0).getComponent(Laya.Animator);
 		//创建动作状态
-		var state1 = new Laya.AnimatorState();
+		let state1 = new Laya.AnimatorState();
 		//动作名称
 		state1.name = "hello";
 		//动作播放起始时间
@@ -76,7 +76,7 @@ class AnimatorDemo
 		//为动画组件添加一个动作状态
 		this.animator.addState(state1);
 		
-		var state2 = new Laya.AnimatorState();
+		let state2 = new Laya.AnimatorState();
 		state2.name = "ride";
 		state2.clipStart = 0 / 581;
 		state2.clipEnd = 33 / 581;
@@ -86,7 +86,7 @@ class AnimatorDemo
 		this.animator.addState(state2);
 		this.animator.speed = 0.0;
 		
-		var state3 = new Laya.AnimatorState();
+		let state3 = new Laya.AnimatorState();
 		state3.name = "动作状态三";
 		state3.clipStart = 34 / 581;
 		state3.clipEnd = 100 / 581;
@@ -96,7 +96,7 @@ class AnimatorDemo
 		this.animator.addState(state3);
 		this.animator.speed = 0.0;
 		
-		var state4 = new Laya.AnimatorState();
+		let state4 = new Laya.AnimatorState();
 		state4.name = "动作状态四";
 		state4.clipStart = 101 / 581;
 		state4.clipEnd = 200 / 581;
@@ -106,7 +106,7 @@ class AnimatorDemo
 		this.animator.addState(state4);
 		this.animator.speed = 0.0;
 		
-		var state5 = new Laya.AnimatorState();
+		let state5 = new Laya.AnimatorState();
 		state5.name = "动作状态五";
 		state5.clipStart = 201 / 581;
 		state5.clipEnd = 295 / 581;
@@ -116,7 +116,7 @@ class AnimatorDemo
 		this.animator.addState(state5);
 		this.animator.speed = 0.0;
 		
-		var state6 = new Laya.AnimatorState();
+		let state6 = new Laya.AnimatorState();
 		state6.name = "动作状态六";
 		state6.clipStart = 345 / 581;
 		state6.clipEnd = 581 / 581;
@@ -250,7 +250,7 @@ class AnimatorDemo
 	onFrame() {
 		if (this.animator.speed > 0.0){
 			//获取播放状态的归一化时间
-			var curNormalizedTime = this.animator.getCurrentAnimatorPlayState(0).normalizedTime;
+			let curNormalizedTime = this.animator.getCurrentAnimatorPlayState(0).normalizedTime;
 			this.text.text = "当前动画状态进度：" + curNormalizedTime;
 		}
 	}

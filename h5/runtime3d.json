@@ -19,6 +19,7 @@
 		"3d/js/LayaAir3D_Shader/customMaterials/CustomMaterial.js",
 		"3d/js/LayaAir3D_Shader/customMaterials/CustomTerrainMaterial.js",
 		"3d/js/LayaAir3D_Shader/customMaterials/cartoonMaterial.js",
+		"3d/js/LayaAir3D_Shader/customMaterials/MultiplePassOutlineMaterial.js",
 		"res/threeDimen/pbrlut.js",
 		"conchInit3d.js"
 	],

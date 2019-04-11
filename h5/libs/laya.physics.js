@@ -3013,54 +3013,6 @@ var MouseJoint=(function(_super){
 
 
 /**
-*齿轮关节：用来模拟两个齿轮间的约束关系，齿轮旋转时，产生的动量有两种输出方式，一种是齿轮本身的角速度，另一种是齿轮表面的线速度
-*/
-//class laya.physics.joint.GearJoint extends laya.physics.joint.JointBase
-var GearJoint=(function(_super){
-	function GearJoint(){
-		/**[首次设置有效]要绑定的第1个关节，类型可以是RevoluteJoint或者PrismaticJoint*/
-		this.joint1=null;
-		/**[首次设置有效]要绑定的第2个关节，类型可以是RevoluteJoint或者PrismaticJoint*/
-		this.joint2=null;
-		/**[首次设置有效]两个刚体是否可以发生碰撞，默认为false*/
-		this.collideConnected=false;
-		/**两个齿轮角速度比例，默认1*/
-		this._ratio=1;
-		GearJoint.__super.call(this);
-	}
-
-	__class(GearJoint,'laya.physics.joint.GearJoint',_super);
-	var __proto=GearJoint.prototype;
-	__proto._createJoint=function(){
-		if (!this._joint){
-			if (!this.joint1)throw "Joint1 can not be empty";
-			if (!this.joint2)throw "Joint2 can not be empty";
-			var box2d=window.box2d;
-			var def=GearJoint._temp || (GearJoint._temp=new box2d.b2GearJointDef());
-			def.bodyA=this.joint1.owner.getComponent(RigidBody).getBody();
-			def.bodyB=this.joint2.owner.getComponent(RigidBody).getBody();
-			def.joint1=this.joint1.joint;
-			def.joint2=this.joint2.joint;
-			def.ratio=this._ratio;
-			def.collideConnected=this.collideConnected;
-			this._joint=Physics.I._createJoint(def);
-		}
-	}
-
-	/**两个齿轮角速度比例，默认1*/
-	__getset(0,__proto,'ratio',function(){
-		return this._ratio;
-		},function(value){
-		this._ratio=value;
-		if (this._joint)this._joint.SetRatio(value);
-	});
-
-	GearJoint._temp=null;
-	return GearJoint;
-})(JointBase)
-
-
-/**
 *2D线形碰撞体
 */
 //class laya.physics.ChainCollider extends laya.physics.ColliderBase
@@ -3136,6 +3088,54 @@ var ChainCollider=(function(_super){
 
 	return ChainCollider;
 })(ColliderBase)
+
+
+/**
+*齿轮关节：用来模拟两个齿轮间的约束关系，齿轮旋转时，产生的动量有两种输出方式，一种是齿轮本身的角速度，另一种是齿轮表面的线速度
+*/
+//class laya.physics.joint.GearJoint extends laya.physics.joint.JointBase
+var GearJoint=(function(_super){
+	function GearJoint(){
+		/**[首次设置有效]要绑定的第1个关节，类型可以是RevoluteJoint或者PrismaticJoint*/
+		this.joint1=null;
+		/**[首次设置有效]要绑定的第2个关节，类型可以是RevoluteJoint或者PrismaticJoint*/
+		this.joint2=null;
+		/**[首次设置有效]两个刚体是否可以发生碰撞，默认为false*/
+		this.collideConnected=false;
+		/**两个齿轮角速度比例，默认1*/
+		this._ratio=1;
+		GearJoint.__super.call(this);
+	}
+
+	__class(GearJoint,'laya.physics.joint.GearJoint',_super);
+	var __proto=GearJoint.prototype;
+	__proto._createJoint=function(){
+		if (!this._joint){
+			if (!this.joint1)throw "Joint1 can not be empty";
+			if (!this.joint2)throw "Joint2 can not be empty";
+			var box2d=window.box2d;
+			var def=GearJoint._temp || (GearJoint._temp=new box2d.b2GearJointDef());
+			def.bodyA=this.joint1.owner.getComponent(RigidBody).getBody();
+			def.bodyB=this.joint2.owner.getComponent(RigidBody).getBody();
+			def.joint1=this.joint1.joint;
+			def.joint2=this.joint2.joint;
+			def.ratio=this._ratio;
+			def.collideConnected=this.collideConnected;
+			this._joint=Physics.I._createJoint(def);
+		}
+	}
+
+	/**两个齿轮角速度比例，默认1*/
+	__getset(0,__proto,'ratio',function(){
+		return this._ratio;
+		},function(value){
+		this._ratio=value;
+		if (this._joint)this._joint.SetRatio(value);
+	});
+
+	GearJoint._temp=null;
+	return GearJoint;
+})(JointBase)
 
 
 /**

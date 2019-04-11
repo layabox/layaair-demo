@@ -15,16 +15,16 @@ class MaterialDemo{
 		this.index = 0;
 
 		//预加载所有资源
-		var resource = [
+		let resource = [
 			"res/threeDimen/scene/ChangeMaterialDemo/Conventional/scene.ls",  
 			"res/threeDimen/texture/earth.png"];
 		Laya.loader.create(resource, Laya.Handler.create(this, this.onPreLoadFinish));	
     }
     onPreLoadFinish(){
         //初始化3D场景
-		var scene = Laya.stage.addChild(Laya.Loader.getRes("res/threeDimen/scene/ChangeMaterialDemo/Conventional/scene.ls")) ;
+		let scene = Laya.stage.addChild(Laya.Loader.getRes("res/threeDimen/scene/ChangeMaterialDemo/Conventional/scene.ls")) ;
 		//获取相机
-		var camera =  scene.getChildByName("Main Camera") ;
+		let camera =  scene.getChildByName("Main Camera") ;
 		//为相机添加视角控制组件(脚本)
 		camera.addComponent(CameraMoveScript);
 		//获取球型精灵

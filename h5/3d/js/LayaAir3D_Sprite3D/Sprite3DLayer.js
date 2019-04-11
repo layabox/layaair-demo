@@ -26,7 +26,7 @@ class Sprite3DLayer{
 		this.camera.addLayer(5);
 			
 		//添加平行光
-		var directionLight = this._scene.addChild(new Laya.DirectionLight());
+		let directionLight = this._scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.rotate(new Laya.Vector3( -3.14 / 3, 0, 0));
 			
@@ -37,14 +37,14 @@ class Sprite3DLayer{
     }
     onComplete(){
         //添加地面
-        var grid = this._scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
+        let grid = this._scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
         //地面接收阴影
         (grid.getChildAt(0)).meshRenderer.receiveShadow = true;
         //设置该精灵的蒙版为5(所属图层)
         (grid.getChildAt(0)).layer = 5;
         
         //添加静态猴子
-        var staticLayaMonkey = this._scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
+        let staticLayaMonkey = this._scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
         //设置静态猴子的材质
         staticLayaMonkey.meshRenderer.material = Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
         //设置静态猴子的蒙版为1(所属图层)
@@ -56,9 +56,9 @@ class Sprite3DLayer{
         staticLayaMonkey.meshRenderer.castShadow = true;
         
         //克隆sprite3d
-        var layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
-        var layaMonkey_clone2 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
-        var layaMonkey_clone3 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
+        let layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
+        let layaMonkey_clone2 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
+        let layaMonkey_clone3 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, new Laya.Vector3(0.0, 0, 0.5));
         
         //设置蒙版(所属图层)
         layaMonkey_clone1.layer = 2;
@@ -71,7 +71,7 @@ class Sprite3DLayer{
         //旋转
         layaMonkey_clone2.transform.rotate(new Laya.Vector3(0, 60, 0), false, false);
         //缩放
-        var scale = new Laya.Vector3(0.1, 0.1, 0.1);
+        let scale = new Laya.Vector3(0.1, 0.1, 0.1);
         layaMonkey_clone3.transform.localScale = scale;
         
         //生成UI

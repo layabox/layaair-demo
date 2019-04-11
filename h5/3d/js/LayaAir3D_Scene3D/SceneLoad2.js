@@ -10,7 +10,7 @@ class SceneLoad2{
 
     sceneLoadFinished(scene){
         Laya.stage.addChild(scene);
-        var camera = scene.getChildByName("Main Camera");
+        let camera = scene.getChildByName("Main Camera");
         camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
         camera.addComponent(CameraMoveScript);
         Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox3/skyBox3.lmat", Laya.Handler.create(null, function (mat) {

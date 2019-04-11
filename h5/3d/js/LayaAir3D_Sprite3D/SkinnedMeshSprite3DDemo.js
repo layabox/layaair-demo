@@ -14,14 +14,14 @@ class SkinnedMeshSprite3DDemo
 		Laya.stage.addChild(this.scene);
 		
 		//创建相机
-		var camera = new Laya.Camera(0, 0.1, 100);
+		let camera = new Laya.Camera(0, 0.1, 100);
 		this.scene.addChild(camera);
 		camera.transform.translate(new Laya.Vector3(0, 0.5, 1));
 		camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
 		camera.addComponent(CameraMoveScript);
 		
 		//添加光照
-		var directionLight = new Laya.DirectionLight();
+		let directionLight = new Laya.DirectionLight();
 		this.scene.addChild(directionLight);
 		directionLight.color = new Laya.Vector3(1, 1, 1);
 		directionLight.transform.rotate(new Laya.Vector3( -3.14 / 3, 0, 0));
@@ -32,9 +32,9 @@ class SkinnedMeshSprite3DDemo
 	}
 	onComplete() {
 		//添加父级猴子
-		var dude = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/dude/dude.lh"));
+		let dude = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/dude/dude.lh"));
 		//缩放
-		var scale = new Laya.Vector3(0.1, 0.1, 0.1);
+		let scale = new Laya.Vector3(0.1, 0.1, 0.1);
 		dude.transform.localScale = scale;
 		dude.transform.rotate(new Laya.Vector3( 0, 3.14, 0));
 	}

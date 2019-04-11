@@ -6,10 +6,10 @@ class BlinnPhongMaterialLoad{
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
-        var camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
+        let camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         camera.transform.translate(new Laya.Vector3(0, 0.9, 1.5));
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
-        var directionLight = this.scene.addChild(new Laya.DirectionLight());
+        let directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(0.6, 0.6, 0.6);
         directionLight.direction = new Laya.Vector3(1, -1, -1);
         Laya.Mesh.load("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm", Laya.Handler.create(this, this.loadSprite3D));

@@ -15,7 +15,7 @@ class Sky_SkyBox{
     }
 
     loadMaterial(mat){
-      var skyRenderer = this.scene.skyRenderer;
+      let skyRenderer = this.scene.skyRenderer;
       skyRenderer.mesh = Laya.SkyBox.instance;
       skyRenderer.material = mat;
       Laya.timer.frameLoop(1, this, this.onFrameLoop);  

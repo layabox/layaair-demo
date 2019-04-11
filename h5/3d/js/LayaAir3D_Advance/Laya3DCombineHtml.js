@@ -1,10 +1,10 @@
 class Laya3DCombineHtml{
         constructor(){
-                var div = Laya.Browser.window.document.createElement("div");
+                let div = Laya.Browser.window.document.createElement("div");
                 div.innerHTML = "<h1 style='color: red;'>此内容来源于HTML网页, 可直接在html代码中书写 - h1标签</h1>";
                 document.body.appendChild(div);
                 //1.开启第四个参数
-                var config3D = new Laya.Config3D();
+                let config3D = new Laya.Config3D();
                 config3D.isAlpha = true;
                 Laya3D.init(0, 0, config3D);
                 Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
@@ -12,7 +12,7 @@ class Laya3DCombineHtml{
                 //2.设置舞台背景色为空
                 Laya.stage.bgColor = null;
                 this.scene = new Laya.Scene3D();
-                var camera = new Laya.Camera(0, 0.1, 100);
+                let camera = new Laya.Camera(0, 0.1, 100);
                 Laya.stage.addChild(this.scene);
                 this.scene.addChild(camera);
                 camera.transform.translate(new Laya.Vector3(0, 0.5, 1));

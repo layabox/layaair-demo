@@ -8,7 +8,7 @@ class PointLightDemo{
         Laya.Stat.show();
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
         this.scene.ambientColor = new Laya.Vector3(0.1, 0.1, 0.1);
-        var camera = (this.scene.addChild(new Laya.Camera(0, 0.1, 1000)));
+        let camera = (this.scene.addChild(new Laya.Camera(0, 0.1, 1000)));
         camera.transform.translate(new Laya.Vector3(0, 0.7, 1.3));
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         camera.addComponent(CameraMoveScript);
@@ -18,16 +18,16 @@ class PointLightDemo{
         this.pointLight.transform.position = new Laya.Vector3(0.4, 0.4, 0.0);
         this.pointLight.range = 3.0;
         Laya.Sprite3D.load("res/threeDimen/staticModel/grid/plane.lh", Laya.Handler.create(this, function (sprite) {
-            var grid = this.scene.addChild(sprite);
+            let grid = this.scene.addChild(sprite);
             Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, this.loadSprite3D));
         }));
     }
 
     loadSprite3D(sp){
         this.scene.addChild(sp);
-        var aniSprite3d = sp.getChildAt(0);
-        var animator = aniSprite3d.getComponent(Laya.Animator);
-        var state = new Laya.AnimatorState();
+        let aniSprite3d = sp.getChildAt(0);
+        let animator = aniSprite3d.getComponent(Laya.Animator);
+        let state = new Laya.AnimatorState();
         state.name = "attack";
         state.clipStart = 75 / 150;
         state.clipEnd = 110 / 150;

@@ -8,11 +8,11 @@ class TrailRender {
 		Laya.Stat.show();
 		
 		//加载场景
-		var scene = new Laya.Scene3D();
+		let scene = new Laya.Scene3D();
 		Laya.stage.addChild(scene);
 		
 		//加载相机
-		var camera = new Laya.Camera(0, 0.1, 1000);
+		let camera = new Laya.Camera(0, 0.1, 1000);
 		scene.addChild(camera);
 		camera.transform.translate(new Laya.Vector3(0, 8, 10));
 		camera.transform.rotate(new Laya.Vector3( -45, 0, 0), true, false);
@@ -20,7 +20,7 @@ class TrailRender {
 		camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SOLIDCOLOR;
 		
 		//创建平行光
-		var directionLight = new Laya.DirectionLight();
+		let directionLight = new Laya.DirectionLight();
 		scene.addChild(directionLight);
 		//设置平行光颜色
 		directionLight.color = new Laya.Vector3(1, 1, 1);

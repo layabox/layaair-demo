@@ -10,9 +10,9 @@ class TrailDemo
 		//加载拖尾示例效果
 		Laya.Scene3D.load("res/threeDimen/TrailTest/Trail.ls", Laya.Handler.create(this, function(scene) {
 			Laya.stage.addChild(scene);
-			var camera = scene.getChildByName("Main Camera");
+			let camera = scene.getChildByName("Main Camera");
 			camera.addComponent(CameraMoveScript);
-			var directionLight = new Laya.DirectionLight();
+			let directionLight = new Laya.DirectionLight();
 			scene.addChild(directionLight);
 			directionLight.color = new Laya.Vector3(1, 1, 1);
 			directionLight.transform.rotate(new Laya.Vector3(-Math.PI / 3, 0, 0));

@@ -103,14 +103,15 @@ var DeformSlotDisplayData=(function(){
 //class laya.ani.KeyFramesContent
 var KeyFramesContent=(function(){
 	function KeyFramesContent(){
+		//TODO 这个对内存影响较大，建议减少一下
 		this.startTime=NaN;
 		this.duration=NaN;
 		this.interpolationData=null;
 		//私有插值方式 [type0(插值类型),Data0(插值数据,可为空)，type1(插值类型),Data1(插值数据,可为空)] 注意：254全线性插值，255全不插值
 		this.data=null;
-		//=new Float32Array();
+		//=new Float32Array();数据
 		this.dData=null;
-		//=new Float32Array();
+		//=new Float32Array();数据变化量
 		this.nextData=null;
 	}
 
@@ -174,12 +175,17 @@ var BezierLerp=(function(){
 var Transform=(function(){
 	function Transform(){
 		this.skX=0;
+		// 旋转？
 		this.skY=0;
+		// 不知道干什么的
 		this.scX=1;
+		// 缩放
 		this.scY=1;
 		this.x=0;
+		// 偏移
 		this.y=0;
 		this.skewX=0;
+		// skew
 		this.skewY=0;
 		this.mMatrix=null;
 	}
@@ -365,6 +371,7 @@ var BoneSlot=(function(){
 		/**用户自定义的皮肤 */
 		this._diyTexture=null;
 		this._parentMatrix=null;
+		// 指向了骨骼的resultMatrix
 		this._resultMatrix=null;
 		/**索引替换表 */
 		this._replaceDic={};
@@ -501,7 +508,7 @@ var BoneSlot=(function(){
 	/**
 	*把纹理画到Graphics上
 	*@param graphics
-	*@param noUseSave
+	*@param noUseSave 不使用共享的矩阵对象 _tempResultMatrix，只有实时计算的时候才设置为true
 	*/
 	__proto.draw=function(graphics,boneMatrixArray,noUseSave,alpha){
 		(noUseSave===void 0)&& (noUseSave=false);
@@ -549,9 +556,9 @@ var BoneSlot=(function(){
 							}
 							tResultMatrix._checkTransform();
 							if (tRotateKey){
-								graphics.drawTexture(tTexture,-this.currDisplayData.height / 2,-this.currDisplayData.width / 2,this.currDisplayData.height,this.currDisplayData.width,tResultMatrix);
+								graphics.drawTexture(tTexture,-this.currDisplayData.height / 2,-this.currDisplayData.width / 2,this.currDisplayData.height,this.currDisplayData.width,tResultMatrix,alpha);
 								}else {
-								graphics.drawTexture(tTexture,-this.currDisplayData.width / 2,-this.currDisplayData.height / 2,this.currDisplayData.width,this.currDisplayData.height,tResultMatrix);
+								graphics.drawTexture(tTexture,-this.currDisplayData.width / 2,-this.currDisplayData.height / 2,this.currDisplayData.width,this.currDisplayData.height,tResultMatrix,alpha);
 							}
 						}
 					}
@@ -620,9 +627,9 @@ var BoneSlot=(function(){
 						}
 					}
 					}else {
-					this.skinMesh(boneMatrixArray,tSkinSprite,alpha);
+					this.skinMesh(boneMatrixArray,tSkinSprite);
 				}
-				graphics.drawSkin(tSkinSprite);
+				graphics.drawSkin(tSkinSprite,alpha);
 				break ;
 			case 2:
 				if (noUseSave){
@@ -636,8 +643,8 @@ var BoneSlot=(function(){
 				if (tSkinSprite==null){
 					return;
 				}
-				this.skinMesh(boneMatrixArray,tSkinSprite,alpha);
-				graphics.drawSkin(tSkinSprite);
+				this.skinMesh(boneMatrixArray,tSkinSprite);
+				graphics.drawSkin(tSkinSprite,alpha);
 				break ;
 			case 3:
 				break ;
@@ -648,7 +655,7 @@ var BoneSlot=(function(){
 	*显示蒙皮动画
 	*@param boneMatrixArray 当前帧的骨骼矩阵
 	*/
-	__proto.skinMesh=function(boneMatrixArray,skinSprite,alpha){
+	__proto.skinMesh=function(boneMatrixArray,skinSprite){
 		var tTexture=this.currTexture;
 		var tBones=this.currDisplayData.bones;
 		var tUvs;
@@ -681,7 +688,6 @@ var BoneSlot=(function(){
 		var tRed=1;
 		var tGreed=1;
 		var tBlue=1;
-		var tAlpha=alpha;
 		BoneSlot._tempVerticleArr.length=0;
 		tVertices=BoneSlot._tempVerticleArr;
 		if (this.deformData && this.deformData.length > 0){
@@ -948,6 +954,7 @@ var SkinSlotDisplayData=(function(){
 		this.name=null;
 		this.attachmentName=null;
 		this.type=0;
+		//0 硬 1 skin 2 另一种skin? 3 不支持
 		this.transform=null;
 		this.width=NaN;
 		this.height=NaN;
@@ -2474,7 +2481,6 @@ var AnimationPlayer=(function(_super){
 		this._cacheFrameRateInterval=NaN;
 		/**缓存播放速率*/
 		this._cachePlayRate=NaN;
-		this._fullFrames=null;
 		/**是否缓存*/
 		this.isCache=true;
 		/**播放速率*/
@@ -2510,8 +2516,11 @@ var AnimationPlayer=(function(_super){
 	*@private
 	*/
 	__proto._computeFullKeyframeIndices=function(){
-		var anifullFrames=this._fullFrames=[];
+		return;
 		var templet=this._templet;
+		if (templet._fullFrames)
+			return;
+		var anifullFrames=this._templet._fullFrames=[];
 		var cacheFrameInterval=this._cacheFrameRateInterval *this._cachePlayRate;
 		for (var i=0,iNum=templet.getAnimationCount();i < iNum;i++){
 			var aniFullFrame=[];
@@ -2521,21 +2530,27 @@ var AnimationPlayer=(function(_super){
 			}
 			for (var j=0,jNum=templet.getAnimation(i).nodes.length;j < jNum;j++){
 				var node=templet.getAnimation(i).nodes[j];
-				var frameCount=Math.floor(node.playTime / cacheFrameInterval+0.01);
+				var frameCount=Math.round(node.playTime / cacheFrameInterval);
 				var nodeFullFrames=new Uint16Array(frameCount+1);
-				var lastFrameIndex=-1;
-				for (var n=0,nNum=node.keyFrame.length;n < nNum;n++){
-					var keyFrame=node.keyFrame[n];
-					var tm=keyFrame.startTime;
-					var endTm=tm+keyFrame.duration+cacheFrameInterval;
-					do {
-						var frameIndex=Math.floor(tm / cacheFrameInterval+0.5);
-						for (var k=lastFrameIndex+1;k < frameIndex;k++)
-						nodeFullFrames[k]=n;
-						lastFrameIndex=frameIndex;
-						nodeFullFrames[frameIndex]=n;
-						tm+=cacheFrameInterval;
-					}while (tm <=endTm);
+				var stidx=-1;
+				var nodeframes=node.keyFrame;
+				for (var n=0,nNum=nodeframes.length;n < nNum;n++){
+					var keyFrame=nodeframes[n];
+					var pos=Math.round(keyFrame.startTime / cacheFrameInterval);
+					if (stidx < 0 && pos>0){
+						stidx=pos;
+					}
+					if (pos <=frameCount){
+						nodeFullFrames[pos]=n;
+					}
+				};
+				var cf=0;
+				for (n=stidx;n < frameCount;n++){
+					if (nodeFullFrames[n]==0){
+						nodeFullFrames[n]=cf;
+						}else {
+						cf=nodeFullFrames[n];
+					}
 				}
 				aniFullFrame.push(nodeFullFrames);
 			}
@@ -2634,7 +2649,6 @@ var AnimationPlayer=(function(_super){
 	__proto._destroy=function(){
 		this.offAll();
 		this._templet=null;
-		this._fullFrames=null;
 		this._destroyed=true;
 	}
 
@@ -2907,8 +2921,8 @@ var GraphicsAni=(function(_super){
 	__class(GraphicsAni,'laya.ani.GraphicsAni',_super);
 	var __proto=GraphicsAni.prototype;
 	//TODO:coverage
-	__proto.drawSkin=function(skinA){
-		this.drawTriangles(skinA.texture,0,0,skinA.vertices,skinA.uvs,skinA.indexes,skinA.transform||Matrix.EMPTY);
+	__proto.drawSkin=function(skinA,alpha){
+		this.drawTriangles(skinA.texture,0,0,skinA.vertices,skinA.uvs,skinA.indexes,skinA.transform||Matrix.EMPTY,alpha);
 	}
 
 	GraphicsAni.create=function(){
@@ -2991,6 +3005,9 @@ var AnimationTemplet=(function(_super){
 		//this._aniClassName=null;
 		/**@private */
 		//this._animationDatasCache=null;
+		this._fullFrames=null;
+		/**@private */
+		this._boneCurKeyFrm=[];
 		AnimationTemplet.__super.call(this);
 		this._anis=new Array;
 	}
@@ -3090,15 +3107,73 @@ var AnimationTemplet=(function(_super){
 		aniDatasCache[frameIndex]=data;
 	}
 
-	//TODO:coverage
+	/**
+	*计算当前时间应该对应关键帧的哪一帧
+	*@param nodeframes 当前骨骼的关键帧数据
+	*@param nodeid 骨骼id，因为要使用和更新 _boneCurKeyFrm
+	*@param tm
+	*@return
+	*问题
+	*最后一帧有问题，例如倒数第二帧时间是0.033ms,则后两帧非常靠近，当实际给最后一帧的时候，根据帧数计算出的时间实际上落在倒数第二帧
+	*使用与AnimationPlayer一致的累积时间就行
+	*/
+	__proto.getNodeKeyFrame=function(nodeframes,nodeid,tm){
+		var cid=this._boneCurKeyFrm[nodeid];
+		var frmNum=nodeframes.length;
+		if (cid==void 0 || cid>=frmNum){
+			cid=this._boneCurKeyFrm[nodeid]=0;
+		};
+		var kinfo=nodeframes[cid];
+		var curFrmTm=kinfo.startTime;
+		var dt=tm-curFrmTm;
+		if (dt==0 || (dt > 0 && kinfo.duration > dt)){
+			return cid;
+		};
+		var i=0;
+		if (dt > 0){
+			tm=tm+0.01;
+			for (i=cid+1;i < frmNum;i++){
+				kinfo=nodeframes[i];
+				if (kinfo.startTime <=tm && kinfo.startTime+kinfo.duration > tm){
+					this._boneCurKeyFrm[nodeid]=i;
+					return i;
+				}
+			}
+			return frmNum-1;
+			}else {
+			for (i=0;i < cid;i++){
+				kinfo=nodeframes[i];
+				if (kinfo.startTime <=tm && kinfo.startTime+kinfo.duration > tm){
+					this._boneCurKeyFrm[nodeid]=i;
+					return i;
+				}
+			}
+			return cid;
+		}
+		return 0;
+	}
+
+	/**
+	*
+	*@param aniIndex
+	*@param originalData
+	*@param nodesFrameIndices
+	*@param frameIndex
+	*@param playCurTime
+	*/
 	__proto.getOriginalData=function(aniIndex,originalData,nodesFrameIndices,frameIndex,playCurTime){
 		var oneAni=this._anis[aniIndex];
 		var nodes=oneAni.nodes;
+		var curKFrm=this._boneCurKeyFrm;
+		if (curKFrm.length < nodes.length){
+			curKFrm.length=nodes.length;
+		};
 		var j=0;
 		for (var i=0,n=nodes.length,outOfs=0;i < n;i++){
 			var node=nodes[i];
 			var key;
-			key=node.keyFrame[nodesFrameIndices[i][frameIndex]];
+			var kfrm=node.keyFrame;
+			key=kfrm[ this.getNodeKeyFrame(kfrm,i,playCurTime)];
 			node.dataOffset=outOfs;
 			var dt=playCurTime-key.startTime;
 			var lerpType=node.lerpType;
@@ -3317,6 +3392,7 @@ var Skeleton=(function(_super){
 		this._boneList=null;
 		/**@private */
 		this._aniSectionDic=null;
+		// section 是每段数据(transform,slot,ik,path)的长度，这个是一个section的数据，表示每个clip的section数据
 		this._eventIndex=0;
 		this._drawOrderIndex=0;
 		this._drawOrder=null;
@@ -3582,11 +3658,9 @@ var Skeleton=(function(_super){
 			this._emitMissedEvents(this._player.playStart,this._player.playEnd,this._eventIndex);
 			this._eventIndex=0;
 		};
-		var tEventData;
-		var tEventAniArr=this._templet.eventAniArr;
-		var tEventArr=tEventAniArr[this._aniClipIndex];
+		var tEventArr=this._templet.eventAniArr[this._aniClipIndex];
 		if (tEventArr && this._eventIndex < tEventArr.length){
-			tEventData=tEventArr[this._eventIndex];
+			var tEventData=tEventArr[this._eventIndex];
 			if (tEventData.time >=this._player.playStart && tEventData.time <=this._player.playEnd){
 				if (this._player.currentPlayTime >=tEventData.time){
 					this.event(/*laya.events.Event.LABEL*/"label",tEventData);
@@ -3648,6 +3722,7 @@ var Skeleton=(function(_super){
 	/**
 	*@private
 	*创建grahics图像
+	*@param _clipIndex 第几帧
 	*/
 	__proto._createGraphics=function(_clipIndex){
 		(_clipIndex===void 0)&& (_clipIndex=-1);
@@ -3667,8 +3742,7 @@ var Skeleton=(function(_super){
 				}
 				tDrawOrderData=tDrawOrderArr[this._drawOrderIndex];
 			}
-		};
-		var tGraphics;
+		}
 		if (this._aniMode==0 || this._aniMode==1){
 			this.graphics=GraphicsAni.create();
 			}else {
@@ -3677,10 +3751,10 @@ var Skeleton=(function(_super){
 				}else {
 				this.graphics=GraphicsAni.create();
 			}
-		}
-		tGraphics=this.graphics;
+		};
+		var tGraphics=this.graphics;
 		var bones=this._templet.getNodes(this._aniClipIndex);
-		this._templet.getOriginalData(this._aniClipIndex,this._curOriginalData,this._player._fullFrames[this._aniClipIndex],_clipIndex,curTime);
+		this._templet.getOriginalData(this._aniClipIndex,this._curOriginalData,null,_clipIndex,this._player._elapsedPlaybackTime);
 		var tSectionArr=this._aniSectionDic[this._aniClipIndex];
 		var tParentMatrix;
 		var tStartIndex=0;
@@ -3690,18 +3764,20 @@ var Skeleton=(function(_super){
 		var tParentTransform;
 		var tSrcBone;
 		var boneCount=this._templet.srcBoneMatrixArr.length;
+		var origDt=this._curOriginalData;
 		for (i=0,n=tSectionArr[0];i < boneCount;i++){
 			tSrcBone=this._boneList[i];
+			var resultTrans=tSrcBone.resultTransform;
 			tParentTransform=this._templet.srcBoneMatrixArr[i];
-			tSrcBone.resultTransform.scX=tParentTransform.scX *this._curOriginalData[tStartIndex++];
-			tSrcBone.resultTransform.skX=tParentTransform.skX+this._curOriginalData[tStartIndex++];
-			tSrcBone.resultTransform.skY=tParentTransform.skY+this._curOriginalData[tStartIndex++];
-			tSrcBone.resultTransform.scY=tParentTransform.scY *this._curOriginalData[tStartIndex++];
-			tSrcBone.resultTransform.x=tParentTransform.x+this._curOriginalData[tStartIndex++];
-			tSrcBone.resultTransform.y=tParentTransform.y+this._curOriginalData[tStartIndex++];
+			resultTrans.scX=tParentTransform.scX *origDt[tStartIndex++];
+			resultTrans.skX=tParentTransform.skX+origDt[tStartIndex++];
+			resultTrans.skY=tParentTransform.skY+origDt[tStartIndex++];
+			resultTrans.scY=tParentTransform.scY *origDt[tStartIndex++];
+			resultTrans.x=tParentTransform.x+origDt[tStartIndex++];
+			resultTrans.y=tParentTransform.y+origDt[tStartIndex++];
 			if (this._templet.tMatrixDataLen===8){
-				tSrcBone.resultTransform.skewX=tParentTransform.skewX+this._curOriginalData[tStartIndex++];
-				tSrcBone.resultTransform.skewY=tParentTransform.skewY+this._curOriginalData[tStartIndex++];
+				resultTrans.skewX=tParentTransform.skewX+origDt[tStartIndex++];
+				resultTrans.skewY=tParentTransform.skewY+origDt[tStartIndex++];
 			}
 		};
 		var tSlotDic={};
@@ -3709,23 +3785,17 @@ var Skeleton=(function(_super){
 		var tBoneData;
 		for (n+=tSectionArr[1];i < n;i++){
 			tBoneData=bones[i];
-			tSlotDic[tBoneData.name]=this._curOriginalData[tStartIndex++];
-			tSlotAlphaDic[tBoneData.name]=this._curOriginalData[tStartIndex++];
-			this._curOriginalData[tStartIndex++];
-			this._curOriginalData[tStartIndex++];
-			this._curOriginalData[tStartIndex++];
-			this._curOriginalData[tStartIndex++];
+			tSlotDic[tBoneData.name]=origDt[tStartIndex++];
+			tSlotAlphaDic[tBoneData.name]=origDt[tStartIndex++];
+			tStartIndex+=4;
 		};
 		var tBendDirectionDic={};
 		var tMixDic={};
 		for (n+=tSectionArr[2];i < n;i++){
 			tBoneData=bones[i];
-			tBendDirectionDic[tBoneData.name]=this._curOriginalData[tStartIndex++];
-			tMixDic[tBoneData.name]=this._curOriginalData[tStartIndex++];
-			this._curOriginalData[tStartIndex++];
-			this._curOriginalData[tStartIndex++];
-			this._curOriginalData[tStartIndex++];
-			this._curOriginalData[tStartIndex++];
+			tBendDirectionDic[tBoneData.name]=origDt[tStartIndex++];
+			tMixDic[tBoneData.name]=origDt[tStartIndex++];
+			tStartIndex+=4;
 		}
 		if (this._pathDic){
 			var tPathConstraint;
@@ -3736,24 +3806,20 @@ var Skeleton=(function(_super){
 					var tByte=new Byte(tBoneData.extenData);
 					switch (tByte.getByte()){
 						case 1:
-							tPathConstraint.position=this._curOriginalData[tStartIndex++];
+							tPathConstraint.position=origDt[tStartIndex++];
 							break ;
 						case 2:
-							tPathConstraint.spacing=this._curOriginalData[tStartIndex++];
+							tPathConstraint.spacing=origDt[tStartIndex++];
 							break ;
 						case 3:
-							tPathConstraint.rotateMix=this._curOriginalData[tStartIndex++];
-							tPathConstraint.translateMix=this._curOriginalData[tStartIndex++];
+							tPathConstraint.rotateMix=origDt[tStartIndex++];
+							tPathConstraint.translateMix=origDt[tStartIndex++];
 							break ;
 						}
 				}
 			}
 		}
-		if (this._yReverseMatrix){
-			this._rootBone.update(this._yReverseMatrix);
-			}else {
-			this._rootBone.update(Matrix.TEMP.identity());
-		}
+		this._rootBone.update(this._yReverseMatrix || Matrix.TEMP.identity());
 		if (this._ikArr){
 			var tIkConstraint;
 			for (i=0,n=this._ikArr.length;i < n;i++){
@@ -3827,11 +3893,8 @@ var Skeleton=(function(_super){
 				tDBBoneSlot=this._boneSlotArray[this._drawOrder[i]];
 				tSlotData2=tSlotDic[tDBBoneSlot.name];
 				tSlotData3=tSlotAlphaDic[tDBBoneSlot.name];
-				if (!isNaN(tSlotData3)){
-					tGraphics.save();
-					tGraphics.alpha(tSlotData3);
-				}
-				if (!isNaN(tSlotData2)&& tSlotData2 !=-2){
+				if (!isNaN(tSlotData3)){}
+					if (!isNaN(tSlotData2)&& tSlotData2 !=-2){
 					if (this._templet.attachmentNames){
 						tDBBoneSlot.showDisplayByName(this._templet.attachmentNames[tSlotData2]);
 						}else {
@@ -3853,20 +3916,15 @@ var Skeleton=(function(_super){
 					}else {
 					tDBBoneSlot.draw(tGraphics,this._boneMatrixArray,this._aniMode==2);
 				}
-				if (!isNaN(tSlotData3)){
-					tGraphics.restore();
-				}
-			}
+				if (!isNaN(tSlotData3)){}
+					}
 			}else {
 			for (i=0,n=this._boneSlotArray.length;i < n;i++){
 				tDBBoneSlot=this._boneSlotArray[i];
 				tSlotData2=tSlotDic[tDBBoneSlot.name];
 				tSlotData3=tSlotAlphaDic[tDBBoneSlot.name];
-				if (!isNaN(tSlotData3)){
-					tGraphics.save();
-					tGraphics.alpha(tSlotData3);
-				}
-				if (!isNaN(tSlotData2)&& tSlotData2 !=-2){
+				if (!isNaN(tSlotData3)){}
+					if (!isNaN(tSlotData2)&& tSlotData2 !=-2){
 					if (this._templet.attachmentNames){
 						tDBBoneSlot.showDisplayByName(this._templet.attachmentNames[tSlotData2]);
 						}else {
@@ -3888,10 +3946,8 @@ var Skeleton=(function(_super){
 					}else {
 					tDBBoneSlot.draw(tGraphics,this._boneMatrixArray,this._aniMode==2);
 				}
-				if (!isNaN(tSlotData3)){
-					tGraphics.restore();
-				}
-			}
+				if (!isNaN(tSlotData3)){}
+					}
 		}
 		if (this._aniMode==0){
 			this._templet.setGrahicsDataWithCache(this._aniClipIndex,_clipIndex,tGraphics);
@@ -4799,6 +4855,7 @@ var Templet=(function(_super){
 		this._textureDic={};
 		this._loadList=null;
 		this._path=null;
+		this._relativeUrl=null;
 		/**@private */
 		this.tMatrixDataLen=0;
 		this.mRootBone=null;
@@ -4836,6 +4893,7 @@ var Templet=(function(_super){
 	*/
 	__proto.parseData=function(texture,skeletonData,playbackRate){
 		(playbackRate===void 0)&& (playbackRate=30);
+		if(!this._path&&this._relativeUrl)this._path=this._relativeUrl.slice(0,this._relativeUrl.lastIndexOf("/"))+"/";
 		if(!this._path&&this.url)this._path=this.url.slice(0,this.url.lastIndexOf("/"))+"/";
 		this._mainTexture=texture;
 		if (this._mainTexture){
@@ -5398,6 +5456,11 @@ var Templet=(function(_super){
 			return this._graphicsCache[aniIndex][frameIndex];
 		}
 		return null;
+	}
+
+	__proto._setCreateURL=function(url){
+		this._relativeUrl=url;
+		laya.resource.Resource.prototype._setCreateURL.call(this,url);
 	}
 
 	/**

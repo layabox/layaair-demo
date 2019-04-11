@@ -1,6 +1,5 @@
 class WaterPrimaryMaterialDemo{
     constructor(){
-        debugger;
         Laya3D.init(0, 0);
         Laya.Stat.show();
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
@@ -8,7 +7,7 @@ class WaterPrimaryMaterialDemo{
     
         Laya.Scene3D.load("res/threeDimen/scene/LayaScene_water/Conventional/Default.ls", Laya.Handler.create(this, function(scene) {
             Laya.stage.addChild(scene);
-            var camera = scene.getChildByName("Main Camera");
+            let camera = scene.getChildByName("Main Camera");
             camera.addComponent(CameraMoveScript);
         }));
     }

@@ -17,7 +17,7 @@ class Performance{
 		
 		Laya.Scene3D.load("res/threeDimen/scene/StaticBatching/staticBatching.ls", Laya.Handler.create(this, function(scene) {
 			Laya.stage.addChild(scene);
-			var camera = scene.getChildByName("Main Camera");
+			let camera = scene.getChildByName("Main Camera");
 			camera.addComponent(CameraMoveScript);
 				
 			//获取相同材质的精灵

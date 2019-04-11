@@ -393,20 +393,26 @@
 				["Shader_Simple", "简单Shader", "", "core,webgl,ani,d3,CameraMoveScript.js,CustomMaterial.js"],
 				["Shader_GlowingEdge", "边缘光照Shader", "", "core,webgl,ani,d3,CustomMaterial.js,CameraMoveScript.js"],
 				["Shader_Terrain", "地形Shader", "", "core,webgl,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js"],
-				["Shader_CartoonRender", "卡通着色Shader（多Pass）", "", "core,webgl,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js,cartoonMaterial.js"]
+				["Shader_MultiplePassOutline", "描边Shader（多Pass）", "", "core,webgl,ani,d3,CameraMoveScript.js,MultiplePassOutlineMaterial.js"]
 			]
 		},
-      {
-        "prefix": "Advance",
-        "tr_zhCN": "高级应用",
-        "manifest": [
-          [ "Laya3DCombineHtml", "Laya3D与网页混合", "", "core,webgl,ani,d3" ],
-          [ "AStarFindPath", "寻路导航", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
-          [ "PBRDemo", "基于物理渲染", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-          [ "Scene2DPlayer3D", "2D场景加3D人物", "", "core,webgl,ani,d3,ui,CameraMoveScript.js" ],
-          [ "Secne3DPlayer2D", "3D场景加2D人物", "", "core,webgl,ani,d3,ui,CameraMoveScript.js,physics3D" ]
-        ]
-      }
+    {
+			"prefix": "Advance",
+			"tr_zhCN": "高级应用",
+			"manifest": [
+				[ "Laya3DCombineHtml", "Laya3D与网页混合", "", "core,webgl,ani,d3" ],
+				[ "AStarFindPath", "寻路导航", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
+				[ "Scene2DPlayer3D", "2D场景加3D人物", "", "core,webgl,ani,d3,ui,CameraMoveScript.js" ],
+				[ "Secne3DPlayer2D", "3D场景加2D人物", "", "core,webgl,ani,d3,ui,CameraMoveScript.js,physics3D" ]
+			]
+		},
+		{
+			"prefix": "Demo",
+			"tr_zhCN": "展示案例",
+			"manifest": [
+				[ "PBRDemo", "基于物理的渲染", "", "core,webgl,ani,d3" ]
+			]
+    }
 
 		]
 	}

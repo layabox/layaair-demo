@@ -17,6 +17,7 @@ loadLib("3d/js/common/TriggerCollisionScript.js");
 loadLib("3d/js/LayaAir3D_Shader/customMaterials/CustomMaterial.js");
 loadLib("3d/js/LayaAir3D_Shader/customMaterials/CustomTerrainMaterial.js");
 loadLib("3d/js/LayaAir3D_Shader/customMaterials/cartoonMaterial.js");
+loadLib("3d/js/LayaAir3D_Shader/customMaterials/MultiplePassOutlineMaterial.js");
 loadLib("res/threeDimen/pbrlut.js");
 loadLib("conchInit3d.js");
 

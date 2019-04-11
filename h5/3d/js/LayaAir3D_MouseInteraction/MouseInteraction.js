@@ -24,7 +24,7 @@ class MouseInteraction{
         this.camera.addComponent(CameraMoveScript);
         
         //添加光照
-        var directionLight = this.scene.addChild(new Laya.DirectionLight());
+        let directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.rotate(new Laya.Vector3( -3.14 / 3, 0, 0));
         
@@ -49,13 +49,13 @@ class MouseInteraction{
 
     onComplete(){
         //加载地面
-        var grid = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
+        let grid = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
         //指定精灵的图层
         grid.layer = 10;
         //地面接收阴影
         (grid.getChildAt(0)).meshRenderer.receiveShadow = true;
         //加载静态小猴子
-        var staticLayaMonkey = this.scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
+        let staticLayaMonkey = this.scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
         //设置材质
         staticLayaMonkey.meshRenderer.material = Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
         //设置位置
@@ -69,9 +69,9 @@ class MouseInteraction{
         
         
         //克隆sprite3d
-        var layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, new Laya.Vector3(0.0, 0, 0.5));
-        var layaMonkey_clone2 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, new Laya.Vector3(0.0, 0, 0.5));
-        var layaMonkey_clone3 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, new Laya.Vector3(0.0, 0, 0.5));
+        let layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, new Laya.Vector3(0.0, 0, 0.5));
+        let layaMonkey_clone2 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, new Laya.Vector3(0.0, 0, 0.5));
+        let layaMonkey_clone3 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, new Laya.Vector3(0.0, 0, 0.5));
         //设置精灵名字
         staticLayaMonkey.name = "大熊";
         layaMonkey_clone1.name = "二熊";
@@ -85,30 +85,30 @@ class MouseInteraction{
         //旋转
         layaMonkey_clone2.transform.rotate(new Laya.Vector3(0, 60, 0), false, false);
         //缩放
-        var scale = new Laya.Vector3(0.1, 0.1, 0.1);
+        let scale = new Laya.Vector3(0.1, 0.1, 0.1);
         layaMonkey_clone3.transform.localScale = scale;
         
         //给模型添加碰撞组件
-        var meshCollider = staticLayaMonkey.addComponent(Laya.PhysicsCollider);
+        let meshCollider = staticLayaMonkey.addComponent(Laya.PhysicsCollider);
         //创建网格碰撞器
-        var meshShape = new Laya.MeshColliderShape();
+        let meshShape = new Laya.MeshColliderShape();
         //获取模型的mesh
         meshShape.mesh = staticLayaMonkey.meshFilter.sharedMesh;
         //设置模型的碰撞形状
         meshCollider.colliderShape = meshShape;
 
-        var meshCollider1 = layaMonkey_clone1.addComponent(Laya.PhysicsCollider);
-        var meshShape1 = new Laya.MeshColliderShape();
+        let meshCollider1 = layaMonkey_clone1.addComponent(Laya.PhysicsCollider);
+        let meshShape1 = new Laya.MeshColliderShape();
         meshShape1.mesh = layaMonkey_clone1.meshFilter.sharedMesh;
         meshCollider1.colliderShape = meshShape1;
         
-        var meshCollider2 = layaMonkey_clone2.addComponent(Laya.PhysicsCollider);
-        var meshShape2 = new Laya.MeshColliderShape();
+        let meshCollider2 = layaMonkey_clone2.addComponent(Laya.PhysicsCollider);
+        let meshShape2 = new Laya.MeshColliderShape();
         meshShape2.mesh = layaMonkey_clone2.meshFilter.sharedMesh;
         meshCollider2.colliderShape = meshShape2;
         
-        var meshCollider3 = layaMonkey_clone3.addComponent(Laya.PhysicsCollider);
-        var meshShape3 = new Laya.MeshColliderShape();
+        let meshCollider3 = layaMonkey_clone3.addComponent(Laya.PhysicsCollider);
+        let meshShape3 = new Laya.MeshColliderShape();
         meshShape3.mesh = layaMonkey_clone3.meshFilter.sharedMesh;
         meshCollider3.colliderShape = meshShape3;
         

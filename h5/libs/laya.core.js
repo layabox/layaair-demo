@@ -363,10 +363,10 @@ var LayaGLQuickRunner=(function(){
 	LayaGLQuickRunner.transform_drawTexture=function(sprite,context,x,y){
 		var style=sprite._style;
 		var tex=sprite.texture;
-		context.saveTransform(LayaGLQuickRunner.curMat);
-		context.transformByMatrix(sprite.transform,x,y);
-		context.drawTexture(tex,-sprite.pivotX,-sprite.pivotY,sprite._width || tex.width,sprite._height || tex.height);
-		context.restoreTransform(LayaGLQuickRunner.curMat);
+		var w=sprite._width || ((tex)._w > 0?(tex)._w:tex.width);
+		var h=sprite._height || ((tex)._h > 0?(tex)._h:tex.height);
+		var mat=(sprite)._tfChanged?(sprite)._adjustTransform():(sprite)._transform;
+		(context).drawTextureWithTransform(tex,-style.pivotX,-style.pivotY,w,h,mat,x,y,1,null,null);
 	}
 
 	LayaGLQuickRunner.alpha_drawTexture=function(sprite,context,x,y){
@@ -2182,7 +2182,7 @@ var Browser=(function(){
 				Laya["KGMiniAdapter"].enable();
 			}
 		}
-		if (u.indexOf("QGMiniGame")>-1){
+		if (u.indexOf("QGGame")>-1){
 			if (!Laya["QGMiniAdapter"]){
 				console.error("请先添加OPPO小游戏适配库");
 				}else {
@@ -2229,10 +2229,9 @@ var Browser=(function(){
 		Browser.onPC=!Browser.onMobile;
 		Browser.onMiniGame=/*[SAFE]*/ u.indexOf('MiniGame')>-1;
 		Browser.onBDMiniGame=/*[SAFE]*/ u.indexOf('SwanGame')>-1;
-		Browser.onQGMiniGame=/*[SAFE]*/ u.indexOf('QGMiniGame')>-1;
+		Browser.onQGMiniGame=/*[SAFE]*/ u.indexOf('QGGame')>-1;
 		Browser.onLimixiu=/*[SAFE]*/ u.indexOf('limixiu')>-1;
-		if((typeof /*__JS__ */getApp=='function'))
-			Browser.onKGMiniGame=true;
+		Browser.onKGMiniGame=/*[SAFE]*/ u.indexOf('QuickGame')>-1;
 		Browser.supportLocalStorage=LocalStorage.__init__();
 		Browser.supportWebAudio=SoundManager.__init__();
 		Render._mainCanvas=new HTMLCanvas(true);
@@ -2308,6 +2307,73 @@ var Browser=(function(){
 	Browser._pixelRatio=-1;
 	Browser._supportWebGL=false;
 	return Browser;
+})()
+
+
+/**
+*绘制带九宫格信息的图片
+*@private
+*/
+//class laya.display.cmd.Draw9GridTexture
+var Draw9GridTexture=(function(){
+	function Draw9GridTexture(){
+		/**
+		*纹理。
+		*/
+		//this.texture=null;
+		/**
+		*（可选）X轴偏移量。
+		*/
+		//this.x=NaN;
+		/**
+		*（可选）Y轴偏移量。
+		*/
+		//this.y=NaN;
+		/**
+		*（可选）宽度。
+		*/
+		//this.width=NaN;
+		/**
+		*（可选）高度。
+		*/
+		//this.height=NaN;
+		//this.sizeGrid=null;
+	}
+
+	__class(Draw9GridTexture,'laya.display.cmd.Draw9GridTexture');
+	var __proto=Draw9GridTexture.prototype;
+	/**
+	*回收到对象池
+	*/
+	__proto.recover=function(){
+		this.texture._removeReference();
+		Pool.recover("Draw9GridTexture",this);
+	}
+
+	/**@private */
+	__proto.run=function(context,gx,gy){
+		context.drawTextureWithSizeGrid(this.texture,this.x,this.y,this.width,this.height,this.sizeGrid,gx,gy);
+	}
+
+	/**@private */
+	__getset(0,__proto,'cmdID',function(){
+		return "Draw9GridTexture";
+	});
+
+	Draw9GridTexture.create=function(texture,x,y,width,height,sizeGrid){
+		var cmd=Pool.getItemByClass("Draw9GridTexture",Draw9GridTexture);
+		cmd.texture=texture;
+		texture._addReference();
+		cmd.x=x;
+		cmd.y=y;
+		cmd.width=width;
+		cmd.height=height;
+		cmd.sizeGrid=sizeGrid;
+		return cmd;
+	}
+
+	Draw9GridTexture.ID="Draw9GridTexture";
+	return Draw9GridTexture;
 })()
 
 
@@ -2764,15 +2830,15 @@ var MouseManager=(function(){
 var Graphics=(function(){
 	function Graphics(){
 		/**@private */
-		//this._sp=null;
+		this._sp=null;
 		/**@private */
 		this._one=null;
 		/**@private */
 		this._cmds=null;
 		/**@private */
-		//this._vectorgraphArray=null;
+		this._vectorgraphArray=null;
 		/**@private */
-		//this._graphicBounds=null;
+		this._graphicBounds=null;
 		/**@private */
 		this.autoDestroy=false;
 		this._render=this._renderEmpty;
@@ -3295,9 +3361,9 @@ var Graphics=(function(){
 	*@private
 	*/
 	__proto._renderAll=function(sprite,context,x,y){
-		var cmds=this._cmds,cmd;
+		var cmds=this._cmds;
 		for (var i=0,n=cmds.length;i < n;i++){
-			(cmd=cmds[i]).run(context,x,y);
+			cmds[i].run(context,x,y);
 		}
 	}
 
@@ -3469,6 +3535,22 @@ var Graphics=(function(){
 	*/
 	__proto.drawPath=function(x,y,paths,brush,pen){
 		return this._saveToCmd(Render._context._drawPath,DrawPathCmd.create.call(this,x,y,paths,brush,pen));
+	}
+
+	/**
+	*@private
+	*绘制带九宫格的图片
+	*@param texture
+	*@param x
+	*@param y
+	*@param width
+	*@param height
+	*@param sizeGrid
+	*/
+	__proto.draw9Grid=function(texture,x,y,width,height,sizeGrid){
+		(x===void 0)&& (x=0);
+		(y===void 0)&& (y=0);
+		this._saveToCmd(null,Draw9GridTexture.create(texture,x,y,width,height,sizeGrid));
 	}
 
 	/**
@@ -4254,13 +4336,17 @@ var RenderSprite=(function(){
 		if(tex._getSource())
 			context.drawTexture(tex,x-sprite.pivotX+tex.offsetX,y-sprite.pivotY+tex.offsetY,sprite._width || tex.width,sprite._height || tex.height);
 		var next=this._next;
-		next._fun.call(next,sprite,context,x,y);
+		if(next!=RenderSprite.NORENDER)
+			next._fun.call(next,sprite,context,x,y);
 	}
 
 	__proto._graphics=function(sprite,context,x,y){
-		sprite._graphics && sprite._graphics._render(sprite,context,x-sprite.pivotX,y-sprite.pivotY);
+		var style=sprite._style;
+		var g=sprite._graphics;
+		g && g._render(sprite,context,x-style.pivotX,y-style.pivotY);
 		var next=this._next;
-		next._fun.call(next,sprite,context,x,y);
+		if(next!=RenderSprite.NORENDER)
+			next._fun.call(next,sprite,context,x,y);
 	}
 
 	//TODO:coverage
@@ -4296,8 +4382,10 @@ var RenderSprite=(function(){
 			context.transform(transform.a,transform.b,transform.c,transform.d,transform.tx+x,transform.ty+y);
 			_next._fun.call(_next,sprite,context,0,0);
 			context.restore();
-		}else
-		_next._fun.call(_next,sprite,context,x,y);
+			}else {
+			if(_next!=RenderSprite.NORENDER)
+				_next._fun.call(_next,sprite,context,x,y);
+		}
 	}
 
 	__proto._children=function(sprite,context,x,y){
@@ -9008,7 +9096,7 @@ var DrawTextureCmd=(function(){
 		*（可选）颜色滤镜。
 		*/
 		//this.color=null;
-		//this.colorFlt=null;
+		this.colorFlt=null;
 		/**
 		*（可选）混合模式。
 		*/
@@ -9584,6 +9672,8 @@ var Utils=(function(){
 
 	Utils.getQueryString=function(name){
 		if (Browser.onMiniGame)return null;
+		if(!window.location || !window.location.search)
+			return null;
 		var reg=new RegExp("(^|&)"+name+"=([^&]*)(&|$)");
 		var r=window.location.search.substr(1).match(reg);
 		if (r !=null)return unescape(r[2]);
@@ -9755,7 +9845,7 @@ var Stat=(function(){
 	Stat.show=function(x,y){
 		(x===void 0)&& (x=0);
 		(y===void 0)&& (y=0);
-		if (!Browser.onMiniGame && !Browser.onLimixiu && !Render.isConchApp)Stat._useCanvas=true;
+		if (!Browser.onMiniGame && !Browser.onLimixiu && !Render.isConchApp && !Browser.onBDMiniGame && !Browser.onKGMiniGame && !Browser.onQGMiniGame)Stat._useCanvas=true;
 		Stat._show=true;
 		Stat._fpsData.length=60;
 		Stat._view[0]={title:"FPS(Canvas)",value:"_fpsStr",color:"yellow",units:"int"};
@@ -9801,7 +9891,9 @@ var Stat=(function(){
 			Stat._ctx.font=Stat._fontSize+"px Arial";
 			Stat._canvas.source.style.cssText="pointer-events:none;background:rgba(150,150,150,0.8);z-index:100000;position: absolute;direction:ltr;left:"+x+"px;top:"+y+"px;width:"+(Stat._width / pixel)+"px;height:"+(Stat._height / pixel)+"px;";
 		}
-		Browser.container.appendChild(Stat._canvas.source);
+		if(!Browser.onKGMiniGame){
+			Browser.container.appendChild(Stat._canvas.source);
+		}
 		Stat._first=true;
 		Stat.loop();
 		Stat._first=false;
@@ -11411,6 +11503,45 @@ var Context=(function(){
 	}
 
 	//TODO:coverage
+	__proto.drawTextureWithSizeGrid=function(tex,tx,ty,width,height,sizeGrid,gx,gy){
+		if (!tex._getSource())
+			return;
+		Stat.renderBatches++;
+		tx+=gx;
+		ty+=gy;
+		var uv=tex.uv,w=tex.bitmap._width,h=tex.bitmap._height;
+		var top=sizeGrid[0];
+		var right=sizeGrid[1];
+		var bottom=sizeGrid[2];
+		var left=sizeGrid[3];
+		var repeat=sizeGrid[4];
+		var needClip=false;
+		if (width==w){
+			left=right=0;
+		}
+		if (height==h){
+			top=bottom=0;
+		}
+		if (left+right > width){
+			var clipWidth=width;
+			needClip=true;
+			width=left+right;
+			/*no*/this.save();
+			this.clipRect(0+tx,0+ty,clipWidth,height);
+		}
+		left && top && this.drawRect(0+tx,0+ty,left,top,"#ff0000");
+		right && top && this.drawRect(width-right+tx,0+ty,right,top,"#ff0000");
+		left && bottom && this.drawRect(0+tx,height-bottom+ty,left,bottom,"#ff0000");
+		right && bottom && this.drawRect(width-right+tx,height-bottom+ty,right,bottom,"#ff0000");
+		top && this.drawRect(left+tx,0+ty,width-left-right,top,"#ffff00");
+		bottom && this.drawRect(left+tx,height-bottom+ty,width-left-right,bottom,"#ffff00");
+		left && this.drawRect(0+tx,top+ty,left,height-top-bottom,"#ffff00");
+		right && this.drawRect(width-right+tx,top+ty,right,height-top-bottom,"#ffff00");
+		this.drawRect(left+tx,top+ty,width-left-right,height-top-bottom,"#ff00ff");
+		if (needClip)/*no*/this.restore();
+	}
+
+	//TODO:coverage
 	__proto.drawTexture2=function(x,y,pivotX,pivotY,m,args2){
 		var tex=args2[0];
 		Stat.renderBatches++;
@@ -11732,7 +11863,7 @@ var Context=(function(){
 		to=to || /*__JS__ */CanvasRenderingContext2D.prototype;
 		if(to.init2d)return;
 		to.init2d=true;
-		var funs=["saveTransform","restoreTransform","transformByMatrix","drawTriangles","drawTriangle",'drawTextures','fillWords','fillBorderWords','drawRect','strokeWord','drawText','fillTexture','setTransformByMatrix','clipRect','drawTexture','drawTexture2','drawTextureWithTransform','flush','clear','destroy','drawCanvas','fillBorderText','drawCurves',"_drawRect","alpha","_transform","_rotate","_scale","_drawLine","_drawLines","_drawCircle","_fillAndStroke","_drawPie","_drawPoly","_drawPath","drawTextureWithTransform"];
+		var funs=["saveTransform","restoreTransform","transformByMatrix","drawTriangles","drawTriangle",'drawTextures','fillWords','fillBorderWords','drawRect','strokeWord','drawText','fillTexture','setTransformByMatrix','clipRect','drawTexture','drawTexture2','drawTextureWithTransform',"drawTextureWithSizeGrid",'flush','clear','destroy','drawCanvas','fillBorderText','drawCurves',"_drawRect","alpha","_transform","_rotate","_scale","_drawLine","_drawLines","_drawCircle","_fillAndStroke","_drawPie","_drawPoly","_drawPath","drawTextureWithTransform"];
 		funs.forEach(function(i){
 			to[i]=from[i];
 		});
@@ -11942,6 +12073,7 @@ var Config=(function(){
 	Config.webGL2D_MeshAllocMaxMem=true;
 	Config.is2DPixelArtGame=false;
 	Config.useWebGL2=false;
+	Config.useRetinalCanvas=false;
 	return Config;
 })()
 
@@ -14125,6 +14257,7 @@ var LoaderManager=(function(_super){
 		(priority===void 0)&& (priority=1);
 		(cache===void 0)&& (cache=true);
 		if ((url instanceof Array)){
+			var allScuess=true;
 			var items=url;
 			var itemCount=items.length;
 			var loadedCount=0;
@@ -14146,8 +14279,9 @@ var LoaderManager=(function(_super){
 			function onComplete (item,content){
 				loadedCount++;
 				item.progress=1;
+				content || (allScuess=false);
 				if (loadedCount===itemCount && complete){
-					complete.run();
+					complete.runWith(allScuess);
 				}
 			}
 			function onProgress (item,value){
@@ -14835,232 +14969,6 @@ var Socket=(function(_super){
 
 
 /**
-*@private
-*<code>Resource</code> 资源存取类。
-*/
-//class laya.resource.Resource extends laya.events.EventDispatcher
-var Resource=(function(_super){
-	function Resource(){
-		/**@private */
-		//this._id=0;
-		/**@private */
-		//this._url=null;
-		/**@private */
-		this._cpuMemory=0;
-		/**@private */
-		this._gpuMemory=0;
-		/**@private */
-		//this._destroyed=false;
-		/**@private */
-		//this._referenceCount=0;
-		/**是否加锁，如果true为不能使用自动释放机制。*/
-		//this.lock=false;
-		/**名称。 */
-		//this.name=null;
-		Resource.__super.call(this);
-		this._id=++Resource._uniqueIDCounter;
-		this._destroyed=false;
-		this._referenceCount=0;
-		Resource._idResourcesMap[this.id]=this;
-		this.lock=false;
-	}
-
-	__class(Resource,'laya.resource.Resource',_super);
-	var __proto=Resource.prototype;
-	Laya.imps(__proto,{"laya.resource.ICreateResource":true,"laya.resource.IDestroy":true})
-	/**
-	*@private
-	*/
-	__proto._setCPUMemory=function(value){
-		var offsetValue=value-this._cpuMemory;
-		this._cpuMemory=value;
-		Resource._addCPUMemory(offsetValue);
-	}
-
-	/**
-	*@private
-	*/
-	__proto._setGPUMemory=function(value){
-		var offsetValue=value-this._gpuMemory;
-		this._gpuMemory=value;
-		Resource._addGPUMemory(offsetValue);
-	}
-
-	/**
-	*@private
-	*/
-	__proto._setCreateURL=function(url){
-		url=URL.formatURL(url);
-		if (this._url!==url){
-			var resList;
-			if (this._url){
-				resList=Resource._urlResourcesMap[this._url];
-				resList.splice(resList.indexOf(this),1);
-				(resList.length===0)&& (delete Resource._urlResourcesMap[this._url]);
-			}
-			if (url){
-				resList=Resource._urlResourcesMap[url];
-				(resList)|| (Resource._urlResourcesMap[url]=resList=[]);
-				resList.push(this);
-			}
-			this._url=url;
-		}
-	}
-
-	/**
-	*@private
-	*/
-	__proto._addReference=function(count){
-		(count===void 0)&& (count=1);
-		this._referenceCount+=count;
-	}
-
-	/**
-	*@private
-	*/
-	__proto._removeReference=function(count){
-		(count===void 0)&& (count=1);
-		this._referenceCount-=count;
-	}
-
-	/**
-	*@private
-	*/
-	__proto._clearReference=function(){
-		this._referenceCount=0;
-	}
-
-	/**
-	*@private
-	*/
-	__proto._recoverResource=function(){}
-	/**
-	*@private
-	*/
-	__proto._disposeResource=function(){}
-	/**
-	*@private
-	*/
-	__proto._activeResource=function(){}
-	/**
-	*销毁资源,销毁后资源不能恢复。
-	*/
-	__proto.destroy=function(){
-		if (this._destroyed)
-			return;
-		this._destroyed=true;
-		this.lock=false;
-		this._disposeResource();
-		delete Resource._idResourcesMap[this.id];
-		var resList;
-		if (this._url){
-			resList=Resource._urlResourcesMap[this._url];
-			if (resList){
-				resList.splice(resList.indexOf(this),1);
-				(resList.length===0)&& (delete Resource._urlResourcesMap[this._url]);
-			};
-			var resou=Loader.getRes(this._url);
-			(resou==this)&& (delete Loader.loadedMap[this._url]);
-		}
-	}
-
-	/**
-	*获取唯一标识ID,通常用于识别。
-	*/
-	__getset(0,__proto,'id',function(){
-		return this._id;
-	});
-
-	/**
-	*显存大小。
-	*/
-	__getset(0,__proto,'gpuMemory',function(){
-		return this._gpuMemory;
-	});
-
-	/**
-	*获取资源的URL地址。
-	*@return URL地址。
-	*/
-	__getset(0,__proto,'url',function(){
-		return this._url;
-	});
-
-	/**
-	*内存大小。
-	*/
-	__getset(0,__proto,'cpuMemory',function(){
-		return this._cpuMemory;
-	});
-
-	/**
-	*是否已处理。
-	*/
-	__getset(0,__proto,'destroyed',function(){
-		return this._destroyed;
-	});
-
-	/**
-	*获取资源的引用计数。
-	*/
-	__getset(0,__proto,'referenceCount',function(){
-		return this._referenceCount;
-	});
-
-	/**
-	*当前内存，以字节为单位。
-	*/
-	__getset(1,Resource,'cpuMemory',function(){
-		return this._cpuMemory;
-	},laya.events.EventDispatcher._$SET_cpuMemory);
-
-	/**
-	*当前显存，以字节为单位。
-	*/
-	__getset(1,Resource,'gpuMemory',function(){
-		return this._gpuMemory;
-	},laya.events.EventDispatcher._$SET_gpuMemory);
-
-	Resource._addCPUMemory=function(size){
-		this._cpuMemory+=size;
-	}
-
-	Resource._addGPUMemory=function(size){
-		this._gpuMemory+=size;
-	}
-
-	Resource._addMemory=function(cpuSize,gpuSize){
-		this._cpuMemory+=cpuSize;
-		this._gpuMemory+=gpuSize;
-	}
-
-	Resource.getResourceByID=function(id){
-		return Resource._idResourcesMap[id];
-	}
-
-	Resource.getResourceByURL=function(url,index){
-		(index===void 0)&& (index=0);
-		return Resource._urlResourcesMap[url][index];
-	}
-
-	Resource.destroyUnusedResources=function(){
-		for (var k in Resource._idResourcesMap){
-			var res=Resource._idResourcesMap[k];
-			if (!res.lock && res._referenceCount===0)
-				res.destroy();
-		}
-	}
-
-	Resource._uniqueIDCounter=0;
-	Resource._idResourcesMap={};
-	Resource._urlResourcesMap={};
-	Resource._cpuMemory=0;
-	Resource._gpuMemory=0;
-	return Resource;
-})(EventDispatcher)
-
-
-/**
 *<p><code>ColorFilter</code> 是颜色滤镜。使用 ColorFilter 类可以将 4 x 5 矩阵转换应用于输入图像上的每个像素的 RGBA 颜色和 Alpha 值，以生成具有一组新的 RGBA 颜色和 Alpha 值的结果。该类允许饱和度更改、色相旋转、亮度转 Alpha 以及各种其他效果。您可以将滤镜应用于任何显示对象（即，从 Sprite 类继承的对象）。</p>
 *<p>注意：对于 RGBA 值，最高有效字节代表红色通道值，其后的有效字节分别代表绿色、蓝色和 Alpha 通道值。</p>
 */
@@ -15293,6 +15201,232 @@ var ColorFilter=(function(_super){
 	]);
 	return ColorFilter;
 })(Filter)
+
+
+/**
+*@private
+*<code>Resource</code> 资源存取类。
+*/
+//class laya.resource.Resource extends laya.events.EventDispatcher
+var Resource=(function(_super){
+	function Resource(){
+		/**@private */
+		this._id=0;
+		/**@private */
+		this._url=null;
+		/**@private */
+		this._cpuMemory=0;
+		/**@private */
+		this._gpuMemory=0;
+		/**@private */
+		this._destroyed=false;
+		/**@private */
+		this._referenceCount=0;
+		/**是否加锁，如果true为不能使用自动释放机制。*/
+		this.lock=false;
+		/**名称。 */
+		this.name=null;
+		Resource.__super.call(this);
+		this._id=++Resource._uniqueIDCounter;
+		this._destroyed=false;
+		this._referenceCount=0;
+		Resource._idResourcesMap[this.id]=this;
+		this.lock=false;
+	}
+
+	__class(Resource,'laya.resource.Resource',_super);
+	var __proto=Resource.prototype;
+	Laya.imps(__proto,{"laya.resource.ICreateResource":true,"laya.resource.IDestroy":true})
+	/**
+	*@private
+	*/
+	__proto._setCPUMemory=function(value){
+		var offsetValue=value-this._cpuMemory;
+		this._cpuMemory=value;
+		Resource._addCPUMemory(offsetValue);
+	}
+
+	/**
+	*@private
+	*/
+	__proto._setGPUMemory=function(value){
+		var offsetValue=value-this._gpuMemory;
+		this._gpuMemory=value;
+		Resource._addGPUMemory(offsetValue);
+	}
+
+	/**
+	*@private
+	*/
+	__proto._setCreateURL=function(url){
+		url=URL.formatURL(url);
+		if (this._url!==url){
+			var resList;
+			if (this._url){
+				resList=Resource._urlResourcesMap[this._url];
+				resList.splice(resList.indexOf(this),1);
+				(resList.length===0)&& (delete Resource._urlResourcesMap[this._url]);
+			}
+			if (url){
+				resList=Resource._urlResourcesMap[url];
+				(resList)|| (Resource._urlResourcesMap[url]=resList=[]);
+				resList.push(this);
+			}
+			this._url=url;
+		}
+	}
+
+	/**
+	*@private
+	*/
+	__proto._addReference=function(count){
+		(count===void 0)&& (count=1);
+		this._referenceCount+=count;
+	}
+
+	/**
+	*@private
+	*/
+	__proto._removeReference=function(count){
+		(count===void 0)&& (count=1);
+		this._referenceCount-=count;
+	}
+
+	/**
+	*@private
+	*/
+	__proto._clearReference=function(){
+		this._referenceCount=0;
+	}
+
+	/**
+	*@private
+	*/
+	__proto._recoverResource=function(){}
+	/**
+	*@private
+	*/
+	__proto._disposeResource=function(){}
+	/**
+	*@private
+	*/
+	__proto._activeResource=function(){}
+	/**
+	*销毁资源,销毁后资源不能恢复。
+	*/
+	__proto.destroy=function(){
+		if (this._destroyed)
+			return;
+		this._destroyed=true;
+		this.lock=false;
+		this._disposeResource();
+		delete Resource._idResourcesMap[this.id];
+		var resList;
+		if (this._url){
+			resList=Resource._urlResourcesMap[this._url];
+			if (resList){
+				resList.splice(resList.indexOf(this),1);
+				(resList.length===0)&& (delete Resource._urlResourcesMap[this._url]);
+			};
+			var resou=Loader.getRes(this._url);
+			(resou==this)&& (delete Loader.loadedMap[this._url]);
+		}
+	}
+
+	/**
+	*获取唯一标识ID,通常用于识别。
+	*/
+	__getset(0,__proto,'id',function(){
+		return this._id;
+	});
+
+	/**
+	*显存大小。
+	*/
+	__getset(0,__proto,'gpuMemory',function(){
+		return this._gpuMemory;
+	});
+
+	/**
+	*获取资源的URL地址。
+	*@return URL地址。
+	*/
+	__getset(0,__proto,'url',function(){
+		return this._url;
+	});
+
+	/**
+	*内存大小。
+	*/
+	__getset(0,__proto,'cpuMemory',function(){
+		return this._cpuMemory;
+	});
+
+	/**
+	*是否已处理。
+	*/
+	__getset(0,__proto,'destroyed',function(){
+		return this._destroyed;
+	});
+
+	/**
+	*获取资源的引用计数。
+	*/
+	__getset(0,__proto,'referenceCount',function(){
+		return this._referenceCount;
+	});
+
+	/**
+	*当前内存，以字节为单位。
+	*/
+	__getset(1,Resource,'cpuMemory',function(){
+		return this._cpuMemory;
+	},laya.events.EventDispatcher._$SET_cpuMemory);
+
+	/**
+	*当前显存，以字节为单位。
+	*/
+	__getset(1,Resource,'gpuMemory',function(){
+		return this._gpuMemory;
+	},laya.events.EventDispatcher._$SET_gpuMemory);
+
+	Resource._addCPUMemory=function(size){
+		this._cpuMemory+=size;
+	}
+
+	Resource._addGPUMemory=function(size){
+		this._gpuMemory+=size;
+	}
+
+	Resource._addMemory=function(cpuSize,gpuSize){
+		this._cpuMemory+=cpuSize;
+		this._gpuMemory+=gpuSize;
+	}
+
+	Resource.getResourceByID=function(id){
+		return Resource._idResourcesMap[id];
+	}
+
+	Resource.getResourceByURL=function(url,index){
+		(index===void 0)&& (index=0);
+		return Resource._urlResourcesMap[url][index];
+	}
+
+	Resource.destroyUnusedResources=function(){
+		for (var k in Resource._idResourcesMap){
+			var res=Resource._idResourcesMap[k];
+			if (!res.lock && res._referenceCount===0)
+				res.destroy();
+		}
+	}
+
+	Resource._uniqueIDCounter=0;
+	Resource._idResourcesMap={};
+	Resource._urlResourcesMap={};
+	Resource._cpuMemory=0;
+	Resource._gpuMemory=0;
+	return Resource;
+})(EventDispatcher)
 
 
 /**
@@ -17057,6 +17191,10 @@ var Texture=(function(_super){
 	function Texture(bitmap,uv,sourceWidth,sourceHeight){
 		/**@private uv的范围*/
 		this.uvrect=[0,0,1,1];
+		/**@private*/
+		this.url=null;
+		/**@private*/
+		this.$_GID=0;
 		/**@private */
 		this._w=0;
 		/**@private */
@@ -17347,7 +17485,7 @@ var Texture=(function(_super){
 		var u1=tex.uv[0],v1=tex.uv[1],u2=tex.uv[4],v2=tex.uv[5];
 		var inAltasUVWidth=(u2-u1),inAltasUVHeight=(v2-v1);
 		var oriUV=Texture.moveUV(uv[0],uv[1],[x,y,x+width,y,x+width,y+height,x,y+height]);
-		tex.uv=[u1+oriUV[0] *inAltasUVWidth,v1+oriUV[1] *inAltasUVHeight,u2-(1-oriUV[2])*inAltasUVWidth,v1+oriUV[3] *inAltasUVHeight,u2-(1-oriUV[4])*inAltasUVWidth,v2-(1-oriUV[5])*inAltasUVHeight,u1+oriUV[6] *inAltasUVWidth,v2-(1-oriUV[7])*inAltasUVHeight];
+		tex.uv=new Float32Array([u1+oriUV[0] *inAltasUVWidth,v1+oriUV[1] *inAltasUVHeight,u2-(1-oriUV[2])*inAltasUVWidth,v1+oriUV[3] *inAltasUVHeight,u2-(1-oriUV[4])*inAltasUVWidth,v2-(1-oriUV[5])*inAltasUVHeight,u1+oriUV[6] *inAltasUVWidth,v2-(1-oriUV[7])*inAltasUVHeight]);
 		var bitmapScale=bitmap.scaleRate;
 		if (bitmapScale && bitmapScale !=1){
 			tex.sourceWidth /=bitmapScale;
@@ -17378,9 +17516,9 @@ var Texture=(function(_super){
 		return tex;
 	}
 
-	Texture.DEF_UV=[0,0,1.0,0,1.0,1.0,0,1.0];
-	Texture.NO_UV=[0,0,0,0,0,0,0,0];
-	Texture.INV_UV=[0,1,1.0,1,1.0,0.0,0,0.0];
+	Texture.DEF_UV=new Float32Array([0,0,1.0,0,1.0,1.0,0,1.0]);
+	Texture.NO_UV=new Float32Array([0,0,0,0,0,0,0,0]);
+	Texture.INV_UV=new Float32Array([0,1,1.0,1,1.0,0.0,0,0.0]);
 	Texture._rect1=new Rectangle();
 	Texture._rect2=new Rectangle();
 	return Texture;
@@ -18134,11 +18272,14 @@ var Sprite=(function(_super){
 		this._tfChanged=false;
 		var style=this._style;
 		var sx=style.scaleX,sy=style.scaleY;
+		var sskx=style.skewX;
+		var ssky=style.skewY;
+		var rot=style.rotation;
 		var m=this._transform || (this._transform=this._createTransform());
-		if (style.rotation || sx!==1 || sy!==1 || style.skewX!==0 || style.skewY!==0){
+		if (rot || sx!==1 || sy!==1 || sskx!==0 || ssky!==0){
 			m._bTransform=true;
-			var skx=(style.rotation-style.skewX)*0.0174532922222222;
-			var sky=(style.rotation+style.skewY)*0.0174532922222222;
+			var skx=(rot-sskx)*0.0174532922222222;
+			var sky=(rot+ssky)*0.0174532922222222;
 			var cx=Math.cos(sky);
 			var ssx=Math.sin(sky);
 			var cy=Math.sin(skx);
@@ -20017,8 +20158,8 @@ var Stage=(function(_super){
 		var scaleMode=this._scaleMode;
 		var scaleX=screenWidth / this.designWidth;
 		var scaleY=screenHeight / this.designHeight;
-		var canvasWidth=this.designWidth;
-		var canvasHeight=this.designHeight;
+		var canvasWidth=Config.useRetinalCanvas?screenWidth:this.designWidth;
+		var canvasHeight=Config.useRetinalCanvas?screenHeight:this.designHeight;
 		var realWidth=screenWidth;
 		var realHeight=screenHeight;
 		var pixelRatio=Browser.pixelRatio;
@@ -20032,13 +20173,13 @@ var Stage=(function(_super){
 				break ;
 			case "showall":
 				scaleX=scaleY=Math.min(scaleX,scaleY);
-				canvasWidth=realWidth=Math.ceil(this.designWidth *scaleX);
-				canvasHeight=realHeight=Math.ceil(this.designHeight *scaleY);
+				canvasWidth=realWidth=Math.round(this.designWidth *scaleX);
+				canvasHeight=realHeight=Math.round(this.designHeight *scaleY);
 				break ;
 			case "noborder":
 				scaleX=scaleY=Math.max(scaleX,scaleY);
-				realWidth=Math.ceil(this.designWidth *scaleX);
-				realHeight=Math.ceil(this.designHeight *scaleY);
+				realWidth=Math.round(this.designWidth *scaleX);
+				realHeight=Math.round(this.designHeight *scaleY);
 				break ;
 			case "full":
 				scaleX=scaleY=1;
@@ -20047,22 +20188,26 @@ var Stage=(function(_super){
 				break ;
 			case "fixedwidth":
 				scaleY=scaleX;
-				this._height=canvasHeight=Math.ceil(screenHeight / scaleX);
+				this._height=canvasHeight=Math.round(screenHeight / scaleX);
 				break ;
 			case "fixedheight":
 				scaleX=scaleY;
-				this._width=canvasWidth=Math.ceil(screenWidth / scaleY);
+				this._width=canvasWidth=Math.round(screenWidth / scaleY);
 				break ;
 			case "fixedauto":
 				if ((screenWidth / screenHeight)< (this.designWidth / this.designHeight)){
 					scaleY=scaleX;
-					this._height=canvasHeight=Math.ceil(screenHeight / scaleX);
+					this._height=canvasHeight=Math.round(screenHeight / scaleX);
 					}else {
 					scaleX=scaleY;
-					this._width=canvasWidth=Math.ceil(screenWidth / scaleY);
+					this._width=canvasWidth=Math.round(screenWidth / scaleY);
 				}
 				break ;
 			}
+		if (Config.useRetinalCanvas){
+			canvasWidth=screenWidth;
+			canvasHeight=screenHeight;
+		}
 		scaleX *=this.scaleX;
 		scaleY *=this.scaleY;
 		if (scaleX===1 && scaleY===1){
@@ -23963,7 +24108,7 @@ var GraphicAnimation=(function(_super){
 })(FrameAnimation)
 
 
-	Laya.__init([LoaderManager,EventDispatcher,GraphicAnimation,SceneUtils,Render,Timer,CallLater,LocalStorage,TimeLine]);
+	Laya.__init([EventDispatcher,LoaderManager,GraphicAnimation,SceneUtils,Render,Timer,CallLater,LocalStorage,TimeLine]);
 })(window,document,Laya);
 
 (function(window,document,Laya){

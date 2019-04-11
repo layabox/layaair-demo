@@ -6,7 +6,7 @@ class Shader_Terrain{
         Laya.Stat.show();
         this.initShader();
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
-        var camera = this.scene.addChild(new Laya.Camera(0, 0.1, 1000));
+        let camera = this.scene.addChild(new Laya.Camera(0, 0.1, 1000));
         camera.transform.rotate(new Laya.Vector3(-18, 180, 0), false, false);
         camera.transform.translate(new Laya.Vector3(-28, 20, -18), false);
         camera.addComponent(CameraMoveScript);
@@ -15,7 +15,7 @@ class Shader_Terrain{
     }
 
     loadSprite3D(mesh){
-            var terrain = this.scene.addChild(new Laya.MeshSprite3D(mesh));
+            let terrain = this.scene.addChild(new Laya.MeshSprite3D(mesh));
             Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/splatAlphaTexture.png", Laya.Handler.create(this, this.loadSplatAlphaTexture));
             Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_01.jpg", Laya.Handler.create(this, this.loadDiffuseTexture1));
             Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_02.jpg", Laya.Handler.create(this, this.loadDiffuseTexture2));
@@ -47,12 +47,12 @@ class Shader_Terrain{
     }
     initShader() {
         CustomTerrainMaterial.__init__();
-        var attributeMap = {
+        let attributeMap = {
             'a_Position': Laya.VertexMesh.MESH_POSITION0,
             'a_Normal': Laya.VertexMesh.MESH_NORMAL0,
             'a_Texcoord0': Laya.VertexMesh.MESH_TEXTURECOORDINATE0
         };
-        var uniformMap = {
+        let uniformMap = {
             'u_MvpMatrix': Laya.Shader3D.PERIOD_SPRITE,
             'u_WorldMat': Laya.Shader3D.PERIOD_SPRITE,
             'u_CameraPos':  Laya.Shader3D.PERIOD_CAMERA,
@@ -68,7 +68,7 @@ class Shader_Terrain{
             'u_DiffuseScale4': Laya.Shader3D.PERIOD_MATERIAL,
             'u_DiffuseScale5': Laya.Shader3D.PERIOD_MATERIAL
         };
-        var vs = "attribute vec4 a_Position;\n" +
+        let vs = "attribute vec4 a_Position;\n" +
             "attribute vec2 a_Texcoord0;\n" +
             "attribute vec3 a_Normal;\n" +
             "uniform mat4 u_MvpMatrix;\n" +
@@ -78,7 +78,7 @@ class Shader_Terrain{
             "gl_Position = u_MvpMatrix * a_Position;\n" +
             "v_Texcoord0 = a_Texcoord0;\n" +
             "}";
-        var ps = "#ifdef FSHIGHPRECISION\n" +
+        let ps = "#ifdef FSHIGHPRECISION\n" +
             "precision highp float;\n" +
             "#else\n" +
             "precision mediump float;\n" +
@@ -134,8 +134,8 @@ class Shader_Terrain{
             "#endif\n" +
             "}";
 
-			var customTerrianShader = Laya.Shader3D.add("CustomTerrainShader");
-			var subShader =new Laya.SubShader(attributeMap, uniformMap, Laya.RenderableSprite3D.shaderDefines, CustomTerrainMaterial.shaderDefines);
+			let customTerrianShader = Laya.Shader3D.add("CustomTerrainShader");
+			let subShader =new Laya.SubShader(attributeMap, uniformMap, Laya.RenderableSprite3D.shaderDefines, CustomTerrainMaterial.shaderDefines);
 			customTerrianShader.addSubShader(subShader);
 			subShader.addShaderPass(vs, ps);
     }

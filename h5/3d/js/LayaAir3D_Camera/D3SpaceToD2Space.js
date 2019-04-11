@@ -12,8 +12,8 @@ class D3SpaceToD2Space{
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.translate(new Laya.Vector3(0, 0.35, 1));
         this.camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
-        var directionLight = this.scene.addChild(new Laya.DirectionLight());
-        var completeHandler = Laya.Handler.create(this, this.onComplete);
+        let directionLight = this.scene.addChild(new Laya.DirectionLight());
+        let completeHandler = Laya.Handler.create(this, this.onComplete);
         Laya.loader.create("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", completeHandler);
     }
 

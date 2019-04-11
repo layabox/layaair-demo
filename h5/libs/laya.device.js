@@ -543,7 +543,7 @@ var Video=(function(_super){
 	var __proto=Video.prototype;
 	__proto.onPlayComplete=function(e){
 		this.event("ended");
-		if(!Render.isConchApp || !this.videoElement.loop)
+		if(!Render.isConchApp || !this.videoElement || !this.videoElement.loop)
 			Laya.timer.clear(this,this.renderCanvas);
 	}
 
@@ -964,6 +964,14 @@ var HtmlVideo=(function(_super){
 		return this._source;
 	}
 
+	__proto.destroy=function(){
+		laya.resource.Resource.prototype.destroy.call(this);
+		var isConchApp=/*__JS__ */Render.isConchApp;
+		if (isConchApp){
+			this.video._destroy();
+		}
+	}
+
 	HtmlVideo.create=function(){
 		return new HtmlVideo();
 	}
@@ -1014,7 +1022,7 @@ var WebGLVideo=(function(_super){
 			}
 			this.gl.deleteTexture(this._source);
 		}
-		laya.resource.Resource.prototype.destroy.call(this);
+		_super.prototype.destroy.call(this);
 	}
 
 	__getset(0,__proto,'_glTexture',function(){

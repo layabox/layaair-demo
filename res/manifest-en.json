@@ -402,7 +402,7 @@
 					["Shader_Simple", "Shader_Simple", "", "core,webgl,ani,d3,CameraMoveScript.js,CustomMaterial.js"],
 					["Shader_GlowingEdge", "GlowingEdge", "", "core,webgl,ani,d3,CustomMaterial.js,CameraMoveScript.js"],
 					["Shader_Terrain", "Shader_Terrain", "", "core,webgl,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js"],
-					["Shader_CartoonRender", "CartoonRender(Multiple Pass)", "", "core,webgl,ani,d3,cartoonMaterial.js,CameraMoveScript.js"]
+					["Shader_MultiplePassOutline", "Outline(Multiple Pass)", "", "core,webgl,ani,d3,CameraMoveScript.js"]
 				]
 			},
 			{
@@ -415,6 +415,13 @@
 					["Scene2DPlayer3D", "Scene2DPlayer3D", "", "core,webgl,ani,d3,ui,CameraMoveScript.js" ],
 					["Secne3DPlayer2D", "Secne3DPlayer2D", "", "core,webgl,ani,d3,ui,CameraMoveScript.js,physics3D" ]
 		  		]
+			},
+			{
+				"prefix": "Demo",
+				"tr_zhCN": "Demo",
+				"manifest": [
+					[ "PBRDemo", "PBRDemo", "", "core,webgl,ani,d3" ]
+				]
 			}]
 	}
 }

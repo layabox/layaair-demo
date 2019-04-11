@@ -8,7 +8,7 @@ class SceneLoad1{
 	}
 	sceneLoadFinished(scene){
 		Laya.stage.addChild(scene);
-        var camera = scene.getChildByName("Camera");
+        let camera = scene.getChildByName("Camera");
         camera.addComponent(CameraMoveScript);
 	}
 }

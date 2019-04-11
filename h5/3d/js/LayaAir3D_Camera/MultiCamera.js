@@ -16,18 +16,18 @@ class MultiCamera{
         this.camera2.addComponent(CameraMoveScript);
         this.camera2.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
         Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Laya.Handler.create(this, this.loadLmat));
-        var directionLight = this.scene.addChild(new Laya.DirectionLight());
+        let directionLight = this.scene.addChild(new Laya.DirectionLight());
         Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, this.loadSprite));
     }
 
     loadLmat(mat){
-        var skyRenderer = this.camera2.skyRenderer;;
+        let skyRenderer = this.camera2.skyRenderer;
 		skyRenderer.mesh = Laya.SkyBox.instance;
 		skyRenderer.material = mat;
     }
 
     loadSprite(sp){
-        var layaMonkey = this.scene.addChild(sp);
+        let layaMonkey = this.scene.addChild(sp);
     }
 }
 

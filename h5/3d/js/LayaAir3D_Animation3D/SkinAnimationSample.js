@@ -6,14 +6,14 @@ class SkinAnimationSample{
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         Laya.Stat.show();
-        var scene = Laya.stage.addChild(new Laya.Scene3D());
-        var camera = (scene.addChild(new Laya.Camera(0, 0.1, 1000)));
+        let scene = Laya.stage.addChild(new Laya.Scene3D());
+        let camera = (scene.addChild(new Laya.Camera(0, 0.1, 1000)));
         camera.transform.translate(new Laya.Vector3(0, 1.5, 4));
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         camera.addComponent(CameraMoveScript);
-        var directionLight = scene.addChild(new Laya.DirectionLight());
+        let directionLight = scene.addChild(new Laya.DirectionLight());
         //设置灯光方向
-        var mat = directionLight.transform.worldMatrix;
+        let mat = directionLight.transform.worldMatrix;
 		mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
 		directionLight.transform.worldMatrix = mat;
         directionLight.color = new Laya.Vector3(1, 1, 1);
@@ -40,9 +40,9 @@ class SkinAnimationSample{
         this.changeActionButton.scale(Laya.Browser.pixelRatio, Laya.Browser.pixelRatio);
         this.changeActionButton.pos(Laya.stage.width / 2 - this.changeActionButton.width * Laya.Browser.pixelRatio / 2, Laya.stage.height - 100 * Laya.Browser.pixelRatio);
         this.changeActionButton.on(Laya.Event.CLICK, this, function () {
-                //根据名称播放动画
-                this.zombieAnimator.play(this.clipName[++this.curStateIndex % this.clipName.length]);
-            });
+            //根据名称播放动画
+            this.zombieAnimator.play(this.clipName[++this.curStateIndex % this.clipName.length]);
+        });
 
      }
 }

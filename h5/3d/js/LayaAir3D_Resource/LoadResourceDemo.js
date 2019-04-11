@@ -1,6 +1,6 @@
 class LoadResourceDemo{
     constructor(){
-        this._scene =null;
+        this.scene =null;
         this.sprite3D =null;
         //初始化引擎
 		Laya3D.init(0, 0);
@@ -18,7 +18,7 @@ class LoadResourceDemo{
     LoadRes(){
         //场景加载
 		Laya.Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Laya.Handler.create(this, function(scene) {
-			this._scene = scene;
+			this.scene = scene;
 			Laya.stage.addChild(scene);
 			//获取场景相机
 			var camera = scene.getChildByName("Main Camera");
@@ -31,14 +31,14 @@ class LoadResourceDemo{
 			camera.addComponent(CameraMoveScript);
 
 			//添加光照
-			var directionLight = this._scene.addChild(new Laya.DirectionLight());
+			var directionLight = this.scene.addChild(new Laya.DirectionLight());
 			directionLight.color = new Laya.Vector3(1, 1, 1);
 			directionLight.transform.rotate(new Laya.Vector3( -3.14 / 3, 0, 0));
 		
 			
 			(scene.getChildByName('Scenes').getChildByName('HeightMap')).active = false;
 			(scene.getChildByName('Scenes').getChildByName('Area') ).active = false;
-			this.sprite3D = this._scene.addChild(new Laya.Sprite3D());
+			this.sprite3D = this.scene.addChild(new Laya.Sprite3D());
 			
 			///材质加载
 			Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox2/skyBox2.lmat", Laya.Handler.create(null, function(mat) {
@@ -121,10 +121,10 @@ class LoadResourceDemo{
     }
     onPreLoadFinish(){
         //初始化3D场景
-			this._scene = Laya.stage.addChild(Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/XunLongShi.ls"));
+			this.scene = Laya.stage.addChild(Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/XunLongShi.ls"));
 			
 			//获取相机
-			var camera = this._scene.getChildByName("Main Camera");
+			var camera = this.scene.getChildByName("Main Camera");
 			//设置相机清楚标记，使用天空
 			camera.clearFlag =Laya.BaseCamera.CLEARFLAG_SKY;
 			//调整相机的位置
@@ -134,7 +134,7 @@ class LoadResourceDemo{
 			camera.addComponent(CameraMoveScript);
 			
 			//添加光照
-			var directionLight = this._scene.addChild(new Laya.DirectionLight());
+			var directionLight = this.scene.addChild(new Laya.DirectionLight());
 			//光照颜色
 			directionLight.color = new Laya.Vector3(1, 1, 1);
 			directionLight.transform.rotate(new Laya.Vector3( -3.14 / 3, 0, 0));
@@ -146,12 +146,12 @@ class LoadResourceDemo{
 			skyRenderer.material = skyboxMaterial;
 			
 			//激活场景中的子节点
-			(this._scene.getChildByName('Scenes').getChildByName('HeightMap')).active = false;
-			(this._scene.getChildByName('Scenes').getChildByName('Area')).active = false;
+			(this.scene.getChildByName('Scenes').getChildByName('HeightMap')).active = false;
+			(this.scene.getChildByName('Scenes').getChildByName('Area')).active = false;
 			
 			
 			//使用纹理
-			var earth1 = this._scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(5, 32, 32)));
+			var earth1 = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(5, 32, 32)));
 			earth1.transform.translate(new Laya.Vector3(17, 20, 0));
 			
 			var earthMat = new Laya.BlinnPhongMaterial();
@@ -162,20 +162,20 @@ class LoadResourceDemo{
 			//获取Mesh资源
 			var mesh = Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm");
 			//为精灵设置Mesh资源
-			var layaMonkey = this._scene.addChild(new Laya.MeshSprite3D(mesh));
+			var layaMonkey = this.scene.addChild(new Laya.MeshSprite3D(mesh));
 			layaMonkey.transform.localScale = new Laya.Vector3(4, 4, 4);
 			layaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
 			layaMonkey.transform.translate(new Laya.Vector3(5, 3, 13));
 			
 			//使用精灵
 			var sp = Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh");
-			var layaMonkey2 = this._scene.addChild(sp);
+			var layaMonkey2 = this.scene.addChild(sp);
 			layaMonkey2.transform.localScale = new Laya.Vector3(4, 4, 4);
 			layaMonkey2.transform.translate(new Laya.Vector3(-10, 13, 0));
 
 			//使用精灵
 			this.pangzi = Laya.Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/PangZiNoAni.lh");
-			this._scene.addChild(this.pangzi);
+			this.scene.addChild(this.pangzi);
 			this.pangzi.transform.localScale = new Laya.Vector3(4, 4, 4);
 			this.pangzi.transform.translate(new Laya.Vector3(-20, 13, 0));
 			//获取动画组件

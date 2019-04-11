@@ -95,9 +95,9 @@ class  PhysicsWorldCompoundCollider{
             boxShape3.localOffset = boxLocalOffset3;
             compoundShape.addChildShape(boxShape3);
             var boxShape4 = new Laya.BoxColliderShape(0.1, 0.1, 0.3);
-            var boxLocalOffset3 = boxShape4.localOffset;
-            boxLocalOffset3.setValue(0.2, 0.153, -0.048);
-            boxShape4.localOffset = boxLocalOffset3;
+            var boxLocalOffset4 = boxShape4.localOffset;
+            boxLocalOffset4.setValue(0.2, 0.153, -0.048);
+            boxShape4.localOffset = boxLocalOffset4;
             compoundShape.addChildShape(boxShape4);
             rigidBody.colliderShape = compoundShape;
         }));

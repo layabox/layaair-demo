@@ -15,21 +15,21 @@ class PhysicsWorldBuildingBlocks{
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.translate(new Laya.Vector3(4.5, 6, 4.5));
         this.camera.transform.rotate(new Laya.Vector3(-30, 45, 0), true, false);
-        var directionLight = this.scene.addChild(new Laya.DirectionLight());
+        let directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
-        var mat = directionLight.transform.worldMatrix;
+        let mat = directionLight.transform.worldMatrix;
         mat.setForward(new Laya.Vector3(-1, -1, 1));
         directionLight.transform.worldMatrix = mat;
-        var plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(13, 13, 10, 10)));
-        var planeMat = new Laya.BlinnPhongMaterial();
+        let plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(13, 13, 10, 10)));
+        let planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
             planeMat.albedoTexture = tex;
         }));
         planeMat.tilingOffset = new Laya.Vector4(2, 2, 0, 0);
         plane.meshRenderer.material = planeMat;
         plane.meshRenderer.receiveShadow = true;
-        var rigidBody = plane.addComponent(Laya.PhysicsCollider);
-        var boxShape = new Laya.BoxColliderShape(13, 0, 13);
+        let rigidBody = plane.addComponent(Laya.PhysicsCollider);
+        let boxShape = new Laya.BoxColliderShape(13, 0, 13);
         rigidBody.colliderShape = boxShape;
         this.addMouseEvent();
         this.addBox();
@@ -53,37 +53,37 @@ class PhysicsWorldBuildingBlocks{
     }
 
     addVerticalBox(x, y, z){
-        var mat = new Laya.BlinnPhongMaterial();
+        let mat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function (tex) {
             mat.albedoTexture = tex;
         }));
-        var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(0.5, 0.33, 2)));
+        let box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(0.5, 0.33, 2)));
         box.meshRenderer.material = mat;
         box.meshRenderer.castShadow = true;
         box.meshRenderer.receiveShadow = true;
         box.transform.position = new Laya.Vector3(x, y, z);
-        var rigidBody = box.addComponent(Laya.Rigidbody3D);
+        let rigidBody = box.addComponent(Laya.Rigidbody3D);
         rigidBody.mass = 10;
         rigidBody.friction = 0.4;
         rigidBody.restitution = 0.2;
-        var boxShape = new Laya.BoxColliderShape(0.5, 0.33, 2);
+        let boxShape = new Laya.BoxColliderShape(0.5, 0.33, 2);
         rigidBody.colliderShape = boxShape;
     }
     addHorizontalBox(x, y, z){
-        var mat = new Laya.BlinnPhongMaterial();
+        let mat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function (tex) {
             mat.albedoTexture = tex;
         }));
-        var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(2, 0.33, 0.5)));
+        let box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(2, 0.33, 0.5)));
         box.meshRenderer.material = mat;
         box.meshRenderer.castShadow = true;
         box.meshRenderer.receiveShadow = true;
         box.transform.position = new Laya.Vector3(x, y, z);
-        var rigidBody = box.addComponent(Laya.Rigidbody3D);
+        let rigidBody = box.addComponent(Laya.Rigidbody3D);
         rigidBody.mass = 10;
         rigidBody.friction = 1.0;
         rigidBody.restitution = 0.2;
-        var boxShape = new Laya.BoxColliderShape(2, 0.33, 0.5);
+        let boxShape = new Laya.BoxColliderShape(2, 0.33, 0.5);
         rigidBody.colliderShape = boxShape;
     }
 
@@ -93,7 +93,7 @@ class PhysicsWorldBuildingBlocks{
         this.camera.viewportPointToRay(this.point, this.ray);
         this.scene.physicsSimulation.rayCast(this.ray, this.outHitResult);
         if (this.outHitResult.succeeded) {
-            var collider = this.outHitResult.collider;
+            let collider = this.outHitResult.collider;
             this.hasSelectedSprite = collider.owner;
             this.hasSelectedRigidBody = collider;
             collider.angularFactor = this.ZERO;

@@ -30,7 +30,7 @@ class PBRStandardMaterialDemo{
     }
 
     loadMaterial(skyMaterial){
-        var skyRenderer = this.camera.skyRenderer;
+        let skyRenderer = this.camera.skyRenderer;
         skyRenderer.mesh = Laya.SkyBox.instance;
         skyRenderer.material = skyMaterial;
     }
@@ -64,10 +64,10 @@ class PBRStandardMaterialDemo{
         this.mat.normalScale = 1;
         //光滑度数据源:从金属度贴图/反射贴图获取。
         this.mat.smoothnessSource = Laya.PBRStandardMaterial.SmoothnessSource_MetallicGlossTexture_Alpha;
-        var barrel = this.scene.getChildByName("Wooden_Barrel");
-        var barrel1 = this.scene.getChildByName("Wooden_Barrel (1)");
-        var barrel2 = this.scene.getChildByName("Wooden_Barrel (2)");
-        var barrel3 = this.scene.getChildByName("Wooden_Barrel (3)");
+        let barrel = this.scene.getChildByName("Wooden_Barrel");
+        let barrel1 = this.scene.getChildByName("Wooden_Barrel (1)");
+        let barrel2 = this.scene.getChildByName("Wooden_Barrel (2)");
+        let barrel3 = this.scene.getChildByName("Wooden_Barrel (3)");
         barrel.meshRenderer.sharedMaterial = this.mat;
         barrel1.meshRenderer.sharedMaterial = this.mat;
         barrel2.meshRenderer.sharedMaterial = this.mat;

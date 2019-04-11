@@ -14,22 +14,22 @@ class PhysicsWorldCharacter{
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         this.camera.transform.translate(new Laya.Vector3(0, 8, 20));
         this.camera.transform.rotate(new Laya.Vector3(-30, 0, 0), true, false);
-        var directionLight = this.scene.addChild(new Laya.DirectionLight());
+        let directionLight = this.scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
-        var mat = directionLight.transform.worldMatrix;
+        let mat = directionLight.transform.worldMatrix;
         mat.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
         directionLight.transform.worldMatrix = mat;
-        var plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(20, 20, 10, 10)));
-        var planeMat = new Laya.BlinnPhongMaterial();
+        let plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(20, 20, 10, 10)));
+        let planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
             planeMat.albedoTexture = tex;
         }));
         planeMat.tilingOffset = new Laya.Vector4(2, 2, 0, 0);
         plane.meshRenderer.material = planeMat;
-        var rigidBody = plane.addComponent(Laya.PhysicsCollider);
-        var boxShape = new Laya.BoxColliderShape(20, 0, 20);
+        let rigidBody = plane.addComponent(Laya.PhysicsCollider);
+        let boxShape = new Laya.BoxColliderShape(20, 0, 20);
         rigidBody.colliderShape = boxShape;
-        for (var i = 0; i < 60; i++) {
+        for (let i = 0; i < 60; i++) {
             this.addBox();
             this.addCapsule();
         }
@@ -40,8 +40,8 @@ class PhysicsWorldCharacter{
         Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function (monkey) {
             this.scene.addChild(monkey);
             monkey.transform.localScale = new Laya.Vector3(1, 1, 1);
-            var character = monkey.addComponent(Laya.CharacterController);
-            var sphereShape = new Laya.CapsuleColliderShape(1.0, 3.4);
+            let character = monkey.addComponent(Laya.CharacterController);
+            let sphereShape = new Laya.CapsuleColliderShape(1.0, 3.4);
             sphereShape.localOffset = new Laya.Vector3(0, 1.7, 0);
             character.colliderShape = sphereShape;
             this.kinematicSphere = monkey;
@@ -49,7 +49,7 @@ class PhysicsWorldCharacter{
         }));
     }
     onKeyDown() {
-        var character = this.kinematicSphere.getComponent(Laya.CharacterController);
+        let character = this.kinematicSphere.getComponent(Laya.CharacterController);
         Laya.KeyBoardManager.hasKeyDown(87) && character.move(this.translateW);//W
         Laya.KeyBoardManager.hasKeyDown(83) && character.move(this.translateS);//S
         Laya.KeyBoardManager.hasKeyDown(65) && character.move(this.translateA);//A
@@ -57,46 +57,46 @@ class PhysicsWorldCharacter{
         Laya.KeyBoardManager.hasKeyDown(69) && character.jump(); //E
     }
     addBox() {
-        var mat1 = new Laya.BlinnPhongMaterial();
+        let mat1 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function (tex) {
             mat1.albedoTexture = tex;
         }));
-        var sX = Math.random() * 0.75 + 0.25;
-        var sY = Math.random() * 0.75 + 0.25;
-        var sZ = Math.random() * 0.75 + 0.25;
-        var box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
+        let sX = Math.random() * 0.75 + 0.25;
+        let sY = Math.random() * 0.75 + 0.25;
+        let sZ = Math.random() * 0.75 + 0.25;
+        let box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         box.meshRenderer.material = mat1;
-        var transform = box.transform;
-        var pos = transform.position;
+        let transform = box.transform;
+        let pos = transform.position;
         pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         box.transform.position = pos;
-        var rotationEuler = transform.rotationEuler;
+        let rotationEuler = transform.rotationEuler;
         rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
         transform.rotationEuler = rotationEuler;
-        var rigidBody = box.addComponent(Laya.Rigidbody3D);
-        var boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
+        let rigidBody = box.addComponent(Laya.Rigidbody3D);
+        let boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
         rigidBody.colliderShape = boxShape;
         rigidBody.mass = 10;
     }
     addCapsule() {
-        var mat3 = new Laya.BlinnPhongMaterial();
+        let mat3 = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function (tex) {
             mat3.albedoTexture = tex;
         }));
-        var raidius = Math.random() * 0.2 + 0.2;
-        var height = Math.random() * 0.5 + 0.8;
-        var capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
+        let raidius = Math.random() * 0.2 + 0.2;
+        let height = Math.random() * 0.5 + 0.8;
+        let capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = mat3;
-        var transform = capsule.transform;
-        var pos = transform.position;
+        let transform = capsule.transform;
+        let pos = transform.position;
         pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
         transform.position = pos;
-        var rotationEuler = transform.rotationEuler;
+        let rotationEuler = transform.rotationEuler;
         rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
         transform.rotationEuler = rotationEuler;
 
-        var rigidBody = capsule.addComponent(Laya.Rigidbody3D);
-        var sphereShape = new Laya.CapsuleColliderShape(raidius, height);
+        let rigidBody = capsule.addComponent(Laya.Rigidbody3D);
+        let sphereShape = new Laya.CapsuleColliderShape(raidius, height);
         rigidBody.colliderShape = sphereShape;
         rigidBody.mass = 10;
     }

@@ -14,10 +14,10 @@ class RenderTargetCamera{
 
     onComplete(){
 		//加载场景
-		var scene = Laya.loader.getRes("res/threeDimen/scene/CourtyardScene/Courtyard.ls");
+		let scene = Laya.loader.getRes("res/threeDimen/scene/CourtyardScene/Courtyard.ls");
 		Laya.stage.addChild(scene);  
 		//添加相机
-		var camera = scene.addChild(new Laya.Camera(0, 0.1, 1000));
+		let camera = scene.addChild(new Laya.Camera(0, 0.1, 1000));
 		camera.transform.translate(new Laya.Vector3(57, 2.5, 58));
 		camera.transform.rotate(new Laya.Vector3( -10, 150, 0), true, false);
 		//设置相机清除标识
@@ -26,7 +26,7 @@ class RenderTargetCamera{
 		camera.addComponent(CameraMoveScript);
 			
 		//渲染到纹理的相机
-		var renderTargetCamera = scene.addChild(new Laya.Camera(0, 0.1, 1000));
+		let renderTargetCamera = scene.addChild(new Laya.Camera(0, 0.1, 1000));
 		renderTargetCamera.transform.translate(new Laya.Vector3(57, 2.5, 58));
 		renderTargetCamera.transform.rotate(new Laya.Vector3( -10, 150, 0), true, false);
 		//选择渲染目标为纹理
@@ -37,10 +37,10 @@ class RenderTargetCamera{
 		renderTargetCamera.addComponent(CameraMoveScript);
 			
 		//创建网格精灵
-		var renderTargetObj = scene.getChildAt(0).getChildByName("RenderTarget");
+		let renderTargetObj = scene.getChildAt(0).getChildByName("RenderTarget");
 			
         Laya.loader.load("res/threeDimen/ui/button.png", Laya.Handler.create(null, function() {
-            var changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "渲染目标"));
+            let changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "渲染目标"));
             changeActionButton.size(160, 40);
             changeActionButton.labelBold = true;
             changeActionButton.labelSize = 30;

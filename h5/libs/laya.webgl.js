@@ -230,19 +230,19 @@ var Submit=(function(){
 	function Submit(renderType){
 		this.clipInfoID=-1;
 		//用来比较clipinfo
-		//this._mesh=null;
+		this._mesh=null;
 		//代替 _vb,_ib
-		//this._blendFn=null;
-		//this._id=0;
+		this._blendFn=null;
+		this._id=0;
 		//protected var _isSelfVb:Boolean=false;
-		//this._renderType=0;
-		//this._parent=null;
+		this._renderType=0;
+		this._parent=null;
 		// 从VB中什么地方开始画，画到哪
-		//this._startIdx=0;
+		this._startIdx=0;
 		//indexbuffer 的偏移，单位是byte
 		this._numEle=0;
 		this._ref=1;
-		//this.shaderValue=null;
+		this.shaderValue=null;
 		this._key=new SubmitKey();
 		(renderType===void 0)&& (renderType=10000);
 		this._renderType=renderType;
@@ -2023,8 +2023,8 @@ var SubmitCMD=(function(){
 
 /**
 *对象 cacheas normal的时候，本质上只是想把submit缓存起来，以后直接执行
-*为了避免各种各样的麻烦，这里采用复制响应部分的submit的方法。执行环境还是在原来的context中
-*否则包括clipt等都非常难以处理
+*为了避免各种各样的麻烦，这里采用复制相应部分的submit的方法。执行环境还是在原来的context中
+*否则包括clip等都非常难以处理
 */
 //class laya.webgl.canvas.WebGLCacheAsNormalCanvas
 var WebGLCacheAsNormalCanvas=(function(){
@@ -3566,6 +3566,7 @@ var TextRender=(function(){
 	*/
 	__proto._drawResortedWords=function(ctx,startx,starty,samePagesData){
 		var isLastRender=ctx._charSubmitCache && ctx._charSubmitCache._enbale;
+		var mat=ctx._curMat;
 		for (var id in samePagesData){
 			var pri=samePagesData[id];
 			var pisz=pri.length;if (pisz <=0)continue ;
@@ -3580,7 +3581,7 @@ var TextRender=(function(){
 				}else
 				ctx._inner_drawTexture(ri.tex.texture,(ri.tex.texture).bitmap.id,
 				startx+riSaved.x-ri.orix ,starty+riSaved.y-ri.oriy,riSaved.w,riSaved.h,
-				null,ri.uv,1.0,isLastRender);
+				mat,ri.uv,1.0,isLastRender);
 				if ((ctx).touches){
 					(ctx).touches.push(ri);
 				}
@@ -5540,31 +5541,34 @@ var WebGLContext2D=(function(_super){
 	var ContextParams;
 	function WebGLContext2D(){
 		this._drawTriUseAbsMatrix=false;
+		//drawTriange函数的矩阵是全局的，不用再乘以当前矩阵了。这是一个补丁。
+		this._width=0;
+		//
+		this._height=0;
 		//还原2D视口
 		this._id=++WebGLContext2D._COUNT;
-		//this._other=null;
-		//this._renderNextSubmitIndex=0;
+		this._other=null;
+		this._renderNextSubmitIndex=0;
 		this._path=null;
 		//this._primitiveValue2D=null;
 		this._drawCount=1;
-		this._maxNumEle=0;
 		this._renderCount=0;
 		this._isConvexCmd=true;
 		//arc等是convex的，moveTo,linTo就不是了
 		this._submits=null;
 		this._curSubmit=null;
 		//当前将要使用的设置。用来跟上一次的_curSubmit比较
-		//this._mesh=null;
+		this._mesh=null;
 		//用Mesh2D代替_vb,_ib. 当前使用的mesh
-		//this._pathMesh=null;
+		this._pathMesh=null;
 		//矢量专用mesh。
-		//this._triangleMesh=null;
+		this._triangleMesh=null;
 		//drawTriangles专用mesh。由于ib不固定，所以不能与_mesh通用
 		this.meshlist=[];
 		//用矩阵描述的clip信息。最终的点投影到这个矩阵上，在0~1之间就可见。
 		this._clipInfoID=0;
 		//生成clipid的，原来是 _clipInfoID=++_clipInfoID 这样会有问题，导致兄弟clip的id都相同
-		//this._curMat=null;
+		this._curMat=null;
 		//计算矩阵缩放的缓存
 		this._lastMatScaleX=1.0;
 		this._lastMatScaleY=1.0;
@@ -5573,16 +5577,16 @@ var WebGLContext2D=(function(_super){
 		this._lastMat_c=0.0;
 		this._lastMat_d=1.0;
 		this._nBlendType=0;
-		//this._save=null;
-		//this._targets=null;
-		//this._charSubmitCache=null;
+		this._save=null;
+		this._targets=null;
+		this._charSubmitCache=null;
 		this._saveMark=null;
 		/**
 		*所cacheAs精灵
 		*对于cacheas bitmap的情况，如果图片还没准备好，需要有机会重画，所以要保存sprite。例如在图片
 		*加载完成后，调用repaint
 		*/
-		//this.sprite=null;
+		this.sprite=null;
 		//文字颜色。使用顶点色
 		this._drawTextureUseColor=false;
 		this._italicDeg=0;
@@ -5592,13 +5596,17 @@ var WebGLContext2D=(function(_super){
 		this._fillColor=0;
 		this._flushCnt=0;
 		//给fillrect用
-		//this._colorFiler=null;
+		this._colorFiler=null;
 		this.drawTexAlign=false;
 		/*******************************************start矢量绘制***************************************************/
 		this.mId=-1;
 		this.mHaveKey=false;
 		this.mHaveLineKey=false;
 		WebGLContext2D.__super.call(this);
+		this._tmpMatrix=new Matrix();
+		this._drawTexToDrawTri_Vert=new Float32Array(8);
+		this._drawTexToDrawTri_Index=new Uint16Array([0,1,2,0,2,3]);
+		this._tempUV=new Float32Array(8);
 		this._width=99999999;
 		this._height=99999999;
 		this._submitKey=new SubmitKey();
@@ -5999,8 +6007,9 @@ var WebGLContext2D=(function(_super){
 		};
 		var n=pos.length / 2;
 		var ipos=0;
+		var bmpid=tex.bitmap.id;
 		for (var i=0;i < n;i++){
-			this._inner_drawTexture(tex,tex.bitmap.id,pos[ipos++]+tx,pos[ipos++]+ty,0,0,null,null,1.0,false);
+			this._inner_drawTexture(tex,bmpid,pos[ipos++]+tx,pos[ipos++]+ty,0,0,null,null,1.0,false);
 		}
 	}
 
@@ -6117,24 +6126,29 @@ var WebGLContext2D=(function(_super){
 		var preKey=this._curSubmit._key;
 		uv=uv || /*__JS__ */tex._uv
 		if (preKey.submitType===/*laya.webgl.submit.Submit.KEY_TRIANGLES*/4 && preKey.other===imgid){
-			var tv=WebGLContext2D._drawTexToDrawTri_Vert;
+			var tv=this._drawTexToDrawTri_Vert;
 			tv[0]=x;tv[1]=y;tv[2]=x+width,tv[3]=y,tv[4]=x+width,tv[5]=y+height,tv[6]=x,tv[7]=y+height;
 			this._drawTriUseAbsMatrix=true;
-			this.drawTriangles(tex,0,0,tv,(uv ),WebGLContext2D._drawTexToDrawTri_Index,m,alpha,null,'normal');
+			var tuv=this._tempUV;
+			tuv[0]=uv[0];tuv[1]=uv[1];tuv[2]=uv[2];tuv[3]=uv[3];tuv[4]=uv[4];tuv[5]=uv[5];tuv[6]=uv[6];tuv[7]=uv[7];
+			this.drawTriangles(tex,0,0,tv,tuv,this._drawTexToDrawTri_Index,m,alpha);
 			this._drawTriUseAbsMatrix=false;
 			return true;
 		};
+		var mesh=this._mesh;
+		var submit=this._curSubmit;
 		var ops=lastRender?this._charSubmitCache.getPos():this._transedPoints;
 		this.transformQuad(x,y,width || tex.width,height || tex.height,this._italicDeg,m || this._curMat,ops);
 		if (this.drawTexAlign){
-			ops[0]=Math.round(ops[0]);
-			ops[1]=Math.round(ops[1]);
-			ops[2]=Math.round(ops[2]);
-			ops[3]=Math.round(ops[3]);
-			ops[4]=Math.round(ops[4]);
-			ops[5]=Math.round(ops[5]);
-			ops[6]=Math.round(ops[6]);
-			ops[7]=Math.round(ops[7]);
+			var round=Math.round;
+			ops[0]=round(ops[0]);
+			ops[1]=round(ops[1]);
+			ops[2]=round(ops[2]);
+			ops[3]=round(ops[3]);
+			ops[4]=round(ops[4]);
+			ops[5]=round(ops[5]);
+			ops[6]=round(ops[6]);
+			ops[7]=round(ops[7]);
 			this.drawTexAlign=false;
 		};
 		var rgba=this._mixRGBandAlpha(0xffffffff,this._shader2D.ALPHA *alpha);
@@ -6144,25 +6158,23 @@ var WebGLContext2D=(function(_super){
 		}
 		this._drawCount++;
 		var sameKey=imgid >=0 && preKey.submitType===/*laya.webgl.submit.Submit.KEY_DRAWTEXTURE*/2 && preKey.other===imgid;
-		sameKey && (sameKey=sameKey&& this.isSameClipInfo(this._curSubmit));
+		sameKey && (sameKey=sameKey&& this.isSameClipInfo(submit));
 		this._lastTex=tex;
-		if (this._mesh.vertNum+4 > 65535){
-			this._mesh=MeshQuadTexture.getAMesh();
-			this.meshlist.push(this._mesh);
+		if (mesh.vertNum+4 > 65535){
+			mesh=this._mesh=MeshQuadTexture.getAMesh();
+			this.meshlist.push(mesh);
 			sameKey=false;
-		}
-		if (!this.clipedOff(this._transedPoints)){
-			this._mesh.addQuad(ops,uv ,rgba,true);
+			}{
+			mesh.addQuad(ops,uv ,rgba,true);
 			if (!sameKey){
-				var submit=SubmitTexture.create(this,this._mesh,Value2D.create(/*laya.webgl.shader.d2.ShaderDefines2D.TEXTURE2D*/0x01,0));
-				this._submits[this._submits._length++]=this._curSubmit=submit;
+				this._submits[this._submits._length++]=this._curSubmit=submit=SubmitTexture.create(this,mesh,Value2D.create(/*laya.webgl.shader.d2.ShaderDefines2D.TEXTURE2D*/0x01,0));
 				submit.shaderValue.textureHost=tex;
 				submit._key.other=imgid;
 				this._copyClipInfo(submit,this._globalClipMatrix);
 			}
-			this._curSubmit._numEle+=6;
-			this._mesh.indexNum+=6;
-			this._mesh.vertNum+=4;
+			submit._numEle+=6;
+			mesh.indexNum+=6;
+			mesh.vertNum+=4;
 			return true;
 		}
 		return false;
@@ -6176,16 +6188,28 @@ var WebGLContext2D=(function(_super){
 	__proto.transform4Points=function(a,m,out){
 		var tx=m.tx;
 		var ty=m.ty;
+		var ma=m.a;
+		var mb=m.b;
+		var mc=m.c;
+		var md=m.d;
+		var a0=a[0];
+		var a1=a[1];
+		var a2=a[2];
+		var a3=a[3];
+		var a4=a[4];
+		var a5=a[5];
+		var a6=a[6];
+		var a7=a[7];
 		if (m._bTransform){
-			out[0]=a[0] *m.a+a[1] *m.c+tx;out[1]=a[0] *m.b+a[1] *m.d+ty;
-			out[2]=a[2] *m.a+a[3] *m.c+tx;out[3]=a[2] *m.b+a[3] *m.d+ty;
-			out[4]=a[4] *m.a+a[5] *m.c+tx;out[5]=a[4] *m.b+a[5] *m.d+ty;
-			out[6]=a[6] *m.a+a[7] *m.c+tx;out[7]=a[6] *m.b+a[7] *m.d+ty;
+			out[0]=a0 *ma+a1 *mc+tx;out[1]=a0 *mb+a1 *md+ty;
+			out[2]=a2 *ma+a3 *mc+tx;out[3]=a2 *mb+a3 *md+ty;
+			out[4]=a4 *ma+a5 *mc+tx;out[5]=a4 *mb+a5 *md+ty;
+			out[6]=a6 *ma+a7 *mc+tx;out[7]=a6 *mb+a7 *md+ty;
 			}else {
-			out[0]=a[0]+tx;out[1]=a[1]+ty;
-			out[2]=a[2]+tx;out[3]=a[3]+ty;
-			out[4]=a[4]+tx;out[5]=a[5]+ty;
-			out[6]=a[6]+tx;out[7]=a[7]+ty;
+			out[0]=a0+tx;out[1]=a1+ty;
+			out[2]=a2+tx;out[3]=a3+ty;
+			out[4]=a4+tx;out[5]=a5+ty;
+			out[6]=a6+tx;out[7]=a7+ty;
 		}
 	}
 
@@ -6214,11 +6238,31 @@ var WebGLContext2D=(function(_super){
 			xoff=Math.tan(italicDeg *Math.PI / 180)*h;
 		};
 		var maxx=x+w;var maxy=y+h;
-		this._temp4Points[0]=x+xoff;this._temp4Points[1]=y;
-		this._temp4Points[2]=maxx+xoff;this._temp4Points[3]=y;
-		this._temp4Points[4]=maxx;this._temp4Points[5]=maxy;
-		this._temp4Points[6]=x;this._temp4Points[7]=maxy;
-		this.transform4Points(this._temp4Points,m,out);
+		var tx=m.tx;
+		var ty=m.ty;
+		var ma=m.a;
+		var mb=m.b;
+		var mc=m.c;
+		var md=m.d;
+		var a0=x+xoff;
+		var a1=y;
+		var a2=maxx+xoff;
+		var a3=y;
+		var a4=maxx;
+		var a5=maxy;
+		var a6=x;
+		var a7=maxy;
+		if (m._bTransform){
+			out[0]=a0 *ma+a1 *mc+tx;out[1]=a0 *mb+a1 *md+ty;
+			out[2]=a2 *ma+a3 *mc+tx;out[3]=a2 *mb+a3 *md+ty;
+			out[4]=a4 *ma+a5 *mc+tx;out[5]=a4 *mb+a5 *md+ty;
+			out[6]=a6 *ma+a7 *mc+tx;out[7]=a6 *mb+a7 *md+ty;
+			}else {
+			out[0]=a0+tx;out[1]=a1+ty;
+			out[2]=a2+tx;out[3]=a3+ty;
+			out[4]=a4+tx;out[5]=a5+ty;
+			out[6]=a6+tx;out[7]=a7+ty;
+		}
 	}
 
 	__proto.pushRT=function(){
@@ -6280,6 +6324,7 @@ var WebGLContext2D=(function(_super){
 	*/
 	__proto.drawTextureWithTransform=function(tex,x,y,width,height,transform,tx,ty,alpha,blendMode,colorfilter){
 		var oldcomp=null;
+		var curMat=this._curMat;
 		if (blendMode){
 			oldcomp=this.globalCompositeOperation;
 			this.globalCompositeOperation=blendMode;
@@ -6289,7 +6334,7 @@ var WebGLContext2D=(function(_super){
 			this.setColorFilter(colorfilter);
 		}
 		if (!transform){
-			this._drawTextureM(tex,x+tx,y+ty,width,height,null,alpha,null);
+			this._drawTextureM(tex,x+tx,y+ty,width,height,curMat,alpha,null);
 			if (blendMode){
 				this.globalCompositeOperation=oldcomp;
 			}
@@ -6298,15 +6343,15 @@ var WebGLContext2D=(function(_super){
 			}
 			return;
 		};
-		var curMat=this._curMat;
-		WebGLContext2D._tmpMatrix.a=transform.a;WebGLContext2D._tmpMatrix.b=transform.b;WebGLContext2D._tmpMatrix.c=transform.c;WebGLContext2D._tmpMatrix.d=transform.d;WebGLContext2D._tmpMatrix.tx=transform.tx+tx;WebGLContext2D._tmpMatrix.ty=transform.ty+ty;
-		WebGLContext2D._tmpMatrix._bTransform=transform._bTransform;
+		var tmpMat=this._tmpMatrix;
+		tmpMat.a=transform.a;tmpMat.b=transform.b;tmpMat.c=transform.c;tmpMat.d=transform.d;tmpMat.tx=transform.tx+tx;tmpMat.ty=transform.ty+ty;
+		tmpMat._bTransform=transform._bTransform;
 		if (transform && curMat._bTransform){
-			Matrix.mul(WebGLContext2D._tmpMatrix,curMat,WebGLContext2D._tmpMatrix);
-			transform=WebGLContext2D._tmpMatrix;
+			Matrix.mul(tmpMat,curMat,tmpMat);
+			transform=tmpMat;
 			transform._bTransform=true;
 			}else {
-			transform=WebGLContext2D._tmpMatrix;
+			transform=tmpMat;
 		}
 		this._drawTextureM(tex,x,y,width,height,transform,alpha,null);
 		if (blendMode){
@@ -6396,7 +6441,6 @@ var WebGLContext2D=(function(_super){
 			submit._numEle=6;
 			this._mesh.indexNum+=6;
 			this._mesh.vertNum+=4;
-			this._maxNumEle=Math.max(this._maxNumEle,submit._numEle);
 			this._submits[this._submits._length++]=submit;
 			this._curSubmit=Submit.RENDERBASE
 			return true;
@@ -6413,6 +6457,8 @@ var WebGLContext2D=(function(_super){
 			return;
 		}
 		this._drawCount++;
+		var tmpMat=this._tmpMatrix;
+		var triMesh=this._triangleMesh;
 		var oldColorFilter=null;
 		var needRestorFilter=false;
 		if (color){
@@ -6424,34 +6470,33 @@ var WebGLContext2D=(function(_super){
 		var webGLImg=tex.bitmap;
 		var preKey=this._curSubmit._key;
 		var sameKey=preKey.submitType===/*laya.webgl.submit.Submit.KEY_TRIANGLES*/4 && preKey.other===webGLImg.id && preKey.blendShader==this._nBlendType;
-		var rgba=this._mixRGBandAlpha(0xffffffff,this._shader2D.ALPHA *alpha);
-		var vertNum=vertices.length / 2;
-		var eleNum=indices.length;
-		if (this._triangleMesh.vertNum+vertNum > 65535){
-			this._triangleMesh=MeshTexture.getAMesh();
-			this.meshlist.push(this._triangleMesh);
+		if (triMesh.vertNum+vertices.length / 2 > 65535){
+			triMesh=this._triangleMesh=MeshTexture.getAMesh();
+			this.meshlist.push(triMesh);
 			sameKey=false;
 		}
 		if (!sameKey){
-			var submit=this._curSubmit=SubmitTexture.create(this,this._triangleMesh,Value2D.create(/*laya.webgl.shader.d2.ShaderDefines2D.TEXTURE2D*/0x01,0));
+			var submit=this._curSubmit=SubmitTexture.create(this,triMesh,Value2D.create(/*laya.webgl.shader.d2.ShaderDefines2D.TEXTURE2D*/0x01,0));
 			submit.shaderValue.textureHost=tex;
 			submit._renderType=/*laya.webgl.submit.Submit.TYPE_TEXTURE*/10016;
 			submit._key.submitType=/*laya.webgl.submit.Submit.KEY_TRIANGLES*/4;
 			submit._key.other=webGLImg.id;
 			this._copyClipInfo(submit,this._globalClipMatrix);
 			this._submits[this._submits._length++]=submit;
-		}
-		if (!matrix){
-			WebGLContext2D._tmpMatrix.a=1;WebGLContext2D._tmpMatrix.b=0;WebGLContext2D._tmpMatrix.c=0;WebGLContext2D._tmpMatrix.d=1;WebGLContext2D._tmpMatrix.tx=x;WebGLContext2D._tmpMatrix.ty=y;
-			}else {
-			WebGLContext2D._tmpMatrix.a=matrix.a;WebGLContext2D._tmpMatrix.b=matrix.b;WebGLContext2D._tmpMatrix.c=matrix.c;WebGLContext2D._tmpMatrix.d=matrix.d;WebGLContext2D._tmpMatrix.tx=matrix.tx+x;WebGLContext2D._tmpMatrix.ty=matrix.ty+y;
-		}
+		};
+		var rgba=this._mixRGBandAlpha(0xffffffff,this._shader2D.ALPHA *alpha);
 		if(!this._drawTriUseAbsMatrix){
-			Matrix.mul(WebGLContext2D._tmpMatrix,this._curMat,WebGLContext2D._tmpMatrix);
+			if (!matrix){
+				tmpMat.a=1;tmpMat.b=0;tmpMat.c=0;tmpMat.d=1;tmpMat.tx=x;tmpMat.ty=y;
+				}else {
+				tmpMat.a=matrix.a;tmpMat.b=matrix.b;tmpMat.c=matrix.c;tmpMat.d=matrix.d;tmpMat.tx=matrix.tx+x;tmpMat.ty=matrix.ty+y;
+			}
+			Matrix.mul(tmpMat,this._curMat,tmpMat);
+			triMesh.addData(vertices,uvs,indices,tmpMat,rgba);
+			}else {
+			triMesh.addData(vertices,uvs,indices,matrix,rgba);
 		}
-		this._triangleMesh.addData(vertices,uvs,indices,WebGLContext2D._tmpMatrix,rgba,this);
-		this._curSubmit._numEle+=eleNum;
-		this._maxNumEle=Math.max(this._maxNumEle,this._curSubmit._numEle);
+		this._curSubmit._numEle+=indices.length;
 		if (needRestorFilter){
 			this._colorFiler=oldColorFilter;
 			this._curSubmit=Submit.RENDERBASE;
@@ -6994,6 +7039,9 @@ var WebGLContext2D=(function(_super){
 	}
 
 	__proto._mixRGBandAlpha=function(color,alpha){
+		if (alpha >=1){
+			return color;
+		};
 		var a=((color & 0xff000000)>>> 24);
 		if (a !=0){
 			a*=alpha;
@@ -7026,6 +7074,39 @@ var WebGLContext2D=(function(_super){
 
 	__proto._getPath=function(){
 		return this._path || (this._path=new Path());
+	}
+
+	/*下面的方式是有bug的。canvas是直接save，restore，现在是为了优化，但是有bug，所以先不重载了
+	override public function saveTransform(matrix:Matrix):void {
+		this._curMat.copyTo(matrix);
+	}
+
+	override public function restoreTransform(matrix:Matrix):void {
+		matrix.copyTo(this._curMat);
+	}
+
+	override public function transformByMatrix(matrix:Matrix,tx:Number,ty:Number):void {
+		var mat:Matrix=_curMat;
+		matrix.setTranslate(tx,ty);
+		Matrix.mul(matrix,mat,mat);
+		matrix.setTranslate(0,0);
+		mat._bTransform=true;
+	}
+
+	*/
+	__proto.transformByMatrix=function(matrix,tx,ty){
+		SaveTransform.save(this);
+		Matrix.mul(matrix,this._curMat,this._curMat);
+		this._curMat.tx+=tx;
+		this._curMat.ty+=ty;
+		this._curMat._checkTransform();
+	}
+
+	__proto.transformByMatrixNoSave=function(matrix,tx,ty){
+		Matrix.mul(matrix,this._curMat,this._curMat);
+		this._curMat.tx+=tx;
+		this._curMat.ty+=ty;
+		this._curMat._checkTransform();
 	}
 
 	/*,_shader2D.ALPHA=1*/
@@ -7123,36 +7204,19 @@ var WebGLContext2D=(function(_super){
 		gl.viewport(0,0,RenderState2D.width,RenderState2D.height);
 	}
 
-	WebGLContext2D._tempPoint=new Point();
 	WebGLContext2D._SUBMITVBSIZE=32000;
 	WebGLContext2D._MAXSIZE=99999999;
 	WebGLContext2D._MAXVERTNUM=65535;
 	WebGLContext2D.MAXCLIPRECT=new Rectangle(0,0,99999999,99999999);
 	WebGLContext2D._COUNT=0;
-	WebGLContext2D._tmpMatrix=new Matrix();
 	WebGLContext2D.SEGNUM=32;
 	WebGLContext2D._contextcount=0;
 	WebGLContext2D._clipID_Gen=0;
 	WebGLContext2D.defTexture=null;
 	__static(WebGLContext2D,
-	['_drawStyleTemp',function(){return this._drawStyleTemp=new DrawStyle(null);},'_keyMap',function(){return this._keyMap=new StringKey();},'_drawTexToDrawTri_Vert',function(){return this._drawTexToDrawTri_Vert=new Float32Array(8);},'_drawTexToDrawTri_Index',function(){return this._drawTexToDrawTri_Index=new Uint16Array([0,1,2,0,2,3]);},'_textRender',function(){return this._textRender=new TextRender();}
+	['_textRender',function(){return this._textRender=new TextRender();}
 	]);
 	WebGLContext2D.__init$=function(){
-		/*下面的方式是有bug的。canvas是直接save，restore，现在是为了优化，但是有bug，所以先不重载了
-		override public function saveTransform(matrix:Matrix):void {
-			this._curMat.copyTo(matrix);
-		}
-		override public function restoreTransform(matrix:Matrix):void {
-			matrix.copyTo(this._curMat);
-		}
-		override public function transformByMatrix(matrix:Matrix,tx:Number,ty:Number):void {
-			var mat:Matrix=_curMat;
-			matrix.setTranslate(tx,ty);
-			Matrix.mul(matrix,mat,mat);
-			matrix.setTranslate(0,0);
-			mat._bTransform=true;
-		}
-		*/
 		//class ContextParams
 		ContextParams=(function(){
 			function ContextParams(){
@@ -7379,7 +7443,7 @@ var ShaderDefines2D=(function(_super){
 var MeshQuadTexture=(function(_super){
 	//private static var _num;
 	function MeshQuadTexture(){
-		MeshQuadTexture.__super.call(this,laya.webgl.utils.MeshQuadTexture.const_stride,4,4);
+		MeshQuadTexture.__super.call(this,/*CLASS CONST:laya.webgl.utils.MeshQuadTexture.const_stride*/24,4,4);
 		this.canReuse=true;
 		this.setAttributes(laya.webgl.utils.MeshQuadTexture._fixattriInfo);
 		if(!laya.webgl.utils.MeshQuadTexture._fixib){
@@ -7419,7 +7483,7 @@ var MeshQuadTexture=(function(_super){
 	__proto.addQuad=function(pos,uv,color,useTex){
 		var vb=this._vb;
 		var vpos=(vb._byteLength >> 2);
-		vb.setByteLength((vpos+laya.webgl.utils.MeshQuadTexture.const_stride)<<2);
+		vb.setByteLength((vpos+/*CLASS CONST:laya.webgl.utils.MeshQuadTexture.const_stride*/24)<<2);
 		var vbdata=vb._floatArray32 || vb.getFloat32Array();
 		var vbu32Arr=vb._uint32Array;
 		var cpos=vpos;
@@ -7432,10 +7496,13 @@ var MeshQuadTexture=(function(_super){
 	}
 
 	MeshQuadTexture.getAMesh=function(){
+		var ret=null;
 		if (laya.webgl.utils.MeshQuadTexture._POOL.length){
-			return laya.webgl.utils.MeshQuadTexture._POOL.pop();
-		}
-		return new MeshQuadTexture();
+			ret=laya.webgl.utils.MeshQuadTexture._POOL.pop();
+		}else
+		ret=new MeshQuadTexture();
+		ret._vb._resizeBuffer(64 *1024 *24,false);
+		return ret;
 	}
 
 	MeshQuadTexture.const_stride=24;
@@ -7660,20 +7727,23 @@ var Buffer2D=(function(_super){
 	*@return
 	*/
 	__proto._resizeBuffer=function(nsz,copy){
-		if (nsz < this._buffer.byteLength)
+		var buff=this._buffer;
+		if (nsz <=buff.byteLength)
 			return this;
-		if (copy && this._buffer && this._buffer.byteLength > 0){
+		var u8buf=this._u8Array;
+		if (copy && buff && buff.byteLength > 0){
 			var newbuffer=new ArrayBuffer(nsz);
-			var oldU8Arr=(this._u8Array && this._u8Array.buffer==this._buffer)?this._u8Array :new Uint8Array(this._buffer);
-			this._u8Array=new Uint8Array(newbuffer);
-			this._u8Array.set(oldU8Arr,0);
-			this._buffer=newbuffer;
+			var oldU8Arr=(u8buf && u8buf.buffer==buff)?u8buf :new Uint8Array(buff);
+			u8buf=this._u8Array=new Uint8Array(newbuffer);
+			u8buf.set(oldU8Arr,0);
+			buff=this._buffer=newbuffer;
 			}else{
-			this._buffer=new ArrayBuffer(nsz);
+			buff=this._buffer=new ArrayBuffer(nsz);
+			this._u8Array=null;
 		}
 		this._checkArrayUse();
 		this._upload=true;
-		this._bufferSize=this._buffer.byteLength;
+		this._bufferSize=buff.byteLength;
 		return this;
 	}
 
@@ -7696,12 +7766,23 @@ var Buffer2D=(function(_super){
 		this._checkArrayUse();
 	}
 
-	//TODO:coverage
+	/**
+	*附加Uint16Array的数据。数据长度是len。byte的话要*2
+	*@param data
+	*@param len
+	*/
 	__proto.appendU16Array=function(data,len){
 		this._resizeBuffer(this._byteLength+len*2,true);
 		var u=new Uint16Array(this._buffer,this._byteLength,len);
-		for (var i=0;i < len;i++){
-			u[i]=data[i];
+		if (len==6){
+			u[0]=data[0];u[1]=data[1];u[2]=data[2];
+			u[3]=data[3];u[4]=data[4];u[5]=data[5];
+			}else if(len>=100){
+			u.set(new Uint16Array(data.buffer,0,len));
+			}else{
+			for (var i=0;i < len;i++){
+				u[i]=data[i];
+			}
 		}
 		this._byteLength+=len *2;
 		this._checkArrayUse();
@@ -7807,7 +7888,7 @@ var Buffer2D=(function(_super){
 //class laya.webgl.utils.MeshVG extends laya.webgl.utils.Mesh2D
 var MeshVG=(function(_super){
 	function MeshVG(){
-		MeshVG.__super.call(this,laya.webgl.utils.MeshVG.const_stride,4,4);
+		MeshVG.__super.call(this,/*CLASS CONST:laya.webgl.utils.MeshVG.const_stride*/12,4,4);
 		this.canReuse=true;
 		this.setAttributes(laya.webgl.utils.MeshVG._fixattriInfo);
 	}
@@ -7821,7 +7902,7 @@ var MeshVG=(function(_super){
 	*@param ib index数组。
 	*/
 	__proto.addVertAndIBToMesh=function(ctx,points,rgba,ib){
-		var startpos=this._vb.needSize(points.length / 2 *MeshVG.const_stride);
+		var startpos=this._vb.needSize(points.length / 2 *12);
 		var f32pos=startpos >> 2;
 		var vbdata=this._vb._floatArray32 || this._vb.getFloat32Array();
 		var vbu32Arr=this._vb._uint32Array;
@@ -7857,10 +7938,13 @@ var MeshVG=(function(_super){
 	}
 
 	MeshVG.getAMesh=function(){
+		var ret;
 		if (laya.webgl.utils.MeshVG._POOL.length){
-			return laya.webgl.utils.MeshVG._POOL.pop();
-		}
-		return new MeshVG();
+			ret=laya.webgl.utils.MeshVG._POOL.pop();
+		}else
+		ret=new MeshVG();
+		ret._vb._resizeBuffer(64 *1024 *12,false);
+		return ret;
 	}
 
 	MeshVG.const_stride=12;
@@ -8101,7 +8185,7 @@ var CharRender_Native=(function(_super){
 var MeshParticle2D=(function(_super){
 	//TODO:coverage
 	function MeshParticle2D(maxNum){
-		MeshParticle2D.__super.call(this,laya.webgl.utils.MeshParticle2D.const_stride,maxNum*4*MeshParticle2D.const_stride,4);
+		MeshParticle2D.__super.call(this,/*CLASS CONST:laya.webgl.utils.MeshParticle2D.const_stride*/116,maxNum*4*116,4);
 		this.canReuse=true;
 		this.setAttributes(laya.webgl.utils.MeshParticle2D._fixattriInfo);
 		this.createQuadIB(maxNum);
@@ -8111,7 +8195,7 @@ var MeshParticle2D=(function(_super){
 	__class(MeshParticle2D,'laya.webgl.utils.MeshParticle2D',_super);
 	var __proto=MeshParticle2D.prototype;
 	__proto.setMaxParticleNum=function(maxNum){
-		this._vb._resizeBuffer(maxNum *4 *MeshParticle2D.const_stride,false);
+		this._vb._resizeBuffer(maxNum *4 *116,false);
 		this.createQuadIB(maxNum);
 	}
 
@@ -8140,7 +8224,7 @@ var MeshParticle2D=(function(_super){
 		return new MeshParticle2D(maxNum);
 	}
 
-	MeshParticle2D.const_stride=29*4;
+	MeshParticle2D.const_stride=116;
 	MeshParticle2D._POOL=[];
 	__static(MeshParticle2D,
 	['_fixattriInfo',function(){return this._fixattriInfo=[
@@ -8165,43 +8249,56 @@ var MeshParticle2D=(function(_super){
 //class laya.webgl.utils.MeshTexture extends laya.webgl.utils.Mesh2D
 var MeshTexture=(function(_super){
 	function MeshTexture(){
-		MeshTexture.__super.call(this,laya.webgl.utils.MeshTexture.const_stride,4,4);
+		MeshTexture.__super.call(this,/*CLASS CONST:laya.webgl.utils.MeshTexture.const_stride*/24,4,4);
 		this.canReuse=true;
 		this.setAttributes(laya.webgl.utils.MeshTexture._fixattriInfo);
 	}
 
 	__class(MeshTexture,'laya.webgl.utils.MeshTexture',_super);
 	var __proto=MeshTexture.prototype;
-	__proto.addData=function(vertices,uvs,idx,matrix,rgba,ctx){
-		var vertsz=vertices.length / 2;
-		var startpos=this._vb.needSize(vertsz *MeshTexture.const_stride);
+	__proto.addData=function(vertices,uvs,idx,matrix,rgba){
+		var vb=this._vb;
+		var ib=this._ib;
+		var vertsz=vertices.length >>1;
+		var startpos=vb.needSize(vertsz *24);
 		var f32pos=startpos >> 2;
-		var vbdata=this._vb._floatArray32 || this._vb.getFloat32Array();
-		var vbu32Arr=this._vb._uint32Array;
+		var vbdata=vb._floatArray32 || vb.getFloat32Array();
+		var vbu32Arr=vb._uint32Array;
 		var ci=0;
-		for (var i=0;i < vertsz;i++){
+		var m00=matrix.a;
+		var m01=matrix.b;
+		var m10=matrix.c;
+		var m11=matrix.d;
+		var tx=matrix.tx;
+		var ty=matrix.ty;
+		var i=0;
+		for (i=0;i < vertsz;i++){
 			var x=vertices[ci],y=vertices[ci+1];
-			var x1=x *matrix.a+y *matrix.c+matrix.tx;
-			var y1=x *matrix.b+y *matrix.d+matrix.ty;
-			vbdata[f32pos++]=x1;vbdata[f32pos++]=y1;
-			vbdata[f32pos++]=uvs[ci];vbdata[f32pos++]=uvs[ci+1];
+			vbdata[f32pos]=x *m00+y *m10+tx;
+			vbdata[f32pos+1]=x *m01+y *m11+ty;
+			vbdata[f32pos+2]=uvs[ci];
+			vbdata[f32pos+3]=uvs[ci+1];
+			vbu32Arr[f32pos+4]=rgba;
+			vbu32Arr[f32pos+5]=0xff;
+			f32pos+=6;
 			ci+=2;
-			vbu32Arr[f32pos++]=rgba;
-			vbu32Arr[f32pos++]=0xff;
 		}
-		this._vb.setNeedUpload();
+		vb.setNeedUpload();
 		var vertN=this.vertNum;
+		var sz=idx.length;
+		var stib=ib.needSize(idx.byteLength);
+		var cidx=ib.getUint16Array();
+		var stibid=stib >> 1;
 		if (vertN > 0){
-			var sz=idx.length;
-			if (sz > MeshTexture.tmpIdx.length)MeshTexture.tmpIdx=new Uint16Array(sz);
-			for (var ii=0;ii < sz;ii++){
-				MeshTexture.tmpIdx[ii]=idx[ii]+vertN;
+			var end=stibid+sz;
+			var si=0;
+			for (i=stibid;i < end;i++,si++){
+				cidx[i]=idx[si]+vertN;
 			}
-			this._ib.appendU16Array(MeshTexture.tmpIdx,idx.length);
 			}else {
-			this._ib.append(idx);
+			cidx.set(idx,stibid);
 		}
-		this._ib.setNeedUpload();
+		ib.setNeedUpload();
 		this.vertNum+=vertsz;
 		this.indexNum+=idx.length;
 	}
@@ -8225,10 +8322,13 @@ var MeshTexture=(function(_super){
 	}
 
 	MeshTexture.getAMesh=function(){
+		var ret;
 		if (laya.webgl.utils.MeshTexture._POOL.length){
-			return laya.webgl.utils.MeshTexture._POOL.pop();
+			ret=laya.webgl.utils.MeshTexture._POOL.pop();
 		}
-		return new MeshTexture();
+		else ret=new MeshTexture();
+		ret._vb._resizeBuffer(64 *1024 *24,false);
+		return ret;
 	}
 
 	MeshTexture.const_stride=24;
@@ -8237,7 +8337,7 @@ var MeshTexture=(function(_super){
 	['_fixattriInfo',function(){return this._fixattriInfo=[
 		/*laya.webgl.WebGLContext.FLOAT*/0x1406,4,0,
 		/*laya.webgl.WebGLContext.UNSIGNED_BYTE*/0x1401,4,16,
-		/*laya.webgl.WebGLContext.UNSIGNED_BYTE*/0x1401,4,20];},'tmpIdx',function(){return this.tmpIdx=new Uint16Array(4);}
+		/*laya.webgl.WebGLContext.UNSIGNED_BYTE*/0x1401,4,20];}
 	]);
 	return MeshTexture;
 })(Mesh2D)
@@ -8756,21 +8856,21 @@ var BaseTexture=(function(_super){
 		WebGLContext.bindTexture(gl,this._glTextureType,this._glTexture);
 		switch (value){
 			case 0:
-				if (this._mipmap && this._isPot(this._width)&& this._isPot(this._height))
+				if (this._mipmap)
 					gl.texParameteri(this._glTextureType,/*laya.webgl.WebGLContext.TEXTURE_MIN_FILTER*/0x2801,/*laya.webgl.WebGLContext.NEAREST_MIPMAP_NEAREST*/0x2700);
 				else
 				gl.texParameteri(this._glTextureType,/*laya.webgl.WebGLContext.TEXTURE_MIN_FILTER*/0x2801,/*laya.webgl.WebGLContext.NEAREST*/0x2600);
 				gl.texParameteri(this._glTextureType,/*laya.webgl.WebGLContext.TEXTURE_MAG_FILTER*/0x2800,/*laya.webgl.WebGLContext.NEAREST*/0x2600);
 				break ;
 			case 1:
-				if (this._mipmap && this._isPot(this._width)&& this._isPot(this._height))
+				if (this._mipmap)
 					gl.texParameteri(this._glTextureType,/*laya.webgl.WebGLContext.TEXTURE_MIN_FILTER*/0x2801,/*laya.webgl.WebGLContext.LINEAR_MIPMAP_NEAREST*/0x2701);
 				else
 				gl.texParameteri(this._glTextureType,/*laya.webgl.WebGLContext.TEXTURE_MIN_FILTER*/0x2801,/*laya.webgl.WebGLContext.LINEAR*/0x2601);
 				gl.texParameteri(this._glTextureType,/*laya.webgl.WebGLContext.TEXTURE_MAG_FILTER*/0x2800,/*laya.webgl.WebGLContext.LINEAR*/0x2601);
 				break ;
 			case 2:
-				if (this._mipmap && this._isPot(this._width)&& this._isPot(this._height))
+				if (this._mipmap)
 					gl.texParameteri(this._glTextureType,/*laya.webgl.WebGLContext.TEXTURE_MIN_FILTER*/0x2801,/*laya.webgl.WebGLContext.LINEAR_MIPMAP_LINEAR*/0x2703);
 				else
 				gl.texParameteri(this._glTextureType,/*laya.webgl.WebGLContext.TEXTURE_MIN_FILTER*/0x2801,/*laya.webgl.WebGLContext.LINEAR*/0x2601);
@@ -9435,6 +9535,8 @@ var Texture2D=(function(_super){
 		//this._canRead=false;
 		/**@private */
 		//this._pixels=null;
+		/**@private */
+		//this._mipmapCount=0;
 		(width===void 0)&& (width=0);
 		(height===void 0)&& (height=0);
 		(format===void 0)&& (format=1);
@@ -9447,18 +9549,54 @@ var Texture2D=(function(_super){
 		this._canRead=canRead;
 		this._setWarpMode(/*laya.webgl.WebGLContext.TEXTURE_WRAP_S*/0x2802,this._wrapModeU);
 		this._setWarpMode(/*laya.webgl.WebGLContext.TEXTURE_WRAP_T*/0x2803,this._wrapModeV);
-		Config.is2DPixelArtGame && (this._filterMode=/*laya.webgl.resource.BaseTexture.FILTERMODE_POINT*/0);
 		this._setFilterMode(this._filterMode);
 		this._setAnisotropy(this._anisoLevel);
-		if (this._mipmap && this._isPot(width)&& this._isPot(height)){
+		if (this._mipmap){
+			this._mipmapCount=/*__JS__ */Math.max(Math.ceil(Math.log2(width))+1,Math.ceil(Math.log2(2))+1);
+			for (var i=0;i < this._mipmapCount;i++)
+			this._setPixels(null,i,Math.max(width >> i,1),Math.max(height >> i,1));
 			this._setGPUMemory(width *height *4 *(1+1 / 3));
 			}else {
+			this._mipmapCount=1;
 			this._setGPUMemory(width *height *4);
 		}
 	}
 
 	__class(Texture2D,'laya.webgl.resource.Texture2D',_super);
 	var __proto=Texture2D.prototype;
+	/**
+	*@private
+	*/
+	__proto._getFormatByteCount=function(){
+		switch (this._format){
+			case 0:
+				return 3;
+			case 1:
+				return 4;
+			case 2:
+				return 1;
+			default :
+				throw "Texture2D: unknown format.";
+			}
+	}
+
+	/**
+	*@private
+	*/
+	__proto._setPixels=function(pixels,miplevel,width,height){
+		var gl=LayaGL.instance;
+		var textureType=this._glTextureType;
+		var glFormat=this._getGLFormat();
+		WebGLContext.bindTexture(gl,textureType,this._glTexture);
+		if (this.format===/*laya.webgl.resource.BaseTexture.FORMAT_R8G8B8*/0){
+			gl.pixelStorei(/*laya.webgl.WebGLContext.UNPACK_ALIGNMENT*/0x0CF5,1);
+			gl.texImage2D(textureType,miplevel,glFormat,width,height,0,glFormat,/*laya.webgl.WebGLContext.UNSIGNED_BYTE*/0x1401,pixels);
+			gl.pixelStorei(/*laya.webgl.WebGLContext.UNPACK_ALIGNMENT*/0x0CF5,4);
+			}else {
+			gl.texImage2D(textureType,miplevel,glFormat,width,height,0,glFormat,/*laya.webgl.WebGLContext.UNSIGNED_BYTE*/0x1401,pixels);
+		}
+	}
+
 	/**
 	*@private
 	*/
@@ -9643,6 +9781,8 @@ var Texture2D=(function(_super){
 		var height=source.height;
 		this._width=width;
 		this._height=height;
+		if (!(this._isPot(width)&& this._isPot(height)))
+			this._mipmap=false;
 		this._setWarpMode(/*laya.webgl.WebGLContext.TEXTURE_WRAP_S*/0x2802,this._wrapModeU);
 		this._setWarpMode(/*laya.webgl.WebGLContext.TEXTURE_WRAP_T*/0x2803,this._wrapModeV);
 		this._setFilterMode(this._filterMode);
@@ -9657,7 +9797,7 @@ var Texture2D=(function(_super){
 			gl.texImage2D(this._glTextureType,0,glFormat,glFormat,/*laya.webgl.WebGLContext.UNSIGNED_BYTE*/0x1401,source);
 			(premultiplyAlpha)&& (gl.pixelStorei(/*laya.webgl.WebGLContext.UNPACK_PREMULTIPLY_ALPHA_WEBGL*/0x9241,false));
 		}
-		if (this._mipmap && this._isPot(width)&& this._isPot(height)){
+		if (this._mipmap){
 			gl.generateMipmap(this._glTextureType);
 			this._setGPUMemory(width *height *4 *(1+1 / 3));
 			}else {
@@ -9686,19 +9826,12 @@ var Texture2D=(function(_super){
 		(miplevel===void 0)&& (miplevel=0);
 		if (!pixels)
 			throw "Texture2D:pixels can't be null.";
-		var gl=LayaGL.instance;
-		var textureType=this._glTextureType;
-		WebGLContext.bindTexture(gl,textureType,this._glTexture);
-		var glFormat=this._getGLFormat();
 		var width=Math.max(this._width >> miplevel,1);
 		var height=Math.max(this._height >> miplevel,1);
-		if (this._format===/*laya.webgl.resource.BaseTexture.FORMAT_R8G8B8*/0){
-			gl.pixelStorei(/*laya.webgl.WebGLContext.UNPACK_ALIGNMENT*/0x0CF5,1);
-			gl.texImage2D(textureType,miplevel,glFormat,width,height,0,glFormat,/*laya.webgl.WebGLContext.UNSIGNED_BYTE*/0x1401,pixels);
-			gl.pixelStorei(/*laya.webgl.WebGLContext.UNPACK_ALIGNMENT*/0x0CF5,4);
-			}else {
-			gl.texImage2D(textureType,miplevel,glFormat,width,height,0,glFormat,/*laya.webgl.WebGLContext.UNSIGNED_BYTE*/0x1401,pixels);
-		}
+		var pixelsCount=width *height *this._getFormatByteCount();
+		if (pixels.length < pixelsCount)
+			throw "Texture2D:pixels length should at least "+pixelsCount+".";
+		this._setPixels(pixels,miplevel,width,height);
 		if (this._canRead)
 			this._pixels=pixels;
 		this._readyed=true;
@@ -9772,6 +9905,13 @@ var Texture2D=(function(_super){
 		else
 		throw new Error("Texture2D: must set texture canRead is true.");
 	}
+
+	/**
+	*获取mipmap数量。
+	*/
+	__getset(0,__proto,'mipmapCount',function(){
+		return this._mipmapCount;
+	});
 
 	/**
 	*@inheritDoc

@@ -9,21 +9,21 @@ class TextureGPUCompression{
         if(Laya.Browser.onAndroid){
             Laya.Scene3D.load("res/threeDimen/scene/LayaScene_TextureGPUCompression/Android/layaScene.ls", Laya.Handler.create(this, function(scene) {
             Laya.stage.addChild(scene);
-            var camera = scene.getChildByName("Main Camera");
+            let camera = scene.getChildByName("Main Camera");
             camera.addComponent(CameraMoveScript);
             }));
         }
         else if(Laya.Browser.onIOS){
             Laya.Scene3D.load("res/threeDimen/scene/LayaScene_TextureGPUCompression/IOS/layaScene.ls", Laya.Handler.create(this, function(scene) {
             Laya.stage.addChild(scene);
-            var camera = scene.getChildByName("Main Camera");
+            let camera = scene.getChildByName("Main Camera");
             camera.addComponent(CameraMoveScript);
             }));
         }
         else{
             Laya.Scene3D.load("res/threeDimen/scene/LayaScene_TextureGPUCompression/Conventional/layaScene.ls", Laya.Handler.create(this, function(scene) {
             Laya.stage.addChild(scene);
-            var camera = scene.getChildByName("Main Camera");
+            let camera = scene.getChildByName("Main Camera");
             camera.addComponent(CameraMoveScript);
             }));
         }

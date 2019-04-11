@@ -11,17 +11,17 @@ class Shader_GlowingEdge {
         this.initShader();
         
         //创建场景
-        var scene = Laya.stage.addChild(new Laya.Scene3D());
+        let scene = Laya.stage.addChild(new Laya.Scene3D());
 
         //初始化变量
         this.rotation = new Laya.Vector3(0, 0.01, 0);
         //创建相机
-        var camera = (scene.addChild(new Laya.Camera(0, 0.1, 1000)));
+        let camera = (scene.addChild(new Laya.Camera(0, 0.1, 1000)));
         camera.transform.translate(new Laya.Vector3(0, 0.85, 1.7));
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         camera.addComponent(CameraMoveScript);
         //创建平行光
-        var directionLight = scene.addChild(new Laya.DirectionLight());
+        let directionLight = scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
         
         //加载精灵
@@ -29,25 +29,25 @@ class Shader_GlowingEdge {
             scene.addChild(dude);
             
             //使用自定义材质
-            var customMaterial1 = new CustomMaterial();
+            let customMaterial1 = new CustomMaterial();
             Laya.Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/head.png", Laya.Handler.create(this, function(tex) {
                 customMaterial1.diffuseTexture = tex;
             }));
             customMaterial1.marginalColor = new Laya.Vector3(1, 0.7, 0);
             
-            var customMaterial2 = new CustomMaterial();
+            let customMaterial2 = new CustomMaterial();
             Laya.Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/jacket.png", Laya.Handler.create(this, function(tex) {
                 customMaterial2.diffuseTexture = tex;
             }));
             customMaterial2.marginalColor = new Laya.Vector3(1, 0.7, 0);
             
-            var customMaterial3 = new CustomMaterial();
+            let customMaterial3 = new CustomMaterial();
             Laya.Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/pants.png",Laya.Handler.create(this,function(tex){
                 customMaterial3.diffuseTexture = tex;
             }));
             customMaterial3.marginalColor = new Laya.Vector3(1, 0.7, 0);
             
-            var customMaterial4 = new CustomMaterial();
+            let customMaterial4 = new CustomMaterial();
             Laya.Texture2D.load("res/threeDimen/skinModel/dude/Assets/dude/upBodyC.png",Laya.Handler.create(this,function(tex){
                 customMaterial4.diffuseTexture =tex ;
             }));
@@ -55,7 +55,7 @@ class Shader_GlowingEdge {
             //设置边缘颜色
             customMaterial4.marginalColor = new Laya.Vector3(1, 0.7, 0);
             
-            var baseMaterials = [];
+            let baseMaterials = [];
             baseMaterials[0] = customMaterial1;
             baseMaterials[1] = customMaterial2;
             baseMaterials[2] = customMaterial3;
@@ -68,9 +68,9 @@ class Shader_GlowingEdge {
         }));
         
         //加载地球精灵
-        var earth = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(0.5, 128, 128)));
+        let earth = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(0.5, 128, 128)));
         
-        var customMaterial = new CustomMaterial();
+        let customMaterial = new CustomMaterial();
         Laya.Texture2D.load("res/threeDimen/texture/earth.png", Laya.Handler.create(null, function(tex){
             customMaterial.diffuseTexture = tex;
         }));
@@ -82,14 +82,14 @@ class Shader_GlowingEdge {
         });
     }
     initShader() {
-        var attributeMap = {
+        let attributeMap = {
             'a_Position': Laya.VertexMesh.MESH_POSITION0, 
             'a_Normal': Laya.VertexMesh.MESH_NORMAL0, 
             'a_Texcoord': Laya.VertexMesh.MESH_TEXTURECOORDINATE0,
             'a_BoneWeights': Laya.VertexMesh.MESH_BLENDWEIGHT0, 
             'a_BoneIndices': Laya.VertexMesh.MESH_BLENDINDICES0
         };
-        var uniformMap = {
+        let uniformMap = {
             'u_Bones': Laya.Shader3D.PERIOD_CUSTOM, 
             'u_CameraPos': Laya.Shader3D.PERIOD_CAMERA, 
             'u_MvpMatrix': Laya.Shader3D.PERIOD_SPRITE, 
@@ -99,7 +99,7 @@ class Shader_GlowingEdge {
             'u_DirectionLight.Direction': Laya.Shader3D.PERIOD_SCENE, 
             'u_DirectionLight.Color': Laya.Shader3D.PERIOD_SCENE
         };
-        var vs = '#include "Lighting.glsl";\n' +
+        let vs = '#include "Lighting.glsl";\n' +
         "attribute vec4 a_Position;\n"+
         "attribute vec2 a_Texcoord;\n"+
         "attribute vec3 a_Normal;\n"+
@@ -142,7 +142,7 @@ class Shader_GlowingEdge {
         "#endif\n"+
         "gl_Position=remapGLPositionZ(gl_Position);\n" + 
         "}";
-        var ps = "#ifdef FSHIGHPRECISION\n"+
+        let ps = "#ifdef FSHIGHPRECISION\n"+
         "precision highp float;\n"+
         "#else\n"+
         "precision mediump float;\n"+
@@ -167,7 +167,7 @@ class Shader_GlowingEdge {
         "gl_FragColor = texture2D(u_texture, v_Texcoord) + vec4(Emissive,1.0);\n"+
         "}";
 
-        var vsOutline = '#include "Lighting.glsl";\n' +
+        let vsOutline = '#include "Lighting.glsl";\n' +
         "attribute vec4 a_Position;\n"+
         "attribute vec2 a_Texcoord;\n"+
         "attribute vec3 a_Normal;\n"+
@@ -211,7 +211,7 @@ class Shader_GlowingEdge {
         "gl_Position.xyz=remapGLPositionZ(gl_Position).xyz + normalize(v_Normal) * 0.002;\n" + 
         "}";
 
-        var psOutline = "#ifdef FSHIGHPRECISION\n"+
+        let psOutline = "#ifdef FSHIGHPRECISION\n"+
         "precision highp float;\n"+
         "#else\n"+
         "precision mediump float;\n"+
@@ -241,9 +241,9 @@ class Shader_GlowingEdge {
         "}";
 
         //创建自定义Shader
-        var customShader = Laya.Shader3D.add("CustomShader");
+        let customShader = Laya.Shader3D.add("CustomShader");
         //为Shader添加SubShader
-		var subShader = new Laya.SubShader(attributeMap, uniformMap, Laya.SkinnedMeshSprite3D.shaderDefines);
+		let subShader = new Laya.SubShader(attributeMap, uniformMap, Laya.SkinnedMeshSprite3D.shaderDefines);
         customShader.addSubShader(subShader);
         //为SubShader添加ShaderPass
         subShader.addShaderPass(vs,ps);

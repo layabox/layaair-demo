@@ -16,27 +16,29 @@ class Shader_CartoonRender {
         Laya.Scene3D.load("res/threeDimen/cartoon/CartoonTest.ls", Laya.Handler.create(this, function(scene) {
             Laya.stage.addChild(scene);
             //获取场景相机
-            var camera = scene.getChildByName("Main Camera");
+            let camera = scene.getChildByName("Main Camera");
             camera.addComponent(CameraMoveScript);
             //添加光照
-            var directionLight = scene.addChild(new Laya.DirectionLight());
+            let directionLight = scene.addChild(new Laya.DirectionLight());
             directionLight.color = new Laya.Vector3(1, 1, 1);
             directionLight.transform.rotate(new Laya.Vector3(-1.14 / 3, 0, 0));
             
             this.kiana = scene.getChildByName("Kiana");
+            //this.kiana.transform.rotate(new Laya.Vector3(0, 0, 0));
+            this.kiana.transform.translate(new Laya.Vector3(1.5, 0, 0));
             this.setkianaCartoon();
         }));
 	}
 		
     setkianaCartoon() {
-        var kiana_Cartoon = this.kiana.getChildByName("Kiana_Cartoon");
+        let kiana_Cartoon = this.kiana.getChildByName("Kiana_Cartoon");
         
-        var kiana_cartoon_face = kiana_Cartoon.getChildByName("Face");
-        var kiana_cartoon_hair = kiana_Cartoon.getChildByName("Hair");
-        var kiana_cartoon_body = kiana_Cartoon.getChildByName("Body");
+        let kiana_cartoon_face = kiana_Cartoon.getChildByName("Face");
+        let kiana_cartoon_hair = kiana_Cartoon.getChildByName("Hair");
+        let kiana_cartoon_body = kiana_Cartoon.getChildByName("Body");
         
         //创建材质
-        var faceMaterial = new CartoonMaterial();
+        let faceMaterial = new CartoonMaterial();
         //加载纹理
         Laya.Texture2D.load("res/threeDimen/cartoon/Assets/CartoonTest/Texture/Avatar_Kiana_C1_Texture_Face_Color_Common.png", Laya.Handler.create(null, function(tex) {
             faceMaterial.albedoTexture = tex;
@@ -57,7 +59,7 @@ class Shader_CartoonRender {
         //设置描边线条的亮度
         faceMaterial.outlineLightness = 0.25;
         
-        var hairMaterial = new CartoonMaterial();
+        let hairMaterial = new CartoonMaterial();
         Laya.Texture2D.load("res/threeDimen/cartoon/Assets/CartoonTest/Texture/Avatar_Kiana_C2_Texture_Hair_Color_Common.png", Laya.Handler.create(null, function(tex) {
             hairMaterial.albedoTexture = tex;
         }));
@@ -74,7 +76,7 @@ class Shader_CartoonRender {
         hairMaterial.outlineWidth = 0.002;
         hairMaterial.outlineLightness = 0.25;
         
-        var bodyMaterial = new CartoonMaterial();
+        let bodyMaterial = new CartoonMaterial();
         Laya.Texture2D.load("res/threeDimen/cartoon/Assets/CartoonTest/Texture/Avatar_Kiana_C2_Texture_Body_Color_RGB2048.png", Laya.Handler.create(null, function(tex) {
             bodyMaterial.albedoTexture = tex;
         }));

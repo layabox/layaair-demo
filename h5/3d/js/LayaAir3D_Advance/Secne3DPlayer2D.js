@@ -19,7 +19,7 @@ class Secne3DPlayer2D {
         this.camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         
         //创建平行光
-        var directionLight = new Laya.DirectionLight();
+        let directionLight = new Laya.DirectionLight();
         this.scene.addChild(directionLight);
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.rotate(new Laya.Vector3(-3.14/3, 0,0));
@@ -36,7 +36,7 @@ class Secne3DPlayer2D {
 		
 	onComplete() {
         //加载三维地面
-        var grid = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
+        this.scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
         //加载二维猴子
         this.layaMonkey2D = Laya.stage.addChild(new Laya.Image("res/threeDimen/monkey.png"));
         //开启定时器循环

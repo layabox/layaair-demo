@@ -353,6 +353,9 @@ $(document).ready(function()
 			case "VRCameraMoveScript.js":
 				d3Path = "VRCameraMoveScript.js";
 				break;
+			case "MultiplePassOutlineMaterial.js":
+				d3Path = "MultiplePassOutlineMaterial.js";
+				break;
 			default:
 				d3Path = "";
 		}

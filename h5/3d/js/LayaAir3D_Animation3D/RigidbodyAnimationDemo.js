@@ -7,7 +7,7 @@ class RigidbodyAnimationDemo {
 	
 		Laya.Scene3D.load("res/threeDimen/scene/LayaScene_RigidbodyAnimation/Conventional/scene.ls", Laya.Handler.create(this, function(scene) {
 			Laya.stage.addChild(scene);
-			var camera = scene.getChildByName("Main Camera");
+			let camera = scene.getChildByName("Main Camera");
 			camera.addComponent(CameraMoveScript);
 		}));
 	

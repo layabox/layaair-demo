@@ -28,13 +28,13 @@ class TransformDemo{
 
 
 		//添加相机
-        var camera = (this._scene.addChild(new Laya.Camera(0, 0.1, 100)));
+        let camera = (this._scene.addChild(new Laya.Camera(0, 0.1, 100)));
         camera.transform.translate(new Laya.Vector3(0, 0.8, 5));
         camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
 		camera.addComponent(CameraMoveScript);
 			
 		//添加光照
-		var directionLight = this._scene.addChild(new Laya.DirectionLight());
+		let directionLight = this._scene.addChild(new Laya.DirectionLight());
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.rotate(new Laya.Vector3( -3.14 / 3, 0, 0));
 			
@@ -58,20 +58,20 @@ class TransformDemo{
 
     onComplete(){
         //加载地面
-        var grid = this._scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
+        let grid = this._scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
         //地面接收阴影
         (grid.getChildAt(0)).meshRenderer.receiveShadow = true;
         //加载静态小猴子
-        var staticLayaMonkey = this._scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
+        let staticLayaMonkey = this._scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
         //设置材质
         staticLayaMonkey.meshRenderer.material = Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
         //设置位置
-        var staticMonkeyTrans = staticLayaMonkey.transform;
-        var staticMonkeypos = staticMonkeyTrans.position;
+        let staticMonkeyTrans = staticLayaMonkey.transform;
+        let staticMonkeypos = staticMonkeyTrans.position;
         staticMonkeypos.setValue(0, 0, 0.5);
         staticMonkeyTrans.position = staticMonkeypos;
         //设置缩放
-        var staticMonkeyScale = staticMonkeyTrans.localScale;
+        let staticMonkeyScale = staticMonkeyTrans.localScale;
         staticMonkeyScale.setValue(0.3, 0.3, 0.3);
         staticMonkeyTrans.localScale = staticMonkeyScale;
         //设置旋转
@@ -98,7 +98,7 @@ class TransformDemo{
         this._rotate1.setValue(0, 60, 0);
         this.clone2Transform.rotate(this._rotate1, false, false);
         //缩放
-        var scale = this.clone3Transform.localScale;
+        let scale = this.clone3Transform.localScale;
         scale.setValue(0.1,0.1,0.1);
         this.clone3Transform.localScale = scale;
 

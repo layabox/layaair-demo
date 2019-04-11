@@ -8,22 +8,22 @@ class Sky_Procedural{
 		Laya.Stat.show();
 	
 		//初始化3D场景
-		var scene = Laya.stage.addChild(new Laya.Scene3D());
+		let scene = Laya.stage.addChild(new Laya.Scene3D());
 		
 		//初始化相机并设置清除标记为天空
-		var camera = scene.addChild(new Laya.Camera(0, 0.1, 100));
+		let camera = scene.addChild(new Laya.Camera(0, 0.1, 100));
 		camera.addComponent(CameraMoveScript);
 		camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
 		
 		//初始化平行光
 		this.directionLight = scene.addChild(new Laya.DirectionLight()) ;
-		var mat = this.directionLight.transform.worldMatrix;
+		let mat = this.directionLight.transform.worldMatrix;
 		mat.setForward(new Laya.Vector3(1.0, -1.0, -1.0));
 		this.directionLight.transform.worldMatrix = mat;
 		this.rotation = new Laya.Vector3(-0.01, 0, 0);
 		
 		//初始化天空渲染器
-		var skyRenderer= scene.skyRenderer;
+		let skyRenderer= scene.skyRenderer;
 		skyRenderer.mesh= Laya.SkyDome.instance;
 		skyRenderer.material= new Laya.SkyProceduralMaterial();
 

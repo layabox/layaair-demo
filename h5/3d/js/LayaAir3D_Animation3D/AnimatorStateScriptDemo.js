@@ -24,7 +24,7 @@ class AnimatorStateScriptDemo
 	
 		
 		//预加载所有资源
-		var resource = [
+		let resource = [
 			"res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh", 
 			"res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh", 
 			"res/threeDimen/skinModel/BoneLinkScene/PangZi.lh"
@@ -40,29 +40,29 @@ class AnimatorStateScriptDemo
 		this.scene.ambientColor = new Laya.Vector3(0.5, 0.5, 0.5);
 		
 		//初始化相机
-		var camera = new Laya.Camera(0, 0.1, 100);
+		let camera = new Laya.Camera(0, 0.1, 100);
 		this.scene.addChild(camera);
 		camera.transform.translate(new Laya.Vector3(0, 3, 5));
 		camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
 		camera.addComponent(CameraMoveScript);
 		
-		var directionLight = new Laya.DirectionLight();
+		let directionLight = new Laya.DirectionLight();
 		this.scene.addChild(directionLight);
 		//设置灯光方向
-		var mat = directionLight.transform.worldMatrix;
+		let mat = directionLight.transform.worldMatrix;
 		mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
 		directionLight.transform.worldMatrix = mat;
 		
 		//初始化角色精灵
-		var role = new Laya.Sprite3D();
+		let role = new Laya.Sprite3D();
 		this.scene.addChild(role);
 		
 		//初始化胖子
-		var pangzi = role.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/PangZi.lh"));
+		let pangzi = role.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/PangZi.lh"));
 		//获取动画组件
 		this.animator = pangzi.getChildAt(0).getComponent(Laya.Animator);
 		//创建动作状态
-		var state1 = new Laya.AnimatorState();
+		let state1 = new Laya.AnimatorState();
 		//动作名称
 		state1.name = "hello";
 		//动作播放起始时间
@@ -74,29 +74,29 @@ class AnimatorStateScriptDemo
 		//循环模式
 		state1.clip.islooping = true;
 		//为动画状态添加动画状态脚本
-		var asst1 = state1.addScript(AnimatorStateScriptTest);
+		let asst1 = state1.addScript(AnimatorStateScriptTest);
         asst1.text = this.text;
 		//为动画组件添加一个动作状态
 		this.animator.addState(state1);
 		
-		var state2 = new Laya.AnimatorState();
+		let state2 = new Laya.AnimatorState();
 		state2.name = "ride";
 		state2.clipStart = 0 / 581;
 		state2.clipEnd = 33 / 581;
 		state2.clip = this.animator.getDefaultState().clip;
 		state2.clip.islooping = true;
-        var asst2 = state2.addScript(AnimatorStateScriptTest);
+        let asst2 = state2.addScript(AnimatorStateScriptTest);
         asst2.text = this.text;
 		this.animator.addState(state2);
 		this.animator.speed = 0.0;
 		
-		var state3 = new Laya.AnimatorState();
+		let state3 = new Laya.AnimatorState();
 		state3.name = "动作状态三";
 		state3.clipStart = 34 / 581;
 		state3.clipEnd = 100 / 581;
 		state3.clip = this.animator.getDefaultState().clip;
 		state3.clip.islooping = true;
-		var asst3 = state3.addScript(AnimatorStateScriptTest);
+		let asst3 = state3.addScript(AnimatorStateScriptTest);
         asst3.text = this.text;
 		this.animator.addState(state3);
 		this.animator.speed = 0.0;
@@ -138,7 +138,7 @@ class AnimatorStateScriptDemo
 			this.changeActionButton.labelSize = 30;
 			this.changeActionButton.sizeGrid = "4,4,4,4";
 			this.changeActionButton.scale(Laya.Browser.pixelRatio, Laya.Browser.pixelRatio);
-			this.changeActionButton.pos(Laya.stage.width / 2 - this.changeActionButton.width * Laya.Browser.pixelRatio / 2 + 100, Laya.stage.height - 100 * Laya.Browser.pixelRatio);
+			this.changeActionButton.pos(Laya.stage.width / 2 - this.changeActionButton.width * Laya.Browser.pixelRatio / 2, Laya.stage.height - 100 * Laya.Browser.pixelRatio);
 			
 			this.changeActionButton.on(Laya.Event.CLICK, this, function(){
 				

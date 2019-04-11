@@ -30,17 +30,17 @@ class RealTimeShadow{
         Laya.timer.frameLoop(1, this, this.onFrameLoop);
     }
     onComplete(){
-        var grid = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
+        let grid = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
         //地面接收阴影
         grid.getChildAt(0).meshRenderer.receiveShadow = true;
-        var staticLayaMonkey = this.scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
+        let staticLayaMonkey = this.scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
         staticLayaMonkey.meshRenderer.material = Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
         staticLayaMonkey.transform.position = new Laya.Vector3(0, 0, -0.5);
         staticLayaMonkey.transform.localScale = new Laya.Vector3(0.3, 0.3, 0.3);
         staticLayaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
         //产生阴影
         staticLayaMonkey.meshRenderer.castShadow = true;
-        var layaMonkey = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
+        let layaMonkey = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh"));
         //产生阴影
         layaMonkey.getChildAt(0).getChildAt(0).skinnedMeshRenderer.castShadow = true;
     }
@@ -48,7 +48,7 @@ class RealTimeShadow{
         Laya.Quaternion.createFromYawPitchRoll(0.025, 0, 0, this.quaternion);
         this.directionLight.transform.worldMatrix.getForward(this.direction);
         Laya.Vector3.transformQuat(this.direction, this.quaternion, this.direction);
-        var mat = this.directionLight.transform.worldMatrix;
+        let mat = this.directionLight.transform.worldMatrix;
 		mat.setForward(this.direction);
 		this.directionLight.transform.worldMatrix = mat;
     }

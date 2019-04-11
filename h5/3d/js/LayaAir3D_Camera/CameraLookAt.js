@@ -13,7 +13,7 @@ class CameraLookAt
 		this.upVector = new Laya.Vector3(0, 1, 0);     
 		this.index = 0;   
 		//预加载所有资源
-		var resource = [  
+		let resource = [  
 			"res/threeDimen/texture/layabox.png",
 			"res/threeDimen/skyBox/skyBox3/skyBox3.lmat"
 		];
@@ -23,7 +23,7 @@ class CameraLookAt
     onPreLoadFinish()
     {
 		//创建场景
-		var scene = new Laya.Scene3D();
+		let scene = new Laya.Scene3D();
 		Laya.stage.addChild(scene);
 			
 		//创建相机，构造函数的三个参数为相机横纵比，近距裁剪，远距裁剪
@@ -42,13 +42,13 @@ class CameraLookAt
 		scene.addChild(this.camera);
 			
 		//添加平行光
-		var directionLight = new Laya.DirectionLight();
+		let directionLight = new Laya.DirectionLight();
 		scene.addChild(directionLight);
 		//设置平行光颜色
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.rotate(new Laya.Vector3( -3.14 / 3, 0, 0));
 			
-		var sprite = new Laya.Sprite3D;
+		let sprite = new Laya.Sprite3D();
 		scene.addChild(sprite);
 			
 		//正方体
@@ -68,12 +68,12 @@ class CameraLookAt
 		sprite.addChild(this.cylinder);
 			
 		//创建linnPhong材质
-		var materialBill = new Laya.BlinnPhongMaterial;
+		let materialBill = new Laya.BlinnPhongMaterial();
 		this.box.meshRenderer.material = materialBill;
 		this.capsule.meshRenderer.material = materialBill;
 		this.cylinder.meshRenderer.material = materialBill;
 		//为材质加载纹理
-		var tex = Laya.Loader.getRes("res/threeDimen/texture/layabox.png");
+		let tex = Laya.Loader.getRes("res/threeDimen/texture/layabox.png");
 		//设置反照率贴图
 		materialBill.albedoTexture = tex;
 			
@@ -83,7 +83,7 @@ class CameraLookAt
 			
 		Laya.loader.load(["res/threeDimen/ui/button.png"], Laya.Handler.create(this, function() {
 				
-			var changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "切换注视目标"));
+			let changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "切换注视目标"));
 			changeActionButton.size(200, 40);
 			changeActionButton.labelBold = true;
 			changeActionButton.labelSize = 30;
@@ -92,7 +92,6 @@ class CameraLookAt
 			changeActionButton.pos(Laya.stage.width / 2 - changeActionButton.width * Laya.Browser.pixelRatio / 2 , Laya.stage.height - 100 * Laya.Browser.pixelRatio);
 				
 			changeActionButton.on(Laya.Event.CLICK, this, function(){
-				debugger;
 				this.index++;
 				if (this.index % 3 === 1 ){
 					//摄像机捕捉模型目标

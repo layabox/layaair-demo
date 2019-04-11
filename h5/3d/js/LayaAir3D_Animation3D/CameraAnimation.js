@@ -7,7 +7,7 @@ class CameraAnimation {
 	
 		Laya.Scene3D.load("res/threeDimen/scene/cameraDonghua/Conventional/layaScene.ls", Laya.Handler.create(this, function(scene) {
 			Laya.stage.addChild(scene);
-			var camera = scene.getChildByName("Main Camera");
+			let camera = scene.getChildByName("Main Camera");
 			camera.addComponent(CameraMoveScript);
 		}));
 	

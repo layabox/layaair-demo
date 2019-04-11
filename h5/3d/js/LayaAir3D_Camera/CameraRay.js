@@ -8,8 +8,8 @@ class CameraRay {
 		Laya.Stat.show();
 		
         this.scene = new Laya.Scene3D();
-        this.point = new Laya.Vector2;
-		this.outs = new Array;
+        this.point = new Laya.Vector2();
+		this.outs = [];
 		this.tmpVector = new Laya.Vector3(0, 0, 0);
 		this.albedoColor = new Laya.Vector4(1.0, 0.0, 0.0, 1.0);
 		Laya.stage.addChild(this.scene);
@@ -24,17 +24,17 @@ class CameraRay {
 		//this.camera.clearColor = null;
 		
 		//方向光
-		var directionLight = new Laya.DirectionLight();
+		let directionLight = new Laya.DirectionLight();
 		this.scene.addChild(directionLight);
 		directionLight.color = new Laya.Vector3(0.6, 0.6, 0.6);
-		var mat = directionLight.transform.worldMatrix;
+		let mat = directionLight.transform.worldMatrix;
 		mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
 		directionLight.transform.worldMatrix = mat;
 		
 		//平面
-		var plane = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(10, 10, 10, 10));
+		let plane = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(10, 10, 10, 10));
 		this.scene.addChild(plane);
-		var planeMat = new Laya.BlinnPhongMaterial();
+		let planeMat = new Laya.BlinnPhongMaterial();
 		Laya.Texture2D.load("res/threeDimen/Physics/grass.png", Laya.Handler.create(null, function(tex) {
 			planeMat.albedoTexture = tex;
 		}));
@@ -44,9 +44,9 @@ class CameraRay {
 		plane.meshRenderer.material = planeMat;
 		
 		//平面添加物理碰撞体组件
-		var planeStaticCollider = plane.addComponent(Laya.PhysicsCollider);
+		let planeStaticCollider = plane.addComponent(Laya.PhysicsCollider);
 		//创建盒子形状碰撞器
-		var planeShape = new Laya.BoxColliderShape(10, 0, 10);
+		let planeShape = new Laya.BoxColliderShape(10, 0, 10);
 		//物理碰撞体设置形状
 		planeStaticCollider.colliderShape = planeShape;
 		//物理碰撞体设置摩擦力
@@ -61,17 +61,17 @@ class CameraRay {
 	}
 	
 	addBoxXYZ(x, y, z) {
-		var mat1 = new Laya.BlinnPhongMaterial();
+		let mat1 = new Laya.BlinnPhongMaterial();
 		Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(null, function(tex) {
 			mat1.albedoTexture = tex;
 		}));
 		
 		//随机生成坐标值
-		var sX = Math.random() * 0.75 + 0.25;
-		var sY = Math.random() * 0.75 + 0.25;
-		var sZ = Math.random() * 0.75 + 0.25;
+		let sX = Math.random() * 0.75 + 0.25;
+		let sY = Math.random() * 0.75 + 0.25;
+		let sZ = Math.random() * 0.75 + 0.25;
 		//创建盒型MeshSprite3D
-		var box = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(sX, sY, sZ));
+		let box = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(sX, sY, sZ));
 		this.scene.addChild(box);
 		//设置材质
 		box.meshRenderer.material = mat1;
@@ -81,9 +81,9 @@ class CameraRay {
 		this.tmpVector.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
 		box.transform.rotationEuler = this.tmpVector;
 		//创建刚体碰撞器
-		var rigidBody = box.addComponent(Laya.Rigidbody3D);
+		let rigidBody = box.addComponent(Laya.Rigidbody3D);
 		//创建盒子形状碰撞器
-		var boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
+		let boxShape = new Laya.BoxColliderShape(sX, sY, sZ);
 		//设置盒子的碰撞形状
 		rigidBody.colliderShape = boxShape; 
 		//设置刚体的质量
@@ -102,7 +102,7 @@ class CameraRay {
 		//拿到射线碰撞的物体
 		this.scene.physicsSimulation.rayCastAll(this._ray,this.outs);
 		//如果碰撞到物体
-		if (this.outs.length != 0)
+		if (this.outs.length !== 0)
 		{
 
 			for (let i = 0; i <  this.outs.length; i++)

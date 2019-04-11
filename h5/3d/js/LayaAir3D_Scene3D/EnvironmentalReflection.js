@@ -13,7 +13,7 @@ class EnvironmentalReflection {
         this.scene.reflectionMode = Laya.Scene3D.REFLECTIONMODE_CUSTOM;
         
         //初始化照相机
-        var camera = new Laya.Camera(0, 0.1, 100);
+        let camera = new Laya.Camera(0, 0.1, 100);
         this.scene.addChild(camera);
         camera.transform.translate(new Laya.Vector3(0, 2, 3));
         camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
@@ -25,7 +25,7 @@ class EnvironmentalReflection {
         //天空盒
         Laya.BaseMaterial.load("res/threeDimen/skyBox/DawnDusk/SkyBox.lmat", Laya.Handler.create(this, function(mat) {
             //获取相机的天空盒渲染体
-            var skyRenderer = camera.skyRenderer;
+            let skyRenderer = camera.skyRenderer;
             //设置天空盒mesh
             skyRenderer.mesh = Laya.SkyBox.instance;
             //设置天空盒材质
@@ -36,7 +36,7 @@ class EnvironmentalReflection {
             mat.exposure = 1.6;
         }));
         //创建平行光
-        var directionLight = new Laya.DirectionLight();
+        let directionLight = new Laya.DirectionLight();
         this.scene.addChild(directionLight);
         directionLight.color = new Laya.Vector3(1, 1, 1);
         
@@ -51,7 +51,7 @@ class EnvironmentalReflection {
             this.teapot.transform.rotate(new Laya.Vector3(-90, 0, 0), false, false);
             this.sprite3D.addChild(this.teapot);
             //实例PBR材质
-            var pbrMat = new Laya.PBRStandardMaterial();
+            let pbrMat = new Laya.PBRStandardMaterial();
             //开启该材质的反射
             pbrMat.enableReflection = true;
             //设置材质的金属度，尽量高点，反射效果更明显

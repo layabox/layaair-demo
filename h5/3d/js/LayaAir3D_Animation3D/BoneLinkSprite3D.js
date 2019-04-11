@@ -13,7 +13,7 @@ class BoneLinkSprite3D{
         //开启统计信息
         Laya.Stat.show();
         //预加载所有资源
-        var resource = [
+        let resource = [
             "res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh",
             "res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh",
             "res/threeDimen/skinModel/BoneLinkScene/PangZi.lh"
@@ -25,13 +25,13 @@ class BoneLinkSprite3D{
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
         this.scene.ambientColor = new Laya.Vector3(0.5, 0.5, 0.5);
         //初始化相机
-        var camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
+        let camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));
         camera.transform.translate(new Laya.Vector3(0, 3, 5));
         camera.transform.rotate(new Laya.Vector3(-15, 0, 0), true, false);
         camera.addComponent(CameraMoveScript);
-        var directionLight = this.scene.addChild(new Laya.DirectionLight());
+        let directionLight = this.scene.addChild(new Laya.DirectionLight());
        //设置灯光方向
-        var mat = directionLight.transform.worldMatrix;
+        let mat = directionLight.transform.worldMatrix;
 		mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
 		directionLight.transform.worldMatrix = mat;
         //初始化角色精灵
@@ -40,7 +40,7 @@ class BoneLinkSprite3D{
         this.pangzi = this.role.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/PangZi.lh"));
         //获取动画组件
         this.animator = this.pangzi.getChildAt(0).getComponent(Laya.Animator);
-        var state1 = new Laya.AnimatorState();
+        let state1 = new Laya.AnimatorState();
         state1.name = "hello";
         state1.clipStart = 296 / 581;
         state1.clipEnd = 346 / 581;
@@ -48,7 +48,7 @@ class BoneLinkSprite3D{
         state1.clip.islooping = true;
         this.animator.addState(state1);
         this.animator.play("hello");
-        var state2 = new Laya.AnimatorState();
+        let state2 = new Laya.AnimatorState();
         state2.name = "ride";
         state2.clipStart = 3 / 581;
         state2.clipEnd = 33 / 581;
@@ -59,7 +59,7 @@ class BoneLinkSprite3D{
         this.dragon1.transform.localScale = this.dragonScale;
         this.aniSprte3D1 = this.dragon1.getChildAt(0);
         this.dragonAnimator1 = this.aniSprte3D1.getComponent(Laya.Animator);
-        var state3 = new Laya.AnimatorState();
+        let state3 = new Laya.AnimatorState();
         state3.name = "run";
         state3.clipStart = 50 / 644;
         state3.clipEnd = 65 / 644;
@@ -70,7 +70,7 @@ class BoneLinkSprite3D{
         this.dragon2.transform.localScale = this.dragonScale;
         this.aniSprte3D2 = this.dragon2.getChildAt(0);
         this.dragonAnimator2 = this.aniSprte3D2.getComponent(Laya.Animator);
-        var state4 = new Laya.AnimatorState();
+        let state4 = new Laya.AnimatorState();
         state4.name = "run";
         state4.clipStart = 50 / 550;
         state4.clipEnd = 65 / 550;
