@@ -14,8 +14,9 @@ loadLib("3d/js/common/CameraMoveScript.js");
 loadLib("3d/js/common/VRCameraMoveScript.js");
 loadLib("3d/js/common/Tool.js");
 loadLib("3d/js/common/TriggerCollisionScript.js");
-loadLib("3d/js/shaderModule/customMaterials/CustomMaterial.js");
-loadLib("3d/js/shaderModule/customMaterials/CustomTerrainMaterial.js");
+loadLib("3d/js/LayaAir3D_Shader/customMaterials/CustomMaterial.js");
+loadLib("3d/js/LayaAir3D_Shader/customMaterials/CustomTerrainMaterial.js");
+loadLib("3d/js/LayaAir3D_Shader/customMaterials/cartoonMaterial.js");
 loadLib("res/threeDimen/pbrlut.js");
 loadLib("conchInit3d.js");
 
