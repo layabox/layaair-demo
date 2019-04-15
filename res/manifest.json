@@ -294,6 +294,7 @@
 			"manifest": [
 				["Sprite3DParent", "子父级关系", "", "core,webgl,ani,d3,ui,CameraMoveScript.js"],
 				["ScriptSample", "添加脚本", "", "core,webgl,ani,d3,CameraMoveScript.js"],
+				["TransformDemo", "变换示例", "", "core,webgl,ani,d3,CameraMoveScript.js"],
 				["Sprite3DClone", "克隆精灵", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
 				["PixelLineSprite3DDemo", "像素线精灵", "", "core,webgl,ani,d3,CameraMoveScript.js,Tool.js" ]
 			]
