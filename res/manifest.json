@@ -319,7 +319,6 @@
         ["BlinnPhong_NormalMap", "BlinnPhong-法线贴图", "", "core,webgl,ani,d3" ],
 				["BlinnPhong_SpecularMap", "BlinnPhong-高光贴图", "", "core,webgl,ani,d3,CameraMoveScript.js"],
 				["PBRStandardMaterialDemo", "PBRStandard材质", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				["PBRSpecularMaterialDeno", "PBRSpecular材质", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
 				["EffectMaterialDemo", "Effect材质", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
 				["UnlitMaterialDemo", "Unlit材质", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
 				["WaterPrimaryMaterialDemo", "WaterPrimary材质", "", "core,webgl,ani,d3,physics3D,CameraMoveScript.js" ]
