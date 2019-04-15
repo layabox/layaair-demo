@@ -1,11 +1,11 @@
 import CameraMoveScript from "./common/CameraMoveScript"
 class TransformDemo{
-    private _scene:Laya.Scene3D;
-	private _position:Laya.Vector3 = new Laya.Vector3(0, 0, 0);
-	private _position1:Laya.Vector3 = new Laya.Vector3(0, 0, 0);
-	private _rotate:Laya.Vector3 = new Laya.Vector3(0, 1, 0);
-	private _scale:Laya.Vector3 = new Laya.Vector3();
-	private _rotate1:Laya.Vector3 = new Laya.Vector3(0, 0, 0);
+    private scene:Laya.Scene3D;
+	private position:Laya.Vector3 = new Laya.Vector3(0, 0, 0);
+	private position1:Laya.Vector3 = new Laya.Vector3(0, 0, 0);
+	private rotate:Laya.Vector3 = new Laya.Vector3(0, 1, 0);
+	private scale:Laya.Vector3 = new Laya.Vector3();
+	private rotate1:Laya.Vector3 = new Laya.Vector3(0, 0, 0);
 	private scaleDelta:number = 0;
 	private scaleValue:number = 0;
 		
@@ -26,19 +26,19 @@ class TransformDemo{
         Laya.Stat.show();
 			
 		//创建场景
-		this._scene = new Laya.Scene3D();
-		Laya.stage.addChild(this._scene);
+		this.scene = new Laya.Scene3D();
+		Laya.stage.addChild(this.scene);
             
 		//添加相机
 		var camera = new Laya.Camera(0, 0.1, 100);
-		this._scene.addChild(camera);
+		this.scene.addChild(camera);
         camera.transform.translate(new Laya.Vector3(0, 0.8, 5));
         camera.transform.rotate(new Laya.Vector3( -15, 0, 0), true, false);
 		camera.addComponent(CameraMoveScript);
 			
 		//添加光照
 		var directionLight= new Laya.DirectionLight();
-		this._scene.addChild(directionLight);
+		this.scene.addChild(directionLight);
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.rotate(new Laya.Vector3( -3.14 / 3, 0, 0));
 			
@@ -62,11 +62,11 @@ class TransformDemo{
 
     onComplete(){
         //加载地面
-        var grid = this._scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh")) as Laya.Sprite3D;
+        var grid = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh")) as Laya.Sprite3D;
         //地面接收阴影
         (grid.getChildAt(0) as Laya.MeshSprite3D).meshRenderer.receiveShadow = true;
         //加载静态小猴子
-        var staticLayaMonkey = this._scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm"))) as Laya.MeshSprite3D;
+        var staticLayaMonkey = this.scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm"))) as Laya.MeshSprite3D;
         //设置材质
         staticLayaMonkey.meshRenderer.material = Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/Materials/T_Diffuse.lmat");
 		//设置位置
@@ -85,22 +85,22 @@ class TransformDemo{
 		staticLayaMonkey.removeSelf();
          
 		//克隆sprite3d
-        this.layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, this._position1);
-        this.layaMonkey_clone2 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, this._position1);
-		this.layaMonkey_clone3 = Laya.Sprite3D.instantiate(staticLayaMonkey, this._scene, false, this._position1);
+        this.layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, this.position1);
+        this.layaMonkey_clone2 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, this.position1);
+		this.layaMonkey_clone3 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, this.position1);
 		//得到三个Transform3D
 		this.clone1Transform = this.layaMonkey_clone1.transform;
 		this.clone2Transform = this.layaMonkey_clone2.transform;
 		this.clone3Transform = this.layaMonkey_clone3.transform;
 
 		//平移
-		this._position1.setValue(-1.5, 0, 0.0);
-		this.clone2Transform.translate(this._position1);
-		this._position1.setValue(1.0, 0, 0.0);
-        this.clone3Transform.translate(this._position1);
+		this.position1.setValue(-1.5, 0, 0.0);
+		this.clone2Transform.translate(this.position1);
+		this.position1.setValue(1.0, 0, 0.0);
+        this.clone3Transform.translate(this.position1);
 		//旋转
-		this._rotate1.setValue(0, 60, 0);
-        this.clone2Transform.rotate(this._rotate1, false, false);
+		this.rotate1.setValue(0, 60, 0);
+        this.clone2Transform.rotate(this.rotate1, false, false);
         //缩放
 		var scale = this.clone3Transform.localScale;
 		scale.setValue(0.1, 0.1, 0.1);
@@ -113,13 +113,13 @@ class TransformDemo{
     animate() {
         this.scaleValue = Math.sin(this.scaleDelta += 0.1);
         
-        this._position.y = Math.max(0, this.scaleValue / 2);;
-        this.layaMonkey_clone1.transform.position = this._position;
+        this.position.y = Math.max(0, this.scaleValue / 2);;
+        this.layaMonkey_clone1.transform.position = this.position;
         
-        this.layaMonkey_clone2.transform.rotate(this._rotate, false, false);
+        this.layaMonkey_clone2.transform.rotate(this.rotate, false, false);
         
-        this._scale.x = this._scale.y = this._scale.z = Math.abs(this.scaleValue) / 5;
-        this.layaMonkey_clone3.transform.localScale = this._scale;
+        this.scale.x = this.scale.y = this.scale.z = Math.abs(this.scaleValue) / 5;
+        this.layaMonkey_clone3.transform.localScale = this.scale;
     }
 }
 //激活启动类
