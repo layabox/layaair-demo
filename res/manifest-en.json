@@ -303,7 +303,6 @@
 				"manifest": [
 					["Sprite3DParent", "Sprite3DParent", "", "core,webgl,ani,d3,ui,CameraMoveScript.js"],
 					["ScriptSample", "ScriptSample", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-					["TransformDemo", "变换示例", "", "core,webgl,ani,d3,CameraMoveScript.js"],
 					["Sprite3DClone", "Sprite3DClone", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
 					["PixelLineSprite3DDemo", "PixelLineSprite3DDemo", "", "core,webgl,ani,d3,Tool.js,CameraMoveScript.js" ]
 				]
