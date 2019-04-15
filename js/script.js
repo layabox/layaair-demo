@@ -356,6 +356,12 @@ $(document).ready(function()
 			case "MultiplePassOutlineMaterial.js":
 				d3Path = "MultiplePassOutlineMaterial.js";
 				break;
+			case "CustomMaterial.js":
+				d3Path = "CustomMaterial.js";
+				break;
+			case "CustomTerrainMaterial.js":
+				d3Path = "CustomTerrainMaterial.js";
+				break;
 			default:
 				d3Path = "";
 		}
