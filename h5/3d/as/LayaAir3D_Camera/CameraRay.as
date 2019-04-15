@@ -145,8 +145,7 @@ package LayaAir3D_Camera {
 			camera.viewportPointToRay(point, _ray);
 			//拿到射线碰撞的物体
 			scene.physicsSimulation.rayCastAll(_ray, outs);
-			
-			debugger;
+		
 			//如果碰撞到物体
 			if (outs.length != 0) {
 				

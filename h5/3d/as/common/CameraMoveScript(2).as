@@ -105,7 +105,6 @@ package common {
 		}
 		
 		protected function updateCamera(elapsedTime:Number):void {
-			//debugger;
 			if (!isNaN(lastMouseX) && !isNaN(lastMouseY) && isMouseDown) {
 				var scene:Scene3D = owner.scene;
 				KeyBoardManager.hasKeyDown(87) && moveForward(-0.005 * elapsedTime);//W

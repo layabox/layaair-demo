@@ -13,7 +13,6 @@ class Shader_MultiplePassOutline {
 		//显示性能面板
 		Laya.Stat.show();
 		//初始化Shader
-		debugger;
 		MultiplePassOutlineMaterial.initShader();
 		//创建场景
 		var scene = Laya.stage.addChild(new Laya.Scene3D()) as Laya.Scene3D;

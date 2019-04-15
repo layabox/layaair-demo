@@ -256,7 +256,6 @@ $(document).ready(function()
 
 	function LoadCode(demo_full_name, lang, successCallback)
 	{
-		debugger;
 		var p = demo_full_name.split('&');
 		var path = 'h5/' + p[0] + '/' + lang + '/';
 		if (p[0] == '2d')
@@ -505,7 +504,7 @@ $(document).ready(function()
 		if (category == '2d') {
 			path += group + '_' + name + '.' + g_lang;
 		} else {
-			path += group.toLowerCase() + 'Module' + '/';
+			path += 'LayaAir3D_' + group + '/';
 			path += name;
 			path += '.' + g_lang;
 		}

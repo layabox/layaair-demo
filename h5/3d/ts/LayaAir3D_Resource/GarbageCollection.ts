@@ -41,7 +41,6 @@ class GarbageCollection{
 		}));
 	}
 	private loadScene():void {
-		debugger;
 		Laya.Scene3D.load("res/threeDimen/scene/ParticleScene/Example_01.ls", Laya.Handler.create(this, function(scene:Laya.Scene3D) {
 			this.scene = Laya.stage.addChildAt(scene, 0);
 			var camera:Laya.Camera = this.scene.addChild(new Laya.Camera(0, 0.1, 100));

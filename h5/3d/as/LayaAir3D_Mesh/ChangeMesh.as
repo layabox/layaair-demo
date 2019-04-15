@@ -74,7 +74,6 @@ package LayaAir3D_Mesh {
 				changeActionButton.pos(Laya.stage.width / 2 - changeActionButton.width * Browser.pixelRatio / 2, Laya.stage.height - 100 * Browser.pixelRatio);
 				
 				changeActionButton.on(Event.CLICK, this, function():void {
-					debugger;
 					index++;
 					if (index % 5 === 1) {
 						//切换mesh

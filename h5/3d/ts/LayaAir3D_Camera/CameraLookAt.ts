@@ -96,7 +96,6 @@ class CameraLookAt
 			changeActionButton.pos(Laya.stage.width / 2 - changeActionButton.width * Laya.Browser.pixelRatio / 2 , Laya.stage.height - 100 * Laya.Browser.pixelRatio);
 				
 			changeActionButton.on(Laya.Event.CLICK, this, function():void{
-				debugger;
 				this.index++;
 				if (this.index % 3 === 1 ){
 					//摄像机捕捉模型目标

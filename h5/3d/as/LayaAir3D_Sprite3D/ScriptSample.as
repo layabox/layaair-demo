@@ -63,7 +63,6 @@ class MonkeyScript extends Script3D {
 	}
 	
 	override public function onEnable():void {
-		debugger;
 		trace(this._enabled);
 	}
 	

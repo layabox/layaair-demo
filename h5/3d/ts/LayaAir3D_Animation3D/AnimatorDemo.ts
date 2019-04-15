@@ -62,7 +62,6 @@ class AnimatorDemo
 		var pangzi = role.addChild(Laya.Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/PangZi.lh")) as Laya.Sprite3D;
 		//获取动画组件
 		this.animator = pangzi.getChildAt(0).getComponent(Laya.Animator) as Laya.Animator;
-		debugger;
 		//创建动作状态
 		var state1 = new Laya.AnimatorState();
 		//动作名称

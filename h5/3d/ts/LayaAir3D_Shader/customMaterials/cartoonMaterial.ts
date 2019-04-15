@@ -106,7 +106,6 @@ export default class CartoonMaterial extends Laya.BaseMaterial {
 		//var ps1:String = __INCLUDESTR__("shader/outline.ps");
 		var pass1:Laya.ShaderPass = subShader.addShaderPass(vs1, ps1) as Laya.ShaderPass;
 		pass1.renderState.cull = Laya.RenderState.CULL_FRONT;
-		debugger;
 		var vs2:string = "attribute vec4 a_Position;\n" + 
 		"attribute vec3 a_Normal;\n" +
 		"attribute vec2 a_Texcoord0;\n" +	
