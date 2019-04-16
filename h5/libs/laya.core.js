@@ -15625,7 +15625,11 @@ var SoundChannel=(function(_super){
 	/**
 	*停止播放。
 	*/
-	__proto.stop=function(){}
+	__proto.stop=function(){
+		if (this.completeHandler)this.completeHandler.run();
+		this.completeHandler=null;
+	}
+
 	/**
 	*暂停播放。
 	*/
@@ -19450,6 +19454,7 @@ var AudioSoundChannel=(function(_super){
 	*
 	*/
 	__proto.stop=function(){
+		_super.prototype.stop.call(this);
 		this.isStopped=true;
 		SoundManager.removeChannel(this);
 		this.completeHandler=null;
@@ -19657,6 +19662,7 @@ var WebAudioSoundChannel=(function(_super){
 	*停止播放
 	*/
 	__proto.stop=function(){
+		_super.prototype.stop.call(this);
 		this._clearBufferSource();
 		this.audioBuffer=null;
 		if (this.gain)
@@ -19712,10 +19718,10 @@ var WebAudioSoundChannel=(function(_super){
 	__getset(0,__proto,'volume',function(){
 		return this._volume;
 		},function(v){
+		this._volume=v;
 		if (this.isStopped){
 			return;
 		}
-		this._volume=v;
 		if (this.gain.gain.setTargetAtTime){
 			this.gain.gain.setTargetAtTime(v,this.context.currentTime,0.001);
 		}else
