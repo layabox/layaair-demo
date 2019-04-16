@@ -284,7 +284,7 @@
 				["DirectionLightDemo", "方向光", "", "core,webgl,ani,d3,CameraMoveScript.js"],
 				["PointLightDemo", "点光", "", "core,webgl,ani,d3,CameraMoveScript.js"],
 				["SpotLightDemo", "聚光", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				["RealTimeShadow", "实时光照", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
+				["RealTimeShadow", "实时阴影", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
 			]
 		},
 
