@@ -16,8 +16,6 @@ package LayaAir3D_Shader.customMaterials {
 	 */
 	public class MultiplePassOutlineMaterial extends BaseMaterial {
 		public static const ALBEDOTEXTURE:int = Shader3D.propertyNameToID("u_AlbedoTexture");
-		public static const MARGINALCOLOR:int = Shader3D.propertyNameToID("u_marginalColor");
-		public static const OUTLINETEXTURE:int = Shader3D.propertyNameToID("u_OutlineTexture");
 		public static const OUTLINEWIDTH:int = Shader3D.propertyNameToID("u_OutlineWidth");
 		public static const OUTLINELIGHTNESS:int = Shader3D.propertyNameToID("u_OutlineLightness");
 		
@@ -49,34 +47,6 @@ package LayaAir3D_Shader.customMaterials {
 			else
 				_defineDatas.remove(MultiplePassOutlineMaterial.SHADERDEFINE_ALBEDOTEXTURE);
 			_shaderValues.setTexture(ALBEDOTEXTURE, value);
-		}
-		/**
-		 * 设置边缘光照颜色。
-		 * @param value 边缘光照颜色。
-		 */
-		public function set marginalColor(value:Vector3):void {
-			_shaderValues.setVector3(MARGINALCOLOR, value);
-		}
-		
-		
-		/**
-		 * 获取漫轮廓贴图。
-		 * @return 轮廓贴图。
-		 */
-		public function get outlineTexture():BaseTexture {
-			return _shaderValues.getTexture(OUTLINETEXTURE);
-		}
-		
-		/**
-		 * 设置轮廓贴图。
-		 * @param value 轮廓贴图。
-		 */
-		public function set outlineTexture(value:BaseTexture):void {
-			if (value)
-				_defineDatas.add(MultiplePassOutlineMaterial.SHADERDEFINE_OUTLINETEXTURE);
-			else
-				_defineDatas.remove(MultiplePassOutlineMaterial.SHADERDEFINE_OUTLINETEXTURE);
-			_shaderValues.setTexture(OUTLINETEXTURE, value);
 		}
 		/**
 		 * 获取轮廓宽度。
@@ -117,20 +87,13 @@ package LayaAir3D_Shader.customMaterials {
 			__init__();
 			var attributeMap:Object = {'a_Position': VertexMesh.MESH_POSITION0, 
 									   'a_Normal': VertexMesh.MESH_NORMAL0, 
-									   'a_Texcoord0': VertexMesh.MESH_TEXTURECOORDINATE0,
-									   'a_BoneWeights': VertexMesh.MESH_BLENDWEIGHT0, 
-									   'a_BoneIndices': VertexMesh.MESH_BLENDINDICES0
+									   'a_Texcoord0': VertexMesh.MESH_TEXTURECOORDINATE0
 									};
 			var uniformMap:Object = {'u_MvpMatrix': Shader3D.PERIOD_SPRITE, 
 									 'u_WorldMat': Shader3D.PERIOD_SPRITE,
 									 'u_OutlineWidth': Shader3D.PERIOD_MATERIAL, 
-			                         'u_OutlineTexture': Shader3D.PERIOD_MATERIAL,
 									 'u_OutlineLightness': Shader3D.PERIOD_MATERIAL,
-									 'u_Bones': Shader3D.PERIOD_CUSTOM, 
-									 'u_CameraPos': Shader3D.PERIOD_CAMERA,
-									 'u_texture': Shader3D.PERIOD_MATERIAL, 
-									 'u_DirectionLight.Direction': Shader3D.PERIOD_SCENE, 
-									 'u_DirectionLight.Color': Shader3D.PERIOD_SCENE
+									 'u_AlbedoTexture': Shader3D.PERIOD_MATERIAL
 									};
 									
 			var customShader:Shader3D = Shader3D.add("MultiplePassOutlineShader");
@@ -141,8 +104,8 @@ package LayaAir3D_Shader.customMaterials {
 			var pass1:ShaderPass = subShader.addShaderPass(vs1, ps1);
 			pass1.renderState.cull = RenderState.CULL_FRONT;
 			
-			var vs2:String = __INCLUDESTR__("../customShader/outline2.vs");
-			var ps2:String = __INCLUDESTR__("../customShader/outline2.ps");
+			var vs2:String = __INCLUDESTR__("../customShader/outline02.vs");
+			var ps2:String = __INCLUDESTR__("../customShader/outline02.ps");
 			subShader.addShaderPass(vs2, ps2);
 		}
 		

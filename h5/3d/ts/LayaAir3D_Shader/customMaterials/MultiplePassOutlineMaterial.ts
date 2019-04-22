@@ -4,6 +4,7 @@ export default class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
 		public static OUTLINETEXTURE = Laya.Shader3D.propertyNameToID("u_OutlineTexture");
 		public static OUTLINEWIDTH = Laya.Shader3D.propertyNameToID("u_OutlineWidth");
 		public static OUTLINELIGHTNESS = Laya.Shader3D.propertyNameToID("u_OutlineLightness");
+		public static OUTLINECOLOR = Laya.Shader3D.propertyNameToID("u_OutlineColor");
 		
 		public static SHADERDEFINE_ALBEDOTEXTURE;
 		/**@private */
@@ -35,33 +36,17 @@ export default class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
 			this._shaderValues.setTexture(MultiplePassOutlineMaterial.ALBEDOTEXTURE, value);
 		}
 		/**
-		 * 设置边缘光照颜色。
-		 * @param value 边缘光照颜色。
-		 */
-		public set marginalColor(value:Laya.Vector3) {
-			//this._shaderValues.setVector3(MultiplePassOutlineMaterial.MARGINALCOLOR, value);
-		}
+    	 * 获取线条颜色
+    	 * @return 线条颜色
+    	 */
+    	public get outlineColor() {
+        	return _shaderValues.getVector(MultiplePassOutlineMaterial.OUTLINECOLOR);
+    	}
+    
+    	public set outlineColor(value) {
+        	this._shaderValues.setVector(MultiplePassOutlineMaterial.OUTLINECOLOR, value);
+    	}
 		
-		
-		/**
-		 * 获取漫轮廓贴图。
-		 * @return 轮廓贴图。
-		 */
-		public get outlineTexture():Laya.BaseTexture {
-			return this._shaderValues.getTexture(MultiplePassOutlineMaterial.OUTLINETEXTURE);
-		}
-		
-		/**
-		 * 设置轮廓贴图。
-		 * @param value 轮廓贴图。
-		 */
-		public set outlineTexture(value:Laya.BaseTexture) {
-			//if (value)
-				//this._defineDatas.add(MultiplePassOutlineMaterial.SHADERDEFINE_OUTLINETEXTURE);
-			//else
-				//this._defineDatas.remove(MultiplePassOutlineMaterial.SHADERDEFINE_OUTLINETEXTURE);
-			//this._shaderValues.setTexture(MultiplePassOutlineMaterial.OUTLINETEXTURE, value);
-		}
 		/**
 		 * 获取轮廓宽度。
 		 * @return 轮廓宽度,范围为0到0.05。
@@ -101,20 +86,14 @@ export default class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
 			MultiplePassOutlineMaterial.__init__();
 			var attributeMap:Object = {'a_Position': Laya.VertexMesh.MESH_POSITION0, 
 									   'a_Normal': Laya.VertexMesh.MESH_NORMAL0, 
-									   'a_Texcoord0': Laya.VertexMesh.MESH_TEXTURECOORDINATE0,
-									   'a_BoneWeights': Laya.VertexMesh.MESH_BLENDWEIGHT0, 
-									   'a_BoneIndices': Laya.VertexMesh.MESH_BLENDINDICES0
+									   'a_Texcoord0': Laya.VertexMesh.MESH_TEXTURECOORDINATE0
 									};
 			var uniformMap:Object = {'u_MvpMatrix': Laya.Shader3D.PERIOD_SPRITE, 
 									 'u_WorldMat': Laya.Shader3D.PERIOD_SPRITE,
+									 'u_OutlineColor': Laya.Shader3D.PERIOD_MATERIAL,
 									 'u_OutlineWidth': Laya.Shader3D.PERIOD_MATERIAL, 
-			                         'u_OutlineTexture': Laya.Shader3D.PERIOD_MATERIAL,
 									 'u_OutlineLightness': Laya.Shader3D.PERIOD_MATERIAL,
-									 'u_Bones': Laya.Shader3D.PERIOD_CUSTOM, 
-									 'u_CameraPos': Laya.Shader3D.PERIOD_CAMERA,
-									 'u_texture': Laya.Shader3D.PERIOD_MATERIAL, 
-									 'u_DirectionLight.Direction': Laya.Shader3D.PERIOD_SCENE, 
-									 'u_DirectionLight.Color': Laya.Shader3D.PERIOD_SCENE
+									 'u_AlbedoTexture': Laya.Shader3D.PERIOD_MATERIAL
 									};
 									
 			var customShader:Laya.Shader3D = Laya.Shader3D.add("MultiplePassOutlineShader");
@@ -127,11 +106,8 @@ export default class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
             "uniform mat4 u_MvpMatrix;\n" + 
             "uniform float u_OutlineWidth;\n" + 
             
-            "varying vec2 v_Texcoord0;\n" + 
-            
             "void main()\n" + 
-            "{\n" + 
-            "   v_Texcoord0 = a_Texcoord0;\n" +     
+            "{\n" +  
             "   vec4 position = vec4(a_Position.xyz + a_Normal * u_OutlineWidth, 1.0);\n" + 
             "   gl_Position = u_MvpMatrix * position;\n" + 
             "}\n" ;
@@ -140,32 +116,16 @@ export default class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
             "precision highp float;\n" + 
             "#else\n" + 
             "   precision mediump float;\n" + 
-            "#endif\n" + 
-        
-            "struct DirectionLight\n" + 
-            "{\n" + 
-            "   vec3 Color;\n" + 
-            "   vec3 Direction;\n" + 
-            "};\n" + 
-        
-            "varying vec2 v_Texcoord0;\n" + 
-        
-            "#ifdef OUTLINETEXTURE\n" + 
-            "   uniform sampler2D u_OutlineTexture;\n" + 
-            "#endif\n" + 
+			"#endif\n" + 
+			"uniform vec4 u_OutlineColor;\n" + 
             "uniform float u_OutlineLightness;\n" + 
         
             "void main()\n" + 
-            "{\n" + 
-            "   vec4 outlineTextureColor = vec4(1.0);\n" + 
-            "   #ifdef OUTLINETEXTURE\n" + 
-            "       outlineTextureColor = texture2D(u_OutlineTexture, v_Texcoord0);\n" + 
-            "   #endif\n" + 
-            
-            "   vec3 finalColor = outlineTextureColor.rgb * u_OutlineLightness;\n" + 
-            
-            "   gl_FragColor = vec4(finalColor,0.0);\n" + 
-            "}";
+        	"{\n" + 
+        	"   vec3 finalColor = u_OutlineColor.rgb * u_OutlineLightness;\n" + 
+        
+        	"   gl_FragColor = vec4(finalColor,0.0);\n" + 
+        	"}";
         
 			var pass1 = subShader.addShaderPass(vs1, ps1);
 			pass1.renderState.cull = Laya.RenderState.CULL_FRONT;
