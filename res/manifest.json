@@ -293,7 +293,6 @@
 			"tr_zhCN": "3D精灵",
 			"manifest": [
 				["Sprite3DParent", "子父级关系", "", "core,webgl,ani,d3,ui,CameraMoveScript.js"],
-				["ScriptSample", "添加脚本", "", "core,webgl,ani,d3,CameraMoveScript.js"],
 				["TransformDemo", "变换示例", "", "core,webgl,ani,d3,CameraMoveScript.js"],
 				["Sprite3DClone", "克隆精灵", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
 				["PixelLineSprite3DDemo", "像素线精灵", "", "core,webgl,ani,d3,CameraMoveScript.js,Tool.js" ]
@@ -367,6 +366,13 @@
 			"manifest": [
 				["MouseInteraction", "鼠标交互", "", "core,webgl,ani,d3,physics3D,CameraMoveScript.js"],
 				["MultiTouch", "多点触控", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+			]
+		},
+		{
+			"prefix": "Script",
+			"tr_zhCN": "脚本",
+			"manifest": [
+				["ScriptDemo", "脚本示例", "", "core,webgl,ani,d3,CameraMoveScript.js"]
 			]
 		},
 		{

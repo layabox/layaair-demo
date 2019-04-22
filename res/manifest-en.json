@@ -379,6 +379,13 @@
 				]
 			},
 			{
+				"prefix": "Script",
+				"tr_zhCN": "脚本",
+				"manifest": [
+					["ScriptDemo", "脚本示例", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+				]
+			},
+			{
 				"prefix": "Sky",
 				"tr_zhCN": "Sky",
 				"manifest": [
