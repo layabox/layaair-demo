@@ -53,7 +53,7 @@ package LayaAir3D_Resource {
 		//加载资源
 		public function LoadRes() {
 			//场景加载
-			Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Handler.create(this, function(scene:Scene3D):void {
+			Scene3D.load("res/threeDimen/scene/XunLongShi/XunLongShi.ls", Handler.create(this, function(scene:Scene3D):void {
 				_scene = scene;
 				Laya.stage.addChild(scene);
 				//添加相机
@@ -155,7 +155,7 @@ package LayaAir3D_Resource {
 		//批量预加载方式
 		public function PreloadingRes() {
 			//预加载所有资源
-			var resource:Array = ["res/threeDimen/scene/TerrainScene/XunLongShi.ls",
+			var resource:Array = ["res/threeDimen/scene/XunLongShi/XunLongShi.ls",
 			"res/threeDimen/skyBox/skyBox2/skyBox2.lmat",
 			"res/threeDimen/texture/earth.png", 
 			"res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm",
@@ -167,7 +167,7 @@ package LayaAir3D_Resource {
 		
 		public function onPreLoadFinish() {
 			//初始化3D场景
-			_scene = Laya.stage.addChild(Loader.getRes("res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Scene3D;
+			_scene = Laya.stage.addChild(Loader.getRes("res/threeDimen/scene/XunLongShi/XunLongShi.ls")) as Scene3D;
 			//添加相机
 			var camera:Camera = new Camera();
 			_scene.addChild(camera);

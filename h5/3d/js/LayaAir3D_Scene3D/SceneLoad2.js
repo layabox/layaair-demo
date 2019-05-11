@@ -7,7 +7,7 @@ class SceneLoad2 {
 		//显示性能面板
 		Laya.Stat.show();
 		
-		Laya.Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Laya.Handler.create(this, function(scene) {
+		Laya.Scene3D.load("res/threeDimen/scene/XunLongShi/XunLongShi.ls", Laya.Handler.create(this, function(scene) {
 			Laya.stage.addChild(scene);
 			//开启雾化效果
 			scene.enableFog = true;

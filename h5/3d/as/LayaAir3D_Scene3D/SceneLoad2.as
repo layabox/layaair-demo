@@ -23,7 +23,7 @@ package LayaAir3D_Scene3D {
 			//显示性能面板
 			Stat.show();
 			
-			Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Handler.create(this, function(scene:Scene3D):void {
+			Scene3D.load("res/threeDimen/scene/XunLongShi/XunLongShi.ls", Handler.create(this, function(scene:Scene3D):void {
 				Laya.stage.addChild(scene);
 				//开启雾化效果
 				scene.enableFog = true;

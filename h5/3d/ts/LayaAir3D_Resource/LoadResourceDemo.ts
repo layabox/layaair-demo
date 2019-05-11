@@ -22,7 +22,7 @@ class LoadResourceDemo{
     }
     LoadRes(){
         //场景加载
-		Laya.Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Laya.Handler.create(this, function(scene) {
+		Laya.Scene3D.load("res/threeDimen/scene/XunLongShi/XunLongShi.ls", Laya.Handler.create(this, function(scene) {
 			this._scene = scene;
 			Laya.stage.addChild(scene);
 			//添加相机
@@ -112,7 +112,7 @@ class LoadResourceDemo{
     PreloadingRes(){
         //预加载所有资源
 		var resource = [
-            "res/threeDimen/scene/TerrainScene/XunLongShi.ls",  
+            "res/threeDimen/scene/XunLongShi/XunLongShi.ls",  
             "res/threeDimen/skyBox/skyBox2/skyBox2.lmat",
             "res/threeDimen/texture/earth.png",
             "res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm",
@@ -122,7 +122,7 @@ class LoadResourceDemo{
     }
     onPreLoadFinish(){
         //初始化3D场景
-		this._scene = Laya.stage.addChild(Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Laya.Scene3D;
+		this._scene = Laya.stage.addChild(Laya.Loader.getRes("res/threeDimen/scene/XunLongShi/XunLongShi.ls")) as Laya.Scene3D;
 		
 		//添加相机
 		var camera = new Laya.Camera();
