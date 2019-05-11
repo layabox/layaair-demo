@@ -30,6 +30,8 @@ package LayaAir3D_Physics3D {
 		private var translateS:Vector3 = new Vector3(0, 0, 0.2);
 		private var translateA:Vector3 = new Vector3(-0.2, 0, 0);
 		private var translateD:Vector3 = new Vector3(0.2, 0, 0);
+		private var mat1:BlinnPhongMaterial;
+		private var mat2:BlinnPhongMaterial; 
 		
 		public function PhysicsWorld_Character() {
 			//初始化引擎
@@ -70,6 +72,18 @@ package LayaAir3D_Physics3D {
 			tilingOffset.setValue(2, 2, 0, 0);
 			planeMat.tilingOffset = tilingOffset;
 			plane.meshRenderer.material = planeMat;
+			
+			mat1 = new BlinnPhongMaterial();
+			mat2 = new BlinnPhongMaterial();
+			
+			//加载纹理资源
+			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat1.albedoTexture = tex;
+			}));
+			
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat2.albedoTexture = tex;
+			}));
 			
 			//创建物理碰撞器
 			var physicsCollider:PhysicsCollider = plane.addComponent(PhysicsCollider) as PhysicsCollider;
@@ -120,11 +134,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addBox():void {
-			var mat1:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat1.albedoTexture = tex;
-			}));
-			
 			var sX:int = Math.random() * 0.75 + 0.25;
 			var sY:int = Math.random() * 0.75 + 0.25;
 			var sZ:int = Math.random() * 0.75 + 0.25;
@@ -145,15 +154,10 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addCapsule():void {
-			var mat3:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat3.albedoTexture = tex;
-			}));
-			
 			var raidius:int = Math.random() * 0.2 + 0.2;
 			var height:int = Math.random() * 0.5 + 0.8;
 			var capsule:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createCapsule(raidius, height))) as MeshSprite3D;
-			capsule.meshRenderer.material = mat3;
+			capsule.meshRenderer.material = mat2;
 			var transform:Transform3D = capsule.transform;
 			var pos:Vector3 = transform.position;
 			pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);

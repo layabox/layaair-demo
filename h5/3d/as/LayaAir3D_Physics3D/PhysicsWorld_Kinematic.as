@@ -33,6 +33,9 @@ package LayaAir3D_Physics3D {
 		private var translateQ:Vector3 = new Vector3(-0.01, 0, 0);
 		private var translateE:Vector3 = new Vector3(0.01, 0, 0);
 		
+		private var mat1:BlinnPhongMaterial;
+		private var mat3:BlinnPhongMaterial;
+		
 		public function PhysicsWorld_Kinematic() {
 			Laya3D.init(0, 0, null);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
@@ -51,6 +54,17 @@ package LayaAir3D_Physics3D {
 			var mat:Matrix4x4 = directionLight.transform.worldMatrix;
 			mat.setForward(new Vector3(-1.0, -1.0, 1.0));
 			directionLight.transform.worldMatrix=mat;
+			
+			mat1 = new BlinnPhongMaterial();
+			mat3 = new BlinnPhongMaterial();
+			//加载纹理资源
+			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat1.albedoTexture = tex;
+			}));
+			
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat3.albedoTexture = tex;
+			}));
 			
 			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(20, 20, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
@@ -111,12 +125,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addBox():void {
-			var mat1:BlinnPhongMaterial = new BlinnPhongMaterial();
-			;
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat1.albedoTexture = tex;
-			}));
-			
 			var sX:int = Math.random() * 0.75 + 0.25;
 			var sY:int = Math.random() * 0.75 + 0.25;
 			var sZ:int = Math.random() * 0.75 + 0.25;
@@ -137,11 +145,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addCapsule():void {
-			var mat3:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat3.albedoTexture = tex;
-			}));
-			
 			var raidius:int = Math.random() * 0.2 + 0.2;
 			var height:int = Math.random() * 0.5 + 0.8;
 			var capsule:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createCapsule(raidius, height))) as MeshSprite3D;

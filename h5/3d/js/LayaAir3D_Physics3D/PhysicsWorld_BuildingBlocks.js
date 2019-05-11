@@ -20,6 +20,16 @@ class PhysicsWorldBuildingBlocks{
         let mat = directionLight.transform.worldMatrix;
         mat.setForward(new Laya.Vector3(-1, -1, 1));
         directionLight.transform.worldMatrix = mat;
+
+        //材质加载
+        this.mat1 = new Laya.BlinnPhongMaterial;
+        //添加漫反射贴图
+        Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(this, function (tex) {
+            this.mat1.albedoTexture = tex;
+        }));
+        this.mesh1 = Laya.PrimitiveMesh.createBox(0.5, 0.33, 2);
+        this.mesh2 = Laya.PrimitiveMesh.createBox(2, 0.33, 0.5);
+
         let plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(13, 13, 10, 10)));
         let planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
@@ -53,12 +63,8 @@ class PhysicsWorldBuildingBlocks{
     }
 
     addVerticalBox(x, y, z){
-        let mat = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function (tex) {
-            mat.albedoTexture = tex;
-        }));
-        let box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(0.5, 0.33, 2)));
-        box.meshRenderer.material = mat;
+        let box = this.scene.addChild(new Laya.MeshSprite3D(this.mesh1));
+        box.meshRenderer.material = this.mat1;
         box.meshRenderer.castShadow = true;
         box.meshRenderer.receiveShadow = true;
         box.transform.position = new Laya.Vector3(x, y, z);
@@ -70,12 +76,8 @@ class PhysicsWorldBuildingBlocks{
         rigidBody.colliderShape = boxShape;
     }
     addHorizontalBox(x, y, z){
-        let mat = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function (tex) {
-            mat.albedoTexture = tex;
-        }));
-        let box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(2, 0.33, 0.5)));
-        box.meshRenderer.material = mat;
+        let box = this.scene.addChild(new Laya.MeshSprite3D(this.mesh2));
+        box.meshRenderer.material = this.mat1;;
         box.meshRenderer.castShadow = true;
         box.meshRenderer.receiveShadow = true;
         box.transform.position = new Laya.Vector3(x, y, z);

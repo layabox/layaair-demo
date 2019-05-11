@@ -17,9 +17,11 @@ class UnlitMaterialDemo{
         
         this.rotation = new Laya.Vector3(0, 0.01, 0);
 
-        let earth1 = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere()));
+        //创建公用的mesh
+        var sphereMesh = Laya.PrimitiveMesh.createSphere();
+        let earth1 = scene.addChild(new Laya.MeshSprite3D(sphereMesh));
         earth1.transform.position = new Laya.Vector3(-0.6, 0, 0);
-        let earth2 = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere()));
+        let earth2 = scene.addChild(new Laya.MeshSprite3D(sphereMesh));
         earth2.transform.position = new Laya.Vector3(0.6, 0, 0);
         
         //创建Unlit材质

@@ -25,6 +25,7 @@ package LayaAir3D_Physics3D {
 	public class PhysicsWorld_ContinueCollisionDetection {
 		private var scene:Scene3D;
 		private var tmpVector:Vector3 = new Vector3(0, 0, 0);
+		private var mat2:BlinnPhongMaterial;
 		public function PhysicsWorld_ContinueCollisionDetection() {
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
@@ -49,6 +50,12 @@ package LayaAir3D_Physics3D {
 			mat.setForward(new Vector3(-1.0, -1.0, -1.0));
 			directionLight.transform.worldMatrix=mat;
 			
+			mat2 = new BlinnPhongMaterial();
+			//加载纹理资源
+			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat2.albedoTexture = tex;
+			}));
+			
 			//平面
 			var plane:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(10, 10, 10, 10))) as MeshSprite3D;
 			var planeMat:BlinnPhongMaterial = new BlinnPhongMaterial();
@@ -71,11 +78,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addSphere():void {
-			var mat2:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat2.albedoTexture = tex;
-			}));
-			
 			var radius:Number = Math.random() * 0.2 + 0.2;
 			var sphere:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(radius))) as MeshSprite3D;
 			sphere.meshRenderer.material = mat2;

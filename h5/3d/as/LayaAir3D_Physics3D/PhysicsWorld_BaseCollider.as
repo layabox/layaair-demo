@@ -30,6 +30,12 @@ package LayaAir3D_Physics3D {
 	public class PhysicsWorld_BaseCollider {
 		private var scene:Scene3D;
 		private var tmpVector:Vector3 = new Vector3(0, 0, 0);
+		private var mat1:BlinnPhongMaterial;
+		private var mat2:BlinnPhongMaterial; 
+		private var mat3:BlinnPhongMaterial;
+		private var mat4:BlinnPhongMaterial;
+		private var mat5:BlinnPhongMaterial;
+		
 		
 		public function PhysicsWorld_BaseCollider() {
 			//初始化引擎
@@ -80,6 +86,32 @@ package LayaAir3D_Physics3D {
 			//物理碰撞体设置弹力
 			planeStaticCollider.restitution = 0.3;
 			
+			
+			mat1 = new BlinnPhongMaterial();
+			mat2 = new BlinnPhongMaterial();
+			mat3 = new BlinnPhongMaterial();
+			mat4 = new BlinnPhongMaterial();
+			mat5 = new BlinnPhongMaterial();
+			//加载纹理资源
+			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat1.albedoTexture = tex;
+			}));
+			
+			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat2.albedoTexture = tex;
+			}));
+			
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat3.albedoTexture = tex;
+			}));
+			
+			Texture2D.load("res/threeDimen/Physics/steel2.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat4.albedoTexture = tex;
+			}));
+			Texture2D.load("res/threeDimen/Physics/steel.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat5.albedoTexture = tex;
+			}));
+			
 			//随机生成精灵
 			randomAddPhysicsSprite();
 		}
@@ -110,11 +142,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addBox():void {
-			var mat1:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat1.albedoTexture = tex;
-			}));
-			
 			//随机生成坐标值
 			var sX:int = Math.random() * 0.75 + 0.25;
 			var sY:int = Math.random() * 0.75 + 0.25;
@@ -142,11 +169,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addSphere():void {
-			var mat2:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat2.albedoTexture = tex;
-			}));
-			
 			//随机生成半径大小
 			var radius:Number = Math.random() * 0.2 + 0.2;
 			//创建球型MeshSprite3D
@@ -168,11 +190,7 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addCapsule():void {
-			var mat3:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat3.albedoTexture = tex;
-			}));
-			
+
 			var raidius:int = Math.random() * 0.2 + 0.2;
 			var height:int = Math.random() * 0.5 + 0.8;
 			//创建胶囊MeshSprite3D
@@ -199,10 +217,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addCone():void {
-			var mat4:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/steel2.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat4.albedoTexture = tex;
-			}));
 			var raidius:int = Math.random() * 0.2 + 0.2;
 			var height:int = Math.random() * 0.5 + 0.8;
 			//创建圆锥MeshSprite3D
@@ -225,10 +239,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addCylinder():void {
-			var mat5:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/steel.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat5.albedoTexture = tex;
-			}));
 			var raidius:int = Math.random() * 0.2 + 0.2;
 			var height:int = Math.random() * 0.5 + 0.8;
 			//创建圆锥MeshSprite3D

@@ -35,27 +35,27 @@ class ShaderSimple{
         };
         let vs = `
             attribute vec4 a_Position;
-            "uniform mat4 u_MvpMatrix;
-            "uniform mat4 u_WorldMat;
-            "attribute vec3 a_Normal;
-            "varying vec3 v_Normal;
-            "void main()
-            "{
-            "gl_Position = u_MvpMatrix * a_Position;
-            "mat3 worldMat=mat3(u_WorldMat);
-            "v_Normal=worldMat*a_Normal;
-            "}`;
+            uniform mat4 u_MvpMatrix;
+            uniform mat4 u_WorldMat;
+            attribute vec3 a_Normal;
+            varying vec3 v_Normal;
+            void main()
+            {
+            gl_Position = u_MvpMatrix * a_Position;
+            mat3 worldMat=mat3(u_WorldMat);
+            v_Normal=worldMat*a_Normal;
+            }`;
         let ps = `
             #ifdef FSHIGHPRECISION
-            "precision highp float;
-            "#else
-            "precision mediump float;
-            "#endif
-            "varying vec3 v_Normal;
-            "void main()
-            "{
-            "gl_FragColor=vec4(v_Normal,1.0);
-            "}`;
+            precision highp float;
+            #else
+            precision mediump float;
+            #endif
+            varying vec3 v_Normal;
+            void main()
+            {
+            gl_FragColor=vec4(v_Normal,1.0);
+            }`;
         let customShader = Laya.Shader3D.add("CustomShader");
 		let subShader =new Laya.SubShader(attributeMap, uniformMap);
         customShader.addSubShader(subShader);

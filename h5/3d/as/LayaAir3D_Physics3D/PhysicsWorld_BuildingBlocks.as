@@ -37,6 +37,9 @@ package LayaAir3D_Physics3D {
 		private var delX:Number;
 		private var delY:Number;
 		
+		private var mat:BlinnPhongMaterial;
+		
+		
 		public function PhysicsWorld_BuildingBlocks() {
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
@@ -64,6 +67,13 @@ package LayaAir3D_Physics3D {
 			plane.meshRenderer.material = planeMat;
 			plane.meshRenderer.receiveShadow = true;
 			
+			mat = new BlinnPhongMaterial();
+			
+			//加载纹理资源
+			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat.albedoTexture = tex;
+			}));
+			
 			var rigidBody:PhysicsCollider = plane.addComponent(PhysicsCollider) as PhysicsCollider;
 			var boxShape:BoxColliderShape = new BoxColliderShape(13, 0, 13);
 			rigidBody.colliderShape = boxShape;
@@ -85,13 +95,7 @@ package LayaAir3D_Physics3D {
 			}
 		}
 		
-		public function addHorizontalBox(x:Number, y:Number, z:Number):void {
-			
-			var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat.albedoTexture = tex;
-			}));
-			
+		public function addHorizontalBox(x:Number, y:Number, z:Number):void {		
 			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(2, 0.33, 0.5))) as MeshSprite3D;
 			box.meshRenderer.material = mat;
 			box.meshRenderer.castShadow = true;
@@ -107,12 +111,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addVerticalBox(x:Number, y:Number, z:Number):void {
-			
-			var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat.albedoTexture = tex;
-			}));
-			
 			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(0.5, 0.33, 2))) as MeshSprite3D;
 			box.meshRenderer.material = mat;
 			box.meshRenderer.castShadow = true;

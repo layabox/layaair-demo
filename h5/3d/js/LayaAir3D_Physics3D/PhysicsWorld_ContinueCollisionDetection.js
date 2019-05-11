@@ -18,6 +18,13 @@ class PhysicsWorldContinueCollisionDetection{
         let mat = directionLight.transform.worldMatrix;
         mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
         directionLight.transform.worldMatrix = mat;
+
+        //材质加载
+        this.mat2 = new Laya.BlinnPhongMaterial;
+        Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(this, function (tex) {
+            this.mat2.albedoTexture = tex;
+        }));
+
         //平面
         let plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(10, 10, 10, 10)));
         let planeMat = new Laya.BlinnPhongMaterial();
@@ -37,13 +44,9 @@ class PhysicsWorldContinueCollisionDetection{
     
     }
     addSphere() {
-        let mat2 = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function (tex) {
-            mat2.albedoTexture = tex;
-        }));
         let radius = Math.random() * 0.2 + 0.2;
         let sphere = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius)));
-        sphere.meshRenderer.material = mat2;
+        sphere.meshRenderer.material = this.mat2;
         let pos = sphere.transform.position;
         pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
         sphere.transform.position = pos;

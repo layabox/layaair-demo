@@ -31,7 +31,9 @@ package LayaAir3D_Physics3D {
 		
 		private var scene:Scene3D;
 		private var tmpVector:Vector3 = new Vector3(0, 0, 0);
-		
+		private var mat1:BlinnPhongMaterial;
+		private var mat2:BlinnPhongMaterial; 
+		private var mat3:BlinnPhongMaterial;
 		public function PhysicsWorld_MeshCollider() {
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
@@ -54,6 +56,22 @@ package LayaAir3D_Physics3D {
 			mat.setForward(new Vector3(0.0, -0.8, -1.0));
 			directionLight.transform.worldMatrix=mat;
 			directionLight.color = new Vector3(1, 1, 1);
+			
+			mat1 = new BlinnPhongMaterial();
+			mat2 = new BlinnPhongMaterial();
+			mat3 = new BlinnPhongMaterial();
+			//加载纹理资源
+			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat1.albedoTexture = tex;
+			}));
+			
+			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat2.albedoTexture = tex;
+			}));
+			
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat3.albedoTexture = tex;
+			}));
 			
 			Laya.loader.create(["res/threeDimen/staticModel/lizard/Assets/Lizard/lizard-lizard_geo.lm", "res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_diff.png", "res/threeDimen/staticModel/lizard/Assets/Lizard/lizard_norm.png"], Handler.create(this, complete));
 		}
@@ -121,11 +139,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addBox():void {
-			var mat1:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat1.albedoTexture = tex;
-			}));
-			
 			var sX:int = Math.random() * 0.75 + 0.25;
 			var sY:int = Math.random() * 0.75 + 0.25;
 			var sZ:int = Math.random() * 0.75 + 0.25;
@@ -146,11 +159,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addSphere():void {
-			var mat2:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/plywood.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat2.albedoTexture = tex;
-			}));
-			
 			var radius:Number = Math.random() * 0.2 + 0.2;
 			var sphere:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createSphere(radius))) as MeshSprite3D;
 			sphere.meshRenderer.material = mat2;
@@ -165,11 +173,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addCapsule():void {
-			var mat3:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat3.albedoTexture = tex;
-			}));
-			
 			var raidius:int = Math.random() * 0.2 + 0.2;
 			var height:int = Math.random() * 0.5 + 0.8;
 			var capsule:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createCapsule(raidius, height))) as MeshSprite3D;

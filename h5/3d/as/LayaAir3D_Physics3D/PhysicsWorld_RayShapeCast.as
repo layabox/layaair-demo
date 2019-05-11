@@ -41,7 +41,8 @@ package LayaAir3D_Physics3D {
 		private	var to:Vector3 = new Vector3(0, 1, -5);
 		private var _albedoColor:Vector4 = new Vector4(1.0, 1.0, 1.0, 0.5);
 		private var _position:Vector3 = new Vector3(0, 0, 0);
-		
+		private var mat1:BlinnPhongMaterial;
+		private var mat3:BlinnPhongMaterial;
 		public function PhysicsWorld_RayShapeCast() {
 			//初始化引擎
 			Laya3D.init(0, 0);
@@ -81,6 +82,17 @@ package LayaAir3D_Physics3D {
 			tilingOffset.setValue(2, 2, 0, 0);
 			planeMat.tilingOffset = tilingOffset;
 			plane.meshRenderer.material = planeMat;
+			
+			
+			mat1 = new BlinnPhongMaterial();
+			mat3 = new BlinnPhongMaterial();
+			//加载纹理资源
+			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat1.albedoTexture = tex;
+			}));
+			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
+				mat3.albedoTexture = tex;
+			}));
 			
 			//为地面创建物理碰撞器
 			var planeBody:PhysicsCollider = plane.addComponent(PhysicsCollider) as PhysicsCollider;
@@ -260,11 +272,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addBox():void {
-			var mat1:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/rocks.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat1.albedoTexture = tex;
-			}));
-			
 			//随机生成盒子的位置
 			var sX:int = Math.random() * 0.75 + 0.25;
 			var sY:int = Math.random() * 0.75 + 0.25;
@@ -292,11 +299,6 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addCapsule():void {
-			var mat3:BlinnPhongMaterial = new BlinnPhongMaterial();
-			Texture2D.load("res/threeDimen/Physics/wood.jpg", Handler.create(this, function(tex:Texture2D):void {
-				mat3.albedoTexture = tex;
-			}));
-			
 			//随机生成胶囊的半径和高度
 			var raidius:int = Math.random() * 0.2 + 0.2;
 			var height:int = Math.random() * 0.5 + 0.8;

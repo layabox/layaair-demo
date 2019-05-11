@@ -22,6 +22,30 @@ class PhysicsWorldCollisionFiflter{
         let mat = directionLight.transform.worldMatrix;
         mat.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
         directionLight.transform.worldMatrix = mat;
+
+        //材质加载
+        this.mat1 = new Laya.BlinnPhongMaterial;
+        this.mat2 = new Laya.BlinnPhongMaterial;
+        this.mat3 = new Laya.BlinnPhongMaterial;
+        this.mat4 = new Laya.BlinnPhongMaterial;
+        this.mat5 = new Laya.BlinnPhongMaterial;
+        //添加漫反射贴图
+        Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function (tex) {
+            this.mat1.albedoTexture = tex;
+        }));
+        Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(this, function (tex) {
+            this.mat2.albedoTexture = tex;
+        }));
+        Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function (tex) {
+            this.mat3.albedoTexture = tex;
+        }));
+        Laya.Texture2D.load("res/threeDimen/Physics/steel2.jpg", Laya.Handler.create(this, function(tex) {
+            this.mat4.albedoTexture = tex;
+        }));
+        Laya.Texture2D.load("res/threeDimen/Physics/steel.jpg", Laya.Handler.create(this, function(tex) {
+            this.mat5.albedoTexture = tex;
+        }));
+
         this.plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(20, 20, 10, 10)));
         let planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
@@ -70,16 +94,12 @@ class PhysicsWorldCollisionFiflter{
 		Laya.KeyBoardManager.hasKeyDown(69) && plane.transform.translate(this.translateE);//E
     }
     addBox() {
-        let mat1 = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(null, function (tex) {
-            mat1.albedoTexture = tex;
-        }));
-        mat1.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 1.0);
+        this.mat1.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 1.0);
         let sX = Math.random() * 0.75 + 0.25;
         let sY = Math.random() * 0.75 + 0.25;
         let sZ = Math.random() * 0.75 + 0.25;
         let box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
-        box.meshRenderer.material = mat1;
+        box.meshRenderer.material = this.mat1;
 
         let transform = box.transform;
         let pos = transform.position;
@@ -96,14 +116,10 @@ class PhysicsWorldCollisionFiflter{
         rigidBody.collisionGroup = Laya.Physics3DUtils.COLLISIONFILTERGROUP_CUSTOMFILTER1; //自定义组1
     }
     addCapsule() {
-        let mat3 = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
-            mat3.albedoTexture = tex;
-        }));
         let raidius = Math.random() * 0.2 + 0.2;
         let height = Math.random() * 0.5 + 0.8;
         let capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
-        capsule.meshRenderer.material = mat3;
+        capsule.meshRenderer.material = this.mat3;
 
         let transform = capsule.transform;
         let pos = transform.position;
@@ -121,13 +137,9 @@ class PhysicsWorldCollisionFiflter{
     }
     //添加球体
     addSphere(){
-        let mat2 = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function (tex) {
-            mat2.albedoTexture = tex;
-         }));
         let radius = Math.random() * 0.2 + 0.2;
         let sphere = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(radius)));
-        sphere.meshRenderer.material = mat2;
+        sphere.meshRenderer.material = this.mat2;
         let pos = sphere.transform.position;
         pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
         sphere.transform.position = pos;
@@ -139,17 +151,13 @@ class PhysicsWorldCollisionFiflter{
     }
     //添加圆锥
     addCone() {
-        let mat4 = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("res/threeDimen/Physics/steel2.jpg", Laya.Handler.create(this, function(tex) {
-            mat4.albedoTexture = tex;
-        }));
         let raidius = Math.random() * 0.2 + 0.2;
         let height = Math.random() * 0.5 + 0.8;
         //创建圆锥MeshSprite3D
         let cone = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCone(raidius, height));
         this.scene.addChild(cone);
         //设置材质
-        cone.meshRenderer.material = mat4;
+        cone.meshRenderer.material = this.mat4;
         //设置位置
         let pos = cone.transform.position;
         pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
@@ -166,17 +174,13 @@ class PhysicsWorldCollisionFiflter{
     }
     //添加圆柱
     addCylinder() {
-        let mat5 = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("res/threeDimen/Physics/steel.jpg", Laya.Handler.create(this, function(tex) {
-            mat5.albedoTexture = tex;
-        }));
         let raidius = Math.random() * 0.2 + 0.2;
         let height = Math.random() * 0.5 + 0.8;
         //创建圆锥MeshSprite3D
         let cylinder = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCylinder(raidius, height));
         this.scene.addChild(cylinder);
         //设置材质
-        cylinder.meshRenderer.material = mat5;
+        cylinder.meshRenderer.material = this.mat5;
 
         let transform = cylinder.transform;
         let pos = transform.position;
