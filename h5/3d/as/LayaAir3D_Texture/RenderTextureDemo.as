@@ -16,8 +16,8 @@ package LayaAir3D_Texture {
 	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.webgl.resource.BaseTexture;
-	import laya.webgl.resource.Texture2D;
+	import laya.resource.BaseTexture;
+	import laya.resource.Texture2D;
 	
 	public class RenderTextureDemo {
 		private var box:MeshSprite3D;
@@ -73,7 +73,7 @@ package LayaAir3D_Texture {
 			
 			var renderTargetObj:MeshSprite3D = scene.getChildAt(0).getChildByName("RenderTarget") as MeshSprite3D;
 			
-			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(null, function():void {
+			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(this, function():void {
 				var changeActionButton:Button = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "渲染目标")) as Button;
 				changeActionButton.size(160, 40);
 				changeActionButton.labelBold = true;

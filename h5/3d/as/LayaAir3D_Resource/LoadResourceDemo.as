@@ -21,8 +21,12 @@ package LayaAir3D_Resource {
 	import laya.net.Loader;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.webgl.resource.Texture2D;
+	import laya.resource.Texture2D;
 	
+	/**
+	 * ...
+	 * @author ...
+	 */
 	public class LoadResourceDemo {
 		
 		private var _scene:Scene3D;
@@ -39,10 +43,10 @@ package LayaAir3D_Resource {
 			Stat.show();
 			
 			//加载资源
-			//LoadRes();
+			LoadRes();
 		
 			//批量预加载方式
-			PreloadingRes();
+			//PreloadingRes();
 		
 		}
 		
@@ -52,13 +56,13 @@ package LayaAir3D_Resource {
 			Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Handler.create(this, function(scene:Scene3D):void {
 				_scene = scene;
 				Laya.stage.addChild(scene);
-				//获取场景相机
-				var camera:Camera = scene.getChildByName("Main Camera") as Camera;
+				//添加相机
+				var camera:Camera = new Camera();
+				scene.addChild(camera);
 				//设置相机清楚标记，使用天空
 				camera.clearFlag = BaseCamera.CLEARFLAG_SKY;
 				//调整相机的位置
-				camera.transform.translate(new Vector3(10, 45, -60));
-				camera.transform.rotate(new Vector3(-10, 170, 0), false, false);
+				camera.transform.translate(new Vector3(3, 20, 47));
 				//相机视角控制组件(脚本)
 				camera.addComponent(CameraMoveScript);
 				//添加光照
@@ -164,13 +168,13 @@ package LayaAir3D_Resource {
 		public function onPreLoadFinish() {
 			//初始化3D场景
 			_scene = Laya.stage.addChild(Loader.getRes("res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Scene3D;
-			//获取相机
-			var camera:Camera = _scene.getChildByName("Main Camera") as Camera;
+			//添加相机
+			var camera:Camera = new Camera();
+			_scene.addChild(camera);
 			//设置相机清楚标记，使用天空
 			camera.clearFlag = BaseCamera.CLEARFLAG_SKY;
 			//调整相机的位置
-			camera.transform.translate(new Vector3(10, 45, -60));
-			camera.transform.rotate(new Vector3(-10, 170, 0), false, false);
+			camera.transform.translate(new Vector3(4, 20, 47));
 			//相机视角控制组件(脚本)
 			camera.addComponent(CameraMoveScript);
 			

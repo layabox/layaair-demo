@@ -17,7 +17,8 @@ package LayaAir3D_Shader {
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.webgl.resource.Texture2D;
+	import laya.resource.Texture2D;
+	import laya.d3.shader.Shader3D;
 	
 	/**
 	 * ...
@@ -123,6 +124,7 @@ package LayaAir3D_Shader {
 			customShader.addSubShader(subShader);
 			//SubShader添加ShaderPass
 			subShader.addShaderPass(vs, ps) as ShaderPass;
+			//Shader3D.compileShader("CustomShader", 0, 0, 5, 0, 0);
 		}
 	}
 }

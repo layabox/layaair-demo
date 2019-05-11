@@ -1,4 +1,4 @@
-package LayaAir3D_Animation {
+package LayaAir3D_Animation3D {
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.scene.Scene3D;
 	import laya.display.Stage;
@@ -22,6 +22,7 @@ package LayaAir3D_Animation {
 			Scene3D.load("res/threeDimen/scene/LayaScene_AnimationEvent/Conventional/layaScene.ls", Handler.create(this, function(scene:Scene3D):void {
 				Laya.stage.addChild(scene) as Scene3D;
 				var cube:Sprite3D = scene.getChildByName("Cube");
+				debugger;
 				//添加组件(脚本)
 				cube.addComponent(SceneScript);
 			}));

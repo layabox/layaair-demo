@@ -1,4 +1,4 @@
-package LayaAir3D_Animation {
+package LayaAir3D_Animation3D {
 	import common.CameraMoveScript;
 	import laya.d3.component.Animator;
 	import laya.d3.component.AnimatorState;

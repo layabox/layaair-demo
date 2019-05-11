@@ -25,13 +25,13 @@ class LoadResourceDemo{
 		Laya.Scene3D.load("res/threeDimen/scene/TerrainScene/XunLongShi.ls", Laya.Handler.create(this, function(scene) {
 			this._scene = scene;
 			Laya.stage.addChild(scene);
-			//获取场景相机
-			var camera = scene.getChildByName("Main Camera");
+			//添加相机
+			var camera = new Laya.Camera();
+			this.scene.addChild(camera);
 			//设置相机清楚标记，使用天空
 			camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
 			//调整相机的位置
-			camera.transform.translate(new Laya.Vector3(10, 45, -60));
-			camera.transform.rotate(new Laya.Vector3(-10, 170, 0), false, false);
+			camera.transform.translate(new Laya.Vector3(3, 20, 47));
 			//相机视角控制组件(脚本)
 			camera.addComponent(CameraMoveScript);
 			//添加光照
@@ -124,13 +124,13 @@ class LoadResourceDemo{
         //初始化3D场景
 		this._scene = Laya.stage.addChild(Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Laya.Scene3D;
 		
-		//获取相机
-		var camera = this._scene.getChildByName("Main Camera") as Laya.Camera;
+		//添加相机
+		var camera = new Laya.Camera();
+		this.scene.addChild(camera);
 		//设置相机清楚标记，使用天空
 		camera.clearFlag =Laya.BaseCamera.CLEARFLAG_SKY;
 		//调整相机的位置
-		camera.transform.translate(new Laya.Vector3(10, 45, -60));
-		camera.transform.rotate(new Laya.Vector3(-10, 170, 0), false, false);
+		camera.transform.translate(new Laya.Vector3(3, 20, 47));
 		//相机视角控制组件(脚本)
 		camera.addComponent(CameraMoveScript);
 		

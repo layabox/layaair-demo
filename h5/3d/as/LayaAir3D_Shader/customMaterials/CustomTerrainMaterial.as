@@ -3,7 +3,7 @@ package LayaAir3D_Shader.customMaterials {
 	import laya.d3.math.Vector2;
 	import laya.d3.shader.Shader3D;
 	import laya.d3.shader.ShaderDefines;
-	import laya.webgl.resource.BaseTexture;
+	import laya.resource.BaseTexture;
 	
 	/**
 	 * ...

@@ -62,159 +62,160 @@ export default class CartoonMaterial extends Laya.BaseMaterial {
 		var subShader = new Laya.SubShader(attributeMap, uniformMap,Laya.SkinnedMeshSprite3D.shaderDefines,CartoonMaterial.shaderDefines) as Laya.SubShader;
 		cartoonShader3D.addSubShader(subShader);
 		//var vs1:String = __INCLUDESTR__("shader/outline.vs");
-		var vs1:string = "attribute vec4 a_Position;\n" + 
-		"attribute vec3 a_Normal;\n" + 
-		"attribute vec2 a_Texcoord0;\n" +
-		"uniform mat4 u_MvpMatrix;\n" + 
-		"uniform float u_OutlineWidth;\n" + 
-		"varying vec2 v_Texcoord0;\n" +     
-		"void main()\n" + 
-		"{\n"+ 
-		"   v_Texcoord0 = a_Texcoord0;\n" + 
-		"   vec4 position = vec4(a_Position.xyz + a_Normal * u_OutlineWidth, 1.0);\n" + 
-		"   gl_Position = u_MvpMatrix * position;\n" + 
-		"}\n";
-		var ps1:string = "#ifdef FSHIGHPRECISION\n" + 
-		"   precision highp float;\n" + 
-		"#else\n" + 
-		"   precision mediump float;\n" + 
-		"#endif\n" + 
+		var vs1:string = `
+		attribute vec4 a_Position; 
+		attribute vec3 a_Normal; 
+		attribute vec2 a_Texcoord0;
+		uniform mat4 u_MvpMatrix; 
+		uniform float u_OutlineWidth; 
+		varying vec2 v_Texcoord0;     
+		void main() 
+		{ 
+		   v_Texcoord0 = a_Texcoord0; 
+		   vec4 position = vec4(a_Position.xyz + a_Normal * u_OutlineWidth, 1.0); 
+		   gl_Position = u_MvpMatrix * position; 
+		}`;
+		var ps1:string = `
+		#ifdef FSHIGHPRECISION 
+		   precision highp float; 
+		#else 
+		   precision mediump float; 
+		#endif 
 	
-		"struct DirectionLight\n" + 
-		"{\n" + 
-		"   vec3 Color;\n" + 
-		"   vec3 Direction;\n" + 
-		"};\n" + 
+		struct DirectionLight 
+		{ 
+		   vec3 Color; 
+		   vec3 Direction; 
+		}; 
 	
-		"varying vec2 v_Texcoord0;\n" + 
+		varying vec2 v_Texcoord0; 
 	
-		"#ifdef OUTLINETEXTURE\n" + 
-		"   uniform sampler2D u_OutlineTexture;\n" + 
-		"#endif\n" + 
-		"   uniform float u_OutlineLightness;\n" + 
+		#ifdef OUTLINETEXTURE 
+		   uniform sampler2D u_OutlineTexture; 
+		#endif 
+		   uniform float u_OutlineLightness; 
 	
-		"void main()\n" + 
-		"{\n" + 
-		"vec4 outlineTextureColor = vec4(1.0);\n" + 
-		"#ifdef OUTLINETEXTURE\n" + 
-		"   outlineTextureColor = texture2D(u_OutlineTexture, v_Texcoord0);\n" + 
-		"#endif\n" + 
-		"vec3 finalColor = outlineTextureColor.rgb * u_OutlineLightness;\n" + 
-		"gl_FragColor = vec4(finalColor,0.0);\n" + 
-		"}\n";
+		void main() 
+		{ 
+		vec4 outlineTextureColor = vec4(1.0); 
+		#ifdef OUTLINETEXTURE 
+		   outlineTextureColor = texture2D(u_OutlineTexture, v_Texcoord0); 
+		#endif 
+		vec3 finalColor = outlineTextureColor.rgb * u_OutlineLightness; 
+		gl_FragColor = vec4(finalColor,0.0); 
+		}`;
 	
-		//var ps1:String = __INCLUDESTR__("shader/outline.ps");
 		var pass1:Laya.ShaderPass = subShader.addShaderPass(vs1, ps1) as Laya.ShaderPass;
 		pass1.renderState.cull = Laya.RenderState.CULL_FRONT;
-		var vs2:string = "attribute vec4 a_Position;\n" + 
-		"attribute vec3 a_Normal;\n" +
-		"attribute vec2 a_Texcoord0;\n" +	
-		"uniform mat4 u_MvpMatrix;\n" +
-		"uniform mat4 u_WorldMat;\n" +
-		"uniform vec3 u_CameraPos;\n" +	
-		"varying vec2 v_Texcoord0;\n" +
-		"varying vec3 v_Normal;\n" +
-		"varying vec3 v_PositionWorld;\n" +
-		"varying vec3 v_ViewDir;\n" +
+		var vs2:string = `
+		attribute vec4 a_Position; 
+		attribute vec3 a_Normal;
+		attribute vec2 a_Texcoord0;	
+		uniform mat4 u_MvpMatrix;
+		uniform mat4 u_WorldMat;
+		uniform vec3 u_CameraPos;	
+		varying vec2 v_Texcoord0;
+		varying vec3 v_Normal;
+		varying vec3 v_PositionWorld;
+		varying vec3 v_ViewDir;
 		
-		"void main()\n" +
-		"{\n" +
-		"    gl_Position = u_MvpMatrix * a_Position;\n" +		
-		"    mat3 worldMat = mat3(u_WorldMat);\n" +
-		"	v_PositionWorld = (u_WorldMat * a_Position).xyz;\n" +
-		"	v_Normal = worldMat * a_Normal;\n" +
-		"	v_Texcoord0 = a_Texcoord0;\n" +		
-		"	v_ViewDir = u_CameraPos - v_PositionWorld;\n" + 
-		"}\n";
+		void main()
+		{
+		    gl_Position = u_MvpMatrix * a_Position;		
+		    mat3 worldMat = mat3(u_WorldMat);
+			v_PositionWorld = (u_WorldMat * a_Position).xyz;
+			v_Normal = worldMat * a_Normal;
+			v_Texcoord0 = a_Texcoord0;		
+			v_ViewDir = u_CameraPos - v_PositionWorld; 
+		}`;
 
-		var ps2:string = "#ifdef FSHIGHPRECISION\n" +
-		"	precision highp float;\n" +
-		"#else\n" +
-		"	precision mediump float;\n" +
-		"#endif\n" +
+		var ps2:string = `
+		#ifdef FSHIGHPRECISION
+			precision highp float;
+		#else
+			precision mediump float;
+		#endif
 	
-		"struct DirectionLight\n" +
-		"{\n" +
-		"	vec3 Color;\n" +
-		"	vec3 Direction;\n" +
-		"};\n" +
+		struct DirectionLight
+		{
+			vec3 Color;
+			vec3 Direction;
+		};
 	
-		"varying vec2 v_Texcoord0;\n" +
-		"varying vec3 v_Normal;\n" +
-		"varying vec3 v_PositionWorld;\n" +
-		"varying vec3 v_ViewDir;\n" +
+		varying vec2 v_Texcoord0;
+		varying vec3 v_Normal;
+		varying vec3 v_PositionWorld;
+		varying vec3 v_ViewDir;
 	
-		"#ifdef ALBEDOTEXTURE\n" +
-		"	uniform sampler2D u_AlbedoTexture;\n" +
-		"#endif\n" +
+		#ifdef ALBEDOTEXTURE
+			uniform sampler2D u_AlbedoTexture;
+		#endif
 	
-		"#ifdef BLENDTEXTURE\n" +
-		"	uniform sampler2D u_BlendTexture;\n" +
-		"#endif\n" +
+		#ifdef BLENDTEXTURE
+			uniform sampler2D u_BlendTexture;
+		#endif
 	
-		"uniform vec4 u_ShadowColor;\n" +
-		"uniform float u_ShadowRange;\n" +
-		"uniform float u_ShadowIntensity;\n" +
-		"uniform float u_SpecularRange;\n" +
-		"uniform float u_SpecularIntensity;\n" +
+		uniform vec4 u_ShadowColor;
+		uniform float u_ShadowRange;
+		uniform float u_ShadowIntensity;
+		uniform float u_SpecularRange;
+		uniform float u_SpecularIntensity;
 	
-		"uniform DirectionLight u_DirectionLight;\n" +
+		uniform DirectionLight u_DirectionLight;
 	
-		"void main()\n" +
-		"{\n" +
-		"	vec3 normal = normalize(v_Normal);\n" +
-		"	vec3 viewdir = normalize(v_ViewDir);\n" +
-		"	vec3 lightDir = normalize(u_DirectionLight.Direction);\n" +
+		void main()
+		{
+			vec3 normal = normalize(v_Normal);
+			vec3 viewdir = normalize(v_ViewDir);
+			vec3 lightDir = normalize(u_DirectionLight.Direction);
 		
-		"	vec4 albedoTextureColor = vec4(1.0);\n" +
-		"#ifdef ALBEDOTEXTURE\n" +
-		"	albedoTextureColor = texture2D(u_AlbedoTexture, v_Texcoord0);\n" +
-		"#endif\n" +
+			vec4 albedoTextureColor = vec4(1.0);
+		#ifdef ALBEDOTEXTURE
+			albedoTextureColor = texture2D(u_AlbedoTexture, v_Texcoord0);
+		#endif
 		
-		"vec4 blendTextureColor = vec4(1.0);\n" + 
-		"#ifdef BLENDTEXTURE\n" +
-		"	blendTextureColor = texture2D(u_BlendTexture, v_Texcoord0);\n" +
-		"#endif\n" +
+		vec4 blendTextureColor = vec4(1.0); 
+		#ifdef BLENDTEXTURE
+			blendTextureColor = texture2D(u_BlendTexture, v_Texcoord0);
+		#endif
 		
-		"float blendTexColorG = blendTextureColor.g;\n" +
+		float blendTexColorG = blendTextureColor.g;
 		
 		//Overlay BlendMode 叠加
-		"vec3 albedoColor;\n" +
-		"albedoColor.r = albedoTextureColor.r > 0.5 ? 1.0 - 2.0 * (1.0 - albedoTextureColor.r) * (1.0 - blendTexColorG) : 2.0 * albedoTextureColor.r * blendTexColorG;\n" +
-		"albedoColor.g = albedoTextureColor.g > 0.5 ? 1.0 - 2.0 * (1.0 - albedoTextureColor.g) * (1.0 - blendTexColorG) : 2.0 * albedoTextureColor.g * blendTexColorG;\n" +
-		"albedoColor.b = albedoTextureColor.b > 0.5 ? 1.0 - 2.0 * (1.0 - albedoTextureColor.b) * (1.0 - blendTexColorG) : 2.0 * albedoTextureColor.b * blendTexColorG;\n" +
+		vec3 albedoColor;
+		albedoColor.r = albedoTextureColor.r > 0.5 ? 1.0 - 2.0 * (1.0 - albedoTextureColor.r) * (1.0 - blendTexColorG) : 2.0 * albedoTextureColor.r * blendTexColorG;
+		albedoColor.g = albedoTextureColor.g > 0.5 ? 1.0 - 2.0 * (1.0 - albedoTextureColor.g) * (1.0 - blendTexColorG) : 2.0 * albedoTextureColor.g * blendTexColorG;
+		albedoColor.b = albedoTextureColor.b > 0.5 ? 1.0 - 2.0 * (1.0 - albedoTextureColor.b) * (1.0 - blendTexColorG) : 2.0 * albedoTextureColor.b * blendTexColorG;
 		
-		"albedoColor = clamp(albedoColor, 0.0, 1.0);\n" +
+		albedoColor = clamp(albedoColor, 0.0, 1.0);
 		
-		"float nl = max(dot(normal, -lightDir), 0.0);\n" +
+		float nl = max(dot(normal, -lightDir), 0.0);
 		
-		"float shadowValue = nl + blendTexColorG - 0.5;\n" +
-		"float shadow = step(shadowValue, u_ShadowRange);\n" +
-		"if(u_ShadowRange > (shadowValue + 0.015))\n" +
-		"	shadow = 1.0;\n" +
-		"else if(u_ShadowRange < (shadowValue - 0.015))\n" +
-		"	shadow = 0.0;\n" +
-		"else\n" +
-		"	shadow = (u_ShadowRange - (shadowValue - 0.015)) / 0.03;\n" +
+		float shadowValue = nl + blendTexColorG - 0.5;
+		float shadow = step(shadowValue, u_ShadowRange);
+		if(u_ShadowRange > (shadowValue + 0.015))
+			shadow = 1.0;
+		else if(u_ShadowRange < (shadowValue - 0.015))
+			shadow = 0.0;
+		else
+			shadow = (u_ShadowRange - (shadowValue - 0.015)) / 0.03;
 			
-		"shadow = clamp(shadow, 0.0, 1.0);\n" +
+		shadow = clamp(shadow, 0.0, 1.0);
 		
 		//specularTextureColor.r 影响高光范围
-		"float specular = step(u_SpecularRange, clamp(pow(nl, blendTextureColor.r), 0.0, 1.0));\n" +
+		float specular = step(u_SpecularRange, clamp(pow(nl, blendTextureColor.r), 0.0, 1.0));
 		//specularTextureColor.b 影响高光强度
-		"specular = step(0.1, specular * blendTextureColor.b);\n" +
+		specular = step(0.1, specular * blendTextureColor.b);
 		
-		"vec3 albedoAreaColor = (1.0 - shadow) * albedoColor;\n" +
-		"vec3 shadowAreaColor = shadow * albedoColor * u_ShadowColor.rgb * u_ShadowIntensity;\n" +
-		"vec3 speculAreaColor = (1.0 - shadow) * albedoColor * u_SpecularIntensity * specular;\n" +
+		vec3 albedoAreaColor = (1.0 - shadow) * albedoColor;
+		vec3 shadowAreaColor = shadow * albedoColor * u_ShadowColor.rgb * u_ShadowIntensity;
+		vec3 speculAreaColor = (1.0 - shadow) * albedoColor * u_SpecularIntensity * specular;
 		
-		"vec3 finalColor = albedoAreaColor + speculAreaColor + shadowAreaColor;\n" +
+		vec3 finalColor = albedoAreaColor + speculAreaColor + shadowAreaColor;
 		
-		"gl_FragColor = vec4(finalColor, 1.0);\n" +
-		"}";
+		gl_FragColor = vec4(finalColor, 1.0);
+		}`;
 	
-		//var vs2:String = __INCLUDESTR__("shader/cartoon.vs");
-		//var ps2:String = __INCLUDESTR__("shader/cartoon.ps");
 		subShader.addShaderPass(vs2, ps2);
 	}
 	

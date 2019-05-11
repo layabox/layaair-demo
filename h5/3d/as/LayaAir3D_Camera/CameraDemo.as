@@ -16,11 +16,12 @@ package LayaAir3D_Camera {
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.net.Loader;
+	import laya.resource.Texture2D;
 	import laya.ui.Button;
 	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.webgl.resource.Texture2D;
+
 	
 	/**
 	 * ...
@@ -38,8 +39,7 @@ package LayaAir3D_Camera {
 		
 		public function CameraDemo() {
 			//初始化引擎
-			Laya3D.init(1000, 500);
-			//适配模式
+			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 			//开启统计信息
@@ -130,6 +130,7 @@ package LayaAir3D_Camera {
 				changeActionButton2.on(Event.CLICK, this, function():void {
 					index2++;
 					if (index2 % 2 === 1) {
+						debugger;
 						//设置相机的清除标识为天空盒
 						camera.clearFlag = BaseCamera.CLEARFLAG_SKY;
 						//使用加载天空盒材质

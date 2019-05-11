@@ -99,76 +99,80 @@ export default class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
 			var customShader:Laya.Shader3D = Laya.Shader3D.add("MultiplePassOutlineShader");
 			var subShader:Laya.SubShader = new Laya.SubShader(attributeMap, uniformMap,MultiplePassOutlineMaterial.shaderDefines);
             customShader.addSubShader(subShader);
-            let vs1:string = "attribute vec4 a_Position;\n" + 
-            "attribute vec3 a_Normal;\n" + 
-            "attribute vec2 a_Texcoord0;\n" + 
+			let vs1:string = `
+			attribute vec4 a_Position; 
+            attribute vec3 a_Normal; 
+            attribute vec2 a_Texcoord0; 
             
-            "uniform mat4 u_MvpMatrix;\n" + 
-            "uniform float u_OutlineWidth;\n" + 
+            uniform mat4 u_MvpMatrix; 
+            uniform float u_OutlineWidth; 
             
-            "void main()\n" + 
-            "{\n" +  
-            "   vec4 position = vec4(a_Position.xyz + a_Normal * u_OutlineWidth, 1.0);\n" + 
-            "   gl_Position = u_MvpMatrix * position;\n" + 
-            "}\n" ;
+            void main() 
+            {  
+               vec4 position = vec4(a_Position.xyz + a_Normal * u_OutlineWidth, 1.0); 
+               gl_Position = u_MvpMatrix * position; 
+            }` ;
 
-			let ps1:string = "#ifdef FSHIGHPRECISION\n" + 
-            "precision highp float;\n" + 
-            "#else\n" + 
-            "   precision mediump float;\n" + 
-			"#endif\n" + 
-			"uniform vec4 u_OutlineColor;\n" + 
-            "uniform float u_OutlineLightness;\n" + 
+			let ps1:string = `
+			#ifdef FSHIGHPRECISION 
+            precision highp float; 
+            #else 
+               precision mediump float; 
+			#endif 
+			uniform vec4 u_OutlineColor; 
+            uniform float u_OutlineLightness; 
         
-            "void main()\n" + 
-        	"{\n" + 
-        	"   vec3 finalColor = u_OutlineColor.rgb * u_OutlineLightness;\n" + 
+            void main() 
+        	{ 
+        	   vec3 finalColor = u_OutlineColor.rgb * u_OutlineLightness; 
         
-        	"   gl_FragColor = vec4(finalColor,0.0);\n" + 
-        	"}";
+        	   gl_FragColor = vec4(finalColor,0.0); 
+        	}`;
         
 			var pass1 = subShader.addShaderPass(vs1, ps1);
 			pass1.renderState.cull = Laya.RenderState.CULL_FRONT;
-			let vs2:string = '#include "Lighting.glsl";\n' + 
+			let vs2:string = `
+			#include "Lighting.glsl"; 
 
-            "attribute vec4 a_Position;\n" + 
-            "attribute vec2 a_Texcoord0;\n" + 
+            attribute vec4 a_Position; 
+            attribute vec2 a_Texcoord0; 
             
-            "uniform mat4 u_MvpMatrix;\n" + 
-            "uniform mat4 u_WorldMat;\n" + 
+            uniform mat4 u_MvpMatrix; 
+            uniform mat4 u_WorldMat; 
             
             
-            "attribute vec3 a_Normal;\n" + 
-            "varying vec3 v_Normal;\n" + 
-            "varying vec2 v_Texcoord0;\n" + 
+            attribute vec3 a_Normal; 
+            varying vec3 v_Normal; 
+            varying vec2 v_Texcoord0; 
             
-            "void main()\n" + 
-            "{\n" + 
-            "   gl_Position = u_MvpMatrix * a_Position;\n" + 
+            void main() 
+            { 
+               gl_Position = u_MvpMatrix * a_Position; 
                   
-            "   mat3 worldMat=mat3(u_WorldMat);\n" + 
-            "   v_Normal=worldMat*a_Normal;\n" + 
-            "   v_Texcoord0 = a_Texcoord0;\n" + 
-            "   gl_Position=remapGLPositionZ(gl_Position);\n" + 
-            "}\n" 
-			let ps2:string = "#ifdef FSHIGHPRECISION\n" + 
-            "precision highp float;\n" +
-            "#else\n" +
-            "precision mediump float;\n" +
-            "#endif\n" +
-            "varying vec2 v_Texcoord0;\n" +
-            "varying vec3 v_Normal;\n" +
+               mat3 worldMat=mat3(u_WorldMat); 
+               v_Normal=worldMat*a_Normal; 
+               v_Texcoord0 = a_Texcoord0; 
+               gl_Position=remapGLPositionZ(gl_Position); 
+            }`;
+			let ps2:string = `
+			#ifdef FSHIGHPRECISION 
+            precision highp float;
+            #else
+            precision mediump float;
+            #endif
+            varying vec2 v_Texcoord0;
+            varying vec3 v_Normal;
             
-            "uniform sampler2D u_AlbedoTexture;\n" +
+            uniform sampler2D u_AlbedoTexture;
             
             
-            "void main()\n" +
-            "{\n" +
-            "   vec4 albedoTextureColor = vec4(1.0);\n" +
+            void main()
+            {
+               vec4 albedoTextureColor = vec4(1.0);
                
-            "   albedoTextureColor = texture2D(u_AlbedoTexture, v_Texcoord0);\n" +
-            "   gl_FragColor=albedoTextureColor;\n" +
-            "}\n" 
+               albedoTextureColor = texture2D(u_AlbedoTexture, v_Texcoord0);
+               gl_FragColor=albedoTextureColor;
+            }`;
             
 			subShader.addShaderPass(vs2, ps2);
 		}
@@ -180,5 +184,6 @@ export default class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
 			this.setShaderName("MultiplePassOutlineShader");
 			this._shaderValues.setNumber(MultiplePassOutlineMaterial.OUTLINEWIDTH, 0.01581197);
 			this._shaderValues.setNumber(MultiplePassOutlineMaterial.OUTLINELIGHTNESS, 1);
+			this._shaderValues.setVector(MultiplePassOutlineMaterial.OUTLINECOLOR, new Laya.Vector4(1.0,1.0,1.0,0.0));
 		}
 	}

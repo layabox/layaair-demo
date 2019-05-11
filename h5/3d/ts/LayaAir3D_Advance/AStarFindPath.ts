@@ -39,11 +39,6 @@ class AStarFindPath
 		//初始化3D场景
 		this.scene = Laya.stage.addChild(Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Laya.Scene3D;
 		
-		//删除原始资源中包含的默认相机
-		var camera:Laya.Camera = this.scene.getChildByName("Main Camera") as Laya.Camera;
-		//删除自身
-		camera.removeSelf();
-		
 		//根据场景中方块生成路径点
 		this.initPath(this.scene);
 		

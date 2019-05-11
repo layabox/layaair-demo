@@ -15,7 +15,6 @@ package LayaAir3D_MouseInteraction {
 	import laya.d3.resource.models.Mesh;
 	import laya.display.Stage;
 	import laya.display.Text;
-	import laya.events.Event;
 	import laya.events.MouseManager;
 	import laya.net.Loader;
 	import laya.utils.Handler;
@@ -154,6 +153,7 @@ package LayaAir3D_MouseInteraction {
 			//添加鼠标事件
 			addMouseEvent();
 		
+			debugger;
 			//显示文本显示框
 			text.name = "text";
 			text.overflow = Text.HIDDEN;

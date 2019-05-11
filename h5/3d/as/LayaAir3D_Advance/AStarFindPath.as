@@ -17,12 +17,10 @@ package LayaAir3D_Advance {
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.net.Loader;
-	import laya.ui.Button;
-	import laya.utils.Browser;
+	import laya.resource.Texture2D;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
 	import laya.utils.Tween;
-	import laya.webgl.resource.Texture2D;
 	
 	public class AStarFindPath {
 		private var terrainSprite:MeshTerrainSprite3D;
@@ -65,10 +63,6 @@ package LayaAir3D_Advance {
 		private function onLoadFinish():void {
 			//初始化3D场景
 			scene = Laya.stage.addChild(Loader.getRes("res/threeDimen/scene/TerrainScene/XunLongShi.ls")) as Scene3D;
-			
-			//删除原始资源中包含的默认相机
-			var camera:Camera = scene.getChildByName("Main Camera") as Camera;
-			camera.removeSelf();
 			
 			//根据场景中方块生成路径点
 			initPath(scene);

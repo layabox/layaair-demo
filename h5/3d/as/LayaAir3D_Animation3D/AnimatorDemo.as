@@ -1,4 +1,4 @@
-package LayaAir3D_Animation {
+package LayaAir3D_Animation3D {
 	import common.CameraMoveScript;
 	import laya.d3.component.Animator;
 	import laya.d3.component.AnimatorState;
@@ -74,6 +74,7 @@ package LayaAir3D_Animation {
 			
 			//初始化角色精灵
 			var role:Sprite3D = _scene.addChild(new Sprite3D()) as Sprite3D;
+			debugger;
 			//初始化胖子
 			var pangzi:Sprite3D = role.addChild(Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/PangZi.lh")) as Sprite3D;
 			//获取动画组件

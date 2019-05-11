@@ -5,9 +5,9 @@ package LayaAir3D_MouseInteraction {
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
+	import laya.d3.math.Matrix4x4;
 	import laya.d3.math.Vector3;
 	import laya.d3.math.Vector4;
-	import laya.d3.math.Matrix4x4;
 	import laya.d3.physics.PhysicsCollider;
 	import laya.d3.physics.Rigidbody3D;
 	import laya.d3.physics.shape.BoxColliderShape;
@@ -15,8 +15,9 @@ package LayaAir3D_MouseInteraction {
 	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
 	import laya.display.Text;
+	import laya.resource.Texture2D;
 	import laya.utils.Handler;
-	import laya.webgl.resource.Texture2D;
+
 	
 	/**
 	 * ...

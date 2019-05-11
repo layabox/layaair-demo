@@ -2,6 +2,7 @@ package LayaAir3D_Camera {
 	import common.CameraMoveScript;
 	import laya.d3.core.BaseCamera;
 	import laya.d3.core.Camera;
+	import laya.d3.core.material.PBRSpecularMaterial;
 	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
@@ -14,8 +15,11 @@ package LayaAir3D_Camera {
 	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
+	import laya.resource.BaseTexture;
+	import laya.resource.Texture2D;
 	
 	public class RenderTargetCamera {
+		private var pbrTexture:Texture2D;
 		public function RenderTargetCamera() {
 			//初始化引擎
 			Laya3D.init(0, 0);
@@ -25,7 +29,7 @@ package LayaAir3D_Camera {
 			Stat.show();
 			
 			//预加载资源
-			Laya.loader.create(["res/threeDimen/scene/CourtyardScene/Courtyard.ls"], Handler.create(this, onComplete));
+			Laya.loader.create(["res/threeDimen/scene/CourtyardScene/Courtyard.ls","res/threeDimen/texture/earth.png"], Handler.create(this, onComplete));
 		}
 		
 		private function onComplete():void {

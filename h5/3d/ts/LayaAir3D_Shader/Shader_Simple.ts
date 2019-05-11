@@ -39,29 +39,31 @@ class Shader_Simple {
             'u_MvpMatrix': Laya.Shader3D.PERIOD_SPRITE, 
             'u_WorldMat': Laya.Shader3D.PERIOD_SPRITE
         };
-        var vs:string = '#include "Lighting.glsl";\n' + 
-        "attribute vec4 a_Position;\n"+
-        "uniform mat4 u_MvpMatrix;\n"+
-        "uniform mat4 u_WorldMat;\n"+
-        "attribute vec3 a_Normal;\n"+
-        "varying vec3 v_Normal;\n"+
-        "void main()\n"+
-        "{\n"+
-        "gl_Position = u_MvpMatrix * a_Position;\n"+
-        "mat3 worldMat=mat3(u_WorldMat);\n"+
-        "v_Normal=worldMat*a_Normal;\n"+
-        "gl_Position=remapGLPositionZ(gl_Position);\n" + 
-        "}";
-        var ps:string = "#ifdef FSHIGHPRECISION\n"+
-        "precision highp float;\n"+
-        "#else\n"+
-        "precision mediump float;\n"+
-        "#endif\n"+
-        "varying vec3 v_Normal;\n" +
-        "void main()\n"+
-        "{\n"+
-        "gl_FragColor=vec4(v_Normal,1.0);\n"+
-        "}";      
+        var vs:string = `
+        #include "Lighting.glsl"; 
+        attribute vec4 a_Position;
+        uniform mat4 u_MvpMatrix;
+        uniform mat4 u_WorldMat;
+        attribute vec3 a_Normal;
+        varying vec3 v_Normal;
+        void main()
+        {
+        gl_Position = u_MvpMatrix * a_Position;
+        mat3 worldMat=mat3(u_WorldMat);
+        v_Normal=worldMat*a_Normal;
+        gl_Position=remapGLPositionZ(gl_Position); 
+        }`;
+        var ps:string = `
+        #ifdef FSHIGHPRECISION
+        precision highp float;
+        #else
+        precision mediump float;
+        #endif
+        varying vec3 v_Normal;
+        void main()
+        {
+        gl_FragColor=vec4(v_Normal,1.0);
+        }`;      
 
 		var customShader:Laya.Shader3D = Laya.Shader3D.add("CustomShader");
 		var subShader:Laya.SubShader =new Laya.SubShader(attributeMap, uniformMap);

@@ -14,7 +14,7 @@ package LayaAir3D_Material {
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.webgl.resource.Texture2D;
+	import laya.resource.Texture2D;
 	
 	/**
 	 * ...

@@ -10,6 +10,11 @@ package LayaAir3D_Resource {
 	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
+	
+	/**
+	 * ...
+	 * @author LayaAir3D Team
+	 */
 	public class GarbageCollection {
 		/**@private */
 		private var _scene:Scene3D;
@@ -68,7 +73,7 @@ package LayaAir3D_Resource {
 				var camera:Camera = scene.addChild(new Camera(0, 0.1, 100)) as Camera;
 				camera.transform.translate(new Vector3(0, 1, 0));
 				camera.addComponent(CameraMoveScript);
-			}))
+			}));
 		}
 		
 		/**

@@ -5,27 +5,26 @@ package LayaAir3D_Camera {
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
+	import laya.d3.math.Matrix4x4;
 	import laya.d3.math.Ray;
 	import laya.d3.math.Vector2;
 	import laya.d3.math.Vector3;
 	import laya.d3.math.Vector4;
-	import laya.d3.math.Matrix4x4;
 	import laya.d3.physics.HitResult;
 	import laya.d3.physics.PhysicsCollider;
 	import laya.d3.physics.Rigidbody3D;
 	import laya.d3.physics.shape.BoxColliderShape;
-	import laya.d3.physics.shape.CapsuleColliderShape;
-	import laya.d3.physics.shape.ConeColliderShape;
-	import laya.d3.physics.shape.CylinderColliderShape;
-	import laya.d3.physics.shape.SphereColliderShape;
 	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
+	import laya.display.Text;
 	import laya.events.Event;
 	import laya.events.MouseManager;
+	import laya.resource.Texture2D;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.display.Text;
-	import laya.webgl.resource.Texture2D;
+
+
+
 	
 	/**
 	 * ...
@@ -145,7 +144,8 @@ package LayaAir3D_Camera {
 			camera.viewportPointToRay(point, _ray);
 			//拿到射线碰撞的物体
 			scene.physicsSimulation.rayCastAll(_ray, outs);
-		
+			
+			debugger;
 			//如果碰撞到物体
 			if (outs.length != 0) {
 				

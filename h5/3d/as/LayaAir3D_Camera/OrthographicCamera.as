@@ -21,10 +21,10 @@ package LayaAir3D_Camera {
 		private var _translate:Vector3 = new Vector3(0, 0, 0);
 		
 		public function OrthographicCamera() {
-			
-			Laya3D.init(1024, 768);
-			Laya.stage.scaleMode = Stage.SCALE_FIXED_HEIGHT;
-			Laya.stage.screenMode = Stage.SCREEN_NONE;
+			//初始化引擎
+			Laya3D.init(0, 0);
+			Laya.stage.scaleMode = Stage.SCALE_FULL;
+			Laya.stage.screenMode = Stage.SCREEN_NONE;;
 			Stat.show();
 			
 			var dialog:Image = Laya.stage.addChild(new Image("res/cartoon2/background.jpg")) as Image;

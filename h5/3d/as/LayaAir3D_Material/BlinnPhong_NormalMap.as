@@ -5,12 +5,13 @@ package LayaAir3D_Material {
 	import laya.d3.core.light.DirectionLight;
 	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
-	import laya.d3.math.Vector3;
 	import laya.d3.math.Matrix4x4;
+	import laya.d3.math.Vector3;
 	import laya.display.Stage;
+	import laya.resource.Texture2D;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.webgl.resource.Texture2D;
+
 	
 	public class BlinnPhong_NormalMap {
 		private var scene:Scene3D;

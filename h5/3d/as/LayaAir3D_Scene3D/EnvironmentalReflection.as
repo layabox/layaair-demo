@@ -16,7 +16,7 @@ package LayaAir3D_Scene3D {
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.webgl.resource.Texture2D;
+	import laya.resource.Texture2D;
 	import laya.d3.resource.models.Mesh;
 	
 	public class EnvironmentalReflection {

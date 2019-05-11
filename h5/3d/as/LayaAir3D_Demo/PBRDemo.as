@@ -1,4 +1,4 @@
-package LayaAir3DDemo {
+package LayaAir3D_Demo {
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;

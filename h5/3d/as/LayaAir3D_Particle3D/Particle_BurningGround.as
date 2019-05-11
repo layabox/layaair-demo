@@ -1,4 +1,4 @@
-package LayaAir3D_Particle {
+package LayaAir3D_Particle3D {
 	import laya.d3.core.Camera;
 	import laya.d3.core.Sprite3D;
 	import laya.d3.core.scene.Scene3D;

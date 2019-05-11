@@ -21,8 +21,12 @@ class SceneLoad2 {
 			//设置场景环境光
 			scene.ambientColor = new Laya.Vector3(0.6, 0, 0);
 			
-			//获取场景中的相机
-			var camera = scene.getChildByName("Main Camera") as Laya.Camera;
+			//添加相机
+			var camera = new Laya.Camera();
+			scene.addChild(camera);
+			//调整相机的位置
+			camera.transform.translate(new Laya.Vector3(10, 15, -25));
+			camera.transform.rotate(new Laya.Vector3(-20, 170, 0), false, false);
 			//设置相机横纵比
 			camera.aspectRatio = 0;
 			//设置相机近距裁剪

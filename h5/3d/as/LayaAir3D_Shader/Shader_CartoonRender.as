@@ -11,7 +11,7 @@ package LayaAir3D_Shader {
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.utils.Stat;
-	import laya.webgl.resource.Texture2D;
+	import laya.resource.Texture2D;
 	import laya.d3Extend.cartoonMaterial.CartoonMaterial;
 	import laya.utils.Handler;
 	import laya.d3.core.light.DirectionLight;

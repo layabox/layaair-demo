@@ -37,7 +37,11 @@ package LayaAir3D_Scene3D {
 				scene.ambientColor = new Vector3(0.6, 0, 0);
 				
 				//获取场景中的相机
-				var camera:Camera = scene.getChildByName("Main Camera") as Camera;
+				var camera:Camera = new Camera();
+				scene.addChild(camera);
+				//调整相机的位置
+				camera.transform.translate(new Vector3(10, 15, -25));
+				camera.transform.rotate(new Vector3(-20, 170, 0), false, false);
 				//设置相机横纵比
 				camera.aspectRatio = 0;
 				//设置相机近距裁剪
@@ -54,7 +58,7 @@ package LayaAir3D_Scene3D {
 				camera.addComponent(CameraMoveScript);
 				
 				//加载相机天空盒材质
-				BaseMaterial.load("res/threeDimen/skyBox/skyBox3/SkyBox.lmat", Handler.create(this, function(mat:BaseMaterial):void {
+				BaseMaterial.load("res/threeDimen/skyBox/skyBox2/SkyBox2.lmat", Handler.create(this, function(mat:BaseMaterial):void {
 					var skyRenderer:SkyRenderer = camera.skyRenderer;
 					skyRenderer.mesh = SkyBox.instance;
 					skyRenderer.material = mat;

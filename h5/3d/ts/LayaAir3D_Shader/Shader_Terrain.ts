@@ -74,73 +74,75 @@ class Shader_Terrain {
             'u_DiffuseScale5': Laya.Shader3D.PERIOD_MATERIAL
         };
         
-        var vs:string = '#include "Lighting.glsl";\n' +
-        "attribute vec4 a_Position;\n"+
-        "attribute vec2 a_Texcoord0;\n"+
-        "attribute vec3 a_Normal;\n"+
-        "uniform mat4 u_MvpMatrix;\n"+
-        "varying vec2 v_Texcoord0;\n"+
-        "void main()\n"+
-        "{\n"+
-          "gl_Position = u_MvpMatrix * a_Position;\n"+
-          "v_Texcoord0 = a_Texcoord0;\n"+
-          "gl_Position=remapGLPositionZ(gl_Position);\n" + 
-       "}";
-        var ps:string ="#ifdef FSHIGHPRECISION\n"+
-        "precision highp float;\n"+
-        "#else\n"+
-        "precision mediump float;\n"+
-        "#endif\n"+
-        "uniform sampler2D u_SplatAlphaTexture;\n"+
-        "uniform sampler2D u_DiffuseTexture1;\n"+
-        "uniform sampler2D u_DiffuseTexture2;\n"+
-        "uniform sampler2D u_DiffuseTexture3;\n"+
-        "uniform sampler2D u_DiffuseTexture4;\n"+
-        "uniform sampler2D u_DiffuseTexture5;\n"+
-        "uniform vec2 u_DiffuseScale1;\n"+
-        "uniform vec2 u_DiffuseScale2;\n"+
-        "uniform vec2 u_DiffuseScale3;\n"+
-        "uniform vec2 u_DiffuseScale4;\n"+
-        "uniform vec2 u_DiffuseScale5;\n"+
-        "varying vec2 v_Texcoord0;\n"+
-        "void main()\n"+
-        "{\n"+
-        "#ifdef CUSTOM_DETAIL_NUM1\n"+
-        "vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\n"+
-        "vec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScale1);\n"+
-        "gl_FragColor.xyz = color1.xyz * splatAlpha.r;\n"+
-        "#endif\n"+
-        "#ifdef CUSTOM_DETAIL_NUM2\n"+
-        "vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\n"+
-        "vec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScale1);\n"+
-        "vec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScale2);\n"+
-        "gl_FragColor.xyz = color1.xyz * splatAlpha.r + color2.xyz * (1.0 - splatAlpha.r);\n"+
-        "#endif\n"+
-        "#ifdef CUSTOM_DETAIL_NUM3\n"+
-        "vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\n"+
-        "vec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScale1);\n"+
-        "vec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScale2);\n"+
-        "vec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScale3);\n"+
-        "gl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * (1.0 - splatAlpha.r - splatAlpha.g);\n"+
-        "#endif\n"+
-        "#ifdef CUSTOM_DETAIL_NUM4\n"+
-        "vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\n"+
-        "vec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScale1);\n"+
-        "vec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScale2);\n"+
-        "vec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScale3);\n"+
-        "vec4 color4 = texture2D(u_DiffuseTexture4, v_Texcoord0 * u_DiffuseScale4);\n"+
-        "gl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * splatAlpha.b + color4.xyz * (1.0 - splatAlpha.r - splatAlpha.g - splatAlpha.b);\n"+
-        "#endif\n"+
-        "#ifdef CUSTOM_DETAIL_NUM5\n"+
-        "vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\n"+
-        "vec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScale1);\n"+
-        "vec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScale2);\n"+
-        "vec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScale3);\n"+
-        "vec4 color4 = texture2D(u_DiffuseTexture4, v_Texcoord0 * u_DiffuseScale4);\n"+
-        "vec4 color5 = texture2D(u_DiffuseTexture5, v_Texcoord0 * u_DiffuseScale5);\n"+
-        "gl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * splatAlpha.b + color4.xyz * splatAlpha.a + color5.xyz * (1.0 - splatAlpha.r - splatAlpha.g - splatAlpha.b - splatAlpha.a);\n"+
-        "#endif\n"+
-        "}";
+        var vs:string = `
+        #include "Lighting.glsl";
+        attribute vec4 a_Position;
+        attribute vec2 a_Texcoord0;
+        attribute vec3 a_Normal;
+        uniform mat4 u_MvpMatrix;
+        varying vec2 v_Texcoord0;
+        void main()
+        {
+          gl_Position = u_MvpMatrix * a_Position;
+          v_Texcoord0 = a_Texcoord0;
+          gl_Position=remapGLPositionZ(gl_Position);
+       }`;
+        var ps:string =`
+        #ifdef FSHIGHPRECISION
+        precision highp float;
+        #else
+        precision mediump float;
+        #endif
+        uniform sampler2D u_SplatAlphaTexture;
+        uniform sampler2D u_DiffuseTexture1;
+        uniform sampler2D u_DiffuseTexture2;
+        uniform sampler2D u_DiffuseTexture3;
+        uniform sampler2D u_DiffuseTexture4;
+        uniform sampler2D u_DiffuseTexture5;
+        uniform vec2 u_DiffuseScale1;
+        uniform vec2 u_DiffuseScale2;
+        uniform vec2 u_DiffuseScale3;
+        uniform vec2 u_DiffuseScale4;
+        uniform vec2 u_DiffuseScale5;
+        varying vec2 v_Texcoord0;
+        void main()
+        {
+        #ifdef CUSTOM_DETAIL_NUM1
+        vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);
+        vec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScale1);
+        gl_FragColor.xyz = color1.xyz * splatAlpha.r;
+        #endif
+        #ifdef CUSTOM_DETAIL_NUM2
+        vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);
+        vec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScale1);
+        vec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScale2);
+        gl_FragColor.xyz = color1.xyz * splatAlpha.r + color2.xyz * (1.0 - splatAlpha.r);
+        #endif
+        #ifdef CUSTOM_DETAIL_NUM3
+        vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);
+        vec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScale1);
+        vec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScale2);
+        vec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScale3);
+        gl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * (1.0 - splatAlpha.r - splatAlpha.g);
+        #endif
+        #ifdef CUSTOM_DETAIL_NUM4
+        vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);
+        vec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScale1);
+        vec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScale2);
+        vec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScale3);
+        vec4 color4 = texture2D(u_DiffuseTexture4, v_Texcoord0 * u_DiffuseScale4);
+        gl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * splatAlpha.b + color4.xyz * (1.0 - splatAlpha.r - splatAlpha.g - splatAlpha.b);
+        #endif
+        #ifdef CUSTOM_DETAIL_NUM5
+        vec4 splatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);
+        vec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScale1);
+        vec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScale2);
+        vec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScale3);
+        vec4 color4 = texture2D(u_DiffuseTexture4, v_Texcoord0 * u_DiffuseScale4);
+        vec4 color5 = texture2D(u_DiffuseTexture5, v_Texcoord0 * u_DiffuseScale5);
+        gl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * splatAlpha.b + color4.xyz * splatAlpha.a + color5.xyz * (1.0 - splatAlpha.r - splatAlpha.g - splatAlpha.b - splatAlpha.a);
+        #endif
+        }`;
 		var customTerrianShader:Laya.Shader3D = Laya.Shader3D.add("CustomTerrainShader");
 		var subShader:Laya.SubShader =new Laya.SubShader(attributeMap, uniformMap, Laya.RenderableSprite3D.shaderDefines, CustomTerrainMaterial.shaderDefines);
 		customTerrianShader.addSubShader(subShader);

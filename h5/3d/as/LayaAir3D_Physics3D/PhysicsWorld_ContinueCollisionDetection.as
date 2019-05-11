@@ -1,4 +1,4 @@
-package LayaAir3D_Physics {
+package LayaAir3D_Physics3D {
 	import common.CameraMoveScript;
 	import laya.d3.core.Camera;
 	import laya.d3.core.MeshSprite3D;
@@ -16,7 +16,7 @@ package LayaAir3D_Physics {
 	import laya.display.Stage;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.webgl.resource.Texture2D;
+	import laya.resource.Texture2D;
 	
 	/**
 	 * ...

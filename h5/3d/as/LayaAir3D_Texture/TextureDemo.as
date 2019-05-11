@@ -21,8 +21,8 @@ package LayaAir3D_Texture {
 	import laya.utils.Handler;
 	import laya.utils.Stat;
 	import laya.webgl.WebGLContext;
-	import laya.webgl.resource.BaseTexture;
-	import laya.webgl.resource.Texture2D;
+	import laya.resource.BaseTexture;
+	import laya.resource.Texture2D;
 	
 	/**
 	 * ...
@@ -59,9 +59,9 @@ package LayaAir3D_Texture {
 			box.transform.rotate(new Vector3(0, 0, 0), false, false);
 			var mat:BlinnPhongMaterial = new BlinnPhongMaterial();
 			//漫反射贴图
-			Texture2D.load("res/threeDimen/texture/layabox.png", Handler.create(null, function(texture:Texture2D):void {
+			Texture2D.load("res/threeDimen/texture/layabox.png", Handler.create(this, function(texture:Texture2D):void {
 				//在U方向上使用WARPMODE_CLAMP
-				texture.wrapModeU = BaseTexture.WARPMODE_CLAMP;
+				texture.wrapModeU = BaseTexture.WARPMODE_REPEAT;
 				//在V方向使用WARPMODE_REPEAT
 				texture.wrapModeV = BaseTexture.WARPMODE_REPEAT;
 				//设置过滤方式
@@ -72,7 +72,7 @@ package LayaAir3D_Texture {
 				mat.albedoTexture = texture;
 				//修改材质贴图的平铺和偏移
 				var tilingOffset:Vector4 = mat.tilingOffset;
-				tilingOffset.setValue(2, 2, 0, 0);
+				tilingOffset.setValue(3, 3, 0.0, 0.0);
 				mat.tilingOffset = tilingOffset;
 				
 				box.meshRenderer.material = mat;

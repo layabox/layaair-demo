@@ -9,9 +9,10 @@ package LayaAir3D_Material {
 	import laya.d3.math.Vector4;
 	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
+	import laya.resource.Texture2D;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.webgl.resource.Texture2D;
+
 	
 	/**
 	 * ...

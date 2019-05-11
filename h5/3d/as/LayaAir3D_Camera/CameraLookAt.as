@@ -9,20 +9,15 @@ package LayaAir3D_Camera
 	import laya.d3.core.material.BlinnPhongMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
-	import laya.d3.math.Vector4;
 	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.net.Loader;
+	import laya.resource.Texture2D;
 	import laya.ui.Button;
 	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.webgl.resource.Texture2D;
-	import laya.d3.core.material.BaseMaterial;
-	import laya.d3.resource.models.SkyBox;
-	import laya.d3.resource.models.SkyRenderer;
-	import laya.d3.core.Sprite3D;
 	/**
 	 * ...
 	 * @author ...

@@ -15,7 +15,7 @@ package LayaAir3D_Scene3D {
 			Stat.show();
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
-			
+			debugger;
 			//加载场景
 			Scene3D.load("res/threeDimen/scene/LayaScene_dudeScene/Conventional/dudeScene.ls", Handler.create(this, function(scene:Scene3D):void {
 				Laya.stage.addChild(scene) as Scene3D;
@@ -35,10 +35,7 @@ package LayaAir3D_Scene3D {
 				
 				//设置灯光环境色
 				//scene.ambientColor = new Vector3(2.5, 0, 0);
-			
 			}));
-		
 		}
-	
 	}
 }
