@@ -16,6 +16,9 @@ class PhysicsWorld_BuildingBlocks
     private ONE:Laya.Vector3 = new Laya.Vector3(0,0,0);
     private tmpVector:Laya.Vector3;
 
+    private mat1:Laya.BlinnPhongMaterial; 
+    private mesh1:Laya.Mesh;
+    private mesh2:Laya.Mesh;
     constructor()
     {
         Laya3D.init(0,0);
@@ -28,8 +31,6 @@ class PhysicsWorld_BuildingBlocks
         this.camera = this.scene.addChild(new Laya.Camera(0,0.1,100)) as Laya.Camera;
         this.camera.transform.translate(new Laya.Vector3(4.5,6,4.5));
         this.camera.transform.rotate(new Laya.Vector3(-30,45,0),true,false);
-        //this.camera.clearColor =new Laya.Vector4(0.5,0.5,0.5,1.0);
-       
         this.tmpVector = new Laya.Vector3(0,0,0);
 
         var directionLight:Laya.DirectionLight = this.scene.addChild(new Laya.DirectionLight()) as Laya.DirectionLight;
@@ -38,12 +39,19 @@ class PhysicsWorld_BuildingBlocks
         mat.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
         directionLight.transform.worldMatrix = mat;
 
+        //资源加载
+        this.mat1 = new Laya.BlinnPhongMaterial();
+        Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
+            this.mat1.albedoTexture = tex;
+        }));
+        this.mesh1 = Laya.PrimitiveMesh.createBox(0.5, 0.33, 2); 
+        this.mesh2 = Laya.PrimitiveMesh.createBox(2, 0.33, 0.5);
         var plane:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(13,13,10,10))) as Laya.MeshSprite3D;
-       var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
+        var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
 
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
 				planeMat.albedoTexture = tex;
-			}));
+		}));
         planeMat.tilingOffset = new Laya.Vector4(2,2,0,0);
         plane.meshRenderer.material = planeMat;
         plane.meshRenderer.receiveShadow = true;
@@ -58,8 +66,7 @@ class PhysicsWorld_BuildingBlocks
  
     public addBox():void
     {
-        //var i:number = 0;
-        for (var i:number = 0; i < 8; i++) {
+        for (let i:number = 0; i < 8; i++) {
             this.addVerticalBox(-0.65, 0.165 + i * 0.33 * 2, 0);
             this.addVerticalBox(0, 0.165 + i * 0.33 * 2, 0);
             this.addVerticalBox(0.65, 0.165 + i * 0.33 * 2, 0);
@@ -71,13 +78,8 @@ class PhysicsWorld_BuildingBlocks
     }
     public addVerticalBox(x:number, y:number, z:number):void
     {
-        var mat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
-            mat.albedoTexture = tex;
-        }));
-        
-        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(0.5, 0.33, 2))) as Laya.MeshSprite3D;
-        box.meshRenderer.material = mat;
+        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(this.mesh1)) as Laya.MeshSprite3D;
+        box.meshRenderer.material = this.mat1;
         box.meshRenderer.castShadow = true;
         box.meshRenderer.receiveShadow = true;
         box.transform.position = new Laya.Vector3(x, y, z);
@@ -91,13 +93,8 @@ class PhysicsWorld_BuildingBlocks
     }
     public addHorizontalBox(x:number, y:number, z:number):void
     {
-        var mat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
-            mat.albedoTexture = tex;
-        }));
-        
-        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(2, 0.33, 0.5))) as Laya.MeshSprite3D;
-        box.meshRenderer.material = mat;
+        var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(this.mesh2)) as Laya.MeshSprite3D;
+        box.meshRenderer.material = this.mat1;
         box.meshRenderer.castShadow = true;
         box.meshRenderer.receiveShadow = true;
         this.tmpVector.setValue(x, y, z);

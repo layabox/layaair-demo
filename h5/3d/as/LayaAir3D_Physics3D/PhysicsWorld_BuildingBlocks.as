@@ -13,6 +13,7 @@ package LayaAir3D_Physics3D {
 	import laya.d3.physics.PhysicsCollider;
 	import laya.d3.physics.Rigidbody3D;
 	import laya.d3.physics.shape.BoxColliderShape;
+	import laya.d3.resource.models.Mesh;
 	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.display.Stage;
 	import laya.events.Event;
@@ -38,7 +39,8 @@ package LayaAir3D_Physics3D {
 		private var delY:Number;
 		
 		private var mat:BlinnPhongMaterial;
-		
+		private var mesh1:Mesh;
+		private var mesh2:Mesh;
 		
 		public function PhysicsWorld_BuildingBlocks() {
 			Laya3D.init(0, 0);
@@ -67,6 +69,8 @@ package LayaAir3D_Physics3D {
 			plane.meshRenderer.material = planeMat;
 			plane.meshRenderer.receiveShadow = true;
 			
+			mesh1 = PrimitiveMesh.createBox(2, 0.33, 0.5);
+			mesh2 = PrimitiveMesh.createBox(0.5, 0.33, 2);
 			mat = new BlinnPhongMaterial();
 			
 			//加载纹理资源
@@ -96,7 +100,7 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addHorizontalBox(x:Number, y:Number, z:Number):void {		
-			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(2, 0.33, 0.5))) as MeshSprite3D;
+			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(mesh1)) as MeshSprite3D;
 			box.meshRenderer.material = mat;
 			box.meshRenderer.castShadow = true;
 			box.meshRenderer.receiveShadow = true;
@@ -111,7 +115,7 @@ package LayaAir3D_Physics3D {
 		}
 		
 		public function addVerticalBox(x:Number, y:Number, z:Number):void {
-			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createBox(0.5, 0.33, 2))) as MeshSprite3D;
+			var box:MeshSprite3D = scene.addChild(new MeshSprite3D(mesh2)) as MeshSprite3D;
 			box.meshRenderer.material = mat;
 			box.meshRenderer.castShadow = true;
 			box.meshRenderer.receiveShadow = true;

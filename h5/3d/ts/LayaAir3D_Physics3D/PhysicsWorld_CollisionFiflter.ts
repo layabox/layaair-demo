@@ -12,6 +12,13 @@ class PhysicsWorld_CollisionFiflter
     private translateQ:Laya.Vector3 = new Laya.Vector3(-0.01, 0, 0);
     private translateE:Laya.Vector3 = new Laya.Vector3(0.01, 0, 0);
     private tmpVector:Laya.Vector3 = new Laya.Vector3(0, 0, 0);
+
+    private mat1:Laya.BlinnPhongMaterial;
+    private mat2:Laya.BlinnPhongMaterial;
+    private mat3:Laya.BlinnPhongMaterial;
+    private mat4:Laya.BlinnPhongMaterial;
+    private mat5:Laya.BlinnPhongMaterial;
+
     
     constructor()
     {
@@ -33,6 +40,31 @@ class PhysicsWorld_CollisionFiflter
         var mat = directionLight.transform.worldMatrix;
         mat.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
         directionLight.transform.worldMatrix = mat;
+
+        //资源加载
+        this.mat1 = new Laya.BlinnPhongMaterial();
+        this.mat2 = new Laya.BlinnPhongMaterial();
+        this.mat3 = new Laya.BlinnPhongMaterial();
+        this.mat4 = new Laya.BlinnPhongMaterial();
+        this.mat5 = new Laya.BlinnPhongMaterial();
+        Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
+            this.mat1.albedoTexture = tex;
+        }));
+        this.mat1.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 1.0);
+        Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function(tex:Laya.Texture2D):void {
+            this.mat3.albedoTexture = tex;
+        }));
+        Laya.Texture2D.load("res/threeDimen/Physics/plywood.jpg", Laya.Handler.create(this, function (tex) {
+            this.mat2.albedoTexture = tex;
+        }));
+        Laya.Texture2D.load("res/threeDimen/Physics/steel2.jpg", Laya.Handler.create(this, function(tex) {
+            this.mat4.albedoTexture = tex;
+        }));
+        Laya.Texture2D.load("res/threeDimen/Physics/steel.jpg", Laya.Handler.create(this, function(tex) {
+            this.mat5.albedoTexture = tex;
+        }));
+
+
         this.plane = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(20, 20, 10, 10))) as Laya.MeshSprite3D;
         var planeMat:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
@@ -49,6 +81,9 @@ class PhysicsWorld_CollisionFiflter
         for (var i:number = 0; i < 30; i++) {
             this.addBox();
             this.addCapsule();
+            this.addCone();
+            this.addCylinder();
+            this.addSphere();
         }
     }
     public addKinematicSphere():void {
@@ -84,17 +119,11 @@ class PhysicsWorld_CollisionFiflter
     }
     
     public addBox():void {
-        var mat1:Laya.BlinnPhongMaterial = new Laya.BlinnPhongMaterial();
-        Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(null, function(tex:Laya.Texture2D):void {
-            mat1.albedoTexture = tex;
-        }));
-        mat1.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 1.0);
-        
         var sX:number = Math.random() * 0.75 + 0.25;
         var sY:number = Math.random() * 0.75 + 0.25;
         var sZ:number = Math.random() * 0.75 + 0.25;
         var box:Laya.MeshSprite3D = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(sX, sY, sZ))) as Laya.MeshSprite3D;
-        box.meshRenderer.material = mat1;
+        box.meshRenderer.material = this.mat1;
         this.tmpVector.setValue(Math.random() * 16 - 8, sY / 2, Math.random() * 16 - 8);
         box.transform.position = this.tmpVector;
         this.tmpVector.setValue(0, Math.random() * 360, 0);
@@ -128,6 +157,72 @@ class PhysicsWorld_CollisionFiflter
         rigidBody.mass = 10;
         rigidBody.collisionGroup = Laya.Physics3DUtils.COLLISIONFILTERGROUP_CUSTOMFILTER2;//自定义组2,会跳过碰撞
     
+    }
+    //添加球体
+    private addSphere():void {
+        let radius = Math.random() * 0.2 + 0.2;
+        let sphere:Laya.MeshSprite3D = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(radius));
+        this.scene.addChild(sphere);
+        sphere.meshRenderer.material = this.mat2;
+        let pos = sphere.transform.position;
+        pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        sphere.transform.position = pos;
+        let rigidBody = sphere.addComponent(Laya.Rigidbody3D);
+        let sphereShape = new Laya.SphereColliderShape(radius);
+        rigidBody.colliderShape = sphereShape;
+        rigidBody.mass = 10;
+        rigidBody.collisionGroup = Laya.Physics3DUtils.COLLISIONFILTERGROUP_CUSTOMFILTER3;//自定义组3
+    }
+    //添加圆锥
+    private addCone():void  {
+        let raidius = Math.random() * 0.2 + 0.2;
+        let height = Math.random() * 0.5 + 0.8;
+        //创建圆锥MeshSprite3D
+        let cone = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCone(raidius, height));
+        this.scene.addChild(cone);
+        //设置材质
+        cone.meshRenderer.material = this.mat4;
+        //设置位置
+        let pos = cone.transform.position;
+        pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        cone.transform.position = pos;
+        //创建刚体碰撞器
+        let rigidBody = cone.addComponent(Laya.Rigidbody3D);
+        //创建球型碰撞器
+        let coneShape = new Laya.ConeColliderShape(raidius, height);
+        //设置刚体碰撞器的形状
+        rigidBody.colliderShape = coneShape;
+        //设置刚体碰撞器的质量
+        rigidBody.mass = 10;	
+        rigidBody.collisionGroup = Laya.Physics3DUtils.COLLISIONFILTERGROUP_CUSTOMFILTER4;//自定义组4
+    }
+    //添加圆柱
+    private addCylinder():void  {
+        let raidius = Math.random() * 0.2 + 0.2;
+        let height = Math.random() * 0.5 + 0.8;
+        //创建圆锥MeshSprite3D
+        let cylinder = new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCylinder(raidius, height));
+        this.scene.addChild(cylinder);
+        //设置材质
+        cylinder.meshRenderer.material = this.mat5;
+
+        let transform = cylinder.transform;
+        let pos = transform.position;
+        pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
+        transform.position = pos;
+        let rotationEuler = transform.rotationEuler;
+        rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
+        transform.rotationEuler = rotationEuler;
+
+        //创建刚体碰撞器
+        let rigidBody = cylinder.addComponent(Laya.Rigidbody3D);
+        //创建球型碰撞器
+        let cylinderShape = new Laya.CylinderColliderShape(raidius, height);
+        //设置刚体碰撞器的形状
+        rigidBody.colliderShape = cylinderShape;
+        //设置刚体碰撞器的质量
+        rigidBody.mass = 10;
+        rigidBody.collisionGroup = Laya.Physics3DUtils.COLLISIONFILTERGROUP_CUSTOMFILTER5;//自定义组5
     }
 }
 new PhysicsWorld_CollisionFiflter;

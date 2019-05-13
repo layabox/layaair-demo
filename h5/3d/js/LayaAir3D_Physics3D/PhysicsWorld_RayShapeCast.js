@@ -29,17 +29,6 @@ class PhysicsWorldRayShapeCast{
         mat.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
         directionLight.transform.worldMatrix = mat;
 
-        //材质加载
-        this.mat1 = new Laya.BlinnPhongMaterial;
-        this.mat3 = new Laya.BlinnPhongMaterial;
-        //添加漫反射贴图
-        Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function (tex) {
-            this.mat1.albedoTexture = tex;
-        }));
-        Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function (tex) {
-            this.mat3.albedoTexture = tex;
-        }));
-
         let plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(20, 20, 10, 10)));
         let planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
@@ -78,7 +67,12 @@ class PhysicsWorldRayShapeCast{
         let sY = Math.random() * 0.75 + 0.25;
         let sZ = Math.random() * 0.75 + 0.25;
         let box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
-        box.meshRenderer.material = this.mat1;
+        Laya.Texture2D.load("res/threeDimen/Physics/rocks.jpg", Laya.Handler.create(this, function (tex) {
+            let mat1 = new Laya.BlinnPhongMaterial();
+            mat1.albedoTexture = tex;
+            box.meshRenderer.material = mat1;
+        }));
+       
         let transform = box.transform;
         let pos = transform.position;
         pos.setValue(Math.random() * 4 - 2, 2, Math.random() * 4 - 2);
@@ -97,7 +91,12 @@ class PhysicsWorldRayShapeCast{
         let raidius = Math.random() * 0.2 + 0.2;
         let height = Math.random() * 0.5 + 0.8;
         let capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
-        capsule.meshRenderer.material = this.mat3;
+        Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function (tex) {
+            let mat3 = new Laya.BlinnPhongMaterial();
+            mat3.albedoTexture = tex;
+            capsule.meshRenderer.material = mat3;
+        }));
+       
 
         let transform = capsule.transform;
         let pos = transform.position;
