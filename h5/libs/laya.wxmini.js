@@ -8,84 +8,263 @@ window.layalib(function(window,document,Laya){
 	var LocalStorage=laya.net.LocalStorage,Matrix=laya.maths.Matrix,Render=laya.renders.Render,RunDriver=laya.utils.RunDriver;
 	var SoundChannel=laya.media.SoundChannel,SoundManager=laya.media.SoundManager,Stage=laya.display.Stage,URL=laya.net.URL;
 	var Utils=laya.utils.Utils;
-/**@private **/
-//class laya.wx.mini.MiniLocation
-var MiniLocation=(function(){
-	function MiniLocation(){}
-	__class(MiniLocation,'laya.wx.mini.MiniLocation');
-	MiniLocation.__init__=function(){
-		MiniAdpter.window.navigator.geolocation.getCurrentPosition=MiniLocation.getCurrentPosition;
-		MiniAdpter.window.navigator.geolocation.watchPosition=MiniLocation.watchPosition;
-		MiniAdpter.window.navigator.geolocation.clearWatch=MiniLocation.clearWatch;
+/**
+*视频类
+*@author xiaosong
+*@date-2019-04-22
+*/
+//class laya.wx.mini.MiniVideo
+var MiniVideo=(function(){
+	function MiniVideo(width,height){
+		/**视频是否播放结束**/
+		this.videoend=false;
+		this.videourl="";
+		this.videoElement=null;
+		this.onPlayFunc=null;
+		this.onEndedFunC=null;
+		/**视频的总时⻓长，单位为秒**/
+		this._duration=NaN;
+		/**视频播放的当前位置**/
+		this.position=NaN;
+		(width===void 0)&& (width=320);
+		(height===void 0)&& (height=240);
+		this.videoElement=MiniAdpter.window.wx.createVideo({width:width,height:height,autoplay:true});
 	}
 
-	MiniLocation.getCurrentPosition=function(success,error,options){
-		var paramO;
-		paramO={};
-		paramO.success=getSuccess;
-		paramO.fail=error;
-		MiniAdpter.window.wx.getLocation(paramO);
-		function getSuccess (res){
-			if (success !=null){
-				success(res);
-			}
+	__class(MiniVideo,'laya.wx.mini.MiniVideo');
+	var __proto=MiniVideo.prototype;
+	__proto.on=function(eventType,ths,callBack){
+		if(eventType=="loadedmetadata"){
+			this.onPlayFunc=callBack.bind(ths);
+			this.videoElement.onPlay=this.onPlayFunction.bind(this);
+			}else if(eventType=="ended"){
+			this.onEndedFunC=callBack.bind(ths);
+			this.videoElement.onEnded=this.onEndedFunction.bind(this);
+		}
+		this.videoElement.onTimeUpdate=this.onTimeUpdateFunc.bind(this);
+	}
+
+	__proto.onTimeUpdateFunc=function(data){
+		this.position=data.position;
+		this._duration=data.duration;
+	}
+
+	__proto.onPlayFunction=function(){
+		if(this.videoElement)
+			this.videoElement.readyState=200;
+		console.log("=====视频加载完成========");
+		this.onPlayFunc !=null && this.onPlayFunc();
+	}
+
+	__proto.onEndedFunction=function(){
+		if(!this.videoElement)
+			return;
+		this.videoend=true;
+		console.log("=====视频播放完毕========");
+		this.onEndedFunC !=null && this.onEndedFunC();
+	}
+
+	__proto.off=function(eventType,ths,callBack){
+		if(eventType=="loadedmetadata"){
+			this.onPlayFunc=callBack.bind(ths);
+			this.videoElement.offPlay=this.onPlayFunction.bind(this);
+			}else if(eventType=="ended"){
+			this.onEndedFunC=callBack.bind(ths);
+			this.videoElement.offEnded=this.onEndedFunction.bind(this);
 		}
 	}
 
-	MiniLocation.watchPosition=function(success,error,options){
-		MiniLocation._curID++;
-		var curWatchO;
-		curWatchO={};
-		curWatchO.success=success;
-		curWatchO.error=error;
-		MiniLocation._watchDic[MiniLocation._curID]=curWatchO;
-		Laya.systemTimer.loop(1000,null,MiniLocation._myLoop);
-		return MiniLocation._curID;
+	/**
+	*设置播放源。
+	*@param url 播放源路径。
+	*/
+	__proto.load=function(url){
+		if(!this.videoElement)
+			return;
+		this.videoElement.src=url;
 	}
 
-	MiniLocation.clearWatch=function(id){
-		delete MiniLocation._watchDic[id];
-		if (!MiniLocation._hasWatch()){
-			Laya.systemTimer.clear(null,MiniLocation._myLoop);
-		}
+	/**
+	*开始播放视频。
+	*/
+	__proto.play=function(){
+		if(!this.videoElement)
+			return;
+		this.videoend=false;
+		this.videoElement.play();
 	}
 
-	MiniLocation._hasWatch=function(){
-		var key;
-		for (key in MiniLocation._watchDic){
-			if (MiniLocation._watchDic[key])return true;
-		}
-		return false;
+	/**
+	*暂停视频播放。
+	*/
+	__proto.pause=function(){
+		if(!this.videoElement)
+			return;
+		this.videoend=true;
+		this.videoElement.pause();
 	}
 
-	MiniLocation._myLoop=function(){
-		MiniLocation.getCurrentPosition(MiniLocation._mySuccess,MiniLocation._myError);
+	/**
+	*设置大小
+	*@param width
+	*@param height
+	*/
+	__proto.size=function(width,height){
+		if(!this.videoElement)
+			return;
+		this.videoElement.width=width;
+		this.videoElement.height=height;
 	}
 
-	MiniLocation._mySuccess=function(res){
-		var rst={};
-		rst.coords=res;
-		rst.timestamp=Browser.now();
-		var key;
-		for (key in MiniLocation._watchDic){
-			if (MiniLocation._watchDic[key].success){
-				MiniLocation._watchDic[key].success(rst);
-			}
-		}
+	__proto.destroy=function(){
+		if(this.videoElement)
+			this.videoElement.destroy();
+		this.videoElement=null;
+		this.onEndedFunC=null;
+		this.onPlayFunc=null;
+		this.videoend=false;
+		this.videourl=null;
 	}
 
-	MiniLocation._myError=function(res){
-		var key;
-		for (key in MiniLocation._watchDic){
-			if (MiniLocation._watchDic[key].error){
-				MiniLocation._watchDic[key].error(res);
-			}
-		}
+	/**
+	*重新加载视频。
+	*/
+	__proto.reload=function(){
+		if(!this.videoElement)
+			return;
+		this.videoElement.src=this.videourl;
 	}
 
-	MiniLocation._watchDic={};
-	MiniLocation._curID=0;
-	return MiniLocation;
+	/**
+	*获取视频长度（秒）。ready事件触发后可用。
+	*/
+	__getset(0,__proto,'duration',function(){
+		return this._duration;
+	});
+
+	/**
+	*返回视频是否暂停
+	*/
+	__getset(0,__proto,'paused',function(){
+		if(!this.videoElement)
+			return false;
+		return this.videoElement.paused;
+	});
+
+	/**
+	*设置或返回音频/视频是否应在结束时重新播放。
+	*/
+	__getset(0,__proto,'loop',function(){
+		if(!this.videoElement)
+			return false;
+		return this.videoElement.loop;
+		},function(value){
+		if(!this.videoElement)
+			return;
+		this.videoElement.loop=value;
+	});
+
+	/**
+	*设置和获取当前播放头位置。
+	*/
+	__getset(0,__proto,'currentTime',function(){
+		if(!this.videoElement)
+			return 0;
+		return this.videoElement.initialTime;
+		},function(value){
+		if(!this.videoElement)
+			return;
+		this.videoElement.initialTime=value;
+	});
+
+	/**
+	*返回音频/视频的播放是否已结束
+	*/
+	__getset(0,__proto,'ended',function(){
+		return this.videoend;
+	});
+
+	/**
+	*获取和设置静音状态。
+	*/
+	__getset(0,__proto,'muted',function(){
+		if(!this.videoElement)
+			return false;
+		return this.videoElement.muted;
+		},function(value){
+		if(!this.videoElement)
+			return;
+		this.videoElement.muted=value;
+	});
+
+	/**
+	*获取视频源尺寸。ready事件触发后可用。
+	*/
+	__getset(0,__proto,'videoWidth',function(){
+		if(!this.videoElement)
+			return 0;
+		return this.videoElement.width;
+	});
+
+	__getset(0,__proto,'videoHeight',function(){
+		if(!this.videoElement)
+			return 0;
+		return this.videoElement.height;
+	});
+
+	/**
+	*playbackRate 属性设置或返回音频/视频的当前播放速度。如：
+	*<ul>
+	*<li>1.0 正常速度</li>
+	*<li>0.5 半速（更慢）</li>
+	*<li>2.0 倍速（更快）</li>
+	*<li>-1.0 向后，正常速度</li>
+	*<li>-0.5 向后，半速</li>
+	*</ul>
+	*<p>只有 Google Chrome 和 Safari 支持 playbackRate 属性。</p>
+	*/
+	__getset(0,__proto,'playbackRate',function(){
+		if(!this.videoElement)
+			return 0;
+		return this.videoElement.playbackRate;
+		},function(value){
+		if(!this.videoElement)
+			return;
+		this.videoElement.playbackRate=value;
+	});
+
+	__getset(0,__proto,'x',function(){
+		if(!this.videoElement)
+			return 0;
+		return this.videoElement.x;
+		},function(value){
+		if(!this.videoElement)
+			return;
+		this.videoElement.x=value;
+	});
+
+	__getset(0,__proto,'y',function(){
+		if(!this.videoElement)
+			return 0;
+		return this.videoElement.y;
+		},function(value){
+		if(!this.videoElement)
+			return;
+		this.videoElement.y=value;
+	});
+
+	/**
+	*获取当前播放源路径。
+	*/
+	__getset(0,__proto,'currentSrc',function(){
+		return this.videoElement.src;
+	});
+
+	MiniVideo.__init__=function(){
+		/*__JS__ */laya.device.media.Video=MiniVideo;
+	}
+
+	return MiniVideo;
 })()
 
 
@@ -411,324 +590,6 @@ var MiniFileMgr=(function(){
 
 
 /**@private **/
-//class laya.wx.mini.MiniLocalStorage
-var MiniLocalStorage=(function(){
-	function MiniLocalStorage(){}
-	__class(MiniLocalStorage,'laya.wx.mini.MiniLocalStorage');
-	MiniLocalStorage.__init__=function(){
-		MiniLocalStorage.items=MiniLocalStorage;
-	}
-
-	MiniLocalStorage.setItem=function(key,value){
-		try{
-			/*__JS__ */wx.setStorageSync(key,value);
-		}
-		catch(error){
-			/*__JS__ */wx.setStorage({
-				key:key,
-				data:value
-			});
-		}
-	}
-
-	MiniLocalStorage.getItem=function(key){
-		return /*__JS__ */wx.getStorageSync(key);
-	}
-
-	MiniLocalStorage.setJSON=function(key,value){
-		MiniLocalStorage.setItem(key,value);
-	}
-
-	MiniLocalStorage.getJSON=function(key){
-		return MiniLocalStorage.getItem(key);
-	}
-
-	MiniLocalStorage.removeItem=function(key){
-		/*__JS__ */wx.removeStorageSync(key);
-	}
-
-	MiniLocalStorage.clear=function(){
-		/*__JS__ */wx.clearStorageSync();
-	}
-
-	MiniLocalStorage.getStorageInfoSync=function(){
-		try {
-			var res=/*__JS__ */wx.getStorageInfoSync()
-			console.log(res.keys)
-			console.log(res.currentSize)
-			console.log(res.limitSize)
-			return res;
-		}catch (e){}
-		return null;
-	}
-
-	MiniLocalStorage.support=true;
-	MiniLocalStorage.items=null;
-	return MiniLocalStorage;
-})()
-
-
-/**
-*视频类
-*@author xiaosong
-*@date-2019-04-22
-*/
-//class laya.wx.mini.MiniVideo
-var MiniVideo=(function(){
-	function MiniVideo(width,height){
-		/**视频是否播放结束**/
-		this.videoend=false;
-		this.videourl="";
-		this.videoElement=null;
-		this.onPlayFunc=null;
-		this.onEndedFunC=null;
-		/**视频的总时⻓长，单位为秒**/
-		this._duration=NaN;
-		/**视频播放的当前位置**/
-		this.position=NaN;
-		(width===void 0)&& (width=320);
-		(height===void 0)&& (height=240);
-		this.videoElement=MiniAdpter.window.wx.createVideo({width:width,height:height,autoplay:true});
-	}
-
-	__class(MiniVideo,'laya.wx.mini.MiniVideo');
-	var __proto=MiniVideo.prototype;
-	__proto.on=function(eventType,ths,callBack){
-		if(eventType=="loadedmetadata"){
-			this.onPlayFunc=callBack.bind(ths);
-			this.videoElement.onPlay=this.onPlayFunction.bind(this);
-			}else if(eventType=="ended"){
-			this.onEndedFunC=callBack.bind(ths);
-			this.videoElement.onEnded=this.onEndedFunction.bind(this);
-		}
-		this.videoElement.onTimeUpdate=this.onTimeUpdateFunc.bind(this);
-	}
-
-	__proto.onTimeUpdateFunc=function(data){
-		this.position=data.position;
-		this._duration=data.duration;
-	}
-
-	__proto.onPlayFunction=function(){
-		if(this.videoElement)
-			this.videoElement.readyState=200;
-		console.log("=====视频加载完成========");
-		this.onPlayFunc !=null && this.onPlayFunc();
-	}
-
-	__proto.onEndedFunction=function(){
-		if(!this.videoElement)
-			return;
-		this.videoend=true;
-		console.log("=====视频播放完毕========");
-		this.onEndedFunC !=null && this.onEndedFunC();
-	}
-
-	__proto.off=function(eventType,ths,callBack){
-		if(eventType=="loadedmetadata"){
-			this.onPlayFunc=callBack.bind(ths);
-			this.videoElement.offPlay=this.onPlayFunction.bind(this);
-			}else if(eventType=="ended"){
-			this.onEndedFunC=callBack.bind(ths);
-			this.videoElement.offEnded=this.onEndedFunction.bind(this);
-		}
-	}
-
-	/**
-	*设置播放源。
-	*@param url 播放源路径。
-	*/
-	__proto.load=function(url){
-		if(!this.videoElement)
-			return;
-		this.videoElement.src=url;
-	}
-
-	/**
-	*开始播放视频。
-	*/
-	__proto.play=function(){
-		if(!this.videoElement)
-			return;
-		this.videoend=false;
-		this.videoElement.play();
-	}
-
-	/**
-	*暂停视频播放。
-	*/
-	__proto.pause=function(){
-		if(!this.videoElement)
-			return;
-		this.videoend=true;
-		this.videoElement.pause();
-	}
-
-	/**
-	*设置大小
-	*@param width
-	*@param height
-	*/
-	__proto.size=function(width,height){
-		if(!this.videoElement)
-			return;
-		this.videoElement.width=width;
-		this.videoElement.height=height;
-	}
-
-	__proto.destroy=function(){
-		if(this.videoElement)
-			this.videoElement.destroy();
-		this.videoElement=null;
-		this.onEndedFunC=null;
-		this.onPlayFunc=null;
-		this.videoend=false;
-		this.videourl=null;
-	}
-
-	/**
-	*重新加载视频。
-	*/
-	__proto.reload=function(){
-		if(!this.videoElement)
-			return;
-		this.videoElement.src=this.videourl;
-	}
-
-	/**
-	*获取视频长度（秒）。ready事件触发后可用。
-	*/
-	__getset(0,__proto,'duration',function(){
-		return this._duration;
-	});
-
-	/**
-	*返回视频是否暂停
-	*/
-	__getset(0,__proto,'paused',function(){
-		if(!this.videoElement)
-			return false;
-		return this.videoElement.paused;
-	});
-
-	/**
-	*设置或返回音频/视频是否应在结束时重新播放。
-	*/
-	__getset(0,__proto,'loop',function(){
-		if(!this.videoElement)
-			return false;
-		return this.videoElement.loop;
-		},function(value){
-		if(!this.videoElement)
-			return;
-		this.videoElement.loop=value;
-	});
-
-	/**
-	*设置和获取当前播放头位置。
-	*/
-	__getset(0,__proto,'currentTime',function(){
-		if(!this.videoElement)
-			return 0;
-		return this.videoElement.initialTime;
-		},function(value){
-		if(!this.videoElement)
-			return;
-		this.videoElement.initialTime=value;
-	});
-
-	/**
-	*返回音频/视频的播放是否已结束
-	*/
-	__getset(0,__proto,'ended',function(){
-		return this.videoend;
-	});
-
-	/**
-	*获取和设置静音状态。
-	*/
-	__getset(0,__proto,'muted',function(){
-		if(!this.videoElement)
-			return false;
-		return this.videoElement.muted;
-		},function(value){
-		if(!this.videoElement)
-			return;
-		this.videoElement.muted=value;
-	});
-
-	/**
-	*获取视频源尺寸。ready事件触发后可用。
-	*/
-	__getset(0,__proto,'videoWidth',function(){
-		if(!this.videoElement)
-			return 0;
-		return this.videoElement.width;
-	});
-
-	__getset(0,__proto,'videoHeight',function(){
-		if(!this.videoElement)
-			return 0;
-		return this.videoElement.height;
-	});
-
-	/**
-	*playbackRate 属性设置或返回音频/视频的当前播放速度。如：
-	*<ul>
-	*<li>1.0 正常速度</li>
-	*<li>0.5 半速（更慢）</li>
-	*<li>2.0 倍速（更快）</li>
-	*<li>-1.0 向后，正常速度</li>
-	*<li>-0.5 向后，半速</li>
-	*</ul>
-	*<p>只有 Google Chrome 和 Safari 支持 playbackRate 属性。</p>
-	*/
-	__getset(0,__proto,'playbackRate',function(){
-		if(!this.videoElement)
-			return 0;
-		return this.videoElement.playbackRate;
-		},function(value){
-		if(!this.videoElement)
-			return;
-		this.videoElement.playbackRate=value;
-	});
-
-	__getset(0,__proto,'x',function(){
-		if(!this.videoElement)
-			return 0;
-		return this.videoElement.x;
-		},function(value){
-		if(!this.videoElement)
-			return;
-		this.videoElement.x=value;
-	});
-
-	__getset(0,__proto,'y',function(){
-		if(!this.videoElement)
-			return 0;
-		return this.videoElement.y;
-		},function(value){
-		if(!this.videoElement)
-			return;
-		this.videoElement.y=value;
-	});
-
-	/**
-	*获取当前播放源路径。
-	*/
-	__getset(0,__proto,'currentSrc',function(){
-		return this.videoElement.src;
-	});
-
-	MiniVideo.__init__=function(){
-		/*__JS__ */laya.device.media.Video=MiniVideo;
-	}
-
-	return MiniVideo;
-})()
-
-
-/**@private **/
 //class laya.wx.mini.MiniImage
 var MiniImage=(function(){
 	function MiniImage(){}
@@ -976,6 +837,145 @@ var MiniInput=(function(){
 	}
 
 	return MiniInput;
+})()
+
+
+/**@private **/
+//class laya.wx.mini.MiniLocation
+var MiniLocation=(function(){
+	function MiniLocation(){}
+	__class(MiniLocation,'laya.wx.mini.MiniLocation');
+	MiniLocation.__init__=function(){
+		MiniAdpter.window.navigator.geolocation.getCurrentPosition=MiniLocation.getCurrentPosition;
+		MiniAdpter.window.navigator.geolocation.watchPosition=MiniLocation.watchPosition;
+		MiniAdpter.window.navigator.geolocation.clearWatch=MiniLocation.clearWatch;
+	}
+
+	MiniLocation.getCurrentPosition=function(success,error,options){
+		var paramO;
+		paramO={};
+		paramO.success=getSuccess;
+		paramO.fail=error;
+		MiniAdpter.window.wx.getLocation(paramO);
+		function getSuccess (res){
+			if (success !=null){
+				success(res);
+			}
+		}
+	}
+
+	MiniLocation.watchPosition=function(success,error,options){
+		MiniLocation._curID++;
+		var curWatchO;
+		curWatchO={};
+		curWatchO.success=success;
+		curWatchO.error=error;
+		MiniLocation._watchDic[MiniLocation._curID]=curWatchO;
+		Laya.systemTimer.loop(1000,null,MiniLocation._myLoop);
+		return MiniLocation._curID;
+	}
+
+	MiniLocation.clearWatch=function(id){
+		delete MiniLocation._watchDic[id];
+		if (!MiniLocation._hasWatch()){
+			Laya.systemTimer.clear(null,MiniLocation._myLoop);
+		}
+	}
+
+	MiniLocation._hasWatch=function(){
+		var key;
+		for (key in MiniLocation._watchDic){
+			if (MiniLocation._watchDic[key])return true;
+		}
+		return false;
+	}
+
+	MiniLocation._myLoop=function(){
+		MiniLocation.getCurrentPosition(MiniLocation._mySuccess,MiniLocation._myError);
+	}
+
+	MiniLocation._mySuccess=function(res){
+		var rst={};
+		rst.coords=res;
+		rst.timestamp=Browser.now();
+		var key;
+		for (key in MiniLocation._watchDic){
+			if (MiniLocation._watchDic[key].success){
+				MiniLocation._watchDic[key].success(rst);
+			}
+		}
+	}
+
+	MiniLocation._myError=function(res){
+		var key;
+		for (key in MiniLocation._watchDic){
+			if (MiniLocation._watchDic[key].error){
+				MiniLocation._watchDic[key].error(res);
+			}
+		}
+	}
+
+	MiniLocation._watchDic={};
+	MiniLocation._curID=0;
+	return MiniLocation;
+})()
+
+
+/**@private **/
+//class laya.wx.mini.MiniLocalStorage
+var MiniLocalStorage=(function(){
+	function MiniLocalStorage(){}
+	__class(MiniLocalStorage,'laya.wx.mini.MiniLocalStorage');
+	MiniLocalStorage.__init__=function(){
+		MiniLocalStorage.items=MiniLocalStorage;
+	}
+
+	MiniLocalStorage.setItem=function(key,value){
+		try{
+			/*__JS__ */wx.setStorageSync(key,value);
+		}
+		catch(error){
+			/*__JS__ */wx.setStorage({
+				key:key,
+				data:value
+			});
+		}
+	}
+
+	MiniLocalStorage.getItem=function(key){
+		return /*__JS__ */wx.getStorageSync(key);
+	}
+
+	MiniLocalStorage.setJSON=function(key,value){
+		MiniLocalStorage.setItem(key,value);
+	}
+
+	MiniLocalStorage.getJSON=function(key){
+		return MiniLocalStorage.getItem(key);
+	}
+
+	MiniLocalStorage.removeItem=function(key){
+		/*__JS__ */wx.removeStorageSync(key);
+	}
+
+	MiniLocalStorage.clear=function(){
+		/*__JS__ */wx.clearStorageSync();
+	}
+
+	MiniLocalStorage.getStorageInfoSync=function(){
+		try {
+			var res=/*__JS__ */wx.getStorageInfoSync()
+			console.log(res.keys)
+			console.log(res.currentSize)
+			console.log(res.limitSize)
+			return res;
+		}catch (e){}
+		return null;
+	}
+
+	MiniLocalStorage.support=true;
+	MiniLocalStorage.items=null;
+	return MiniLocalStorage;
 })()
 
 
@@ -1443,6 +1443,80 @@ var MiniLoader=(function(_super){
 
 
 /**@private **/
+//class laya.wx.mini.MiniAccelerator extends laya.events.EventDispatcher
+var MiniAccelerator=(function(_super){
+	function MiniAccelerator(){
+		MiniAccelerator.__super.call(this);
+	}
+
+	__class(MiniAccelerator,'laya.wx.mini.MiniAccelerator',_super);
+	var __proto=MiniAccelerator.prototype;
+	/**
+	*侦听加速器运动。
+	*@param observer 回调函数接受4个参数，见类说明。
+	*/
+	__proto.on=function(type,caller,listener,args){
+		_super.prototype.on.call(this,type,caller,listener,args);
+		MiniAccelerator.startListen(this["onDeviceOrientationChange"]);
+		return this;
+	}
+
+	/**
+	*取消侦听加速器。
+	*@param handle 侦听加速器所用处理器。
+	*/
+	__proto.off=function(type,caller,listener,onceOnly){
+		(onceOnly===void 0)&& (onceOnly=false);
+		if (!this.hasListener(type))
+			MiniAccelerator.stopListen();
+		return _super.prototype.off.call(this,type,caller,listener,onceOnly);
+	}
+
+	MiniAccelerator.__init__=function(){
+		try{
+			var Acc;
+			Acc=/*__JS__ */laya.device.motion.Accelerator;
+			if (!Acc)return;
+			Acc["prototype"]["on"]=MiniAccelerator["prototype"]["on"];
+			Acc["prototype"]["off"]=MiniAccelerator["prototype"]["off"];
+			}catch (e){
+		}
+	}
+
+	MiniAccelerator.startListen=function(callBack){
+		MiniAccelerator._callBack=callBack;
+		if (MiniAccelerator._isListening)return;
+		MiniAccelerator._isListening=true;
+		try{
+			/*__JS__ */wx.onAccelerometerChange(MiniAccelerator.onAccelerometerChange);
+		}catch(e){}
+	}
+
+	MiniAccelerator.stopListen=function(){
+		MiniAccelerator._isListening=false;
+		try{
+			/*__JS__ */wx.stopAccelerometer({});
+		}catch(e){}
+	}
+
+	MiniAccelerator.onAccelerometerChange=function(res){
+		var e;
+		e={};
+		e.acceleration=res;
+		e.accelerationIncludingGravity=res;
+		e.rotationRate={};
+		if (MiniAccelerator._callBack !=null){
+			MiniAccelerator._callBack(e);
+		}
+	}
+
+	MiniAccelerator._isListening=false;
+	MiniAccelerator._callBack=null;
+	return MiniAccelerator;
+})(EventDispatcher)
+
+
+/**@private **/
 //class laya.wx.mini.MiniSound extends laya.events.EventDispatcher
 var MiniSound=(function(_super){
 	function MiniSound(){
@@ -1672,80 +1746,6 @@ var MiniSound=(function(_super){
 	MiniSound._id=0;
 	MiniSound._audioCache={};
 	return MiniSound;
-})(EventDispatcher)
-
-
-/**@private **/
-//class laya.wx.mini.MiniAccelerator extends laya.events.EventDispatcher
-var MiniAccelerator=(function(_super){
-	function MiniAccelerator(){
-		MiniAccelerator.__super.call(this);
-	}
-
-	__class(MiniAccelerator,'laya.wx.mini.MiniAccelerator',_super);
-	var __proto=MiniAccelerator.prototype;
-	/**
-	*侦听加速器运动。
-	*@param observer 回调函数接受4个参数，见类说明。
-	*/
-	__proto.on=function(type,caller,listener,args){
-		_super.prototype.on.call(this,type,caller,listener,args);
-		MiniAccelerator.startListen(this["onDeviceOrientationChange"]);
-		return this;
-	}
-
-	/**
-	*取消侦听加速器。
-	*@param handle 侦听加速器所用处理器。
-	*/
-	__proto.off=function(type,caller,listener,onceOnly){
-		(onceOnly===void 0)&& (onceOnly=false);
-		if (!this.hasListener(type))
-			MiniAccelerator.stopListen();
-		return _super.prototype.off.call(this,type,caller,listener,onceOnly);
-	}
-
-	MiniAccelerator.__init__=function(){
-		try{
-			var Acc;
-			Acc=/*__JS__ */laya.device.motion.Accelerator;
-			if (!Acc)return;
-			Acc["prototype"]["on"]=MiniAccelerator["prototype"]["on"];
-			Acc["prototype"]["off"]=MiniAccelerator["prototype"]["off"];
-			}catch (e){
-		}
-	}
-
-	MiniAccelerator.startListen=function(callBack){
-		MiniAccelerator._callBack=callBack;
-		if (MiniAccelerator._isListening)return;
-		MiniAccelerator._isListening=true;
-		try{
-			/*__JS__ */wx.onAccelerometerChange(MiniAccelerator.onAccelerometerChange);
-		}catch(e){}
-	}
-
-	MiniAccelerator.stopListen=function(){
-		MiniAccelerator._isListening=false;
-		try{
-			/*__JS__ */wx.stopAccelerometer({});
-		}catch(e){}
-	}
-
-	MiniAccelerator.onAccelerometerChange=function(res){
-		var e;
-		e={};
-		e.acceleration=res;
-		e.accelerationIncludingGravity=res;
-		e.rotationRate={};
-		if (MiniAccelerator._callBack !=null){
-			MiniAccelerator._callBack(e);
-		}
-	}
-
-	MiniAccelerator._isListening=false;
-	MiniAccelerator._callBack=null;
-	return MiniAccelerator;
 })(EventDispatcher)
 
 

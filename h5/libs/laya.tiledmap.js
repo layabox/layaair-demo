@@ -6,160 +6,6 @@
 	var Loader=laya.net.Loader,Point=laya.maths.Point,Rectangle=laya.maths.Rectangle,Render=laya.renders.Render;
 	var Sprite=laya.display.Sprite,Texture=laya.resource.Texture;
 /**
-*此类是子纹理类，也包括同类动画的管理
-*TiledMap会把纹理分割成无数子纹理，也可以把其中的某块子纹理替换成一个动画序列
-*本类的实现就是如果发现子纹理被替换成一个动画序列，animationKey会被设为true
-*即animationKey为true,就使用TileAniSprite来做显示，把动画序列根据时间画到TileAniSprite上
-*@author ...
-*/
-//class laya.map.TileTexSet
-var TileTexSet=(function(){
-	function TileTexSet(){
-		/**唯一标识*/
-		this.gid=-1;
-		/**子纹理的引用*/
-		this.texture=null;
-		/**纹理显示时的坐标偏移X*/
-		this.offX=0;
-		/**纹理显示时的坐标偏移Y*/
-		this.offY=0;
-		/**当前要播放动画的纹理序列*/
-		this.textureArray=null;
-		/**当前动画每帧的时间间隔*/
-		this.durationTimeArray=null;
-		/**动画播放的总时间 */
-		this.animationTotalTime=0;
-		/**true表示当前纹理，是一组动画，false表示当前只有一个纹理*/
-		this.isAnimation=false;
-		this._spriteNum=0;
-		//当前动画有多少个显示对象
-		this._aniDic=null;
-		//通过显示对象的唯一名字，去保存显示显示对象
-		this._frameIndex=0;
-		//当前动画播放到第几帧
-		this._time=0;
-		//距离上次动画刷新，过了多少长时间
-		this._interval=0;
-		//每帧刷新的时间间隔
-		this._preFrameTime=0;
-	}
-
-	__class(TileTexSet,'laya.map.TileTexSet');
-	var __proto=TileTexSet.prototype;
-	/**
-	*加入一个动画显示对象到此动画中
-	*@param aniName //显示对象的名字
-	*@param sprite //显示对象
-	*/
-	__proto.addAniSprite=function(aniName,sprite){
-		if (this.animationTotalTime==0){
-			return;
-		}
-		if (this._aniDic==null){
-			this._aniDic={};
-		}
-		if (this._spriteNum==0){
-			Laya.timer.frameLoop(3,this,this.animate);
-			this._preFrameTime=Browser.now();
-			this._frameIndex=0;
-			this._time=0;
-			this._interval=0;
-		}
-		this._spriteNum++;
-		this._aniDic[aniName]=sprite;
-		if (this.textureArray && this._frameIndex < this.textureArray.length){
-			var tTileTextureSet=this.textureArray[this._frameIndex];
-			this.drawTexture(sprite,tTileTextureSet);
-		}
-	}
-
-	/**
-	*把动画画到所有注册的SPRITE上
-	*/
-	__proto.animate=function(){
-		if (this.textureArray && this.textureArray.length > 0 && this.durationTimeArray && this.durationTimeArray.length > 0){
-			var tNow=Browser.now();
-			this._interval=tNow-this._preFrameTime;
-			this._preFrameTime=tNow;
-			if (this._interval > this.animationTotalTime){
-				this._interval=this._interval % this.animationTotalTime;
-			}
-			this._time+=this._interval;
-			var tTime=this.durationTimeArray[this._frameIndex];
-			while (this._time > tTime){
-				this._time-=tTime;
-				this._frameIndex++;
-				if (this._frameIndex >=this.durationTimeArray.length || this._frameIndex >=this.textureArray.length){
-					this._frameIndex=0;
-				};
-				var tTileTextureSet=this.textureArray[this._frameIndex];
-				var tSprite;
-				for (var p in this._aniDic){
-					tSprite=this._aniDic[p];
-					this.drawTexture(tSprite,tTileTextureSet);
-				}
-				tTime=this.durationTimeArray[this._frameIndex];
-			}
-		}
-	}
-
-	__proto.drawTexture=function(sprite,tileTextSet){
-		sprite.graphics.clear(true);
-		sprite.graphics.drawImage(tileTextSet.texture,tileTextSet.offX,tileTextSet.offY);
-	}
-
-	/**
-	*移除不需要更新的SPRITE
-	*@param _name
-	*/
-	__proto.removeAniSprite=function(_name){
-		if (this._aniDic && this._aniDic[_name]){
-			delete this._aniDic[_name];
-			this._spriteNum--
-			if (this._spriteNum==0){
-				Laya.timer.clear(this,this.animate);
-			}
-		}
-	}
-
-	/**
-	*显示当前动画的使用情况
-	*/
-	__proto.showDebugInfo=function(){
-		var tInfo=null;
-		if (this._spriteNum > 0){
-			tInfo="TileTextureSet::gid:"+this.gid.toString()+" 动画数:"+this._spriteNum.toString();
-		}
-		return tInfo;
-	}
-
-	/**
-	*清理
-	*/
-	__proto.clearAll=function(){
-		this.gid=-1;
-		if (this.texture){
-			this.texture.destroy();
-			this.texture=null;
-		}
-		this.offX=0;
-		this.offY=0;
-		this.textureArray=null;
-		this.durationTimeArray=null;
-		this.isAnimation=false;
-		this._spriteNum=0;
-		this._aniDic=null;
-		this._frameIndex=0;
-		this._preFrameTime=0;
-		this._time=0;
-		this._interval=0;
-	}
-
-	return TileTexSet;
-})()
-
-
-/**
 *tiledMap是整个地图的核心
 *地图以层级来划分地图（例如：地表层，植被层，建筑层）
 *每层又以分块（GridSprite)来处理显示对象，只显示在视口区域的区
@@ -1557,134 +1403,157 @@ var TiledMap=(function(){
 
 
 /**
-*地图的每层都会分块渲染处理
-*本类就是地图的块数据
+*此类是子纹理类，也包括同类动画的管理
+*TiledMap会把纹理分割成无数子纹理，也可以把其中的某块子纹理替换成一个动画序列
+*本类的实现就是如果发现子纹理被替换成一个动画序列，animationKey会被设为true
+*即animationKey为true,就使用TileAniSprite来做显示，把动画序列根据时间画到TileAniSprite上
 *@author ...
 */
-//class laya.map.GridSprite extends laya.display.Sprite
-var GridSprite=(function(_super){
-	function GridSprite(){
-		/**相对于地图X轴的坐标*/
-		this.relativeX=0;
-		/**相对于地图Y轴的坐标*/
-		this.relativeY=0;
-		/**是否用于对象层的独立物件*/
-		this.isAloneObject=false;
-		/**当前GRID中是否有动画*/
-		this.isHaveAnimation=false;
-		/**当前GRID包含的动画*/
-		this.aniSpriteArray=null;
-		/**当前GRID包含多少个TILE(包含动画)*/
-		this.drawImageNum=0;
-		this._map=null;
-		GridSprite.__super.call(this);
+//class laya.map.TileTexSet
+var TileTexSet=(function(){
+	function TileTexSet(){
+		/**唯一标识*/
+		this.gid=-1;
+		/**子纹理的引用*/
+		this.texture=null;
+		/**纹理显示时的坐标偏移X*/
+		this.offX=0;
+		/**纹理显示时的坐标偏移Y*/
+		this.offY=0;
+		/**当前要播放动画的纹理序列*/
+		this.textureArray=null;
+		/**当前动画每帧的时间间隔*/
+		this.durationTimeArray=null;
+		/**动画播放的总时间 */
+		this.animationTotalTime=0;
+		/**true表示当前纹理，是一组动画，false表示当前只有一个纹理*/
+		this.isAnimation=false;
+		this._spriteNum=0;
+		//当前动画有多少个显示对象
+		this._aniDic=null;
+		//通过显示对象的唯一名字，去保存显示显示对象
+		this._frameIndex=0;
+		//当前动画播放到第几帧
+		this._time=0;
+		//距离上次动画刷新，过了多少长时间
+		this._interval=0;
+		//每帧刷新的时间间隔
+		this._preFrameTime=0;
 	}
 
-	__class(GridSprite,'laya.map.GridSprite',_super);
-	var __proto=GridSprite.prototype;
+	__class(TileTexSet,'laya.map.TileTexSet');
+	var __proto=TileTexSet.prototype;
 	/**
-	*传入必要的参数，用于裁剪，跟确认此对象类型
-	*@param map 把地图的引用传进来，参与一些裁剪计算
-	*@param objectKey true:表示当前GridSprite是个活动对象，可以控制，false:地图层的组成块
+	*加入一个动画显示对象到此动画中
+	*@param aniName //显示对象的名字
+	*@param sprite //显示对象
 	*/
-	__proto.initData=function(map,objectKey){
-		(objectKey===void 0)&& (objectKey=false);
-		this._map=map;
-		this.isAloneObject=objectKey;
-	}
-
-	/**
-	*把一个动画对象绑定到当前GridSprite
-	*@param sprite 动画的显示对象
-	*/
-	__proto.addAniSprite=function(sprite){
-		if (this.aniSpriteArray==null){
-			this.aniSpriteArray=[];
+	__proto.addAniSprite=function(aniName,sprite){
+		if (this.animationTotalTime==0){
+			return;
 		}
-		this.aniSpriteArray.push(sprite);
-	}
-
-	/**
-	*显示当前GridSprite，并把上面的动画全部显示
-	*/
-	__proto.show=function(){
-		if (!this._visible){
-			this.visible=true;
-			if (this.aniSpriteArray==null){
-				return;
-			};
-			var tAniSprite;
-			for (var i=0;i < this.aniSpriteArray.length;i++){
-				tAniSprite=this.aniSpriteArray[i];
-				tAniSprite.show();
-			}
+		if (this._aniDic==null){
+			this._aniDic={};
 		}
-	}
-
-	/**
-	*隐藏当前GridSprite，并把上面绑定的动画全部移除
-	*/
-	__proto.hide=function(){
-		if (this._visible){
-			this.visible=false;
-			if (this.aniSpriteArray==null){
-				return;
-			};
-			var tAniSprite;
-			for (var i=0;i < this.aniSpriteArray.length;i++){
-				tAniSprite=this.aniSpriteArray[i];
-				tAniSprite.hide();
-			}
+		if (this._spriteNum==0){
+			Laya.timer.frameLoop(3,this,this.animate);
+			this._preFrameTime=Browser.now();
+			this._frameIndex=0;
+			this._time=0;
+			this._interval=0;
+		}
+		this._spriteNum++;
+		this._aniDic[aniName]=sprite;
+		if (this.textureArray && this._frameIndex < this.textureArray.length){
+			var tTileTextureSet=this.textureArray[this._frameIndex];
+			this.drawTexture(sprite,tTileTextureSet);
 		}
 	}
 
 	/**
-	*刷新坐标，当我们自己控制一个GridSprite移动时，需要调用此函数，手动刷新
+	*把动画画到所有注册的SPRITE上
 	*/
-	__proto.updatePos=function(){
-		if (this.isAloneObject){
-			if (this._map){
-				this.x=this.relativeX-this._map._viewPortX;
-				this.y=this.relativeY-this._map._viewPortY;
+	__proto.animate=function(){
+		if (this.textureArray && this.textureArray.length > 0 && this.durationTimeArray && this.durationTimeArray.length > 0){
+			var tNow=Browser.now();
+			this._interval=tNow-this._preFrameTime;
+			this._preFrameTime=tNow;
+			if (this._interval > this.animationTotalTime){
+				this._interval=this._interval % this.animationTotalTime;
 			}
-			if (this._x < 0 || this._x > this._map.viewPortWidth || this._y < 0 || this._y > this._map.viewPortHeight){
-				this.hide();
-				}else {
-				this.show();
+			this._time+=this._interval;
+			var tTime=this.durationTimeArray[this._frameIndex];
+			while (this._time > tTime){
+				this._time-=tTime;
+				this._frameIndex++;
+				if (this._frameIndex >=this.durationTimeArray.length || this._frameIndex >=this.textureArray.length){
+					this._frameIndex=0;
+				};
+				var tTileTextureSet=this.textureArray[this._frameIndex];
+				var tSprite;
+				for (var p in this._aniDic){
+					tSprite=this._aniDic[p];
+					this.drawTexture(tSprite,tTileTextureSet);
+				}
+				tTime=this.durationTimeArray[this._frameIndex];
 			}
-			}else {
-			if (this._map){
-				this.x=this.relativeX-this._map._viewPortX;
-				this.y=this.relativeY-this._map._viewPortY;
+		}
+	}
+
+	__proto.drawTexture=function(sprite,tileTextSet){
+		sprite.graphics.clear(true);
+		sprite.graphics.drawImage(tileTextSet.texture,tileTextSet.offX,tileTextSet.offY);
+	}
+
+	/**
+	*移除不需要更新的SPRITE
+	*@param _name
+	*/
+	__proto.removeAniSprite=function(_name){
+		if (this._aniDic && this._aniDic[_name]){
+			delete this._aniDic[_name];
+			this._spriteNum--
+			if (this._spriteNum==0){
+				Laya.timer.clear(this,this.animate);
 			}
 		}
 	}
 
 	/**
-	*重置当前对象的所有属性
+	*显示当前动画的使用情况
+	*/
+	__proto.showDebugInfo=function(){
+		var tInfo=null;
+		if (this._spriteNum > 0){
+			tInfo="TileTextureSet::gid:"+this.gid.toString()+" 动画数:"+this._spriteNum.toString();
+		}
+		return tInfo;
+	}
+
+	/**
+	*清理
 	*/
 	__proto.clearAll=function(){
-		if (this._map){
-			this._map=null;
+		this.gid=-1;
+		if (this.texture){
+			this.texture.destroy();
+			this.texture=null;
 		}
-		this.visible=false;
-		var tAniSprite;
-		if (this.aniSpriteArray !=null){
-			for (var i=0;i < this.aniSpriteArray.length;i++){
-				tAniSprite=this.aniSpriteArray[i];
-				tAniSprite.clearAll();
-			}
-		}
-		this.destroy();
-		this.relativeX=0;
-		this.relativeY=0;
-		this.isHaveAnimation=false;
-		this.aniSpriteArray=null;
-		this.drawImageNum=0;
+		this.offX=0;
+		this.offY=0;
+		this.textureArray=null;
+		this.durationTimeArray=null;
+		this.isAnimation=false;
+		this._spriteNum=0;
+		this._aniDic=null;
+		this._frameIndex=0;
+		this._preFrameTime=0;
+		this._time=0;
+		this._interval=0;
 	}
 
-	return GridSprite;
-})(Sprite)
+	return TileTexSet;
+})()
 
 
 /**
@@ -2089,6 +1958,137 @@ var MapLayer=(function(_super){
 	}
 
 	return MapLayer;
+})(Sprite)
+
+
+/**
+*地图的每层都会分块渲染处理
+*本类就是地图的块数据
+*@author ...
+*/
+//class laya.map.GridSprite extends laya.display.Sprite
+var GridSprite=(function(_super){
+	function GridSprite(){
+		/**相对于地图X轴的坐标*/
+		this.relativeX=0;
+		/**相对于地图Y轴的坐标*/
+		this.relativeY=0;
+		/**是否用于对象层的独立物件*/
+		this.isAloneObject=false;
+		/**当前GRID中是否有动画*/
+		this.isHaveAnimation=false;
+		/**当前GRID包含的动画*/
+		this.aniSpriteArray=null;
+		/**当前GRID包含多少个TILE(包含动画)*/
+		this.drawImageNum=0;
+		this._map=null;
+		GridSprite.__super.call(this);
+	}
+
+	__class(GridSprite,'laya.map.GridSprite',_super);
+	var __proto=GridSprite.prototype;
+	/**
+	*传入必要的参数，用于裁剪，跟确认此对象类型
+	*@param map 把地图的引用传进来，参与一些裁剪计算
+	*@param objectKey true:表示当前GridSprite是个活动对象，可以控制，false:地图层的组成块
+	*/
+	__proto.initData=function(map,objectKey){
+		(objectKey===void 0)&& (objectKey=false);
+		this._map=map;
+		this.isAloneObject=objectKey;
+	}
+
+	/**
+	*把一个动画对象绑定到当前GridSprite
+	*@param sprite 动画的显示对象
+	*/
+	__proto.addAniSprite=function(sprite){
+		if (this.aniSpriteArray==null){
+			this.aniSpriteArray=[];
+		}
+		this.aniSpriteArray.push(sprite);
+	}
+
+	/**
+	*显示当前GridSprite，并把上面的动画全部显示
+	*/
+	__proto.show=function(){
+		if (!this._visible){
+			this.visible=true;
+			if (this.aniSpriteArray==null){
+				return;
+			};
+			var tAniSprite;
+			for (var i=0;i < this.aniSpriteArray.length;i++){
+				tAniSprite=this.aniSpriteArray[i];
+				tAniSprite.show();
+			}
+		}
+	}
+
+	/**
+	*隐藏当前GridSprite，并把上面绑定的动画全部移除
+	*/
+	__proto.hide=function(){
+		if (this._visible){
+			this.visible=false;
+			if (this.aniSpriteArray==null){
+				return;
+			};
+			var tAniSprite;
+			for (var i=0;i < this.aniSpriteArray.length;i++){
+				tAniSprite=this.aniSpriteArray[i];
+				tAniSprite.hide();
+			}
+		}
+	}
+
+	/**
+	*刷新坐标，当我们自己控制一个GridSprite移动时，需要调用此函数，手动刷新
+	*/
+	__proto.updatePos=function(){
+		if (this.isAloneObject){
+			if (this._map){
+				this.x=this.relativeX-this._map._viewPortX;
+				this.y=this.relativeY-this._map._viewPortY;
+			}
+			if (this._x < 0 || this._x > this._map.viewPortWidth || this._y < 0 || this._y > this._map.viewPortHeight){
+				this.hide();
+				}else {
+				this.show();
+			}
+			}else {
+			if (this._map){
+				this.x=this.relativeX-this._map._viewPortX;
+				this.y=this.relativeY-this._map._viewPortY;
+			}
+		}
+	}
+
+	/**
+	*重置当前对象的所有属性
+	*/
+	__proto.clearAll=function(){
+		if (this._map){
+			this._map=null;
+		}
+		this.visible=false;
+		var tAniSprite;
+		if (this.aniSpriteArray !=null){
+			for (var i=0;i < this.aniSpriteArray.length;i++){
+				tAniSprite=this.aniSpriteArray[i];
+				tAniSprite.clearAll();
+			}
+		}
+		this.destroy();
+		this.relativeX=0;
+		this.relativeY=0;
+		this.isHaveAnimation=false;
+		this.aniSpriteArray=null;
+		this.drawImageNum=0;
+	}
+
+	return GridSprite;
 })(Sprite)
 
 
