@@ -9,6 +9,37 @@
 	var Stat=laya.utils.Stat,Texture=laya.resource.Texture,Value2D=laya.webgl.shader.d2.value.Value2D,VertexBuffer2D=laya.webgl.utils.VertexBuffer2D;
 	var WebGL=laya.webgl.WebGL,WebGLContext=laya.webgl.WebGLContext;
 /**
+*
+*<code>ParticleTemplateBase</code> 类是粒子模板基类
+*
+*/
+//class laya.particle.ParticleTemplateBase
+var ParticleTemplateBase=(function(){
+	function ParticleTemplateBase(){
+		/**
+		*粒子配置数据
+		*/
+		this.settings=null;
+		/**
+		*粒子贴图
+		*/
+		this.texture=null;
+	}
+
+	__class(ParticleTemplateBase,'laya.particle.ParticleTemplateBase');
+	var __proto=ParticleTemplateBase.prototype;
+	/**
+	*添加一个粒子
+	*@param position 粒子位置
+	*@param velocity 粒子速度
+	*
+	*/
+	__proto.addParticleArray=function(position,velocity){}
+	return ParticleTemplateBase;
+})()
+
+
+/**
 *<code>EmitterBase</code> 类是粒子发射器类
 */
 //class laya.particle.emitter.EmitterBase
@@ -110,6 +141,49 @@ var EmitterBase=(function(){
 	});
 
 	return EmitterBase;
+})()
+
+
+/**
+*@private
+*/
+//class laya.particle.ParticleEmitter
+var ParticleEmitter=(function(){
+	function ParticleEmitter(templet,particlesPerSecond,initialPosition){
+		this._templet=null;
+		this._timeBetweenParticles=NaN;
+		this._previousPosition=null;
+		this._timeLeftOver=0;
+		this._tempVelocity=new Float32Array([0,0,0]);
+		this._tempPosition=new Float32Array([0,0,0]);
+		this._templet=templet;
+		this._timeBetweenParticles=1.0 / particlesPerSecond;
+		this._previousPosition=initialPosition;
+	}
+
+	__class(ParticleEmitter,'laya.particle.ParticleEmitter');
+	var __proto=ParticleEmitter.prototype;
+	__proto.update=function(elapsedTime,newPosition){
+		elapsedTime=elapsedTime / 1000;
+		if (elapsedTime > 0){
+			MathUtil.subtractVector3(newPosition,this._previousPosition,this._tempVelocity);
+			MathUtil.scaleVector3(this._tempVelocity,1 / elapsedTime,this._tempVelocity);
+			var timeToSpend=this._timeLeftOver+elapsedTime;
+			var currentTime=-this._timeLeftOver;
+			while (timeToSpend > this._timeBetweenParticles){
+				currentTime+=this._timeBetweenParticles;
+				timeToSpend-=this._timeBetweenParticles;
+				MathUtil.lerpVector3(this._previousPosition,newPosition,currentTime / elapsedTime,this._tempPosition);
+				this._templet.addParticleArray(this._tempPosition,this._tempVelocity);
+			}
+			this._timeLeftOver=timeToSpend;
+		}
+		this._previousPosition[0]=newPosition[0];
+		this._previousPosition[1]=newPosition[1];
+		this._previousPosition[2]=newPosition[2];
+	}
+
+	return ParticleEmitter;
 })()
 
 
@@ -243,80 +317,6 @@ var ParticleSetting=(function(){
 
 
 /**
-*
-*<code>ParticleTemplateBase</code> 类是粒子模板基类
-*
-*/
-//class laya.particle.ParticleTemplateBase
-var ParticleTemplateBase=(function(){
-	function ParticleTemplateBase(){
-		/**
-		*粒子配置数据
-		*/
-		this.settings=null;
-		/**
-		*粒子贴图
-		*/
-		this.texture=null;
-	}
-
-	__class(ParticleTemplateBase,'laya.particle.ParticleTemplateBase');
-	var __proto=ParticleTemplateBase.prototype;
-	/**
-	*添加一个粒子
-	*@param position 粒子位置
-	*@param velocity 粒子速度
-	*
-	*/
-	__proto.addParticleArray=function(position,velocity){}
-	return ParticleTemplateBase;
-})()
-
-
-/**
-*@private
-*/
-//class laya.particle.ParticleEmitter
-var ParticleEmitter=(function(){
-	function ParticleEmitter(templet,particlesPerSecond,initialPosition){
-		this._templet=null;
-		this._timeBetweenParticles=NaN;
-		this._previousPosition=null;
-		this._timeLeftOver=0;
-		this._tempVelocity=new Float32Array([0,0,0]);
-		this._tempPosition=new Float32Array([0,0,0]);
-		this._templet=templet;
-		this._timeBetweenParticles=1.0 / particlesPerSecond;
-		this._previousPosition=initialPosition;
-	}
-
-	__class(ParticleEmitter,'laya.particle.ParticleEmitter');
-	var __proto=ParticleEmitter.prototype;
-	__proto.update=function(elapsedTime,newPosition){
-		elapsedTime=elapsedTime / 1000;
-		if (elapsedTime > 0){
-			MathUtil.subtractVector3(newPosition,this._previousPosition,this._tempVelocity);
-			MathUtil.scaleVector3(this._tempVelocity,1 / elapsedTime,this._tempVelocity);
-			var timeToSpend=this._timeLeftOver+elapsedTime;
-			var currentTime=-this._timeLeftOver;
-			while (timeToSpend > this._timeBetweenParticles){
-				currentTime+=this._timeBetweenParticles;
-				timeToSpend-=this._timeBetweenParticles;
-				MathUtil.lerpVector3(this._previousPosition,newPosition,currentTime / elapsedTime,this._tempPosition);
-				this._templet.addParticleArray(this._tempPosition,this._tempVelocity);
-			}
-			this._timeLeftOver=timeToSpend;
-		}
-		this._previousPosition[0]=newPosition[0];
-		this._previousPosition[1]=newPosition[1];
-		this._previousPosition[2]=newPosition[2];
-	}
-
-	return ParticleEmitter;
-})()
-
-
-/**
 *@private
 */
 //class laya.particle.ParticleData
@@ -439,77 +439,6 @@ var ParticleShaderValue=(function(_super){
 	]);
 	return ParticleShaderValue;
 })(Value2D)
-
-
-/**
-*
-*@private
-*/
-//class laya.particle.emitter.Emitter2D extends laya.particle.emitter.EmitterBase
-var Emitter2D=(function(_super){
-	function Emitter2D(_template){
-		this.setting=null;
-		this._posRange=null;
-		this._canvasTemplate=null;
-		this._emitFun=null;
-		Emitter2D.__super.call(this);
-		this.template=_template;
-	}
-
-	__class(Emitter2D,'laya.particle.emitter.Emitter2D',_super);
-	var __proto=Emitter2D.prototype;
-	__proto.emit=function(){
-		_super.prototype.emit.call(this);
-		if(this._emitFun!=null)
-			this._emitFun();
-	}
-
-	__proto.getRandom=function(value){
-		return (Math.random()*2-1)*value;
-	}
-
-	__proto.webGLEmit=function(){
-		var pos=new Float32Array(3);
-		pos[0]=this.getRandom(this._posRange[0]);
-		pos[1]=this.getRandom(this._posRange[1]);
-		pos[2]=this.getRandom(this._posRange[2]);
-		var v=new Float32Array(3);
-		v[0]=0;
-		v[1]=0;
-		v[2]=0;
-		this._particleTemplate.addParticleArray(pos,v);
-	}
-
-	__proto.canvasEmit=function(){
-		var pos=new Float32Array(3);
-		pos[0]=this.getRandom(this._posRange[0]);
-		pos[1]=this.getRandom(this._posRange[1]);
-		pos[2]=this.getRandom(this._posRange[2]);
-		var v=new Float32Array(3);
-		v[0]=0;
-		v[1]=0;
-		v[2]=0;
-		this._particleTemplate.addParticleArray(pos,v);
-	}
-
-	__getset(0,__proto,'template',function(){
-		return this._particleTemplate;
-		},function(template){
-		this._particleTemplate=template;
-		if (!template){
-			this._emitFun=null;
-			this.setting=null;
-			this._posRange=null;
-		};
-		this.setting=template.settings;
-		this._posRange=this.setting.positionVariance;
-		if((this._particleTemplate instanceof laya.particle.ParticleTemplate2D )){
-			this._emitFun=this.webGLEmit;
-		}
-	});
-
-	return Emitter2D;
-})(EmitterBase)
 
 
 /**
@@ -649,6 +578,77 @@ var ParticleTemplateWebGL=(function(_super){
 
 	return ParticleTemplateWebGL;
 })(ParticleTemplateBase)
+
+
+/**
+*
+*@private
+*/
+//class laya.particle.emitter.Emitter2D extends laya.particle.emitter.EmitterBase
+var Emitter2D=(function(_super){
+	function Emitter2D(_template){
+		this.setting=null;
+		this._posRange=null;
+		this._canvasTemplate=null;
+		this._emitFun=null;
+		Emitter2D.__super.call(this);
+		this.template=_template;
+	}
+
+	__class(Emitter2D,'laya.particle.emitter.Emitter2D',_super);
+	var __proto=Emitter2D.prototype;
+	__proto.emit=function(){
+		_super.prototype.emit.call(this);
+		if(this._emitFun!=null)
+			this._emitFun();
+	}
+
+	__proto.getRandom=function(value){
+		return (Math.random()*2-1)*value;
+	}
+
+	__proto.webGLEmit=function(){
+		var pos=new Float32Array(3);
+		pos[0]=this.getRandom(this._posRange[0]);
+		pos[1]=this.getRandom(this._posRange[1]);
+		pos[2]=this.getRandom(this._posRange[2]);
+		var v=new Float32Array(3);
+		v[0]=0;
+		v[1]=0;
+		v[2]=0;
+		this._particleTemplate.addParticleArray(pos,v);
+	}
+
+	__proto.canvasEmit=function(){
+		var pos=new Float32Array(3);
+		pos[0]=this.getRandom(this._posRange[0]);
+		pos[1]=this.getRandom(this._posRange[1]);
+		pos[2]=this.getRandom(this._posRange[2]);
+		var v=new Float32Array(3);
+		v[0]=0;
+		v[1]=0;
+		v[2]=0;
+		this._particleTemplate.addParticleArray(pos,v);
+	}
+
+	__getset(0,__proto,'template',function(){
+		return this._particleTemplate;
+		},function(template){
+		this._particleTemplate=template;
+		if (!template){
+			this._emitFun=null;
+			this.setting=null;
+			this._posRange=null;
+		};
+		this.setting=template.settings;
+		this._posRange=this.setting.positionVariance;
+		if((this._particleTemplate instanceof laya.particle.ParticleTemplate2D )){
+			this._emitFun=this.webGLEmit;
+		}
+	});
+
+	return Emitter2D;
+})(EmitterBase)
 
 
 /**

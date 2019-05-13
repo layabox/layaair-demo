@@ -3,8 +3,6 @@
 	   "libs/bytebuffer.js",
 	   "libs/protobuf.js",
 	   "libs/laya.core.js",
-	   "libs/laya.webgl.js",
-	   "libs/laya.filter.js",
 	   "libs/laya.particle.js",
 	   "libs/laya.ani.js",
 	   "libs/laya.ui.js",

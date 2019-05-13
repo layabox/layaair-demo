@@ -42,7 +42,7 @@ class SceneLoad2 {
 			camera.addComponent(CameraMoveScript);
 			
 			//加载相机天空盒材质
-			Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox3/SkyBox.lmat", Laya.Handler.create(this, function(mat) {
+			Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox3/SkyBox3.lmat", Laya.Handler.create(this, function(mat) {
 				var skyRenderer = camera.skyRenderer;
 				skyRenderer.mesh = Laya.SkyBox.instance;
 				skyRenderer.material = mat;

@@ -6,161 +6,161 @@
 			"prefix": "Sprite",
 			"tr_zhCN": "Sprite",
 			"manifest": [
-				["DisplayImage", "显示图片", "Sprite.loadImage可以直接加载外部，也可以从缓冲区读取图片。Graphics.drawTexture绘制纹理。如果使用Sprite.loadImage显示图集中一张图，则图集必须已被加载", "core,webgl"],
-				["Container", "容器", "Sprite能够作为其他显示对象的容器", "core,webgl"],
-				["RoateAndScale", "旋转缩放", "设置Sprite的旋转角度和缩放系数", "core,webgl"],
-				["DrawPath", "根据数据绘制路径", "drawPath可以绘制路径点", "core,webgl"],
-				["MagnifyingGlass", "遮罩-放大镜", "移动鼠标观看放大的效果", "core,webgl"],
-				["DrawShapes", "绘制各种形状", "使用Graphics绘制矢量图形", "core,webgl"],
-				["Cache", "缓存为静态图像", "通过将多个显示对象缓存成静态图像可以大幅提升渲染效率，关于注意事项参见文档", "core,webgl"],
-				["NodeControl", "节点控制", "通过控制容器改变自身以及子级外观", "core,webgl"],
-				["Pivot", "轴心点", "改变pivot可以控制旋转和缩放的中心", "core,webgl"],
-				["SwitchTexture", "切换纹理", "点击猩猩切换纹理。这里使用graphics.drawTexture，也可以使用loadImage", "core,webgl"],
-				["Guide", "新手引导", "模拟游戏的入手流程引导", "core,webgl"]
+				["DisplayImage", "显示图片", "Sprite.loadImage可以直接加载外部，也可以从缓冲区读取图片。Graphics.drawTexture绘制纹理。如果使用Sprite.loadImage显示图集中一张图，则图集必须已被加载", "core"],
+				["Container", "容器", "Sprite能够作为其他显示对象的容器", "core"],
+				["RoateAndScale", "旋转缩放", "设置Sprite的旋转角度和缩放系数", "core"],
+				["DrawPath", "根据数据绘制路径", "drawPath可以绘制路径点", "core"],
+				["MagnifyingGlass", "遮罩-放大镜", "移动鼠标观看放大的效果", "core"],
+				["DrawShapes", "绘制各种形状", "使用Graphics绘制矢量图形", "core"],
+				["Cache", "缓存为静态图像", "通过将多个显示对象缓存成静态图像可以大幅提升渲染效率，关于注意事项参见文档", "core"],
+				["NodeControl", "节点控制", "通过控制容器改变自身以及子级外观", "core"],
+				["Pivot", "轴心点", "改变pivot可以控制旋转和缩放的中心", "core"],
+				["SwitchTexture", "切换纹理", "点击猩猩切换纹理。这里使用graphics.drawTexture，也可以使用loadImage", "core"],
+				["Guide", "新手引导", "模拟游戏的入手流程引导", "core"]
 			]
 		},
 		{
 			"prefix": "Animation",
 			"tr_zhCN": "动画",
 			"manifest": [
-				["SWF", "SWF动画", "MovieClip可以加载并播放SWF动画。<br/>SWF由Flash IDE创建，这类SWF不能包含代码", "core,webgl,ani"],
-				["Altas", "图集动画", "Animation可以加载并播放图集动画。<br/>图集可以使用LayaAir IDE或者TexturePacker导出", "core,webgl"]
+				["SWF", "SWF动画", "MovieClip可以加载并播放SWF动画。<br/>SWF由Flash IDE创建，这类SWF不能包含代码", "core,ani"],
+				["Altas", "图集动画", "Animation可以加载并播放图集动画。<br/>图集可以使用LayaAir IDE或者TexturePacker导出", "core"]
 			]
 		},
 		{
 			"prefix": "Skeleton",
 			"tr_zhCN": "骨骼动画",
 			"manifest": [
-				["MultiTexture", "多纹理", "", "core,webgl,ani"],
-				["SpineEvent", "Spine事件", "", "core,webgl,ani"],
-				["SpineStretchyman", "橡胶人", "", "core,webgl,ani"],
-				["SpineVine", "藤蔓", "", "core,webgl,ani"],
-				["ChangeSkin", "换装", "", "core,webgl,ani"]
+				["MultiTexture", "多纹理", "", "core,ani"],
+				["SpineEvent", "Spine事件", "", "core,ani"],
+				["SpineStretchyman", "橡胶人", "", "core,ani"],
+				["SpineVine", "藤蔓", "", "core,ani"],
+				["ChangeSkin", "换装", "", "core,ani"]
 			]
 		},
 		{
 			"prefix": "BlendMode",
 			"tr_zhCN": "混合模式",
 			"manifest": [
-				["Lighter", "Lighter", "设置blendMode指定混合模式", "core,webgl"]
+				["Lighter", "Lighter", "设置blendMode指定混合模式", "core"]
 			]
 		},
 		{
 			"prefix": "TiledMap",
 			"tr_zhCN": "区块地图",
 			"manifest": [
-				["AnimationTile", "带动画的地图", "", "core,webgl,tiledmap"],
-				["IsometricWorld", "等角地图", "", "core,webgl,tiledmap"],
-				["PerspectiveWall", "PerspectiveWall", "", "core,webgl,tiledmap"],
-				["ScrollMap", "滚动地图", "", "core,webgl,tiledmap"]
+				["AnimationTile", "带动画的地图", "", "core,tiledmap"],
+				["IsometricWorld", "等角地图", "", "core,tiledmap"],
+				["PerspectiveWall", "PerspectiveWall", "", "core,tiledmap"],
+				["ScrollMap", "滚动地图", "", "core,tiledmap"]
 			]
 		},
 		{
 			"prefix": "Filters",
 			"tr_zhCN": "滤镜",
 			"manifest": [
-				["Glow", "发光滤镜", "", "core,webgl,filter"],
-				["Blur", "模糊滤镜", "", "core,webgl,filter"],
-				["Color", "颜色滤镜", "", "core,webgl,filter"]
+				["Glow", "发光滤镜", "", "core"],
+				["Blur", "模糊滤镜", "", "core"],
+				["Color", "颜色滤镜", "", "core"]
 			]
 		},
 		{
 			"prefix": "Particle",
 			"tr_zhCN": "粒子",
 			"manifest": [
-				["T1", "粒子演示1", "", "core,webgl,particle"],
-				["T2", "粒子演示2", "", "core,webgl,particle"],
-				["T3", "粒子演示3", "", "core,webgl,particle"]
+				["T1", "粒子演示1", "", "core,particle"],
+				["T2", "粒子演示2", "", "core,particle"],
+				["T3", "粒子演示3", "", "core,particle"]
 			]
 		},
 		{
 			"prefix": "Sound",
 			"tr_zhCN": "音频",
 			"manifest": [
-				["SimpleDemo", "播放演示", "", "core,webgl"]
+				["SimpleDemo", "播放演示", "", "core"]
 			]
 		},
 		{
 			"prefix": "Text",
 			"tr_zhCN": "文本",
 			"manifest": [
-				["AutoSize", "自动调整文本尺寸", "autosize可以根据文本内容自适应其大小", "core,webgl"],
-				["BitmapFont", "位图字体", "使用BitmapFont加载显示位图字体", "core,webgl"],
-				["ComplexStyle", "复杂的文本样式", "对齐、字号、字体、粗体、行距、描边、边框等多种设置", "core,webgl"],
-				["Editable", "禁止编辑", "只在PC生效，使文件不可编辑，只允许复制", "core,webgl"],
-				["Overflow", "Overflow", "设置overflow定义文本超出的行为。visible不进行任何裁切。<br>scroll不显示文本域外的字符像素，并且支持scroll接口。<br>hidden不显示超出文本域的字符。<br>性能从高至低为：hidden > visible > scroll", "core,webgl"],
-				["Underline", "下划线", "设置underline和underlineColor", "core,webgl"],
-				["HTML", "HTML文本", "", "core,webgl,html"],
-				["InputSingleline", "单行输入", "", "core,webgl"],
-				["InputMultiline", "多行输入", "多行输入框可以使用Enter键", "core,webgl"],
-				["MaxChars", "字数限制", "设置maxChars限制字符数量", "core,webgl"],
-				["Restrict", "字符限制", "设置restrict限制字符", "core,webgl"],
-				["Scroll", "滚动文本", "设置overflow为scroll，并且使用scroll接口滚动文本", "core,webgl"],
-				["WordWrap", "自动换行", "设置wordWrap为true使文本可以换行", "core,webgl"]
+				["AutoSize", "自动调整文本尺寸", "autosize可以根据文本内容自适应其大小", "core"],
+				["BitmapFont", "位图字体", "使用BitmapFont加载显示位图字体", "core"],
+				["ComplexStyle", "复杂的文本样式", "对齐、字号、字体、粗体、行距、描边、边框等多种设置", "core"],
+				["Editable", "禁止编辑", "只在PC生效，使文件不可编辑，只允许复制", "core"],
+				["Overflow", "Overflow", "设置overflow定义文本超出的行为。visible不进行任何裁切。<br>scroll不显示文本域外的字符像素，并且支持scroll接口。<br>hidden不显示超出文本域的字符。<br>性能从高至低为：hidden > visible > scroll", "core"],
+				["Underline", "下划线", "设置underline和underlineColor", "core"],
+				["HTML", "HTML文本", "", "core,html"],
+				["InputSingleline", "单行输入", "", "core"],
+				["InputMultiline", "多行输入", "多行输入框可以使用Enter键", "core"],
+				["MaxChars", "字数限制", "设置maxChars限制字符数量", "core"],
+				["Restrict", "字符限制", "设置restrict限制字符", "core"],
+				["Scroll", "滚动文本", "设置overflow为scroll，并且使用scroll接口滚动文本", "core"],
+				["WordWrap", "自动换行", "设置wordWrap为true使文本可以换行", "core"]
 			]
 		},
 		{
 			"prefix": "UI",
 			"tr_zhCN": "UI",
 			"manifest": [
-				["Label", "Label", "", "core,webgl,ui"],
-				["Button", "Button", "", "core,webgl,ui"],
-				["RadioGroup", "RadioGroup", "", "core,webgl,ui"],
-				["CheckBox", "CheckBox", "", "core,webgl,ui"],
-				["Clip", "Clip", "", "core,webgl,ui"],
-				["ColorPicker", "ColorPicker", "", "core,webgl,ui"],
-				["ComboBox", "ComboBox", "", "core,webgl,ui"],
-				["Dialog", "Dialog", "", "core,webgl,ui"],
-				["ScrollBar", "ScrollBar", "", "core,webgl,ui"],
-				["Slider", "Slider", "", "core,webgl,ui"],
-				["Image", "Image", "", "core,webgl,ui"],
-				["List", "List", "", "core,webgl,ui"],
-				["ProgressBar", "ProgressBar", "", "core,webgl,ui"],
-				["Tab", "Tab", "", "core,webgl,ui"],
-				["Input", "Input", "", "core,webgl,ui"],
-				["TextArea", "TextArea", "", "core,webgl,ui"],
-				["Tree", "Tree", "", "core,webgl,ui"]
+				["Label", "Label", "", "core,ui"],
+				["Button", "Button", "", "core,ui"],
+				["RadioGroup", "RadioGroup", "", "core,ui"],
+				["CheckBox", "CheckBox", "", "core,ui"],
+				["Clip", "Clip", "", "core,ui"],
+				["ColorPicker", "ColorPicker", "", "core,ui"],
+				["ComboBox", "ComboBox", "", "core,ui"],
+				["Dialog", "Dialog", "", "core,ui"],
+				["ScrollBar", "ScrollBar", "", "core,ui"],
+				["Slider", "Slider", "", "core,ui"],
+				["Image", "Image", "", "core,ui"],
+				["List", "List", "", "core,ui"],
+				["ProgressBar", "ProgressBar", "", "core,ui"],
+				["Tab", "Tab", "", "core,ui"],
+				["Input", "Input", "", "core,ui"],
+				["TextArea", "TextArea", "", "core,ui"],
+				["Tree", "Tree", "", "core,ui"]
 			]
 		},
 		{
 			"prefix": "Timer",
 			"tr_zhCN": "计时器",
 			"manifest": [
-				["CallLater", "延迟调用", "", "core,webgl"],
-				["DelayExcute", "延迟执行", "", "core,webgl"],
-				["Interval", "间隔循环", "", "core,webgl"]
+				["CallLater", "延迟调用", "", "core"],
+				["DelayExcute", "延迟执行", "", "core"],
+				["Interval", "间隔循环", "", "core"]
 			]
 		},
 		{
 			"prefix": "Tween",
 			"tr_zhCN": "缓动",
 			"manifest": [
-				["SimpleSample", "简单的Tween", "", "core,webgl"],
-				["Letters", "逐字缓动", "", "core,webgl"],
-				["EaseFunctionsDemo", "缓动函数演示", "", "core,webgl,ui"],
-				["TimeLine", "时间线", "", "core,webgl"]
+				["SimpleSample", "简单的Tween", "", "core"],
+				["Letters", "逐字缓动", "", "core"],
+				["EaseFunctionsDemo", "缓动函数演示", "", "core,ui"],
+				["TimeLine", "时间线", "", "core"]
 			]
 		},
 		{
 			"prefix": "Interaction",
 			"tr_zhCN": "鼠标交互",
 			"manifest": [
-				["Hold", "Hold", "持续按住猩猩两秒后产生互动", "core,webgl"],
-				["Drag", "拖动", "拖动显示对象，在超出边界后可以看到回弹效果", "core,webgl"],
-				["Rotate", "双指旋转（多点触控）", "以旋转手势旋转矩形。请在支持多点触控的设备中查看。", "core,webgl"],
-				["Scale", "双指缩放（多点触控）", "以扩张和挤压的手势缩放矩形。请在支持多点触控的设备中查看。", "core,webgl"],
-				["Swipe", "滑动", "", "core,webgl"],
-				["CustomEvent", "自定义事件", "点击矩形触发自定义旋转事件", "core,webgl"],
-				["Keyboard", "键盘交互", "敲击键盘查看对应键控代码。需要在新标签中查看本示例", "core,webgl"],
-				["Mouse", "鼠标交互", "", "core,webgl"],
-				["FixInteractiveRegion", "修正交互区域", "API mouseThrough命名具有误导性。该接口用于修正交互的区域，设置后，交互响应区会变成非空白内容边界区域。点击任意显示对象查看交互目标", "core,webgl"]
+				["Hold", "Hold", "持续按住猩猩两秒后产生互动", "core"],
+				["Drag", "拖动", "拖动显示对象，在超出边界后可以看到回弹效果", "core"],
+				["Rotate", "双指旋转（多点触控）", "以旋转手势旋转矩形。请在支持多点触控的设备中查看。", "core"],
+				["Scale", "双指缩放（多点触控）", "以扩张和挤压的手势缩放矩形。请在支持多点触控的设备中查看。", "core"],
+				["Swipe", "滑动", "", "core"],
+				["CustomEvent", "自定义事件", "点击矩形触发自定义旋转事件", "core"],
+				["Keyboard", "键盘交互", "敲击键盘查看对应键控代码。需要在新标签中查看本示例", "core"],
+				["Mouse", "鼠标交互", "", "core"],
+				["FixInteractiveRegion", "修正交互区域", "API mouseThrough命名具有误导性。该接口用于修正交互的区域，设置后，交互响应区会变成非空白内容边界区域。点击任意显示对象查看交互目标", "core"]
 			]
 		},
 		{
 			"prefix": "Loader",
 			"tr_zhCN": "加载",
 			"manifest": [
-				["ClearTextureRes", "销毁Texture使用的图片资源", "销毁Texture使用的图片资源，保留texture壳，如果下次渲染的时候，发现texture使用的图片资源不存在，则会自动恢复；相比clearRes，clearTextureRes只是清理texture里面使用的图片资源，并不销毁texture，再次使用到的时候会自动恢复图片资源；而clearRes会彻底销毁texture，导致不能再使用；clearTextureRes能确保立即销毁图片资源，并且不用担心销毁错误，clearRes则采用引用计数方式销毁；【注意】如果图片本身在自动合集里面（默认图片小于512*512），内存是不能被销毁的，此图片被大图合集管理器管理。", "core,webgl,ani"],
+				["ClearTextureRes", "销毁Texture使用的图片资源", "销毁Texture使用的图片资源，保留texture壳，如果下次渲染的时候，发现texture使用的图片资源不存在，则会自动恢复；相比clearRes，clearTextureRes只是清理texture里面使用的图片资源，并不销毁texture，再次使用到的时候会自动恢复图片资源；而clearRes会彻底销毁texture，导致不能再使用；clearTextureRes能确保立即销毁图片资源，并且不用担心销毁错误，clearRes则采用引用计数方式销毁；【注意】如果图片本身在自动合集里面（默认图片小于512*512），内存是不能被销毁的，此图片被大图合集管理器管理。", "core,ani"],
 				["SingleType", "单一类型资源加载", "只包含代码", "core"],
 				["MultipleType", "多种类型资源加载", "只包含代码", "core"],
 				["Sequence", "加载序列", "资源序列的加载，按照加载优先级加载资源。本例只需查看代码", "core"],
@@ -171,32 +171,32 @@
 			"prefix": "SmartScale",
 			"tr_zhCN": "屏幕适配",
 			"manifest": [
-				["Align_Contral", "对齐模式", "横向对齐分为左中右，纵向对齐分为上中下", "core,webgl"],
-				["Landscape", "自动横屏", "改变LayaAir的屏幕方向并不会OS的屏幕方向，并且不受OS屏幕方向影响。设置自动横屏后，游戏的方向会始终与舞台较大的边保持垂直。此例使用新窗口打开，只要拖动改变浏览器的尺寸即可看到效果", "core,webgl"],
-				["Portrait", "自动竖屏", "改变LayaAir的屏幕方向并不会OS的屏幕方向，并且不受OS屏幕方向影响。设置自动横屏后，游戏的方向会始终与舞台较小的边保持垂直。此例使用新窗口打开，只要拖动改变浏览器的尺寸即可看到效果", "core,webgl"],
-				["Scale_EXTRACT_FIT", "缩放-Extract Fit", "整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示", "core,webgl"],
-				["Scale_NOBORDER", "缩放-No Border", "整个应用程序填满指定区域，不发生扭曲，但有可能进行一些裁切，同时保持应用程序的原始高宽比", "core,webgl"],
-				["Scale_NOSCALE", "缩放-No Scale", "整个应用程序的大小固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切", "core,webgl"],
-				["Scale_SHOW_ALL", "缩放-Show All", "整个应用程序在指定区域中可见，且不发生扭曲，同时保持应用程序的原始高宽比。应用程序的两侧可能会显示边框", "core,webgl"],
-				["T", "屏幕适配", "点击文本切换适配模式", "core,webgl,ui"]
+				["Align_Contral", "对齐模式", "横向对齐分为左中右，纵向对齐分为上中下", "core"],
+				["Landscape", "自动横屏", "改变LayaAir的屏幕方向并不会OS的屏幕方向，并且不受OS屏幕方向影响。设置自动横屏后，游戏的方向会始终与舞台较大的边保持垂直。此例使用新窗口打开，只要拖动改变浏览器的尺寸即可看到效果", "core"],
+				["Portrait", "自动竖屏", "改变LayaAir的屏幕方向并不会OS的屏幕方向，并且不受OS屏幕方向影响。设置自动横屏后，游戏的方向会始终与舞台较小的边保持垂直。此例使用新窗口打开，只要拖动改变浏览器的尺寸即可看到效果", "core"],
+				["Scale_EXTRACT_FIT", "缩放-Extract Fit", "整个应用程序在指定区域中可见，但不尝试保持原始高宽比。可能会发生扭曲，应用程序可能会拉伸或压缩显示", "core"],
+				["Scale_NOBORDER", "缩放-No Border", "整个应用程序填满指定区域，不发生扭曲，但有可能进行一些裁切，同时保持应用程序的原始高宽比", "core"],
+				["Scale_NOSCALE", "缩放-No Scale", "整个应用程序的大小固定，因此，即使播放器窗口的大小更改，它也会保持不变。如果播放器窗口比内容小，则可能进行一些裁切", "core"],
+				["Scale_SHOW_ALL", "缩放-Show All", "整个应用程序在指定区域中可见，且不发生扭曲，同时保持应用程序的原始高宽比。应用程序的两侧可能会显示边框", "core"],
+				["T", "屏幕适配", "点击文本切换适配模式", "core,ui"]
 			]
 		},
 		{
 			"prefix": "InputDevice",
 			"tr_zhCN": "输入设备",
 			"manifest": [
-				["Map", "地图", "请在能够获取地理位置的设备上观赏。在设备移动时，自动更新当前的位置", "core,webgl,device,BaiduMap"],
-				["Compass", "指南针", "请在支持陀螺仪的设备上观赏。能够获取地球坐标系的浏览器能够正确识别方位，否则使用设备坐标系时，以设备初始朝向为北。罗盘中心的十字准星表示当前朝向", "core,webgl,device"],
-				["Shake", "摇一摇", "请在支持重力感应的设备上观赏。摇晃三次后，不再侦听设备摇晃", "core,webgl,device"],
-				["GluttonousSnake", "贪吃蛇（重力感应）", "通过倾斜设备移动蛇，猎食增加长度。这条蛇不咬自己", "core,webgl,device"]
+				["Map", "地图", "请在能够获取地理位置的设备上观赏。在设备移动时，自动更新当前的位置", "core,device,BaiduMap"],
+				["Compass", "指南针", "请在支持陀螺仪的设备上观赏。能够获取地球坐标系的浏览器能够正确识别方位，否则使用设备坐标系时，以设备初始朝向为北。罗盘中心的十字准星表示当前朝向", "core,device"],
+				["Shake", "摇一摇", "请在支持重力感应的设备上观赏。摇晃三次后，不再侦听设备摇晃", "core,device"],
+				["GluttonousSnake", "贪吃蛇（重力感应）", "通过倾斜设备移动蛇，猎食增加长度。这条蛇不咬自己", "core,device"]
 			]
 		},
 		{
 			"prefix": "Network",
 			"tr_zhCN": "网络和格式",
 			"manifest": [
-				["POST", "POST", "", "core,webgl"],
-				["GET", "GET", "", "core,webgl"],
+				["POST", "POST", "", "core"],
+				["GET", "GET", "", "core"],
 				["XML", "XML", "使用DOMParser解析XML，打开控制台查看结果", "core"],
 				["Socket", "Socket", "由于服务器是ws协议，因此https协议下会报错", "core"],
 				["ProtocolBuffer", "ProtocolBuffer", "使用protobuf.js（演示使用的decodeIO的版本），在控制台查看结果", "core,protobuf"]
@@ -221,27 +221,27 @@
 			"prefix": "PerformanceTest",
 			"tr_zhCN": "性能测试",
 			"manifest": [
-				["Maggots", "虫子（慎入）", "5000只虫子每一帧执行位移、旋转、缩放", "core,webgl"],
-				["Cartoon", "卡通人物", "500个角色旋转和位移", "core,webgl"],
-				["Cartoon2", "卡通人物2", "500个动画乱序移动", "core,webgl"],
-				["Skeleton", "骨骼", "100个骨骼动画。点击切换动作", "core,webgl,ani"]
+				["Maggots", "虫子（慎入）", "5000只虫子每一帧执行位移、旋转、缩放", "core"],
+				["Cartoon", "卡通人物", "500个角色旋转和位移", "core"],
+				["Cartoon2", "卡通人物2", "500个动画乱序移动", "core"],
+				["Skeleton", "骨骼", "100个骨骼动画。点击切换动作", "core,ani"]
 			]
 		},
 		{
 			"prefix": "PIXI",
 			"tr_zhCN": "其他引擎的Demo",
 			"manifest": [
-				["Example_04", "Example_04", "原Pixi.js Demo", "core,webgl"],
-				["Example_05", "Example_05", "原Pixi.js Demo", "core,webgl"],
-				["Example_21", "Example_21", "原Pixi.js Demo", "core,webgl"],
-				["Example_23", "Example_23", "原Pixi.js Demo", "core,webgl"]
+				["Example_04", "Example_04", "原Pixi.js Demo", "core"],
+				["Example_05", "Example_05", "原Pixi.js Demo", "core"],
+				["Example_21", "Example_21", "原Pixi.js Demo", "core"],
+				["Example_23", "Example_23", "原Pixi.js Demo", "core"]
 			]
 		},
 		{
 			"prefix": "IDE",
 			"tr_zhCN": "IDE",
 			"manifest": [
-				["Project", "显示IDE创建的界面", "本例GUI由LayaAir IDE组装，使用", "core,webgl,ui,UI code"]
+				["Project", "显示IDE创建的界面", "本例GUI由LayaAir IDE组装，使用", "core,ui,UI code"]
 			]
 		}],
 		"3d": [
@@ -249,42 +249,42 @@
 			"prefix": "Resource",
       "tr_zhCN": "Resource",
       "manifest": [
-				[ "LoadResourceDemo", "资源加载", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				[ "GarbageCollection", "释放显存", "", "core,webgl,ani,ui,d3" ]
+				[ "LoadResourceDemo", "资源加载", "", "core,ani,d3,CameraMoveScript.js" ],
+				[ "GarbageCollection", "释放显存", "", "core,ani,ui,d3,CameraMoveScript.js" ]
       ]
 		},
 		{
 			"prefix": "Scene3D",
 			"tr_zhCN": "Scene3D",
 			"manifest": [
-				[ "SceneLoad1", "场景加载一", "", "core,webgl,ani,d3,physics3D,CameraMoveScript.js" ],
-				[ "SceneLoad2", "场景加载二", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				[ "EnvironmentalReflection", "环境反射", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				[ "LightmapScene", "光照贴图", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
+				[ "SceneLoad1", "场景加载一", "", "core,ani,d3,physics3D,CameraMoveScript.js" ],
+				[ "SceneLoad2", "场景加载二", "", "core,ani,d3,CameraMoveScript.js" ],
+				[ "EnvironmentalReflection", "环境反射", "", "core,ani,d3,CameraMoveScript.js" ],
+				[ "LightmapScene", "光照贴图", "", "core,ani,d3,CameraMoveScript.js" ]
 			]
 		},
 		{
 			"prefix": "Camera",
 			"tr_zhCN": "摄像机",
 			"manifest": [
-				["CameraDemo", "摄像机示例", "", "core,webgl,ani,d3,ui,CameraMoveScript.js"],
-				["CameraLookAt", "摄像机捕捉目标", "", "core,webgl,ani,d3,ui,CameraMoveScript.js"],
-				["MultiCamera", "多照相机", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-				["CameraRay", "创建射线", "", "core,webgl,ani,d3,physics3D,CameraMoveScript.js"],
-				["CameraLayer", "可视遮罩层", "", "core,webgl,ani,d3,ui,CameraMoveScript.js"],
-				["OrthographicCamera", "正交摄像机", "", "core,webgl,ui,ani,d3"],
-				["D3SpaceToD2Space", "3D空间转2D空间", "", "core,webgl,ui,ani,d3"],
-				["RenderTargetCamera", "渲染到纹理", "", "core,webgl,ui,ani,d3,CameraMoveScript.js"]
+				["CameraDemo", "摄像机示例", "", "core,ani,d3,ui,CameraMoveScript.js"],
+				["CameraLookAt", "摄像机捕捉目标", "", "core,ani,d3,ui,CameraMoveScript.js"],
+				["MultiCamera", "多照相机", "", "core,ani,d3,CameraMoveScript.js"],
+				["CameraRay", "创建射线", "", "core,ani,d3,physics3D,CameraMoveScript.js"],
+				["CameraLayer", "可视遮罩层", "", "core,ani,d3,ui,CameraMoveScript.js"],
+				["OrthographicCamera", "正交摄像机", "", "core,ui,ani,d3"],
+				["D3SpaceToD2Space", "3D空间转2D空间", "", "core,ui,ani,d3"],
+				["RenderTargetCamera", "渲染到纹理", "", "core,ui,ani,d3,CameraMoveScript.js"]
 			]
 		},
 		{
 			"prefix": "Lighting",
 			"tr_zhCN": "光照",
 			"manifest": [
-				["DirectionLightDemo", "方向光", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-				["PointLightDemo", "点光", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-				["SpotLightDemo", "聚光", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				["RealTimeShadow", "实时阴影", "", "core,webgl,ani,d3,CameraMoveScript.js" ]
+				["DirectionLightDemo", "方向光", "", "core,ani,d3,CameraMoveScript.js"],
+				["PointLightDemo", "点光", "", "core,ani,d3,CameraMoveScript.js"],
+				["SpotLightDemo", "聚光", "", "core,ani,d3,CameraMoveScript.js" ],
+				["RealTimeShadow", "实时阴影", "", "core,ani,d3,CameraMoveScript.js" ]
 			]
 		},
 
@@ -292,19 +292,19 @@
 			"prefix": "Sprite3D",
 			"tr_zhCN": "3D精灵",
 			"manifest": [
-				["Sprite3DParent", "子父级关系", "", "core,webgl,ani,d3,ui,CameraMoveScript.js"],
-				["TransformDemo", "变换示例", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-				["Sprite3DClone", "克隆精灵", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				["PixelLineSprite3DDemo", "像素线精灵", "", "core,webgl,ani,d3,CameraMoveScript.js,Tool.js" ]
+				["Sprite3DParent", "子父级关系", "", "core,ani,d3,ui,CameraMoveScript.js"],
+				["TransformDemo", "变换示例", "", "core,ani,d3,CameraMoveScript.js"],
+				["Sprite3DClone", "克隆精灵", "", "core,ani,d3,CameraMoveScript.js" ],
+				["PixelLineSprite3DDemo", "像素线精灵", "", "core,ani,d3,CameraMoveScript.js,Tool.js" ]
 			]
 		},
 		{
 			"prefix": "Mesh",
 			"tr_zhCN": "Mesh网格",
 			"manifest": [
-				["MeshLoad", "网格加载", "", "core,webgl,ui,ani,d3,Tool.js"],
-				["CustomMesh", "自定义网格", "", "core,webgl,ui,ani,d3,Tool.js,CameraMoveScript.js" ],
-				["ChangeMesh", "切换网格", "", "core,webgl,ui,ani,d3,physics3D,Tool.js,CameraMoveScript.js" ]
+				["MeshLoad", "网格加载", "", "core,ui,ani,d3,Tool.js"],
+				["CustomMesh", "自定义网格", "", "core,ui,ani,d3,Tool.js,CameraMoveScript.js" ],
+				["ChangeMesh", "切换网格", "", "core,ui,ani,d3,physics3D,Tool.js,CameraMoveScript.js" ]
 			]
 		},
 		
@@ -312,75 +312,75 @@
 			"prefix": "Material",
 			"tr_zhCN": "材质",
 			"manifest": [
-				["MaterialDemo", "材质示例", "", "core,webgl,ani,d3,physics3D" ],
-        ["BlinnPhongMaterialLoad", "BlinnPhong材质加载", "", "core,webgl,ani,d3" ],
-        ["BlinnPhong_DiffuseMap", "BlinnPhong-漫反射贴图", "", "core,webgl,ani,d3" ],
-        ["BlinnPhong_NormalMap", "BlinnPhong-法线贴图", "", "core,webgl,ani,d3" ],
-				["BlinnPhong_SpecularMap", "BlinnPhong-高光贴图", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-				["PBRStandardMaterialDemo", "PBRStandard材质", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				["EffectMaterialDemo", "Effect材质", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				["UnlitMaterialDemo", "Unlit材质", "", "core,webgl,ani,d3,CameraMoveScript.js" ],
-				["WaterPrimaryMaterialDemo", "WaterPrimary材质", "", "core,webgl,ani,d3,physics3D,CameraMoveScript.js" ]
+				["MaterialDemo", "材质示例", "", "core,ani,d3,physics3D,ui,CameraMoveScript.js" ],
+        ["BlinnPhongMaterialLoad", "BlinnPhong材质加载", "", "core,ani,d3" ],
+        ["BlinnPhong_DiffuseMap", "BlinnPhong-漫反射贴图", "", "core,ani,d3" ],
+        ["BlinnPhong_NormalMap", "BlinnPhong-法线贴图", "", "core,ani,d3" ],
+				["BlinnPhong_SpecularMap", "BlinnPhong-高光贴图", "", "core,ani,d3,CameraMoveScript.js"],
+				["PBRStandardMaterialDemo", "PBRStandard材质", "", "core,ani,d3,CameraMoveScript.js" ],
+				["EffectMaterialDemo", "Effect材质", "", "core,ani,d3,CameraMoveScript.js" ],
+				["UnlitMaterialDemo", "Unlit材质", "", "core,ani,d3,CameraMoveScript.js" ],
+				["WaterPrimaryMaterialDemo", "WaterPrimary材质", "", "core,ani,d3,physics3D,CameraMoveScript.js" ]
 			]
 		},
 		{
 			"prefix": "Texture",
 			"tr_zhCN": "纹理",
 			"manifest": [
-				["TextureDemo", "纹理示例", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-				["TextureGPUCompression", "纹理压缩", "", "core,webgl,ani,d3,physics3D,CameraMoveScript.js"]
+				["TextureDemo", "纹理示例", "", "core,ani,d3,CameraMoveScript.js"],
+				["TextureGPUCompression", "纹理压缩", "", "core,ani,d3,physics3D,CameraMoveScript.js"]
 			]
 		},
 		{
 			"prefix": "Animation3D",
 			"tr_zhCN": "动画",
       		"manifest": [
-				["AnimatorDemo", "动画示例", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["AnimationLayerBlend", "动画过渡和混合", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["AnimatorStateScriptDemo", "动画状态脚本", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-        ["BoneLinkSprite3D", "蒙皮动画挂点", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["MaterialAnimation", "材质动画", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["RigidbodyAnimationDemo", "刚体动画", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-        ["CameraAnimation", "摄像机动画", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ]
+				["AnimatorDemo", "动画示例", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["AnimationLayerBlend", "动画过渡和混合", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["AnimatorStateScriptDemo", "动画状态脚本", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+        ["BoneLinkSprite3D", "蒙皮动画挂点", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["MaterialAnimation", "材质动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["RigidbodyAnimationDemo", "刚体动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+        ["CameraAnimation", "摄像机动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ]
       ]
 		},
 		{
 			"prefix": "Physics3D",
 			"tr_zhCN": "物理系统",
       		"manifest": [
-				["PhysicsWorld_BaseCollider", "基础碰撞器", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["PhysicsWorld_BuildingBlocks", "选取物体", "", "core,webgl,ui,ani,d3,physics3D" ],
-				["PhysicsWorld_Character", "角色碰撞器", "", "core,webgl,ui,ani,d3,physics3D" ],
-				["PhysicsWorld_CollisionFiflter", "碰撞器过滤器", "", "core,webgl,ui,ani,d3,physics3D" ],
-				["PhysicsWorld_CompoundCollider", "碰撞器混合", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["PhysicsWorld_ContinueCollisionDetection", "连续碰撞检测", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["PhysicsWorld_Kinematic", "刚体碰撞", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["PhysicsWorld_MeshCollider", "网格碰撞器", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["PhysicsWorld_RayShapeCast", "射线检测", "", "core,webgl,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["PhysicsWorld_TriggerAndCollisionEvent", "触发和碰撞事件", "","core,webgl,ui,ani,d3,CameraMoveScript.js,TriggerCollisionScript.js,physics3D" ]
+				["PhysicsWorld_BaseCollider", "基础碰撞器", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["PhysicsWorld_BuildingBlocks", "选取物体", "", "core,ui,ani,d3,physics3D" ],
+				["PhysicsWorld_Character", "角色碰撞器", "", "core,ui,ani,d3,physics3D" ],
+				["PhysicsWorld_CollisionFiflter", "碰撞器过滤器", "", "core,ui,ani,d3,physics3D" ],
+				["PhysicsWorld_CompoundCollider", "碰撞器混合", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["PhysicsWorld_ContinueCollisionDetection", "连续碰撞检测", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["PhysicsWorld_Kinematic", "刚体碰撞", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["PhysicsWorld_MeshCollider", "网格碰撞器", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["PhysicsWorld_RayShapeCast", "射线检测", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["PhysicsWorld_TriggerAndCollisionEvent", "触发和碰撞事件", "","core,ui,ani,d3,CameraMoveScript.js,TriggerCollisionScript.js,physics3D" ]
       		]
 		},
 		{
 			"prefix": "MouseInteraction",
 			"tr_zhCN": "鼠标交互",
 			"manifest": [
-				["MouseInteraction", "鼠标交互", "", "core,webgl,ani,d3,physics3D,CameraMoveScript.js"],
-				["MultiTouch", "多点触控", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+				["MouseInteraction", "鼠标交互", "", "core,ani,d3,physics3D,CameraMoveScript.js"],
+				["MultiTouch", "多点触控", "", "core,ani,d3,CameraMoveScript.js"]
 			]
 		},
 		{
 			"prefix": "Script",
 			"tr_zhCN": "脚本",
 			"manifest": [
-				["ScriptDemo", "脚本示例", "", "core,webgl,ani,d3,CameraMoveScript.js"]
+				["ScriptDemo", "脚本示例", "", "core,ani,d3,CameraMoveScript.js"]
 			]
 		},
 		{
 			"prefix": "Sky",
 			"tr_zhCN": "天空",
 			"manifest": [
-				["Sky_SkyBox", "天空盒", "", "core,webgl,ani,d3,CameraMoveScript.js"],
-				["Sky_Procedural", "程序化天空", "", "core,webgl,ani,d3,CameraMoveScript.js"]		
+				["Sky_SkyBox", "天空盒", "", "core,ani,d3,CameraMoveScript.js"],
+				["Sky_Procedural", "程序化天空", "", "core,ani,d3,CameraMoveScript.js"]		
 			]
 		},
 	
@@ -388,8 +388,8 @@
 			"prefix": "Particle3D",
 			"tr_zhCN": "粒子系统",
 			"manifest": [
-				[ "Particle_EternalLight", "永恒之光", "", "core,webgl,ani,d3" ],
-				[ "Particle_BurningGround", "燃烧大地", "", "core,webgl,ani,d3" ]
+				[ "Particle_EternalLight", "永恒之光", "", "core,ani,d3" ],
+				[ "Particle_BurningGround", "燃烧大地", "", "core,ani,d3" ]
 			]
 		},
 		
@@ -397,27 +397,27 @@
 			"prefix": "Shader",
 			"tr_zhCN": "自定义Shader",
 			"manifest": [
-				["Shader_Simple", "简单Shader", "", "core,webgl,ani,d3,CameraMoveScript.js,CustomMaterial.js"],
-				["Shader_GlowingEdge", "边缘光照Shader", "", "core,webgl,ani,d3,CustomMaterial.js,CameraMoveScript.js"],
-				["Shader_Terrain", "地形Shader", "", "core,webgl,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js"],
-				["Shader_MultiplePassOutline", "描边Shader（多Pass）", "", "core,webgl,ani,d3,CameraMoveScript.js,MultiplePassOutlineMaterial.js"]
+				["Shader_Simple", "简单Shader", "", "core,ani,d3,CameraMoveScript.js,CustomMaterial.js"],
+				["Shader_GlowingEdge", "边缘光照Shader", "", "core,ani,d3,CustomMaterial.js,CameraMoveScript.js"],
+				["Shader_Terrain", "地形Shader", "", "core,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js"],
+				["Shader_MultiplePassOutline", "描边Shader（多Pass）", "", "core,ani,d3,CameraMoveScript.js,MultiplePassOutlineMaterial.js"]
 			]
 		},
     {
 			"prefix": "Advance",
 			"tr_zhCN": "高级应用",
 			"manifest": [
-				[ "Laya3DCombineHtml", "Laya3D与网页混合", "", "core,webgl,ani,d3" ],
-				[ "AStarFindPath", "寻路导航", "", "core,webgl,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
-				[ "Scene2DPlayer3D", "2D场景加3D人物", "", "core,webgl,ani,d3,ui,CameraMoveScript.js" ],
-				[ "Secne3DPlayer2D", "3D场景加2D人物", "", "core,webgl,ani,d3,ui,CameraMoveScript.js,physics3D" ]
+				[ "Laya3DCombineHtml", "Laya3D与网页混合", "", "core,ani,d3" ],
+				[ "AStarFindPath", "寻路导航", "", "core,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
+				[ "Scene2DPlayer3D", "2D场景加3D人物", "", "core,ani,d3,ui,CameraMoveScript.js" ],
+				[ "Secne3DPlayer2D", "3D场景加2D人物", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ]
 			]
 		},
 		{
 			"prefix": "Demo",
 			"tr_zhCN": "展示案例",
 			"manifest": [
-				[ "PBRDemo", "基于物理的渲染", "", "core,webgl,ani,d3" ]
+				[ "PBRDemo", "基于物理的渲染", "", "core,ani,d3" ]
 			]
     }
 

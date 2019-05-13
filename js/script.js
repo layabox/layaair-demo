@@ -397,9 +397,6 @@ $(document).ready(function()
 			case "device":
 				libPath = "laya.device.js";
 				break;
-			case "filter":
-				libPath = "laya.filter.js";
-				break;
 			case "html":
 				libPath = "laya.html.js";
 				break;
@@ -429,9 +426,6 @@ $(document).ready(function()
 				break;
 			case "ui":
 				libPath = "laya.ui.js";
-				break;
-			case "webgl":
-				libPath = "laya.webgl.js";
 				break;
 			case "wxmini":
 				libPath = "laya.wxmini.js";
