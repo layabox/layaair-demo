@@ -402,7 +402,13 @@
 					[ "Particle_BurningGround", "BurningGround", "", "core,ani,d3" ]
 				]
 			},
-			
+			{
+				"prefix": "Trail",
+				"tr_zhCN": "拖尾系统",
+				"manifest": [
+					[ "TrailRender", "TrailRender", "", "core,ani,d3,physics3D"]
+				]
+			},
 			{
 				"prefix": "Shader",
 				"tr_zhCN": "Customizeshader",
