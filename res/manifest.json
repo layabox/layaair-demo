@@ -396,7 +396,7 @@
 			"prefix": "Trail",
 			"tr_zhCN": "拖尾系统",
 			"manifest": [
-				[ "TrailRender", "拖尾示例", "", "core,ani,d3,physics3D"]
+				[ "TrailRender", "拖尾示例", "", "core,ani,d3"]
 			]
 		},
 		
