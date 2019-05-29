@@ -53,22 +53,7 @@
 					"anisoLevel":1
 				}
 			},
-			{
-				"name":"normalTexture",
-				"path":"../Textures/granite_1_n.png",
-				"constructParams":[
-					1024,
-					1024,
-					1,
-					true
-				],
-				"propertyParams":{
-					"filterMode":1,
-					"wrapModeU":0,
-					"wrapModeV":0,
-					"anisoLevel":1
-				}
-			},
+			
 			{
 				"name":"occlusionTexture",
 				"path":"../Textures/granite_1_o.png",

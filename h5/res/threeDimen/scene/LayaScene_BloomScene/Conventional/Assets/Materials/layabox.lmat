@@ -16,7 +16,7 @@
 		"enableVertexColor":false,
 		"alphaTest":false,
 		"alphaTestValue":0.01,
-		"renderQueue":3000,
+		"renderQueue":2000,
 		"albedoIntensity":1,
 		"enableLighting":true,
 		"shininess":0.078125,
@@ -59,9 +59,9 @@
 			{
 				"name":"albedoColor",
 				"value":[
-					1,
-					1,
-					1,
+					0.8627451,
+					0.8627451,
+					0.8627451,
 					1
 				]
 			}

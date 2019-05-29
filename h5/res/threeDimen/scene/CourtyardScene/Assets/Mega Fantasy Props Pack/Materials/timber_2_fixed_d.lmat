@@ -54,22 +54,6 @@
 				}
 			},
 			{
-				"name":"normalTexture",
-				"path":"../Textures/timber_2_fixed_n.png",
-				"constructParams":[
-					1024,
-					1024,
-					1,
-					true
-				],
-				"propertyParams":{
-					"filterMode":1,
-					"wrapModeU":0,
-					"wrapModeV":0,
-					"anisoLevel":1
-				}
-			},
-			{
 				"name":"occlusionTexture",
 				"path":"../Textures/timber_2_fixed_o.png",
 				"constructParams":[

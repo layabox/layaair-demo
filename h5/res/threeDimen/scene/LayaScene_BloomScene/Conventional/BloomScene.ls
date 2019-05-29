@@ -37,13 +37,13 @@
 					"layer":0,
 					"position":[
 						0,
-						5,
+						2,
 						-9
 					],
 					"rotation":[
 						0,
-						0.9659258,
-						0.2588191,
+						1,
+						0,
 						0
 					],
 					"scale":[
@@ -1918,26 +1918,7 @@
 						}
 					]
 				},
-				"components":[
-					{
-						"type":"PhysicsCollider",
-						"restitution":0,
-						"friction":0.5,
-						"rollingFriction":0,
-						"shapes":[
-							{
-								"type":"SphereColliderShape",
-								"center":[
-									0,
-									0,
-									0
-								],
-								"radius":0.5
-							}
-						],
-						"isTrigger":false
-					}
-				],
+				"components":[],
 				"child":[]
 			},
 			{
@@ -1972,27 +1953,7 @@
 						}
 					]
 				},
-				"components":[
-					{
-						"type":"PhysicsCollider",
-						"restitution":0,
-						"friction":0.5,
-						"rollingFriction":0,
-						"shapes":[
-							{
-								"type":"CapsuleColliderShape",
-								"center":[
-									0,
-									0,
-									0
-								],
-								"radius":0.5,
-								"height":2
-							}
-						],
-						"isTrigger":false
-					}
-				],
+				"components":[],
 				"child":[]
 			},
 			{
@@ -2027,30 +1988,35 @@
 						}
 					]
 				},
-				"components":[
-					{
-						"type":"PhysicsCollider",
-						"restitution":0,
-						"friction":0.5,
-						"rollingFriction":0,
-						"shapes":[
-							{
-								"type":"BoxColliderShape",
-								"center":[
-									0,
-									0,
-									0
-								],
-								"size":[
-									1,
-									1,
-									1
-								]
-							}
-						],
-						"isTrigger":false
-					}
-				],
+				"components":[],
+				"child":[]
+			},
+			{
+				"type":"Sprite3D",
+				"instanceID":62,
+				"props":{
+					"name":"GameObject",
+					"active":true,
+					"isStatic":false,
+					"layer":8,
+					"position":[
+						-1.372697,
+						3.642537,
+						-1.982886
+					],
+					"rotation":[
+						0,
+						0,
+						0,
+						-1
+					],
+					"scale":[
+						1,
+						1,
+						1
+					]
+				},
+				"components":[],
 				"child":[]
 			}
 		]

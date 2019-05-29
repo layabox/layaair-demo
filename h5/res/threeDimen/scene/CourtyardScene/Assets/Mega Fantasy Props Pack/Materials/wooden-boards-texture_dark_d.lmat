@@ -54,22 +54,6 @@
 				}
 			},
 			{
-				"name":"normalTexture",
-				"path":"../Textures/wooden-boards-texture_n.png",
-				"constructParams":[
-					1024,
-					1024,
-					1,
-					true
-				],
-				"propertyParams":{
-					"filterMode":1,
-					"wrapModeU":0,
-					"wrapModeV":0,
-					"anisoLevel":1
-				}
-			},
-			{
 				"name":"occlusionTexture",
 				"path":"../Textures/wooden-boards-texture_o.png",
 				"constructParams":[
