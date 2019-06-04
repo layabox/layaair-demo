@@ -364,7 +364,7 @@
 			"prefix": "MouseInteraction",
 			"tr_zhCN": "鼠标交互",
 			"manifest": [
-				["MouseInteraction", "鼠标交互", "", "core,ani,d3,physics3D,CameraMoveScript.js,physics3D"],
+				["MouseInteraction", "鼠标交互", "", "core,ani,d3,physics3D,CameraMoveScript.js"],
 				["MultiTouch", "多点触控", "", "core,ani,d3,CameraMoveScript.js,physics3D"]
 			]
 		},

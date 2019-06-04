@@ -375,7 +375,7 @@
 				"tr_zhCN": "MouseInteraction",
 				"manifest": [
 					["MouseInteraction", "MouseInteraction", "", "core,ani,d3,ui,physics3D,CameraMoveScript.js"],
-					["MultiTouch", "MultiTouch", "", "core,ani,d3,CameraMoveScript.js"]
+					["MultiTouch", "MultiTouch", "", "core,ani,d3,CameraMoveScript.js,physics3D"]
 				]
 			},
 			{
