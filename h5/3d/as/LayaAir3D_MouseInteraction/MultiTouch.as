@@ -55,7 +55,7 @@ package LayaAir3D_MouseInteraction {
 			camera.transform.lookAt(monkey.transform.position, new Vector3(0, 1, 0));
 			
 			//设置文本显示框位置
-			text.x = Laya.stage.width / 2 - 50;
+			text.y = 50;
 			text.text = "触控点归零";
 			//显示文本显示框
 			text.name = "ceshi";
@@ -64,8 +64,20 @@ package LayaAir3D_MouseInteraction {
 			text.font = "Impact";
 			text.fontSize = 20;
 			text.borderColor = "#FFFF00";
-			text.x = Laya.stage.width / 2;
+			text.x = Laya.stage.width / 2 - 100;
 			Laya.stage.addChild(text);
+			//设置操作提示框
+			var infoText:Text = new Text();
+			infoText.x = Laya.stage.width / 2 - 100;
+			infoText.text = "单指旋转，双指缩放";
+			//显示文本显示框
+			infoText.name = "ceshi";
+			infoText.overflow = Text.HIDDEN;
+			infoText.color = "#FFFFFF";
+			infoText.font = "Impact";
+			infoText.fontSize = 20;
+			infoText.borderColor = "#FFFF00";
+			Laya.stage.addChild(infoText);
 		}
 	}
 }
@@ -93,6 +105,7 @@ class MonkeyScript extends Script3D {
 	private var first:Boolean = true;
 	private var twoFirst:Boolean = true;
 	private var tmpVector:Vector3 = new Vector3(0, 0, 0);
+	private var sprite3DSacle:Vector3 = 1.0;
 	
 	override public function onAwake():void {
 	}
@@ -116,15 +129,15 @@ class MonkeyScript extends Script3D {
 			//是否为新一次触碰，并未发生移动
 			if (first) {
 				//获取触碰点的位置
-				lastPosition.x = touch._position.x;
-				lastPosition.y = touch._position.y;
+				lastPosition.x = touch.position.x;
+				lastPosition.y = touch.position.y;
 				first = false;
 			} else {
 				//移动触碰点
-				var deltaY:int = touch._position.y - lastPosition.y;
-				var deltaX:int = touch._position.x - lastPosition.x;
-				lastPosition.x = touch._position.x;
-				lastPosition.y = touch._position.y;
+				var deltaY:int = touch.position.y - lastPosition.y;
+				var deltaX:int = touch.position.x - lastPosition.x;
+				lastPosition.x = touch.position.x;
+				lastPosition.y = touch.position.y;
 				//根据移动的距离进行旋转
 				tmpVector.setValue(1 * deltaY / 2, 1 * deltaX / 2, 0);
 				(owner as Sprite3D).transform.rotate(tmpVector, true, false);
@@ -141,14 +154,18 @@ class MonkeyScript extends Script3D {
 				disVector1.x = touch.position.x - touch2.position.x;
 				disVector1.y = touch.position.y - touch2.position.y;
 				distance = Vector2.scalarLength(disVector1);
+				sprite3DSacle = (owner as Sprite3D).transform.scale;
 				twoFirst = false;
 			} else {
 				disVector2.x = touch.position.x - touch2.position.x;
 				disVector2.y = touch.position.y - touch2.position.y;
-				var distance2:Number = Vector2.scalarLength(disVector2);
+				var distance2:Number = Vector2.scalarLength(disVector2); 
 				//根据移动的距离进行缩放
-				tmpVector.setValue(0, 0, -0.01 * (distance2 - distance));
-				_camera.transform.translate(tmpVector);
+				var factor:Number =  0.001 * (distance2 - distance);
+				sprite3DSacle.x += factor;
+				sprite3DSacle.y += factor;
+				sprite3DSacle.z += factor;
+				(owner as Sprite3D).transform.scale = sprite3DSacle;
 				distance = distance2;
 			}
 		} else if (0 === touchCount) {
