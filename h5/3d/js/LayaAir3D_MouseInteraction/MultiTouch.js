@@ -38,18 +38,28 @@ class MultiTouch{
 			
 		//显示文本显示框
 		this.text = new Laya.Text();
-		this.text.x = Laya.stage.width / 2 -50 ;
+		this.text.y = 50;
+		this.text.name = "ceshi";
+		this.text.x = Laya.stage.width / 2 -100 ;
 		this.text.text = "触控点归零";
 		//显示文本显示框
-		this.text = new Laya.Text();
-		this.text.name = "ceshi";
 		this.text.overflow = Laya.Text.HIDDEN;
 		this.text.color = "#FFFFFF";
 		this.text.font = "Impact";
 		this.text.fontSize = 20;
 		this.text.borderColor = "#FFFF00";
-		this.text.x = Laya.stage.width / 2;
 		Laya.stage.addChild(this.text);
+
+		//设置操作提示框
+		this.infoText = new Laya.Text();
+		this.infoText.x = Laya.stage.width / 2 - 100;
+		this.infoText.text = "单指旋转，双指缩放";
+		this.infoText.overflow = Laya.Text.HIDDEN;
+		this.infoText.color = "#FFFFFF";
+		this.infoText.font = "Impact";
+		this.infoText.fontSize = 20;
+		this.infoText.borderColor = "#FFFF00";
+		Laya.stage.addChild(this.infoText);
 }
 
 }
@@ -70,6 +80,7 @@ class MonkeyScript extends Laya.Script3D{
 		this.twoFirst = true;
 		this.rotate = new Laya.Vector3(0,0,0);
 		this.translate = new Laya.Vector3(0,0,0);
+		this.sprite3DSacle = new Laya.Vector3(0,0,0);
 	}
 	onStart(){
 		this.scene =  this.owner.parent;
@@ -116,6 +127,7 @@ class MonkeyScript extends Laya.Script3D{
 				this.disVector1.x = touch.position.x - touch2.position.x;
 				this.disVector1.y = touch.position.y - touch2.position.y;
 				this.distance = Laya.Vector2.scalarLength(this.disVector1);
+				this.sprite3DSacle = this.owner.transform.scale;
 				this.twoFirst = false;
 			}
 			else{
@@ -123,8 +135,11 @@ class MonkeyScript extends Laya.Script3D{
 				this.disVector2.y = touch.position.y - touch2.position.y;
 				let distance2 = Laya.Vector2.scalarLength(this.disVector2);
 				//根据移动的距离进行缩放
-				this.translate.setValue(0, 0, -0.01 * (distance2 - this.distance));
-				this.camera.transform.translate(this.translate);
+				let factor =  0.001 * (distance2 - this.distance);
+				this.sprite3DSacle.x += factor;
+				this.sprite3DSacle.y += factor;
+				this.sprite3DSacle.z += factor;
+				this.owner.transform.scale = this.sprite3DSacle;
 				this.distance = distance2;
 			}	
 		}
