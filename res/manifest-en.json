@@ -283,7 +283,8 @@
 					["CameraLayer", "CameraLayer", "", "core,ani,d3,ui,CameraMoveScript.js"],
 					["OrthographicCamera", "OrthographicCamera", "", "core,ui,ani,d3"],
 					["D3SpaceToD2Space", "D3SpaceToD2Space", "", "core,ui,ani,d3"],
-					["RenderTargetCamera", "RenderTargetCamera", "", "core,ui,ani,d3,ui,CameraMoveScript.js"]
+					["RenderTargetCamera", "RenderTargetCamera", "", "core,ui,ani,d3,ui,CameraMoveScript.js"],
+					["PickPixel", "PickPixel", "", "core,ui,ani,d3,CameraMoveScript.js"]
 				]
 			},
 			{
@@ -389,8 +390,8 @@
 				"prefix": "Sky",
 				"tr_zhCN": "Sky",
 				"manifest": [
-					["Sky_SkyBox", "SkyBox", "", "core,ani,d3,CameraMoveScript.js,physics3D"],
-					["Sky_Procedural", "Sky_Procedural", "", "core,ani,d3,CameraMoveScript.js,physics3D"]		
+					["Sky_SkyBox", "SkyBox", "", "core,ani,d3,CameraMoveScript.js"],
+					["Sky_Procedural", "Sky_Procedural", "", "core,ani,d3,CameraMoveScript.js"]		
 				]
 			},
 		
@@ -427,7 +428,8 @@
 					["AStarFindPath", "AStarFindPath", "", "core,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
 					["PBRDemo", "PBRDemo", "", "core,ani,d3,CameraMoveScript.js" ],
 					["Scene2DPlayer3D", "Scene2DPlayer3D", "", "core,ani,d3,ui,CameraMoveScript.js" ],
-					["Secne3DPlayer2D", "Secne3DPlayer2D", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ]
+					["Secne3DPlayer2D", "Secne3DPlayer2D", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
+					[ "PostProcessBloom", "PostProcessBloom", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ]
 		  		]
 			},
 			{

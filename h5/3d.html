@@ -34,8 +34,8 @@
     <script src="3d/js/common/VRCameraMoveScript.js"></script>
     <script src="3d/js/common/Tool.js"></script>
     <script src="3d/js/common/TriggerCollisionScript.js"></script>
-    <script src="3d/js/shaderModule/customMaterials/CustomMaterial.js"></script>
-    <script src="3d/js/shaderModule/customMaterials/CustomTerrainMaterial.js"></script>
+    <script src="3d/js/LayaAir3D_Shader/customMaterials/CustomMaterial.js"></script>
+    <script src="3d/js/LayaAir3D_Shader/customMaterials/CustomTerrainMaterial.js"></script>
     <script src="3d/js/LayaAir3D_Shader/customMaterials/MultiplePassOutlineMaterial.js"></script>
     <script src='res/threeDimen/pbrlut.js' loader='laya'></script>
 
@@ -44,7 +44,8 @@
     <div style="position: absolute; left: 150px; top: 0px; z-index: 999999">
         <span style="color:#ff0000">左右箭头键切换</span>
         <select id="select" onChange="selectChanged()">
-
+			<option>3d/js/LayaAir3D_MouseInteraction/MultiTouch</option>
+			<option>3d/js/LayaAir3D_Advance/PostProcessBloom</option>
             <option>3d/js/advancedModule/Laya3DCombineHtml</option>
 			<option>3d/js/advancedModule/GarbageCollection</option>
             <option>3d/js/advancedModule/RealTimeShadow</option>

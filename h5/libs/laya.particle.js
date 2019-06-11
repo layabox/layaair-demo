@@ -3,190 +3,12 @@
 	var __un=Laya.un,__uns=Laya.uns,__static=Laya.static,__class=Laya.class,__getset=Laya.getset,__newvec=Laya.__newvec;
 
 	var BlendMode=laya.webgl.canvas.BlendMode,Buffer=laya.webgl.utils.Buffer,Context=laya.resource.Context;
-	var DrawParticleCmd=laya.display.cmd.DrawParticleCmd,Handler=laya.utils.Handler,Loader=laya.net.Loader,MathUtil=laya.maths.MathUtil;
-	var MeshParticle2D=laya.webgl.utils.MeshParticle2D,Render=laya.renders.Render,RenderState2D=laya.webgl.utils.RenderState2D;
-	var Shader=laya.webgl.shader.Shader,ShaderValue=laya.webgl.shader.ShaderValue,Sprite=laya.display.Sprite;
-	var Stat=laya.utils.Stat,Texture=laya.resource.Texture,Value2D=laya.webgl.shader.d2.value.Value2D,VertexBuffer2D=laya.webgl.utils.VertexBuffer2D;
-	var WebGL=laya.webgl.WebGL,WebGLContext=laya.webgl.WebGLContext;
-/**
-*
-*<code>ParticleTemplateBase</code> 类是粒子模板基类
-*
-*/
-//class laya.particle.ParticleTemplateBase
-var ParticleTemplateBase=(function(){
-	function ParticleTemplateBase(){
-		/**
-		*粒子配置数据
-		*/
-		this.settings=null;
-		/**
-		*粒子贴图
-		*/
-		this.texture=null;
-	}
-
-	__class(ParticleTemplateBase,'laya.particle.ParticleTemplateBase');
-	var __proto=ParticleTemplateBase.prototype;
-	/**
-	*添加一个粒子
-	*@param position 粒子位置
-	*@param velocity 粒子速度
-	*
-	*/
-	__proto.addParticleArray=function(position,velocity){}
-	return ParticleTemplateBase;
-})()
-
-
-/**
-*<code>EmitterBase</code> 类是粒子发射器类
-*/
-//class laya.particle.emitter.EmitterBase
-var EmitterBase=(function(){
-	function EmitterBase(){
-		/**
-		*积累的帧时间
-		*/
-		this._frameTime=0;
-		/**
-		*粒子发射速率
-		*/
-		this._emissionRate=60;
-		/**
-		*当前剩余发射时间
-		*/
-		this._emissionTime=0;
-		/**
-		*发射粒子最小时间间隔
-		*/
-		this.minEmissionTime=1 / 60;
-		/**@private */
-		this._particleTemplate=null;
-	}
-
-	__class(EmitterBase,'laya.particle.emitter.EmitterBase');
-	var __proto=EmitterBase.prototype;
-	/**
-	*开始发射粒子
-	*@param duration 发射持续的时间(秒)
-	*/
-	__proto.start=function(duration){
-		(duration===void 0)&& (duration=Number.MAX_VALUE);
-		if (this._emissionRate !=0)
-			this._emissionTime=duration;
-	}
-
-	/**
-	*停止发射粒子
-	*@param clearParticles 是否清理当前的粒子
-	*/
-	__proto.stop=function(){
-		this._emissionTime=0;
-	}
-
-	/**
-	*清理当前的活跃粒子
-	*@param clearTexture 是否清理贴图数据,若清除贴图数据将无法再播放
-	*/
-	__proto.clear=function(){
-		this._emissionTime=0;
-	}
-
-	/**
-	*发射一个粒子
-	*
-	*/
-	__proto.emit=function(){}
-	/**
-	*时钟前进
-	*@param passedTime 前进时间
-	*
-	*/
-	__proto.advanceTime=function(passedTime){
-		(passedTime===void 0)&& (passedTime=1);
-		this._emissionTime-=passedTime;
-		if (this._emissionTime < 0)return;
-		this._frameTime+=passedTime;
-		if (this._frameTime < this.minEmissionTime)return;
-		while (this._frameTime > this.minEmissionTime){
-			this._frameTime-=this.minEmissionTime;
-			this.emit();
-		}
-	}
-
-	/**
-	*设置粒子粒子模板
-	*@param particleTemplate 粒子模板
-	*
-	*/
-	__getset(0,__proto,'particleTemplate',null,function(particleTemplate){
-		this._particleTemplate=particleTemplate;
-	});
-
-	/**
-	*设置粒子发射速率
-	*@param emissionRate 粒子发射速率 (个/秒)
-	*/
-	/**
-	*获取粒子发射速率
-	*@return 发射速率 粒子发射速率 (个/秒)
-	*/
-	__getset(0,__proto,'emissionRate',function(){
-		return this._emissionRate;
-		},function(_emissionRate){
-		if (_emissionRate <=0)return;
-		this._emissionRate=_emissionRate;
-		(_emissionRate > 0)&& (this.minEmissionTime=1 / _emissionRate);
-	});
-
-	return EmitterBase;
-})()
-
-
-/**
-*@private
-*/
-//class laya.particle.ParticleEmitter
-var ParticleEmitter=(function(){
-	function ParticleEmitter(templet,particlesPerSecond,initialPosition){
-		this._templet=null;
-		this._timeBetweenParticles=NaN;
-		this._previousPosition=null;
-		this._timeLeftOver=0;
-		this._tempVelocity=new Float32Array([0,0,0]);
-		this._tempPosition=new Float32Array([0,0,0]);
-		this._templet=templet;
-		this._timeBetweenParticles=1.0 / particlesPerSecond;
-		this._previousPosition=initialPosition;
-	}
-
-	__class(ParticleEmitter,'laya.particle.ParticleEmitter');
-	var __proto=ParticleEmitter.prototype;
-	__proto.update=function(elapsedTime,newPosition){
-		elapsedTime=elapsedTime / 1000;
-		if (elapsedTime > 0){
-			MathUtil.subtractVector3(newPosition,this._previousPosition,this._tempVelocity);
-			MathUtil.scaleVector3(this._tempVelocity,1 / elapsedTime,this._tempVelocity);
-			var timeToSpend=this._timeLeftOver+elapsedTime;
-			var currentTime=-this._timeLeftOver;
-			while (timeToSpend > this._timeBetweenParticles){
-				currentTime+=this._timeBetweenParticles;
-				timeToSpend-=this._timeBetweenParticles;
-				MathUtil.lerpVector3(this._previousPosition,newPosition,currentTime / elapsedTime,this._tempPosition);
-				this._templet.addParticleArray(this._tempPosition,this._tempVelocity);
-			}
-			this._timeLeftOver=timeToSpend;
-		}
-		this._previousPosition[0]=newPosition[0];
-		this._previousPosition[1]=newPosition[1];
-		this._previousPosition[2]=newPosition[2];
-	}
-
-	return ParticleEmitter;
-})()
-
-
+	var DrawParticleCmd=laya.display.cmd.DrawParticleCmd,Graphics=laya.display.Graphics,Handler=laya.utils.Handler;
+	var Loader=laya.net.Loader,MathUtil=laya.maths.MathUtil,MeshParticle2D=laya.webgl.utils.MeshParticle2D,Render=laya.renders.Render;
+	var RenderSprite=laya.renders.RenderSprite,RenderState2D=laya.webgl.utils.RenderState2D,Shader=laya.webgl.shader.Shader;
+	var ShaderValue=laya.webgl.shader.ShaderValue,Sprite=laya.display.Sprite,Stat=laya.utils.Stat,Texture=laya.resource.Texture;
+	var Value2D=laya.webgl.shader.d2.value.Value2D,VertexBuffer2D=laya.webgl.utils.VertexBuffer2D,WebGL=laya.webgl.WebGL;
+	var WebGLContext=laya.webgl.WebGLContext;
 /**
 *<code>ParticleSettings</code> 类是粒子配置数据类
 */
@@ -396,6 +218,185 @@ var ParticleData=(function(){
 /**
 *@private
 */
+//class laya.particle.ParticleEmitter
+var ParticleEmitter=(function(){
+	function ParticleEmitter(templet,particlesPerSecond,initialPosition){
+		this._templet=null;
+		this._timeBetweenParticles=NaN;
+		this._previousPosition=null;
+		this._timeLeftOver=0;
+		this._tempVelocity=new Float32Array([0,0,0]);
+		this._tempPosition=new Float32Array([0,0,0]);
+		this._templet=templet;
+		this._timeBetweenParticles=1.0 / particlesPerSecond;
+		this._previousPosition=initialPosition;
+	}
+
+	__class(ParticleEmitter,'laya.particle.ParticleEmitter');
+	var __proto=ParticleEmitter.prototype;
+	__proto.update=function(elapsedTime,newPosition){
+		elapsedTime=elapsedTime / 1000;
+		if (elapsedTime > 0){
+			MathUtil.subtractVector3(newPosition,this._previousPosition,this._tempVelocity);
+			MathUtil.scaleVector3(this._tempVelocity,1 / elapsedTime,this._tempVelocity);
+			var timeToSpend=this._timeLeftOver+elapsedTime;
+			var currentTime=-this._timeLeftOver;
+			while (timeToSpend > this._timeBetweenParticles){
+				currentTime+=this._timeBetweenParticles;
+				timeToSpend-=this._timeBetweenParticles;
+				MathUtil.lerpVector3(this._previousPosition,newPosition,currentTime / elapsedTime,this._tempPosition);
+				this._templet.addParticleArray(this._tempPosition,this._tempVelocity);
+			}
+			this._timeLeftOver=timeToSpend;
+		}
+		this._previousPosition[0]=newPosition[0];
+		this._previousPosition[1]=newPosition[1];
+		this._previousPosition[2]=newPosition[2];
+	}
+
+	return ParticleEmitter;
+})()
+
+
+/**
+*<code>EmitterBase</code> 类是粒子发射器类
+*/
+//class laya.particle.emitter.EmitterBase
+var EmitterBase=(function(){
+	function EmitterBase(){
+		/**
+		*积累的帧时间
+		*/
+		this._frameTime=0;
+		/**
+		*粒子发射速率
+		*/
+		this._emissionRate=60;
+		/**
+		*当前剩余发射时间
+		*/
+		this._emissionTime=0;
+		/**
+		*发射粒子最小时间间隔
+		*/
+		this.minEmissionTime=1 / 60;
+		/**@private */
+		this._particleTemplate=null;
+	}
+
+	__class(EmitterBase,'laya.particle.emitter.EmitterBase');
+	var __proto=EmitterBase.prototype;
+	/**
+	*开始发射粒子
+	*@param duration 发射持续的时间(秒)
+	*/
+	__proto.start=function(duration){
+		(duration===void 0)&& (duration=Number.MAX_VALUE);
+		if (this._emissionRate !=0)
+			this._emissionTime=duration;
+	}
+
+	/**
+	*停止发射粒子
+	*@param clearParticles 是否清理当前的粒子
+	*/
+	__proto.stop=function(){
+		this._emissionTime=0;
+	}
+
+	/**
+	*清理当前的活跃粒子
+	*@param clearTexture 是否清理贴图数据,若清除贴图数据将无法再播放
+	*/
+	__proto.clear=function(){
+		this._emissionTime=0;
+	}
+
+	/**
+	*发射一个粒子
+	*
+	*/
+	__proto.emit=function(){}
+	/**
+	*时钟前进
+	*@param passedTime 前进时间
+	*
+	*/
+	__proto.advanceTime=function(passedTime){
+		(passedTime===void 0)&& (passedTime=1);
+		this._emissionTime-=passedTime;
+		if (this._emissionTime < 0)return;
+		this._frameTime+=passedTime;
+		if (this._frameTime < this.minEmissionTime)return;
+		while (this._frameTime > this.minEmissionTime){
+			this._frameTime-=this.minEmissionTime;
+			this.emit();
+		}
+	}
+
+	/**
+	*设置粒子粒子模板
+	*@param particleTemplate 粒子模板
+	*
+	*/
+	__getset(0,__proto,'particleTemplate',null,function(particleTemplate){
+		this._particleTemplate=particleTemplate;
+	});
+
+	/**
+	*设置粒子发射速率
+	*@param emissionRate 粒子发射速率 (个/秒)
+	*/
+	/**
+	*获取粒子发射速率
+	*@return 发射速率 粒子发射速率 (个/秒)
+	*/
+	__getset(0,__proto,'emissionRate',function(){
+		return this._emissionRate;
+		},function(_emissionRate){
+		if (_emissionRate <=0)return;
+		this._emissionRate=_emissionRate;
+		(_emissionRate > 0)&& (this.minEmissionTime=1 / _emissionRate);
+	});
+
+	return EmitterBase;
+})()
+
+
+/**
+*
+*<code>ParticleTemplateBase</code> 类是粒子模板基类
+*
+*/
+//class laya.particle.ParticleTemplateBase
+var ParticleTemplateBase=(function(){
+	function ParticleTemplateBase(){
+		/**
+		*粒子配置数据
+		*/
+		this.settings=null;
+		/**
+		*粒子贴图
+		*/
+		this.texture=null;
+	}
+
+	__class(ParticleTemplateBase,'laya.particle.ParticleTemplateBase');
+	var __proto=ParticleTemplateBase.prototype;
+	/**
+	*添加一个粒子
+	*@param position 粒子位置
+	*@param velocity 粒子速度
+	*
+	*/
+	__proto.addParticleArray=function(position,velocity){}
+	return ParticleTemplateBase;
+})()
+
+
+/**
+*@private
+*/
 //class laya.particle.shader.value.ParticleShaderValue extends laya.webgl.shader.d2.value.Value2D
 var ParticleShaderValue=(function(_super){
 	function ParticleShaderValue(){
@@ -439,6 +440,81 @@ var ParticleShaderValue=(function(_super){
 	]);
 	return ParticleShaderValue;
 })(Value2D)
+
+
+/**
+*
+*@private
+*/
+//class laya.particle.emitter.Emitter2D extends laya.particle.emitter.EmitterBase
+var Emitter2D=(function(_super){
+	function Emitter2D(_template){
+		this.setting=null;
+		this._posRange=null;
+		this._canvasTemplate=null;
+		this._emitFun=null;
+		Emitter2D.__super.call(this);
+		this.template=_template;
+	}
+
+	__class(Emitter2D,'laya.particle.emitter.Emitter2D',_super);
+	var __proto=Emitter2D.prototype;
+	__proto.emit=function(){
+		_super.prototype.emit.call(this);
+		if(this._emitFun!=null)
+			this._emitFun();
+	}
+
+	__proto.getRandom=function(value){
+		return (Math.random()*2-1)*value;
+	}
+
+	__proto.webGLEmit=function(){
+		var pos=new Float32Array(3);
+		pos[0]=this.getRandom(this._posRange[0]);
+		pos[1]=this.getRandom(this._posRange[1]);
+		pos[2]=this.getRandom(this._posRange[2]);
+		var v=new Float32Array(3);
+		v[0]=0;
+		v[1]=0;
+		v[2]=0;
+		this._particleTemplate.addParticleArray(pos,v);
+	}
+
+	__proto.canvasEmit=function(){
+		var pos=new Float32Array(3);
+		pos[0]=this.getRandom(this._posRange[0]);
+		pos[1]=this.getRandom(this._posRange[1]);
+		pos[2]=this.getRandom(this._posRange[2]);
+		var v=new Float32Array(3);
+		v[0]=0;
+		v[1]=0;
+		v[2]=0;
+		this._particleTemplate.addParticleArray(pos,v);
+	}
+
+	__getset(0,__proto,'template',function(){
+		return this._particleTemplate;
+		},function(template){
+		this._particleTemplate=template;
+		if (!template){
+			this._emitFun=null;
+			this.setting=null;
+			this._posRange=null;
+		};
+		this.setting=template.settings;
+		this._posRange=this.setting.positionVariance;
+		if((this._particleTemplate instanceof laya.particle.ParticleTemplate2D )){
+			this._emitFun=this.webGLEmit;
+		}else
+		if(Laya.__typeof(this._particleTemplate,laya.particle.ParticleTemplateCanvas)){
+			this._canvasTemplate=template;
+			this._emitFun=this.canvasEmit;
+		}
+	});
+
+	return Emitter2D;
+})(EmitterBase)
 
 
 /**
@@ -581,77 +657,6 @@ var ParticleTemplateWebGL=(function(_super){
 
 
 /**
-*
-*@private
-*/
-//class laya.particle.emitter.Emitter2D extends laya.particle.emitter.EmitterBase
-var Emitter2D=(function(_super){
-	function Emitter2D(_template){
-		this.setting=null;
-		this._posRange=null;
-		this._canvasTemplate=null;
-		this._emitFun=null;
-		Emitter2D.__super.call(this);
-		this.template=_template;
-	}
-
-	__class(Emitter2D,'laya.particle.emitter.Emitter2D',_super);
-	var __proto=Emitter2D.prototype;
-	__proto.emit=function(){
-		_super.prototype.emit.call(this);
-		if(this._emitFun!=null)
-			this._emitFun();
-	}
-
-	__proto.getRandom=function(value){
-		return (Math.random()*2-1)*value;
-	}
-
-	__proto.webGLEmit=function(){
-		var pos=new Float32Array(3);
-		pos[0]=this.getRandom(this._posRange[0]);
-		pos[1]=this.getRandom(this._posRange[1]);
-		pos[2]=this.getRandom(this._posRange[2]);
-		var v=new Float32Array(3);
-		v[0]=0;
-		v[1]=0;
-		v[2]=0;
-		this._particleTemplate.addParticleArray(pos,v);
-	}
-
-	__proto.canvasEmit=function(){
-		var pos=new Float32Array(3);
-		pos[0]=this.getRandom(this._posRange[0]);
-		pos[1]=this.getRandom(this._posRange[1]);
-		pos[2]=this.getRandom(this._posRange[2]);
-		var v=new Float32Array(3);
-		v[0]=0;
-		v[1]=0;
-		v[2]=0;
-		this._particleTemplate.addParticleArray(pos,v);
-	}
-
-	__getset(0,__proto,'template',function(){
-		return this._particleTemplate;
-		},function(template){
-		this._particleTemplate=template;
-		if (!template){
-			this._emitFun=null;
-			this.setting=null;
-			this._posRange=null;
-		};
-		this.setting=template.settings;
-		this._posRange=this.setting.positionVariance;
-		if((this._particleTemplate instanceof laya.particle.ParticleTemplate2D )){
-			this._emitFun=this.webGLEmit;
-		}
-	});
-
-	return Emitter2D;
-})(EmitterBase)
-
-
-/**
 *@private
 */
 //class laya.particle.ParticleTemplate2D extends laya.particle.ParticleTemplateWebGL
@@ -733,17 +738,17 @@ var ParticleTemplate2D=(function(_super){
 			}
 			this.blend();
 			if (this._firstActiveElement !=this._firstFreeElement){
-				var gl=WebGL.mainContext;
+				var gl=WebGLContext.mainContext;
 				this._mesh.useMesh(gl);
 				this.sv.u_texture=this.texture._getSource();
 				this.sv.upload();
 				if (this._firstActiveElement < this._firstFreeElement){
-					WebGL.mainContext.drawElements(/*laya.webgl.WebGLContext.TRIANGLES*/0x0004,(this._firstFreeElement-this._firstActiveElement)*6,/*laya.webgl.WebGLContext.UNSIGNED_SHORT*/0x1403,this._firstActiveElement *6 *2);
+					WebGLContext.mainContext.drawElements(/*laya.webgl.WebGLContext.TRIANGLES*/0x0004,(this._firstFreeElement-this._firstActiveElement)*6,/*laya.webgl.WebGLContext.UNSIGNED_SHORT*/0x1403,this._firstActiveElement *6 *2);
 				}
 				else{
-					WebGL.mainContext.drawElements(/*laya.webgl.WebGLContext.TRIANGLES*/0x0004,(this.settings.maxPartices-this._firstActiveElement)*6,/*laya.webgl.WebGLContext.UNSIGNED_SHORT*/0x1403,this._firstActiveElement *6 *2);
+					WebGLContext.mainContext.drawElements(/*laya.webgl.WebGLContext.TRIANGLES*/0x0004,(this.settings.maxPartices-this._firstActiveElement)*6,/*laya.webgl.WebGLContext.UNSIGNED_SHORT*/0x1403,this._firstActiveElement *6 *2);
 					if (this._firstFreeElement > 0)
-						WebGL.mainContext.drawElements(/*laya.webgl.WebGLContext.TRIANGLES*/0x0004,this._firstFreeElement *6,/*laya.webgl.WebGLContext.UNSIGNED_SHORT*/0x1403,0);
+						WebGLContext.mainContext.drawElements(/*laya.webgl.WebGLContext.TRIANGLES*/0x0004,this._firstFreeElement *6,/*laya.webgl.WebGLContext.UNSIGNED_SHORT*/0x1403,0);
 				}
 				Stat.renderBatches++;
 			}
@@ -800,7 +805,7 @@ var ParticleTemplate2D=(function(_super){
 
 	__proto.blend=function(){
 		if (BlendMode.activeBlendFunction!==this._blendFn){
-			var gl=WebGL.mainContext;
+			var gl=WebGLContext.mainContext;
 			gl.enable(/*laya.webgl.WebGLContext.BLEND*/0x0BE2);
 			this._blendFn(gl);
 			BlendMode.activeBlendFunction=this._blendFn;
@@ -825,6 +830,8 @@ var Particle2D=(function(_super){
 	function Particle2D(setting){
 		/**@private */
 		this._particleTemplate=null;
+		/**@private */
+		this._canvasTemplate=null;
 		/**@private */
 		this._emitter=null;
 		/**是否自动播放*/
@@ -892,6 +899,9 @@ var Particle2D=(function(_super){
 	*/
 	__proto.advanceTime=function(passedTime){
 		(passedTime===void 0)&& (passedTime=1);
+		if (this._canvasTemplate){
+			this._canvasTemplate.advanceTime(passedTime);
+		}
 		if (this._emitter){
 			this._emitter.advanceTime(passedTime);
 		}
@@ -906,6 +916,9 @@ var Particle2D=(function(_super){
 		this._matrix4[13]=context._curMat.ty;
 		var sv=(this._particleTemplate).sv;
 		sv.u_mmat=this._matrix4;
+		if (this._canvasTemplate){
+			this._canvasTemplate.render(context,x,y);
+		}
 	}
 
 	__proto.destroy=function(destroyChild){

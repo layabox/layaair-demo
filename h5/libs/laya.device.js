@@ -6,116 +6,6 @@
 	var Handler=laya.utils.Handler,LayaGL=laya.layagl.LayaGL,Rectangle=laya.maths.Rectangle,Render=laya.renders.Render;
 	var Sprite=laya.display.Sprite,Stage=laya.display.Stage,Texture=laya.resource.Texture,Utils=laya.utils.Utils;
 	var WebGL=laya.webgl.WebGL,WebGLContext=laya.webgl.WebGLContext;
-/**
-*使用前可用<code>supported</code>查看浏览器支持。
-*/
-//class laya.device.geolocation.Geolocation
-var Geolocation=(function(){
-	function Geolocation(){}
-	__class(Geolocation,'laya.device.geolocation.Geolocation');
-	Geolocation.getCurrentPosition=function(onSuccess,onError){
-		Geolocation.navigator.geolocation.getCurrentPosition(function(pos){
-			Geolocation.position.setPosition(pos);
-			onSuccess.runWith(Geolocation.position);
-		},
-		function(error){
-			onError.runWith(error);
-			},{
-			enableHighAccuracy :laya.device.geolocation.Geolocation.enableHighAccuracy,
-			timeout :laya.device.geolocation.Geolocation.timeout,
-			maximumAge :laya.device.geolocation.Geolocation.maximumAge
-		});
-	}
-
-	Geolocation.watchPosition=function(onSuccess,onError){
-		return Geolocation.navigator.geolocation.watchPosition(function(pos){
-			Geolocation.position.setPosition(pos);
-			onSuccess.runWith(Geolocation.position);
-		},
-		function(error){
-			onError.runWith(error);
-			},{
-			enableHighAccuracy :Geolocation.enableHighAccuracy,
-			timeout :Geolocation.timeout,
-			maximumAge :Geolocation.maximumAge
-		});
-	}
-
-	Geolocation.clearWatch=function(id){
-		Geolocation.navigator.geolocation.clearWatch(id);
-	}
-
-	Geolocation.PERMISSION_DENIED=1;
-	Geolocation.POSITION_UNAVAILABLE=2;
-	Geolocation.TIMEOUT=3;
-	Geolocation.enableHighAccuracy=false;
-	Geolocation.maximumAge=0;
-	__static(Geolocation,
-	['navigator',function(){return this.navigator=Browser.window.navigator;},'position',function(){return this.position=new GeolocationInfo();},'supported',function(){return this.supported=!!Geolocation.navigator.geolocation;},'timeout',function(){return this.timeout=1E10;}
-	]);
-	return Geolocation;
-})()
-
-
-/**
-*Media用于捕捉摄像头和麦克风。可以捕捉任意之一，或者同时捕捉两者。<code>getCamera</code>前可以使用<code>supported()</code>检查当前浏览器是否支持。
-*<b>NOTE:</b>
-*<p>目前Media在移动平台只支持Android，不支持IOS。只可在FireFox完整地使用，Chrome测试时无法捕捉视频。</p>
-*/
-//class laya.device.media.Media
-var Media=(function(){
-	function Media(){}
-	__class(Media,'laya.device.media.Media');
-	Media.supported=function(){
-		return !!Browser.window.navigator.getUserMedia;
-	}
-
-	Media.getMedia=function(options,onSuccess,onError){
-		if (Browser.window.navigator.getUserMedia){
-			Browser.window.navigator.getUserMedia(options,function(stream){
-				onSuccess.runWith(Browser.window.URL.createObjectURL(stream));
-				},function(err){
-				onError.runWith(err);
-			});
-		}
-	}
-
-	Media.__init$=function(){
-		/*__JS__ */navigator.getUserMedia=navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;;
-	}
-
-	return Media;
-})()
-
-
-/**
-*加速度x/y/z的单位均为m/s²。
-*在硬件（陀螺仪）不支持的情况下，alpha、beta和gamma值为null。
-*
-*@author Survivor
-*/
-//class laya.device.motion.AccelerationInfo
-var AccelerationInfo=(function(){
-	function AccelerationInfo(){
-		/**
-		*x轴上的加速度值。
-		*/
-		this.x=NaN;
-		/**
-		*y轴上的加速度值。
-		*/
-		this.y=NaN;
-		/**
-		*z轴上的加速度值。
-		*/
-		this.z=NaN;
-	}
-
-	__class(AccelerationInfo,'laya.device.motion.AccelerationInfo');
-	return AccelerationInfo;
-})()
-
-
 //class laya.device.geolocation.GeolocationInfo
 var GeolocationInfo=(function(){
 	function GeolocationInfo(){
@@ -202,6 +92,116 @@ var RotationInfo=(function(){
 
 	__class(RotationInfo,'laya.device.motion.RotationInfo');
 	return RotationInfo;
+})()
+
+
+/**
+*Media用于捕捉摄像头和麦克风。可以捕捉任意之一，或者同时捕捉两者。<code>getCamera</code>前可以使用<code>supported()</code>检查当前浏览器是否支持。
+*<b>NOTE:</b>
+*<p>目前Media在移动平台只支持Android，不支持IOS。只可在FireFox完整地使用，Chrome测试时无法捕捉视频。</p>
+*/
+//class laya.device.media.Media
+var Media=(function(){
+	function Media(){}
+	__class(Media,'laya.device.media.Media');
+	Media.supported=function(){
+		return !!Browser.window.navigator.getUserMedia;
+	}
+
+	Media.getMedia=function(options,onSuccess,onError){
+		if (Browser.window.navigator.getUserMedia){
+			Browser.window.navigator.getUserMedia(options,function(stream){
+				onSuccess.runWith(Browser.window.URL.createObjectURL(stream));
+				},function(err){
+				onError.runWith(err);
+			});
+		}
+	}
+
+	Media.__init$=function(){
+		/*__JS__ */navigator.getUserMedia=navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;;
+	}
+
+	return Media;
+})()
+
+
+/**
+*使用前可用<code>supported</code>查看浏览器支持。
+*/
+//class laya.device.geolocation.Geolocation
+var Geolocation=(function(){
+	function Geolocation(){}
+	__class(Geolocation,'laya.device.geolocation.Geolocation');
+	Geolocation.getCurrentPosition=function(onSuccess,onError){
+		Geolocation.navigator.geolocation.getCurrentPosition(function(pos){
+			Geolocation.position.setPosition(pos);
+			onSuccess.runWith(Geolocation.position);
+		},
+		function(error){
+			onError.runWith(error);
+			},{
+			enableHighAccuracy :laya.device.geolocation.Geolocation.enableHighAccuracy,
+			timeout :laya.device.geolocation.Geolocation.timeout,
+			maximumAge :laya.device.geolocation.Geolocation.maximumAge
+		});
+	}
+
+	Geolocation.watchPosition=function(onSuccess,onError){
+		return Geolocation.navigator.geolocation.watchPosition(function(pos){
+			Geolocation.position.setPosition(pos);
+			onSuccess.runWith(Geolocation.position);
+		},
+		function(error){
+			onError.runWith(error);
+			},{
+			enableHighAccuracy :Geolocation.enableHighAccuracy,
+			timeout :Geolocation.timeout,
+			maximumAge :Geolocation.maximumAge
+		});
+	}
+
+	Geolocation.clearWatch=function(id){
+		Geolocation.navigator.geolocation.clearWatch(id);
+	}
+
+	Geolocation.PERMISSION_DENIED=1;
+	Geolocation.POSITION_UNAVAILABLE=2;
+	Geolocation.TIMEOUT=3;
+	Geolocation.enableHighAccuracy=false;
+	Geolocation.maximumAge=0;
+	__static(Geolocation,
+	['navigator',function(){return this.navigator=Browser.window.navigator;},'position',function(){return this.position=new GeolocationInfo();},'supported',function(){return this.supported=!!Geolocation.navigator.geolocation;},'timeout',function(){return this.timeout=1E10;}
+	]);
+	return Geolocation;
+})()
+
+
+/**
+*加速度x/y/z的单位均为m/s²。
+*在硬件（陀螺仪）不支持的情况下，alpha、beta和gamma值为null。
+*
+*@author Survivor
+*/
+//class laya.device.motion.AccelerationInfo
+var AccelerationInfo=(function(){
+	function AccelerationInfo(){
+		/**
+		*x轴上的加速度值。
+		*/
+		this.x=NaN;
+		/**
+		*y轴上的加速度值。
+		*/
+		this.y=NaN;
+		/**
+		*z轴上的加速度值。
+		*/
+		this.z=NaN;
+	}
+
+	__class(AccelerationInfo,'laya.device.motion.AccelerationInfo');
+	return AccelerationInfo;
 })()
 
 
@@ -480,6 +480,75 @@ var Accelerator=(function(_super){
 	]);
 	return Accelerator;
 })(EventDispatcher)
+
+
+/**
+*@private
+*/
+//class laya.device.media.HtmlVideo extends laya.resource.Bitmap
+var HtmlVideo=(function(_super){
+	function HtmlVideo(){
+		this.video=null;
+		this._source=null;
+		HtmlVideo.__super.call(this);
+		this._width=1;
+		this._height=1;
+		this.createDomElement();
+	}
+
+	__class(HtmlVideo,'laya.device.media.HtmlVideo',_super);
+	var __proto=HtmlVideo.prototype;
+	__proto.createDomElement=function(){
+		var _$this=this;
+		this._source=this.video=Browser.createElement("video");
+		var style=this.video.style;
+		style.position='absolute';
+		style.top='0px';
+		style.left='0px';
+		this.video.addEventListener("loadedmetadata",(function(){
+			this._w=_$this.video.videoWidth;
+			this._h=_$this.video.videoHeight;
+		})['bind'](this));
+	}
+
+	__proto.setSource=function(url,extension){
+		while(this.video.childElementCount)
+		this.video.firstChild.remove();
+		if (extension & Video.MP4)
+			this.appendSource(url,"video/mp4");
+		if (extension & Video.OGG)
+			this.appendSource(url+".ogg","video/ogg");
+	}
+
+	__proto.appendSource=function(source,type){
+		var sourceElement=Browser.createElement("source");
+		sourceElement.src=source;
+		sourceElement.type=type;
+		this.video.appendChild(sourceElement);
+	}
+
+	__proto.getVideo=function(){
+		return this.video;
+	}
+
+	__proto._getSource=function(){
+		return this._source;
+	}
+
+	__proto.destroy=function(){
+		laya.resource.Resource.prototype.destroy.call(this);
+		var isConchApp=/*__JS__ */Render.isConchApp;
+		if (isConchApp){
+			this.video._destroy();
+		}
+	}
+
+	HtmlVideo.create=function(){
+		return new HtmlVideo();
+	}
+
+	return HtmlVideo;
+})(Bitmap)
 
 
 /**
@@ -903,75 +972,6 @@ var Video=(function(_super){
 	Video.SUPPORT_NO="";
 	return Video;
 })(Sprite)
-
-
-/**
-*@private
-*/
-//class laya.device.media.HtmlVideo extends laya.resource.Bitmap
-var HtmlVideo=(function(_super){
-	function HtmlVideo(){
-		this.video=null;
-		this._source=null;
-		HtmlVideo.__super.call(this);
-		this._width=1;
-		this._height=1;
-		this.createDomElement();
-	}
-
-	__class(HtmlVideo,'laya.device.media.HtmlVideo',_super);
-	var __proto=HtmlVideo.prototype;
-	__proto.createDomElement=function(){
-		var _$this=this;
-		this._source=this.video=Browser.createElement("video");
-		var style=this.video.style;
-		style.position='absolute';
-		style.top='0px';
-		style.left='0px';
-		this.video.addEventListener("loadedmetadata",(function(){
-			this._w=_$this.video.videoWidth;
-			this._h=_$this.video.videoHeight;
-		})['bind'](this));
-	}
-
-	__proto.setSource=function(url,extension){
-		while(this.video.childElementCount)
-		this.video.firstChild.remove();
-		if (extension & Video.MP4)
-			this.appendSource(url,"video/mp4");
-		if (extension & Video.OGG)
-			this.appendSource(url+".ogg","video/ogg");
-	}
-
-	__proto.appendSource=function(source,type){
-		var sourceElement=Browser.createElement("source");
-		sourceElement.src=source;
-		sourceElement.type=type;
-		this.video.appendChild(sourceElement);
-	}
-
-	__proto.getVideo=function(){
-		return this.video;
-	}
-
-	__proto._getSource=function(){
-		return this._source;
-	}
-
-	__proto.destroy=function(){
-		laya.resource.Resource.prototype.destroy.call(this);
-		var isConchApp=/*__JS__ */Render.isConchApp;
-		if (isConchApp){
-			this.video._destroy();
-		}
-	}
-
-	HtmlVideo.create=function(){
-		return new HtmlVideo();
-	}
-
-	return HtmlVideo;
-})(Bitmap)
 
 
 /**

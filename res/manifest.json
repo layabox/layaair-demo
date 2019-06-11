@@ -274,7 +274,8 @@
 				["CameraLayer", "可视遮罩层", "", "core,ani,d3,ui,CameraMoveScript.js"],
 				["OrthographicCamera", "正交摄像机", "", "core,ui,ani,d3"],
 				["D3SpaceToD2Space", "3D空间转2D空间", "", "core,ui,ani,d3"],
-				["RenderTargetCamera", "渲染到纹理", "", "core,ui,ani,d3,CameraMoveScript.js"]
+				["RenderTargetCamera", "渲染到纹理", "", "core,ui,ani,d3,CameraMoveScript.js"],
+				["PickPixel", "拾取像素", "", "core,ui,ani,d3,CameraMoveScript.js"]
 			]
 		},
 		{
@@ -365,7 +366,7 @@
 			"tr_zhCN": "鼠标交互",
 			"manifest": [
 				["MouseInteraction", "鼠标交互", "", "core,ani,d3,physics3D,CameraMoveScript.js"],
-				["MultiTouch", "多点触控", "", "core,ani,d3,CameraMoveScript.js,physics3D"]
+				["MultiTouch", "多点触控", "", "core,ani,d3,CameraMoveScript.js,physics3D,physics3D"]
 			]
 		},
 		{
@@ -417,7 +418,8 @@
 				[ "Laya3DCombineHtml", "Laya3D与网页混合", "", "core,ani,d3" ],
 				[ "AStarFindPath", "寻路导航", "", "core,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
 				[ "Scene2DPlayer3D", "2D场景加3D人物", "", "core,ani,d3,ui,CameraMoveScript.js" ],
-				[ "Secne3DPlayer2D", "3D场景加2D人物", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ]
+				[ "Secne3DPlayer2D", "3D场景加2D人物", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
+				[ "PostProcessBloom", "后期处理Bloom", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ]
 			]
 		},
 		{
