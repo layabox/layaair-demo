@@ -315,5 +315,26 @@
         $(".panel-group").css("height", $(window).height() - 156);
     }
 </script>
+<script type="text/javascript">
+    var isFocus = false;
+    var timer;
+    function focusIframe() {
+        if (demo_frame && demo_frame.contentWindow && demo_frame.contentWindow.document) {
+            isFocus = true;
+            timer && clearInterval(timer);
+            var iframeDoc = demo_frame.contentWindow.document;
+            iframeDoc.onclick = function() {
+                demo_frame.focus();
+            }
+            iframeDoc.onfocus = function() {
+                console.log("frame focus");
+            }
+            iframeDoc.onblur = function() {
+                console.log("frame blur");
+            }
+        }
+    }
+    timer = setInterval(focusIframe, 1000);
+</script>
 </body>
 </html>
