@@ -316,13 +316,15 @@
     }
 </script>
 <script type="text/javascript">
-    var isFocus = false;
-    var timer;
+    var 
+        isFocus = false,
+        url;
     function focusIframe() {
         if (demo_frame && demo_frame.contentWindow) {
             isFocus = true;
-            timer && clearInterval(timer);
             var iframeWin = demo_frame.contentWindow;
+            demo_frame.focus();
+            // 用onxxx的好处是，只会注册一次
             iframeWin.onclick = function() {
                 demo_frame.focus();
             }
@@ -334,7 +336,13 @@
             }
         }
     }
-    timer = setInterval(focusIframe, 1000);
+    // url变化，没有找到检测search变化的事件，自己写吧
+    setInterval(function() {
+        if (url !== location.href || !isFocus) {
+            url = location.href;
+            focusIframe();
+        }
+    }, 1000);
 </script>
 </body>
 </html>
