@@ -319,17 +319,17 @@
     var isFocus = false;
     var timer;
     function focusIframe() {
-        if (demo_frame && demo_frame.contentWindow && demo_frame.contentWindow.document) {
+        if (demo_frame && demo_frame.contentWindow) {
             isFocus = true;
             timer && clearInterval(timer);
-            var iframeDoc = demo_frame.contentWindow.document;
-            iframeDoc.onclick = function() {
+            var iframeWin = demo_frame.contentWindow;
+            iframeWin.onclick = function() {
                 demo_frame.focus();
             }
-            iframeDoc.onfocus = function() {
+            iframeWin.onfocus = function() {
                 console.log("frame focus");
             }
-            iframeDoc.onblur = function() {
+            iframeWin.onblur = function() {
                 console.log("frame blur");
             }
         }
