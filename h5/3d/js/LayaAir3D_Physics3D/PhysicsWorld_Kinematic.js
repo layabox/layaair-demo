@@ -72,12 +72,12 @@ class PhysicsWorldKinematic{
         Laya.timer.frameLoop(1, this, this.onKeyDown);
     }
     onKeyDown() {
-        Laya.KeyBoardManager.hasKeyDown(87) && kinematicSphere.transform.translate(this.translateW);//W
-		Laya.KeyBoardManager.hasKeyDown(83) && kinematicSphere.transform.translate(this.translateS);//S
-		Laya.KeyBoardManager.hasKeyDown(65) && kinematicSphere.transform.translate(this.translateA);//A
-		Laya.KeyBoardManager.hasKeyDown(68) && kinematicSphere.transform.translate(this.translateD);//D
-		Laya.KeyBoardManager.hasKeyDown(81) && plane.transform.translate(this.translateQ);//Q
-		Laya.KeyBoardManager.hasKeyDown(69) && plane.transform.translate(this.translateE);//E
+        Laya.KeyBoardManager.hasKeyDown(87) && this.kinematicSphere.transform.translate(this.translateW);//W
+		Laya.KeyBoardManager.hasKeyDown(83) && this.kinematicSphere.transform.translate(this.translateS);//S
+		Laya.KeyBoardManager.hasKeyDown(65) && this.kinematicSphere.transform.translate(this.translateA);//A
+		Laya.KeyBoardManager.hasKeyDown(68) && this.kinematicSphere.transform.translate(this.translateD);//D
+		Laya.KeyBoardManager.hasKeyDown(81) && this.kinematicSphere.transform.translate(this.translateQ);//Q
+		Laya.KeyBoardManager.hasKeyDown(69) && this.kinematicSphere.transform.translate(this.translateE);//E
     }
     addBox() {
         let sX = Math.random() * 0.75 + 0.25;

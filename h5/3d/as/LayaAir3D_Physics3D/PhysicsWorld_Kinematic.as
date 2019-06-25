@@ -120,8 +120,8 @@ package LayaAir3D_Physics3D {
 			KeyBoardManager.hasKeyDown(83) && kinematicSphere.transform.translate(translateS);//S
 			KeyBoardManager.hasKeyDown(65) && kinematicSphere.transform.translate(translateA);//A
 			KeyBoardManager.hasKeyDown(68) && kinematicSphere.transform.translate(translateD);//D
-			KeyBoardManager.hasKeyDown(81) && plane.transform.translate(translateQ);//Q
-			KeyBoardManager.hasKeyDown(69) && plane.transform.translate(translateE);//E
+			KeyBoardManager.hasKeyDown(81) && kinematicSphere.transform.translate(translateQ);//Q
+			KeyBoardManager.hasKeyDown(69) && kinematicSphere.transform.translate(translateE);//E
 		}
 		
 		public function addBox():void {
