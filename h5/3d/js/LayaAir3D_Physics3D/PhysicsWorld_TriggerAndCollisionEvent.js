@@ -23,7 +23,7 @@ class PhysicsWorldTriggerAndCollisionEvent{
         let mat = directionLight.transform.worldMatrix;
         mat.setForward(new Laya.Vector3(-1.0, -1.0, 1.0));
         directionLight.transform.worldMatrix = mat;
-        let plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(20, 20, 10, 10)));
+        let plane = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(20, 20, 10, 10)));
         let planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
             planeMat.albedoTexture = tex;
@@ -47,7 +47,7 @@ class PhysicsWorldTriggerAndCollisionEvent{
         }));
         mat2.albedoColor = new Laya.Vector4(1.0, 0.0, 0.0, 1.0);
         let radius = 0.8;
-        let sphere = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius)));
+        let sphere = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(radius)));
         sphere.meshRenderer.material = mat2;
         sphere.transform.position = new Laya.Vector3(0, 0.8, 0);
         let rigidBody = sphere.addComponent(Laya.Rigidbody3D);
@@ -59,12 +59,12 @@ class PhysicsWorldTriggerAndCollisionEvent{
         Laya.timer.frameLoop(1, this, this.onKeyDown);
     }
     onKeyDown() {
-        Laya.KeyBoardManager.hasKeyDown(87) && kinematicSphere.transform.translate(this.translateW);//W
-        Laya.KeyBoardManager.hasKeyDown(83) && kinematicSphere.transform.translate(this.translateS);//S
-        Laya.KeyBoardManager.hasKeyDown(65) && kinematicSphere.transform.translate(this.translateA);//A
-        Laya.KeyBoardManager.hasKeyDown(68) && kinematicSphere.transform.translate(this.translateD);//D
-        Laya.KeyBoardManager.hasKeyDown(81) && plane.transform.translate(this.translateQ);//Q
-        Laya.KeyBoardManager.hasKeyDown(69) && plane.transform.translate(this.translateE);//E
+        Laya.KeyBoardManager.hasKeyDown(87) && this.kinematicSphere.transform.translate(this.translateW);//W
+        Laya.KeyBoardManager.hasKeyDown(83) && this.kinematicSphere.transform.translate(this.translateS);//S
+        Laya.KeyBoardManager.hasKeyDown(65) && this.kinematicSphere.transform.translate(this.translateA);//A
+        Laya.KeyBoardManager.hasKeyDown(68) && this.kinematicSphere.transform.translate(this.translateD);//D
+        Laya.KeyBoardManager.hasKeyDown(81) && this.kinematicSphere.transform.translate(this.translateQ);//Q
+        Laya.KeyBoardManager.hasKeyDown(69) && this.kinematicSphere.transform.translate(this.translateE);//E
     }
     addBoxAndTrigger() {
         let mat1 = new Laya.BlinnPhongMaterial();
@@ -75,7 +75,7 @@ class PhysicsWorldTriggerAndCollisionEvent{
         let sX = Math.random() * 0.75 + 0.25;
         let sY = Math.random() * 0.75 + 0.25;
         let sZ = Math.random() * 0.75 + 0.25;
-        let box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
+        let box = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         box.meshRenderer.material = mat1;
 
         let transform = box.transform;
@@ -101,7 +101,7 @@ class PhysicsWorldTriggerAndCollisionEvent{
         }));
         let raidius = Math.random() * 0.2 + 0.2;
         let height = Math.random() * 0.5 + 0.8;
-        let capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
+        let capsule = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = mat3;
 
         let transform = capsule.transform;
@@ -125,7 +125,7 @@ class PhysicsWorldTriggerAndCollisionEvent{
             mat2.albedoTexture = tex;
         }));
         let radius = Math.random() * 0.2 + 0.2;
-        let sphere = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius)));
+        let sphere = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(radius)));
         sphere.meshRenderer.material = mat2;
         let pos = sphere.transform.position;
         pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
