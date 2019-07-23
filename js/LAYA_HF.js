@@ -229,8 +229,8 @@ function laya_nav(laya) {
                     "en": "Example"
                 },
                 "url": {
-                    "zh": laya_http + "layaair.ldc.layabox.com/demo2/",
-                    "en": laya_http + "layaair.ldc.layabox.com/demo2/"
+                    "zh": laya_http + "layaair2.ldc2.layabox.com/demo2/",
+                    "en": laya_http + "layaair2.ldc2.layabox.com/demo2/"
                 },
                 "visual": {
                     "zh": 1,
@@ -257,8 +257,8 @@ function laya_nav(laya) {
                     "en": "API"
                 },
                 "url": {
-                    "zh": laya_http + "layaair.ldc.layabox.com/api2/" + lang_param,
-                    "en": laya_http + "layaair.ldc.layabox.com/api2/English/index.html" + lang_param
+                    "zh": laya_http + "layaair2.ldc2.layabox.com/api2/" + lang_param,
+                    "en": laya_http + "layaair2.ldc2.layabox.com/api2/English/index.html" + lang_param
                 },
                 "visual": {
                     "zh": 1,
