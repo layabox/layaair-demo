@@ -267,7 +267,7 @@ function laya_nav(laya) {
                 "blank": "0"
             }, {
                 "title": {
-                    "zh": "腾讯课堂教学",
+                    "zh": "引擎视频教学",
                     "en": "Classroom"
                 },
                 "url": {
