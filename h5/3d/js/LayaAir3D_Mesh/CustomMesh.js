@@ -30,7 +30,7 @@ class CustomMesh{
     }
     //正方体
     drawBox(){
-        let box = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(0.5, 0.5, 0.5)));
+        let box = this.sprite3D.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(0.5, 0.5, 0.5)));
         box.transform.position = new Laya.Vector3(2.0, 0.25, 0.6);
         box.transform.rotate(new Laya.Vector3(0, 45, 0), false, false);
         let boxLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(100));
@@ -38,28 +38,28 @@ class CustomMesh{
     }
     //球体
     drawSphere(){
-        this.sphere = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(0.25, 20, 20)));
+        this.sphere = this.sprite3D.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(0.25, 20, 20)));
         this.sphere.transform.position = new Laya.Vector3(1.0, 0.25, 0.6);
         let sphereLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(3500));
         Tool.linearModel(this.sphere, sphereLineSprite3D, Laya.Color.GREEN);
     }
     //圆柱体
     drawCylinder(){
-        let cylinder = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCylinder(0.25, 1, 20)));
+        let cylinder = this.sprite3D.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCylinder(0.25, 1, 20)));
         cylinder.transform.position = new Laya.Vector3(0, 0.5, 0.6);
         let cylinderLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(1000));
         Tool.linearModel(cylinder, cylinderLineSprite3D, Laya.Color.GREEN);
     }
     //胶囊体
     drawCapsule(){
-        let capsule = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(0.25, 1, 10, 20)));
+        let capsule = this.sprite3D.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCapsule(0.25, 1, 10, 20)));
         capsule.transform.position = new Laya.Vector3(-1.0, 0.5, 0.6);
         let capsuleLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(3000));
         Tool.linearModel(capsule, capsuleLineSprite3D, Laya.Color.GREEN);
     }
     //圆锥体
     drawCone(){
-        let cone = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCone(0.25, 0.75)));
+        let cone = this.sprite3D.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCone(0.25, 0.75)));
         cone.transform.position = new Laya.Vector3(-2.0, 0.375, 0.6);
         let coneLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(500));
         Tool.linearModel(cone, coneLineSprite3D, Laya.Color.GREEN);
@@ -67,7 +67,7 @@ class CustomMesh{
     //平面
     drawPlane(){
         //平面
-        let plane = this.sprite3D.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(6, 6, 10, 10)));
+        let plane = this.sprite3D.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(6, 6, 10, 10)));
         let planeLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(1000));
         Tool.linearModel(plane, planeLineSprite3D, Laya.Color.GRAY);
     }

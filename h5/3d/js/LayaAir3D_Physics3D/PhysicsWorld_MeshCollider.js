@@ -98,7 +98,7 @@ class PhysicsWorldMeshCollider{
         let sX = Math.random() * 0.75 + 0.25;
         let sY = Math.random() * 0.75 + 0.25;
         let sZ = Math.random() * 0.75 + 0.25;
-        let box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
+        let box = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         box.meshRenderer.material = this.mat1;
         let transform = box.transform;
         let pos = transform.position;
@@ -119,7 +119,7 @@ class PhysicsWorldMeshCollider{
         mat2.albedoTexture = tex;
         }));
         let radius = Math.random() * 0.2 + 0.2;
-        let sphere = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius)));
+        let sphere = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(radius)));
         sphere.meshRenderer.material = this.mat2;
         let pos = sphere.transform.position;
         pos.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
@@ -137,7 +137,7 @@ class PhysicsWorldMeshCollider{
         }))
         let raidius = Math.random() * 0.2 + 0.2;
         let height = Math.random() * 0.5 + 0.8;
-        let capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
+        let capsule = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = this.mat3;
 
         let transform = capsule.transform;

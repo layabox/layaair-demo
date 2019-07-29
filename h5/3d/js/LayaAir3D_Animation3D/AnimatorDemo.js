@@ -72,7 +72,7 @@ class AnimatorDemo
 		//循环模式
 		state1.clip.islooping = true;
 		//为动画状态添加动画状态脚本
-		state1.addScript(AnimatorStateScriptDemo);
+		state1.addScript(AnimatorStateScriptTest);
 		//为动画组件添加一个动作状态
 		this.animator.addState(state1);
 		
@@ -82,7 +82,7 @@ class AnimatorDemo
 		state2.clipEnd = 33 / 581;
 		state2.clip = this.animator.getDefaultState().clip;
 		state2.clip.islooping = true;
-		state2.addScript(AnimatorStateScriptDemo);
+		state2.addScript(AnimatorStateScriptTest);
 		this.animator.addState(state2);
 		this.animator.speed = 0.0;
 		
@@ -92,7 +92,7 @@ class AnimatorDemo
 		state3.clipEnd = 100 / 581;
 		state3.clip = this.animator.getDefaultState().clip;
 		state3.clip.islooping = true;
-		state3.addScript(AnimatorStateScriptDemo);
+		state3.addScript(AnimatorStateScriptTest);
 		this.animator.addState(state3);
 		this.animator.speed = 0.0;
 		
@@ -102,7 +102,7 @@ class AnimatorDemo
 		state4.clipEnd = 200 / 581;
 		state4.clip = this.animator.getDefaultState().clip;
 		state4.clip.islooping = true;
-		state4.addScript(AnimatorStateScriptDemo);
+		state4.addScript(AnimatorStateScriptTest);
 		this.animator.addState(state4);
 		this.animator.speed = 0.0;
 		
@@ -112,7 +112,7 @@ class AnimatorDemo
 		state5.clipEnd = 295 / 581;
 		state5.clip = this.animator.getDefaultState().clip;
 		state5.clip.islooping = true;
-		state5.addScript(AnimatorStateScriptDemo);
+		state5.addScript(AnimatorStateScriptTest);
 		this.animator.addState(state5);
 		this.animator.speed = 0.0;
 		
@@ -122,7 +122,7 @@ class AnimatorDemo
 		state6.clipEnd = 581 / 581;
 		state6.clip = this.animator.getDefaultState().clip;
 		state6.clip.islooping = true;
-		state6.addScript(AnimatorStateScriptDemo);
+		state6.addScript(AnimatorStateScriptTest);
 		this.animator.addState(state6);
 		this.animator.speed = 0.0;
 		
@@ -256,36 +256,6 @@ class AnimatorDemo
 	}
 	
 
-}
-
-//继承自AnimatorStateScript(动画状态脚本)
-class AnimatorStateScriptDemo extends Laya.AnimatorStateScript{
-	
-	constructor(){
-		super();
-	}
-
-		
-	/**
-	 * 动画状态开始时执行。
-	 */
-	onStateEnter() {
-		console.log("动画开始播放了");
-	}
-		
-	/**
-	 * 动画状态更新时执行。
-	 */
-    onStateUpdate() {
-		console.log("动画状态更新了");
-	}
-		
-	/**
-	 * 动画状态退出时执行。
-	 */
-	onStateExit() {
-		console.log("动画退出了");
-	}
 }
 
 new AnimatorDemo();

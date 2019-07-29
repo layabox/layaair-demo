@@ -1,5 +1,6 @@
 class PostProcessBloom {
     constructor() {
+        debugger;
         //初始化引擎
         Laya3D.init(0, 0);
         Laya.Stat.show();
@@ -13,7 +14,7 @@ class PostProcessBloom {
             //获取场景中的相机
             this.camera = scene.getChildByName("Main Camera");
             //加入摄像机移动控制脚本
-            this.camera.addComponent(CameraMoveScript);
+           // this.camera.addComponent(CameraMoveScript);
             //增加后期处理
             var postProcess = new Laya.PostProcess();
             //增加后期处理泛光效果

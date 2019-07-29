@@ -286,7 +286,7 @@
 									"materials":[
 										{
 											"type":"Laya.BlinnPhongMaterial",
-											"path":"Assets/Model/Scenes/Materials/New Material.lmat"
+											"path":"Assets/Model/Scenes/Materials/21 - Default.lmat"
 										}
 									]
 								},

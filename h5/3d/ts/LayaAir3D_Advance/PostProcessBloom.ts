@@ -1,7 +1,7 @@
 
 import CameraMoveScript from "./common/CameraMoveScript"
 class PostProcessBloom {
-	private rotation:Laya.Vector3 = new Laya.Vector3(0, 0.01, 0);\
+	private rotation:Laya.Vector3 = new Laya.Vector3(0, 0.01, 0);
 	private camera:Laya.Camera;
     constructor() {
         //初始化引擎

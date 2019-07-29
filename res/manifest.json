@@ -293,6 +293,7 @@
 			"prefix": "Sprite3D",
 			"tr_zhCN": "3D精灵",
 			"manifest": [
+				["SkinnedMeshSprite3DDemo", "蒙皮精灵", "", "core,ani,d3,ui,CameraMoveScript.js"],
 				["Sprite3DParent", "子父级关系", "", "core,ani,d3,ui,CameraMoveScript.js"],
 				["TransformDemo", "变换示例", "", "core,ani,d3,CameraMoveScript.js"],
 				["Sprite3DClone", "克隆精灵", "", "core,ani,d3,CameraMoveScript.js" ],
@@ -314,9 +315,9 @@
 			"tr_zhCN": "材质",
 			"manifest": [
 				["MaterialDemo", "材质示例", "", "core,ani,d3,physics3D,ui,CameraMoveScript.js" ],
-        ["BlinnPhongMaterialLoad", "BlinnPhong材质加载", "", "core,ani,d3" ],
-        ["BlinnPhong_DiffuseMap", "BlinnPhong-漫反射贴图", "", "core,ani,d3" ],
-        ["BlinnPhong_NormalMap", "BlinnPhong-法线贴图", "", "core,ani,d3" ],
+				["BlinnPhongMaterialLoad", "BlinnPhong材质加载", "", "core,ani,d3" ],
+				["BlinnPhong_DiffuseMap", "BlinnPhong-漫反射贴图", "", "core,ani,d3" ],
+				["BlinnPhong_NormalMap", "BlinnPhong-法线贴图", "", "core,ani,d3" ],
 				["BlinnPhong_SpecularMap", "BlinnPhong-高光贴图", "", "core,ani,d3,CameraMoveScript.js"],
 				["PBRStandardMaterialDemo", "PBRStandard材质", "", "core,ani,d3,CameraMoveScript.js" ],
 				["EffectMaterialDemo", "Effect材质", "", "core,ani,d3,CameraMoveScript.js" ],
@@ -336,13 +337,13 @@
 			"prefix": "Animation3D",
 			"tr_zhCN": "动画",
       		"manifest": [
-				["AnimatorDemo", "动画示例", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["AnimatorDemo", "动画示例", "", "core,ui,ani,d3,CameraMoveScript.js,AnimatorStateScriptTest.js,physics3D" ],
 				["AnimationLayerBlend", "动画过渡和混合", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["AnimatorStateScriptDemo", "动画状态脚本", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-        ["BoneLinkSprite3D", "蒙皮动画挂点", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["AnimatorStateScriptDemo", "动画状态脚本", "", "core,ui,ani,d3,CameraMoveScript.js,CustomAnimatorStateScript.js,physics3D" ],
+        		["BoneLinkSprite3D", "蒙皮动画挂点", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 				["MaterialAnimation", "材质动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 				["RigidbodyAnimationDemo", "刚体动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-        ["CameraAnimation", "摄像机动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ]
+        		["CameraAnimation", "摄像机动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ]
       ]
 		},
 		{
@@ -411,12 +412,21 @@
 				["Shader_MultiplePassOutline", "描边Shader（多Pass）", "", "core,ani,d3,CameraMoveScript.js,MultiplePassOutlineMaterial.js"]
 			]
 		},
+		{
+			"prefix": "Performance",
+			"tr_zhCN": "性能测试",
+			"manifest": [
+				["StaticBatchingTest", "静态合批", "", "core,d3,ui,CameraMoveScript.js,physics3D"],
+				["DynamicBatchTest", "动态合批", "", "core,d3,ui,CameraMoveScript.js,physics3D"]
+			]
+
+		},
     {
 			"prefix": "Advance",
 			"tr_zhCN": "高级应用",
 			"manifest": [
 				[ "Laya3DCombineHtml", "Laya3D与网页混合", "", "core,ani,d3" ],
-				[ "AStarFindPath", "寻路导航", "", "core,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
+				[ "AStarFindPath", "寻路导航", "", "core,ani,d3,astar.js,CameraMoveScript.js" ],
 				[ "Scene2DPlayer3D", "2D场景加3D人物", "", "core,ani,d3,ui,CameraMoveScript.js" ],
 				[ "Secne3DPlayer2D", "3D场景加2D人物", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
 				[ "PostProcessBloom", "后期处理Bloom", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ]

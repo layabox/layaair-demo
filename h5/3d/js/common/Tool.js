@@ -3,46 +3,31 @@ class Tool{
 
 	}
 	static linearModel(sprite3D, lineSprite3D, color){
-		var vertex1 = new Laya.Vector3();
-        var vertex2 = new Laya.Vector3();
-        var vertex3 = new Laya.Vector3();
-        var lineCount = 0;
-        if (sprite3D instanceof Laya.MeshSprite3D) {
-            var meshSprite3D = sprite3D;
-            var mesh = meshSprite3D.meshFilter.sharedMesh;
-         
-            var vbBuffer = mesh._vertexBuffers ? mesh._vertexBuffers[0] : mesh._primitveGeometry._vertexBuffer;
-            var vbBufferData = vbBuffer.getData();
-            var ibBufferData = mesh._indexBuffer ? mesh._indexBuffer.getData() : mesh._primitveGeometry._indexBuffer.getData();
-            var vertexStrideCount = vbBuffer.vertexDeclaration.vertexStride / 4;
-            var loopCount = 0;
-            var index = 0;
-            for (var i = 0; i < ibBufferData.length; i += 3) {
-                loopCount = 0;
-                index = 0;
-                vertex1.x = vbBufferData[ibBufferData[i + loopCount] * vertexStrideCount + index++];
-                vertex1.y = vbBufferData[ibBufferData[i + loopCount] * vertexStrideCount + index++];
-                vertex1.z = vbBufferData[ibBufferData[i + loopCount] * vertexStrideCount + index++];
-                loopCount++;
-                index = 0;
-                vertex2.x = vbBufferData[ibBufferData[i + loopCount] * vertexStrideCount + index++];
-                vertex2.y = vbBufferData[ibBufferData[i + loopCount] * vertexStrideCount + index++];
-                vertex2.z = vbBufferData[ibBufferData[i + loopCount] * vertexStrideCount + index++];
-                loopCount++;
-                index = 0;
-                vertex3.x = vbBufferData[ibBufferData[i + loopCount] * vertexStrideCount + index++];
-                vertex3.y = vbBufferData[ibBufferData[i + loopCount] * vertexStrideCount + index++];
-                vertex3.z = vbBufferData[ibBufferData[i + loopCount] * vertexStrideCount + index++];
-                loopCount++;
-                Laya.Vector3.transformCoordinate(vertex1, meshSprite3D.transform.worldMatrix, vertex1);
-                Laya.Vector3.transformCoordinate(vertex2, meshSprite3D.transform.worldMatrix, vertex2);
-                Laya.Vector3.transformCoordinate(vertex3, meshSprite3D.transform.worldMatrix, vertex3);
-				lineSprite3D.addLine(vertex1, vertex2, color, color);
-				lineSprite3D.addLine(vertex2, vertex3, color, color);
-				lineSprite3D.addLine(vertex3, vertex1, color, color);
-            }
-        }
-        for (var i = 0, n = sprite3D.numChildren; i < n; i++)
-            this.linearModel(sprite3D.getChildAt(i), lineSprite3D, color);
-	}
+		if (sprite3D instanceof Laya.MeshSprite3D) {
+			var meshSprite3D = sprite3D;
+			var mesh = meshSprite3D.meshFilter.sharedMesh;
+			var positions = [];
+			mesh.getPositions(positions);
+			var indices = mesh.getSubMesh(0).getIndices();
+
+			for (var i = 0; i < indices.length; i += 3) {
+				var vertex0 = positions[indices[i]];
+				var vertex1 = positions[indices[i + 1]];
+				var vertex2 = positions[indices[i + 2]];
+				Laya.Vector3.transformCoordinate(vertex0, meshSprite3D.transform.worldMatrix, this.transVertex0);
+				Laya.Vector3.transformCoordinate(vertex1, meshSprite3D.transform.worldMatrix, this.transVertex1);
+				Laya.Vector3.transformCoordinate(vertex2, meshSprite3D.transform.worldMatrix, this.transVertex2);
+				lineSprite3D.addLine(this.transVertex0, this.transVertex1, color, color);
+				lineSprite3D.addLine(this.transVertex1, this.transVertex2, color, color);
+				lineSprite3D.addLine(this.transVertex2, this.transVertex0, color, color);
+			}
+		}
+
+		for (var i = 0, n = sprite3D.numChildren; i < n; i++)
+			Tool.linearModel((sprite3D.getChildAt(i)), lineSprite3D, color);
+    }
+
 }
+Tool.transVertex0 = new Laya.Vector3();
+Tool.transVertex1 = new Laya.Vector3();
+Tool.transVertex2 = new Laya.Vector3();

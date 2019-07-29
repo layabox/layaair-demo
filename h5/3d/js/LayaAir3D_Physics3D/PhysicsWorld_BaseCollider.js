@@ -46,7 +46,7 @@ class PhysicsWorldBaseCollider{
 
 
         //平面加载
-        let plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(10, 10, 10, 10)));
+        let plane = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(10, 10, 10, 10)));
         let planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/grass.png", Laya.Handler.create(null, function (tex) {
             planeMat.albedoTexture = tex;
@@ -98,7 +98,7 @@ class PhysicsWorldBaseCollider{
         let sY = Math.random() * 0.75 + 0.25;
         let sZ = Math.random() * 0.75 + 0.25;
         //设置box模型
-        let box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
+        let box = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         //将box的模型赋予材质
         box.meshRenderer.material = this.mat1;
         //设置掉落位置
@@ -117,7 +117,7 @@ class PhysicsWorldBaseCollider{
     //添加球体
     addSphere(){
         let radius = Math.random() * 0.2 + 0.2;
-        let sphere = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius)));
+        let sphere = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(radius)));
         sphere.meshRenderer.material = this.mat2;
         this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
         sphere.transform.position = this.tmpVector;
@@ -130,7 +130,7 @@ class PhysicsWorldBaseCollider{
     addCapsule(){
         let raidius = Math.random() * 0.2 + 0.2;
         let height = Math.random() * 0.5 + 0.8;
-        let capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
+        let capsule = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = this.mat3;
         this.tmpVector.setValue(Math.random() * 4 - 2, 10, Math.random() * 4 - 2);
         capsule.transform.position = this.tmpVector;

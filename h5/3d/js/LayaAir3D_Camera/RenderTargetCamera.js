@@ -9,21 +9,34 @@ class RenderTargetCamera{
         Laya.Stat.show(); 
 
 		//预加载角色动画资源
-        Laya.loader.create("res/threeDimen/scene/CourtyardScene/Courtyard.ls",Laya.Handler.create(this,this.onComplete));	
+        Laya.loader.create("res/threeDimen/scene/LayaScene_city01/Conventional/city01.ls",Laya.Handler.create(this,this.onComplete));	
     }
 
     onComplete(){
 		//加载场景
-		let scene = Laya.loader.getRes("res/threeDimen/scene/CourtyardScene/Courtyard.ls");
+		let scene = Laya.loader.getRes("res/threeDimen/scene/LayaScene_city01/Conventional/city01.ls");
 		Laya.stage.addChild(scene);  
 		//添加相机
-		let camera = scene.addChild(new Laya.Camera(0, 0.1, 1000));
-		camera.transform.translate(new Laya.Vector3(57, 2.5, 58));
-		camera.transform.rotate(new Laya.Vector3( -10, 150, 0), true, false);
-		//设置相机清除标识
-		camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
+		var camera = scene.getChildByName("Main Camera");
 		//相机添加视角控制组件(脚本)
 		camera.addComponent(CameraMoveScript);
+
+		//正方体
+		var box = scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(6, 6)));
+		box.transform.position = new Laya.Vector3(-28.8, 8, -65);
+		box.transform.rotate(new Laya.Vector3(90, 0, 0), true, false);
+		var mat = new Laya.UnlitMaterial();
+		mat.albedoColor = new Laya.Vector4(1.0, 1.0, 1.0, 1.0);
+		mat.cull = Laya.RenderState.CULL_NONE;
+		box.meshRenderer.sharedMaterial = mat;
+		//增加个小猴
+		Laya.Sprite3D.load("res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", Laya.Handler.create(this, function (layaMonkey) {
+			scene.addChild(layaMonkey);
+			layaMonkey.transform.localScale = new Laya.Vector3(0.5, 0.5, 0.5);
+			layaMonkey.transform.rotate(new Laya.Vector3(0, 180, 0), true, false);
+			layaMonkey.transform.position = new Laya.Vector3(-28.8, 5, -53);
+		}));
+
 			
 		//渲染到纹理的相机
 		let renderTargetCamera = scene.addChild(new Laya.Camera(0, 0.1, 1000));
@@ -36,9 +49,6 @@ class RenderTargetCamera{
 		//相机添加视角控制组件(脚本)
 		renderTargetCamera.addComponent(CameraMoveScript);
 			
-		//创建网格精灵
-		let renderTargetObj = scene.getChildAt(0).getChildByName("RenderTarget");
-			
         Laya.loader.load("res/threeDimen/ui/button.png", Laya.Handler.create(null, function() {
             let changeActionButton = Laya.stage.addChild(new Laya.Button("res/threeDimen/ui/button.png", "渲染目标"));
             changeActionButton.size(160, 40);
@@ -48,8 +58,18 @@ class RenderTargetCamera{
             changeActionButton.scale(Laya.Browser.pixelRatio, Laya.Browser.pixelRatio);
             changeActionButton.pos(Laya.stage.width / 2 - changeActionButton.width * Laya.Browser.pixelRatio / 2, Laya.stage.height - 100 * Laya.Browser.pixelRatio);
             changeActionButton.on(Laya.Event.CLICK, this, function() {
+				//渲染到纹理的相机
+				var renderTargetCamera = scene.addChild(new Laya.Camera(0, 0.3, 1000));
+				renderTargetCamera.transform.position = new Laya.Vector3(-28.8, 8, -60);
+				renderTargetCamera.transform.rotate(new Laya.Vector3(0, 180, 0), true, false);
+				//选择渲染目标为纹理
+				renderTargetCamera.renderTarget = new Laya.RenderTexture(512, 512);
+				//渲染顺序
+				renderTargetCamera.renderingOrder = -1;
+				//清除标记
+				renderTargetCamera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
 				//设置网格精灵的纹理
-				(renderTargetObj.meshRenderer.material).albedoTexture = renderTargetCamera.renderTarget;
+				mat.albedoTexture = renderTargetCamera.renderTarget;
             });
         }));
     }

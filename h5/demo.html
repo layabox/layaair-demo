@@ -113,6 +113,8 @@
                 case "CameraMoveScript.js":
                 case "VRCameraMoveScript.js":
                 case "TriggerCollisionScript.js":
+                case "AnimatorStateScriptTest.js":
+                case "CustomAnimatorStateScript.js":
               
                 case "DrawBoxColliderScript.js":
                     lib = "3d/js/common/" + lib;
@@ -122,6 +124,9 @@
                 case "cartoonMaterial.js":
                 case "MultiplePassOutlineMaterial.js":
                     lib = "3d/js/LayaAir3D_Shader/customMaterials/" + lib;
+                    break;
+                case "astar.js" :
+                    lib = "libs/" + lib;
                     break;
                 default:
                     lib = "libs/laya." + lib + ".js";

@@ -74,7 +74,7 @@ class AnimatorStateScriptDemo
 		//循环模式
 		state1.clip.islooping = true;
 		//为动画状态添加动画状态脚本
-		let asst1 = state1.addScript(AnimatorStateScriptTest);
+		let asst1 = state1.addScript(CustomAnimatorStateScript);
         asst1.text = this.text;
 		//为动画组件添加一个动作状态
 		this.animator.addState(state1);
@@ -85,7 +85,7 @@ class AnimatorStateScriptDemo
 		state2.clipEnd = 33 / 581;
 		state2.clip = this.animator.getDefaultState().clip;
 		state2.clip.islooping = true;
-        let asst2 = state2.addScript(AnimatorStateScriptTest);
+        let asst2 = state2.addScript(CustomAnimatorStateScript);
         asst2.text = this.text;
 		this.animator.addState(state2);
 		this.animator.speed = 0.0;
@@ -96,7 +96,7 @@ class AnimatorStateScriptDemo
 		state3.clipEnd = 100 / 581;
 		state3.clip = this.animator.getDefaultState().clip;
 		state3.clip.islooping = true;
-		let asst3 = state3.addScript(AnimatorStateScriptTest);
+		let asst3 = state3.addScript(CustomAnimatorStateScript);
         asst3.text = this.text;
 		this.animator.addState(state3);
 		this.animator.speed = 0.0;
@@ -172,38 +172,5 @@ class AnimatorStateScriptDemo
 
 }
 
-//继承自AnimatorStateScript(动画状态脚本)
-class AnimatorStateScriptTest extends Laya.AnimatorStateScript{
-	
-	constructor(){
-        super();
-        this.text = null;
-	}
-
-		
-	/**
-	 * 动画状态开始时执行。
-	 */
-	onStateEnter() {
-        console.log("动画开始播放了");
-        this.text.text = "动画状态：动画开始播放";
-	}
-		
-	/**
-	 * 动画状态更新时执行。
-	 */
-    onStateUpdate() {
-        console.log("动画状态更新了");
-        this.text.text = "动画状态：动画更新中";
-	}
-		
-	/**
-	 * 动画状态退出时执行。
-	 */
-	onStateExit() {
-        console.log("动画退出了");
-        this.text.text = "动画状态：动画开始退出";
-	}
-}
 
 new AnimatorStateScriptDemo();

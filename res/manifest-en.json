@@ -302,6 +302,7 @@
 				"prefix": "Sprite3D",
 				"tr_zhCN": "Sprite3D",
 				"manifest": [
+					["SkinnedMeshSprite3DDemo", "SkinnedMeshSprite3DDemo", "", "core,ani,d3,ui,CameraMoveScript.js"],
 					["Sprite3DParent", "Sprite3DParent", "", "core,ani,d3,ui,CameraMoveScript.js"],
 					["ScriptSample", "ScriptSample", "", "core,ani,d3,CameraMoveScript.js"],
 					["TransformDemo", "TransformDemo", "", "core,ani,d3,CameraMoveScript.js"],
@@ -346,9 +347,9 @@
 				"prefix": "Animation3D",
 				"tr_zhCN": "Animation3D",
 		  		"manifest": [
-					["AnimatorDemo", "AnimatorDemo", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["AnimatorDemo", "AnimatorDemo", "", "core,ui,ani,d3,CameraMoveScript.js,AnimatorStateScriptTest.js,physics3D" ],
 					["AnimationLayerBlend", "AnimationLayerBlend", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["AnimatorStateScriptDemo", "AnimatorStateScript", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["AnimatorStateScriptDemo", "AnimatorStateScript", "", "core,ui,ani,d3,CameraMoveScript.js,CustomAnimatorStateScript.js,physics3D" ],
 					["BoneLinkSprite3D", "BoneLinkSprite3D", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 					["MaterialAnimation", "MaterialAnimation", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 					["RigidbodyAnimationDemo", "RigidbodyAnimation", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
@@ -421,11 +422,20 @@
 				]
 			},
 			{
+				"prefix": "Performance",
+				"tr_zhCN": "性能测试",
+				"manifest": [
+					["StaticBatchingTest", "StaticBatchingTest", "", "core,d3,ui,CameraMoveScript.js,physics3D"],
+					["DynamicBatchTest", "DynamicBatchTest", "", "core,d3,ui,CameraMoveScript.js,physics3D"]
+				]
+	
+			},
+			{
 				"prefix": "Advance",
 				"tr_zhCN": "Advance",
 		  		"manifest": [
 					["Laya3DCombineHtml", "Laya3DCombineHtml", "", "core,ani,d3" ],
-					["AStarFindPath", "AStarFindPath", "", "core,ani,d3,pathfinding,d3Plugin,CameraMoveScript.js" ],
+					["AStarFindPath", "AStarFindPath", "", "core,ani,d3,astar.js,CameraMoveScript.js" ],
 					["PBRDemo", "PBRDemo", "", "core,ani,d3,CameraMoveScript.js" ],
 					["Scene2DPlayer3D", "Scene2DPlayer3D", "", "core,ani,d3,ui,CameraMoveScript.js" ],
 					["Secne3DPlayer2D", "Secne3DPlayer2D", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],

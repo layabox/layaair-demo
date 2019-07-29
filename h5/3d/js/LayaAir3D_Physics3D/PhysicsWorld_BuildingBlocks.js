@@ -30,7 +30,7 @@ class PhysicsWorldBuildingBlocks{
         this.mesh1 = Laya.PrimitiveMesh.createBox(0.5, 0.33, 2);
         this.mesh2 = Laya.PrimitiveMesh.createBox(2, 0.33, 0.5);
 
-        let plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(13, 13, 10, 10)));
+        let plane = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(13, 13, 10, 10)));
         let planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(null, function (tex) {
             planeMat.albedoTexture = tex;

@@ -340,6 +340,15 @@ $(document).ready(function()
 	function get3DFullName(d3Name) {
 		var d3Path;
 		switch(d3Name) {
+			case "astar.js":
+				d3Path = "astar.js";
+				break;
+			case "AnimatorStateScriptTest.js":
+				d3Path = "AnimatorStateScriptTest.js";
+				break;
+			case "CustomAnimatorStateScript.js":
+				d3Path = "CustomAnimatorStateScript.js";
+				break;
 			case "CameraMoveScript.js":
 				d3Path = "CameraMoveScript.js";
 				break;

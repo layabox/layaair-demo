@@ -36,7 +36,7 @@ class PhysicsWorldKinematic{
         }));
 
 
-        let plane = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createPlane(20, 20, 10, 10)));
+        let plane = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(20, 20, 10, 10)));
         let planeMat = new Laya.BlinnPhongMaterial();
         Laya.Texture2D.load("res/threeDimen/Physics/wood.jpg", Laya.Handler.create(this, function (tex) {
             planeMat.albedoTexture = tex;
@@ -60,7 +60,7 @@ class PhysicsWorldKinematic{
         }));
         mat2.albedoColor = new Laya.Vector4(1.0, 0.0, 0.0, 1.0);
         let radius = 0.8;
-        let sphere = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createSphere(radius)));
+        let sphere = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createSphere(radius)));
         sphere.meshRenderer.material = mat2;
         sphere.transform.position = new Laya.Vector3(0, 0.8, 0);
         let rigidBody = sphere.addComponent(Laya.Rigidbody3D);
@@ -83,7 +83,7 @@ class PhysicsWorldKinematic{
         let sX = Math.random() * 0.75 + 0.25;
         let sY = Math.random() * 0.75 + 0.25;
         let sZ = Math.random() * 0.75 + 0.25;
-        let box = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
+        let box = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(sX, sY, sZ)));
         box.meshRenderer.material = this.mat1;
         let transform = box.transform;
         let pos = transform.position;
@@ -105,7 +105,7 @@ class PhysicsWorldKinematic{
         }));
         let raidius = Math.random() * 0.2 + 0.2;
         let height = Math.random() * 0.5 + 0.8;
-        let capsule = this.scene.addChild(new Laya.MeshSprite3D(new Laya.PrimitiveMesh.createCapsule(raidius, height)));
+        let capsule = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createCapsule(raidius, height)));
         capsule.meshRenderer.material = this.mat3;
 
         let transform = capsule.transform;

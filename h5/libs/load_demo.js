@@ -36,14 +36,18 @@ for (var i = 0; i < script_tags.length; i++)
 		libs += "IDE导出的文件";
 	else if (src.indexOf("laya.d3.min.js") > -1)
 		libs += "3D";
-	else if (src.indexOf("pathfinding") > -1)
-		libs += "PathFinding";
+	else if (src.indexOf("astar") > -1)
+		libs += "astar.js";
 	else if (src.indexOf("d3Plugin") > -1)
 		libs += "d3Plugin";
 	else if (src.indexOf("common/CameraMoveScript.js") > -1)
 		libs += "CameraMoveScript.js";
 	else if (src.indexOf("common/VRCameraMoveScript.js") > -1)
 		libs += "VRCameraMoveScript.js";
+	else if (src.indexOf("common/AnimatorStateScriptTest.js") > -1)
+		libs += "AnimatorStateScriptTest.js";
+	else if (src.indexOf("common/CustomAnimatorStateScript.js") > -1)
+		libs += "CustomAnimatorStateScript.js";
 	else if (src.indexOf("GlitterStripSampler") > -1)
 		libs += "GlitterStripSampler.js";
 	else if (src.indexOf("CustomMaterial") > -1)
