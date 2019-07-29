@@ -36,7 +36,7 @@ class CameraDemo
 			//使用默认的颜色
 			//this.camera.clearColor = new Laya.Vector4(0, 0.2, 0.6, 1);
 			//设置摄像机视野范围（角度）
-			this.camera.fieldOfView = 60;
+			this.camera.fieldOfView = 45;
 			//为相机添加视角控制组件(脚本)
 			this.camera.addComponent(CameraMoveScript);
 			scene.addChild(this.camera);
