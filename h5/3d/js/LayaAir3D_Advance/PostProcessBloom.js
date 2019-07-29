@@ -1,6 +1,5 @@
 class PostProcessBloom {
     constructor() {
-        debugger;
         //初始化引擎
         Laya3D.init(0, 0);
         Laya.Stat.show();
