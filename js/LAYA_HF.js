@@ -229,8 +229,8 @@ function laya_nav(laya) {
                     "en": "Example"
                 },
                 "url": {
-                    "zh": laya_http + "layaair.ldc.layabox.com/demo2/",
-                    "en": laya_http + "layaair.ldc.layabox.com/demo2/"
+                    "zh": laya_http + "layaair2.ldc2.layabox.com/demo2/",
+                    "en": laya_http + "layaair2.ldc2.layabox.com/demo2/"
                 },
                 "visual": {
                     "zh": 1,
@@ -257,8 +257,8 @@ function laya_nav(laya) {
                     "en": "API"
                 },
                 "url": {
-                    "zh": laya_http + "layaair.ldc.layabox.com/api2/" + lang_param,
-                    "en": laya_http + "layaair.ldc.layabox.com/api2/English/index.html" + lang_param
+                    "zh": laya_http + "layaair2.ldc2.layabox.com/api2/" + lang_param,
+                    "en": laya_http + "layaair2.ldc2.layabox.com/api2/English/index.html" + lang_param
                 },
                 "visual": {
                     "zh": 1,
@@ -267,7 +267,7 @@ function laya_nav(laya) {
                 "blank": "0"
             }, {
                 "title": {
-                    "zh": "腾讯课堂教学",
+                    "zh": "引擎视频教学",
                     "en": "Classroom"
                 },
                 "url": {
@@ -287,20 +287,6 @@ function laya_nav(laya) {
                 "url": {
                     "zh": laya_http + "wiki.cloud.layabox.com/",
                     "en": laya_http + "wiki.cloud.layabox.com/"
-                },
-                "visual": {
-                    "zh": visual,
-                    "en": visual
-                },
-                "blank": "1"
-            }, {
-                "title": {
-                    "zh": "流量共享平台",
-                    "en": "Traffic sharing platform"
-                },
-                "url": {
-                    "zh": laya_http + "share.layabox.com/",
-                    "en": laya_http + "share.layabox.com/"
                 },
                 "visual": {
                     "zh": visual,
