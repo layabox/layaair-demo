@@ -7,7 +7,6 @@ class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
      * @private
      */
     static __init__() {
-        MultiplePassOutlineMaterial.SHADERDEFINE_ALBEDOTEXTURE = MultiplePassOutlineMaterial.shaderDefines.registerDefine("ALBEDOTEXTURE");
     }
     /**
      * 获取漫反射贴图。
@@ -22,10 +21,6 @@ class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
      * @param value 漫反射贴图。
      */
     set albedoTexture(value) {
-        if (value)
-            this._defineDatas.add(MultiplePassOutlineMaterial.SHADERDEFINE_ALBEDOTEXTURE);
-        else
-            this._defineDatas.remove(MultiplePassOutlineMaterial.SHADERDEFINE_ALBEDOTEXTURE);
         this._shaderValues.setTexture(MultiplePassOutlineMaterial.ALBEDOTEXTURE, value);
     }
     /**
@@ -91,76 +86,73 @@ class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
         var customShader = Laya.Shader3D.add("MultiplePassOutlineShader");
         var subShader = new Laya.SubShader(attributeMap, uniformMap,MultiplePassOutlineMaterial.shaderDefines);
         customShader.addSubShader(subShader);
-        let vs1 = "attribute vec4 a_Position;\n" + 
-        "attribute vec3 a_Normal;\n" + 
+        let vs1 = `attribute vec4 a_Position;
+        attribute vec3 a_Normal;
         
-        "uniform mat4 u_MvpMatrix;\n" + 
-        "uniform float u_OutlineWidth;\n" + 
+        uniform mat4 u_MvpMatrix; 
+        uniform float u_OutlineWidth;
 
         
-        "void main()\n" + 
-        "{\n" + 
-        "   vec4 position = vec4(a_Position.xyz + a_Normal * u_OutlineWidth, 1.0);\n" + 
-        "   gl_Position = u_MvpMatrix * position;\n" + 
-        "}\n" ;
+        void main() 
+        {
+           vec4 position = vec4(a_Position.xyz + a_Normal * u_OutlineWidth, 1.0);
+           gl_Position = u_MvpMatrix * position;
+        }`;
 
-        let ps1 = "#ifdef FSHIGHPRECISION\n" + 
-        "precision highp float;\n" + 
-        "#else\n" + 
-        "   precision mediump float;\n" + 
-        "#endif\n" + 
-        "uniform vec4 u_OutlineColor;\n" + 
-        "uniform float u_OutlineLightness;\n" + 
+        let ps1 = `#ifdef FSHIGHPRECISION
+        precision highp float;
+        #else
+           precision mediump float;
+        #endif
+        uniform vec4 u_OutlineColor; 
+        uniform float u_OutlineLightness;
     
-        "void main()\n" + 
-        "{\n" + 
-        "   vec3 finalColor = u_OutlineColor.rgb * u_OutlineLightness;\n" + 
-        
-        "   gl_FragColor = vec4(finalColor,0.0);\n" + 
-        "}";
+        void main()
+        {
+           vec3 finalColor = u_OutlineColor.rgb * u_OutlineLightness;
+           gl_FragColor = vec4(finalColor,0.0); 
+        }`;
     
         var pass1 = subShader.addShaderPass(vs1, ps1);
         pass1.renderState.cull = Laya.RenderState.CULL_FRONT;
-        let vs2 = '#include "Lighting.glsl";\n' + 
+        let vs2 = `#include "Lighting.glsl"
 
-        "attribute vec4 a_Position;\n" + 
-        "attribute vec2 a_Texcoord0;\n" + 
+        attribute vec4 a_Position; 
+        attribute vec2 a_Texcoord0;
         
-        "uniform mat4 u_MvpMatrix;\n" + 
-        "uniform mat4 u_WorldMat;\n" + 
+        uniform mat4 u_MvpMatrix;
+        uniform mat4 u_WorldMat;
         
+        attribute vec3 a_Normal; 
+        varying vec3 v_Normal; 
+        varying vec2 v_Texcoord0; 
         
-        "attribute vec3 a_Normal;\n" + 
-        "varying vec3 v_Normal;\n" + 
-        "varying vec2 v_Texcoord0;\n" + 
+        void main() 
+        {
+           gl_Position = u_MvpMatrix * a_Position;
+           mat3 worldMat=mat3(u_WorldMat); 
+           v_Normal=worldMat*a_Normal; 
+           v_Texcoord0 = a_Texcoord0;
+           gl_Position=remapGLPositionZ(gl_Position); 
+        }`;
+        let ps2 = `#ifdef FSHIGHPRECISION
+        precision highp float;
+        #else
+        precision mediump float;
+        #endif
+        varying vec2 v_Texcoord0;
+        varying vec3 v_Normal;
         
-        "void main()\n" + 
-        "{\n" + 
-        "   gl_Position = u_MvpMatrix * a_Position;\n" + 
-              
-        "   mat3 worldMat=mat3(u_WorldMat);\n" + 
-        "   v_Normal=worldMat*a_Normal;\n" + 
-        "   v_Texcoord0 = a_Texcoord0;\n" + 
-        "   gl_Position=remapGLPositionZ(gl_Position);\n" + 
-        "}\n" 
-        let ps2 = "#ifdef FSHIGHPRECISION\n" + 
-        "precision highp float;\n" +
-        "#else\n" +
-        "precision mediump float;\n" +
-        "#endif\n" +
-        "varying vec2 v_Texcoord0;\n" +
-        "varying vec3 v_Normal;\n" +
-        
-        "uniform sampler2D u_AlbedoTexture;\n" +
+        uniform sampler2D u_AlbedoTexture;
         
         
-        "void main()\n" +
-        "{\n" +
-        "   vec4 albedoTextureColor = vec4(1.0);\n" +
+        void main()
+        {
+           vec4 albedoTextureColor = vec4(1.0);
            
-        "   albedoTextureColor = texture2D(u_AlbedoTexture, v_Texcoord0);\n" +
-        "   gl_FragColor=albedoTextureColor;\n" +
-        "}\n" 
+           albedoTextureColor = texture2D(u_AlbedoTexture, v_Texcoord0);
+           gl_FragColor=albedoTextureColor;
+        }`; 
         
         subShader.addShaderPass(vs2, ps2);
     }

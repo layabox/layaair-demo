@@ -22,7 +22,6 @@ package LayaAir3D_Shader.customMaterials {
 		public static const OUTLINEWIDTH:int = Shader3D.propertyNameToID("u_OutlineWidth");
 		public static const OUTLINELIGHTNESS:int = Shader3D.propertyNameToID("u_OutlineLightness");
 		
-		public static var SHADERDEFINE_ALBEDOTEXTURE:int;
 		/**@private */
 		public static var shaderDefines:ShaderDefines = new ShaderDefines(BaseMaterial.shaderDefines);
 		
@@ -30,7 +29,6 @@ package LayaAir3D_Shader.customMaterials {
 		 * @private
 		 */
 		public static function __init__():void {
-			SHADERDEFINE_ALBEDOTEXTURE = shaderDefines.registerDefine("ALBEDOTEXTURE");
 		}
 		/**
 		 * 获取漫反射贴图。
@@ -45,10 +43,6 @@ package LayaAir3D_Shader.customMaterials {
 		 * @param value 漫反射贴图。
 		 */
 		public function set albedoTexture(value:BaseTexture):void {
-			if (value)
-				_defineDatas.add(MultiplePassOutlineMaterial.SHADERDEFINE_ALBEDOTEXTURE);
-			else
-				_defineDatas.remove(MultiplePassOutlineMaterial.SHADERDEFINE_ALBEDOTEXTURE);
 			_shaderValues.setTexture(ALBEDOTEXTURE, value);
 		}
 		/**

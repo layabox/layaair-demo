@@ -6,7 +6,6 @@ export default class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
 		public static OUTLINELIGHTNESS = Laya.Shader3D.propertyNameToID("u_OutlineLightness");
 		public static OUTLINECOLOR = Laya.Shader3D.propertyNameToID("u_OutlineColor");
 		
-		public static SHADERDEFINE_ALBEDOTEXTURE;
 		/**@private */
 		public static shaderDefines:Laya.ShaderDefines = new Laya.ShaderDefines(Laya.BaseMaterial.shaderDefines);
 		
@@ -14,7 +13,6 @@ export default class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
 		 * @private
 		 */
 		public static __init__():void {
-			MultiplePassOutlineMaterial.SHADERDEFINE_ALBEDOTEXTURE = MultiplePassOutlineMaterial.shaderDefines.registerDefine("ALBEDOTEXTURE");
 		}
 		/**
 		 * 获取漫反射贴图。
@@ -29,10 +27,6 @@ export default class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
 		 * @param value 漫反射贴图。
 		 */
 		public  set albedoTexture(value:Laya.BaseTexture) {
-			if (value)
-				this._defineDatas.add(MultiplePassOutlineMaterial.SHADERDEFINE_ALBEDOTEXTURE);
-			else
-				this._defineDatas.remove(MultiplePassOutlineMaterial.SHADERDEFINE_ALBEDOTEXTURE);
 			this._shaderValues.setTexture(MultiplePassOutlineMaterial.ALBEDOTEXTURE, value);
 		}
 		/**
