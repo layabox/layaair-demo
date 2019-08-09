@@ -1,5 +1,5 @@
 /**
- * AStar + LayaAir 编写的寻路示例代码
+ * 本实例使用的A星算法，来源于开源A星算法:https://github.com/bgrins/javascript-astar
  */
 class AStarFindPath{
   constructor(){
@@ -8,6 +8,8 @@ class AStarFindPath{
     this.upVector3 = new Laya.Vector3(0, 1, 0);
     this.tarPosition = new Laya.Vector3(0, 0, 0);
     this.finalPosition = new Laya.Vector3(0, 0, 0);
+    this.rotation = new Laya.Vector3(-45, 180, 0);
+	  this.rotation2 = new Laya.Vector3(0, 180, 0);
     this.index = 0;
     this.curPathIndex = 0;
     this.nextPathIndex = 1;
@@ -42,7 +44,6 @@ class AStarFindPath{
     let heightMap = Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/HeightMap.png");
     //初始化MeshTerrainSprite3D
     this.terrainSprite = Laya.MeshTerrainSprite3D.createFromMeshAndHeightMap(meshSprite3D.meshFilter.sharedMesh, heightMap, 6.574996471405029, 10.000000953674316);
-    //更新terrainSprite世界矩阵(为可行走区域世界矩阵)
 
     //读取墙壁的数据
     this.aStarMap = Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/AStarMap.png");
@@ -80,11 +81,10 @@ class AStarFindPath{
     }));
     moveCamera.addComponent(CameraMoveScript);
     moveCamera.transform.localPosition = new Laya.Vector3(0, 7, -7);
-    moveCamera.transform.rotate(new Laya.Vector3(-45, 180, 0), true, false);
+    moveCamera.transform.rotate(this.rotation, true, false);
     Laya.stage.on(Laya.Event.MOUSE_UP, this, function () {
         this.index = 0;
         //获取每次生成路径
-        var x = this.path[this.curPathIndex % this.pointCount].x;
         var startPoint = this.getGridIndex(this.path[this.curPathIndex % this.pointCount].x, 
                                                   this.path[this.curPathIndex++ % this.pointCount].z);
         var endPoint = this.getGridIndex(this.path[this.nextPathIndex % this.pointCount].x, 
@@ -172,21 +172,6 @@ class AStarFindPath{
 		return aStarArr;
 	}
 
-  createPath(){
-    // for(let i = 0; i != 64; ++i){
-    //   for(let j = 0; j != 64; ++j){
-    //     let point = this.graph.grid[i][j];  
-    //     if(point.weight === 0){
-    //       var resultPoint = this.pathFingding.getRealPositionB(point);  
-    //       var box = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(0.76, 0.76, 0.76)));
-    //       box.transform.position = new Laya.Vector3(resultPoint.x, this.moveSprite3D.transform.position.y, resultPoint.z);
-    //       box.meshRenderer.material = new Laya.BlinnPhongMaterial();
-    //       box.meshRenderer.material.albedoColor = new Laya.Vector4(1.0,0.0,0.0,1.0);
-    //     }  
-    //   }
-    // }
-  }
-
   loopfun(){
     if(this.resPath && this.index < this.resPath.length){
       //AStar寻路位置
@@ -197,18 +182,18 @@ class AStarFindPath{
       if (isNaN(this.position.y)) {
         this.position.y = this.moveSprite3D.transform.position.y;
       }
-      this.tarPosition.x = this.position.x;
-      this.tarPosition.z = this.position.z;
-      this.tarPosition.y = this.moveSprite3D.transform.position.y;
-      //调整方向
-      this.layaMonkey.transform.lookAt(this.tarPosition, this.upVector3, false);
-      //因为资源规格,这里需要旋转180度
-      this.layaMonkey.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
-      //调整位置
-      // var box = this.scene.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(0.76, 0.76, 0.76)));
-      // box.transform.position = new Laya.Vector3(this.position.x, this.position.y, this.position.z);
-      // box.meshRenderer.material = new Laya.BlinnPhongMaterial();
-      // box.meshRenderer.material.albedoColor = new Laya.Vector4(1.0,0.0,0.0,1.0);
+      
+      //在出发前进行姿态的调整
+      if(this.index === 1){
+        //调整方向
+        this.tarPosition.x = this.resPath[this.resPath.length -1].x;
+        this.tarPosition.z = this.resPath[this.resPath.length -1].z;
+        this.tarPosition.y = this.moveSprite3D.transform.position.y;
+        this.layaMonkey.transform.lookAt(this.tarPosition, this.upVector3, false);
+        //因为资源规格,这里需要旋转180度
+        this.layaMonkey.transform.rotate(this.rotation2, false, false);
+      }
+
       Laya.Tween.to(this.finalPosition, { x: this.position.x, y: this.position.y, z: this.position.z }, 40);
       this.moveSprite3D.transform.position = this.finalPosition;
     }
@@ -216,9 +201,7 @@ class AStarFindPath{
   }
   initPath(scene){
     for (let i = 0; i < this.pointCount; i++) {
-      //as中的String变为了string
       let str = "path" + i;
-      let pos = scene.getChildByName('Scenes').getChildByName('Area').getChildByName(str).transform.localPosition;
       this.path.push(scene.getChildByName('Scenes').getChildByName('Area').getChildByName(str).transform.localPosition);
 
     }
