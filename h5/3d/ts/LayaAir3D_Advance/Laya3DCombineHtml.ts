@@ -6,7 +6,7 @@ class Laya3DCombineHtml {
 		//1.开启第四个参数
         var config3D:Laya.Config3D = new Laya.Config3D();
 		config3D.isAlpha = true;
-        Laya3D.init(0, 0);
+        Laya3D.init(0, 0, config3D);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
         Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
         //2.设置舞台背景色为空
