@@ -70,7 +70,6 @@ class CustomMesh{
         let plane = this.sprite3D.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(10, 10, 256,256)));
         var mat = new Laya.BlinnPhongMaterial();
         plane.meshRenderer.sharedMaterial = mat;
-        mat.albedoColor = new Laya.Vector4(1.0, 0.0, 0.0, 1.0);
         let planeLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(500000));
         Tool.linearModel(plane, planeLineSprite3D, Laya.Color.GRAY);
     }
