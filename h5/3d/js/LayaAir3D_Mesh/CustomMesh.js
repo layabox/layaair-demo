@@ -33,6 +33,9 @@ class CustomMesh{
         let box = this.sprite3D.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createBox(0.5, 0.5, 0.5)));
         box.transform.position = new Laya.Vector3(2.0, 0.25, 0.6);
         box.transform.rotate(new Laya.Vector3(0, 45, 0), false, false);
+        var mat = new Laya.BlinnPhongMaterial();
+        mat.albedoColor = new Laya.Vector4(1.0, 0.0, 0.0, 1.0);
+        box.meshRenderer.sharedMaterial = mat;
         let boxLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(100));
         Tool.linearModel(box, boxLineSprite3D, Laya.Color.GREEN);
     }
@@ -67,8 +70,11 @@ class CustomMesh{
     //平面
     drawPlane(){
         //平面
-        let plane = this.sprite3D.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(6, 6, 10, 10)));
-        let planeLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(1000));
+        let plane = this.sprite3D.addChild(new Laya.MeshSprite3D(Laya.PrimitiveMesh.createPlane(10, 10, 256,256)));
+        var mat = new Laya.BlinnPhongMaterial();
+        plane.meshRenderer.sharedMaterial = mat;
+        mat.albedoColor = new Laya.Vector4(1.0, 0.0, 0.0, 1.0);
+        let planeLineSprite3D = this.lineSprite3D.addChild(new Laya.PixelLineSprite3D(500000));
         Tool.linearModel(plane, planeLineSprite3D, Laya.Color.GRAY);
     }
     loadUI(){

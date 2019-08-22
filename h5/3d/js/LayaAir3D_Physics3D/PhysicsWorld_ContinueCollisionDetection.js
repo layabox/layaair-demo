@@ -54,6 +54,7 @@ class PhysicsWorldContinueCollisionDetection{
         let sphereShape = new Laya.SphereColliderShape(radius);
         rigidBody.colliderShape = sphereShape;
         rigidBody.mass = 10;
+        debugger;
         rigidBody.ccdSweptSphereRadius = radius;
         rigidBody.ccdMotionThreshold = 0.0001;
     }

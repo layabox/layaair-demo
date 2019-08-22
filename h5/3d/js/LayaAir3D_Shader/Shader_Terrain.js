@@ -16,19 +16,22 @@ class Shader_Terrain{
 
     loadSprite3D(mesh){
             let terrain = this.scene.addChild(new Laya.MeshSprite3D(mesh));
-            Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/splatAlphaTexture.png", Laya.Handler.create(this, this.loadSplatAlphaTexture));
-            Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_01.jpg", Laya.Handler.create(this, this.loadDiffuseTexture1));
-            Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_02.jpg", Laya.Handler.create(this, this.loadDiffuseTexture2));
-            Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_03.jpg", Laya.Handler.create(this, this.loadDiffuseTexture3));
-            Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_04.jpg", Laya.Handler.create(this, this.loadDiffuseTexture4));
-            this.customMaterial.setDiffuseScale1(new Laya.Vector2(27.92727, 27.92727));
-            this.customMaterial.setDiffuseScale2(new Laya.Vector2(13.96364, 13.96364));
-            this.customMaterial.setDiffuseScale3(new Laya.Vector2(18.61818, 18.61818));
-            this.customMaterial.setDiffuseScale4(new Laya.Vector2(13.96364, 13.96364));
-            this.customMaterial.ambientColor = new Laya.Vector3(1, 1, 1);
-            this.customMaterial.diffuseColor = new Laya.Vector3(1, 1, 1);
-            this.customMaterial.specularColor = new Laya.Vector4(1, 1, 1, 8);
-            terrain.meshRenderer.sharedMaterial = this.customMaterial;
+            var line = this.scene.addChild(new Laya.PixelLineSprite3D(100000));
+            Tool.linearModel(terrain, line, Laya.Color.GREEN);
+            terrain.active = false;
+            // Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/splatAlphaTexture.png", Laya.Handler.create(this, this.loadSplatAlphaTexture));
+            // Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_01.jpg", Laya.Handler.create(this, this.loadDiffuseTexture1));
+            // Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_02.jpg", Laya.Handler.create(this, this.loadDiffuseTexture2));
+            // Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_03.jpg", Laya.Handler.create(this, this.loadDiffuseTexture3));
+            // Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_04.jpg", Laya.Handler.create(this, this.loadDiffuseTexture4));
+            // this.customMaterial.setDiffuseScale1(new Laya.Vector2(27.92727, 27.92727));
+            // this.customMaterial.setDiffuseScale2(new Laya.Vector2(13.96364, 13.96364));
+            // this.customMaterial.setDiffuseScale3(new Laya.Vector2(18.61818, 18.61818));
+            // this.customMaterial.setDiffuseScale4(new Laya.Vector2(13.96364, 13.96364));
+            // this.customMaterial.ambientColor = new Laya.Vector3(1, 1, 1);
+            // this.customMaterial.diffuseColor = new Laya.Vector3(1, 1, 1);
+            // this.customMaterial.specularColor = new Laya.Vector4(1, 1, 1, 8);
+            // terrain.meshRenderer.sharedMaterial = this.customMaterial;
     }
     loadSplatAlphaTexture(tex){
         this.customMaterial.splatAlphaTexture = tex;
