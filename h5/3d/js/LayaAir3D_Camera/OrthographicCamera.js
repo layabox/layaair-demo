@@ -9,7 +9,7 @@ class OrthographicCamera{
         Laya.stage.addChild(new Laya.Image("res/cartoon2/background.jpg"));
         this.scene = Laya.stage.addChild(new Laya.Scene3D());
         this.camera = this.scene.addChild(new Laya.Camera(0, 0.1, 1000));
-        this.camera.transform.rotate(new Laya.Vector3(-90, 0, 0), false, false);
+        this.camera.transform.rotate(new Laya.Vector3(-45, 0, 0), false, false);
         this.camera.transform.translate(new Laya.Vector3(5, -10, 1));
         this.camera.orthographic = true;
         this.camera.clearFlag = Laya.BaseCamera.CLEARFLAG_DEPTHONLY;
