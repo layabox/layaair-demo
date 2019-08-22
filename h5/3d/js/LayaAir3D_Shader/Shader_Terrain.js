@@ -16,9 +16,6 @@ class Shader_Terrain{
 
     loadSprite3D(mesh){
             let terrain = this.scene.addChild(new Laya.MeshSprite3D(mesh));
-            var line = this.scene.addChild(new Laya.PixelLineSprite3D(100000));
-            Tool.linearModel(terrain, line, Laya.Color.GREEN);
-            terrain.active = false;
             Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/splatAlphaTexture.png", Laya.Handler.create(this, this.loadSplatAlphaTexture));
             Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_01.jpg", Laya.Handler.create(this, this.loadDiffuseTexture1));
             Laya.Texture2D.load("res/threeDimen/skinModel/Terrain/ground_02.jpg", Laya.Handler.create(this, this.loadDiffuseTexture2));
