@@ -1735,8 +1735,21 @@ window.box2d=box2d;
             if (["get", "set"].indexOf(accessor) === -1) {
                 return;
             }
-            let propertyDes = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(obj), prop);
-            return propertyDes && propertyDes[accessor].bind(obj);
+            let privateProp = `_$${accessor}_${prop}`;
+            if (obj[privateProp]) {
+                return obj[privateProp];
+            }
+            let ObjConstructor = obj.constructor;
+            let des;
+            while (ObjConstructor) {
+                des = Object.getOwnPropertyDescriptor(ObjConstructor.prototype, prop);
+                if (des && des[accessor]) {
+                    obj[privateProp] = des[accessor].bind(obj);
+                    break;
+                }
+                ObjConstructor = Object.getPrototypeOf(ObjConstructor);
+            }
+            return obj[privateProp];
         }
         resetCollider(resetShape) {
             var comps = this.owner.getComponents(ColliderBase);
@@ -2193,61 +2206,6 @@ window.box2d=box2d;
     Laya.ClassUtils.regClass("laya.physics.BoxCollider", BoxCollider);
     Laya.ClassUtils.regClass("Laya.BoxCollider", BoxCollider);
 
-    class CircleCollider extends ColliderBase {
-        constructor() {
-            super(...arguments);
-            this._x = 0;
-            this._y = 0;
-            this._radius = 50;
-        }
-        getDef() {
-            if (!this._shape) {
-                this._shape = new window.box2d.b2CircleShape();
-                this._setShape(false);
-            }
-            this.label = (this.label || "CircleCollider");
-            return super.getDef();
-        }
-        _setShape(re = true) {
-            var scale = this.owner["scaleX"] || 1;
-            this._shape.m_radius = this._radius / Physics.PIXEL_RATIO * scale;
-            this._shape.m_p.Set((this._radius + this._x) / Physics.PIXEL_RATIO * scale, (this._radius + this._y) / Physics.PIXEL_RATIO * scale);
-            if (re)
-                this.refresh();
-        }
-        get x() {
-            return this._x;
-        }
-        set x(value) {
-            this._x = value;
-            if (this._shape)
-                this._setShape();
-        }
-        get y() {
-            return this._y;
-        }
-        set y(value) {
-            this._y = value;
-            if (this._shape)
-                this._setShape();
-        }
-        get radius() {
-            return this._radius;
-        }
-        set radius(value) {
-            if (value <= 0)
-                throw "CircleCollider radius cannot be less than 0";
-            this._radius = value;
-            if (this._shape)
-                this._setShape();
-        }
-        resetShape(re = true) {
-            this._setShape();
-        }
-    }
-    Laya.ClassUtils.regClass("laya.physics.CircleCollider", CircleCollider);
-    Laya.ClassUtils.regClass("Laya.CircleCollider", CircleCollider);
-
     class ChainCollider extends ColliderBase {
         constructor() {
             super(...arguments);
@@ -2314,6 +2272,61 @@ window.box2d=box2d;
     }
     Laya.ClassUtils.regClass("laya.physics.ChainCollider", ChainCollider);
     Laya.ClassUtils.regClass("Laya.ChainCollider", ChainCollider);
+
+    class CircleCollider extends ColliderBase {
+        constructor() {
+            super(...arguments);
+            this._x = 0;
+            this._y = 0;
+            this._radius = 50;
+        }
+        getDef() {
+            if (!this._shape) {
+                this._shape = new window.box2d.b2CircleShape();
+                this._setShape(false);
+            }
+            this.label = (this.label || "CircleCollider");
+            return super.getDef();
+        }
+        _setShape(re = true) {
+            var scale = this.owner["scaleX"] || 1;
+            this._shape.m_radius = this._radius / Physics.PIXEL_RATIO * scale;
+            this._shape.m_p.Set((this._radius + this._x) / Physics.PIXEL_RATIO * scale, (this._radius + this._y) / Physics.PIXEL_RATIO * scale);
+            if (re)
+                this.refresh();
+        }
+        get x() {
+            return this._x;
+        }
+        set x(value) {
+            this._x = value;
+            if (this._shape)
+                this._setShape();
+        }
+        get y() {
+            return this._y;
+        }
+        set y(value) {
+            this._y = value;
+            if (this._shape)
+                this._setShape();
+        }
+        get radius() {
+            return this._radius;
+        }
+        set radius(value) {
+            if (value <= 0)
+                throw "CircleCollider radius cannot be less than 0";
+            this._radius = value;
+            if (this._shape)
+                this._setShape();
+        }
+        resetShape(re = true) {
+            this._setShape();
+        }
+    }
+    Laya.ClassUtils.regClass("laya.physics.CircleCollider", CircleCollider);
+    Laya.ClassUtils.regClass("Laya.CircleCollider", CircleCollider);
 
     class PhysicsDebugDraw extends Laya.Sprite {
         constructor() {
@@ -2880,6 +2893,42 @@ window.box2d=box2d;
     Laya.ClassUtils.regClass("laya.physics.joint.PrismaticJoint", PrismaticJoint);
     Laya.ClassUtils.regClass("Laya.PrismaticJoint", PrismaticJoint);
 
+    class PulleyJoint extends JointBase {
+        constructor() {
+            super(...arguments);
+            this.selfAnchor = [0, 0];
+            this.otherAnchor = [0, 0];
+            this.selfGroundPoint = [0, 0];
+            this.otherGroundPoint = [0, 0];
+            this.ratio = 1.5;
+            this.collideConnected = false;
+        }
+        _createJoint() {
+            if (!this._joint) {
+                if (!this.otherBody)
+                    throw "otherBody can not be empty";
+                this.selfBody = this.selfBody || this.owner.getComponent(RigidBody);
+                if (!this.selfBody)
+                    throw "selfBody can not be empty";
+                var box2d = window.box2d;
+                var def = PulleyJoint._temp || (PulleyJoint._temp = new box2d.b2PulleyJointDef());
+                var posA = this.otherBody.owner.localToGlobal(Laya.Point.TEMP.setTo(this.otherAnchor[0], this.otherAnchor[1]), false, Physics.I.worldRoot);
+                var anchorVecA = new box2d.b2Vec2(posA.x / Physics.PIXEL_RATIO, posA.y / Physics.PIXEL_RATIO);
+                var posB = this.selfBody.owner.localToGlobal(Laya.Point.TEMP.setTo(this.selfAnchor[0], this.selfAnchor[1]), false, Physics.I.worldRoot);
+                var anchorVecB = new box2d.b2Vec2(posB.x / Physics.PIXEL_RATIO, posB.y / Physics.PIXEL_RATIO);
+                var groundA = this.otherBody.owner.localToGlobal(Laya.Point.TEMP.setTo(this.otherGroundPoint[0], this.otherGroundPoint[1]), false, Physics.I.worldRoot);
+                var groundVecA = new box2d.b2Vec2(groundA.x / Physics.PIXEL_RATIO, groundA.y / Physics.PIXEL_RATIO);
+                var groundB = this.selfBody.owner.localToGlobal(Laya.Point.TEMP.setTo(this.selfGroundPoint[0], this.selfGroundPoint[1]), false, Physics.I.worldRoot);
+                var groundVecB = new box2d.b2Vec2(groundB.x / Physics.PIXEL_RATIO, groundB.y / Physics.PIXEL_RATIO);
+                def.Initialize(this.otherBody.getBody(), this.selfBody.getBody(), groundVecA, groundVecB, anchorVecA, anchorVecB, this.ratio);
+                def.collideConnected = this.collideConnected;
+                this._joint = Physics.I._createJoint(def);
+            }
+        }
+    }
+    Laya.ClassUtils.regClass("laya.physics.joint.PulleyJoint", PulleyJoint);
+    Laya.ClassUtils.regClass("Laya.PulleyJoint", PulleyJoint);
+
     class RevoluteJoint extends JointBase {
         constructor() {
             super(...arguments);
@@ -2963,42 +3012,6 @@ window.box2d=box2d;
     }
     Laya.ClassUtils.regClass("laya.physics.joint.RevoluteJoint", RevoluteJoint);
     Laya.ClassUtils.regClass("Laya.RevoluteJoint", RevoluteJoint);
-
-    class PulleyJoint extends JointBase {
-        constructor() {
-            super(...arguments);
-            this.selfAnchor = [0, 0];
-            this.otherAnchor = [0, 0];
-            this.selfGroundPoint = [0, 0];
-            this.otherGroundPoint = [0, 0];
-            this.ratio = 1.5;
-            this.collideConnected = false;
-        }
-        _createJoint() {
-            if (!this._joint) {
-                if (!this.otherBody)
-                    throw "otherBody can not be empty";
-                this.selfBody = this.selfBody || this.owner.getComponent(RigidBody);
-                if (!this.selfBody)
-                    throw "selfBody can not be empty";
-                var box2d = window.box2d;
-                var def = PulleyJoint._temp || (PulleyJoint._temp = new box2d.b2PulleyJointDef());
-                var posA = this.otherBody.owner.localToGlobal(Laya.Point.TEMP.setTo(this.otherAnchor[0], this.otherAnchor[1]), false, Physics.I.worldRoot);
-                var anchorVecA = new box2d.b2Vec2(posA.x / Physics.PIXEL_RATIO, posA.y / Physics.PIXEL_RATIO);
-                var posB = this.selfBody.owner.localToGlobal(Laya.Point.TEMP.setTo(this.selfAnchor[0], this.selfAnchor[1]), false, Physics.I.worldRoot);
-                var anchorVecB = new box2d.b2Vec2(posB.x / Physics.PIXEL_RATIO, posB.y / Physics.PIXEL_RATIO);
-                var groundA = this.otherBody.owner.localToGlobal(Laya.Point.TEMP.setTo(this.otherGroundPoint[0], this.otherGroundPoint[1]), false, Physics.I.worldRoot);
-                var groundVecA = new box2d.b2Vec2(groundA.x / Physics.PIXEL_RATIO, groundA.y / Physics.PIXEL_RATIO);
-                var groundB = this.selfBody.owner.localToGlobal(Laya.Point.TEMP.setTo(this.selfGroundPoint[0], this.selfGroundPoint[1]), false, Physics.I.worldRoot);
-                var groundVecB = new box2d.b2Vec2(groundB.x / Physics.PIXEL_RATIO, groundB.y / Physics.PIXEL_RATIO);
-                def.Initialize(this.otherBody.getBody(), this.selfBody.getBody(), groundVecA, groundVecB, anchorVecA, anchorVecB, this.ratio);
-                def.collideConnected = this.collideConnected;
-                this._joint = Physics.I._createJoint(def);
-            }
-        }
-    }
-    Laya.ClassUtils.regClass("laya.physics.joint.PulleyJoint", PulleyJoint);
-    Laya.ClassUtils.regClass("Laya.PulleyJoint", PulleyJoint);
 
     class RopeJoint extends JointBase {
         constructor() {
