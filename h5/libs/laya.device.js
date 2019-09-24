@@ -217,6 +217,8 @@
 	class HtmlVideo extends Laya.Bitmap {
 	    constructor() {
 	        super();
+	        this._w = 0;
+	        this._h = 0;
 	        this._width = 1;
 	        this._height = 1;
 	        this.createDomElement();
@@ -227,10 +229,10 @@
 	        style.position = 'absolute';
 	        style.top = '0px';
 	        style.left = '0px';
-	        this.video.addEventListener("loadedmetadata", (function () {
+	        this.video.addEventListener("loadedmetadata", () => {
 	            this._w = this.video.videoWidth;
 	            this._h = this.video.videoHeight;
-	        })['bind'](this));
+	        });
 	    }
 	    setSource(url, extension) {
 	        while (this.video.childElementCount)
@@ -377,9 +379,9 @@
 	    static onVolumechange(e) { e.target.layaTarget.event("volumechange"); }
 	    static onWaiting(e) { e.target.layaTarget.event("waiting"); }
 	    onPlayComplete(e) {
-	        this.event("ended");
 	        if (!Laya.ILaya.Render.isConchApp || !this.videoElement || !this.videoElement.loop)
 	            Laya.ILaya.timer.clear(this, this.renderCanvas);
+	        this.event("ended");
 	    }
 	    load(url) {
 	        if (url.indexOf("blob:") == 0)

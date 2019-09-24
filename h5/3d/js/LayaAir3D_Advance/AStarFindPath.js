@@ -47,6 +47,15 @@ class AStarFindPath{
 
     //读取墙壁的数据
     this.aStarMap = Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/Assets/AStarMap.png");
+    this.resPath = [];
+    this.startPoint = new Laya.Vector2();
+    this.endPoint = new Laya.Vector2();
+    for(var i = 0; i < 20; ++i){
+			var newVec = new Laya.Vector2();
+			this.resPath.push(newVec);
+    }
+    
+    this.resPathLength = 0;
 
     //使用astar组织数据
     var aStarArr = this.createGridFromAStarMap( this.aStarMap);
@@ -91,11 +100,11 @@ class AStarFindPath{
                                                   this.path[this.nextPathIndex++ % this.pointCount].z);
         var start = this.graph.grid[startPoint.x][startPoint.z];   
         var end = this.graph.grid[endPoint.x][endPoint.z];                  
-        this.everyPath = astar.search(this.graph, start, end, {
+        this._everyPath = astar.search(this.graph, start, end, {
           closest: this.opts.closest
         });
-        if(this.everyPath && this.everyPath.length > 0){
-          this.resPath = this.getRealPosition(start,this.everyPath); 
+        if (this._everyPath && this._everyPath.length > 0) {
+          this.getRealPosition(start, this._everyPath);
         }
     });
     Laya.timer.loop(40, this, this.loopfun);
@@ -127,23 +136,32 @@ class AStarFindPath{
    * 得到世界坐标系下的真实坐标
    */
   getRealPosition=function(start,path){
-		var resPath = [];
-		var minX=this.terrainSprite.minX;
-		var minZ=this.terrainSprite.minZ;
-		var cellX=this.terrainSprite.width /  this.aStarMap.width;
-		var cellZ=this.terrainSprite.depth /  this.aStarMap.height;
-		var halfCellX=cellX / 2;
-		var halfCellZ=cellZ / 2;
-		resPath[0] = [];
-		resPath[0].x = start.x *cellX+halfCellX+minX;
-		resPath[0].z = start.y *cellZ+halfCellZ+minZ;
-		for (var i = 1;i < path.length;i++){
-			var gridPos=path[i];
-			resPath[i] = [];
-			resPath[i].x = gridPos.x *cellX+halfCellX+minX;
-			resPath[i].z = gridPos.y *cellZ+halfCellZ+minZ;
+    this.resPathLength = path.length;
+		var minX = this.terrainSprite.minX;
+		var minZ = this.terrainSprite.minZ;
+		var cellX = this.terrainSprite.width / this.aStarMap.width;
+		var cellZ = this.terrainSprite.depth / this.aStarMap.height;
+		var halfCellX = cellX / 2;
+		var halfCellZ = cellZ / 2;
+
+		this.resPath[0].x = start.x * cellX + halfCellX + minX;
+		this.resPath[0].y = start.y * cellZ + halfCellZ + minZ;
+
+		if(this.resPath.length < path.length ){
+			var diff = path.length - this.resPath.length;
+			for(var j = 0; j < diff; ++j){
+				var newPoint = new Laya.Vector2();
+				this.resPath.push(newPoint);
+			}
+			
 		}
-		return resPath;
+
+		for (var i = 1; i < path.length; i++) {
+			var gridPos = path[i];
+			this.resPath[i].x = gridPos.x * cellX + halfCellX + minX;
+			this.resPath[i].y = gridPos.y * cellZ + halfCellZ + minZ;
+		}
+		return 0;
 	}
 
   /**
@@ -173,30 +191,28 @@ class AStarFindPath{
 	}
 
   loopfun(){
-    if(this.resPath && this.index < this.resPath.length){
-      //AStar寻路位置
-      this.position.x = this.resPath[this.index].x;
-      this.position.z = this.resPath[this.index++].z;
-      //HeightMap获取高度数据
-      this.position.y = this.terrainSprite.getHeight(this.position.x, this.position.z);
-      if (isNaN(this.position.y)) {
-        this.position.y = this.moveSprite3D.transform.position.y;
-      }
-      
-      //在出发前进行姿态的调整
-      if(this.index === 1){
-        //调整方向
-        this.tarPosition.x = this.resPath[this.resPath.length -1].x;
-        this.tarPosition.z = this.resPath[this.resPath.length -1].z;
-        this.tarPosition.y = this.moveSprite3D.transform.position.y;
-        this.layaMonkey.transform.lookAt(this.tarPosition, this.upVector3, false);
-        //因为资源规格,这里需要旋转180度
-        this.layaMonkey.transform.rotate(this.rotation2, false, false);
-      }
+    if (this.resPath && this.index < this.resPathLength) {
+			//AStar寻路位置
+			this.position.x = this.resPath[this.index].x;
+			this.position.z = this.resPath[this.index++].y;
+			//HeightMap获取高度数据
+			this.position.y = this.terrainSprite.getHeight(this.position.x, this.position.z);
+			if (isNaN(this.position.y)) {
+				this.position.y = this.moveSprite3D.transform.position.y;
+			}
 
-      Laya.Tween.to(this.finalPosition, { x: this.position.x, y: this.position.y, z: this.position.z }, 40);
-      this.moveSprite3D.transform.position = this.finalPosition;
-    }
+			this.tarPosition.x = this.position.x;
+			this.tarPosition.z = this.position.z;
+			this.tarPosition.y = this.moveSprite3D.transform.position.y;
+
+			//调整方向
+			this.layaMonkey.transform.lookAt(this.tarPosition, this.upVector3, false);
+			//因为资源规格,这里需要旋转180度
+			this.layaMonkey.transform.rotate(this.rotation2, false, false);
+			//调整位置
+			Laya.Tween.to(this.finalPosition, { x: this.position.x, y: this.position.y, z: this.position.z }, 40);
+			this.moveSprite3D.transform.position = this.finalPosition;
+		}
 
   }
   initPath(scene){

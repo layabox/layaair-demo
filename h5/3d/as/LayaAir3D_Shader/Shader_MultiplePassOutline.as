@@ -23,7 +23,6 @@ package LayaAir3D_Shader {
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
-			Shader3D.debugMode = true;
 			//显示性能面板
 			Stat.show();
 			//初始化Shader

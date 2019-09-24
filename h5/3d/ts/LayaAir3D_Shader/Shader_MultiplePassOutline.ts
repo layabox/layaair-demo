@@ -9,7 +9,6 @@ class Shader_MultiplePassOutline {
 		Laya3D.init(0, 0);
 		Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
 		Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
-		Laya.Shader3D.debugMode = true;
 		//显示性能面板
 		Laya.Stat.show();
 		//初始化Shader

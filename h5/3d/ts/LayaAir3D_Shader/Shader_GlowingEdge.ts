@@ -3,8 +3,6 @@ import CustomMaterial from "./customMaterials/CustomMaterial"
 class Shader_GlowingEdge {
     private rotation:Laya.Vector3 = new Laya.Vector3(0, 0.01, 0);
     constructor() {
-        //开启Shader调试模式
-		Laya.Shader3D.debugMode = true;
         //初始化引擎
         Laya3D.init(0, 0);
         Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
@@ -91,14 +89,13 @@ class Shader_GlowingEdge {
             'a_BoneIndices': Laya.VertexMesh.MESH_BLENDINDICES0
         };
         var uniformMap:Object = {
-            'u_Bones': Laya.Shader3D.PERIOD_CUSTOM, 
-            'u_CameraPos': Laya.Shader3D.PERIOD_CAMERA, 
-            'u_MvpMatrix': Laya.Shader3D.PERIOD_SPRITE, 
-            'u_WorldMat': Laya.Shader3D.PERIOD_SPRITE, 
-            'u_texture': Laya.Shader3D.PERIOD_MATERIAL, 
-            'u_marginalColor': Laya.Shader3D.PERIOD_MATERIAL, 
-            'u_DirectionLight.Direction': Laya.Shader3D.PERIOD_SCENE, 
-            'u_DirectionLight.Color': Laya.Shader3D.PERIOD_SCENE
+			'u_Bones': Laya.Shader3D.PERIOD_CUSTOM, 
+			'u_CameraPos': Laya.Shader3D.PERIOD_CAMERA, 
+			'u_MvpMatrix': Laya.Shader3D.PERIOD_SPRITE, 
+			'u_WorldMat': Laya.Shader3D.PERIOD_SPRITE, 
+			'u_texture': Laya.Shader3D.PERIOD_MATERIAL, 
+			'u_marginalColor': Laya.Shader3D.PERIOD_MATERIAL, 
+			'u_SunLight.color': Laya.Shader3D.PERIOD_SCENE,
         };
         var vs:string = `
         #include "Lighting.glsl";
@@ -146,9 +143,9 @@ class Shader_GlowingEdge {
         }`;
         var ps:string = `
         #ifdef FSHIGHPRECISION
-        precision highp float;
+            precision highp float;
         #else
-        precision mediump float;
+            precision mediump float;
         #endif
         #include "Lighting.glsl";
         varying vec2 v_Texcoord;
@@ -156,18 +153,19 @@ class Shader_GlowingEdge {
         uniform vec3 u_marginalColor;
         varying vec3 v_Normal;
         #if defined(DIRECTIONLIGHT)
-        uniform vec3 u_CameraPos;
-        varying vec3 v_PositionWorld;
-        uniform DirectionLight u_DirectionLight;
+            uniform vec3 u_CameraPos;
+            varying vec3 v_PositionWorld;
+            uniform DirectionLight u_SunLight;
         #endif
         void main()
         {
-        gl_FragColor=texture2D(u_texture,v_Texcoord);
-        vec3 normal=normalize(v_Normal);
-        vec3 toEyeDir = normalize(u_CameraPos-v_PositionWorld);
-        float Rim = 1.0 - max(0.0,dot(toEyeDir, normal));
-        vec3 Emissive = 2.0 * u_DirectionLight.Color * u_marginalColor * pow(Rim,3.0); 
-        gl_FragColor = texture2D(u_texture, v_Texcoord) + vec4(Emissive,1.0);
+            gl_FragColor=texture2D(u_texture,v_Texcoord);
+            vec3 normal=normalize(v_Normal);
+            vec3 toEyeDir = normalize(u_CameraPos-v_PositionWorld);
+            float Rim = 1.0 - max(0.0,dot(toEyeDir, normal));
+            vec3 lightColor = u_SunLight.color;
+            vec3 Emissive = 2.0 * lightColor * u_marginalColor * pow(Rim,3.0);  
+            gl_FragColor = texture2D(u_texture, v_Texcoord) + vec4(Emissive,1.0);
         }`;
 
         

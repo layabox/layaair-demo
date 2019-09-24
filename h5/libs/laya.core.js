@@ -182,7 +182,8 @@ window.Laya= (function (exports) {
             Pool.recover("DrawCurvesCmd", this);
         }
         run(context, gx, gy) {
-            context.drawCurves(this.x + gx, this.y + gy, this.points, this.lineColor, this.lineWidth);
+            if (this.points)
+                context.drawCurves(this.x + gx, this.y + gy, this.points, this.lineColor, this.lineWidth);
         }
         get cmdID() {
             return DrawCurvesCmd.ID;
@@ -202,12 +203,13 @@ window.Laya= (function (exports) {
             return cmd;
         }
         recover() {
-            this.texture._removeReference();
+            this.texture && this.texture._removeReference();
             this.texture = null;
             Pool.recover("DrawImageCmd", this);
         }
         run(context, gx, gy) {
-            context.drawTexture(this.texture, this.x + gx, this.y + gy, this.width, this.height);
+            if (this.texture)
+                context.drawTexture(this.texture, this.x + gx, this.y + gy, this.width, this.height);
         }
         get cmdID() {
             return DrawImageCmd.ID;
@@ -256,7 +258,7 @@ window.Laya= (function (exports) {
             Pool.recover("DrawLinesCmd", this);
         }
         run(context, gx, gy) {
-            context._drawLines(this.x + gx, this.y + gy, this.points, this.lineColor, this.lineWidth, this.vid);
+            this.points && context._drawLines(this.x + gx, this.y + gy, this.points, this.lineColor, this.lineWidth, this.vid);
         }
         get cmdID() {
             return DrawLinesCmd.ID;
@@ -281,7 +283,7 @@ window.Laya= (function (exports) {
             Pool.recover("DrawPathCmd", this);
         }
         run(context, gx, gy) {
-            context._drawPath(this.x + gx, this.y + gy, this.paths, this.brush, this.pen);
+            this.paths && context._drawPath(this.x + gx, this.y + gy, this.paths, this.brush, this.pen);
         }
         get cmdID() {
             return DrawPathCmd.ID;
@@ -349,7 +351,7 @@ window.Laya= (function (exports) {
             Pool.recover("DrawPolyCmd", this);
         }
         run(context, gx, gy) {
-            context._drawPoly(this.x + gx, this.y + gy, this.points, this.fillColor, this.lineColor, this.lineWidth, this.isConvexPolygon, this.vid);
+            this.points && context._drawPoly(this.x + gx, this.y + gy, this.points, this.fillColor, this.lineColor, this.lineWidth, this.isConvexPolygon, this.vid);
         }
         get cmdID() {
             return DrawPolyCmd.ID;
@@ -816,13 +818,160 @@ window.Laya= (function (exports) {
     LayaGL.UPLOAD_SHADER_UNIFORM_TYPE_ID = 0;
     LayaGL.UPLOAD_SHADER_UNIFORM_TYPE_DATA = 1;
 
+    class WebGLContext {
+        static __init__() {
+            var gl = LayaGL.instance;
+            WebGLContext._depthFunc = gl.LESS;
+            WebGLContext._blendEquation = gl.FUNC_ADD;
+            WebGLContext._blendEquationRGB = gl.FUNC_ADD;
+            WebGLContext._blendEquationAlpha = gl.FUNC_ADD;
+            WebGLContext._sFactor = gl.ONE;
+            WebGLContext._dFactor = gl.ZERO;
+            WebGLContext._sFactorAlpha = gl.ONE;
+            WebGLContext._dFactorAlpha = gl.ZERO;
+            WebGLContext._activedTextureID = gl.TEXTURE0;
+            WebGLContext._glTextureIDs = [gl.TEXTURE0, gl.TEXTURE1, gl.TEXTURE2, gl.TEXTURE3, gl.TEXTURE4, gl.TEXTURE5, gl.TEXTURE6, gl.TEXTURE7];
+        }
+        static useProgram(gl, program) {
+            if (WebGLContext._useProgram === program)
+                return false;
+            gl.useProgram(program);
+            WebGLContext._useProgram = program;
+            return true;
+        }
+        static setDepthTest(gl, value) {
+            value !== WebGLContext._depthTest && (WebGLContext._depthTest = value, value ? gl.enable(gl.DEPTH_TEST) : gl.disable(gl.DEPTH_TEST));
+        }
+        static setDepthMask(gl, value) {
+            value !== WebGLContext._depthMask && (WebGLContext._depthMask = value, gl.depthMask(value));
+        }
+        static setDepthFunc(gl, value) {
+            value !== WebGLContext._depthFunc && (WebGLContext._depthFunc = value, gl.depthFunc(value));
+        }
+        static setBlend(gl, value) {
+            value !== WebGLContext._blend && (WebGLContext._blend = value, value ? gl.enable(gl.BLEND) : gl.disable(gl.BLEND));
+        }
+        static setBlendEquation(gl, blendEquation) {
+            if (blendEquation !== WebGLContext._blendEquation) {
+                WebGLContext._blendEquation = blendEquation;
+                WebGLContext._blendEquationRGB = WebGLContext._blendEquationAlpha = null;
+                gl.blendEquation(blendEquation);
+            }
+        }
+        static setBlendEquationSeparate(gl, blendEquationRGB, blendEquationAlpha) {
+            if (blendEquationRGB !== WebGLContext._blendEquationRGB || blendEquationAlpha !== WebGLContext._blendEquationAlpha) {
+                WebGLContext._blendEquationRGB = blendEquationRGB;
+                WebGLContext._blendEquationAlpha = blendEquationAlpha;
+                WebGLContext._blendEquation = null;
+                gl.blendEquationSeparate(blendEquationRGB, blendEquationAlpha);
+            }
+        }
+        static setBlendFunc(gl, sFactor, dFactor) {
+            if (sFactor !== WebGLContext._sFactor || dFactor !== WebGLContext._dFactor) {
+                WebGLContext._sFactor = sFactor;
+                WebGLContext._dFactor = dFactor;
+                WebGLContext._sFactorRGB = null;
+                WebGLContext._dFactorRGB = null;
+                WebGLContext._sFactorAlpha = null;
+                WebGLContext._dFactorAlpha = null;
+                gl.blendFunc(sFactor, dFactor);
+            }
+        }
+        static setBlendFuncSeperate(gl, srcRGB, dstRGB, srcAlpha, dstAlpha) {
+            if (srcRGB !== WebGLContext._sFactorRGB || dstRGB !== WebGLContext._dFactorRGB || srcAlpha !== WebGLContext._sFactorAlpha || dstAlpha !== WebGLContext._dFactorAlpha) {
+                WebGLContext._sFactorRGB = srcRGB;
+                WebGLContext._dFactorRGB = dstRGB;
+                WebGLContext._sFactorAlpha = srcAlpha;
+                WebGLContext._dFactorAlpha = dstAlpha;
+                WebGLContext._sFactor = null;
+                WebGLContext._dFactor = null;
+                gl.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
+            }
+        }
+        static setCullFace(gl, value) {
+            value !== WebGLContext._cullFace && (WebGLContext._cullFace = value, value ? gl.enable(gl.CULL_FACE) : gl.disable(gl.CULL_FACE));
+        }
+        static setFrontFace(gl, value) {
+            value !== WebGLContext._frontFace && (WebGLContext._frontFace = value, gl.frontFace(value));
+        }
+        static activeTexture(gl, textureID) {
+            if (WebGLContext._activedTextureID !== textureID) {
+                gl.activeTexture(textureID);
+                WebGLContext._activedTextureID = textureID;
+            }
+        }
+        static bindTexture(gl, target, texture) {
+            if (WebGLContext._activeTextures[WebGLContext._activedTextureID - gl.TEXTURE0] !== texture) {
+                gl.bindTexture(target, texture);
+                WebGLContext._activeTextures[WebGLContext._activedTextureID - gl.TEXTURE0] = texture;
+            }
+        }
+        static __init_native() {
+            if (!ILaya.Render.supportWebGLPlusRendering)
+                return;
+            var webGLContext = WebGLContext;
+            webGLContext.activeTexture = webGLContext.activeTextureForNative;
+            webGLContext.bindTexture = webGLContext.bindTextureForNative;
+        }
+        static useProgramForNative(gl, program) {
+            gl.useProgram(program);
+            return true;
+        }
+        static setDepthTestForNative(gl, value) {
+            if (value)
+                gl.enable(gl.DEPTH_TEST);
+            else
+                gl.disable(gl.DEPTH_TEST);
+        }
+        static setDepthMaskForNative(gl, value) {
+            gl.depthMask(value);
+        }
+        static setDepthFuncForNative(gl, value) {
+            gl.depthFunc(value);
+        }
+        static setBlendForNative(gl, value) {
+            if (value)
+                gl.enable(gl.BLEND);
+            else
+                gl.disable(gl.BLEND);
+        }
+        static setBlendFuncForNative(gl, sFactor, dFactor) {
+            gl.blendFunc(sFactor, dFactor);
+        }
+        static setCullFaceForNative(gl, value) {
+            if (value)
+                gl.enable(gl.CULL_FACE);
+            else
+                gl.disable(gl.CULL_FACE);
+        }
+        static setFrontFaceForNative(gl, value) {
+            gl.frontFace(value);
+        }
+        static activeTextureForNative(gl, textureID) {
+            gl.activeTexture(textureID);
+        }
+        static bindTextureForNative(gl, target, texture) {
+            gl.bindTexture(target, texture);
+        }
+        static bindVertexArrayForNative(gl, vertexArray) {
+            gl.bindVertexArray(vertexArray);
+        }
+    }
+    WebGLContext._activeTextures = new Array(8);
+    WebGLContext._useProgram = null;
+    WebGLContext._depthTest = true;
+    WebGLContext._depthMask = true;
+    WebGLContext._blend = false;
+    WebGLContext._cullFace = false;
+    WebGLContext.mainContext = null;
+
     class Handler {
         constructor(caller = null, method = null, args = null, once = false) {
             this.once = false;
             this._id = 0;
             this.setTo(caller, method, args, once);
         }
-        setTo(caller, method, args, once) {
+        setTo(caller, method, args, once = false) {
             this._id = Handler._gid++;
             this.caller = caller;
             this.method = method;
@@ -1225,7 +1374,7 @@ window.Laya= (function (exports) {
                     resList.splice(resList.indexOf(this), 1);
                     (resList.length === 0) && (delete Resource._urlResourcesMap[this._url]);
                 }
-                var resou = ILaya.Loader.getRes(this._url);
+                var resou = ILaya.Loader.loadedMap[this._url];
                 (resou == this) && (delete ILaya.Loader.loadedMap[this._url]);
             }
         }
@@ -1259,124 +1408,19 @@ window.Laya= (function (exports) {
         }
     }
 
-    class WebGLContext {
-        static __init__() {
-            var gl = LayaGL.instance;
-            WebGLContext._depthFunc = gl.LESS;
-            WebGLContext._sFactor = gl.ONE;
-            WebGLContext._dFactor = gl.ZERO;
-            WebGLContext._srcAlpha = gl.ONE;
-            WebGLContext._dstAlpha = gl.ZERO;
-            WebGLContext._activedTextureID = gl.TEXTURE0;
-            WebGLContext._glTextureIDs = [gl.TEXTURE0, gl.TEXTURE1, gl.TEXTURE2, gl.TEXTURE3, gl.TEXTURE4, gl.TEXTURE5, gl.TEXTURE6, gl.TEXTURE7];
-        }
-        static useProgram(gl, program) {
-            if (WebGLContext._useProgram === program)
-                return false;
-            gl.useProgram(program);
-            WebGLContext._useProgram = program;
-            return true;
-        }
-        static setDepthTest(gl, value) {
-            value !== WebGLContext._depthTest && (WebGLContext._depthTest = value, value ? gl.enable(gl.DEPTH_TEST) : gl.disable(gl.DEPTH_TEST));
-        }
-        static setDepthMask(gl, value) {
-            value !== WebGLContext._depthMask && (WebGLContext._depthMask = value, gl.depthMask(value));
-        }
-        static setDepthFunc(gl, value) {
-            value !== WebGLContext._depthFunc && (WebGLContext._depthFunc = value, gl.depthFunc(value));
-        }
-        static setBlend(gl, value) {
-            value !== WebGLContext._blend && (WebGLContext._blend = value, value ? gl.enable(gl.BLEND) : gl.disable(gl.BLEND));
-        }
-        static setBlendFunc(gl, sFactor, dFactor) {
-            (sFactor !== WebGLContext._sFactor || dFactor !== WebGLContext._dFactor) && (WebGLContext._sFactor = WebGLContext._srcAlpha = sFactor, WebGLContext._dFactor = WebGLContext._dstAlpha = dFactor, gl.blendFunc(sFactor, dFactor));
-        }
-        static setBlendFuncSeperate(gl, srcRGB, dstRGB, srcAlpha, dstAlpha) {
-            if (srcRGB !== WebGLContext._sFactor || dstRGB !== WebGLContext._dFactor || srcAlpha !== WebGLContext._srcAlpha || dstAlpha !== WebGLContext._dstAlpha) {
-                WebGLContext._sFactor = srcRGB;
-                WebGLContext._dFactor = dstRGB;
-                WebGLContext._srcAlpha = srcAlpha;
-                WebGLContext._dstAlpha = dstAlpha;
-                gl.blendFuncSeparate(srcRGB, dstRGB, srcAlpha, dstAlpha);
-            }
-        }
-        static setCullFace(gl, value) {
-            value !== WebGLContext._cullFace && (WebGLContext._cullFace = value, value ? gl.enable(gl.CULL_FACE) : gl.disable(gl.CULL_FACE));
-        }
-        static setFrontFace(gl, value) {
-            value !== WebGLContext._frontFace && (WebGLContext._frontFace = value, gl.frontFace(value));
-        }
-        static activeTexture(gl, textureID) {
-            if (WebGLContext._activedTextureID !== textureID) {
-                gl.activeTexture(textureID);
-                WebGLContext._activedTextureID = textureID;
-            }
-        }
-        static bindTexture(gl, target, texture) {
-            if (WebGLContext._activeTextures[WebGLContext._activedTextureID - gl.TEXTURE0] !== texture) {
-                gl.bindTexture(target, texture);
-                WebGLContext._activeTextures[WebGLContext._activedTextureID - gl.TEXTURE0] = texture;
-            }
-        }
-        static __init_native() {
-            if (!ILaya.Render.supportWebGLPlusRendering)
-                return;
-            var webGLContext = WebGLContext;
-            webGLContext.activeTexture = webGLContext.activeTextureForNative;
-            webGLContext.bindTexture = webGLContext.bindTextureForNative;
-        }
-        static useProgramForNative(gl, program) {
-            gl.useProgram(program);
-            return true;
-        }
-        static setDepthTestForNative(gl, value) {
-            if (value)
-                gl.enable(gl.DEPTH_TEST);
-            else
-                gl.disable(gl.DEPTH_TEST);
-        }
-        static setDepthMaskForNative(gl, value) {
-            gl.depthMask(value);
-        }
-        static setDepthFuncForNative(gl, value) {
-            gl.depthFunc(value);
-        }
-        static setBlendForNative(gl, value) {
-            if (value)
-                gl.enable(gl.BLEND);
-            else
-                gl.disable(gl.BLEND);
-        }
-        static setBlendFuncForNative(gl, sFactor, dFactor) {
-            gl.blendFunc(sFactor, dFactor);
-        }
-        static setCullFaceForNative(gl, value) {
-            if (value)
-                gl.enable(gl.CULL_FACE);
-            else
-                gl.disable(gl.CULL_FACE);
-        }
-        static setFrontFaceForNative(gl, value) {
-            gl.frontFace(value);
-        }
-        static activeTextureForNative(gl, textureID) {
-            gl.activeTexture(textureID);
-        }
-        static bindTextureForNative(gl, target, texture) {
-            gl.bindTexture(target, texture);
-        }
-        static bindVertexArrayForNative(gl, vertexArray) {
-            gl.bindVertexArray(vertexArray);
-        }
-    }
-    WebGLContext.mainContext = null;
-    WebGLContext._activeTextures = new Array(8);
-    WebGLContext._useProgram = null;
-    WebGLContext._depthTest = true;
-    WebGLContext._depthMask = true;
-    WebGLContext._blend = false;
-    WebGLContext._cullFace = false;
+    (function (TextureFormat) {
+        TextureFormat[TextureFormat["R8G8B8"] = 0] = "R8G8B8";
+        TextureFormat[TextureFormat["R8G8B8A8"] = 1] = "R8G8B8A8";
+        TextureFormat[TextureFormat["Alpha8"] = 2] = "Alpha8";
+        TextureFormat[TextureFormat["DXT1"] = 3] = "DXT1";
+        TextureFormat[TextureFormat["DXT5"] = 4] = "DXT5";
+        TextureFormat[TextureFormat["ETC1RGB"] = 5] = "ETC1RGB";
+        TextureFormat[TextureFormat["PVRTCRGB_2BPPV"] = 9] = "PVRTCRGB_2BPPV";
+        TextureFormat[TextureFormat["PVRTCRGBA_2BPPV"] = 10] = "PVRTCRGBA_2BPPV";
+        TextureFormat[TextureFormat["PVRTCRGB_4BPPV"] = 11] = "PVRTCRGB_4BPPV";
+        TextureFormat[TextureFormat["PVRTCRGBA_4BPPV"] = 12] = "PVRTCRGBA_4BPPV";
+        TextureFormat[TextureFormat["R32G32B32A32"] = 15] = "R32G32B32A32";
+    })(exports.TextureFormat || (exports.TextureFormat = {}));
 
     class BaseTexture extends Bitmap {
         constructor(format, mipMap) {
@@ -1442,12 +1486,14 @@ window.Laya= (function (exports) {
         }
         _getFormatByteCount() {
             switch (this._format) {
-                case BaseTexture.FORMAT_R8G8B8:
+                case exports.TextureFormat.R8G8B8:
                     return 3;
-                case BaseTexture.FORMAT_R8G8B8A8:
+                case exports.TextureFormat.R8G8B8A8:
                     return 4;
-                case BaseTexture.FORMAT_ALPHA8:
+                case exports.TextureFormat.Alpha8:
                     return 1;
+                case exports.TextureFormat.R32G32B32A32:
+                    return 4;
                 default:
                     throw "Texture2D: unknown format.";
             }
@@ -1460,52 +1506,55 @@ window.Laya= (function (exports) {
             var gl = LayaGL.instance;
             var gpu = LayaGL.layaGPUInstance;
             switch (this._format) {
-                case BaseTexture.FORMAT_R8G8B8:
+                case exports.TextureFormat.R8G8B8:
                     glFormat = gl.RGB;
                     break;
-                case BaseTexture.FORMAT_R8G8B8A8:
+                case exports.TextureFormat.R8G8B8A8:
                     glFormat = gl.RGBA;
                     break;
-                case BaseTexture.FORMAT_ALPHA8:
+                case exports.TextureFormat.Alpha8:
                     glFormat = gl.ALPHA;
                     break;
-                case BaseTexture.FORMAT_DXT1:
+                case exports.TextureFormat.R32G32B32A32:
+                    glFormat = gl.RGBA;
+                    break;
+                case exports.TextureFormat.DXT1:
                     if (gpu._compressedTextureS3tc)
                         glFormat = gpu._compressedTextureS3tc.COMPRESSED_RGB_S3TC_DXT1_EXT;
                     else
                         throw "BaseTexture: not support DXT1 format.";
                     break;
-                case BaseTexture.FORMAT_DXT5:
+                case exports.TextureFormat.DXT5:
                     if (gpu._compressedTextureS3tc)
                         glFormat = gpu._compressedTextureS3tc.COMPRESSED_RGBA_S3TC_DXT5_EXT;
                     else
                         throw "BaseTexture: not support DXT5 format.";
                     break;
-                case BaseTexture.FORMAT_ETC1RGB:
+                case exports.TextureFormat.ETC1RGB:
                     if (gpu._compressedTextureEtc1)
                         glFormat = gpu._compressedTextureEtc1.COMPRESSED_RGB_ETC1_WEBGL;
                     else
                         throw "BaseTexture: not support ETC1RGB format.";
                     break;
-                case BaseTexture.FORMAT_PVRTCRGB_2BPPV:
+                case exports.TextureFormat.PVRTCRGB_2BPPV:
                     if (gpu._compressedTexturePvrtc)
                         glFormat = gpu._compressedTexturePvrtc.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
                     else
                         throw "BaseTexture: not support PVRTCRGB_2BPPV format.";
                     break;
-                case BaseTexture.FORMAT_PVRTCRGBA_2BPPV:
+                case exports.TextureFormat.PVRTCRGBA_2BPPV:
                     if (gpu._compressedTexturePvrtc)
                         glFormat = gpu._compressedTexturePvrtc.COMPRESSED_RGBA_PVRTC_2BPPV1_IMG;
                     else
                         throw "BaseTexture: not support PVRTCRGBA_2BPPV format.";
                     break;
-                case BaseTexture.FORMAT_PVRTCRGB_4BPPV:
+                case exports.TextureFormat.PVRTCRGB_4BPPV:
                     if (gpu._compressedTexturePvrtc)
                         glFormat = gpu._compressedTexturePvrtc.COMPRESSED_RGB_PVRTC_4BPPV1_IMG;
                     else
                         throw "BaseTexture: not support PVRTCRGB_4BPPV format.";
                     break;
-                case BaseTexture.FORMAT_PVRTCRGBA_4BPPV:
+                case exports.TextureFormat.PVRTCRGBA_4BPPV:
                     if (gpu._compressedTexturePvrtc)
                         glFormat = gpu._compressedTexturePvrtc.COMPRESSED_RGBA_PVRTC_4BPPV1_IMG;
                     else
@@ -1606,13 +1655,14 @@ window.Laya= (function (exports) {
     BaseTexture.FORMAT_PVRTCRGB_4BPPV = 11;
     BaseTexture.FORMAT_PVRTCRGBA_4BPPV = 12;
     BaseTexture.RENDERTEXTURE_FORMAT_RGBA_HALF_FLOAT = 14;
+    BaseTexture.FORMAT_R32G32B32A32 = 15;
     BaseTexture.FORMAT_DEPTH_16 = 0;
     BaseTexture.FORMAT_STENCIL_8 = 1;
     BaseTexture.FORMAT_DEPTHSTENCIL_16_8 = 2;
     BaseTexture.FORMAT_DEPTHSTENCIL_NONE = 3;
 
     class Texture2D extends BaseTexture {
-        constructor(width = 0, height = 0, format = BaseTexture.FORMAT_R8G8B8A8, mipmap = true, canRead = false) {
+        constructor(width = 0, height = 0, format = exports.TextureFormat.R8G8B8A8, mipmap = true, canRead = false) {
             super(format, mipmap);
             var gl = LayaGL.instance;
             this._glTextureType = gl.TEXTURE_2D;
@@ -1631,6 +1681,7 @@ window.Laya= (function (exports) {
             }
             else {
                 this._mipmapCount = 1;
+                this._setPixels(null, 0, width, height);
                 this._setGPUMemory(width * height * 4);
             }
         }
@@ -1639,19 +1690,19 @@ window.Laya= (function (exports) {
             pixels[0] = 128;
             pixels[1] = 128;
             pixels[2] = 128;
-            Texture2D.grayTexture = new Texture2D(1, 1, BaseTexture.FORMAT_R8G8B8, false, false);
+            Texture2D.grayTexture = new Texture2D(1, 1, exports.TextureFormat.R8G8B8, false, false);
             Texture2D.grayTexture.setPixels(pixels);
             Texture2D.grayTexture.lock = true;
             pixels[0] = 255;
             pixels[1] = 255;
             pixels[2] = 255;
-            Texture2D.whiteTexture = new Texture2D(1, 1, BaseTexture.FORMAT_R8G8B8, false, false);
+            Texture2D.whiteTexture = new Texture2D(1, 1, exports.TextureFormat.R8G8B8, false, false);
             Texture2D.whiteTexture.setPixels(pixels);
             Texture2D.whiteTexture.lock = true;
             pixels[0] = 0;
             pixels[1] = 0;
             pixels[2] = 0;
-            Texture2D.blackTexture = new Texture2D(1, 1, BaseTexture.FORMAT_R8G8B8, false, false);
+            Texture2D.blackTexture = new Texture2D(1, 1, exports.TextureFormat.R8G8B8, false, false);
             Texture2D.blackTexture.setPixels(pixels);
             Texture2D.blackTexture.lock = true;
         }
@@ -1664,17 +1715,17 @@ window.Laya= (function (exports) {
                 texture.anisoLevel = propertyParams.anisoLevel;
             }
             switch (texture._format) {
-                case BaseTexture.FORMAT_R8G8B8:
-                case BaseTexture.FORMAT_R8G8B8A8:
+                case exports.TextureFormat.R8G8B8:
+                case exports.TextureFormat.R8G8B8A8:
                     texture.loadImageSource(data);
                     break;
-                case BaseTexture.FORMAT_DXT1:
-                case BaseTexture.FORMAT_DXT5:
-                case BaseTexture.FORMAT_ETC1RGB:
-                case BaseTexture.FORMAT_PVRTCRGB_2BPPV:
-                case BaseTexture.FORMAT_PVRTCRGBA_2BPPV:
-                case BaseTexture.FORMAT_PVRTCRGB_4BPPV:
-                case BaseTexture.FORMAT_PVRTCRGBA_4BPPV:
+                case exports.TextureFormat.DXT1:
+                case exports.TextureFormat.DXT5:
+                case exports.TextureFormat.ETC1RGB:
+                case exports.TextureFormat.PVRTCRGB_2BPPV:
+                case exports.TextureFormat.PVRTCRGBA_2BPPV:
+                case exports.TextureFormat.PVRTCRGB_4BPPV:
+                case exports.TextureFormat.PVRTCRGBA_4BPPV:
                     texture.setCompressData(data);
                     break;
                 default:
@@ -1693,27 +1744,34 @@ window.Laya= (function (exports) {
             var textureType = this._glTextureType;
             var glFormat = this._getGLFormat();
             WebGLContext.bindTexture(gl, textureType, this._glTexture);
-            if (this.format === BaseTexture.FORMAT_R8G8B8) {
-                gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-                gl.texImage2D(textureType, miplevel, glFormat, width, height, 0, glFormat, gl.UNSIGNED_BYTE, pixels);
-                gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
-            }
-            else {
-                gl.texImage2D(textureType, miplevel, glFormat, width, height, 0, glFormat, gl.UNSIGNED_BYTE, pixels);
+            switch (this.format) {
+                case exports.TextureFormat.R8G8B8:
+                    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+                    gl.texImage2D(textureType, miplevel, glFormat, width, height, 0, glFormat, gl.UNSIGNED_BYTE, pixels);
+                    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
+                    break;
+                case exports.TextureFormat.R32G32B32A32:
+                    if (LayaGL.layaGPUInstance._isWebGL2)
+                        gl.texImage2D(textureType, miplevel, gl.RGBA32F, width, height, 0, glFormat, gl.FLOAT, pixels);
+                    else
+                        gl.texImage2D(textureType, miplevel, gl.RGBA, width, height, 0, glFormat, gl.FLOAT, pixels);
+                    break;
+                default:
+                    gl.texImage2D(textureType, miplevel, glFormat, width, height, 0, glFormat, gl.UNSIGNED_BYTE, pixels);
             }
         }
         _calcualatesCompressedDataSize(format, width, height) {
             switch (format) {
-                case BaseTexture.FORMAT_DXT1:
-                case BaseTexture.FORMAT_ETC1RGB:
+                case exports.TextureFormat.DXT1:
+                case exports.TextureFormat.ETC1RGB:
                     return ((width + 3) >> 2) * ((height + 3) >> 2) * 8;
-                case BaseTexture.FORMAT_DXT5:
+                case exports.TextureFormat.DXT5:
                     return ((width + 3) >> 2) * ((height + 3) >> 2) * 16;
-                case BaseTexture.FORMAT_PVRTCRGB_4BPPV:
-                case BaseTexture.FORMAT_PVRTCRGBA_4BPPV:
+                case exports.TextureFormat.PVRTCRGB_4BPPV:
+                case exports.TextureFormat.PVRTCRGBA_4BPPV:
                     return Math.floor((Math.max(width, 8) * Math.max(height, 8) * 4 + 7) / 8);
-                case BaseTexture.FORMAT_PVRTCRGB_2BPPV:
-                case BaseTexture.FORMAT_PVRTCRGBA_2BPPV:
+                case exports.TextureFormat.PVRTCRGB_2BPPV:
+                case exports.TextureFormat.PVRTCRGBA_2BPPV:
                     return Math.floor((Math.max(width, 16) * Math.max(height, 8) * 2 + 7) / 8);
                 default:
                     return 0;
@@ -1741,11 +1799,11 @@ window.Laya= (function (exports) {
                 throw "Unsupported format, must contain a FourCC code";
             var compressedFormat = header[DDS_HEADER_PF_FOURCC];
             switch (this._format) {
-                case BaseTexture.FORMAT_DXT1:
+                case exports.TextureFormat.DXT1:
                     if (compressedFormat !== FOURCC_DXT1)
                         throw "the FourCC code is not same with texture format.";
                     break;
-                case BaseTexture.FORMAT_DXT5:
+                case exports.TextureFormat.DXT5:
                     if (compressedFormat !== FOURCC_DXT5)
                         throw "the FourCC code is not same with texture format.";
                     break;
@@ -1783,7 +1841,7 @@ window.Laya= (function (exports) {
             var compressedFormat = header[ETC_HEADER_FORMAT];
             switch (compressedFormat) {
                 case LayaGL.layaGPUInstance._compressedTextureEtc1.COMPRESSED_RGB_ETC1_WEBGL:
-                    this._format = BaseTexture.FORMAT_ETC1RGB;
+                    this._format = exports.TextureFormat.ETC1RGB;
                     break;
                 default:
                     throw "unknown texture format.";
@@ -1815,16 +1873,16 @@ window.Laya= (function (exports) {
             var compressedFormat = header[PVR_HEADER_FORMAT];
             switch (compressedFormat) {
                 case PVR_FORMAT_2BPP_RGB:
-                    this._format = BaseTexture.FORMAT_PVRTCRGB_2BPPV;
+                    this._format = exports.TextureFormat.PVRTCRGB_2BPPV;
                     break;
                 case PVR_FORMAT_4BPP_RGB:
-                    this._format = BaseTexture.FORMAT_PVRTCRGB_4BPPV;
+                    this._format = exports.TextureFormat.PVRTCRGB_4BPPV;
                     break;
                 case PVR_FORMAT_2BPP_RGBA:
-                    this._format = BaseTexture.FORMAT_PVRTCRGBA_2BPPV;
+                    this._format = exports.TextureFormat.PVRTCRGBA_2BPPV;
                     break;
                 case PVR_FORMAT_4BPP_RGBA:
-                    this._format = BaseTexture.FORMAT_PVRTCRGBA_4BPPV;
+                    this._format = exports.TextureFormat.PVRTCRGBA_4BPPV;
                     break;
                 default:
                     throw "Texture2D:unknown PVR format.";
@@ -1923,30 +1981,34 @@ window.Laya= (function (exports) {
             var textureType = this._glTextureType;
             WebGLContext.bindTexture(gl, textureType, this._glTexture);
             var glFormat = this._getGLFormat();
-            if (this._format === BaseTexture.FORMAT_R8G8B8) {
-                gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-                gl.texSubImage2D(textureType, miplevel, x, y, width, height, glFormat, gl.UNSIGNED_BYTE, pixels);
-                gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
-            }
-            else {
-                gl.texSubImage2D(textureType, miplevel, x, y, width, height, glFormat, gl.UNSIGNED_BYTE, pixels);
+            switch (this.format) {
+                case exports.TextureFormat.R8G8B8:
+                    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
+                    gl.texSubImage2D(textureType, miplevel, x, y, width, height, glFormat, gl.UNSIGNED_BYTE, pixels);
+                    gl.pixelStorei(gl.UNPACK_ALIGNMENT, 4);
+                    break;
+                case exports.TextureFormat.R32G32B32A32:
+                    gl.texSubImage2D(textureType, miplevel, x, y, width, height, glFormat, gl.FLOAT, pixels);
+                    break;
+                default:
+                    gl.texSubImage2D(textureType, miplevel, x, y, width, height, glFormat, gl.UNSIGNED_BYTE, pixels);
             }
             this._readyed = true;
             this._activeResource();
         }
         setCompressData(data) {
             switch (this._format) {
-                case BaseTexture.FORMAT_DXT1:
-                case BaseTexture.FORMAT_DXT5:
+                case exports.TextureFormat.DXT1:
+                case exports.TextureFormat.DXT5:
                     this._pharseDDS(data);
                     break;
-                case BaseTexture.FORMAT_ETC1RGB:
+                case exports.TextureFormat.ETC1RGB:
                     this._pharseKTX(data);
                     break;
-                case BaseTexture.FORMAT_PVRTCRGB_2BPPV:
-                case BaseTexture.FORMAT_PVRTCRGBA_2BPPV:
-                case BaseTexture.FORMAT_PVRTCRGB_4BPPV:
-                case BaseTexture.FORMAT_PVRTCRGBA_4BPPV:
+                case exports.TextureFormat.PVRTCRGB_2BPPV:
+                case exports.TextureFormat.PVRTCRGBA_2BPPV:
+                case exports.TextureFormat.PVRTCRGB_4BPPV:
+                case exports.TextureFormat.PVRTCRGBA_4BPPV:
                     this._pharsePVR(data);
                     break;
                 default:
@@ -2019,8 +2081,21 @@ window.Laya= (function (exports) {
     RenderState2D.width = 0;
     RenderState2D.height = 0;
 
+    (function (RenderTextureFormat) {
+        RenderTextureFormat[RenderTextureFormat["R8G8B8"] = 0] = "R8G8B8";
+        RenderTextureFormat[RenderTextureFormat["R8G8B8A8"] = 1] = "R8G8B8A8";
+        RenderTextureFormat[RenderTextureFormat["Alpha8"] = 2] = "Alpha8";
+        RenderTextureFormat[RenderTextureFormat["R16G16B16A16"] = 14] = "R16G16B16A16";
+    })(exports.RenderTextureFormat || (exports.RenderTextureFormat = {}));
+    (function (RenderTextureDepthFormat) {
+        RenderTextureDepthFormat[RenderTextureDepthFormat["DEPTH_16"] = 0] = "DEPTH_16";
+        RenderTextureDepthFormat[RenderTextureDepthFormat["STENCIL_8"] = 1] = "STENCIL_8";
+        RenderTextureDepthFormat[RenderTextureDepthFormat["DEPTHSTENCIL_16_8"] = 2] = "DEPTHSTENCIL_16_8";
+        RenderTextureDepthFormat[RenderTextureDepthFormat["DEPTHSTENCIL_NONE"] = 3] = "DEPTHSTENCIL_NONE";
+    })(exports.RenderTextureDepthFormat || (exports.RenderTextureDepthFormat = {}));
+
     class RenderTexture2D extends BaseTexture {
-        constructor(width, height, format = BaseTexture.FORMAT_R8G8B8, depthStencilFormat = BaseTexture.FORMAT_DEPTH_16) {
+        constructor(width, height, format = exports.RenderTextureFormat.R8G8B8, depthStencilFormat = exports.RenderTextureDepthFormat.DEPTH_16) {
             super(format, false);
             this._mgrKey = 0;
             this._glTextureType = LayaGL.instance.TEXTURE_2D;
@@ -2063,19 +2138,19 @@ window.Laya= (function (exports) {
             this._setGPUMemory(width * height * 4);
             gl.bindFramebuffer(gl.FRAMEBUFFER, this._frameBuffer);
             gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, this._glTexture, 0);
-            if (this._depthStencilFormat !== BaseTexture.FORMAT_DEPTHSTENCIL_NONE) {
+            if (this._depthStencilFormat !== exports.RenderTextureDepthFormat.DEPTHSTENCIL_NONE) {
                 this._depthStencilBuffer = gl.createRenderbuffer();
                 gl.bindRenderbuffer(gl.RENDERBUFFER, this._depthStencilBuffer);
                 switch (this._depthStencilFormat) {
-                    case BaseTexture.FORMAT_DEPTH_16:
+                    case exports.RenderTextureDepthFormat.DEPTH_16:
                         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_COMPONENT16, width, height);
                         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.RENDERBUFFER, this._depthStencilBuffer);
                         break;
-                    case BaseTexture.FORMAT_STENCIL_8:
+                    case exports.RenderTextureDepthFormat.STENCIL_8:
                         gl.renderbufferStorage(gl.RENDERBUFFER, gl.STENCIL_INDEX8, width, height);
                         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.STENCIL_ATTACHMENT, gl.RENDERBUFFER, this._depthStencilBuffer);
                         break;
-                    case BaseTexture.FORMAT_DEPTHSTENCIL_16_8:
+                    case exports.RenderTextureDepthFormat.DEPTHSTENCIL_16_8:
                         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL, width, height);
                         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, this._depthStencilBuffer);
                         break;
@@ -2220,7 +2295,7 @@ window.Laya= (function (exports) {
                 console.error('getRT error! w too big');
             }
             var ret;
-            ret = new RenderTexture2D(w, h, BaseTexture.FORMAT_R8G8B8A8, -1);
+            ret = new RenderTexture2D(w, h, exports.RenderTextureFormat.R8G8B8A8, -1);
             return ret;
         }
         static releaseRT(rt) {
@@ -3653,7 +3728,7 @@ window.Laya= (function (exports) {
             cmd.alpha = alpha;
             cmd.color = color;
             cmd.blendMode = blendMode;
-            cmd.uv = uv;
+            cmd.uv = uv == undefined ? null : uv;
             if (color) {
                 cmd.colorFlt = new ColorFilter();
                 cmd.colorFlt.setColor(color);
@@ -3661,13 +3736,13 @@ window.Laya= (function (exports) {
             return cmd;
         }
         recover() {
-            this.texture._removeReference();
+            this.texture && this.texture._removeReference();
             this.texture = null;
             this.matrix = null;
             Pool.recover("DrawTextureCmd", this);
         }
         run(context, gx, gy) {
-            context.drawTextureWithTransform(this.texture, this.x, this.y, this.width, this.height, this.matrix, gx, gy, this.alpha, this.blendMode, this.colorFlt, this.uv);
+            this.texture && context.drawTextureWithTransform(this.texture, this.x, this.y, this.width, this.height, this.matrix, gx, gy, this.alpha, this.blendMode, this.colorFlt, this.uv);
         }
         get cmdID() {
             return DrawTextureCmd.ID;
@@ -4279,10 +4354,43 @@ window.Laya= (function (exports) {
     }
     SaveTranslate.POOL = SaveBase._createArray();
 
-    class RenderInfo {
+    class BufferStateBase {
+        constructor() {
+            this._nativeVertexArrayObject = LayaGL.layaGPUInstance.createVertexArray();
+        }
+        bind() {
+            if (BufferStateBase._curBindedBufferState !== this) {
+                LayaGL.layaGPUInstance.bindVertexArray(this._nativeVertexArrayObject);
+                BufferStateBase._curBindedBufferState = this;
+            }
+        }
+        unBind() {
+            if (BufferStateBase._curBindedBufferState === this) {
+                LayaGL.layaGPUInstance.bindVertexArray(null);
+                BufferStateBase._curBindedBufferState = null;
+            }
+            else {
+                throw "BufferState: must call bind() function first.";
+            }
+        }
+        destroy() {
+            LayaGL.layaGPUInstance.deleteVertexArray(this._nativeVertexArrayObject);
+        }
+        bindForNative() {
+            LayaGL.instance.bindVertexArray(this._nativeVertexArrayObject);
+            BufferStateBase._curBindedBufferState = this;
+        }
+        unBindForNative() {
+            LayaGL.instance.bindVertexArray(null);
+            BufferStateBase._curBindedBufferState = null;
+        }
     }
-    RenderInfo.loopStTm = 0;
-    RenderInfo.loopCount = 0;
+
+    class BufferState2D extends BufferStateBase {
+        constructor() {
+            super();
+        }
+    }
 
     class Buffer {
         constructor() {
@@ -4304,6 +4412,11 @@ window.Laya= (function (exports) {
             }
         }
     }
+
+    class RenderInfo {
+    }
+    RenderInfo.loopStTm = 0;
+    RenderInfo.loopCount = 0;
 
     class Buffer2D extends Buffer {
         constructor() {
@@ -4530,6 +4643,44 @@ window.Laya= (function (exports) {
     Buffer2D.FLOAT32 = 4;
     Buffer2D.SHORT = 2;
 
+    class IndexBuffer2D extends Buffer2D {
+        constructor(bufferUsage = 0x88e4) {
+            super();
+            this._bufferUsage = bufferUsage;
+            this._bufferType = LayaGL.instance.ELEMENT_ARRAY_BUFFER;
+            this._buffer = new ArrayBuffer(8);
+        }
+        _checkArrayUse() {
+            this._uint16Array && (this._uint16Array = new Uint16Array(this._buffer));
+        }
+        getUint16Array() {
+            return this._uint16Array || (this._uint16Array = new Uint16Array(this._buffer));
+        }
+        _bindForVAO() {
+            var gl = LayaGL.instance;
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._glBuffer);
+        }
+        bind() {
+            if (Buffer._bindedIndexBuffer !== this._glBuffer) {
+                var gl = LayaGL.instance;
+                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._glBuffer);
+                Buffer._bindedIndexBuffer = this._glBuffer;
+                return true;
+            }
+            return false;
+        }
+        destory() {
+            this._uint16Array = null;
+            this._buffer = null;
+        }
+        disposeResource() {
+            this._disposeResource();
+        }
+    }
+    IndexBuffer2D.create = function (bufferUsage = 0x88e4) {
+        return new IndexBuffer2D(bufferUsage);
+    };
+
     class VertexBuffer2D extends Buffer2D {
         constructor(vertexStride, bufferUsage) {
             super();
@@ -4584,82 +4735,6 @@ window.Laya= (function (exports) {
     VertexBuffer2D.create = function (vertexStride, bufferUsage = 0x88e8) {
         return new VertexBuffer2D(vertexStride, bufferUsage);
     };
-
-    class IndexBuffer2D extends Buffer2D {
-        constructor(bufferUsage = 0x88e4) {
-            super();
-            this._bufferUsage = bufferUsage;
-            this._bufferType = LayaGL.instance.ELEMENT_ARRAY_BUFFER;
-            this._buffer = new ArrayBuffer(8);
-        }
-        _checkArrayUse() {
-            this._uint16Array && (this._uint16Array = new Uint16Array(this._buffer));
-        }
-        getUint16Array() {
-            return this._uint16Array || (this._uint16Array = new Uint16Array(this._buffer));
-        }
-        _bindForVAO() {
-            var gl = LayaGL.instance;
-            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._glBuffer);
-        }
-        bind() {
-            if (Buffer._bindedIndexBuffer !== this._glBuffer) {
-                var gl = LayaGL.instance;
-                gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this._glBuffer);
-                Buffer._bindedIndexBuffer = this._glBuffer;
-                return true;
-            }
-            return false;
-        }
-        destory() {
-            this._uint16Array = null;
-            this._buffer = null;
-        }
-        disposeResource() {
-            this._disposeResource();
-        }
-    }
-    IndexBuffer2D.create = function (bufferUsage = 0x88e4) {
-        return new IndexBuffer2D(bufferUsage);
-    };
-
-    class BufferStateBase {
-        constructor() {
-            this._nativeVertexArrayObject = LayaGL.layaGPUInstance.createVertexArray();
-        }
-        bind() {
-            if (BufferStateBase._curBindedBufferState !== this) {
-                LayaGL.layaGPUInstance.bindVertexArray(this._nativeVertexArrayObject);
-                BufferStateBase._curBindedBufferState = this;
-            }
-        }
-        unBind() {
-            if (BufferStateBase._curBindedBufferState === this) {
-                LayaGL.layaGPUInstance.bindVertexArray(null);
-                BufferStateBase._curBindedBufferState = null;
-            }
-            else {
-                throw "BufferState: must call bind() function first.";
-            }
-        }
-        destroy() {
-            LayaGL.layaGPUInstance.deleteVertexArray(this._nativeVertexArrayObject);
-        }
-        bindForNative() {
-            LayaGL.instance.bindVertexArray(this._nativeVertexArrayObject);
-            BufferStateBase._curBindedBufferState = this;
-        }
-        unBindForNative() {
-            LayaGL.instance.bindVertexArray(null);
-            BufferStateBase._curBindedBufferState = null;
-        }
-    }
-
-    class BufferState2D extends BufferStateBase {
-        constructor() {
-            super();
-        }
-    }
 
     class Mesh2D {
         constructor(stride, vballoc, iballoc) {
@@ -5287,7 +5362,6 @@ window.Laya= (function (exports) {
             for (i = 0; i < pointnum; i++) {
                 p1x = points[ci], p1y = points[ci + 1];
                 p2x = points[ci + 2], p2y = points[ci + 3];
-                var p3x = points[ci + 4], p3y = points[ci + 5];
             }
         }
     }
@@ -6390,7 +6464,6 @@ window.Laya= (function (exports) {
         constructor() {
             this.texWidth = 1024;
             this.texHeight = 1024;
-            this.protectDist = 1;
             this.texture = null;
             this.charMaps = {};
             this.texHeight = this.texWidth = ILaya.TextRender.atlasWidth;
@@ -6401,7 +6474,6 @@ window.Laya= (function (exports) {
             this.atlasgrid = new AtlasGrid(this.texWidth / TextAtlas.atlasGridW, this.texHeight / TextAtlas.atlasGridW, this.texture.id);
         }
         setProtecteDist(d) {
-            this.protectDist = d;
         }
         getAEmpty(w, h, pt) {
             var find = this.atlasgrid.addRect(1, Math.ceil(w / TextAtlas.atlasGridW), Math.ceil(h / TextAtlas.atlasGridW), pt);
@@ -6717,7 +6789,7 @@ window.Laya= (function (exports) {
         }
         load(url, complete = null) {
             if (!this._destroyed)
-                ILaya.loader.load(url, Handler.create(this, this._onLoaded, [complete]), null, "htmlimage", 1, false, null, true);
+                ILaya.loader.load(url, Handler.create(this, this._onLoaded, [complete]), null, "htmlimage", 1, true);
         }
         getTexturePixels(x, y, width, height) {
             var st, dst, i;
@@ -6799,7 +6871,7 @@ window.Laya= (function (exports) {
                 ILaya.loader.load(url, Handler.create(this, function (bit) {
                     this.bitmap = bit;
                     onok && onok();
-                }), null, "htmlimage", 1, false, null, true);
+                }), null, "htmlimage", 1, true);
             }
         }
         disposeBitmap() {
@@ -6818,7 +6890,7 @@ window.Laya= (function (exports) {
                     bit = null;
                 }
                 if (this.url && this === ILaya.loader.getRes(this.url))
-                    ILaya.loader.clearRes(this.url);
+                    ILaya.Loader.clearRes(this.url);
             }
         }
     }
@@ -6978,7 +7050,6 @@ window.Laya= (function (exports) {
             var doc = Browser._document = win.document;
             var u = Browser.userAgent = win.navigator.userAgent;
             if (u.indexOf('AlipayMiniGame') > -1 && "my" in Browser.window) {
-                window.aliMiniGame(Laya, Laya);
                 window.aliPayMiniGame(Laya, Laya);
                 if (!Laya["ALIMiniAdapter"]) {
                     console.error("请先添加阿里小游戏适配库");
@@ -7005,6 +7076,15 @@ window.Laya= (function (exports) {
                     else {
                         Laya["MiniAdpter"].enable();
                     }
+                }
+            }
+            if (u.indexOf("MiniGame") > -1 && "qq" in Browser.window) {
+                window.qqMiniGame(Laya, Laya);
+                if (!Laya["QQMiniAdapter"]) {
+                    console.error("请先添加小游戏适配库,详细教程");
+                }
+                else {
+                    Laya["QQMiniAdapter"].enable();
                 }
             }
             if (u.indexOf("SwanGame") > -1) {
@@ -7187,7 +7267,6 @@ window.Laya= (function (exports) {
             this.ctx = null;
             this.lastScaleX = 1.0;
             this.lastScaleY = 1.0;
-            this.needResetScale = false;
             this.maxTexW = 0;
             this.maxTexH = 0;
             this.scaleFontSize = true;
@@ -7387,7 +7466,6 @@ window.Laya= (function (exports) {
     class TextRender {
         constructor() {
             this.fontSizeInfo = {};
-            this.charRender = null;
             this.mapFont = {};
             this.fontID = 0;
             this.mapColor = [];
@@ -7488,7 +7566,7 @@ window.Laya= (function (exports) {
                 return;
             if (data.length <= 0)
                 return;
-            var font = FontInfo.Parse(fontStr);
+            var font = typeof (fontStr) === 'string' ? FontInfo.Parse(fontStr) : fontStr;
             this._fast_filltext(ctx, null, data, x, y, font, color, strokeColor, lineWidth, 0, 0);
         }
         _fast_filltext(ctx, data, htmlchars, x, y, font, color, strokeColor, lineWidth, textAlign, underLine = 0) {
@@ -7557,7 +7635,7 @@ window.Laya= (function (exports) {
                     this._curStrPos = 0;
                     var curstr;
                     while (true) {
-                        if (isHtmlChar) {
+                        if (htmlchars) {
                             var chc = htmlchars[this._curStrPos++];
                             if (chc) {
                                 curstr = chc.char;
@@ -7613,7 +7691,7 @@ window.Laya= (function (exports) {
             ctx._italicDeg = 0;
         }
         _drawResortedWords(ctx, startx, starty, samePagesData) {
-            var isLastRender = ctx._charSubmitCache && ctx._charSubmitCache._enbale;
+            var isLastRender = ctx._charSubmitCache ? ctx._charSubmitCache._enbale : false;
             var mat = ctx._curMat;
             var slen = samePagesData.length;
             for (var id = 0; id < slen; id++) {
@@ -7673,8 +7751,8 @@ window.Laya= (function (exports) {
             }
             var i = 0;
             var sz = this.textAtlases.length;
-            var ri = null;
-            var atlas = null;
+            var ri;
+            var atlas;
             if (!isoTexture) {
                 for (i = 0; i < sz; i++) {
                     atlas = this.textAtlases[i];
@@ -7691,20 +7769,25 @@ window.Laya= (function (exports) {
             ri.height = font._size;
             var margin = ILaya.Render.isConchApp ? 0 : (font._size / 3 | 0);
             var imgdt = null;
-            var w1 = Math.ceil(this.charRender.getWidth(this.fontStr, str) * this.fontScaleX);
+            if (!lineWidth) {
+                lineWidth = 0;
+            }
+            var w1 = Math.ceil((this.charRender.getWidth(this.fontStr, str) + 2 * lineWidth) * this.fontScaleX);
             if (w1 > this.charRender.canvasWidth) {
                 this.charRender.canvasWidth = Math.min(2048, w1 + margin * 2);
             }
             if (isoTexture) {
                 this.charRender.fontsz = font._size;
                 imgdt = this.charRender.getCharBmp(str, this.fontStr, lineWidth, color, strokeColor, ri, margin, margin, margin, margin, null);
-                var tex = TextTexture.getTextTexture(imgdt.width, imgdt.height);
-                tex.addChar(imgdt, 0, 0, ri.uv);
-                ri.tex = tex;
-                ri.orix = margin;
-                ri.oriy = margin;
-                tex.ri = ri;
-                this.isoTextures.push(tex);
+                if (imgdt) {
+                    var tex = TextTexture.getTextTexture(imgdt.width, imgdt.height);
+                    tex.addChar(imgdt, 0, 0, ri.uv);
+                    ri.tex = tex;
+                    ri.orix = margin;
+                    ri.oriy = margin;
+                    tex.ri = ri;
+                    this.isoTextures.push(tex);
+                }
             }
             else {
                 var len = str.length;
@@ -7723,16 +7806,18 @@ window.Laya= (function (exports) {
                 }
                 this.charRender.fontsz = font._size;
                 imgdt = this.charRender.getCharBmp(str, this.fontStr, lineWidth, color, strokeColor, ri, margin, margin, margin, margin, TextRender.imgdtRect);
-                atlas = this.addBmpData(imgdt, ri);
-                if (TextRender.isWan1Wan) {
-                    ri.orix = margin;
-                    ri.oriy = margin;
+                if (imgdt) {
+                    atlas = this.addBmpData(imgdt, ri);
+                    if (TextRender.isWan1Wan) {
+                        ri.orix = margin;
+                        ri.oriy = margin;
+                    }
+                    else {
+                        ri.orix = (this.fontSizeOffX + lineExt);
+                        ri.oriy = (this.fontSizeOffY + lineExt);
+                    }
+                    atlas.charMaps[key] = ri;
                 }
-                else {
-                    ri.orix = (this.fontSizeOffX + lineExt);
-                    ri.oriy = (this.fontSizeOffY + lineExt);
-                }
-                atlas.charMaps[key] = ri;
             }
             return ri;
         }
@@ -7740,7 +7825,7 @@ window.Laya= (function (exports) {
             var w = data.width;
             var h = data.height;
             var sz = this.textAtlases.length;
-            var atlas = null;
+            var atlas;
             var find = false;
             for (var i = 0; i < sz; i++) {
                 atlas = this.textAtlases[i];
@@ -8065,7 +8150,6 @@ window.Laya= (function (exports) {
     TextRender.atlasWidth2 = 2048 * 2048;
     TextRender.tmpRI = new CharRenderInfo();
     TextRender.pixelBBX = [0, 0, 0, 0];
-    TextRender.textRenderInst = null;
     TextRender.imgdtRect = [0, 0, 0, 0];
     TextRender.simClean = false;
     TextTexture.gTextRender = TextRender;
@@ -8085,7 +8169,6 @@ window.Laya= (function (exports) {
             this._width = Context._MAXSIZE;
             this._height = Context._MAXSIZE;
             this._renderCount = 0;
-            this._isConvexCmd = true;
             this._submits = null;
             this._curSubmit = null;
             this._submitKey = new SubmitKey();
@@ -8100,7 +8183,6 @@ window.Laya= (function (exports) {
             this._clipInCache = false;
             this._clipInfoID = 0;
             this._clipID_Gen = 0;
-            this._curMat = null;
             this._lastMatScaleX = 1.0;
             this._lastMatScaleY = 1.0;
             this._lastMat_a = 1.0;
@@ -8150,17 +8232,17 @@ window.Laya= (function (exports) {
         $transform(a, b, c, d, tx, ty) {
         }
         get lineJoin() {
-            return null;
+            return '';
         }
         set lineJoin(value) {
         }
         get lineCap() {
-            return null;
+            return '';
         }
         set lineCap(value) {
         }
         get miterLimit() {
-            return null;
+            return '';
         }
         set miterLimit(value) {
         }
@@ -8224,7 +8306,6 @@ window.Laya= (function (exports) {
             this.beginPath();
             this.strokeStyle = lineColor;
             this.lineWidth = lineWidth;
-            var n = points.length;
             this.addPath(points.slice(), false, false, x, y);
             this.stroke();
         }
@@ -8265,7 +8346,6 @@ window.Laya= (function (exports) {
             this._fillAndStroke(fillColor, lineColor, lineWidth);
         }
         _drawPoly(x, y, points, fillColor, lineColor, lineWidth, isConvexPolygon, vid) {
-            var n = points.length;
             this.beginPath();
             this.addPath(points.slice(), true, isConvexPolygon, x, y);
             this.closePath();
@@ -8306,6 +8386,7 @@ window.Laya= (function (exports) {
         static set2DRenderConfig() {
             var gl = LayaGL.instance;
             WebGLContext.setBlend(gl, true);
+            WebGLContext.setBlendEquation(gl, gl.FUNC_ADD);
             WebGLContext.setBlendFunc(gl, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             WebGLContext.setDepthTest(gl, false);
             WebGLContext.setCullFace(gl, false);
@@ -8324,7 +8405,7 @@ window.Laya= (function (exports) {
         _releaseMem(keepRT = false) {
             if (!this._submits)
                 return;
-            this._curMat.destroy();
+            this._curMat && this._curMat.destroy();
             this._curMat = null;
             this._shader2D.destroy();
             this._shader2D = null;
@@ -8379,7 +8460,6 @@ window.Laya= (function (exports) {
             }
             this._submitKey.clear();
             this._mesh.clearVB();
-            this._renderCount++;
             this._drawCount = 1;
             this._other = ContextParams.DEFAULT;
             this._other.lineWidth = this._shader2D.ALPHA = 1.0;
@@ -8403,7 +8483,7 @@ window.Laya= (function (exports) {
                 this._height = h;
                 if (this._targets) {
                     this._targets.destroy();
-                    this._targets = new RenderTexture2D(w, h, BaseTexture.FORMAT_R8G8B8A8, -1);
+                    this._targets = new RenderTexture2D(w, h, exports.RenderTextureFormat.R8G8B8A8, -1);
                 }
                 if (this.isMain) {
                     WebGLContext.mainContext.viewport(0, 0, w, h);
@@ -8416,7 +8496,7 @@ window.Laya= (function (exports) {
         }
         set asBitmap(value) {
             if (value) {
-                this._targets || (this._targets = new RenderTexture2D(this._width, this._height, BaseTexture.FORMAT_R8G8B8A8, -1));
+                this._targets || (this._targets = new RenderTexture2D(this._width, this._height, exports.RenderTextureFormat.R8G8B8A8, -1));
                 if (!this._width || !this._height)
                     throw Error("asBitmap no size!");
             }
@@ -8536,35 +8616,26 @@ window.Laya= (function (exports) {
             this._other = this._other.make();
             SaveBase.save(this, SaveBase.TYPE_FONT, this._other, false);
         }
-        fillText(txt, x, y, fontStr, color, align) {
-            this._fillText(txt, null, x, y, fontStr, color, null, 0, null);
+        fillText(txt, x, y, fontStr, color, align, lineWidth = 0, borderColor = "") {
+            Context._textRender.filltext(this, txt, x, y, fontStr, color, borderColor, lineWidth, align);
         }
-        _fillText(txt, words, x, y, fontStr, color, strokeColor, lineWidth, textAlign, underLine = 0) {
-            if (txt)
-                Context._textRender.filltext(this, txt, x, y, fontStr, color, strokeColor, lineWidth, textAlign, underLine);
-            else if (words)
-                Context._textRender.fillWords(this, words, x, y, fontStr, color, strokeColor, lineWidth);
+        drawText(text, x, y, font, color, textAlign) {
+            Context._textRender.filltext(this, text, x, y, font, color, null, 0, textAlign);
+        }
+        fillWords(words, x, y, fontStr, color) {
+            Context._textRender.fillWords(this, words, x, y, fontStr, color, null, 0);
+        }
+        strokeWord(text, x, y, font, color, lineWidth, textAlign) {
+            Context._textRender.filltext(this, text, x, y, font, null, color, lineWidth, textAlign);
+        }
+        fillBorderText(txt, x, y, font, color, borderColor, lineWidth, textAlign) {
+            Context._textRender.filltext(this, txt, x, y, font, color, borderColor, lineWidth, textAlign);
+        }
+        fillBorderWords(words, x, y, font, color, borderColor, lineWidth) {
+            Context._textRender.fillWords(this, words, x, y, font, color, borderColor, lineWidth);
         }
         _fast_filltext(data, x, y, fontObj, color, strokeColor, lineWidth, textAlign, underLine = 0) {
             Context._textRender._fast_filltext(this, data, null, x, y, fontObj, color, strokeColor, lineWidth, textAlign, underLine);
-        }
-        fillWords(words, x, y, fontStr, color) {
-            this._fillText(null, words, x, y, fontStr, color, null, -1, null, 0);
-        }
-        fillBorderWords(words, x, y, font, color, borderColor, lineWidth) {
-            this._fillBorderText(null, words, x, y, font, color, borderColor, lineWidth, null);
-        }
-        drawText(text, x, y, font, color, textAlign) {
-            this._fillText(text, null, x, y, font, ColorUtils.create(color).strColor, null, -1, textAlign);
-        }
-        strokeWord(text, x, y, font, color, lineWidth, textAlign) {
-            this._fillText(text, null, x, y, font, null, ColorUtils.create(color).strColor, lineWidth || 1, textAlign);
-        }
-        fillBorderText(txt, x, y, fontStr, fillColor, borderColor, lineWidth, textAlign) {
-            this._fillBorderText(txt, null, x, y, fontStr, ColorUtils.create(fillColor).strColor, ColorUtils.create(borderColor).strColor, lineWidth, textAlign);
-        }
-        _fillBorderText(txt, words, x, y, fontStr, fillColor, borderColor, lineWidth, textAlign) {
-            this._fillText(txt, words, x, y, fontStr, fillColor, borderColor, lineWidth || 1, textAlign);
         }
         _fillRect(x, y, width, height, rgba) {
             var submit = this._curSubmit;
@@ -8957,7 +9028,7 @@ window.Laya= (function (exports) {
             this.sprite && this.sprite.repaint();
         }
         drawTextureWithTransform(tex, x, y, width, height, transform, tx, ty, alpha, blendMode, colorfilter = null, uv) {
-            var oldcomp = null;
+            var oldcomp;
             var curMat = this._curMat;
             if (blendMode) {
                 oldcomp = this.globalCompositeOperation;
@@ -9081,7 +9152,12 @@ window.Laya= (function (exports) {
             this._curSubmit = SubmitBase.RENDERBASE;
             return false;
         }
-        drawTriangles(tex, x, y, vertices, uvs, indices, matrix, alpha, color, blendMode) {
+        drawTriangles(tex, x, y, vertices, uvs, indices, matrix, alpha, color, blendMode, colorNum = 0xffffffff) {
+            var oldcomp = null;
+            if (blendMode) {
+                oldcomp = this.globalCompositeOperation;
+                this.globalCompositeOperation = blendMode;
+            }
             if (!tex._getSource()) {
                 if (this.sprite) {
                     ILaya.systemTimer.callLater(this, this._repaintSprite);
@@ -9116,7 +9192,7 @@ window.Laya= (function (exports) {
                 this._copyClipInfo(submit, this._globalClipMatrix);
                 this._submits[this._submits._length++] = submit;
             }
-            var rgba = this._mixRGBandAlpha(0xffffffff, this._shader2D.ALPHA * alpha);
+            var rgba = this._mixRGBandAlpha(colorNum, this._shader2D.ALPHA * alpha);
             if (!this._drawTriUseAbsMatrix) {
                 if (!matrix) {
                     tmpMat.a = 1;
@@ -9135,7 +9211,7 @@ window.Laya= (function (exports) {
                     tmpMat.ty = matrix.ty + y;
                 }
                 Matrix.mul(tmpMat, this._curMat, tmpMat);
-                triMesh.addData(vertices, uvs, indices, tmpMat, rgba);
+                triMesh.addData(vertices, uvs, indices, tmpMat || this._curMat, rgba);
             }
             else {
                 triMesh.addData(vertices, uvs, indices, matrix, rgba);
@@ -9144,6 +9220,9 @@ window.Laya= (function (exports) {
             if (needRestorFilter) {
                 this._colorFiler = oldColorFilter;
                 this._curSubmit = SubmitBase.RENDERBASE;
+            }
+            if (blendMode) {
+                this.globalCompositeOperation = oldcomp;
             }
         }
         transform(a, b, c, d, tx, ty) {
@@ -9514,6 +9593,8 @@ window.Laya= (function (exports) {
                 y = _y1;
                 lastx = _x1;
                 lasty = _y1;
+                this._path._lastOriX = x;
+                this._path._lastOriY = y;
                 this._path.addPoint(x, y);
             }
             var cvx = ptx1 - orix;
@@ -9524,6 +9605,8 @@ window.Laya= (function (exports) {
                 x = cx + orix;
                 y = cy + oriy;
                 if (Math.abs(lastx - x) > 0.1 || Math.abs(lasty - y) > 0.1) {
+                    this._path._lastOriX = x;
+                    this._path._lastOriY = y;
                     this._path.addPoint(x, y);
                     lastx = x;
                     lasty = y;
@@ -10223,6 +10306,8 @@ window.Laya= (function (exports) {
             this._angleInstancedArrays = null;
             this._isWebGL2 = false;
             this._oesTextureHalfFloat = null;
+            this._oesTextureHalfFloatLinear = null;
+            this._oesTextureFloat = null;
             this._extTextureFilterAnisotropic = null;
             this._compressedTextureS3tc = null;
             this._compressedTexturePvrtc = null;
@@ -10249,7 +10334,8 @@ window.Laya= (function (exports) {
                 if (!forceVAO)
                     this._angleInstancedArrays = this._getExtension("ANGLE_instanced_arrays");
                 this._oesTextureHalfFloat = this._getExtension("OES_texture_half_float");
-                this._getExtension("OES_texture_half_float_linear");
+                this._oesTextureHalfFloatLinear = this._getExtension("OES_texture_half_float_linear");
+                this._oesTextureFloat = this._getExtension("OES_texture_float");
             }
             else {
                 this._getExtension("EXT_color_buffer_float");
@@ -10261,7 +10347,7 @@ window.Laya= (function (exports) {
         }
         static _forceSupportVAOPlatform() {
             let Browser = ILaya.Browser;
-            return (Browser.onMiniGame && Browser.onIOS) || Browser.onBDMiniGame || Browser.onQGMiniGame;
+            return Browser.onBDMiniGame || Browser.onQGMiniGame;
         }
         _getExtension(name) {
             var prefixes = LayaGPU._extentionVendorPrefixes;
@@ -10327,11 +10413,12 @@ window.Laya= (function (exports) {
         constructor(width, height, mainCanv) {
             this._timeId = 0;
             Render._mainCanvas = mainCanv;
-            Render._mainCanvas.source.id = "layaCanvas";
-            Render._mainCanvas.source.width = width;
-            Render._mainCanvas.source.height = height;
+            let source = Render._mainCanvas.source;
+            source.id = "layaCanvas";
+            source.width = width;
+            source.height = height;
             if (Render.isConchApp) {
-                document.body.appendChild(Render._mainCanvas.source);
+                document.body.appendChild(source);
             }
             this.initRender(Render._mainCanvas, width, height);
             window.requestAnimationFrame(loop);
@@ -10405,14 +10492,19 @@ window.Laya= (function (exports) {
     {
         Render.isConchApp = (window.conch != null);
         if (Render.isConchApp) {
-            Render.supportWebGLPlusCulling = true;
+            Render.supportWebGLPlusCulling = false;
+            Render.supportWebGLPlusAnimation = true;
+            Render.supportWebGLPlusRendering = true;
+        }
+        else if (window.qq != null && window.qq.webglPlus != null) {
+            Render.supportWebGLPlusCulling = false;
             Render.supportWebGLPlusAnimation = true;
             Render.supportWebGLPlusRendering = true;
         }
     }
 
     class DrawTrianglesCmd {
-        static create(texture, x, y, vertices, uvs, indices, matrix, alpha, color, blendMode) {
+        static create(texture, x, y, vertices, uvs, indices, matrix, alpha, color, blendMode, colorNum) {
             var cmd = Pool.getItemByClass("DrawTrianglesCmd", DrawTrianglesCmd);
             cmd.texture = texture;
             cmd.x = x;
@@ -10428,6 +10520,7 @@ window.Laya= (function (exports) {
                 cmd.color.color(c[0] * 255, c[1] * 255, c[2] * 255, c[3] * 255);
             }
             cmd.blendMode = blendMode;
+            cmd.colorNum = colorNum;
             return cmd;
         }
         recover() {
@@ -10439,7 +10532,7 @@ window.Laya= (function (exports) {
             Pool.recover("DrawTrianglesCmd", this);
         }
         run(context, gx, gy) {
-            context.drawTriangles(this.texture, this.x + gx, this.y + gy, this.vertices, this.uvs, this.indices, this.matrix, this.alpha, this.color, this.blendMode);
+            context.drawTriangles(this.texture, this.x + gx, this.y + gy, this.vertices, this.uvs, this.indices, this.matrix, this.alpha, this.color, this.blendMode, this.colorNum);
         }
         get cmdID() {
             return DrawTrianglesCmd.ID;
@@ -10850,56 +10943,6 @@ window.Laya= (function (exports) {
     }
     DrawTexturesCmd.ID = "DrawTextures";
 
-    class FillBorderTextCmd {
-        static create(text, x, y, font, fillColor, borderColor, lineWidth, textAlign) {
-            var cmd = Pool.getItemByClass("FillBorderTextCmd", FillBorderTextCmd);
-            cmd.text = text;
-            cmd.x = x;
-            cmd.y = y;
-            cmd.font = font;
-            cmd.fillColor = fillColor;
-            cmd.borderColor = borderColor;
-            cmd.lineWidth = lineWidth;
-            cmd.textAlign = textAlign;
-            return cmd;
-        }
-        recover() {
-            Pool.recover("FillBorderTextCmd", this);
-        }
-        run(context, gx, gy) {
-            context.fillBorderText(this.text, this.x + gx, this.y + gy, this.font, this.fillColor, this.borderColor, this.lineWidth, this.textAlign);
-        }
-        get cmdID() {
-            return FillBorderTextCmd.ID;
-        }
-    }
-    FillBorderTextCmd.ID = "FillBorderText";
-
-    class FillBorderWordsCmd {
-        static create(words, x, y, font, fillColor, borderColor, lineWidth) {
-            var cmd = Pool.getItemByClass("FillBorderWordsCmd", FillBorderWordsCmd);
-            cmd.words = words;
-            cmd.x = x;
-            cmd.y = y;
-            cmd.font = font;
-            cmd.fillColor = fillColor;
-            cmd.borderColor = borderColor;
-            cmd.lineWidth = lineWidth;
-            return cmd;
-        }
-        recover() {
-            this.words = null;
-            Pool.recover("FillBorderWordsCmd", this);
-        }
-        run(context, gx, gy) {
-            context.fillBorderWords(this.words, this.x + gx, this.y + gy, this.font, this.fillColor, this.borderColor, this.lineWidth);
-        }
-        get cmdID() {
-            return FillBorderWordsCmd.ID;
-        }
-    }
-    FillBorderWordsCmd.ID = "FillBorderWords";
-
     class FillTextCmd {
         constructor() {
             this._textIsWorldText = false;
@@ -10908,15 +10951,18 @@ window.Laya= (function (exports) {
             this._fontObj = FillTextCmd._defFontObj;
             this._nTexAlign = 0;
         }
-        static create(text, x, y, font, color, textAlign) {
+        static create(text, words, x, y, font, color, textAlign, lineWidth, borderColor) {
             var cmd = Pool.getItemByClass("FillTextCmd", FillTextCmd);
             cmd.text = text;
             cmd._textIsWorldText = text instanceof WordText;
+            cmd._words = words;
             cmd.x = x;
             cmd.y = y;
             cmd.font = font;
             cmd.color = color;
             cmd.textAlign = textAlign;
+            cmd._lineWidth = lineWidth;
+            cmd._borderColor = borderColor;
             return cmd;
         }
         recover() {
@@ -10926,11 +10972,16 @@ window.Laya= (function (exports) {
             if (ILaya.stage.isGlobalRepaint()) {
                 this._textIsWorldText && this._text.cleanCache();
             }
-            if (this._textIsWorldText) {
-                context._fast_filltext(this._text, this.x + gx, this.y + gy, this._fontObj, this._color, null, 0, this._nTexAlign, 0);
+            if (this._words) {
+                Context._textRender.fillWords(context, this._words, this.x + gx, this.y + gy, this._fontObj, this._color, this._borderColor, this._lineWidth);
             }
             else {
-                context.drawText(this._text, this.x + gx, this.y + gy, this._font, this._color, this._textAlign);
+                if (this._textIsWorldText) {
+                    context._fast_filltext(this._text, this.x + gx, this.y + gy, this._fontObj, this._color, this._borderColor, this._lineWidth, this._nTexAlign, 0);
+                }
+                else {
+                    Context._textRender.filltext(context, this._text, this.x + gx, this.y + gy, this.font, this.color, this._borderColor, this._lineWidth, this._textAlign);
+                }
             }
         }
         get cmdID() {
@@ -10981,29 +11032,6 @@ window.Laya= (function (exports) {
     FillTextCmd.ID = "FillText";
     FillTextCmd._defFontObj = new FontInfo(null);
 
-    class FillWordsCmd {
-        static create(words, x, y, font, color) {
-            var cmd = Pool.getItemByClass("FillWordsCmd", FillWordsCmd);
-            cmd.words = words;
-            cmd.x = x;
-            cmd.y = y;
-            cmd.font = font;
-            cmd.color = color;
-            return cmd;
-        }
-        recover() {
-            this.words = null;
-            Pool.recover("FillWordsCmd", this);
-        }
-        run(context, gx, gy) {
-            context.fillWords(this.words, this.x + gx, this.y + gy, this.font, this.color);
-        }
-        get cmdID() {
-            return FillWordsCmd.ID;
-        }
-    }
-    FillWordsCmd.ID = "FillWords";
-
     class SaveCmd {
         static create() {
             var cmd = Pool.getItemByClass("SaveCmd", SaveCmd);
@@ -11020,30 +11048,6 @@ window.Laya= (function (exports) {
         }
     }
     SaveCmd.ID = "Save";
-
-    class StrokeTextCmd {
-        static create(text, x, y, font, color, lineWidth, textAlign) {
-            var cmd = Pool.getItemByClass("StrokeTextCmd", StrokeTextCmd);
-            cmd.text = text;
-            cmd.x = x;
-            cmd.y = y;
-            cmd.font = font;
-            cmd.color = color;
-            cmd.lineWidth = lineWidth;
-            cmd.textAlign = textAlign;
-            return cmd;
-        }
-        recover() {
-            Pool.recover("StrokeTextCmd", this);
-        }
-        run(context, gx, gy) {
-            context.strokeWord(this.text, this.x + gx, this.y + gy, this.font, this.color, this.lineWidth, this.textAlign);
-        }
-        get cmdID() {
-            return StrokeTextCmd.ID;
-        }
-    }
-    StrokeTextCmd.ID = "StrokeText";
 
     class CacheManger {
         constructor() {
@@ -11341,8 +11345,8 @@ window.Laya= (function (exports) {
                 return null;
             return this._saveToCmd(Render._context.drawTextures, DrawTexturesCmd.create.call(this, texture, pos));
         }
-        drawTriangles(texture, x, y, vertices, uvs, indices, matrix = null, alpha = 1, color = null, blendMode = null) {
-            return this._saveToCmd(Render._context.drawTriangles, DrawTrianglesCmd.create.call(this, texture, x, y, vertices, uvs, indices, matrix, alpha, color, blendMode));
+        drawTriangles(texture, x, y, vertices, uvs, indices, matrix = null, alpha = 1, color = null, blendMode = null, colorNum = undefined) {
+            return this._saveToCmd(Render._context.drawTriangles, DrawTrianglesCmd.create.call(this, texture, x, y, vertices, uvs, indices, matrix, alpha, color, blendMode, colorNum));
         }
         fillTexture(texture, x, y, width = 0, height = 0, type = "repeat", offset = null) {
             if (texture && texture.getIsReady())
@@ -11371,19 +11375,19 @@ window.Laya= (function (exports) {
             return this._saveToCmd(Render._context.clipRect, ClipRectCmd.create.call(this, x, y, width, height));
         }
         fillText(text, x, y, font, color, textAlign) {
-            return this._saveToCmd(Render._context.fillText, FillTextCmd.create.call(this, text, x, y, font || ILaya.Text.defaultFontStr(), color, textAlign));
+            return this._saveToCmd(Render._context.fillText, FillTextCmd.create.call(this, text, null, x, y, font || ILaya.Text.defaultFontStr(), color, textAlign, 0, ""));
         }
-        fillBorderText(text, x, y, font, fillColor, borderColor, lineWidth, textAlign) {
-            return this._saveToCmd(Render._context.fillBorderText, FillBorderTextCmd.create.call(this, text, x, y, font || ILaya.Text.defaultFontStr(), fillColor, borderColor, lineWidth, textAlign));
+        fillBorderText(text, x, y, font, fillColor, textAlign, lineWidth, borderColor) {
+            return this._saveToCmd(Render._context.fillText, FillTextCmd.create.call(this, text, null, x, y, font || ILaya.Text.defaultFontStr(), fillColor, borderColor, lineWidth, textAlign));
         }
         fillWords(words, x, y, font, color) {
-            return this._saveToCmd(Render._context.fillWords, FillWordsCmd.create.call(this, words, x, y, font || ILaya.Text.defaultFontStr(), color));
+            return this._saveToCmd(Render._context.fillText, FillTextCmd.create.call(this, null, words, x, y, font || ILaya.Text.defaultFontStr(), color));
         }
         fillBorderWords(words, x, y, font, fillColor, borderColor, lineWidth) {
-            return this._saveToCmd(Render._context.fillBorderWords, FillBorderWordsCmd.create.call(this, words, x, y, font || ILaya.Text.defaultFontStr(), fillColor, borderColor, lineWidth));
+            return this._saveToCmd(Render._context.fillText, FillTextCmd.create.call(this, null, words, x, y, font || ILaya.Text.defaultFontStr(), fillColor, "", lineWidth, borderColor));
         }
         strokeText(text, x, y, font, color, lineWidth, textAlign) {
-            return this._saveToCmd(Render._context.fillBorderText, StrokeTextCmd.create.call(this, text, x, y, font || ILaya.Text.defaultFontStr(), color, lineWidth, textAlign));
+            return this._saveToCmd(Render._context.fillText, FillTextCmd.create.call(this, text, null, x, y, font || ILaya.Text.defaultFontStr(), null, textAlign, lineWidth, color));
         }
         alpha(alpha) {
             return this._saveToCmd(Render._context.alpha, AlphaCmd.create.call(this, alpha));
@@ -11427,7 +11431,7 @@ window.Laya= (function (exports) {
         }
         _isTextCmd(cmd) {
             var cmdID = cmd.cmdID;
-            return cmdID == FillTextCmd.ID || cmdID == StrokeTextCmd.ID || cmdID == FillBorderTextCmd.ID;
+            return cmdID == FillTextCmd.ID;
         }
         replaceTextColor(color) {
             this._repaint();
@@ -11449,13 +11453,7 @@ window.Laya= (function (exports) {
             var cmdID = cmdO.cmdID;
             switch (cmdID) {
                 case FillTextCmd.ID:
-                case StrokeTextCmd.ID:
                     cmdO.color = color;
-                    break;
-                case FillBorderTextCmd.ID:
-                case FillBorderWordsCmd.ID:
-                case FillBorderTextCmd.ID:
-                    cmdO.fillColor = color;
                     break;
             }
         }
@@ -11464,7 +11462,7 @@ window.Laya= (function (exports) {
             if (!tex) {
                 tex = new Texture();
                 tex.load(url);
-                ILaya.Loader.cacheRes(url, tex);
+                ILaya.Loader.cacheTexture(url, tex);
                 tex.once(Event.READY, this, this.drawImage, [tex, x, y, width, height]);
             }
             else {
@@ -11551,6 +11549,606 @@ window.Laya= (function (exports) {
     Const.HAS_MOUSE = 0x40;
     Const.DISPLAYED_INSTAGE = 0x80;
     Const.DRAWCALL_OPTIMIZE = 0x100;
+
+    class LayaGLQuickRunner {
+        static __init__() {
+            LayaGLQuickRunner.map[SpriteConst.ALPHA | SpriteConst.TRANSFORM | SpriteConst.GRAPHICS] = LayaGLQuickRunner.alpha_transform_drawLayaGL;
+            LayaGLQuickRunner.map[SpriteConst.ALPHA | SpriteConst.GRAPHICS] = LayaGLQuickRunner.alpha_drawLayaGL;
+            LayaGLQuickRunner.map[SpriteConst.TRANSFORM | SpriteConst.GRAPHICS] = LayaGLQuickRunner.transform_drawLayaGL;
+            LayaGLQuickRunner.map[SpriteConst.TRANSFORM | SpriteConst.CHILDS] = LayaGLQuickRunner.transform_drawNodes;
+            LayaGLQuickRunner.map[SpriteConst.ALPHA | SpriteConst.TRANSFORM | SpriteConst.TEXTURE] = LayaGLQuickRunner.alpha_transform_drawTexture;
+            LayaGLQuickRunner.map[SpriteConst.ALPHA | SpriteConst.TEXTURE] = LayaGLQuickRunner.alpha_drawTexture;
+            LayaGLQuickRunner.map[SpriteConst.TRANSFORM | SpriteConst.TEXTURE] = LayaGLQuickRunner.transform_drawTexture;
+            LayaGLQuickRunner.map[SpriteConst.GRAPHICS | SpriteConst.CHILDS] = LayaGLQuickRunner.drawLayaGL_drawNodes;
+        }
+        static transform_drawTexture(sprite, context, x, y) {
+            var style = sprite._style;
+            var tex = sprite.texture;
+            context.saveTransform(LayaGLQuickRunner.curMat);
+            context.transformByMatrix(sprite.transform, x, y);
+            context.drawTexture(tex, -sprite.pivotX, -sprite.pivotY, sprite._width || tex.width, sprite._height || tex.height);
+            context.restoreTransform(LayaGLQuickRunner.curMat);
+        }
+        static alpha_drawTexture(sprite, context, x, y) {
+            var style = sprite._style;
+            var alpha;
+            var tex = sprite.texture;
+            if ((alpha = style.alpha) > 0.01 || sprite._needRepaint()) {
+                var temp = context.globalAlpha;
+                context.globalAlpha *= alpha;
+                context.drawTexture(tex, x - style.pivotX + tex.offsetX, y - style.pivotY + tex.offsetY, sprite._width || tex.width, sprite._height || tex.height);
+                context.globalAlpha = temp;
+            }
+        }
+        static alpha_transform_drawTexture(sprite, context, x, y) {
+            var style = sprite._style;
+            var alpha;
+            var tex = sprite.texture;
+            if ((alpha = style.alpha) > 0.01 || sprite._needRepaint()) {
+                var temp = context.globalAlpha;
+                context.globalAlpha *= alpha;
+                context.saveTransform(LayaGLQuickRunner.curMat);
+                context.transformByMatrix(sprite.transform, x, y);
+                context.drawTexture(tex, -style.pivotX + tex.offsetX, -style.pivotY + tex.offsetY, sprite._width || tex.width, sprite._height || tex.height);
+                context.restoreTransform(LayaGLQuickRunner.curMat);
+                context.globalAlpha = temp;
+            }
+        }
+        static alpha_transform_drawLayaGL(sprite, context, x, y) {
+            var style = sprite._style;
+            var alpha;
+            if ((alpha = style.alpha) > 0.01 || sprite._needRepaint()) {
+                var temp = context.globalAlpha;
+                context.globalAlpha *= alpha;
+                context.saveTransform(LayaGLQuickRunner.curMat);
+                context.transformByMatrix(sprite.transform, x, y);
+                sprite._graphics && sprite._graphics._render(sprite, context, -style.pivotX, -style.pivotY);
+                context.restoreTransform(LayaGLQuickRunner.curMat);
+                context.globalAlpha = temp;
+            }
+        }
+        static alpha_drawLayaGL(sprite, context, x, y) {
+            var style = sprite._style;
+            var alpha;
+            if ((alpha = style.alpha) > 0.01 || sprite._needRepaint()) {
+                var temp = context.globalAlpha;
+                context.globalAlpha *= alpha;
+                sprite._graphics && sprite._graphics._render(sprite, context, x - style.pivotX, y - style.pivotY);
+                context.globalAlpha = temp;
+            }
+        }
+        static transform_drawLayaGL(sprite, context, x, y) {
+            var style = sprite._style;
+            context.saveTransform(LayaGLQuickRunner.curMat);
+            context.transformByMatrix(sprite.transform, x, y);
+            sprite._graphics && sprite._graphics._render(sprite, context, -style.pivotX, -style.pivotY);
+            context.restoreTransform(LayaGLQuickRunner.curMat);
+        }
+        static transform_drawNodes(sprite, context, x, y) {
+            var textLastRender = sprite._getBit(Const.DRAWCALL_OPTIMIZE) && context.drawCallOptimize(true);
+            var style = sprite._style;
+            context.saveTransform(LayaGLQuickRunner.curMat);
+            context.transformByMatrix(sprite.transform, x, y);
+            x = -style.pivotX;
+            y = -style.pivotY;
+            var childs = sprite._children, n = childs.length, ele;
+            if (style.viewport) {
+                var rect = style.viewport;
+                var left = rect.x;
+                var top = rect.y;
+                var right = rect.right;
+                var bottom = rect.bottom;
+                var _x, _y;
+                for (i = 0; i < n; ++i) {
+                    if ((ele = childs[i])._visible && ((_x = ele._x) < right && (_x + ele.width) > left && (_y = ele._y) < bottom && (_y + ele.height) > top)) {
+                        ele.render(context, x, y);
+                    }
+                }
+            }
+            else {
+                for (var i = 0; i < n; ++i)
+                    (ele = childs[i])._visible && ele.render(context, x, y);
+            }
+            context.restoreTransform(LayaGLQuickRunner.curMat);
+            textLastRender && context.drawCallOptimize(false);
+        }
+        static drawLayaGL_drawNodes(sprite, context, x, y) {
+            var textLastRender = sprite._getBit(Const.DRAWCALL_OPTIMIZE) && context.drawCallOptimize(true);
+            var style = sprite._style;
+            x = x - style.pivotX;
+            y = y - style.pivotY;
+            sprite._graphics && sprite._graphics._render(sprite, context, x, y);
+            var childs = sprite._children, n = childs.length, ele;
+            if (style.viewport) {
+                var rect = style.viewport;
+                var left = rect.x;
+                var top = rect.y;
+                var right = rect.right;
+                var bottom = rect.bottom;
+                var _x, _y;
+                for (i = 0; i < n; ++i) {
+                    if ((ele = childs[i])._visible && ((_x = ele._x) < right && (_x + ele.width) > left && (_y = ele._y) < bottom && (_y + ele.height) > top)) {
+                        ele.render(context, x, y);
+                    }
+                }
+            }
+            else {
+                for (var i = 0; i < n; ++i)
+                    (ele = childs[i])._visible && ele.render(context, x, y);
+            }
+            textLastRender && context.drawCallOptimize(false);
+        }
+    }
+    LayaGLQuickRunner.map = {};
+    LayaGLQuickRunner.curMat = new Matrix();
+
+    class RenderSprite {
+        constructor(type, next) {
+            if (LayaGLQuickRunner.map[type]) {
+                this._fun = LayaGLQuickRunner.map[type];
+                this._next = RenderSprite.NORENDER;
+                return;
+            }
+            this._next = next || RenderSprite.NORENDER;
+            switch (type) {
+                case 0:
+                    this._fun = this._no;
+                    return;
+                case SpriteConst.ALPHA:
+                    this._fun = this._alpha;
+                    return;
+                case SpriteConst.TRANSFORM:
+                    this._fun = this._transform;
+                    return;
+                case SpriteConst.BLEND:
+                    this._fun = this._blend;
+                    return;
+                case SpriteConst.CANVAS:
+                    this._fun = this._canvas;
+                    return;
+                case SpriteConst.MASK:
+                    this._fun = this._mask;
+                    return;
+                case SpriteConst.CLIP:
+                    this._fun = this._clip;
+                    return;
+                case SpriteConst.STYLE:
+                    this._fun = this._style;
+                    return;
+                case SpriteConst.GRAPHICS:
+                    this._fun = this._graphics;
+                    return;
+                case SpriteConst.CHILDS:
+                    this._fun = this._children;
+                    return;
+                case SpriteConst.CUSTOM:
+                    this._fun = this._custom;
+                    return;
+                case SpriteConst.TEXTURE:
+                    this._fun = this._texture;
+                    return;
+                case SpriteConst.FILTERS:
+                    this._fun = Filter._filter;
+                    return;
+                case RenderSprite.INIT:
+                    this._fun = RenderSprite._initRenderFun;
+                    return;
+            }
+            this.onCreate(type);
+        }
+        static __init__() {
+            LayaGLQuickRunner.__init__();
+            var i, len;
+            var initRender;
+            initRender = new RenderSprite(RenderSprite.INIT, null);
+            len = RenderSprite.renders.length = SpriteConst.CHILDS * 2;
+            for (i = 0; i < len; i++)
+                RenderSprite.renders[i] = initRender;
+            RenderSprite.renders[0] = new RenderSprite(0, null);
+        }
+        static _initRenderFun(sprite, context, x, y) {
+            var type = sprite._renderType;
+            var r = RenderSprite.renders[type] = RenderSprite._getTypeRender(type);
+            r._fun(sprite, context, x, y);
+        }
+        static _getTypeRender(type) {
+            if (LayaGLQuickRunner.map[type])
+                return new RenderSprite(type, null);
+            var rst = null;
+            var tType = SpriteConst.CHILDS;
+            while (tType > 0) {
+                if (tType & type)
+                    rst = new RenderSprite(tType, rst);
+                tType = tType >> 1;
+            }
+            return rst;
+        }
+        onCreate(type) {
+        }
+        _style(sprite, context, x, y) {
+            var style = sprite._style;
+            if (style.render != null)
+                style.render(sprite, context, x, y);
+            var next = this._next;
+            next._fun.call(next, sprite, context, x, y);
+        }
+        _no(sprite, context, x, y) {
+        }
+        _custom(sprite, context, x, y) {
+            sprite.customRender(context, x, y);
+            this._next._fun.call(this._next, sprite, context, x - sprite.pivotX, y - sprite.pivotY);
+        }
+        _clip(sprite, context, x, y) {
+            var next = this._next;
+            if (next == RenderSprite.NORENDER)
+                return;
+            var r = sprite._style.scrollRect;
+            context.save();
+            context.clipRect(x, y, r.width, r.height);
+            next._fun.call(next, sprite, context, x - r.x, y - r.y);
+            context.restore();
+        }
+        _texture(sprite, context, x, y) {
+            var tex = sprite.texture;
+            if (tex._getSource())
+                context.drawTexture(tex, x - sprite.pivotX + tex.offsetX, y - sprite.pivotY + tex.offsetY, sprite._width || tex.width, sprite._height || tex.height);
+            var next = this._next;
+            if (next != RenderSprite.NORENDER)
+                next._fun.call(next, sprite, context, x, y);
+        }
+        _graphics(sprite, context, x, y) {
+            var style = sprite._style;
+            var g = sprite._graphics;
+            g && g._render(sprite, context, x - style.pivotX, y - style.pivotY);
+            var next = this._next;
+            if (next != RenderSprite.NORENDER)
+                next._fun.call(next, sprite, context, x, y);
+        }
+        _image(sprite, context, x, y) {
+            var style = sprite._style;
+            context.drawTexture2(x, y, style.pivotX, style.pivotY, sprite.transform, sprite._graphics._one);
+        }
+        _image2(sprite, context, x, y) {
+            var style = sprite._style;
+            context.drawTexture2(x, y, style.pivotX, style.pivotY, sprite.transform, sprite._graphics._one);
+        }
+        _alpha(sprite, context, x, y) {
+            var style = sprite._style;
+            var alpha;
+            if ((alpha = style.alpha) > 0.01 || sprite._needRepaint()) {
+                var temp = context.globalAlpha;
+                context.globalAlpha *= alpha;
+                var next = this._next;
+                next._fun.call(next, sprite, context, x, y);
+                context.globalAlpha = temp;
+            }
+        }
+        _transform(sprite, context, x, y) {
+            var transform = sprite.transform, _next = this._next;
+            var style = sprite._style;
+            if (transform && _next != RenderSprite.NORENDER) {
+                context.save();
+                context.transform(transform.a, transform.b, transform.c, transform.d, transform.tx + x, transform.ty + y);
+                _next._fun.call(_next, sprite, context, 0, 0);
+                context.restore();
+            }
+            else {
+                if (_next != RenderSprite.NORENDER)
+                    _next._fun.call(_next, sprite, context, x, y);
+            }
+        }
+        _children(sprite, context, x, y) {
+            var style = sprite._style;
+            var childs = sprite._children, n = childs.length, ele;
+            x = x - sprite.pivotX;
+            y = y - sprite.pivotY;
+            var textLastRender = sprite._getBit(Const.DRAWCALL_OPTIMIZE) && context.drawCallOptimize(true);
+            if (style.viewport) {
+                var rect = style.viewport;
+                var left = rect.x;
+                var top = rect.y;
+                var right = rect.right;
+                var bottom = rect.bottom;
+                var _x, _y;
+                for (i = 0; i < n; ++i) {
+                    if ((ele = childs[i])._visible && ((_x = ele._x) < right && (_x + ele.width) > left && (_y = ele._y) < bottom && (_y + ele.height) > top)) {
+                        ele.render(context, x, y);
+                    }
+                }
+            }
+            else {
+                for (var i = 0; i < n; ++i)
+                    (ele = childs[i])._visible && ele.render(context, x, y);
+            }
+            textLastRender && context.drawCallOptimize(false);
+        }
+        _canvas(sprite, context, x, y) {
+            var _cacheStyle = sprite._cacheStyle;
+            var _next = this._next;
+            if (!_cacheStyle.enableCanvasRender) {
+                _next._fun.call(_next, sprite, context, x, y);
+                return;
+            }
+            _cacheStyle.cacheAs === 'bitmap' ? (Stat.canvasBitmap++) : (Stat.canvasNormal++);
+            var cacheNeedRebuild = false;
+            var textNeedRestore = false;
+            if (_cacheStyle.canvas) {
+                var canv = _cacheStyle.canvas;
+                var ctx = canv.context;
+                var charRIs = canv.touches;
+                if (charRIs) {
+                    for (var ci = 0; ci < charRIs.length; ci++) {
+                        if (charRIs[ci].deleted) {
+                            textNeedRestore = true;
+                            break;
+                        }
+                    }
+                }
+                cacheNeedRebuild = canv.isCacheValid && !canv.isCacheValid();
+            }
+            if (sprite._needRepaint() || (!_cacheStyle.canvas) || textNeedRestore || cacheNeedRebuild || ILaya.stage.isGlobalRepaint()) {
+                if (_cacheStyle.cacheAs === 'normal') {
+                    if (context._targets) {
+                        _next._fun.call(_next, sprite, context, x, y);
+                        return;
+                    }
+                    else {
+                        this._canvas_webgl_normal_repaint(sprite, context);
+                    }
+                }
+                else {
+                    this._canvas_repaint(sprite, context, x, y);
+                }
+            }
+            var tRec = _cacheStyle.cacheRect;
+            context.drawCanvas(_cacheStyle.canvas, x + tRec.x, y + tRec.y, tRec.width, tRec.height);
+        }
+        _canvas_repaint(sprite, context, x, y) {
+            var _cacheStyle = sprite._cacheStyle;
+            var _next = this._next;
+            var tx;
+            var canvas = _cacheStyle.canvas;
+            var left;
+            var top;
+            var tRec;
+            var tCacheType = _cacheStyle.cacheAs;
+            var w, h;
+            var scaleX, scaleY;
+            var scaleInfo;
+            scaleInfo = _cacheStyle._calculateCacheRect(sprite, tCacheType, x, y);
+            scaleX = scaleInfo.x;
+            scaleY = scaleInfo.y;
+            tRec = _cacheStyle.cacheRect;
+            w = tRec.width * scaleX;
+            h = tRec.height * scaleY;
+            left = tRec.x;
+            top = tRec.y;
+            if (tCacheType === 'bitmap' && (w > 2048 || h > 2048)) {
+                console.warn("cache bitmap size larger than 2048,cache ignored");
+                _cacheStyle.releaseContext();
+                _next._fun.call(_next, sprite, context, x, y);
+                return;
+            }
+            if (!canvas) {
+                _cacheStyle.createContext();
+                canvas = _cacheStyle.canvas;
+            }
+            tx = canvas.context;
+            tx.sprite = sprite;
+            (canvas.width != w || canvas.height != h) && canvas.size(w, h);
+            if (tCacheType === 'bitmap')
+                tx.asBitmap = true;
+            else if (tCacheType === 'normal')
+                tx.asBitmap = false;
+            tx.clear();
+            if (scaleX != 1 || scaleY != 1) {
+                var ctx = tx;
+                ctx.save();
+                ctx.scale(scaleX, scaleY);
+                _next._fun.call(_next, sprite, tx, -left, -top);
+                ctx.restore();
+                sprite._applyFilters();
+            }
+            else {
+                ctx = tx;
+                _next._fun.call(_next, sprite, tx, -left, -top);
+                sprite._applyFilters();
+            }
+            if (_cacheStyle.staticCache)
+                _cacheStyle.reCache = false;
+            Stat.canvasReCache++;
+        }
+        _canvas_webgl_normal_repaint(sprite, context) {
+            var _cacheStyle = sprite._cacheStyle;
+            var _next = this._next;
+            var canvas = _cacheStyle.canvas;
+            var tCacheType = _cacheStyle.cacheAs;
+            _cacheStyle._calculateCacheRect(sprite, tCacheType, 0, 0);
+            if (!canvas) {
+                canvas = _cacheStyle.canvas = new WebGLCacheAsNormalCanvas(context, sprite);
+            }
+            var tx = canvas.context;
+            canvas['startRec']();
+            _next._fun.call(_next, sprite, tx, sprite.pivotX, sprite.pivotY);
+            sprite._applyFilters();
+            Stat.canvasReCache++;
+            canvas['endRec']();
+        }
+        _blend(sprite, context, x, y) {
+            var style = sprite._style;
+            var next = this._next;
+            if (style.blendMode) {
+                context.save();
+                context.globalCompositeOperation = style.blendMode;
+                next._fun.call(next, sprite, context, x, y);
+                context.restore();
+            }
+            else {
+                next._fun.call(next, sprite, context, x, y);
+            }
+        }
+        _mask(sprite, context, x, y) {
+            var next = this._next;
+            var mask = sprite.mask;
+            var ctx = context;
+            if (mask) {
+                ctx.save();
+                var preBlendMode = ctx.globalCompositeOperation;
+                var tRect = new Rectangle();
+                tRect.copyFrom(mask.getBounds());
+                tRect.width = Math.round(tRect.width);
+                tRect.height = Math.round(tRect.height);
+                tRect.x = Math.round(tRect.x);
+                tRect.y = Math.round(tRect.y);
+                if (tRect.width > 0 && tRect.height > 0) {
+                    var w = tRect.width;
+                    var h = tRect.height;
+                    var tmpRT = WebGLRTMgr.getRT(w, h);
+                    ctx.breakNextMerge();
+                    ctx.pushRT();
+                    ctx.addRenderObject(SubmitCMD.create([ctx, tmpRT, w, h], RenderSprite.tmpTarget, this));
+                    mask.render(ctx, -tRect.x, -tRect.y);
+                    ctx.breakNextMerge();
+                    ctx.popRT();
+                    ctx.save();
+                    ctx.clipRect(x + tRect.x - sprite.getStyle().pivotX, y + tRect.y - sprite.getStyle().pivotY, w, h);
+                    next._fun.call(next, sprite, ctx, x, y);
+                    ctx.restore();
+                    preBlendMode = ctx.globalCompositeOperation;
+                    ctx.addRenderObject(SubmitCMD.create(["mask"], RenderSprite.setBlendMode, this));
+                    var shaderValue = Value2D.create(ShaderDefines2D.TEXTURE2D, 0);
+                    var uv = Texture.INV_UV;
+                    ctx.drawTarget(tmpRT, x + tRect.x - sprite.getStyle().pivotX, y + tRect.y - sprite.getStyle().pivotY, w, h, Matrix.TEMP.identity(), shaderValue, uv, 6);
+                    ctx.addRenderObject(SubmitCMD.create([tmpRT], RenderSprite.recycleTarget, this));
+                    ctx.addRenderObject(SubmitCMD.create([preBlendMode], RenderSprite.setBlendMode, this));
+                }
+                ctx.restore();
+            }
+            else {
+                next._fun.call(next, sprite, context, x, y);
+            }
+        }
+        static tmpTarget(ctx, rt, w, h) {
+            rt.start();
+            rt.clear(0, 0, 0, 0);
+        }
+        static recycleTarget(rt) {
+            WebGLRTMgr.releaseRT(rt);
+        }
+        static setBlendMode(blendMode) {
+            var gl = WebGLContext.mainContext;
+            BlendMode.targetFns[BlendMode.TOINT[blendMode]](gl);
+        }
+    }
+    RenderSprite.INIT = 0x11111;
+    RenderSprite.renders = [];
+    RenderSprite.NORENDER = new RenderSprite(0, null);
+    RenderSprite.tempUV = new Array(8);
+
+    class HTMLCanvas extends Bitmap {
+        get source() {
+            return this._source;
+        }
+        _getSource() {
+            return this._source;
+        }
+        constructor(createCanvas = false) {
+            super();
+            if (createCanvas)
+                this._source = Browser.createElement("canvas");
+            else {
+                this._source = this;
+            }
+            this.lock = true;
+        }
+        clear() {
+            this._ctx && this._ctx.clear && this._ctx.clear();
+            if (this._texture) {
+                this._texture.destroy();
+                this._texture = null;
+            }
+        }
+        destroy() {
+            super.destroy();
+            this._setCPUMemory(0);
+            this._ctx && this._ctx.destroy && this._ctx.destroy();
+            this._ctx = null;
+        }
+        release() {
+        }
+        get context() {
+            if (this._ctx)
+                return this._ctx;
+            if (this._source == this) {
+                this._ctx = new ILaya.Context();
+            }
+            else {
+                this._ctx = this._source.getContext(ILaya.Render.isConchApp ? 'layagl' : '2d');
+            }
+            this._ctx._canvas = this;
+            return this._ctx;
+        }
+        _setContext(context) {
+            this._ctx = context;
+        }
+        getContext(contextID, other = null) {
+            return this.context;
+        }
+        getMemSize() {
+            return 0;
+        }
+        size(w, h) {
+            if (this._width != w || this._height != h || (this._source && (this._source.width != w || this._source.height != h))) {
+                this._width = w;
+                this._height = h;
+                this._setCPUMemory(w * h * 4);
+                this._ctx && this._ctx.size && this._ctx.size(w, h);
+                if (this._source) {
+                    this._source.height = h;
+                    this._source.width = w;
+                }
+                if (this._texture) {
+                    this._texture.destroy();
+                    this._texture = null;
+                }
+            }
+        }
+        getTexture() {
+            if (!this._texture) {
+                var bitmap = new Texture2D();
+                bitmap.loadImageSource(this.source);
+                this._texture = new Texture(bitmap);
+            }
+            return this._texture;
+        }
+        toBase64(type, encoderOptions) {
+            if (this._source) {
+                if (ILaya.Render.isConchApp) {
+                    var win = window;
+                    if (win.conchConfig.threadMode == 2) {
+                        throw "native 2 thread mode use toBase64Async";
+                    }
+                    var width = this._ctx._targets.sourceWidth;
+                    var height = this._ctx._targets.sourceHeight;
+                    var data = this._ctx._targets.getData(0, 0, width, height);
+                    return win.conchToBase64FlipY ? win.conchToBase64FlipY(type, encoderOptions, data.buffer, width, height) : win.conchToBase64(type, encoderOptions, data.buffer, width, height);
+                }
+                else {
+                    return this._source.toDataURL(type, encoderOptions);
+                }
+            }
+            return null;
+        }
+        toBase64Async(type, encoderOptions, callBack) {
+            var width = this._ctx._targets.sourceWidth;
+            var height = this._ctx._targets.sourceHeight;
+            this._ctx._targets.getDataAsync(0, 0, width, height, function (data) {
+                let win = window;
+                var base64 = win.conchToBase64FlipY ? win.conchToBase64FlipY(type, encoderOptions, data.buffer, width, height) : win.conchToBase64(type, encoderOptions, data.buffer, width, height);
+                callBack(base64);
+            });
+        }
+    }
 
     class HitArea {
         contains(x, y) {
@@ -11893,6 +12491,159 @@ window.Laya= (function (exports) {
     ClassUtils.DrawTypeDic = { "Rect": ["drawRect", [["x", 0], ["y", 0], ["width", 0], ["height", 0], ["fillColor", null], ["lineColor", null], ["lineWidth", 1]]], "Circle": ["drawCircle", [["x", 0], ["y", 0], ["radius", 0], ["fillColor", null], ["lineColor", null], ["lineWidth", 1]]], "Pie": ["drawPie", [["x", 0], ["y", 0], ["radius", 0], ["startAngle", 0], ["endAngle", 0], ["fillColor", null], ["lineColor", null], ["lineWidth", 1]]], "Image": ["drawTexture", [["x", 0], ["y", 0], ["width", 0], ["height", 0]]], "Texture": ["drawTexture", [["skin", null], ["x", 0], ["y", 0], ["width", 0], ["height", 0]], 1, "_adptTextureData"], "FillTexture": ["fillTexture", [["skin", null], ["x", 0], ["y", 0], ["width", 0], ["height", 0], ["repeat", null]], 1, "_adptTextureData"], "FillText": ["fillText", [["text", ""], ["x", 0], ["y", 0], ["font", null], ["color", null], ["textAlign", null]], 1], "Line": ["drawLine", [["x", 0], ["y", 0], ["toX", 0], ["toY", 0], ["lineColor", null], ["lineWidth", 0]], 0, "_adptLineData"], "Lines": ["drawLines", [["x", 0], ["y", 0], ["points", ""], ["lineColor", null], ["lineWidth", 0]], 0, "_adptLinesData"], "Curves": ["drawCurves", [["x", 0], ["y", 0], ["points", ""], ["lineColor", null], ["lineWidth", 0]], 0, "_adptLinesData"], "Poly": ["drawPoly", [["x", 0], ["y", 0], ["points", ""], ["fillColor", null], ["lineColor", null], ["lineWidth", 1]], 0, "_adptLinesData"] };
     ClassUtils._temParam = [];
     ClassUtils._classMap = {};
+
+    class BoundsStyle {
+        reset() {
+            if (this.bounds)
+                this.bounds.recover();
+            if (this.userBounds)
+                this.userBounds.recover();
+            this.bounds = null;
+            this.userBounds = null;
+            this.temBM = null;
+            return this;
+        }
+        recover() {
+            Pool.recover("BoundsStyle", this.reset());
+        }
+        static create() {
+            return Pool.getItemByClass("BoundsStyle", BoundsStyle);
+        }
+    }
+
+    class CacheStyle {
+        constructor() {
+            this.reset();
+        }
+        needBitmapCache() {
+            return this.cacheForFilters || !!this.mask;
+        }
+        needEnableCanvasRender() {
+            return this.userSetCache != "none" || this.cacheForFilters || !!this.mask;
+        }
+        releaseContext() {
+            if (this.canvas && this.canvas.size) {
+                Pool.recover("CacheCanvas", this.canvas);
+                this.canvas.size(0, 0);
+                try {
+                    this.canvas.width = 0;
+                    this.canvas.height = 0;
+                }
+                catch (e) {
+                }
+            }
+            this.canvas = null;
+        }
+        createContext() {
+            if (!this.canvas) {
+                this.canvas = Pool.getItem("CacheCanvas") || new HTMLCanvas(false);
+                var tx = this.canvas.context;
+                if (!tx) {
+                    tx = this.canvas.getContext('2d');
+                }
+            }
+        }
+        releaseFilterCache() {
+            var fc = this.filterCache;
+            if (fc) {
+                fc.destroy();
+                fc.recycle();
+                this.filterCache = null;
+            }
+        }
+        recover() {
+            if (this === CacheStyle.EMPTY)
+                return;
+            Pool.recover("SpriteCache", this.reset());
+        }
+        reset() {
+            this.releaseContext();
+            this.releaseFilterCache();
+            this.cacheAs = "none";
+            this.enableCanvasRender = false;
+            this.userSetCache = "none";
+            this.cacheForFilters = false;
+            this.staticCache = false;
+            this.reCache = true;
+            this.mask = null;
+            this.maskParent = null;
+            this.filterCache = null;
+            this.filters = null;
+            this.hasGlowFilter = false;
+            if (this.cacheRect)
+                this.cacheRect.recover();
+            this.cacheRect = null;
+            return this;
+        }
+        static create() {
+            return Pool.getItemByClass("SpriteCache", CacheStyle);
+        }
+        _calculateCacheRect(sprite, tCacheType, x, y) {
+            var _cacheStyle = sprite._cacheStyle;
+            if (!_cacheStyle.cacheRect)
+                _cacheStyle.cacheRect = Rectangle.create();
+            var tRec;
+            if (tCacheType === "bitmap") {
+                tRec = sprite.getSelfBounds();
+                tRec.width = tRec.width + CacheStyle.CANVAS_EXTEND_EDGE * 2;
+                tRec.height = tRec.height + CacheStyle.CANVAS_EXTEND_EDGE * 2;
+                tRec.x = tRec.x - sprite.pivotX;
+                tRec.y = tRec.y - sprite.pivotY;
+                tRec.x = tRec.x - CacheStyle.CANVAS_EXTEND_EDGE;
+                tRec.y = tRec.y - CacheStyle.CANVAS_EXTEND_EDGE;
+                tRec.x = Math.floor(tRec.x + x) - x;
+                tRec.y = Math.floor(tRec.y + y) - y;
+                tRec.width = Math.floor(tRec.width);
+                tRec.height = Math.floor(tRec.height);
+                _cacheStyle.cacheRect.copyFrom(tRec);
+            }
+            else {
+                _cacheStyle.cacheRect.setTo(-sprite._style.pivotX, -sprite._style.pivotY, 1, 1);
+            }
+            tRec = _cacheStyle.cacheRect;
+            if (sprite._style.scrollRect) {
+                var scrollRect = sprite._style.scrollRect;
+                tRec.x -= scrollRect.x;
+                tRec.y -= scrollRect.y;
+            }
+            CacheStyle._scaleInfo.setTo(1, 1);
+            return CacheStyle._scaleInfo;
+        }
+    }
+    CacheStyle.EMPTY = new CacheStyle();
+    CacheStyle._scaleInfo = new Point();
+    CacheStyle.CANVAS_EXTEND_EDGE = 16;
+
+    class SpriteStyle {
+        constructor() {
+            this.reset();
+        }
+        reset() {
+            this.scaleX = this.scaleY = 1;
+            this.skewX = this.skewY = 0;
+            this.pivotX = this.pivotY = this.rotation = 0;
+            this.alpha = 1;
+            if (this.scrollRect)
+                this.scrollRect.recover();
+            this.scrollRect = null;
+            if (this.viewport)
+                this.viewport.recover();
+            this.viewport = null;
+            this.hitArea = null;
+            this.dragging = null;
+            this.blendMode = null;
+            return this;
+        }
+        recover() {
+            if (this === SpriteStyle.EMPTY)
+                return;
+            Pool.recover("SpriteStyle", this.reset());
+        }
+        static create() {
+            return Pool.getItemByClass("SpriteStyle", SpriteStyle);
+        }
+    }
+    SpriteStyle.EMPTY = new SpriteStyle();
 
     class Node extends EventDispatcher {
         constructor() {
@@ -12466,759 +13217,6 @@ window.Laya= (function (exports) {
     Node.ARRAY_EMPTY = [];
     ClassUtils.regClass("laya.display.Node", Node);
     ClassUtils.regClass("Laya.Node", Node);
-
-    class BoundsStyle {
-        reset() {
-            if (this.bounds)
-                this.bounds.recover();
-            if (this.userBounds)
-                this.userBounds.recover();
-            this.bounds = null;
-            this.userBounds = null;
-            this.temBM = null;
-            return this;
-        }
-        recover() {
-            Pool.recover("BoundsStyle", this.reset());
-        }
-        static create() {
-            return Pool.getItemByClass("BoundsStyle", BoundsStyle);
-        }
-    }
-
-    class HTMLCanvas extends Bitmap {
-        get source() {
-            return this._source;
-        }
-        _getSource() {
-            return this._source;
-        }
-        constructor(createCanvas = false) {
-            super();
-            if (createCanvas)
-                this._source = Browser.createElement("canvas");
-            else {
-                this._source = this;
-            }
-            this.lock = true;
-        }
-        clear() {
-            this._ctx && this._ctx.clear && this._ctx.clear();
-            if (this._texture) {
-                this._texture.destroy();
-                this._texture = null;
-            }
-        }
-        destroy() {
-            super.destroy();
-            this._setCPUMemory(0);
-            this._ctx && this._ctx.destroy && this._ctx.destroy();
-            this._ctx = null;
-        }
-        release() {
-        }
-        get context() {
-            if (this._ctx)
-                return this._ctx;
-            if (this._source == this) {
-                this._ctx = new ILaya.Context();
-            }
-            else {
-                this._ctx = this._source.getContext(ILaya.Render.isConchApp ? 'layagl' : '2d');
-            }
-            this._ctx._canvas = this;
-            return this._ctx;
-        }
-        _setContext(context) {
-            this._ctx = context;
-        }
-        getContext(contextID, other = null) {
-            return this.context;
-        }
-        getMemSize() {
-            return 0;
-        }
-        size(w, h) {
-            if (this._width != w || this._height != h || (this._source && (this._source.width != w || this._source.height != h))) {
-                this._width = w;
-                this._height = h;
-                this._setCPUMemory(w * h * 4);
-                this._ctx && this._ctx.size && this._ctx.size(w, h);
-                if (this._source) {
-                    this._source.height = h;
-                    this._source.width = w;
-                }
-                if (this._texture) {
-                    this._texture.destroy();
-                    this._texture = null;
-                }
-            }
-        }
-        getTexture() {
-            if (!this._texture) {
-                var bitmap = new Texture2D();
-                bitmap.loadImageSource(this.source);
-                this._texture = new Texture(bitmap);
-            }
-            return this._texture;
-        }
-        toBase64(type, encoderOptions) {
-            if (this._source) {
-                if (ILaya.Render.isConchApp) {
-                    var win = window;
-                    if (win.conchConfig.threadMode == 2) {
-                        throw "native 2 thread mode use toBase64Async";
-                    }
-                    var width = this._ctx._targets.sourceWidth;
-                    var height = this._ctx._targets.sourceHeight;
-                    var data = this._ctx._targets.getData(0, 0, width, height);
-                    return win.conchToBase64FlipY ? win.conchToBase64FlipY(type, encoderOptions, data.buffer, width, height) : win.conchToBase64(type, encoderOptions, data.buffer, width, height);
-                }
-                else {
-                    return this._source.toDataURL(type, encoderOptions);
-                }
-            }
-            return null;
-        }
-        toBase64Async(type, encoderOptions, callBack) {
-            var width = this._ctx._targets.sourceWidth;
-            var height = this._ctx._targets.sourceHeight;
-            this._ctx._targets.getDataAsync(0, 0, width, height, function (data) {
-                let win = window;
-                var base64 = win.conchToBase64FlipY ? win.conchToBase64FlipY(type, encoderOptions, data.buffer, width, height) : win.conchToBase64(type, encoderOptions, data.buffer, width, height);
-                callBack(base64);
-            });
-        }
-    }
-
-    class CacheStyle {
-        constructor() {
-            this.reset();
-        }
-        needBitmapCache() {
-            return this.cacheForFilters || !!this.mask;
-        }
-        needEnableCanvasRender() {
-            return this.userSetCache != "none" || this.cacheForFilters || !!this.mask;
-        }
-        releaseContext() {
-            if (this.canvas && this.canvas.size) {
-                Pool.recover("CacheCanvas", this.canvas);
-                this.canvas.size(0, 0);
-                try {
-                    this.canvas.width = 0;
-                    this.canvas.height = 0;
-                }
-                catch (e) {
-                }
-            }
-            this.canvas = null;
-        }
-        createContext() {
-            if (!this.canvas) {
-                this.canvas = Pool.getItem("CacheCanvas") || new HTMLCanvas(false);
-                var tx = this.canvas.context;
-                if (!tx) {
-                    tx = this.canvas.getContext('2d');
-                }
-            }
-        }
-        releaseFilterCache() {
-            var fc = this.filterCache;
-            if (fc) {
-                fc.destroy();
-                fc.recycle();
-                this.filterCache = null;
-            }
-        }
-        recover() {
-            if (this === CacheStyle.EMPTY)
-                return;
-            Pool.recover("SpriteCache", this.reset());
-        }
-        reset() {
-            this.releaseContext();
-            this.releaseFilterCache();
-            this.cacheAs = "none";
-            this.enableCanvasRender = false;
-            this.userSetCache = "none";
-            this.cacheForFilters = false;
-            this.staticCache = false;
-            this.reCache = true;
-            this.mask = null;
-            this.maskParent = null;
-            this.filterCache = null;
-            this.filters = null;
-            this.hasGlowFilter = false;
-            if (this.cacheRect)
-                this.cacheRect.recover();
-            this.cacheRect = null;
-            return this;
-        }
-        static create() {
-            return Pool.getItemByClass("SpriteCache", CacheStyle);
-        }
-        _calculateCacheRect(sprite, tCacheType, x, y) {
-            var _cacheStyle = sprite._cacheStyle;
-            if (!_cacheStyle.cacheRect)
-                _cacheStyle.cacheRect = Rectangle.create();
-            var tRec;
-            if (tCacheType === "bitmap") {
-                tRec = sprite.getSelfBounds();
-                tRec.width = tRec.width + CacheStyle.CANVAS_EXTEND_EDGE * 2;
-                tRec.height = tRec.height + CacheStyle.CANVAS_EXTEND_EDGE * 2;
-                tRec.x = tRec.x - sprite.pivotX;
-                tRec.y = tRec.y - sprite.pivotY;
-                tRec.x = tRec.x - CacheStyle.CANVAS_EXTEND_EDGE;
-                tRec.y = tRec.y - CacheStyle.CANVAS_EXTEND_EDGE;
-                tRec.x = Math.floor(tRec.x + x) - x;
-                tRec.y = Math.floor(tRec.y + y) - y;
-                tRec.width = Math.floor(tRec.width);
-                tRec.height = Math.floor(tRec.height);
-                _cacheStyle.cacheRect.copyFrom(tRec);
-            }
-            else {
-                _cacheStyle.cacheRect.setTo(-sprite._style.pivotX, -sprite._style.pivotY, 1, 1);
-            }
-            tRec = _cacheStyle.cacheRect;
-            if (sprite._style.scrollRect) {
-                var scrollRect = sprite._style.scrollRect;
-                tRec.x -= scrollRect.x;
-                tRec.y -= scrollRect.y;
-            }
-            CacheStyle._scaleInfo.setTo(1, 1);
-            return CacheStyle._scaleInfo;
-        }
-    }
-    CacheStyle.EMPTY = new CacheStyle();
-    CacheStyle._scaleInfo = new Point();
-    CacheStyle.CANVAS_EXTEND_EDGE = 16;
-
-    class SpriteStyle {
-        constructor() {
-            this.reset();
-        }
-        reset() {
-            this.scaleX = this.scaleY = 1;
-            this.skewX = this.skewY = 0;
-            this.pivotX = this.pivotY = this.rotation = 0;
-            this.alpha = 1;
-            if (this.scrollRect)
-                this.scrollRect.recover();
-            this.scrollRect = null;
-            if (this.viewport)
-                this.viewport.recover();
-            this.viewport = null;
-            this.hitArea = null;
-            this.dragging = null;
-            this.blendMode = null;
-            return this;
-        }
-        recover() {
-            if (this === SpriteStyle.EMPTY)
-                return;
-            Pool.recover("SpriteStyle", this.reset());
-        }
-        static create() {
-            return Pool.getItemByClass("SpriteStyle", SpriteStyle);
-        }
-    }
-    SpriteStyle.EMPTY = new SpriteStyle();
-
-    class LayaGLQuickRunner {
-        static __init__() {
-            LayaGLQuickRunner.map[SpriteConst.ALPHA | SpriteConst.TRANSFORM | SpriteConst.GRAPHICS] = LayaGLQuickRunner.alpha_transform_drawLayaGL;
-            LayaGLQuickRunner.map[SpriteConst.ALPHA | SpriteConst.GRAPHICS] = LayaGLQuickRunner.alpha_drawLayaGL;
-            LayaGLQuickRunner.map[SpriteConst.TRANSFORM | SpriteConst.GRAPHICS] = LayaGLQuickRunner.transform_drawLayaGL;
-            LayaGLQuickRunner.map[SpriteConst.TRANSFORM | SpriteConst.CHILDS] = LayaGLQuickRunner.transform_drawNodes;
-            LayaGLQuickRunner.map[SpriteConst.ALPHA | SpriteConst.TRANSFORM | SpriteConst.TEXTURE] = LayaGLQuickRunner.alpha_transform_drawTexture;
-            LayaGLQuickRunner.map[SpriteConst.ALPHA | SpriteConst.TEXTURE] = LayaGLQuickRunner.alpha_drawTexture;
-            LayaGLQuickRunner.map[SpriteConst.TRANSFORM | SpriteConst.TEXTURE] = LayaGLQuickRunner.transform_drawTexture;
-            LayaGLQuickRunner.map[SpriteConst.GRAPHICS | SpriteConst.CHILDS] = LayaGLQuickRunner.drawLayaGL_drawNodes;
-        }
-        static transform_drawTexture(sprite, context, x, y) {
-            var style = sprite._style;
-            var tex = sprite.texture;
-            context.saveTransform(LayaGLQuickRunner.curMat);
-            context.transformByMatrix(sprite.transform, x, y);
-            context.drawTexture(tex, -sprite.pivotX, -sprite.pivotY, sprite._width || tex.width, sprite._height || tex.height);
-            context.restoreTransform(LayaGLQuickRunner.curMat);
-        }
-        static alpha_drawTexture(sprite, context, x, y) {
-            var style = sprite._style;
-            var alpha;
-            var tex = sprite.texture;
-            if ((alpha = style.alpha) > 0.01 || sprite._needRepaint()) {
-                var temp = context.globalAlpha;
-                context.globalAlpha *= alpha;
-                context.drawTexture(tex, x - style.pivotX + tex.offsetX, y - style.pivotY + tex.offsetY, sprite._width || tex.width, sprite._height || tex.height);
-                context.globalAlpha = temp;
-            }
-        }
-        static alpha_transform_drawTexture(sprite, context, x, y) {
-            var style = sprite._style;
-            var alpha;
-            var tex = sprite.texture;
-            if ((alpha = style.alpha) > 0.01 || sprite._needRepaint()) {
-                var temp = context.globalAlpha;
-                context.globalAlpha *= alpha;
-                context.saveTransform(LayaGLQuickRunner.curMat);
-                context.transformByMatrix(sprite.transform, x, y);
-                context.drawTexture(tex, -style.pivotX + tex.offsetX, -style.pivotY + tex.offsetY, sprite._width || tex.width, sprite._height || tex.height);
-                context.restoreTransform(LayaGLQuickRunner.curMat);
-                context.globalAlpha = temp;
-            }
-        }
-        static alpha_transform_drawLayaGL(sprite, context, x, y) {
-            var style = sprite._style;
-            var alpha;
-            if ((alpha = style.alpha) > 0.01 || sprite._needRepaint()) {
-                var temp = context.globalAlpha;
-                context.globalAlpha *= alpha;
-                context.saveTransform(LayaGLQuickRunner.curMat);
-                context.transformByMatrix(sprite.transform, x, y);
-                sprite._graphics && sprite._graphics._render(sprite, context, -style.pivotX, -style.pivotY);
-                context.restoreTransform(LayaGLQuickRunner.curMat);
-                context.globalAlpha = temp;
-            }
-        }
-        static alpha_drawLayaGL(sprite, context, x, y) {
-            var style = sprite._style;
-            var alpha;
-            if ((alpha = style.alpha) > 0.01 || sprite._needRepaint()) {
-                var temp = context.globalAlpha;
-                context.globalAlpha *= alpha;
-                sprite._graphics && sprite._graphics._render(sprite, context, x - style.pivotX, y - style.pivotY);
-                context.globalAlpha = temp;
-            }
-        }
-        static transform_drawLayaGL(sprite, context, x, y) {
-            var style = sprite._style;
-            context.saveTransform(LayaGLQuickRunner.curMat);
-            context.transformByMatrix(sprite.transform, x, y);
-            sprite._graphics && sprite._graphics._render(sprite, context, -style.pivotX, -style.pivotY);
-            context.restoreTransform(LayaGLQuickRunner.curMat);
-        }
-        static transform_drawNodes(sprite, context, x, y) {
-            var textLastRender = sprite._getBit(Const.DRAWCALL_OPTIMIZE) && context.drawCallOptimize(true);
-            var style = sprite._style;
-            context.saveTransform(LayaGLQuickRunner.curMat);
-            context.transformByMatrix(sprite.transform, x, y);
-            x = -style.pivotX;
-            y = -style.pivotY;
-            var childs = sprite._children, n = childs.length, ele;
-            if (style.viewport) {
-                var rect = style.viewport;
-                var left = rect.x;
-                var top = rect.y;
-                var right = rect.right;
-                var bottom = rect.bottom;
-                var _x, _y;
-                for (i = 0; i < n; ++i) {
-                    if ((ele = childs[i])._visible && ((_x = ele._x) < right && (_x + ele.width) > left && (_y = ele._y) < bottom && (_y + ele.height) > top)) {
-                        ele.render(context, x, y);
-                    }
-                }
-            }
-            else {
-                for (var i = 0; i < n; ++i)
-                    (ele = childs[i])._visible && ele.render(context, x, y);
-            }
-            context.restoreTransform(LayaGLQuickRunner.curMat);
-            textLastRender && context.drawCallOptimize(false);
-        }
-        static drawLayaGL_drawNodes(sprite, context, x, y) {
-            var textLastRender = sprite._getBit(Const.DRAWCALL_OPTIMIZE) && context.drawCallOptimize(true);
-            var style = sprite._style;
-            x = x - style.pivotX;
-            y = y - style.pivotY;
-            sprite._graphics && sprite._graphics._render(sprite, context, x, y);
-            var childs = sprite._children, n = childs.length, ele;
-            if (style.viewport) {
-                var rect = style.viewport;
-                var left = rect.x;
-                var top = rect.y;
-                var right = rect.right;
-                var bottom = rect.bottom;
-                var _x, _y;
-                for (i = 0; i < n; ++i) {
-                    if ((ele = childs[i])._visible && ((_x = ele._x) < right && (_x + ele.width) > left && (_y = ele._y) < bottom && (_y + ele.height) > top)) {
-                        ele.render(context, x, y);
-                    }
-                }
-            }
-            else {
-                for (var i = 0; i < n; ++i)
-                    (ele = childs[i])._visible && ele.render(context, x, y);
-            }
-            textLastRender && context.drawCallOptimize(false);
-        }
-    }
-    LayaGLQuickRunner.map = {};
-    LayaGLQuickRunner.curMat = new Matrix();
-
-    class RenderSprite {
-        constructor(type, next) {
-            if (LayaGLQuickRunner.map[type]) {
-                this._fun = LayaGLQuickRunner.map[type];
-                this._next = RenderSprite.NORENDER;
-                return;
-            }
-            this._next = next || RenderSprite.NORENDER;
-            switch (type) {
-                case 0:
-                    this._fun = this._no;
-                    return;
-                case SpriteConst.ALPHA:
-                    this._fun = this._alpha;
-                    return;
-                case SpriteConst.TRANSFORM:
-                    this._fun = this._transform;
-                    return;
-                case SpriteConst.BLEND:
-                    this._fun = this._blend;
-                    return;
-                case SpriteConst.CANVAS:
-                    this._fun = this._canvas;
-                    return;
-                case SpriteConst.MASK:
-                    this._fun = this._mask;
-                    return;
-                case SpriteConst.CLIP:
-                    this._fun = this._clip;
-                    return;
-                case SpriteConst.STYLE:
-                    this._fun = this._style;
-                    return;
-                case SpriteConst.GRAPHICS:
-                    this._fun = this._graphics;
-                    return;
-                case SpriteConst.CHILDS:
-                    this._fun = this._children;
-                    return;
-                case SpriteConst.CUSTOM:
-                    this._fun = this._custom;
-                    return;
-                case SpriteConst.TEXTURE:
-                    this._fun = this._texture;
-                    return;
-                case SpriteConst.FILTERS:
-                    this._fun = Filter._filter;
-                    return;
-                case RenderSprite.INIT:
-                    this._fun = RenderSprite._initRenderFun;
-                    return;
-            }
-            this.onCreate(type);
-        }
-        static __init__() {
-            LayaGLQuickRunner.__init__();
-            var i, len;
-            var initRender;
-            initRender = new RenderSprite(RenderSprite.INIT, null);
-            len = RenderSprite.renders.length = SpriteConst.CHILDS * 2;
-            for (i = 0; i < len; i++)
-                RenderSprite.renders[i] = initRender;
-            RenderSprite.renders[0] = new RenderSprite(0, null);
-        }
-        static _initRenderFun(sprite, context, x, y) {
-            var type = sprite._renderType;
-            var r = RenderSprite.renders[type] = RenderSprite._getTypeRender(type);
-            r._fun(sprite, context, x, y);
-        }
-        static _getTypeRender(type) {
-            if (LayaGLQuickRunner.map[type])
-                return new RenderSprite(type, null);
-            var rst = null;
-            var tType = SpriteConst.CHILDS;
-            while (tType > 0) {
-                if (tType & type)
-                    rst = new RenderSprite(tType, rst);
-                tType = tType >> 1;
-            }
-            return rst;
-        }
-        onCreate(type) {
-        }
-        _style(sprite, context, x, y) {
-            var style = sprite._style;
-            if (style.render != null)
-                style.render(sprite, context, x, y);
-            var next = this._next;
-            next._fun.call(next, sprite, context, x, y);
-        }
-        _no(sprite, context, x, y) {
-        }
-        _custom(sprite, context, x, y) {
-            sprite.customRender(context, x, y);
-            this._next._fun.call(this._next, sprite, context, x - sprite.pivotX, y - sprite.pivotY);
-        }
-        _clip(sprite, context, x, y) {
-            var next = this._next;
-            if (next == RenderSprite.NORENDER)
-                return;
-            var r = sprite._style.scrollRect;
-            context.save();
-            context.clipRect(x, y, r.width, r.height);
-            next._fun.call(next, sprite, context, x - r.x, y - r.y);
-            context.restore();
-        }
-        _texture(sprite, context, x, y) {
-            var tex = sprite.texture;
-            if (tex._getSource())
-                context.drawTexture(tex, x - sprite.pivotX + tex.offsetX, y - sprite.pivotY + tex.offsetY, sprite._width || tex.width, sprite._height || tex.height);
-            var next = this._next;
-            if (next != RenderSprite.NORENDER)
-                next._fun.call(next, sprite, context, x, y);
-        }
-        _graphics(sprite, context, x, y) {
-            var style = sprite._style;
-            var g = sprite._graphics;
-            g && g._render(sprite, context, x - style.pivotX, y - style.pivotY);
-            var next = this._next;
-            if (next != RenderSprite.NORENDER)
-                next._fun.call(next, sprite, context, x, y);
-        }
-        _image(sprite, context, x, y) {
-            var style = sprite._style;
-            context.drawTexture2(x, y, style.pivotX, style.pivotY, sprite.transform, sprite._graphics._one);
-        }
-        _image2(sprite, context, x, y) {
-            var style = sprite._style;
-            context.drawTexture2(x, y, style.pivotX, style.pivotY, sprite.transform, sprite._graphics._one);
-        }
-        _alpha(sprite, context, x, y) {
-            var style = sprite._style;
-            var alpha;
-            if ((alpha = style.alpha) > 0.01 || sprite._needRepaint()) {
-                var temp = context.globalAlpha;
-                context.globalAlpha *= alpha;
-                var next = this._next;
-                next._fun.call(next, sprite, context, x, y);
-                context.globalAlpha = temp;
-            }
-        }
-        _transform(sprite, context, x, y) {
-            var transform = sprite.transform, _next = this._next;
-            var style = sprite._style;
-            if (transform && _next != RenderSprite.NORENDER) {
-                context.save();
-                context.transform(transform.a, transform.b, transform.c, transform.d, transform.tx + x, transform.ty + y);
-                _next._fun.call(_next, sprite, context, 0, 0);
-                context.restore();
-            }
-            else {
-                if (_next != RenderSprite.NORENDER)
-                    _next._fun.call(_next, sprite, context, x, y);
-            }
-        }
-        _children(sprite, context, x, y) {
-            var style = sprite._style;
-            var childs = sprite._children, n = childs.length, ele;
-            x = x - sprite.pivotX;
-            y = y - sprite.pivotY;
-            var textLastRender = sprite._getBit(Const.DRAWCALL_OPTIMIZE) && context.drawCallOptimize(true);
-            if (style.viewport) {
-                var rect = style.viewport;
-                var left = rect.x;
-                var top = rect.y;
-                var right = rect.right;
-                var bottom = rect.bottom;
-                var _x, _y;
-                for (i = 0; i < n; ++i) {
-                    if ((ele = childs[i])._visible && ((_x = ele._x) < right && (_x + ele.width) > left && (_y = ele._y) < bottom && (_y + ele.height) > top)) {
-                        ele.render(context, x, y);
-                    }
-                }
-            }
-            else {
-                for (var i = 0; i < n; ++i)
-                    (ele = childs[i])._visible && ele.render(context, x, y);
-            }
-            textLastRender && context.drawCallOptimize(false);
-        }
-        _canvas(sprite, context, x, y) {
-            var _cacheStyle = sprite._cacheStyle;
-            var _next = this._next;
-            if (!_cacheStyle.enableCanvasRender) {
-                _next._fun.call(_next, sprite, context, x, y);
-                return;
-            }
-            _cacheStyle.cacheAs === 'bitmap' ? (Stat.canvasBitmap++) : (Stat.canvasNormal++);
-            var cacheNeedRebuild = false;
-            var textNeedRestore = false;
-            if (_cacheStyle.canvas) {
-                var canv = _cacheStyle.canvas;
-                var ctx = canv.context;
-                var charRIs = canv.touches;
-                if (charRIs) {
-                    for (var ci = 0; ci < charRIs.length; ci++) {
-                        if (charRIs[ci].deleted) {
-                            textNeedRestore = true;
-                            break;
-                        }
-                    }
-                }
-                cacheNeedRebuild = canv.isCacheValid && !canv.isCacheValid();
-            }
-            if (sprite._needRepaint() || (!_cacheStyle.canvas) || textNeedRestore || cacheNeedRebuild || ILaya.stage.isGlobalRepaint()) {
-                if (_cacheStyle.cacheAs === 'normal') {
-                    if (context._targets) {
-                        _next._fun.call(_next, sprite, context, x, y);
-                        return;
-                    }
-                    else {
-                        this._canvas_webgl_normal_repaint(sprite, context);
-                    }
-                }
-                else {
-                    this._canvas_repaint(sprite, context, x, y);
-                }
-            }
-            var tRec = _cacheStyle.cacheRect;
-            context.drawCanvas(_cacheStyle.canvas, x + tRec.x, y + tRec.y, tRec.width, tRec.height);
-        }
-        _canvas_repaint(sprite, context, x, y) {
-            var _cacheStyle = sprite._cacheStyle;
-            var _next = this._next;
-            var tx;
-            var canvas = _cacheStyle.canvas;
-            var left;
-            var top;
-            var tRec;
-            var tCacheType = _cacheStyle.cacheAs;
-            var w, h;
-            var scaleX, scaleY;
-            var scaleInfo;
-            scaleInfo = _cacheStyle._calculateCacheRect(sprite, tCacheType, x, y);
-            scaleX = scaleInfo.x;
-            scaleY = scaleInfo.y;
-            tRec = _cacheStyle.cacheRect;
-            w = tRec.width * scaleX;
-            h = tRec.height * scaleY;
-            left = tRec.x;
-            top = tRec.y;
-            if (tCacheType === 'bitmap' && (w > 2048 || h > 2048)) {
-                console.warn("cache bitmap size larger than 2048,cache ignored");
-                _cacheStyle.releaseContext();
-                _next._fun.call(_next, sprite, context, x, y);
-                return;
-            }
-            if (!canvas) {
-                _cacheStyle.createContext();
-                canvas = _cacheStyle.canvas;
-            }
-            tx = canvas.context;
-            tx.sprite = sprite;
-            (canvas.width != w || canvas.height != h) && canvas.size(w, h);
-            if (tCacheType === 'bitmap')
-                tx.asBitmap = true;
-            else if (tCacheType === 'normal')
-                tx.asBitmap = false;
-            tx.clear();
-            if (scaleX != 1 || scaleY != 1) {
-                var ctx = tx;
-                ctx.save();
-                ctx.scale(scaleX, scaleY);
-                _next._fun.call(_next, sprite, tx, -left, -top);
-                ctx.restore();
-                sprite._applyFilters();
-            }
-            else {
-                ctx = tx;
-                _next._fun.call(_next, sprite, tx, -left, -top);
-                sprite._applyFilters();
-            }
-            if (_cacheStyle.staticCache)
-                _cacheStyle.reCache = false;
-            Stat.canvasReCache++;
-        }
-        _canvas_webgl_normal_repaint(sprite, context) {
-            var _cacheStyle = sprite._cacheStyle;
-            var _next = this._next;
-            var canvas = _cacheStyle.canvas;
-            var tCacheType = _cacheStyle.cacheAs;
-            var scaleInfo = _cacheStyle._calculateCacheRect(sprite, tCacheType, 0, 0);
-            if (!canvas) {
-                canvas = _cacheStyle.canvas = new WebGLCacheAsNormalCanvas(context, sprite);
-            }
-            var tx = canvas.context;
-            canvas['startRec']();
-            _next._fun.call(_next, sprite, tx, sprite.pivotX, sprite.pivotY);
-            sprite._applyFilters();
-            Stat.canvasReCache++;
-            canvas['endRec']();
-        }
-        _blend(sprite, context, x, y) {
-            var style = sprite._style;
-            var next = this._next;
-            if (style.blendMode) {
-                context.save();
-                context.globalCompositeOperation = style.blendMode;
-                next._fun.call(next, sprite, context, x, y);
-                context.restore();
-            }
-            else {
-                next._fun.call(next, sprite, context, x, y);
-            }
-        }
-        _mask(sprite, context, x, y) {
-            var next = this._next;
-            var mask = sprite.mask;
-            var ctx = context;
-            if (mask) {
-                ctx.save();
-                var preBlendMode = ctx.globalCompositeOperation;
-                var tRect = new Rectangle();
-                tRect.copyFrom(mask.getBounds());
-                tRect.width = Math.round(tRect.width);
-                tRect.height = Math.round(tRect.height);
-                tRect.x = Math.round(tRect.x);
-                tRect.y = Math.round(tRect.y);
-                if (tRect.width > 0 && tRect.height > 0) {
-                    var w = tRect.width;
-                    var h = tRect.height;
-                    var tmpRT = WebGLRTMgr.getRT(w, h);
-                    ctx.breakNextMerge();
-                    ctx.pushRT();
-                    ctx.addRenderObject(SubmitCMD.create([ctx, tmpRT, w, h], RenderSprite.tmpTarget, this));
-                    mask.render(ctx, -tRect.x, -tRect.y);
-                    ctx.breakNextMerge();
-                    ctx.popRT();
-                    ctx.save();
-                    ctx.clipRect(x + tRect.x - sprite.getStyle().pivotX, y + tRect.y - sprite.getStyle().pivotY, w, h);
-                    next._fun.call(next, sprite, ctx, x, y);
-                    ctx.restore();
-                    preBlendMode = ctx.globalCompositeOperation;
-                    ctx.addRenderObject(SubmitCMD.create(["mask"], RenderSprite.setBlendMode, this));
-                    var shaderValue = Value2D.create(ShaderDefines2D.TEXTURE2D, 0);
-                    var uv = Texture.INV_UV;
-                    ctx.drawTarget(tmpRT, x + tRect.x - sprite.getStyle().pivotX, y + tRect.y - sprite.getStyle().pivotY, w, h, Matrix.TEMP.identity(), shaderValue, uv, 6);
-                    ctx.addRenderObject(SubmitCMD.create([tmpRT], RenderSprite.recycleTarget, this));
-                    ctx.addRenderObject(SubmitCMD.create([preBlendMode], RenderSprite.setBlendMode, this));
-                }
-                ctx.restore();
-            }
-            else {
-                next._fun.call(next, sprite, context, x, y);
-            }
-        }
-        static tmpTarget(ctx, rt, w, h) {
-            rt.start();
-            rt.clear(0, 0, 0, 0);
-        }
-        static recycleTarget(rt) {
-            WebGLRTMgr.releaseRT(rt);
-        }
-        static setBlendMode(blendMode) {
-            var gl = WebGLContext.mainContext;
-            BlendMode.targetFns[BlendMode.TOINT[blendMode]](gl);
-        }
-    }
-    RenderSprite.INIT = 0x11111;
-    RenderSprite.renders = [];
-    RenderSprite.NORENDER = new RenderSprite(0, null);
-    RenderSprite.tempUV = new Array(8);
 
     class Sprite extends Node {
         constructor() {
@@ -13843,6 +13841,61 @@ window.Laya= (function (exports) {
         drawToTexture3D(offx, offy, tex) {
             throw 'not implement';
         }
+        static drawToCanvas(sprite, _renderType, canvasWidth, canvasHeight, offsetX, offsetY) {
+            offsetX -= sprite.x;
+            offsetY -= sprite.y;
+            offsetX |= 0;
+            offsetY |= 0;
+            canvasWidth |= 0;
+            canvasHeight |= 0;
+            var ctx = new Context();
+            ctx.size(canvasWidth, canvasHeight);
+            ctx.asBitmap = true;
+            ctx._targets.start();
+            ctx._targets.clear(0, 0, 0, 0);
+            RenderSprite.renders[_renderType]._fun(sprite, ctx, offsetX, offsetY);
+            ctx.flush();
+            ctx._targets.end();
+            ctx._targets.restore();
+            var dt = ctx._targets.getData(0, 0, canvasWidth, canvasHeight);
+            ctx.destroy();
+            var imgdata = new ImageData(canvasWidth, canvasHeight);
+            var lineLen = canvasWidth * 4;
+            var dst = imgdata.data;
+            var y = canvasHeight - 1;
+            var off = y * lineLen;
+            var srcoff = 0;
+            for (; y >= 0; y--) {
+                dst.set(dt.subarray(srcoff, srcoff + lineLen), off);
+                off -= lineLen;
+                srcoff += lineLen;
+            }
+            var canv = new HTMLCanvas(true);
+            canv.size(canvasWidth, canvasHeight);
+            var ctx2d = canv.getContext('2d');
+            ctx2d.putImageData(imgdata, 0, 0);
+            return canv;
+        }
+        static drawToTexture(sprite, _renderType, canvasWidth, canvasHeight, offsetX, offsetY) {
+            offsetX -= sprite.x;
+            offsetY -= sprite.y;
+            offsetX |= 0;
+            offsetY |= 0;
+            canvasWidth |= 0;
+            canvasHeight |= 0;
+            var ctx = new Context();
+            ctx.size(canvasWidth, canvasHeight);
+            ctx.asBitmap = true;
+            ctx._targets.start();
+            ctx._targets.clear(0, 0, 0, 0);
+            RenderSprite.renders[_renderType]._fun(sprite, ctx, offsetX, offsetY);
+            ctx.flush();
+            ctx._targets.end();
+            ctx._targets.restore();
+            var rtex = new Texture(ctx._targets, Texture.INV_UV);
+            ctx.destroy(true);
+            return rtex;
+        }
         customRender(context, x, y) {
             this._repaint = SpriteConst.REPAINT_ALL;
         }
@@ -14018,11 +14071,11 @@ window.Laya= (function (exports) {
                 loaded.call(this);
             }
             else {
-                var tex = ILaya.Loader.getRes(url);
+                var tex = ILaya.Loader.textureMap[URL.formatURL(url)];
                 if (!tex) {
                     tex = new Texture();
                     tex.load(url);
-                    ILaya.Loader.cacheRes(url, tex);
+                    ILaya.Loader.cacheTexture(url, tex);
                 }
                 this.texture = tex;
                 if (!tex.getIsReady())
@@ -14247,59 +14300,6 @@ window.Laya= (function (exports) {
             return this._getBit(Const.DRAWCALL_OPTIMIZE);
         }
     }
-    Sprite.drawToCanvas = function (sprite, _renderType, canvasWidth, canvasHeight, offsetX, offsetY) {
-        offsetX -= sprite.x;
-        offsetY -= sprite.y;
-        offsetX |= 0;
-        offsetY |= 0;
-        canvasWidth |= 0;
-        canvasHeight |= 0;
-        var ctx = new Context();
-        ctx.size(canvasWidth, canvasHeight);
-        ctx.asBitmap = true;
-        ctx._targets.start();
-        RenderSprite.renders[_renderType]._fun(sprite, ctx, offsetX, offsetY);
-        ctx.flush();
-        ctx._targets.end();
-        ctx._targets.restore();
-        var dt = ctx._targets.getData(0, 0, canvasWidth, canvasHeight);
-        ctx.destroy();
-        var imgdata = new ImageData(canvasWidth, canvasHeight);
-        var lineLen = canvasWidth * 4;
-        var dst = imgdata.data;
-        var y = canvasHeight - 1;
-        var off = y * lineLen;
-        var srcoff = 0;
-        for (; y >= 0; y--) {
-            dst.set(dt.subarray(srcoff, srcoff + lineLen), off);
-            off -= lineLen;
-            srcoff += lineLen;
-        }
-        var canv = new HTMLCanvas(true);
-        canv.size(canvasWidth, canvasHeight);
-        var ctx2d = canv.getContext('2d');
-        ctx2d.putImageData(imgdata, 0, 0);
-        return canv;
-    };
-    Sprite.drawToTexture = function (sprite, _renderType, canvasWidth, canvasHeight, offsetX, offsetY) {
-        offsetX -= sprite.x;
-        offsetY -= sprite.y;
-        offsetX |= 0;
-        offsetY |= 0;
-        canvasWidth |= 0;
-        canvasHeight |= 0;
-        var ctx = new Context();
-        ctx.size(canvasWidth, canvasHeight);
-        ctx.asBitmap = true;
-        ctx._targets.start();
-        RenderSprite.renders[_renderType]._fun(sprite, ctx, offsetX, offsetY);
-        ctx.flush();
-        ctx._targets.end();
-        ctx._targets.restore();
-        var rtex = new Texture(ctx._targets, Texture.INV_UV);
-        ctx.destroy(true);
-        return rtex;
-    };
     ClassUtils.regClass("laya.display.Sprite", Sprite);
     ClassUtils.regClass("Laya.Sprite", Sprite);
 
@@ -15680,21 +15680,21 @@ window.Laya= (function (exports) {
             canvas.addEventListener('mousedown', function (e) {
                 if (MouseManager.enabled) {
                     if (!Browser.onIE)
-                        e.preventDefault();
+                        (e.cancelable) && (e.preventDefault());
                     _this.mouseDownTime = Browser.now();
                     _this.runEvent(e);
                 }
             });
             canvas.addEventListener('mouseup', function (e) {
                 if (MouseManager.enabled) {
-                    e.preventDefault();
+                    (e.cancelable) && (e.preventDefault());
                     _this.mouseDownTime = -Browser.now();
                     _this.runEvent(e);
                 }
             }, true);
             canvas.addEventListener('mousemove', function (e) {
                 if (MouseManager.enabled) {
-                    e.preventDefault();
+                    (e.cancelable) && (e.preventDefault());
                     var now = Browser.now();
                     if (now - _this._lastMoveTimer < 10)
                         return;
@@ -15713,7 +15713,7 @@ window.Laya= (function (exports) {
             canvas.addEventListener("touchstart", function (e) {
                 if (MouseManager.enabled) {
                     if (!MouseManager._isFirstTouch && !Input.isInputting)
-                        e.preventDefault();
+                        (e.cancelable) && (e.preventDefault());
                     _this.mouseDownTime = Browser.now();
                     _this.runEvent(e);
                 }
@@ -15721,7 +15721,7 @@ window.Laya= (function (exports) {
             canvas.addEventListener("touchend", function (e) {
                 if (MouseManager.enabled) {
                     if (!MouseManager._isFirstTouch && !Input.isInputting)
-                        e.preventDefault();
+                        (e.cancelable) && (e.preventDefault());
                     MouseManager._isFirstTouch = false;
                     _this.mouseDownTime = -Browser.now();
                     _this.runEvent(e);
@@ -15732,13 +15732,13 @@ window.Laya= (function (exports) {
             }, true);
             canvas.addEventListener("touchmove", function (e) {
                 if (MouseManager.enabled) {
-                    e.preventDefault();
+                    (e.cancelable) && (e.preventDefault());
                     _this.runEvent(e);
                 }
             }, true);
             canvas.addEventListener("touchcancel", function (e) {
                 if (MouseManager.enabled) {
-                    e.preventDefault();
+                    (e.cancelable) && (e.preventDefault());
                     _this.runEvent(e);
                 }
                 else {
@@ -16026,15 +16026,15 @@ window.Laya= (function (exports) {
     class CallLater {
         constructor() {
             this._pool = [];
-            this._map = [];
+            this._map = {};
             this._laters = [];
         }
         _update() {
-            var laters = this._laters;
-            var len = laters.length;
+            let laters = this._laters;
+            let len = laters.length;
             if (len > 0) {
-                for (var i = 0, n = len - 1; i <= n; i++) {
-                    var handler = laters[i];
+                for (let i = 0, n = len - 1; i <= n; i++) {
+                    let handler = laters[i];
                     this._map[handler.key] = null;
                     if (handler.method !== null) {
                         handler.run();
@@ -16048,13 +16048,14 @@ window.Laya= (function (exports) {
         }
         _getHandler(caller, method) {
             var cid = caller ? caller.$_GID || (caller.$_GID = ILaya.Utils.getGID()) : 0;
-            var mid = method.$_TID || (method.$_TID = (ILaya.Timer._mid++) * 100000);
-            return this._map[cid + mid];
+            var mid = method.$_TID || (method.$_TID = (ILaya.Timer._mid++));
+            return this._map[cid + '.' + mid];
         }
         callLater(caller, method, args = null) {
             if (this._getHandler(caller, method) == null) {
+                let handler;
                 if (this._pool.length)
-                    var handler = this._pool.pop();
+                    handler = this._pool.pop();
                 else
                     handler = new LaterHandler();
                 handler.caller = caller;
@@ -16062,7 +16063,7 @@ window.Laya= (function (exports) {
                 handler.args = args;
                 var cid = caller ? caller.$_GID : 0;
                 var mid = method["$_TID"];
-                handler.key = cid + mid;
+                handler.key = cid + '.' + mid;
                 this._map[handler.key] = handler;
                 this._laters.push(handler);
             }
@@ -16144,17 +16145,16 @@ window.Laya= (function (exports) {
             this._isVisibility = true;
             this.useRetinalCanvas = Config.useRetinalCanvas;
             var window = Browser.window;
-            var _me = this;
-            window.addEventListener("focus", function () {
+            window.addEventListener("focus", () => {
                 this._isFocused = true;
-                _me.event(Event.FOCUS);
-                _me.event(Event.FOCUS_CHANGE);
+                this.event(Event.FOCUS);
+                this.event(Event.FOCUS_CHANGE);
             });
-            window.addEventListener("blur", function () {
+            window.addEventListener("blur", () => {
                 this._isFocused = false;
-                _me.event(Event.BLUR);
-                _me.event(Event.FOCUS_CHANGE);
-                if (_me._isInputting())
+                this.event(Event.BLUR);
+                this.event(Event.FOCUS_CHANGE);
+                if (this._isInputting())
                     Input["inputElement"].target.focus = false;
             });
             var state = "visibilityState", visibilityChange = "visibilitychange";
@@ -16175,33 +16175,32 @@ window.Laya= (function (exports) {
                 visibilityChange = "webkitvisibilitychange";
                 state = "webkitVisibilityState";
             }
-            window.document.addEventListener(visibilityChange, visibleChangeFun);
-            function visibleChangeFun() {
+            window.document.addEventListener(visibilityChange, () => {
                 if (Browser.document[state] == "hidden") {
                     this._isVisibility = false;
-                    if (_me._isInputting())
+                    if (this._isInputting())
                         Input["inputElement"].target.focus = false;
                 }
                 else {
                     this._isVisibility = true;
                 }
                 this.renderingEnabled = this._isVisibility;
-                _me.event(Event.VISIBILITY_CHANGE);
-            }
-            window.addEventListener("resize", function () {
+                this.event(Event.VISIBILITY_CHANGE);
+            });
+            window.addEventListener("resize", () => {
                 var orientation = Browser.window.orientation;
-                if (orientation != null && orientation != this._previousOrientation && _me._isInputting()) {
+                if (orientation != null && orientation != this._previousOrientation && this._isInputting()) {
                     Input["inputElement"].target.focus = false;
                 }
                 this._previousOrientation = orientation;
-                if (_me._isInputting())
+                if (this._isInputting())
                     return;
                 if (Browser.onSafari)
-                    _me._safariOffsetY = (Browser.window.__innerHeight || Browser.document.body.clientHeight || Browser.document.documentElement.clientHeight) - Browser.window.innerHeight;
-                _me._resetCanvas();
+                    this._safariOffsetY = (Browser.window.__innerHeight || Browser.document.body.clientHeight || Browser.document.documentElement.clientHeight) - Browser.window.innerHeight;
+                this._resetCanvas();
             });
-            window.addEventListener("orientationchange", function (e) {
-                _me._resetCanvas();
+            window.addEventListener("orientationchange", (e) => {
+                this._resetCanvas();
             });
             this.on(Event.MOUSE_MOVE, this, this._onmouseMove);
             if (Browser.onMobile)
@@ -16731,38 +16730,6 @@ window.Laya= (function (exports) {
     KeyBoardManager._pressKeys = {};
     KeyBoardManager.enabled = true;
     KeyBoardManager._event = new Event();
-
-    class LayaGLRunner {
-        static uploadShaderUniforms(layaGL, commandEncoder, shaderData, uploadUnTexture) {
-            var data = shaderData._data;
-            var shaderUniform = commandEncoder.getArrayData();
-            var shaderCall = 0;
-            for (var i = 0, n = shaderUniform.length; i < n; i++) {
-                var one = shaderUniform[i];
-                if (uploadUnTexture || one.textureID !== -1) {
-                    var value = data[one.dataOffset];
-                    if (value != null)
-                        shaderCall += one.fun.call(one.caller, one, value);
-                }
-            }
-            return shaderCall;
-        }
-        static uploadCustomUniform(layaGL, custom, index, data) {
-            var shaderCall = 0;
-            var one = custom[index];
-            if (one && data != null)
-                shaderCall += one.fun.call(one.caller, one, data);
-            return shaderCall;
-        }
-        static uploadShaderUniformsForNative(layaGL, commandEncoder, shaderData) {
-            var nType = LayaGL.UPLOAD_SHADER_UNIFORM_TYPE_ID;
-            if (shaderData._runtimeCopyValues.length > 0) {
-                nType = LayaGL.UPLOAD_SHADER_UNIFORM_TYPE_DATA;
-            }
-            var data = shaderData._data;
-            return LayaGL.instance.uploadShaderUniforms(commandEncoder, data, nType);
-        }
-    }
 
     class SoundChannel extends EventDispatcher {
         constructor() {
@@ -17692,257 +17659,6 @@ window.Laya= (function (exports) {
     SoundManager._isCheckingDispose = false;
     SoundManager.autoReleaseSound = true;
 
-    class HttpRequest extends EventDispatcher {
-        constructor() {
-            super(...arguments);
-            this._http = new XMLHttpRequest();
-        }
-        send(url, data = null, method = "get", responseType = "text", headers = null) {
-            this._responseType = responseType;
-            this._data = null;
-            if (Browser.onVVMiniGame || Browser.onQGMiniGame || Browser.onQQMiniGame) {
-                url = encodeURI(url);
-            }
-            this._url = url;
-            var _this = this;
-            var http = this._http;
-            url = URL.getAdptedFilePath(url);
-            http.open(method, url, true);
-            if (headers) {
-                for (var i = 0; i < headers.length; i++) {
-                    http.setRequestHeader(headers[i++], headers[i]);
-                }
-            }
-            else if (!(window.conch)) {
-                if (!data || typeof (data) == 'string')
-                    http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-                else
-                    http.setRequestHeader("Content-Type", "application/json");
-            }
-            let restype = responseType !== "arraybuffer" ? "text" : "arraybuffer";
-            http.responseType = restype;
-            if (http.dataType) {
-                http.dataType = restype;
-            }
-            http.onerror = function (e) {
-                _this._onError(e);
-            };
-            http.onabort = function (e) {
-                _this._onAbort(e);
-            };
-            http.onprogress = function (e) {
-                _this._onProgress(e);
-            };
-            http.onload = function (e) {
-                _this._onLoad(e);
-            };
-            http.send(data);
-        }
-        _onProgress(e) {
-            if (e && e.lengthComputable)
-                this.event(Event.PROGRESS, e.loaded / e.total);
-        }
-        _onAbort(e) {
-            this.error("Request was aborted by user");
-        }
-        _onError(e) {
-            this.error("Request failed Status:" + this._http.status + " text:" + this._http.statusText);
-        }
-        _onLoad(e) {
-            var http = this._http;
-            var status = http.status !== undefined ? http.status : 200;
-            if (status === 200 || status === 204 || status === 0) {
-                this.complete();
-            }
-            else {
-                this.error("[" + http.status + "]" + http.statusText + ":" + http.responseURL);
-            }
-        }
-        error(message) {
-            this.clear();
-            console.warn(this.url, message);
-            this.event(Event.ERROR, message);
-        }
-        complete() {
-            this.clear();
-            var flag = true;
-            try {
-                if (this._responseType === "json") {
-                    this._data = JSON.parse(this._http.responseText);
-                }
-                else if (this._responseType === "xml") {
-                    this._data = Utils.parseXMLFromString(this._http.responseText);
-                }
-                else {
-                    this._data = this._http.response || this._http.responseText;
-                }
-            }
-            catch (e) {
-                flag = false;
-                this.error(e.message);
-            }
-            flag && this.event(Event.COMPLETE, this._data instanceof Array ? [this._data] : this._data);
-        }
-        clear() {
-            var http = this._http;
-            http.onerror = http.onabort = http.onprogress = http.onload = null;
-        }
-        get url() {
-            return this._url;
-        }
-        get data() {
-            return this._data;
-        }
-        get http() {
-            return this._http;
-        }
-    }
-
-    class BitmapFont {
-        constructor() {
-            this._fontCharDic = {};
-            this._fontWidthMap = {};
-            this._maxWidth = 0;
-            this._spaceWidth = 10;
-            this.fontSize = 12;
-            this.autoScaleSize = false;
-            this.letterSpacing = 0;
-        }
-        loadFont(path, complete) {
-            this._path = path;
-            this._complete = complete;
-            if (!path || path.indexOf(".fnt") === -1) {
-                console.error('Bitmap font configuration information must be a ".fnt" file');
-                return;
-            }
-            ILaya.loader.load([{ url: path, type: ILaya.Loader.XML }, { url: path.replace(".fnt", ".png"), type: ILaya.Loader.IMAGE }], Handler.create(this, this._onLoaded));
-        }
-        _onLoaded() {
-            this.parseFont(ILaya.Loader.getRes(this._path), ILaya.Loader.getRes(this._path.replace(".fnt", ".png")));
-            this._complete && this._complete.run();
-        }
-        parseFont(xml, texture) {
-            if (xml == null || texture == null)
-                return;
-            this._texture = texture;
-            var tScale = 1;
-            var tInfo = xml.getElementsByTagName("info");
-            if (!tInfo[0].getAttributeNode) {
-                return this.parseFont2(xml, texture);
-            }
-            this.fontSize = parseInt(tInfo[0].getAttributeNode("size").nodeValue);
-            var tPadding = tInfo[0].getAttributeNode("padding").nodeValue;
-            var tPaddingArray = tPadding.split(",");
-            this._padding = [parseInt(tPaddingArray[0]), parseInt(tPaddingArray[1]), parseInt(tPaddingArray[2]), parseInt(tPaddingArray[3])];
-            var chars = xml.getElementsByTagName("char");
-            var i = 0;
-            for (i = 0; i < chars.length; i++) {
-                var tAttribute = chars[i];
-                var tId = parseInt(tAttribute.getAttributeNode("id").nodeValue);
-                var xOffset = parseInt(tAttribute.getAttributeNode("xoffset").nodeValue) / tScale;
-                var yOffset = parseInt(tAttribute.getAttributeNode("yoffset").nodeValue) / tScale;
-                var xAdvance = parseInt(tAttribute.getAttributeNode("xadvance").nodeValue) / tScale;
-                var region = new Rectangle();
-                region.x = parseInt(tAttribute.getAttributeNode("x").nodeValue);
-                region.y = parseInt(tAttribute.getAttributeNode("y").nodeValue);
-                region.width = parseInt(tAttribute.getAttributeNode("width").nodeValue);
-                region.height = parseInt(tAttribute.getAttributeNode("height").nodeValue);
-                var tTexture = Texture.create(texture, region.x, region.y, region.width, region.height, xOffset, yOffset);
-                this._maxWidth = Math.max(this._maxWidth, xAdvance + this.letterSpacing);
-                this._fontCharDic[tId] = tTexture;
-                this._fontWidthMap[tId] = xAdvance;
-            }
-        }
-        parseFont2(xml, texture) {
-            if (xml == null || texture == null)
-                return;
-            this._texture = texture;
-            var tScale = 1;
-            var tInfo = xml.getElementsByTagName("info");
-            this.fontSize = parseInt(tInfo[0].attributes["size"].nodeValue);
-            var tPadding = tInfo[0].attributes["padding"].nodeValue;
-            var tPaddingArray = tPadding.split(",");
-            this._padding = [parseInt(tPaddingArray[0]), parseInt(tPaddingArray[1]), parseInt(tPaddingArray[2]), parseInt(tPaddingArray[3])];
-            var chars = xml.getElementsByTagName("char");
-            var i = 0;
-            for (i = 0; i < chars.length; i++) {
-                var tAttribute = chars[i].attributes;
-                var tId = parseInt(tAttribute["id"].nodeValue);
-                var xOffset = parseInt(tAttribute["xoffset"].nodeValue) / tScale;
-                var yOffset = parseInt(tAttribute["yoffset"].nodeValue) / tScale;
-                var xAdvance = parseInt(tAttribute["xadvance"].nodeValue) / tScale;
-                var region = new Rectangle();
-                region.x = parseInt(tAttribute["x"].nodeValue);
-                region.y = parseInt(tAttribute["y"].nodeValue);
-                region.width = parseInt(tAttribute["width"].nodeValue);
-                region.height = parseInt(tAttribute["height"].nodeValue);
-                var tTexture = Texture.create(texture, region.x, region.y, region.width, region.height, xOffset, yOffset);
-                this._maxWidth = Math.max(this._maxWidth, xAdvance + this.letterSpacing);
-                this._fontCharDic[tId] = tTexture;
-                this._fontWidthMap[tId] = xAdvance;
-            }
-        }
-        getCharTexture(char) {
-            return this._fontCharDic[char.charCodeAt(0)];
-        }
-        destroy() {
-            if (this._texture) {
-                for (var p in this._fontCharDic) {
-                    var tTexture = this._fontCharDic[p];
-                    if (tTexture)
-                        tTexture.destroy();
-                }
-                this._texture.destroy();
-                this._fontCharDic = null;
-                this._fontWidthMap = null;
-                this._texture = null;
-                this._complete = null;
-                this._padding = null;
-            }
-        }
-        setSpaceWidth(spaceWidth) {
-            this._spaceWidth = spaceWidth;
-        }
-        getCharWidth(char) {
-            var code = char.charCodeAt(0);
-            if (this._fontWidthMap[code])
-                return this._fontWidthMap[code] + this.letterSpacing;
-            if (char === " ")
-                return this._spaceWidth + this.letterSpacing;
-            return 0;
-        }
-        getTextWidth(text) {
-            var tWidth = 0;
-            for (var i = 0, n = text.length; i < n; i++) {
-                tWidth += this.getCharWidth(text.charAt(i));
-            }
-            return tWidth;
-        }
-        getMaxWidth() {
-            return this._maxWidth;
-        }
-        getMaxHeight() {
-            return this.fontSize;
-        }
-        _drawText(text, sprite, drawX, drawY, align, width) {
-            var tWidth = this.getTextWidth(text);
-            var tTexture;
-            var dx = 0;
-            align === "center" && (dx = (width - tWidth) / 2);
-            align === "right" && (dx = (width - tWidth));
-            var tx = 0;
-            for (var i = 0, n = text.length; i < n; i++) {
-                tTexture = this.getCharTexture(text.charAt(i));
-                if (tTexture) {
-                    sprite.graphics.drawImage(tTexture, drawX + tx + dx, drawY);
-                    tx += this.getCharWidth(text.charAt(i));
-                }
-            }
-        }
-    }
-    ClassUtils.regClass("laya.display.BitmapFont", BitmapFont);
-    ClassUtils.regClass("Laya.BitmapFont", BitmapFont);
-
     class Prefab {
         create() {
             if (this.json)
@@ -18330,6 +18046,257 @@ window.Laya= (function (exports) {
     Byte.LITTLE_ENDIAN = "littleEndian";
     Byte._sysEndian = null;
 
+    class BitmapFont {
+        constructor() {
+            this._fontCharDic = {};
+            this._fontWidthMap = {};
+            this._maxWidth = 0;
+            this._spaceWidth = 10;
+            this.fontSize = 12;
+            this.autoScaleSize = false;
+            this.letterSpacing = 0;
+        }
+        loadFont(path, complete) {
+            this._path = path;
+            this._complete = complete;
+            if (!path || path.indexOf(".fnt") === -1) {
+                console.error('Bitmap font configuration information must be a ".fnt" file');
+                return;
+            }
+            ILaya.loader.load([{ url: path, type: ILaya.Loader.XML }, { url: path.replace(".fnt", ".png"), type: ILaya.Loader.IMAGE }], Handler.create(this, this._onLoaded));
+        }
+        _onLoaded() {
+            this.parseFont(ILaya.Loader.getRes(this._path), ILaya.Loader.getRes(this._path.replace(".fnt", ".png")));
+            this._complete && this._complete.run();
+        }
+        parseFont(xml, texture) {
+            if (xml == null || texture == null)
+                return;
+            this._texture = texture;
+            var tScale = 1;
+            var tInfo = xml.getElementsByTagName("info");
+            if (!tInfo[0].getAttributeNode) {
+                return this.parseFont2(xml, texture);
+            }
+            this.fontSize = parseInt(tInfo[0].getAttributeNode("size").nodeValue);
+            var tPadding = tInfo[0].getAttributeNode("padding").nodeValue;
+            var tPaddingArray = tPadding.split(",");
+            this._padding = [parseInt(tPaddingArray[0]), parseInt(tPaddingArray[1]), parseInt(tPaddingArray[2]), parseInt(tPaddingArray[3])];
+            var chars = xml.getElementsByTagName("char");
+            var i = 0;
+            for (i = 0; i < chars.length; i++) {
+                var tAttribute = chars[i];
+                var tId = parseInt(tAttribute.getAttributeNode("id").nodeValue);
+                var xOffset = parseInt(tAttribute.getAttributeNode("xoffset").nodeValue) / tScale;
+                var yOffset = parseInt(tAttribute.getAttributeNode("yoffset").nodeValue) / tScale;
+                var xAdvance = parseInt(tAttribute.getAttributeNode("xadvance").nodeValue) / tScale;
+                var region = new Rectangle();
+                region.x = parseInt(tAttribute.getAttributeNode("x").nodeValue);
+                region.y = parseInt(tAttribute.getAttributeNode("y").nodeValue);
+                region.width = parseInt(tAttribute.getAttributeNode("width").nodeValue);
+                region.height = parseInt(tAttribute.getAttributeNode("height").nodeValue);
+                var tTexture = Texture.create(texture, region.x, region.y, region.width, region.height, xOffset, yOffset);
+                this._maxWidth = Math.max(this._maxWidth, xAdvance + this.letterSpacing);
+                this._fontCharDic[tId] = tTexture;
+                this._fontWidthMap[tId] = xAdvance;
+            }
+        }
+        parseFont2(xml, texture) {
+            if (xml == null || texture == null)
+                return;
+            this._texture = texture;
+            var tScale = 1;
+            var tInfo = xml.getElementsByTagName("info");
+            this.fontSize = parseInt(tInfo[0].attributes["size"].nodeValue);
+            var tPadding = tInfo[0].attributes["padding"].nodeValue;
+            var tPaddingArray = tPadding.split(",");
+            this._padding = [parseInt(tPaddingArray[0]), parseInt(tPaddingArray[1]), parseInt(tPaddingArray[2]), parseInt(tPaddingArray[3])];
+            var chars = xml.getElementsByTagName("char");
+            var i = 0;
+            for (i = 0; i < chars.length; i++) {
+                var tAttribute = chars[i].attributes;
+                var tId = parseInt(tAttribute["id"].nodeValue);
+                var xOffset = parseInt(tAttribute["xoffset"].nodeValue) / tScale;
+                var yOffset = parseInt(tAttribute["yoffset"].nodeValue) / tScale;
+                var xAdvance = parseInt(tAttribute["xadvance"].nodeValue) / tScale;
+                var region = new Rectangle();
+                region.x = parseInt(tAttribute["x"].nodeValue);
+                region.y = parseInt(tAttribute["y"].nodeValue);
+                region.width = parseInt(tAttribute["width"].nodeValue);
+                region.height = parseInt(tAttribute["height"].nodeValue);
+                var tTexture = Texture.create(texture, region.x, region.y, region.width, region.height, xOffset, yOffset);
+                this._maxWidth = Math.max(this._maxWidth, xAdvance + this.letterSpacing);
+                this._fontCharDic[tId] = tTexture;
+                this._fontWidthMap[tId] = xAdvance;
+            }
+        }
+        getCharTexture(char) {
+            return this._fontCharDic[char.charCodeAt(0)];
+        }
+        destroy() {
+            if (this._texture) {
+                for (var p in this._fontCharDic) {
+                    var tTexture = this._fontCharDic[p];
+                    if (tTexture)
+                        tTexture.destroy();
+                }
+                this._texture.destroy();
+                this._fontCharDic = null;
+                this._fontWidthMap = null;
+                this._texture = null;
+                this._complete = null;
+                this._padding = null;
+            }
+        }
+        setSpaceWidth(spaceWidth) {
+            this._spaceWidth = spaceWidth;
+        }
+        getCharWidth(char) {
+            var code = char.charCodeAt(0);
+            if (this._fontWidthMap[code])
+                return this._fontWidthMap[code] + this.letterSpacing;
+            if (char === " ")
+                return this._spaceWidth + this.letterSpacing;
+            return 0;
+        }
+        getTextWidth(text) {
+            var tWidth = 0;
+            for (var i = 0, n = text.length; i < n; i++) {
+                tWidth += this.getCharWidth(text.charAt(i));
+            }
+            return tWidth;
+        }
+        getMaxWidth() {
+            return this._maxWidth;
+        }
+        getMaxHeight() {
+            return this.fontSize;
+        }
+        _drawText(text, sprite, drawX, drawY, align, width) {
+            var tWidth = this.getTextWidth(text);
+            var tTexture;
+            var dx = 0;
+            align === "center" && (dx = (width - tWidth) / 2);
+            align === "right" && (dx = (width - tWidth));
+            var tx = 0;
+            for (var i = 0, n = text.length; i < n; i++) {
+                tTexture = this.getCharTexture(text.charAt(i));
+                if (tTexture) {
+                    sprite.graphics.drawImage(tTexture, drawX + tx + dx, drawY);
+                    tx += this.getCharWidth(text.charAt(i));
+                }
+            }
+        }
+    }
+    ClassUtils.regClass("laya.display.BitmapFont", BitmapFont);
+    ClassUtils.regClass("Laya.BitmapFont", BitmapFont);
+
+    class HttpRequest extends EventDispatcher {
+        constructor() {
+            super(...arguments);
+            this._http = new XMLHttpRequest();
+        }
+        send(url, data = null, method = "get", responseType = "text", headers = null) {
+            this._responseType = responseType;
+            this._data = null;
+            if (Browser.onVVMiniGame || Browser.onQGMiniGame || Browser.onQQMiniGame) {
+                url = encodeURI(url);
+            }
+            this._url = url;
+            var _this = this;
+            var http = this._http;
+            url = URL.getAdptedFilePath(url);
+            http.open(method, url, true);
+            if (headers) {
+                for (var i = 0; i < headers.length; i++) {
+                    http.setRequestHeader(headers[i++], headers[i]);
+                }
+            }
+            else if (!(window.conch)) {
+                if (!data || typeof (data) == 'string')
+                    http.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                else
+                    http.setRequestHeader("Content-Type", "application/json");
+            }
+            let restype = responseType !== "arraybuffer" ? "text" : "arraybuffer";
+            http.responseType = restype;
+            if (http.dataType) {
+                http.dataType = restype;
+            }
+            http.onerror = function (e) {
+                _this._onError(e);
+            };
+            http.onabort = function (e) {
+                _this._onAbort(e);
+            };
+            http.onprogress = function (e) {
+                _this._onProgress(e);
+            };
+            http.onload = function (e) {
+                _this._onLoad(e);
+            };
+            http.send(data);
+        }
+        _onProgress(e) {
+            if (e && e.lengthComputable)
+                this.event(Event.PROGRESS, e.loaded / e.total);
+        }
+        _onAbort(e) {
+            this.error("Request was aborted by user");
+        }
+        _onError(e) {
+            this.error("Request failed Status:" + this._http.status + " text:" + this._http.statusText);
+        }
+        _onLoad(e) {
+            var http = this._http;
+            var status = http.status !== undefined ? http.status : 200;
+            if (status === 200 || status === 204 || status === 0) {
+                this.complete();
+            }
+            else {
+                this.error("[" + http.status + "]" + http.statusText + ":" + http.responseURL);
+            }
+        }
+        error(message) {
+            this.clear();
+            console.warn(this.url, message);
+            this.event(Event.ERROR, message);
+        }
+        complete() {
+            this.clear();
+            var flag = true;
+            try {
+                if (this._responseType === "json") {
+                    this._data = JSON.parse(this._http.responseText);
+                }
+                else if (this._responseType === "xml") {
+                    this._data = Utils.parseXMLFromString(this._http.responseText);
+                }
+                else {
+                    this._data = this._http.response || this._http.responseText;
+                }
+            }
+            catch (e) {
+                flag = false;
+                this.error(e.message);
+            }
+            flag && this.event(Event.COMPLETE, this._data instanceof Array ? [this._data] : this._data);
+        }
+        clear() {
+            var http = this._http;
+            http.onerror = http.onabort = http.onprogress = http.onload = null;
+        }
+        get url() {
+            return this._url;
+        }
+        get data() {
+            return this._data;
+        }
+        get http() {
+            return this._http;
+        }
+    }
+
     class Loader extends EventDispatcher {
         constructor() {
             super(...arguments);
@@ -18359,8 +18326,13 @@ window.Laya= (function (exports) {
             this._data = null;
             if (useWorkerLoader)
                 ILaya.WorkerLoader.enableWorkerLoader();
-            if (!ignoreCache && Loader.loadedMap[url]) {
-                this._data = Loader.loadedMap[url];
+            var cacheRes;
+            if (type == Loader.IMAGE)
+                cacheRes = Loader.textureMap[url];
+            else
+                cacheRes = Loader.loadedMap[url];
+            if (!ignoreCache && cacheRes) {
+                this._data = cacheRes;
                 this.event(Event.PROGRESS, 1);
                 this.event(Event.COMPLETE, this._data);
                 return;
@@ -18416,8 +18388,8 @@ window.Laya= (function (exports) {
                 if (!this._http)
                     this._http = new HttpRequest();
             }
-            this._http.on(Event.PROGRESS, onProcessCaller, onProcess);
-            this._http.on(Event.COMPLETE, onLoadCaller, onLoad);
+            onProcess && this._http.on(Event.PROGRESS, onProcessCaller, onProcess);
+            onLoad && this._http.on(Event.COMPLETE, onLoadCaller, onLoad);
             this._http.on(Event.ERROR, onErrorCaller, onError);
             this._http.send(url, null, "get", contentType);
         }
@@ -18464,8 +18436,8 @@ window.Laya= (function (exports) {
                 _this.event(Event.ERROR, "Load image failed");
             };
             if (this._type === "nativeimage") {
-                onLoaded = function (image) {
-                    _this.onLoaded(image);
+                onLoaded = (image) => {
+                    this.onLoaded(image);
                 };
                 this._loadHtmlImage(url, this, onLoaded, this, onError);
             }
@@ -18473,14 +18445,18 @@ window.Laya= (function (exports) {
                 var ext = Utils.getFileExtension(url);
                 if (ext === "ktx" || ext === "pvr") {
                     onLoaded = function (imageData) {
-                        var format;
+                        let format;
                         switch (ext) {
                             case "ktx":
-                                format = 5;
+                                format = exports.TextureFormat.ETC1RGB;
                                 break;
                             case "pvr":
-                                format = 12;
+                                format = exports.TextureFormat.PVRTCRGBA_4BPPV;
                                 break;
+                            default: {
+                                console.error('unknown format', ext);
+                                return;
+                            }
                         }
                         var tex = new Texture2D(0, 0, format, false, false);
                         tex.wrapModeU = BaseTexture.WARPMODE_CLAMP;
@@ -18552,14 +18528,15 @@ window.Laya= (function (exports) {
             }
             else if (type === Loader.ATLAS) {
                 if (!(data instanceof Texture2D)) {
+                    var toloadPics = [];
                     if (!this._data) {
                         this._data = data;
                         if (data.meta && data.meta.image) {
-                            var toloadPics = data.meta.image.split(",");
+                            toloadPics = data.meta.image.split(",");
                             var split = this._url.indexOf("/") >= 0 ? "/" : "\\";
                             var idx = this._url.lastIndexOf(split);
                             var folderPath = idx >= 0 ? this._url.substr(0, idx + 1) : "";
-                            var changeType;
+                            var changeType = null;
                             if (Browser.onAndroid && data.meta.compressTextureAndroid) {
                                 changeType = ".ktx";
                             }
@@ -18608,7 +18585,7 @@ window.Laya= (function (exports) {
                             tPic.scaleRate = scaleRate;
                             var tTexture;
                             tTexture = Texture._create(tPic, obj.frame.x, obj.frame.y, obj.frame.w, obj.frame.h, obj.spriteSourceSize.x, obj.spriteSourceSize.y, obj.sourceSize.w, obj.sourceSize.h, Loader.getRes(url));
-                            Loader.cacheRes(url, tTexture);
+                            Loader.cacheTexture(url, tTexture);
                             tTexture.url = url;
                             map.push(url);
                         }
@@ -18619,7 +18596,7 @@ window.Laya= (function (exports) {
                             tPic = pics[obj.frame.idx ? obj.frame.idx : 0];
                             url = URL.formatURL(directory + name);
                             tTexture = Texture._create(tPic, obj.frame.x, obj.frame.y, obj.frame.w, obj.frame.h, obj.spriteSourceSize.x, obj.spriteSourceSize.y, obj.sourceSize.w, obj.sourceSize.h, Loader.getRes(url));
-                            Loader.cacheRes(url, tTexture);
+                            Loader.cacheTexture(url, tTexture);
                             tTexture.url = url;
                             map.push(url);
                         }
@@ -18705,9 +18682,7 @@ window.Laya= (function (exports) {
         static checkNext() {
             Loader._isWorking = true;
             var startTimer = Browser.now();
-            var thisTimer = startTimer;
             while (Loader._startIndex < Loader._loaders.length) {
-                thisTimer = Browser.now();
                 Loader._loaders[Loader._startIndex].endLoad();
                 Loader._startIndex++;
                 if (Browser.now() - startTimer > Loader.maxTimeOut) {
@@ -18746,22 +18721,20 @@ window.Laya= (function (exports) {
                 for (var i = 0, n = arr.length; i < n; i++) {
                     var resUrl = arr[i];
                     var tex = Loader.getRes(resUrl);
-                    delete Loader.loadedMap[resUrl];
+                    delete Loader.textureMap[resUrl];
                     if (tex)
                         tex.destroy();
                 }
                 arr.length = 0;
                 delete Loader.atlasMap[url];
-                delete Loader.loadedMap[url];
             }
-            else {
-                var res = Loader.loadedMap[url];
-                if (res) {
-                    delete Loader.loadedMap[url];
-                    if (res instanceof Texture && res.bitmap)
-                        res.destroy();
-                }
+            var texture = Loader.textureMap[url];
+            if (texture) {
+                texture.destroy();
+                delete Loader.textureMap[url];
             }
+            var res = Loader.loadedMap[url];
+            (res) && (delete Loader.loadedMap[url]);
         }
         static clearTextureRes(url) {
             url = URL.formatURL(url);
@@ -18782,7 +18755,11 @@ window.Laya= (function (exports) {
             }
         }
         static getRes(url) {
-            return Loader.loadedMap[URL.formatURL(url)];
+            var res = Loader.textureMap[URL.formatURL(url)];
+            if (res)
+                return res;
+            else
+                return Loader.loadedMap[URL.formatURL(url)];
         }
         static getAtlas(url) {
             return Loader.atlasMap[URL.formatURL(url)];
@@ -18793,7 +18770,22 @@ window.Laya= (function (exports) {
                 console.warn("Resources already exist,is repeated loading:", url);
             }
             else {
-                Loader.loadedMap[url] = data;
+                if (data instanceof Texture) {
+                    Loader.loadedMap[url] = data.bitmap;
+                    Loader.textureMap[url] = data;
+                }
+                else {
+                    Loader.loadedMap[url] = data;
+                }
+            }
+        }
+        static cacheTexture(url, data) {
+            url = URL.formatURL(url);
+            if (Loader.textureMap[url] != null) {
+                console.warn("Resources already exist,is repeated loading:", url);
+            }
+            else {
+                Loader.textureMap[url] = data;
             }
         }
         static setGroup(url, group) {
@@ -18838,6 +18830,7 @@ window.Laya= (function (exports) {
     Loader.groupMap = {};
     Loader.loadedMap = {};
     Loader.atlasMap = {};
+    Loader.textureMap = {};
     Loader.preLoadedMap = {};
     Loader._imgCache = {};
     Loader._loaders = [];
@@ -18902,7 +18895,7 @@ window.Laya= (function (exports) {
                 var itemCount = items.length;
                 var loadedCount = 0;
                 if (progress) {
-                    var progress2 = Handler.create(progress.caller, progress.method, progress.args, false);
+                    var progress2 = Handler.create(progress.caller, progress ? progress.method : null, progress.args, false);
                 }
                 for (var i = 0; i < itemCount; i++) {
                     var item = items[i];
@@ -18969,9 +18962,14 @@ window.Laya= (function (exports) {
             }
         }
         load(url, complete = null, progress = null, type = null, priority = 1, cache = true, group = null, ignoreCache = false, useWorkerLoader = ILaya.WorkerLoader.enable) {
-            if (url instanceof Array)
+            if (url instanceof Array) {
                 return this._loadAssets(url, complete, progress, type, priority, cache, group);
-            var content = Loader.getRes(url);
+            }
+            var content;
+            if (type === Loader.IMAGE)
+                content = Loader.textureMap[URL.formatURL(url)];
+            else
+                content = Loader.loadedMap[URL.formatURL(url)];
             if (!ignoreCache && content != null) {
                 ILaya.systemTimer.frameOnce(1, this, function () {
                     progress && progress.runWith(1);
@@ -19200,9 +19198,12 @@ window.Laya= (function (exports) {
             var items = [];
             var success = true;
             for (var i = 0; i < itemCount; i++) {
-                var item = arr[i];
-                if (typeof (item) == 'string')
-                    item = { url: item, type: type, size: 1, priority: priority };
+                let url = arr[i];
+                let item;
+                if (typeof (url) == 'string')
+                    item = { url: url, type: type, size: 1, priority: priority };
+                else
+                    item = url;
                 if (!item.size)
                     item.size = 1;
                 item.progress = 0;
@@ -19227,7 +19228,10 @@ window.Laya= (function (exports) {
                     var num = 0;
                     for (var j = 0; j < items.length; j++) {
                         var item1 = items[j];
-                        num += item1.size * item1.progress;
+                        if (item1) {
+                            let prog = item1.progress == undefined ? 0 : item1.progress;
+                            num += item1.size == undefined ? 0 : item1.size * prog;
+                        }
                     }
                     var v = num / totalSize;
                     progress.runWith(v);
@@ -21037,7 +21041,7 @@ window.Laya= (function (exports) {
             this._view = [];
         }
         show(x = 0, y = 0) {
-            if (!Browser.onMiniGame && !ILaya.Render.isConchApp && !Browser.onBDMiniGame && !Browser.onKGMiniGame && !Browser.onQGMiniGame && !Browser.onQQMiniGame)
+            if (!Browser.onMiniGame && !ILaya.Render.isConchApp && !Browser.onBDMiniGame && !Browser.onKGMiniGame && !Browser.onQGMiniGame && !Browser.onQQMiniGame && !Browser.onAlipayMiniGame)
                 this._useCanvas = true;
             this._show = true;
             Stat._fpsData.length = 60;
@@ -21100,7 +21104,7 @@ window.Laya= (function (exports) {
                 this._leftText.color = "#ffffff";
                 stat.addChild(this._leftText);
                 this._txt = new Text();
-                this._txt.pos(80 * pixel, 5);
+                this._txt.pos(130 * pixel, 5);
                 this._txt.color = "#ffffff";
                 stat.addChild(this._txt);
                 this._sp = stat;
@@ -21119,7 +21123,7 @@ window.Laya= (function (exports) {
             stat.size(width, height);
             stat.graphics.clear();
             stat.graphics.alpha(0.5);
-            stat.graphics.drawRect(0, 0, width, height, "#999999");
+            stat.graphics.drawRect(0, 0, width + 110, height + 30, "#999999");
             stat.graphics.alpha(2);
             this.loop();
         }
@@ -22077,14 +22081,17 @@ window.Laya= (function (exports) {
             SceneUtils.__init();
             Mouse.__init__();
             WebGL.inner_enable();
-            for (var i = 0, n = plugins.length; i < n; i++) {
-                if (plugins[i] && plugins[i].enable) {
-                    plugins[i].enable();
+            if (plugins) {
+                for (var i = 0, n = plugins.length; i < n; i++) {
+                    if (plugins[i] && plugins[i].enable) {
+                        plugins[i].enable();
+                    }
                 }
             }
             if (ILaya.Render.isConchApp) {
                 Laya.enableNative();
             }
+            Laya.enableWebGLPlus();
             CacheManger.beginCheck();
             exports.stage = Laya.stage = new Stage();
             ILaya.stage = Laya.stage;
@@ -22141,23 +22148,25 @@ window.Laya= (function (exports) {
             return Browser.window[Laya._evcode](script);
         }
         static enableDebugPanel(debugJsPath = "libs/laya.debugtool.js") {
-            if (!Laya["DebugPanel"]) {
+            if (!window['Laya']["DebugPanel"]) {
                 var script = Browser.createElement("script");
                 script.onload = function () {
-                    Laya["DebugPanel"].enable();
+                    window['Laya']["DebugPanel"].enable();
                 };
                 script.src = debugJsPath;
                 Browser.document.body.appendChild(script);
             }
             else {
-                Laya["DebugPanel"].enable();
+                window['Laya']["DebugPanel"].enable();
             }
+        }
+        static enableWebGLPlus() {
+            WebGLContext.__init_native();
         }
         static enableNative() {
             if (Laya.isNativeRender_enable)
                 return;
             Laya.isNativeRender_enable = true;
-            WebGLContext.__init_native();
             Shader.prototype.uploadTexture2D = function (value) {
                 var gl = LayaGL.instance;
                 gl.bindTexture(gl.TEXTURE_2D, value);
@@ -22211,9 +22220,6 @@ window.Laya= (function (exports) {
                 }
                 return this._texture;
             };
-            if (Render.supportWebGLPlusRendering) {
-                LayaGLRunner.uploadShaderUniforms = LayaGLRunner.uploadShaderUniformsForNative;
-            }
         }
     }
     Laya.stage = null;
@@ -22224,7 +22230,7 @@ window.Laya= (function (exports) {
     Laya.lateTimer = null;
     Laya.timer = null;
     Laya.loader = null;
-    Laya.version = "2.2.0beta4";
+    Laya.version = "2.3.0beta";
     Laya._isinit = false;
     Laya.isWXOpenDataContext = false;
     Laya.isWXPosMsg = false;
@@ -23032,7 +23038,7 @@ window.Laya= (function (exports) {
             function onLoaded(loadUrl) {
                 if (!Loader.getRes(loadUrl)) {
                     if (Animation.framesMap[url + "#"]) {
-                        _this._setFramesFromCache(this._actionName, true);
+                        _this._setFramesFromCache(_this._actionName, true);
                         _this.index = 0;
                         _this._resumePlay();
                         if (loaded)
@@ -23401,6 +23407,17 @@ window.Laya= (function (exports) {
         }
         createChildren() {
         }
+        static setUIMap(url) {
+            let uimap = ILaya.loader.getRes(url);
+            if (uimap) {
+                for (let key in uimap) {
+                    ILaya.Loader.loadedMap[URL.formatURL(key + ".scene")] = uimap[key];
+                }
+            }
+            else {
+                throw "请提前加载uimap的json，再使用该接口设置！";
+            }
+        }
         loadScene(path) {
             var url = path.indexOf(".") > -1 ? path : path + ".scene";
             var view = ILaya.loader.getRes(url);
@@ -23658,26 +23675,6 @@ window.Laya= (function (exports) {
     ILaya.regClass(Scene);
     ClassUtils.regClass("laya.display.Scene", Scene);
     ClassUtils.regClass("Laya.Scene", Scene);
-
-    class DrawCanvasCmd {
-        constructor() {
-            this._paramData = null;
-        }
-        static create(texture, x, y, width, height) {
-            return null;
-        }
-        recover() {
-            this._graphicsCmdEncoder = null;
-            Pool.recover("DrawCanvasCmd", this);
-        }
-        get cmdID() {
-            return DrawCanvasCmd.ID;
-        }
-    }
-    DrawCanvasCmd.ID = "DrawCanvasCmd";
-    DrawCanvasCmd._DRAW_IMAGE_CMD_ENCODER_ = null;
-    DrawCanvasCmd._PARAM_TEXTURE_POS_ = 2;
-    DrawCanvasCmd._PARAM_VB_POS_ = 5;
 
     class DrawParticleCmd {
         static create(_temp) {
@@ -24255,6 +24252,38 @@ window.Laya= (function (exports) {
         }
         addShaderUniform(one) {
             this.add_ShaderValue(one);
+        }
+    }
+
+    class LayaGLRunner {
+        static uploadShaderUniforms(layaGL, commandEncoder, shaderData, uploadUnTexture) {
+            var data = shaderData._data;
+            var shaderUniform = commandEncoder.getArrayData();
+            var shaderCall = 0;
+            for (var i = 0, n = shaderUniform.length; i < n; i++) {
+                var one = shaderUniform[i];
+                if (uploadUnTexture || one.textureID !== -1) {
+                    var value = data[one.dataOffset];
+                    if (value != null)
+                        shaderCall += one.fun.call(one.caller, one, value);
+                }
+            }
+            return shaderCall;
+        }
+        static uploadCustomUniform(layaGL, custom, index, data) {
+            var shaderCall = 0;
+            var one = custom[index];
+            if (one && data != null)
+                shaderCall += one.fun.call(one.caller, one, data);
+            return shaderCall;
+        }
+        static uploadShaderUniformsForNative(layaGL, commandEncoder, shaderData) {
+            var nType = LayaGL.UPLOAD_SHADER_UNIFORM_TYPE_ID;
+            if (shaderData._runtimeCopyValues.length > 0) {
+                nType = LayaGL.UPLOAD_SHADER_UNIFORM_TYPE_DATA;
+            }
+            var data = shaderData._data;
+            return LayaGL.instance.uploadShaderUniforms(commandEncoder, data, nType);
         }
     }
 
@@ -25463,7 +25492,6 @@ window.Laya= (function (exports) {
     exports.Context = Context;
     exports.Dragging = Dragging;
     exports.Draw9GridTexture = Draw9GridTexture;
-    exports.DrawCanvasCmd = DrawCanvasCmd;
     exports.DrawCircleCmd = DrawCircleCmd;
     exports.DrawCurvesCmd = DrawCurvesCmd;
     exports.DrawImageCmd = DrawImageCmd;
@@ -25487,11 +25515,8 @@ window.Laya= (function (exports) {
     exports.EventDispatcher = EventDispatcher;
     exports.FadeIn = FadeIn;
     exports.FadeOut = FadeOut;
-    exports.FillBorderTextCmd = FillBorderTextCmd;
-    exports.FillBorderWordsCmd = FillBorderWordsCmd;
     exports.FillTextCmd = FillTextCmd;
     exports.FillTextureCmd = FillTextureCmd;
-    exports.FillWordsCmd = FillWordsCmd;
     exports.Filter = Filter;
     exports.FilterSetterBase = FilterSetterBase;
     exports.FontInfo = FontInfo;
@@ -25591,7 +25616,6 @@ window.Laya= (function (exports) {
     exports.Stat = Stat;
     exports.StatUI = StatUI;
     exports.StringKey = StringKey;
-    exports.StrokeTextCmd = StrokeTextCmd;
     exports.Submit = Submit;
     exports.SubmitBase = SubmitBase;
     exports.SubmitCMD = SubmitCMD;

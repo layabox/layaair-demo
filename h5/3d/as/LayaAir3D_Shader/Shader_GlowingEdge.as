@@ -28,8 +28,6 @@ package LayaAir3D_Shader {
 		private var rotation:Vector3 = new Vector3(0, 0.01, 0);
 		
 		public function Shader_GlowingEdge() {
-			//开启Shader调试模式
-			Shader3D.debugMode = true;
 			//初始化引擎
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
@@ -112,8 +110,22 @@ package LayaAir3D_Shader {
 		
 		//初始化shader
 		private function initShader():void {
-			var attributeMap:Object = {'a_Position': VertexMesh.MESH_POSITION0, 'a_Normal': VertexMesh.MESH_NORMAL0, 'a_Texcoord': VertexMesh.MESH_TEXTURECOORDINATE0, 'a_BoneWeights': VertexMesh.MESH_BLENDWEIGHT0, 'a_BoneIndices': VertexMesh.MESH_BLENDINDICES0};
-			var uniformMap:Object = {'u_Bones': Shader3D.PERIOD_CUSTOM, 'u_CameraPos': Shader3D.PERIOD_CAMERA, 'u_MvpMatrix': Shader3D.PERIOD_SPRITE, 'u_WorldMat': Shader3D.PERIOD_SPRITE, 'u_texture': Shader3D.PERIOD_MATERIAL, 'u_marginalColor': Shader3D.PERIOD_MATERIAL, 'u_DirectionLight.Direction': Shader3D.PERIOD_SCENE, 'u_DirectionLight.Color': Shader3D.PERIOD_SCENE};
+			var attributeMap:Object = {
+				'a_Position': VertexMesh.MESH_POSITION0, 
+				'a_Normal': VertexMesh.MESH_NORMAL0, 
+				'a_Texcoord': VertexMesh.MESH_TEXTURECOORDINATE0, 
+				'a_BoneWeights': VertexMesh.MESH_BLENDWEIGHT0, 
+				'a_BoneIndices': VertexMesh.MESH_BLENDINDICES0
+			};
+			var uniformMap:Object = {
+				'u_Bones': Shader3D.PERIOD_CUSTOM, 
+				'u_CameraPos': Shader3D.PERIOD_CAMERA, 
+				'u_MvpMatrix': Shader3D.PERIOD_SPRITE, 
+				'u_WorldMat': Shader3D.PERIOD_SPRITE, 
+				'u_texture': Shader3D.PERIOD_MATERIAL, 
+				'u_marginalColor': Shader3D.PERIOD_MATERIAL, 
+				'u_SunLight.color': Shader3D.PERIOD_SCENE,
+			};
 			//vertexShader和fragmentShader
 			var vs:String = __INCLUDESTR__("customShader/glowingEdgeShader.vs");
 			var ps:String = __INCLUDESTR__("customShader/glowingEdgeShader.ps");

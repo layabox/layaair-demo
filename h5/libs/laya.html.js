@@ -24,6 +24,7 @@
         }
     }
     HTMLExtendStyle.EMPTY = new HTMLExtendStyle();
+    Laya.ClassUtils.regClass("laya.html.utils.HTMLExtendStyle", HTMLExtendStyle);
 
     class HTMLStyle {
         constructor() {
@@ -363,6 +364,7 @@
     HTMLStyle.vAlign_Value = { 0: "top", 0x40: "middle", 0x80: "bottom" };
     HTMLStyle._ALIGN = 0x30;
     HTMLStyle._VALIGN = 0xc0;
+    Laya.ClassUtils.regClass("laya.html.utils.HTMLStyle", HTMLStyle);
 
     class HTMLDocument {
         constructor() {
@@ -377,6 +379,7 @@
         }
     }
     HTMLDocument.document = new HTMLDocument();
+    Laya.ClassUtils.regClass("laya.html.dom.HTMLDocument", HTMLDocument);
 
     class HTMLHitRect {
         constructor() {
@@ -395,6 +398,7 @@
             return Laya.Pool.getItemByClass("HTMLHitRect", HTMLHitRect);
         }
     }
+    Laya.ClassUtils.regClass("laya.html.dom.HTMLHitRect", HTMLHitRect);
 
     class IHtml {
     }
@@ -456,6 +460,7 @@
             }
         }
     }
+    Laya.ClassUtils.regClass("laya.html.utils.LayoutLine", LayoutLine);
 
     class Layout {
         static later(element) {
@@ -607,6 +612,7 @@
         }
     }
     Layout.DIV_ELEMENT_PADDING = 0;
+    Laya.ClassUtils.regClass("laya.html.utils.Layout", Layout);
 
     (function (HTMLElementType) {
         HTMLElementType[HTMLElementType["BASE"] = 0] = "BASE";
@@ -999,6 +1005,7 @@
     HTMLElement._EMPTYTEXT = { text: null, words: null };
     Laya.ILaya.regClass(HTMLElement);
     IHtml.HTMLElementType = exports.HTMLElementType;
+    Laya.ClassUtils.regClass("laya.html.dom.HTMLElement", HTMLElement);
 
     class HTMLBrElement {
         _addToLayout(out) {
@@ -1031,6 +1038,7 @@
     }
     IHtml.HTMLBrElement = HTMLBrElement;
     Laya.ILaya.regClass(HTMLBrElement);
+    Laya.ClassUtils.regClass("laya.html.dom.HTMLBrElement", HTMLBrElement);
 
     class HTMLStyleElement extends HTMLElement {
         _creates() {
@@ -1048,6 +1056,7 @@
         }
     }
     Laya.ILaya.regClass(HTMLStyleElement);
+    Laya.ClassUtils.regClass("laya.html.dom.HTMLStyleElement", HTMLStyleElement);
 
     class HTMLLinkElement extends HTMLElement {
         _creates() {
@@ -1093,6 +1102,7 @@
     }
     HTMLLinkElement._cuttingStyle = new RegExp("((@keyframes[\\s\\t]+|)(.+))[\\t\\n\\r\\\s]*{", "g");
     Laya.ILaya.regClass(HTMLLinkElement);
+    Laya.ClassUtils.regClass("laya.html.dom.HTMLLinkElement", HTMLLinkElement);
 
     class HTMLDivParser extends HTMLElement {
         constructor() {
@@ -1194,6 +1204,64 @@
     }
     IHtml.HTMLDivParser = HTMLDivParser;
     Laya.ILaya.regClass(HTMLDivParser);
+    Laya.ClassUtils.regClass("laya.html.dom.HTMLDivParser", HTMLDivParser);
+
+    class HTMLImageElement extends HTMLElement {
+        constructor() {
+            super();
+            this.eletype = exports.HTMLElementType.IMAGE;
+        }
+        reset() {
+            super.reset();
+            if (this._tex) {
+                this._tex.off(Laya.Event.LOADED, this, this.onloaded);
+            }
+            this._tex = null;
+            this._url = null;
+            return this;
+        }
+        set src(url) {
+            url = this.formatURL(url);
+            if (this._url === url)
+                return;
+            this._url = url;
+            var tex = this._tex = Laya.Loader.getRes(url);
+            if (!tex) {
+                this._tex = tex = new Laya.Texture();
+                tex.load(url);
+                Laya.Loader.cacheTexture(url, tex);
+            }
+            tex.getIsReady() ? this.onloaded() : tex.once(Laya.Event.READY, this, this.onloaded);
+        }
+        onloaded() {
+            if (!this._style)
+                return;
+            var style = this._style;
+            var w = style.widthed(this) ? -1 : this._tex.width;
+            var h = style.heighted(this) ? -1 : this._tex.height;
+            if (!style.widthed(this) && this._width != this._tex.width) {
+                this.width = this._tex.width;
+                this.parent && this.parent._layoutLater();
+            }
+            if (!style.heighted(this) && this._height != this._tex.height) {
+                this.height = this._tex.height;
+                this.parent && this.parent._layoutLater();
+            }
+            this.repaint();
+        }
+        _addToLayout(out) {
+            var style = this._style;
+            !style.absolute && out.push(this);
+        }
+        renderSelfToGraphic(graphic, gX, gY, recList) {
+            if (!this._tex)
+                return;
+            graphic.drawImage(this._tex, gX, gY, this.width || this._tex.width, this.height || this._tex.height);
+        }
+    }
+    IHtml.HTMLImageElement = HTMLImageElement;
+    Laya.ILaya.regClass(HTMLImageElement);
+    Laya.ClassUtils.regClass("laya.html.dom.HTMLImageElement", HTMLImageElement);
 
     class HTMLParse {
         static getInstance(type) {
@@ -1312,6 +1380,7 @@
     Laya.ClassUtils.regClass('a', HTMLElement);
     Laya.ClassUtils.regClass('#text', HTMLElement);
     Laya.ClassUtils.regClass('link', HTMLLinkElement);
+    Laya.ClassUtils.regClass("laya.html.utils.HTMLParse", HTMLParse);
 
     class HTMLDivElement extends Laya.Sprite {
         constructor() {
@@ -1418,6 +1487,7 @@
     }
     IHtml.HTMLDivElement = HTMLDivElement;
     IHtml.HTMLParse = HTMLParse;
+    Laya.ClassUtils.regClass("laya.html.dom.HTMLDivElement", HTMLDivElement);
 
     class HTMLIframeElement extends HTMLDivElement {
         constructor() {
@@ -1427,7 +1497,7 @@
         set href(url) {
             url = this._element.formatURL(url);
             var l = new Laya.Loader();
-            l.once(Laya.Event.COMPLETE, null, function (data) {
+            l.once(Laya.Event.COMPLETE, null, (data) => {
                 var pre = this._element.URI;
                 this._element.URI = new Laya.URL(url);
                 this.innerHTML = data;
@@ -1436,62 +1506,7 @@
             l.load(url, Laya.Loader.TEXT);
         }
     }
-
-    class HTMLImageElement$1 extends HTMLElement {
-        constructor() {
-            super();
-            this.eletype = exports.HTMLElementType.IMAGE;
-        }
-        reset() {
-            super.reset();
-            if (this._tex) {
-                this._tex.off(Laya.Event.LOADED, this, this.onloaded);
-            }
-            this._tex = null;
-            this._url = null;
-            return this;
-        }
-        set src(url) {
-            url = this.formatURL(url);
-            if (this._url === url)
-                return;
-            this._url = url;
-            var tex = this._tex = Laya.Loader.getRes(url);
-            if (!tex) {
-                this._tex = tex = new Laya.Texture();
-                tex.load(url);
-                Laya.Loader.cacheRes(url, tex);
-            }
-            tex.getIsReady() ? this.onloaded() : tex.once(Laya.Event.READY, this, this.onloaded);
-        }
-        onloaded() {
-            if (!this._style)
-                return;
-            var style = this._style;
-            var w = style.widthed(this) ? -1 : this._tex.width;
-            var h = style.heighted(this) ? -1 : this._tex.height;
-            if (!style.widthed(this) && this._width != this._tex.width) {
-                this.width = this._tex.width;
-                this.parent && this.parent._layoutLater();
-            }
-            if (!style.heighted(this) && this._height != this._tex.height) {
-                this.height = this._tex.height;
-                this.parent && this.parent._layoutLater();
-            }
-            this.repaint();
-        }
-        _addToLayout(out) {
-            var style = this._style;
-            !style.absolute && out.push(this);
-        }
-        renderSelfToGraphic(graphic, gX, gY, recList) {
-            if (!this._tex)
-                return;
-            graphic.drawImage(this._tex, gX, gY, this.width || this._tex.width, this.height || this._tex.height);
-        }
-    }
-    IHtml.HTMLImageElement = HTMLImageElement$1;
-    Laya.ILaya.regClass(HTMLImageElement$1);
+    Laya.ClassUtils.regClass("laya.html.dom.HTMLIframeElement", HTMLIframeElement);
 
     exports.HTMLBrElement = HTMLBrElement;
     exports.HTMLDivElement = HTMLDivElement;
@@ -1501,7 +1516,7 @@
     exports.HTMLExtendStyle = HTMLExtendStyle;
     exports.HTMLHitRect = HTMLHitRect;
     exports.HTMLIframeElement = HTMLIframeElement;
-    exports.HTMLImageElement = HTMLImageElement$1;
+    exports.HTMLImageElement = HTMLImageElement;
     exports.HTMLLinkElement = HTMLLinkElement;
     exports.HTMLParse = HTMLParse;
     exports.HTMLStyle = HTMLStyle;

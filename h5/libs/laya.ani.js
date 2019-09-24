@@ -1549,7 +1549,6 @@
                 this.deformData = tVertices;
                 return;
             }
-            var tTweenKey = this.tweenKeyList[this.frameIndex];
             var tPrevVertices = this.vectices[this.frameIndex - 1];
             var tNextVertices = this.vectices[this.frameIndex];
             var tPreFrameTime = this.timeList[this.frameIndex - 1];
@@ -1584,7 +1583,6 @@
         constructor(data, bones) {
             this.isSpine = true;
             this.isDebug = false;
-            this._data = data;
             this._targetBone = bones[data.targetBoneIndex];
             this.isSpine = data.isSpine;
             if (this._bones == null)
@@ -2278,7 +2276,6 @@
             }
         }
     }
-    PathConstraint.NONE = -1;
     PathConstraint.BEFORE = -2;
     PathConstraint.AFTER = -3;
     PathConstraint._tempMt = new Laya.Matrix();
@@ -2606,14 +2603,14 @@
                     if (this._player.currentPlayTime >= tEventData.time) {
                         this.event(Laya.Event.LABEL, tEventData);
                         this._eventIndex++;
-                        if (this._playAudio && tEventData.audioValue && tEventData.audioValue !== "null") {
+                        if (this._playAudio && tEventData.audioValue && tEventData.audioValue !== "null" && tEventData.audioValue !== "undefined") {
                             _soundChannel = Laya.SoundManager.playSound(this._player.templet._path + tEventData.audioValue, 1, Laya.Handler.create(this, this._onAniSoundStoped));
                             Laya.SoundManager.playbackRate = this._player.playbackRate;
                             _soundChannel && this._soundChannelArr.push(_soundChannel);
                         }
                     }
                 }
-                else if (tEventData.time < this._player.playStart && this._playAudio && tEventData.audioValue && tEventData.audioValue !== "null") {
+                else if (tEventData.time < this._player.playStart && this._playAudio && tEventData.audioValue && tEventData.audioValue !== "null" && tEventData.audioValue !== "undefined") {
                     this._eventIndex++;
                     _soundChannel = Laya.SoundManager.playSound(this._player.templet._path + tEventData.audioValue, 1, Laya.Handler.create(this, this._onAniSoundStoped), null, (this._player.currentPlayTime - tEventData.time) / 1000);
                     Laya.SoundManager.playbackRate = this._player.playbackRate;
@@ -3778,7 +3775,7 @@
             return null;
         }
         _setCreateURL(url) {
-            this._relativeUrl = url;
+            this._skBufferUrl = this._relativeUrl = url;
             super._setCreateURL(url);
         }
         setGrahicsDataWithCache(aniIndex, frameIndex, graphics) {
@@ -3810,10 +3807,11 @@
                 tSkinSlotDisplayData.destory();
             }
             this.skinSlotDisplayDataArr.length = 0;
-            if (this.url) {
-                delete Templet.TEMPLET_DICTIONARY[this.url];
+            if (this._relativeUrl) {
+                delete Templet.TEMPLET_DICTIONARY[this._relativeUrl];
             }
             super.destroy();
+            Laya.ILaya.loader.clearRes(this._skBufferUrl);
         }
         getAniNameByIndex(index) {
             var tAni = this.getAnimation(index);

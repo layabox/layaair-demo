@@ -6,8 +6,6 @@ class CustomMesh {
     private curStateIndex = 0;
 		
 	constructor() {
-			
-		Laya.Shader3D.debugMode = true;
 		Laya3D.init(0, 0);
 		Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
 		Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;

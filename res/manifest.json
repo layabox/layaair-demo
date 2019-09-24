@@ -285,7 +285,8 @@
 				["DirectionLightDemo", "方向光", "", "core,ani,d3,CameraMoveScript.js"],
 				["PointLightDemo", "点光", "", "core,ani,d3,CameraMoveScript.js"],
 				["SpotLightDemo", "聚光", "", "core,ani,d3,CameraMoveScript.js" ],
-				["RealTimeShadow", "实时阴影", "", "core,ani,d3,CameraMoveScript.js" ]
+				["RealTimeShadow", "实时阴影", "", "core,ani,d3,CameraMoveScript.js" ],
+				["MultiLight", "多光源", "", "core,ani,d3,CameraMoveScript.js,physics3D"]
 			]
 		},
 
@@ -429,7 +430,8 @@
 				[ "AStarFindPath", "寻路导航", "", "core,ani,d3,astar.js,CameraMoveScript.js" ],
 				[ "Scene2DPlayer3D", "2D场景加3D人物", "", "core,ani,d3,ui,CameraMoveScript.js" ],
 				[ "Secne3DPlayer2D", "3D场景加2D人物", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
-				[ "PostProcessBloom", "后期处理Bloom", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ]
+				[ "PostProcessBloom", "后期处理Bloom", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
+				[ "DrawTextTexture", "3D文字纹理", "", "core,ani,d3,ui,CameraMoveScript.js" ]
 			]
 		},
 		{

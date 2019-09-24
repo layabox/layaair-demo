@@ -153,7 +153,6 @@ package LayaAir3D_MouseInteraction {
 			//添加鼠标事件
 			addMouseEvent();
 		
-			debugger;
 			//显示文本显示框
 			text.name = "text";
 			text.overflow = Text.HIDDEN;

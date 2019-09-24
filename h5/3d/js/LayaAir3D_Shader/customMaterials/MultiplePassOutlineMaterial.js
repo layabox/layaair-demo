@@ -1,8 +1,4 @@
 class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
-    
-    /**@private */
-    static shaderDefines = new Laya.ShaderDefines(Laya.BaseMaterial.shaderDefines);
-    
     /**
      * @private
      */
@@ -86,7 +82,8 @@ class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
         var customShader = Laya.Shader3D.add("MultiplePassOutlineShader");
         var subShader = new Laya.SubShader(attributeMap, uniformMap,MultiplePassOutlineMaterial.shaderDefines);
         customShader.addSubShader(subShader);
-        let vs1 = `attribute vec4 a_Position;
+        let vs1 = `
+        attribute vec4 a_Position;
         attribute vec3 a_Normal;
         
         uniform mat4 u_MvpMatrix; 
@@ -99,8 +96,9 @@ class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
            gl_Position = u_MvpMatrix * position;
         }`;
 
-        let ps1 = `#ifdef FSHIGHPRECISION
-        precision highp float;
+        let ps1 = `
+        #ifdef FSHIGHPRECISION
+            precision highp float;
         #else
            precision mediump float;
         #endif
@@ -115,7 +113,8 @@ class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
     
         var pass1 = subShader.addShaderPass(vs1, ps1);
         pass1.renderState.cull = Laya.RenderState.CULL_FRONT;
-        let vs2 = `#include "Lighting.glsl"
+        let vs2 = `
+        #include "Lighting.glsl"
 
         attribute vec4 a_Position; 
         attribute vec2 a_Texcoord0;
@@ -135,10 +134,11 @@ class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
            v_Texcoord0 = a_Texcoord0;
            gl_Position=remapGLPositionZ(gl_Position); 
         }`;
-        let ps2 = `#ifdef FSHIGHPRECISION
-        precision highp float;
+        let ps2 = `
+        #ifdef FSHIGHPRECISION
+            precision highp float;
         #else
-        precision mediump float;
+            precision mediump float;
         #endif
         varying vec2 v_Texcoord0;
         varying vec3 v_Normal;
@@ -173,4 +173,4 @@ MultiplePassOutlineMaterial.OUTLINECOLOR = Laya.Shader3D.propertyNameToID("u_Out
 MultiplePassOutlineMaterial.OUTLINEWIDTH = Laya.Shader3D.propertyNameToID("u_OutlineWidth");
 MultiplePassOutlineMaterial.OUTLINELIGHTNESS = Laya.Shader3D.propertyNameToID("u_OutlineLightness");
     
-MultiplePassOutlineMaterial.SHADERDEFINE_ALBEDOTEXTURE;
+

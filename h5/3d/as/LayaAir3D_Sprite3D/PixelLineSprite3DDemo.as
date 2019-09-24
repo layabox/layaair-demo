@@ -23,7 +23,6 @@ package LayaAir3D_Sprite3D
 		
 		public function PixelLineSprite3DDemo() 
 		{
-			Shader3D.debugMode = true;
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;

@@ -17,7 +17,6 @@ package LayaAir3D_Sky {
 		
 		public function Sky_Procedural() {
 			//初始化3D配置
-			Shader3D.debugMode = true;
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;

@@ -10,6 +10,7 @@ package LayaAir3D_Advance {
 	import laya.d3.core.Sprite3D;
 	import laya.d3.math.Quaternion;
 	import laya.d3.math.Vector3;
+	import laya.d3.math.Vector2;
 	import laya.d3.resource.models.Mesh;
 	import laya.display.Stage;
 	import laya.events.Event;
@@ -23,7 +24,7 @@ package LayaAir3D_Advance {
     public class AStarFindPath {
         private var terrainSprite:MeshTerrainSprite3D;
         private var layaMonkey:Sprite3D;
-        private var path:Vector.<Vector3>;
+        private var path:Vector.<Vector3> = new Vector.<Vector3>();
         private var _everyPath:Array;
         private var _position:Vector3 = new Vector3(0, 0, 0);
         private var _upVector3:Vector3 = new Vector3(0, 1, 0);
@@ -44,6 +45,11 @@ package LayaAir3D_Advance {
         private var graph:*;
         private var opts:*;
         private var resPath:*;
+
+		private var startPoint:Vector2 = new Vector2();
+		private var endPoint:Vector2 = new Vector2();
+		private var resPath: Vector.<Vector2> = new Vector.<Vector2>();
+		private var resPathLength:Number;
         
         public function AStarFindPath() {
             //初始化引擎
@@ -53,7 +59,10 @@ package LayaAir3D_Advance {
             //显示性能面板
             Stat.show();
             
-            path = new Vector.<Vector3>();
+			for(var i:Number = 0; i < 20; ++i){
+				var newVec:Vector2 = new Vector2();
+				resPath.push(newVec);
+			}
             
             //预加载所有资源
             var resource = [{url: "res/threeDimen/scene/TerrainScene/XunLongShi.ls", clas: Laya.Scene3D, priority: 1}, {url: "res/threeDimen/skinModel/LayaMonkey/LayaMonkey.lh", clas: Laya.Sprite3D, priority: 1}, {url: "res/threeDimen/scene/TerrainScene/Assets/HeightMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [1024, 1024, 1, false, true]}, {url: "res/threeDimen/scene/TerrainScene/Assets/AStarMap.png", clas: Laya.Texture2D, priority: 1, constructParams: [64, 64, 1, false, true]}];
@@ -81,10 +90,10 @@ package LayaAir3D_Advance {
             
             //使用astar组织数据
             var aStarArr:Array = createGridFromAStarMap(aStarMap);
-            graph = new (window as any).Graph(aStarArr);
+            graph = new (window as *).Graph(aStarArr);
             opts = {};
             opts.closest = true;
-            opts.heuristic = (window as any).astar.heuristics.diagonal;
+            opts.heuristic = (window as *).astar.heuristics.diagonal;
             
             //初始化移动单元
             moveSprite3D = scene.addChild(new Sprite3D()) as Sprite3D;
@@ -133,92 +142,98 @@ package LayaAir3D_Advance {
             Laya.stage.on(Event.MOUSE_UP, this, function():void {
                 index = 0;
                 //获取每次生成路径
-                var startPoint:Object = getGridIndex(path[curPathIndex % pointCount].x, path[curPathIndex++ % pointCount].z);
-                var endPoint:Object = this.getGridIndex(path[nextPathIndex % pointCount].x, path[nextPathIndex++ % pointCount].z);
-                var start:Object = graph.grid[startPoint.x][startPoint.z];
-                var end:Object = this.graph.grid[endPoint.x][endPoint.z];
-                
-                _everyPath = (window as any).astar.search(graph, start, end, {closest: opts.closest});
-                if (_everyPath && _everyPath.length > 0) {
-                    resPath = getRealPosition(start, _everyPath);
-                }
+				getGridIndex(path[curPathIndex % pointCount].x, path[curPathIndex++ % pointCount].z, startPoint);
+				getGridIndex(path[nextPathIndex % pointCount].x, path[nextPathIndex++ % pointCount].z, endPoint);
+				var start = graph.grid[startPoint.x][startPoint.y];   
+				var end = graph.grid[endPoint.x][endPoint.y];       		
+
+				_everyPath = (window as *).astar.search(graph, start, end, {
+					closest: opts.closest
+				});
+				if (_everyPath && _everyPath.length > 0) {
+					getRealPosition(start, _everyPath);
+				}
             });
             //开启定时重复执行
             Laya.timer.loop(40, this, loopfun);
         }
         
         private function loopfun():void {
-            if (resPath && index < resPath.length) {
-                //AStar寻路位置
-                _position.x = resPath[index].x;
-                _position.z = resPath[index++].z;
-                //HeightMap获取高度数据
-                _position.y = terrainSprite.getHeight(_position.x, _position.z);
-                if (isNaN(_position.y)) {
-                    _position.y = moveSprite3D.transform.position.y;
-                }
-				
-				//在出发前进行姿态的调整
-				if(index === 1){
-					//调整方向
-					_tarPosition.x = resPath[resPath.length -1].x;
-					_tarPosition.z = resPath[resPath.length -1].z;
-					_tarPosition.y = moveSprite3D.transform.position.y;
-					layaMonkey.transform.lookAt(_tarPosition, _upVector3, false);
-					//因为资源规格,这里需要旋转180度
-					layaMonkey.transform.rotate(_rotation2, false, false);
+            if (resPath && index < resPathLength) {
+				//AStar寻路位置
+				_position.x = resPath[index].x;
+				_position.z = resPath[index++].y;
+				//HeightMap获取高度数据
+				_position.y = terrainSprite.getHeight(_position.x, _position.z);
+				if (isNaN(_position.y)) {
+					_position.y = moveSprite3D.transform.position.y;
 				}
-               
-                //调整位置
-                Tween.to(_finalPosition, {x: _position.x, y: _position.y, z: _position.z}, 40);
-                moveSprite3D.transform.position = _finalPosition;
+
+				_tarPosition.x = _position.x;
+				_tarPosition.z = _position.z;
+				_tarPosition.y = moveSprite3D.transform.position.y;
+
+				//调整方向
+				layaMonkey.transform.lookAt(_tarPosition, _upVector3, false);
+				//因为资源规格,这里需要旋转180度
+				layaMonkey.transform.rotate(_rotation2, false, false);
+				//调整位置
+				Tween.to(_finalPosition, { x: _position.x, y: _position.y, z: _position.z }, 40);
+				moveSprite3D.transform.position = _finalPosition;
             }
         }
         
         /**
          * 得到整数的网格索引
          */
-        private function getGridIndex(x, z):* {
-            var minX:int = terrainSprite.minX;
-            var minZ:int = terrainSprite.minZ;
-            var cellX:Number = terrainSprite.width / aStarMap.width;
-            var cellZ:Number = terrainSprite.depth / aStarMap.height;
-            var gridX:int = Math.floor((x - minX) / cellX);
-            var gridZ:int = Math.floor((z - minZ) / cellZ);
-            var boundWidth:int = aStarMap.width - 1;
-            var boundHeight:int = aStarMap.height - 1;
-            (gridX > boundWidth) && (gridX = boundWidth);
-            (gridZ > boundHeight) && (gridZ = boundHeight);
-            (gridX < 0) && (gridX = 0);
-            (gridZ < 0) && (gridZ = 0);
-            var res:* = {};
-            res.x = gridX;
-            res.z = gridZ;
-            return res;
+       private function getGridIndex(x:Number, z:Number, out:Vector2) {
+            var minX = terrainSprite.minX;
+			var minZ = terrainSprite.minZ;
+			var cellX = terrainSprite.width / aStarMap.width;
+			var cellZ = terrainSprite.depth / aStarMap.height;
+			var gridX = Math.floor((x - minX) / cellX);
+			var gridZ = Math.floor((z - minZ) / cellZ);
+			var boundWidth = aStarMap.width - 1;
+			var boundHeight = aStarMap.height - 1;
+			(gridX > boundWidth) && (gridX = boundWidth);
+			(gridZ > boundHeight) && (gridZ = boundHeight);
+			(gridX < 0) && (gridX = 0);
+			(gridZ < 0) && (gridZ = 0);
+			out.x = gridX;
+			out.y = gridZ;
         }
         
         /**
          * 得到世界坐标系下的真实坐标
          */
-        private function getRealPosition(start, path):Array{
-            var resPath:Array = new Array;
-            var minX:Number = terrainSprite.minX;
-            var minZ:Number = terrainSprite.minZ;
-            var cellX:Number = terrainSprite.width / aStarMap.width;
-            var cellZ:Number = terrainSprite.depth / aStarMap.height;
-            var halfCellX:Number = cellX / 2;
-            var halfCellZ:Number = cellZ / 2;
-            resPath[0] = {};
-            resPath[0].x = start.x * cellX + halfCellX + minX;
-            resPath[0].z = start.y * cellZ + halfCellZ + minZ;
-            for (var i = 1; i < path.length; i++) {
-                var gridPos:* = path[i];
-                resPath[i] = {};
-                resPath[i].x = gridPos.x * cellX + halfCellX + minX;
-                resPath[i].z = gridPos.y * cellZ + halfCellZ + minZ;
-            }
-            return resPath;
-        }
+        private function getRealPosition(start, path): Number {
+			resPathLength = path.length;
+			var minX = terrainSprite.minX;
+			var minZ = terrainSprite.minZ;
+			var cellX = terrainSprite.width / aStarMap.width;
+			var cellZ = terrainSprite.depth / aStarMap.height;
+			var halfCellX = cellX / 2;
+			var halfCellZ = cellZ / 2;
+
+			resPath[0].x = start.x * cellX + halfCellX + minX;
+			resPath[0].y = start.y * cellZ + halfCellZ + minZ;
+
+			if(resPath.length < path.length ){
+				var diff:number = path.length - resPath.length;
+				for(var j:Number = 0; j < diff; ++j){
+					var newPoint:Vector2 = new Vector2();
+					resPath.push(newPoint);
+				}
+				
+			}
+
+			for (var i = 1; i < path.length; i++) {
+				var gridPos = path[i];
+				resPath[i].x = gridPos.x * cellX + halfCellX + minX;
+				resPath[i].y = gridPos.y * cellZ + halfCellZ + minZ;
+			}
+			return 0;
+		}
         
         /**
          * 通过图片数据计算得到AStart网格

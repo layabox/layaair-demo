@@ -5579,11 +5579,11 @@
 	    constructor() {
 	        super();
 	        this.maskLayer = new Laya.Sprite();
-	        this.popupEffect = function (dialog) {
+	        this.popupEffect = (dialog) => {
 	            dialog.scale(1, 1);
 	            dialog._effectTween = Laya.Tween.from(dialog, { x: Laya.ILaya.stage.width / 2, y: Laya.ILaya.stage.height / 2, scaleX: 0, scaleY: 0 }, 300, Laya.Ease.backOut, Laya.Handler.create(this, this.doOpen, [dialog]), 0, false, false);
 	        };
-	        this.closeEffect = function (dialog) {
+	        this.closeEffect = (dialog) => {
 	            dialog._effectTween = Laya.Tween.to(dialog, { x: Laya.ILaya.stage.width / 2, y: Laya.ILaya.stage.height / 2, scaleX: 0, scaleY: 0 }, 300, Laya.Ease.strongOut, Laya.Handler.create(this, this.doClose, [dialog]), 0, false, false);
 	        };
 	        this.popupEffectHandler = new Laya.Handler(this, this.popupEffect);
@@ -5986,7 +5986,7 @@
 	        this.callLater(this._postMsg);
 	    }
 	    get height() {
-	        return super.width;
+	        return super.height;
 	    }
 	    set x(value) {
 	        super.x = value;

@@ -30,8 +30,6 @@ package LayaAir3D_Mesh {
 		private var lineSprite3D:Sprite3D;
 		
 		public function CustomMesh() {
-			
-			Shader3D.debugMode = true;
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;

@@ -294,7 +294,8 @@
 					["DirectionLightDemo", "DirectionLight", "", "core,ani,d3,CameraMoveScript.js"],
 					["PointLightDemo", "PointLight", "", "core,ani,d3,CameraMoveScript.js"],
 					["SpotLightDemo", "SpotLight", "", "core,ani,d3,CameraMoveScript.js" ],
-					["RealTimeShadow", "RealTimeShadow", "", "core,ani,d3,CameraMoveScript.js" ]
+					["RealTimeShadow", "RealTimeShadow", "", "core,ani,d3,CameraMoveScript.js" ],
+					["MultiLight", "MultiLight", "", "core,ani,d3,CameraMoveScript.js,physics3D"]
 				]
 			},
 	
@@ -382,9 +383,9 @@
 			},
 			{
 				"prefix": "Script",
-				"tr_zhCN": "脚本",
+				"tr_zhCN": "Script",
 				"manifest": [
-					["ScriptDemo", "脚本示例", "", "core,ani,d3,CameraMoveScript.js"]
+					["ScriptDemo", "ScriptDemo", "", "core,ani,d3,CameraMoveScript.js"]
 				]
 			},
 			{
@@ -406,7 +407,7 @@
 			},
 			{
 				"prefix": "Trail",
-				"tr_zhCN": "拖尾系统",
+				"tr_zhCN": "Trail",
 				"manifest": [
 					[ "TrailRender", "TrailRender", "", "core,ani,d3"]
 				]
@@ -423,7 +424,7 @@
 			},
 			{
 				"prefix": "Performance",
-				"tr_zhCN": "性能测试",
+				"tr_zhCN": "Performance",
 				"manifest": [
 					["StaticBatchingTest", "StaticBatchingTest", "", "core,d3,ui,CameraMoveScript.js,physics3D"],
 					["DynamicBatchTest", "DynamicBatchTest", "", "core,d3,ui,CameraMoveScript.js,physics3D"]
@@ -439,7 +440,8 @@
 					["PBRDemo", "PBRDemo", "", "core,ani,d3,CameraMoveScript.js" ],
 					["Scene2DPlayer3D", "Scene2DPlayer3D", "", "core,ani,d3,ui,CameraMoveScript.js" ],
 					["Secne3DPlayer2D", "Secne3DPlayer2D", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
-					[ "PostProcessBloom", "PostProcessBloom", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ]
+					[ "PostProcessBloom", "PostProcessBloom", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
+					[ "DrawTextTexture", "3D文字纹理", "", "core,ani,d3,ui,CameraMoveScript.js" ]
 		  		]
 			},
 			{
