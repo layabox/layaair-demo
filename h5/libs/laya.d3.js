@@ -5894,11 +5894,23 @@
 	    }
 	}
 
-	class ShaderVariantInfo {
+	class ShaderVariant {
 	    constructor(shader, subShaderIndex, passIndex, defines) {
 	        this._subShaderIndex = 0;
 	        this._passIndex = 0;
 	        this.setValue(shader, subShaderIndex, passIndex, defines);
+	    }
+	    get shader() {
+	        return this._shader;
+	    }
+	    get subShaderIndex() {
+	        return this._subShaderIndex;
+	    }
+	    get passIndex() {
+	        return this._passIndex;
+	    }
+	    get defineNames() {
+	        return this._defineNames;
 	    }
 	    setValue(shader, subShaderIndex, passIndex, defineNames) {
 	        if (shader) {
@@ -5944,11 +5956,11 @@
 	        }
 	    }
 	    clone() {
-	        var dest = new ShaderVariantInfo(this._shader, this._subShaderIndex, this._passIndex, this._defineNames.slice());
+	        var dest = new ShaderVariant(this._shader, this._subShaderIndex, this._passIndex, this._defineNames.slice());
 	        return dest;
 	    }
 	}
-	class ShaderVariantInfoCollection {
+	class ShaderVariantCollection {
 	    constructor() {
 	        this._allCompiled = false;
 	        this._variants = [];
@@ -5983,6 +5995,9 @@
 	                return true;
 	        }
 	        return false;
+	    }
+	    getByIndex(index) {
+	        return this._variants[index];
 	    }
 	    clear() {
 	        this._variants.length = 0;
@@ -6090,6 +6105,9 @@
 	    static find(name) {
 	        return Shader3D._preCompileShader[name];
 	    }
+	    get name() {
+	        return this._name;
+	    }
 	    addSubShader(subShader) {
 	        this._subShaders.push(subShader);
 	        subShader._owner = this;
@@ -6153,7 +6171,7 @@
 	Shader3D._preCompileShader = {};
 	Shader3D._maskMap = [];
 	Shader3D.debugMode = true;
-	Shader3D.debugShaderVariantInfoCollection = new ShaderVariantInfoCollection();
+	Shader3D.debugShaderVariantCollection = new ShaderVariantCollection();
 
 	class ShaderData {
 	    constructor(ownerResource = null) {
@@ -12528,20 +12546,18 @@
 	        this.height = height;
 	    }
 	    project(source, matrix, out) {
-	        var sX = source.x;
-	        var sY = source.y;
-	        var sZ = source.z;
-	        Vector3.transformV3ToV3(source, matrix, out);
-	        var matE = matrix.elements;
-	        var a = (((sX * matE[3]) + (sY * matE[7])) + (sZ * matE[11])) + matE[15];
-	        if (a !== 1.0) {
-	            out.x = out.x / a;
-	            out.y = out.y / a;
-	            out.z = out.z / a;
+	        var vec4 = Viewport._tempVector4;
+	        Vector3.transformV3ToV4(source, matrix, vec4);
+	        var w = vec4.w;
+	        if (w !== 1.0) {
+	            out.x = vec4.x / w;
+	            out.y = vec4.y / w;
+	            out.z = vec4.z / w;
 	        }
-	        out.x = (((out.x + 1.0) * 0.5) * this.width) + this.x;
-	        out.y = (((-out.y + 1.0) * 0.5) * this.height) + this.y;
-	        out.z = (out.z * (this.maxDepth - this.minDepth)) + this.minDepth;
+	        out.x = (out.x + 1.0) * 0.5 * this.width + this.x;
+	        out.y = (-out.y + 1.0) * 0.5 * this.height + this.y;
+	        out.z = out.z * (this.maxDepth - this.minDepth) + this.minDepth;
+	        out.w = w;
 	    }
 	    unprojectFromMat(source, matrix, out) {
 	        var matrixEleme = matrix.elements;
@@ -12573,6 +12589,7 @@
 	    }
 	}
 	Viewport._tempMatrix4x4 = new Matrix4x4();
+	Viewport._tempVector4 = new Vector4();
 
 	class Picker {
 	    constructor() {
@@ -13811,6 +13828,7 @@
 	                FrustumCulling.renderObjectCulling(smCamera, scene, context, shader, replacementTag, true);
 	                var shadowMap = parallelSplitShadowMap.cameras[i + 1].renderTarget;
 	                shadowMap._start();
+	                RenderContext3D._instance.invertY = false;
 	                context.camera = smCamera;
 	                Camera._updateMark++;
 	                context.viewport = smCamera.viewport;
@@ -24581,6 +24599,7 @@
 	        this._reflectionMode = 1;
 	        this._input = new Input3D();
 	        this._timer = Laya.ILaya.timer;
+	        this._time = 0;
 	        this._collsionTestList = [];
 	        this._renders = new SimpleSingletonList();
 	        this._opaqueQueue = new RenderQueue(false);
@@ -24593,7 +24612,6 @@
 	        this.currentCreationLayer = Math.pow(2, 0);
 	        this.enableLight = true;
 	        this._key = new Laya.SubmitKey();
-	        this._time = 0;
 	        this._pickIdToSprite = new Object();
 	        if (Physics3D._enablePhysics)
 	            this._physicsSimulation = new PhysicsSimulation(Scene3D.physicsSettings);
@@ -25091,7 +25109,7 @@
 	            case BaseCamera.CLEARFLAG_NONE:
 	                break;
 	            default:
-	                throw new Error("BaseScene:camera clearFlag invalid.");
+	                throw new Error("Scene3D:camera clearFlag invalid.");
 	        }
 	    }
 	    _renderScene(context) {
@@ -25350,36 +25368,34 @@
 	    _computeSkinnedData() {
 	        if (this._cacheMesh && this._cacheAvatar || this._cacheMesh && !this._cacheAvatar) {
 	            var bindPoses = this._cacheMesh._inverseBindPoses;
-	            var meshBindPoseIndices = this._cacheMesh._bindPoseIndices;
-	            var pathMarks = this._cacheMesh._skinDataPathMarks;
+	            var pathMarks = this._cacheMesh._skinnedMatrixCaches;
 	            for (var i = 0, n = this._cacheMesh.subMeshCount; i < n; i++) {
 	                var subMeshBoneIndices = this._cacheMesh.getSubMesh(i)._boneIndicesList;
 	                var subData = this._skinnedData[i];
 	                for (var j = 0, m = subMeshBoneIndices.length; j < m; j++) {
 	                    var boneIndices = subMeshBoneIndices[j];
-	                    this._computeSubSkinnedData(bindPoses, boneIndices, meshBindPoseIndices, subData[j], pathMarks);
+	                    this._computeSubSkinnedData(bindPoses, boneIndices, subData[j], pathMarks);
 	                }
 	            }
 	        }
 	    }
-	    _computeSubSkinnedData(bindPoses, boneIndices, meshBindPoseInices, data, pathMarks) {
+	    _computeSubSkinnedData(bindPoses, boneIndices, data, matrixCaches) {
 	        for (var k = 0, q = boneIndices.length; k < q; k++) {
 	            var index = boneIndices[k];
 	            if (this._skinnedDataLoopMarks[index] === Laya.Stat.loopCount) {
-	                var p = pathMarks[index];
-	                var preData = this._skinnedData[p[0]][p[1]];
-	                var srcIndex = p[2] * 16;
+	                var c = matrixCaches[index];
+	                var preData = this._skinnedData[c.subMeshIndex][c.batchIndex];
+	                var srcIndex = c.batchBoneIndex * 16;
 	                var dstIndex = k * 16;
 	                for (var d = 0; d < 16; d++)
 	                    data[dstIndex + d] = preData[srcIndex + d];
 	            }
 	            else {
 	                if (!this._cacheAvatar) {
-	                    var boneIndex = meshBindPoseInices[index];
-	                    Utils3D._mulMatrixArray(this._bones[boneIndex].transform.worldMatrix.elements, bindPoses[boneIndex], data, k * 16);
+	                    Utils3D._mulMatrixArray(this._bones[index].transform.worldMatrix.elements, bindPoses[index], data, k * 16);
 	                }
 	                else {
-	                    Utils3D._mulMatrixArray(this._cacheAnimationNode[index].transform.getWorldMatrix(), bindPoses[meshBindPoseInices[index]], data, k * 16);
+	                    Utils3D._mulMatrixArray(this._cacheAnimationNode[index].transform.getWorldMatrix(), bindPoses[index], data, k * 16);
 	                }
 	                this._skinnedDataLoopMarks[index] = Laya.Stat.loopCount;
 	            }
@@ -25409,7 +25425,7 @@
 	        this._cacheMesh = value;
 	        var subMeshCount = value.subMeshCount;
 	        this._skinnedData = [];
-	        this._skinnedDataLoopMarks.length = value._bindPoseIndices.length;
+	        this._skinnedDataLoopMarks.length = value._inverseBindPoses.length;
 	        for (var i = 0; i < subMeshCount; i++) {
 	            var subBoneIndices = value.getSubMesh(i)._boneIndicesList;
 	            var subCount = subBoneIndices.length;
@@ -25526,13 +25542,12 @@
 	    }
 	    _getCacheAnimationNodes() {
 	        var meshBoneNames = this._cacheMesh._boneNames;
-	        var bindPoseIndices = this._cacheMesh._bindPoseIndices;
-	        var innerBindPoseCount = bindPoseIndices.length;
+	        var innerBindPoseCount = this._cacheMesh._inverseBindPoses.length;
 	        if (!Laya.Render.supportWebGLPlusAnimation) {
 	            this._cacheAnimationNode.length = innerBindPoseCount;
 	            var nodeMap = this._cacheAnimator._avatarNodeMap;
 	            for (var i = 0; i < innerBindPoseCount; i++) {
-	                var node = nodeMap[meshBoneNames[bindPoseIndices[i]]];
+	                var node = nodeMap[meshBoneNames[i]];
 	                this._cacheAnimationNode[i] = node;
 	            }
 	        }
@@ -25540,7 +25555,7 @@
 	            this._cacheAnimationNodeIndices = new Uint16Array(innerBindPoseCount);
 	            var nodeMapC = this._cacheAnimator._avatarNodeMap;
 	            for (i = 0; i < innerBindPoseCount; i++) {
-	                var nodeC = nodeMapC[meshBoneNames[bindPoseIndices[i]]];
+	                var nodeC = nodeMapC[meshBoneNames[i]];
 	                this._cacheAnimationNodeIndices[i] = nodeC ? nodeC._worldMatrixIndex : 0;
 	            }
 	        }
@@ -25560,23 +25575,22 @@
 	            this._setRootNode();
 	        }
 	    }
-	    _computeSubSkinnedDataNative(worldMatrixs, cacheAnimationNodeIndices, inverseBindPosesBuffer, boneIndices, bindPoseInices, data) {
-	        Laya.LayaGL.instance.computeSubSkinnedData(worldMatrixs, cacheAnimationNodeIndices, inverseBindPosesBuffer, boneIndices, bindPoseInices, data);
+	    _computeSubSkinnedDataNative(worldMatrixs, cacheAnimationNodeIndices, inverseBindPosesBuffer, boneIndices, data) {
+	        Laya.LayaGL.instance.computeSubSkinnedData(worldMatrixs, cacheAnimationNodeIndices, inverseBindPosesBuffer, boneIndices, data);
 	    }
 	    _computeSkinnedDataForNative() {
 	        if (this._cacheMesh && this._cacheAvatar || this._cacheMesh && !this._cacheAvatar) {
 	            var bindPoses = this._cacheMesh._inverseBindPoses;
-	            var meshBindPoseIndices = this._cacheMesh._bindPoseIndices;
-	            var pathMarks = this._cacheMesh._skinDataPathMarks;
+	            var pathMarks = this._cacheMesh._skinnedMatrixCaches;
 	            for (var i = 0, n = this._cacheMesh.subMeshCount; i < n; i++) {
 	                var subMeshBoneIndices = this._cacheMesh.getSubMesh(i)._boneIndicesList;
 	                var subData = this._skinnedData[i];
 	                for (var j = 0, m = subMeshBoneIndices.length; j < m; j++) {
 	                    var boneIndices = subMeshBoneIndices[j];
 	                    if (this._cacheAvatar && Laya.Render.supportWebGLPlusAnimation)
-	                        this._computeSubSkinnedDataNative(this._cacheAnimator._animationNodeWorldMatrixs, this._cacheAnimationNodeIndices, this._cacheMesh._inverseBindPosesBuffer, boneIndices, meshBindPoseIndices, subData[j]);
+	                        this._computeSubSkinnedDataNative(this._cacheAnimator._animationNodeWorldMatrixs, this._cacheAnimationNodeIndices, this._cacheMesh._inverseBindPosesBuffer, boneIndices, subData[j]);
 	                    else
-	                        this._computeSubSkinnedData(bindPoses, boneIndices, meshBindPoseIndices, subData[j], pathMarks);
+	                        this._computeSubSkinnedData(bindPoses, boneIndices, subData[j], pathMarks);
 	                }
 	            }
 	        }
@@ -27310,8 +27324,6 @@
 	            else
 	                fn.call(null);
 	        }
-	        LoadModelV04._mesh._bindPoseIndices = new Uint16Array(LoadModelV04._bindPoseIndices);
-	        LoadModelV04._bindPoseIndices.length = 0;
 	        LoadModelV04._strings.length = 0;
 	        LoadModelV04._readData = null;
 	        LoadModelV04._version = null;
@@ -27427,26 +27439,19 @@
 	        subIndexBufferStart.length = drawCount;
 	        subIndexBufferCount.length = drawCount;
 	        boneIndicesList.length = drawCount;
-	        var pathMarks = LoadModelV04._mesh._skinDataPathMarks;
-	        var bindPoseIndices = LoadModelV04._bindPoseIndices;
+	        var skinnedCache = LoadModelV04._mesh._skinnedMatrixCaches;
 	        var subMeshIndex = LoadModelV04._subMeshes.length;
+	        skinnedCache.length = LoadModelV04._mesh._inverseBindPoses.length;
 	        for (var i = 0; i < drawCount; i++) {
 	            subIndexBufferStart[i] = LoadModelV04._readData.getUint32();
 	            subIndexBufferCount[i] = LoadModelV04._readData.getUint32();
 	            var boneDicofs = LoadModelV04._readData.getUint32();
 	            var boneDicCount = LoadModelV04._readData.getUint32();
 	            var boneIndices = boneIndicesList[i] = new Uint16Array(arrayBuffer.slice(offset + boneDicofs, offset + boneDicofs + boneDicCount));
-	            for (var j = 0, m = boneIndices.length; j < m; j++) {
+	            var boneIndexCount = boneIndices.length;
+	            for (var j = 0; j < boneIndexCount; j++) {
 	                var index = boneIndices[j];
-	                var combineIndex = bindPoseIndices.indexOf(index);
-	                if (combineIndex === -1) {
-	                    boneIndices[j] = bindPoseIndices.length;
-	                    bindPoseIndices.push(index);
-	                    pathMarks.push([subMeshIndex, i, j]);
-	                }
-	                else {
-	                    boneIndices[j] = combineIndex;
-	                }
+	                skinnedCache[index] || (skinnedCache[index] = new skinnedMatrixCache(subMeshIndex, i, j));
 	            }
 	        }
 	        LoadModelV04._subMeshes.push(subMesh);
@@ -27456,7 +27461,6 @@
 	LoadModelV04._BLOCK = { count: 0 };
 	LoadModelV04._DATA = { offset: 0, size: 0 };
 	LoadModelV04._strings = [];
-	LoadModelV04._bindPoseIndices = [];
 
 	class LoadModelV05 {
 	    static parse(readData, version, mesh, subMeshes) {
@@ -27477,8 +27481,6 @@
 	            else
 	                fn.call(null);
 	        }
-	        LoadModelV05._mesh._bindPoseIndices = new Uint16Array(LoadModelV05._bindPoseIndices);
-	        LoadModelV05._bindPoseIndices.length = 0;
 	        LoadModelV05._strings.length = 0;
 	        LoadModelV05._readData = null;
 	        LoadModelV05._version = null;
@@ -27674,9 +27676,9 @@
 	        subIndexBufferStart.length = drawCount;
 	        subIndexBufferCount.length = drawCount;
 	        boneIndicesList.length = drawCount;
-	        var pathMarks = LoadModelV05._mesh._skinDataPathMarks;
-	        var bindPoseIndices = LoadModelV05._bindPoseIndices;
+	        var skinnedCache = LoadModelV05._mesh._skinnedMatrixCaches;
 	        var subMeshIndex = LoadModelV05._subMeshes.length;
+	        skinnedCache.length = LoadModelV05._mesh._inverseBindPoses.length;
 	        for (var i = 0; i < drawCount; i++) {
 	            subIndexBufferStart[i] = reader.getUint32();
 	            subIndexBufferCount[i] = reader.getUint32();
@@ -27685,15 +27687,7 @@
 	            var boneIndices = boneIndicesList[i] = new Uint16Array(arrayBuffer.slice(offset + boneDicofs, offset + boneDicofs + boneDicCount));
 	            for (var j = 0, m = boneIndices.length; j < m; j++) {
 	                var index = boneIndices[j];
-	                var combineIndex = bindPoseIndices.indexOf(index);
-	                if (combineIndex === -1) {
-	                    boneIndices[j] = bindPoseIndices.length;
-	                    bindPoseIndices.push(index);
-	                    pathMarks.push([subMeshIndex, i, j]);
-	                }
-	                else {
-	                    boneIndices[j] = combineIndex;
-	                }
+	                skinnedCache[index] || (skinnedCache[index] = new skinnedMatrixCache(subMeshIndex, i, j));
 	            }
 	        }
 	        LoadModelV05._subMeshes.push(subMesh);
@@ -27703,7 +27697,6 @@
 	LoadModelV05._BLOCK = { count: 0 };
 	LoadModelV05._DATA = { offset: 0, size: 0 };
 	LoadModelV05._strings = [];
-	LoadModelV05._bindPoseIndices = [];
 
 	class MeshReader {
 	    constructor() {
@@ -27729,6 +27722,13 @@
 	    }
 	}
 
+	class skinnedMatrixCache {
+	    constructor(subMeshIndex, batchIndex, batchBoneIndex) {
+	        this.subMeshIndex = subMeshIndex;
+	        this.batchIndex = batchIndex;
+	        this.batchBoneIndex = batchBoneIndex;
+	    }
+	}
 	class Mesh extends Laya.Resource {
 	    constructor(isReadable = true) {
 	        super();
@@ -27743,11 +27743,11 @@
 	        this._instanceBufferState = new BufferState();
 	        this._vertexBuffer = null;
 	        this._indexBuffer = null;
+	        this._skinnedMatrixCaches = [];
 	        this._vertexCount = 0;
 	        this._indexFormat = exports.IndexFormat.UInt16;
 	        this._isReadable = isReadable;
 	        this._subMeshes = [];
-	        this._skinDataPathMarks = [];
 	    }
 	    static __init__() {
 	        var physics3D = Physics3D._bullet;
@@ -28208,9 +28208,12 @@
 	        var destInverseBindPoses = destMesh._inverseBindPoses = [];
 	        for (i = 0; i < inverseBindPoses.length; i++)
 	            destInverseBindPoses[i] = inverseBindPoses[i];
-	        destMesh._bindPoseIndices = new Uint16Array(this._bindPoseIndices);
-	        for (i = 0; i < this._skinDataPathMarks.length; i++)
-	            destMesh._skinDataPathMarks[i] = this._skinDataPathMarks[i].slice();
+	        var cacheLength = this._skinnedMatrixCaches.length;
+	        destMesh._skinnedMatrixCaches.length = cacheLength;
+	        for (i = 0; i < cacheLength; i++) {
+	            var skinnedCache = this._skinnedMatrixCaches[i];
+	            destMesh._skinnedMatrixCaches[i] = new skinnedMatrixCache(skinnedCache.subMeshIndex, skinnedCache.batchIndex, skinnedCache.batchBoneIndex);
+	        }
 	        for (i = 0; i < this.subMeshCount; i++) {
 	            var subMesh = this._subMeshes[i];
 	            var subIndexBufferStart = subMesh._subIndexBufferStart;
@@ -29547,8 +29550,8 @@
 	        if (dbugShaderVariantInfo)
 	            dbugShaderVariantInfo.setValue(debugShader, debugShader._subShaders.indexOf(debugSubShader), debugSubShader._passes.indexOf(this), deugDefines);
 	        else
-	            Shader3D._debugShaderVariantInfo = dbugShaderVariantInfo = new ShaderVariantInfo(debugShader, debugShader._subShaders.indexOf(debugSubShader), debugSubShader._passes.indexOf(this), deugDefines);
-	        Shader3D.debugShaderVariantInfoCollection.add(dbugShaderVariantInfo);
+	            Shader3D._debugShaderVariantInfo = dbugShaderVariantInfo = new ShaderVariant(debugShader, debugShader._subShaders.indexOf(debugSubShader), debugSubShader._passes.indexOf(this), deugDefines);
+	        Shader3D.debugShaderVariantCollection.add(dbugShaderVariantInfo);
 	    }
 	    withCompile(compileDefine) {
 	        compileDefine._intersectionDefineDatas(this._validDefine);
@@ -31789,19 +31792,6 @@
 	        Laya.Laya.stage.offAllCaller(this);
 	        this.onDisable();
 	    }
-	    _isScript() {
-	        return true;
-	    }
-	    _onAdded() {
-	        var sprite = this.owner;
-	        var scripts = sprite._scripts;
-	        scripts || (sprite._scripts = scripts = []);
-	        scripts.push(this);
-	        if (!sprite._needProcessCollisions)
-	            sprite._needProcessCollisions = this._checkProcessCollisions();
-	        if (!sprite._needProcessTriggers)
-	            sprite._needProcessTriggers = this._checkProcessTriggers();
-	    }
 	    _onDestroy() {
 	        var scripts = this.owner._scripts;
 	        scripts.splice(scripts.indexOf(this), 1);
@@ -31821,6 +31811,19 @@
 	            }
 	        }
 	        this.onDestroy();
+	    }
+	    _isScript() {
+	        return true;
+	    }
+	    _onAdded() {
+	        var sprite = this.owner;
+	        var scripts = sprite._scripts;
+	        scripts || (sprite._scripts = scripts = []);
+	        scripts.push(this);
+	        if (!sprite._needProcessCollisions)
+	            sprite._needProcessCollisions = this._checkProcessCollisions();
+	        if (!sprite._needProcessTriggers)
+	            sprite._needProcessTriggers = this._checkProcessTriggers();
 	    }
 	    onAwake() {
 	    }
@@ -32723,8 +32726,8 @@
 	exports.ShaderInstance = ShaderInstance;
 	exports.ShaderPass = ShaderPass;
 	exports.ShaderVariable = ShaderVariable;
-	exports.ShaderVariantInfo = ShaderVariantInfo;
-	exports.ShaderVariantInfoCollection = ShaderVariantInfoCollection;
+	exports.ShaderVariant = ShaderVariant;
+	exports.ShaderVariantCollection = ShaderVariantCollection;
 	exports.ShapeUtils = ShapeUtils;
 	exports.ShuriKenParticle3D = ShuriKenParticle3D;
 	exports.ShuriKenParticle3DShaderDeclaration = ShuriKenParticle3DShaderDeclaration;
@@ -32791,5 +32794,6 @@
 	exports.VertexTrail = VertexTrail;
 	exports.Viewport = Viewport;
 	exports.WaterPrimaryMaterial = WaterPrimaryMaterial;
+	exports.skinnedMatrixCache = skinnedMatrixCache;
 
 }(window.Laya = window.Laya || {}, Laya));

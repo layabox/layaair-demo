@@ -1,6 +1,6 @@
-class CustomMaterial extends Laya.BaseMaterial{
+class CustomMaterial extends Laya.Material{
     constructor(){
-        super(3);
+        super();
         this.setShaderName("CustomShader");
     }
     //漫反射贴图的存取函数
