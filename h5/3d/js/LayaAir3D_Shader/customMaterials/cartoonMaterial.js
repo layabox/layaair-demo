@@ -1,4 +1,4 @@
-class CartoonMaterial extends Laya.BaseMaterial {
+class CartoonMaterial extends Laya.Material {
 	/**
 	 * @private
 	 */

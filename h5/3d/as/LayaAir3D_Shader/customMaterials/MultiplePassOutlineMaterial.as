@@ -16,7 +16,7 @@ package LayaAir3D_Shader.customMaterials {
 	 * ...
 	 * @author ...
 	 */
-	public class MultiplePassOutlineMaterial extends BaseMaterial {
+	public class MultiplePassOutlineMaterial extends Material {
 		public static const ALBEDOTEXTURE:int = Shader3D.propertyNameToID("u_AlbedoTexture");
 		public static const OUTLINECOLOR:int = Shader3D.propertyNameToID("u_OutlineColor");
 		public static const OUTLINEWIDTH:int = Shader3D.propertyNameToID("u_OutlineWidth");

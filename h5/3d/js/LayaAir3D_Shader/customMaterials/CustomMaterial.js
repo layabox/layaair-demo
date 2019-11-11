@@ -1,4 +1,4 @@
-class CustomMaterial extends Laya.BaseMaterial{
+class CustomMaterial extends Laya.Material{
     constructor(){
         super();
         this.setShaderName("CustomShader");

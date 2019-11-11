@@ -1,4 +1,4 @@
-class CustomTerrainMaterial extends Laya.BaseMaterial{
+class CustomTerrainMaterial extends Laya.Material{
     constructor(){
         super(11);
         this.setShaderName("CustomTerrainShader");

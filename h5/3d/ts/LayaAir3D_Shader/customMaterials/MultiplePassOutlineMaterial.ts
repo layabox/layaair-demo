@@ -1,4 +1,4 @@
-export default class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
+export default class  MultiplePassOutlineMaterial extends Laya.Material {
 		public static ALBEDOTEXTURE = Laya.Shader3D.propertyNameToID("u_AlbedoTexture");
 		public static MARGINALCOLOR = Laya.Shader3D.propertyNameToID("u_marginalColor");
 		public static OUTLINETEXTURE = Laya.Shader3D.propertyNameToID("u_OutlineTexture");

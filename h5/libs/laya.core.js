@@ -1386,6 +1386,11 @@ window.Laya= (function (exports) {
     Resource._gpuMemory = 0;
 
     class Bitmap extends Resource {
+        constructor() {
+            super();
+            this._width = -1;
+            this._height = -1;
+        }
         get width() {
             return this._width;
         }
@@ -1397,11 +1402,6 @@ window.Laya= (function (exports) {
         }
         set height(height) {
             this._height = height;
-        }
-        constructor() {
-            super();
-            this._width = -1;
-            this._height = -1;
         }
         _getSource() {
             throw "Bitmap: must override it.";
@@ -1673,15 +1673,20 @@ window.Laya= (function (exports) {
             this._setWarpMode(gl.TEXTURE_WRAP_T, this._wrapModeV);
             this._setFilterMode(this._filterMode);
             this._setAnisotropy(this._anisoLevel);
-            if (this._mipmap) {
-                this._mipmapCount = Math.max(Math.ceil(Math.log2(width)) + 1, Math.ceil(Math.log2(height)) + 1);
-                for (var i = 0; i < this._mipmapCount; i++)
-                    this._setPixels(null, i, Math.max(width >> i, 1), Math.max(height >> i, 1));
+            var compress = this._gpuCompressFormat();
+            if (mipmap) {
+                var mipCount = Math.max(Math.ceil(Math.log2(width)) + 1, Math.ceil(Math.log2(height)) + 1);
+                if (!compress) {
+                    for (var i = 0; i < mipCount; i++)
+                        this._setPixels(null, i, Math.max(width >> i, 1), Math.max(height >> i, 1));
+                }
+                this._mipmapCount = mipCount;
                 this._setGPUMemory(width * height * 4 * (1 + 1 / 3));
             }
             else {
+                if (!compress)
+                    this._setPixels(null, 0, width, height);
                 this._mipmapCount = 1;
-                this._setPixels(null, 0, width, height);
                 this._setGPUMemory(width * height * 4);
             }
         }
@@ -1738,6 +1743,12 @@ window.Laya= (function (exports) {
         }
         get defaulteTexture() {
             return Texture2D.grayTexture;
+        }
+        _gpuCompressFormat() {
+            return this._format == exports.TextureFormat.DXT1 || this._format == exports.TextureFormat.DXT5 ||
+                this._format == exports.TextureFormat.ETC1RGB ||
+                this._format == exports.TextureFormat.PVRTCRGB_2BPPV || this._format == exports.TextureFormat.PVRTCRGBA_2BPPV ||
+                this._format == exports.TextureFormat.PVRTCRGB_4BPPV || this._format == exports.TextureFormat.PVRTCRGBA_4BPPV;
         }
         _setPixels(pixels, miplevel, width, height) {
             var gl = LayaGL.instance;
@@ -1961,6 +1972,8 @@ window.Laya= (function (exports) {
             this._activeResource();
         }
         setPixels(pixels, miplevel = 0) {
+            if (this._gpuCompressFormat())
+                throw "Texture2D:the format is GPU compression format.";
             if (!pixels)
                 throw "Texture2D:pixels can't be null.";
             var width = Math.max(this._width >> miplevel, 1);
@@ -1975,6 +1988,8 @@ window.Laya= (function (exports) {
             this._activeResource();
         }
         setSubPixels(x, y, width, height, pixels, miplevel = 0) {
+            if (this._gpuCompressFormat())
+                throw "Texture2D:the format is GPU compression format.";
             if (!pixels)
                 throw "Texture2D:pixels can't be null.";
             var gl = LayaGL.instance;
@@ -2458,7 +2473,6 @@ window.Laya= (function (exports) {
             ShaderDefines2D.reg("COLOR_ADD", ShaderDefines2D.COLORADD);
             ShaderDefines2D.reg("WORLDMAT", ShaderDefines2D.WORLDMAT);
             ShaderDefines2D.reg("FILLTEXTURE", ShaderDefines2D.FILLTEXTURE);
-            ShaderDefines2D.reg("FSHIGHPRECISION", ShaderDefines2D.SHADERDEFINE_FSHIGHPRECISION);
             ShaderDefines2D.reg('MVP3D', ShaderDefines2D.MVP3D);
         }
         static reg(name, value) {
@@ -2480,7 +2494,6 @@ window.Laya= (function (exports) {
     ShaderDefines2D.WORLDMAT = 0x80;
     ShaderDefines2D.FILLTEXTURE = 0x100;
     ShaderDefines2D.SKINMESH = 0x200;
-    ShaderDefines2D.SHADERDEFINE_FSHIGHPRECISION = 0x400;
     ShaderDefines2D.MVP3D = 0x800;
     ShaderDefines2D.NOOPTMASK = ShaderDefines2D.FILTERGLOW | ShaderDefines2D.FILTERBLUR | ShaderDefines2D.FILTERCOLOR | ShaderDefines2D.FILLTEXTURE;
     ShaderDefines2D.__name2int = {};
@@ -3050,7 +3063,7 @@ window.Laya= (function (exports) {
             }
         }
         clear() {
-            this.defines._value = this.subID + (ILaya.WebGL.shaderHighPrecision ? ShaderDefines2D.SHADERDEFINE_FSHIGHPRECISION : 0);
+            this.defines._value = this.subID;
             this.clipOff[0] = 0;
         }
         release() {
@@ -3139,7 +3152,8 @@ window.Laya= (function (exports) {
     }
 
     class Filter {
-        constructor() { }
+        constructor() {
+        }
         get type() { return -1; }
     }
     Filter.BLUR = 0x10;
@@ -5086,7 +5100,7 @@ window.Laya= (function (exports) {
             ctx._globalClipMatrix.copyTo(this.cachedClipInfo);
         }
         startRec() {
-            if (this.context._charSubmitCache._enbale) {
+            if (this.context._charSubmitCache._enable) {
                 this.context._charSubmitCache.enable(false, this.context);
                 this.context._charSubmitCache.enable(true, this.context);
             }
@@ -5124,7 +5138,7 @@ window.Laya= (function (exports) {
             this.invMat.invert();
         }
         endRec() {
-            if (this.context._charSubmitCache._enbale) {
+            if (this.context._charSubmitCache._enable) {
                 this.context._charSubmitCache.enable(false, this.context);
                 this.context._charSubmitCache.enable(true, this.context);
             }
@@ -5169,7 +5183,7 @@ window.Laya= (function (exports) {
 
     var texture_vs = "/*\r\n\ttexture和fillrect使用的。\r\n*/\r\nattribute vec4 posuv;\r\nattribute vec4 attribColor;\r\nattribute vec4 attribFlags;\r\n//attribute vec4 clipDir;\r\n//attribute vec2 clipRect;\r\nuniform vec4 clipMatDir;\r\nuniform vec2 clipMatPos;\t\t// 这个是全局的，不用再应用矩阵了。\r\nvarying vec2 cliped;\r\nuniform vec2 size;\r\nuniform vec2 clipOff;\t\t\t// 使用要把clip偏移。cacheas normal用. 只用了[0]\r\n#ifdef WORLDMAT\r\n\tuniform mat4 mmat;\r\n#endif\r\n#ifdef MVP3D\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\nvarying vec4 v_texcoordAlpha;\r\nvarying vec4 v_color;\r\nvarying float v_useTex;\r\n\r\nvoid main() {\r\n\r\n\tvec4 pos = vec4(posuv.xy,0.,1.);\r\n#ifdef WORLDMAT\r\n\tpos=mmat*pos;\r\n#endif\r\n\tvec4 pos1  =vec4((pos.x/size.x-0.5)*2.0,(0.5-pos.y/size.y)*2.0,0.,1.0);\r\n#ifdef MVP3D\r\n\tgl_Position=u_MvpMatrix*pos1;\r\n#else\r\n\tgl_Position=pos1;\r\n#endif\r\n\tv_texcoordAlpha.xy = posuv.zw;\r\n\t//v_texcoordAlpha.z = attribColor.a/255.0;\r\n\tv_color = attribColor/255.0;\r\n\tv_color.xyz*=v_color.w;//反正后面也要预乘\r\n\t\r\n\tv_useTex = attribFlags.r/255.0;\r\n\tfloat clipw = length(clipMatDir.xy);\r\n\tfloat cliph = length(clipMatDir.zw);\r\n\t\r\n\tvec2 clpos = clipMatPos.xy;\r\n\t#ifdef WORLDMAT\r\n\t\t// 如果有mmat，需要修改clipMatPos,因为 这是cacheas normal （如果不是就错了）， clipMatPos被去掉了偏移\r\n\t\tif(clipOff[0]>0.0){\r\n\t\t\tclpos.x+=mmat[3].x;\t//tx\t最简单处理\r\n\t\t\tclpos.y+=mmat[3].y;\t//ty\r\n\t\t}\r\n\t#endif\r\n\tvec2 clippos = pos.xy - clpos;\t//pos已经应用矩阵了，为了减的有意义，clip的位置也要缩放\r\n\tif(clipw>20000. && cliph>20000.)\r\n\t\tcliped = vec2(0.5,0.5);\r\n\telse {\r\n\t\t//转成0到1之间。/clipw/clipw 表示clippos与normalize之后的clip朝向点积之后，再除以clipw\r\n\t\tcliped=vec2( dot(clippos,clipMatDir.xy)/clipw/clipw, dot(clippos,clipMatDir.zw)/cliph/cliph);\r\n\t}\r\n\r\n}";
 
-    var texture_ps = "/*\r\n\ttexture和fillrect使用的。\r\n*/\r\n#ifdef FSHIGHPRECISION\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\nvarying vec4 v_texcoordAlpha;\r\nvarying vec4 v_color;\r\nvarying float v_useTex;\r\nuniform sampler2D texture;\r\nvarying vec2 cliped;\r\n\r\n#ifdef BLUR_FILTER\r\nuniform vec4 strength_sig2_2sig2_gauss1;\r\nuniform vec2 blurInfo;\r\n\r\n#define PI 3.141593\r\n\r\nfloat getGaussian(float x, float y){\r\n    return strength_sig2_2sig2_gauss1.w*exp(-(x*x+y*y)/strength_sig2_2sig2_gauss1.z);\r\n}\r\n\r\nvec4 blur(){\r\n    const float blurw = 9.0;\r\n    vec4 vec4Color = vec4(0.0,0.0,0.0,0.0);\r\n    vec2 halfsz=vec2(blurw,blurw)/2.0/blurInfo;    \r\n    vec2 startpos=v_texcoordAlpha.xy-halfsz;\r\n    vec2 ctexcoord = startpos;\r\n    vec2 step = 1.0/blurInfo;  //每个像素      \r\n    \r\n    for(float y = 0.0;y<=blurw; ++y){\r\n        ctexcoord.x=startpos.x;\r\n        for(float x = 0.0;x<=blurw; ++x){\r\n            //TODO 纹理坐标的固定偏移应该在vs中处理\r\n            vec4Color += texture2D(texture, ctexcoord)*getGaussian(x-blurw/2.0,y-blurw/2.0);\r\n            ctexcoord.x+=step.x;\r\n        }\r\n        ctexcoord.y+=step.y;\r\n    }\r\n    return vec4Color;\r\n}\r\n#endif\r\n\r\n#ifdef COLOR_FILTER\r\nuniform vec4 colorAlpha;\r\nuniform mat4 colorMat;\r\n#endif\r\n\r\n#ifdef GLOW_FILTER\r\nuniform vec4 u_color;\r\nuniform vec4 u_blurInfo1;\r\nuniform vec4 u_blurInfo2;\r\n#endif\r\n\r\n#ifdef COLOR_ADD\r\nuniform vec4 colorAdd;\r\n#endif\r\n\r\n#ifdef FILLTEXTURE\t\r\nuniform vec4 u_TexRange;//startu,startv,urange, vrange\r\n#endif\r\nvoid main() {\r\n\tif(cliped.x<0.) discard;\r\n\tif(cliped.x>1.) discard;\r\n\tif(cliped.y<0.) discard;\r\n\tif(cliped.y>1.) discard;\r\n\t\r\n#ifdef FILLTEXTURE\t\r\n   vec4 color= texture2D(texture, fract(v_texcoordAlpha.xy)*u_TexRange.zw + u_TexRange.xy);\r\n#else\r\n   vec4 color= texture2D(texture, v_texcoordAlpha.xy);\r\n#endif\r\n\r\n   if(v_useTex<=0.)color = vec4(1.,1.,1.,1.);\r\n   color.a*=v_color.w;\r\n   //color.rgb*=v_color.w;\r\n   color.rgb*=v_color.rgb;\r\n   gl_FragColor=color;\r\n   \r\n   #ifdef COLOR_ADD\r\n\tgl_FragColor = vec4(colorAdd.rgb,colorAdd.a*gl_FragColor.a);\r\n\tgl_FragColor.xyz *= colorAdd.a;\r\n   #endif\r\n   \r\n   #ifdef BLUR_FILTER\r\n\tgl_FragColor =   blur();\r\n\tgl_FragColor.w*=v_color.w;   \r\n   #endif\r\n   \r\n   #ifdef COLOR_FILTER\r\n\tmat4 alphaMat =colorMat;\r\n\r\n\talphaMat[0][3] *= gl_FragColor.a;\r\n\talphaMat[1][3] *= gl_FragColor.a;\r\n\talphaMat[2][3] *= gl_FragColor.a;\r\n\r\n\tgl_FragColor = gl_FragColor * alphaMat;\r\n\tgl_FragColor += colorAlpha/255.0*gl_FragColor.a;\r\n   #endif\r\n   \r\n   #ifdef GLOW_FILTER\r\n\tconst float c_IterationTime = 10.0;\r\n\tfloat floatIterationTotalTime = c_IterationTime * c_IterationTime;\r\n\tvec4 vec4Color = vec4(0.0,0.0,0.0,0.0);\r\n\tvec2 vec2FilterDir = vec2(-(u_blurInfo1.z)/u_blurInfo2.x,-(u_blurInfo1.w)/u_blurInfo2.y);\r\n\tvec2 vec2FilterOff = vec2(u_blurInfo1.x/u_blurInfo2.x/c_IterationTime * 2.0,u_blurInfo1.y/u_blurInfo2.y/c_IterationTime * 2.0);\r\n\tfloat maxNum = u_blurInfo1.x * u_blurInfo1.y;\r\n\tvec2 vec2Off = vec2(0.0,0.0);\r\n\tfloat floatOff = c_IterationTime/2.0;\r\n\tfor(float i = 0.0;i<=c_IterationTime; ++i){\r\n\t\tfor(float j = 0.0;j<=c_IterationTime; ++j){\r\n\t\t\tvec2Off = vec2(vec2FilterOff.x * (i - floatOff),vec2FilterOff.y * (j - floatOff));\r\n\t\t\tvec4Color += texture2D(texture, v_texcoordAlpha.xy + vec2FilterDir + vec2Off)/floatIterationTotalTime;\r\n\t\t}\r\n\t}\r\n\tgl_FragColor = vec4(u_color.rgb,vec4Color.a * u_blurInfo2.z);\r\n\tgl_FragColor.rgb *= gl_FragColor.a;   \r\n   #endif\r\n   \r\n}";
+    var texture_ps = "/*\r\n\ttexture和fillrect使用的。\r\n*/\r\n#ifdef GL_FRAGMENT_PRECISION_HIGH\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\nvarying vec4 v_texcoordAlpha;\r\nvarying vec4 v_color;\r\nvarying float v_useTex;\r\nuniform sampler2D texture;\r\nvarying vec2 cliped;\r\n\r\n#ifdef BLUR_FILTER\r\nuniform vec4 strength_sig2_2sig2_gauss1;\r\nuniform vec2 blurInfo;\r\n\r\n#define PI 3.141593\r\n\r\nfloat getGaussian(float x, float y){\r\n    return strength_sig2_2sig2_gauss1.w*exp(-(x*x+y*y)/strength_sig2_2sig2_gauss1.z);\r\n}\r\n\r\nvec4 blur(){\r\n    const float blurw = 9.0;\r\n    vec4 vec4Color = vec4(0.0,0.0,0.0,0.0);\r\n    vec2 halfsz=vec2(blurw,blurw)/2.0/blurInfo;    \r\n    vec2 startpos=v_texcoordAlpha.xy-halfsz;\r\n    vec2 ctexcoord = startpos;\r\n    vec2 step = 1.0/blurInfo;  //每个像素      \r\n    \r\n    for(float y = 0.0;y<=blurw; ++y){\r\n        ctexcoord.x=startpos.x;\r\n        for(float x = 0.0;x<=blurw; ++x){\r\n            //TODO 纹理坐标的固定偏移应该在vs中处理\r\n            vec4Color += texture2D(texture, ctexcoord)*getGaussian(x-blurw/2.0,y-blurw/2.0);\r\n            ctexcoord.x+=step.x;\r\n        }\r\n        ctexcoord.y+=step.y;\r\n    }\r\n    return vec4Color;\r\n}\r\n#endif\r\n\r\n#ifdef COLOR_FILTER\r\nuniform vec4 colorAlpha;\r\nuniform mat4 colorMat;\r\n#endif\r\n\r\n#ifdef GLOW_FILTER\r\nuniform vec4 u_color;\r\nuniform vec4 u_blurInfo1;\r\nuniform vec4 u_blurInfo2;\r\n#endif\r\n\r\n#ifdef COLOR_ADD\r\nuniform vec4 colorAdd;\r\n#endif\r\n\r\n#ifdef FILLTEXTURE\t\r\nuniform vec4 u_TexRange;//startu,startv,urange, vrange\r\n#endif\r\nvoid main() {\r\n\tif(cliped.x<0.) discard;\r\n\tif(cliped.x>1.) discard;\r\n\tif(cliped.y<0.) discard;\r\n\tif(cliped.y>1.) discard;\r\n\t\r\n#ifdef FILLTEXTURE\t\r\n   vec4 color= texture2D(texture, fract(v_texcoordAlpha.xy)*u_TexRange.zw + u_TexRange.xy);\r\n#else\r\n   vec4 color= texture2D(texture, v_texcoordAlpha.xy);\r\n#endif\r\n\r\n   if(v_useTex<=0.)color = vec4(1.,1.,1.,1.);\r\n   color.a*=v_color.w;\r\n   //color.rgb*=v_color.w;\r\n   color.rgb*=v_color.rgb;\r\n   gl_FragColor=color;\r\n   \r\n   #ifdef COLOR_ADD\r\n\tgl_FragColor = vec4(colorAdd.rgb,colorAdd.a*gl_FragColor.a);\r\n\tgl_FragColor.xyz *= colorAdd.a;\r\n   #endif\r\n   \r\n   #ifdef BLUR_FILTER\r\n\tgl_FragColor =   blur();\r\n\tgl_FragColor.w*=v_color.w;   \r\n   #endif\r\n   \r\n   #ifdef COLOR_FILTER\r\n\tmat4 alphaMat =colorMat;\r\n\r\n\talphaMat[0][3] *= gl_FragColor.a;\r\n\talphaMat[1][3] *= gl_FragColor.a;\r\n\talphaMat[2][3] *= gl_FragColor.a;\r\n\r\n\tgl_FragColor = gl_FragColor * alphaMat;\r\n\tgl_FragColor += colorAlpha/255.0*gl_FragColor.a;\r\n   #endif\r\n   \r\n   #ifdef GLOW_FILTER\r\n\tconst float c_IterationTime = 10.0;\r\n\tfloat floatIterationTotalTime = c_IterationTime * c_IterationTime;\r\n\tvec4 vec4Color = vec4(0.0,0.0,0.0,0.0);\r\n\tvec2 vec2FilterDir = vec2(-(u_blurInfo1.z)/u_blurInfo2.x,-(u_blurInfo1.w)/u_blurInfo2.y);\r\n\tvec2 vec2FilterOff = vec2(u_blurInfo1.x/u_blurInfo2.x/c_IterationTime * 2.0,u_blurInfo1.y/u_blurInfo2.y/c_IterationTime * 2.0);\r\n\tfloat maxNum = u_blurInfo1.x * u_blurInfo1.y;\r\n\tvec2 vec2Off = vec2(0.0,0.0);\r\n\tfloat floatOff = c_IterationTime/2.0;\r\n\tfor(float i = 0.0;i<=c_IterationTime; ++i){\r\n\t\tfor(float j = 0.0;j<=c_IterationTime; ++j){\r\n\t\t\tvec2Off = vec2(vec2FilterOff.x * (i - floatOff),vec2FilterOff.y * (j - floatOff));\r\n\t\t\tvec4Color += texture2D(texture, v_texcoordAlpha.xy + vec2FilterDir + vec2Off)/floatIterationTotalTime;\r\n\t\t}\r\n\t}\r\n\tgl_FragColor = vec4(u_color.rgb,vec4Color.a * u_blurInfo2.z);\r\n\tgl_FragColor.rgb *= gl_FragColor.a;   \r\n   #endif\r\n   \r\n}";
 
     var prime_vs = "attribute vec4 position;\r\nattribute vec4 attribColor;\r\n//attribute vec4 clipDir;\r\n//attribute vec2 clipRect;\r\nuniform vec4 clipMatDir;\r\nuniform vec2 clipMatPos;\r\n#ifdef WORLDMAT\r\n\tuniform mat4 mmat;\r\n#endif\r\nuniform mat4 u_mmat2;\r\n//uniform vec2 u_pos;\r\nuniform vec2 size;\r\nvarying vec4 color;\r\n//vec4 dirxy=vec4(0.9,0.1, -0.1,0.9);\r\n//vec4 clip=vec4(100.,30.,300.,600.);\r\nvarying vec2 cliped;\r\nvoid main(){\r\n\t\r\n#ifdef WORLDMAT\r\n\tvec4 pos=mmat*vec4(position.xy,0.,1.);\r\n\tgl_Position =vec4((pos.x/size.x-0.5)*2.0,(0.5-pos.y/size.y)*2.0,pos.z,1.0);\r\n#else\r\n\tgl_Position =vec4((position.x/size.x-0.5)*2.0,(0.5-position.y/size.y)*2.0,position.z,1.0);\r\n#endif\t\r\n\tfloat clipw = length(clipMatDir.xy);\r\n\tfloat cliph = length(clipMatDir.zw);\r\n\tvec2 clippos = position.xy - clipMatPos.xy;\t//pos已经应用矩阵了，为了减的有意义，clip的位置也要缩放\r\n\tif(clipw>20000. && cliph>20000.)\r\n\t\tcliped = vec2(0.5,0.5);\r\n\telse {\r\n\t\t//clipdir是带缩放的方向，由于上面clippos是在缩放后的空间计算的，所以需要把方向先normalize一下\r\n\t\tcliped=vec2( dot(clippos,clipMatDir.xy)/clipw/clipw, dot(clippos,clipMatDir.zw)/cliph/cliph);\r\n\t}\r\n  //pos2d.x = dot(clippos,dirx);\r\n  color=attribColor/255.;\r\n}";
 
@@ -6073,13 +6087,13 @@ window.Laya= (function (exports) {
             this._ndata = 0;
             this._clipid = -1;
             this._clipMatrix = new Matrix();
-            this._enbale = false;
+            this._enable = false;
         }
         clear() {
             this._tex = null;
             this._imgId = -1;
             this._ndata = 0;
-            this._enbale = false;
+            this._enable = false;
             this._colorFiler = null;
         }
         destroy() {
@@ -6108,10 +6122,10 @@ window.Laya= (function (exports) {
             return CharSubmitCache.__posPool[--CharSubmitCache.__nPosPool];
         }
         enable(value, ctx) {
-            if (value === this._enbale)
+            if (value === this._enable)
                 return;
-            this._enbale = value;
-            this._enbale || this.submit(ctx);
+            this._enable = value;
+            this._enable || this.submit(ctx);
         }
         submit(ctx) {
             var n = this._ndata;
@@ -6333,18 +6347,10 @@ window.Laya= (function (exports) {
             var v0;
             var u1;
             var v1;
-            if (ILaya.Render.isConchApp) {
-                u0 = x / this._texW;
-                v0 = y / this._texH;
-                u1 = (x + data.width) / this._texW;
-                v1 = (y + data.height) / this._texH;
-            }
-            else {
-                u0 = (x + 1) / this._texW;
-                v0 = (y) / this._texH;
-                u1 = (x + data.width - 1) / this._texW;
-                v1 = (y + data.height - 1) / this._texH;
-            }
+            u0 = x / this._texW;
+            v0 = y / this._texH;
+            u1 = (x + data.width) / this._texW;
+            v1 = (y + data.height) / this._texH;
             uv = uv || new Array(8);
             uv[0] = u0, uv[1] = v0;
             uv[2] = u1, uv[3] = v0;
@@ -6390,6 +6396,9 @@ window.Laya= (function (exports) {
             gl.texSubImage2D(gl.TEXTURE_2D, 0, 0, 0, this._texW, this._texH, gl.RGBA, gl.UNSIGNED_BYTE, dt);
         }
         discard() {
+            ILaya.stage.setGlobalRepaint();
+            this.destroy();
+            return;
             if (this._texW != TextTexture.gTextRender.atlasWidth || this._texH != TextTexture.gTextRender.atlasWidth) {
                 this.destroy();
                 return;
@@ -6402,6 +6411,7 @@ window.Laya= (function (exports) {
             TextTexture.pool[TextTexture.poolLen++] = this;
         }
         static getTextTexture(w, h) {
+            return new TextTexture(w, h);
             if (w != TextTexture.gTextRender.atlasWidth || w != TextTexture.gTextRender.atlasWidth)
                 return new TextTexture(w, h);
             if (TextTexture.poolLen > 0) {
@@ -7049,6 +7059,8 @@ window.Laya= (function (exports) {
             var win = Browser._window = window;
             var doc = Browser._document = win.document;
             var u = Browser.userAgent = win.navigator.userAgent;
+            var maxTouchPoints = win.navigator.maxTouchPoints || 0;
+            var platform = win.navigator.platform;
             if (u.indexOf('AlipayMiniGame') > -1 && "my" in Browser.window) {
                 window.aliPayMiniGame(Laya, Laya);
                 if (!Laya["ALIMiniAdapter"]) {
@@ -7152,7 +7164,7 @@ window.Laya= (function (exports) {
             Browser.onIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
             Browser.onIPhone = u.indexOf("iPhone") > -1;
             Browser.onMac = u.indexOf("Mac OS X") > -1;
-            Browser.onIPad = u.indexOf("iPad") > -1;
+            Browser.onIPad = u.indexOf("iPad") > -1 || (platform === 'MacIntel' && maxTouchPoints > 1);
             Browser.onAndroid = u.indexOf('Android') > -1 || u.indexOf('Adr') > -1;
             Browser.onWP = u.indexOf("Windows Phone") > -1;
             Browser.onQQBrowser = u.indexOf("QQBrowser") > -1;
@@ -7345,7 +7357,7 @@ window.Laya= (function (exports) {
                 clearW = Math.max(clearW, rect[0] + rect[2] + 1);
                 clearH = Math.max(clearH, rect[1] + rect[3] + 1);
             }
-            ctx.clearRect(0, 0, clearW, clearH);
+            ctx.clearRect(0, 0, clearW / this.lastScaleX + 1, clearH / this.lastScaleY + 1);
             ctx.save();
             ctx.textBaseline = "middle";
             if (lineWidth > 0) {
@@ -7367,7 +7379,7 @@ window.Laya= (function (exports) {
                 if (rect[2] == -1)
                     rect[2] = Math.ceil((cri.width + lineWidth * 2) * this.lastScaleX);
             }
-            var imgdt = rect ? (ctx.getImageData(rect[0], rect[1], rect[2], rect[3])) : (ctx.getImageData(0, 0, w, h));
+            var imgdt = rect ? (ctx.getImageData(rect[0], rect[1], rect[2], rect[3] + 1)) : (ctx.getImageData(0, 0, w, h + 1));
             ctx.restore();
             cri.bmpWidth = imgdt.width;
             cri.bmpHeight = imgdt.height;
@@ -7433,6 +7445,8 @@ window.Laya= (function (exports) {
         constructor() {
             super();
             this.lastFont = '';
+            this.lastScaleX = 1.0;
+            this.lastScaleY = 1.0;
         }
         getWidth(font, str) {
             if (!window.conchTextCanvas)
@@ -7442,6 +7456,8 @@ window.Laya= (function (exports) {
             return window.conchTextCanvas.measureText(str).width;
         }
         scale(sx, sy) {
+            this.lastScaleX = sx;
+            this.lastScaleY = sy;
         }
         getCharBmp(char, font, lineWidth, colStr, strokeColStr, size, margin_left, margin_top, margin_right, margin_bottom, rect = null) {
             if (!window.conchTextCanvas)
@@ -7452,6 +7468,7 @@ window.Laya= (function (exports) {
             var h = size.height;
             w += (margin_left + margin_right);
             h += (margin_top + margin_bottom);
+            window.conchTextCanvas.scale && window.conchTextCanvas.scale(this.lastScaleX, this.lastScaleY);
             var c1 = ColorUtils.create(strokeColStr);
             var nStrokeColor = c1.numColor;
             var c2 = ColorUtils.create(colStr);
@@ -7578,23 +7595,17 @@ window.Laya= (function (exports) {
                 lineWidth = 0;
             this.setFont(font);
             this.fontScaleX = this.fontScaleY = 1.0;
-            if (!ILaya.Render.isConchApp && TextRender.scaleFontWithCtx) {
+            if (TextRender.scaleFontWithCtx) {
                 var sx = 1;
                 var sy = 1;
-                if (ILaya.Render.isConchApp) {
-                    sx = ctx._curMat.getScaleX();
-                    sy = ctx._curMat.getScaleY();
-                }
-                else {
+                if (!ILaya.Render.isConchApp || (window.conchTextCanvas.scale)) {
                     sx = ctx.getMatScaleX();
                     sy = ctx.getMatScaleY();
                 }
                 if (sx < 1e-4 || sy < 1e-1)
                     return;
-                if (sx > 1)
-                    this.fontScaleX = sx;
-                if (sy > 1)
-                    this.fontScaleY = sy;
+                this.fontScaleX = sx;
+                this.fontScaleY = sy;
             }
             font._italic && (ctx._italicDeg = 13);
             var wt = data;
@@ -7666,12 +7677,7 @@ window.Laya= (function (exports) {
                             else {
                                 add = add.words;
                             }
-                            if (ILaya.Render.isConchApp) {
-                                add.push({ ri: ri, x: stx, y: sty, w: ri.bmpWidth / this.fontScaleX, h: ri.bmpHeight / this.fontScaleY });
-                            }
-                            else {
-                                add.push({ ri: ri, x: stx + 1 / this.fontScaleX, y: sty, w: (ri.bmpWidth - 2) / this.fontScaleX, h: (ri.bmpHeight - 1) / this.fontScaleY });
-                            }
+                            add.push({ ri: ri, x: stx, y: sty, w: ri.bmpWidth / this.fontScaleX, h: ri.bmpHeight / this.fontScaleY });
                             stx += ri.width;
                         }
                     }
@@ -7679,22 +7685,17 @@ window.Laya= (function (exports) {
                 else {
                     var isotex = TextRender.noAtlas || strWidth * this.fontScaleX > TextRender.atlasWidth;
                     ri = this.getCharRenderInfo(str, font, color, strokeColor, lineWidth, isotex);
-                    if (ILaya.Render.isConchApp) {
-                        sameTexData[0] = { texgen: ri.tex.genID, tex: ri.tex, words: [{ ri: ri, x: 0, y: 0, w: ri.bmpWidth / this.fontScaleX, h: ri.bmpHeight / this.fontScaleY }] };
-                    }
-                    else {
-                        sameTexData[0] = { texgen: ri.tex.genID, tex: ri.tex, words: [{ ri: ri, x: 1 / this.fontScaleX, y: 0 / this.fontScaleY, w: (ri.bmpWidth - 2) / this.fontScaleX, h: (ri.bmpHeight - 1) / this.fontScaleY }] };
-                    }
+                    sameTexData[0] = { texgen: ri.tex.genID, tex: ri.tex, words: [{ ri: ri, x: 0, y: 0, w: ri.bmpWidth / this.fontScaleX, h: ri.bmpHeight / this.fontScaleY }] };
                 }
             }
             this._drawResortedWords(ctx, x, y, sameTexData);
             ctx._italicDeg = 0;
         }
         _drawResortedWords(ctx, startx, starty, samePagesData) {
-            var isLastRender = ctx._charSubmitCache ? ctx._charSubmitCache._enbale : false;
+            var isLastRender = ctx._charSubmitCache ? ctx._charSubmitCache._enable : false;
             var mat = ctx._curMat;
             var slen = samePagesData.length;
-            for (var id = 0; id < slen; id++) {
+            for (var id in samePagesData) {
                 var dt = samePagesData[id];
                 if (!dt)
                     continue;
@@ -8134,7 +8135,7 @@ window.Laya= (function (exports) {
         }
     }
     TextRender.useOldCharBook = false;
-    TextRender.atlasWidth = 2048;
+    TextRender.atlasWidth = 1024;
     TextRender.noAtlas = false;
     TextRender.forceSplitRender = false;
     TextRender.forceWholeRender = false;
@@ -8147,7 +8148,6 @@ window.Laya= (function (exports) {
     TextRender.isWan1Wan = false;
     TextRender.showLog = false;
     TextRender.debugUV = false;
-    TextRender.atlasWidth2 = 2048 * 2048;
     TextRender.tmpRI = new CharRenderInfo();
     TextRender.pixelBBX = [0, 0, 0, 0];
     TextRender.imgdtRect = [0, 0, 0, 0];
@@ -8387,6 +8387,7 @@ window.Laya= (function (exports) {
             var gl = LayaGL.instance;
             WebGLContext.setBlend(gl, true);
             WebGLContext.setBlendEquation(gl, gl.FUNC_ADD);
+            BlendMode.activeBlendFunction = null;
             WebGLContext.setBlendFunc(gl, gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
             WebGLContext.setDepthTest(gl, false);
             WebGLContext.setCullFace(gl, false);
@@ -8496,9 +8497,12 @@ window.Laya= (function (exports) {
         }
         set asBitmap(value) {
             if (value) {
-                this._targets || (this._targets = new RenderTexture2D(this._width, this._height, exports.RenderTextureFormat.R8G8B8A8, -1));
+                let rt = this._targets;
                 if (!this._width || !this._height)
                     throw Error("asBitmap no size!");
+                if (!rt || rt.width != this._width || rt.height != this._height) {
+                    this._targets = new RenderTexture2D(this._width, this._height, exports.RenderTextureFormat.R8G8B8A8, -1);
+                }
             }
             else {
                 this._targets && this._targets.destroy();
@@ -8737,7 +8741,7 @@ window.Laya= (function (exports) {
                 this._mesh.addQuad(this._transedPoints, uv, rgba, true);
                 var sv = Value2D.create(ShaderDefines2D.TEXTURE2D, 0);
                 sv.defines.add(ShaderDefines2D.FILLTEXTURE);
-                sv.u_TexRange = texuvRect;
+                sv.u_TexRange = texuvRect.concat();
                 submit = this._curSubmit = SubmitTexture.create(this, this._mesh, sv);
                 this._submits[this._submits._length++] = submit;
                 this._copyClipInfo(submit, this._globalClipMatrix);
@@ -8840,9 +8844,9 @@ window.Laya= (function (exports) {
                 this._mesh.vertNum += 4;
             }
         }
-        drawCallOptimize(enbale) {
-            this._charSubmitCache.enable(enbale, this);
-            return enbale;
+        drawCallOptimize(enable) {
+            this._charSubmitCache.enable(enable, this);
+            return enable;
         }
         _inner_drawTexture(tex, imgid, x, y, width, height, m, uv, alpha, lastRender) {
             var preKey = this._curSubmit._key;
@@ -9712,6 +9716,8 @@ window.Laya= (function (exports) {
             return this._canvas;
         }
         _fillTexture_h(tex, imgid, uv, oriw, orih, x, y, w) {
+            if (oriw <= 0)
+                console.error('_fillTexture_h error: oriw must>0');
             var stx = x;
             var num = Math.floor(w / oriw);
             var left = w % oriw;
@@ -9735,6 +9741,8 @@ window.Laya= (function (exports) {
             }
         }
         _fillTexture_v(tex, imgid, uv, oriw, orih, x, y, h) {
+            if (orih <= 0)
+                console.error('_fillTexture_v error: orih must>0');
             var sty = y;
             var num = Math.floor(h / orih);
             var left = h % orih;
@@ -10306,6 +10314,7 @@ window.Laya= (function (exports) {
             this._angleInstancedArrays = null;
             this._isWebGL2 = false;
             this._oesTextureHalfFloat = null;
+            this._oes_element_index_uint = null;
             this._oesTextureHalfFloatLinear = null;
             this._oesTextureFloat = null;
             this._extTextureFilterAnisotropic = null;
@@ -10314,12 +10323,6 @@ window.Laya= (function (exports) {
             this._compressedTextureEtc1 = null;
             this._gl = gl;
             this._isWebGL2 = isWebGL2;
-            try {
-                var precisionFormat = gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT);
-                precisionFormat.precision ? (WebGL.shaderHighPrecision = true) : WebGL.shaderHighPrecision = false;
-            }
-            catch (e) {
-            }
             if (!isWebGL2) {
                 var forceVAO = LayaGPU._forceSupportVAOPlatform();
                 if (!ILaya.Render.isConchApp) {
@@ -10336,6 +10339,7 @@ window.Laya= (function (exports) {
                 this._oesTextureHalfFloat = this._getExtension("OES_texture_half_float");
                 this._oesTextureHalfFloatLinear = this._getExtension("OES_texture_half_float_linear");
                 this._oesTextureFloat = this._getExtension("OES_texture_float");
+                this._oes_element_index_uint = this._getExtension("OES_element_index_uint");
             }
             else {
                 this._getExtension("EXT_color_buffer_float");
@@ -10405,6 +10409,9 @@ window.Laya= (function (exports) {
                 return true;
             else
                 return false;
+        }
+        supportElementIndexUint32() {
+            return this._isWebGL2 || this._oes_element_index_uint ? true : false;
         }
     }
     LayaGPU._extentionVendorPrefixes = ["", "WEBKIT_", "MOZ_"];
@@ -12046,12 +12053,6 @@ window.Laya= (function (exports) {
     RenderSprite.tempUV = new Array(8);
 
     class HTMLCanvas extends Bitmap {
-        get source() {
-            return this._source;
-        }
-        _getSource() {
-            return this._source;
-        }
         constructor(createCanvas = false) {
             super();
             if (createCanvas)
@@ -12060,6 +12061,12 @@ window.Laya= (function (exports) {
                 this._source = this;
             }
             this.lock = true;
+        }
+        get source() {
+            return this._source;
+        }
+        _getSource() {
+            return this._source;
         }
         clear() {
             this._ctx && this._ctx.clear && this._ctx.clear();
@@ -13136,10 +13143,8 @@ window.Laya= (function (exports) {
             this._components.push(comp);
             comp.owner = this;
             comp._onAdded();
-            if (this.activeInHierarchy) {
+            if (this.activeInHierarchy)
                 comp._setActive(true);
-                (comp._isScript() && comp._enabled) && (comp.onEnable());
-            }
         }
         _destroyComponent(comp) {
             if (this._components) {
@@ -13171,38 +13176,38 @@ window.Laya= (function (exports) {
                 }
             }
         }
-        addComponentIntance(comp) {
-            if (comp.owner)
+        addComponentIntance(component) {
+            if (component.owner)
                 throw "Node:the component has belong to other node.";
-            if (comp.isSingleton && this.getComponent(comp.constructor))
+            if (component.isSingleton && this.getComponent(component.constructor))
                 throw "Node:the component is singleton,can't add the second one.";
-            this._addComponentInstance(comp);
-            return comp;
+            this._addComponentInstance(component);
+            return component;
         }
-        addComponent(type) {
-            var comp = Pool.createByClass(type);
+        addComponent(componentType) {
+            var comp = Pool.createByClass(componentType);
             comp._destroyed = false;
-            if (comp.isSingleton && this.getComponent(type))
-                throw "无法实例" + type + "组件" + "，" + type + "组件已存在！";
+            if (comp.isSingleton && this.getComponent(componentType))
+                throw "无法实例" + componentType + "组件" + "，" + componentType + "组件已存在！";
             this._addComponentInstance(comp);
             return comp;
         }
-        getComponent(clas) {
+        getComponent(componentType) {
             if (this._components) {
                 for (var i = 0, n = this._components.length; i < n; i++) {
                     var comp = this._components[i];
-                    if (comp instanceof clas)
+                    if (comp instanceof componentType)
                         return comp;
                 }
             }
             return null;
         }
-        getComponents(clas) {
+        getComponents(componentType) {
             var arr;
             if (this._components) {
                 for (var i = 0, n = this._components.length; i < n; i++) {
                     var comp = this._components[i];
-                    if (comp instanceof clas) {
+                    if (comp instanceof componentType) {
                         arr = arr || [];
                         arr.push(comp);
                     }
@@ -13835,8 +13840,8 @@ window.Laya= (function (exports) {
         drawToCanvas(canvasWidth, canvasHeight, offsetX, offsetY) {
             return Sprite.drawToCanvas(this, this._renderType, canvasWidth, canvasHeight, offsetX, offsetY);
         }
-        drawToTexture(canvasWidth, canvasHeight, offsetX, offsetY) {
-            return Sprite.drawToTexture(this, this._renderType, canvasWidth, canvasHeight, offsetX, offsetY);
+        drawToTexture(canvasWidth, canvasHeight, offsetX, offsetY, rt = null) {
+            return Sprite.drawToTexture(this, this._renderType, canvasWidth, canvasHeight, offsetX, offsetY, rt);
         }
         drawToTexture3D(offx, offy, tex) {
             throw 'not implement';
@@ -13876,25 +13881,37 @@ window.Laya= (function (exports) {
             ctx2d.putImageData(imgdata, 0, 0);
             return canv;
         }
-        static drawToTexture(sprite, _renderType, canvasWidth, canvasHeight, offsetX, offsetY) {
+        static drawToTexture(sprite, _renderType, canvasWidth, canvasHeight, offsetX, offsetY, rt = null) {
+            if (!Sprite.drawtocanvCtx) {
+                Sprite.drawtocanvCtx = new Context();
+            }
             offsetX -= sprite.x;
             offsetY -= sprite.y;
             offsetX |= 0;
             offsetY |= 0;
             canvasWidth |= 0;
             canvasHeight |= 0;
-            var ctx = new Context();
+            var ctx = rt ? Sprite.drawtocanvCtx : new Context();
+            ctx.clear();
             ctx.size(canvasWidth, canvasHeight);
-            ctx.asBitmap = true;
+            if (rt) {
+                ctx._targets = rt;
+            }
+            else {
+                ctx.asBitmap = true;
+            }
             ctx._targets.start();
             ctx._targets.clear(0, 0, 0, 0);
             RenderSprite.renders[_renderType]._fun(sprite, ctx, offsetX, offsetY);
             ctx.flush();
             ctx._targets.end();
             ctx._targets.restore();
-            var rtex = new Texture(ctx._targets, Texture.INV_UV);
-            ctx.destroy(true);
-            return rtex;
+            if (!rt) {
+                var rtex = new Texture(ctx._targets, Texture.INV_UV);
+                ctx.destroy(true);
+                return rtex;
+            }
+            return rt;
         }
         customRender(context, x, y) {
             this._repaint = SpriteConst.REPAINT_ALL;
@@ -14922,8 +14939,10 @@ window.Laya= (function (exports) {
                 if (ILaya.Render.isConchApp) {
                     return window.conchTextCanvas.measureText(text).width;
                 }
-                else
-                    return ILaya.Browser.context.measureText(text).width;
+                else {
+                    let ret = ILaya.Browser.context.measureText(text) || { width: 100 };
+                    return ret.width;
+                }
             }
         }
         _getWordWrapWidth() {
@@ -15247,6 +15266,8 @@ window.Laya= (function (exports) {
             Input.promptStyleDOM.innerText = "input::-webkit-input-placeholder, textarea::-webkit-input-placeholder {" + "color:" + this._promptColor + "}" + "input:-moz-placeholder, textarea:-moz-placeholder {" + "color:" + this._promptColor + "}" + "input::-moz-placeholder, textarea::-moz-placeholder {" + "color:" + this._promptColor + "}" + "input:-ms-input-placeholder, textarea:-ms-input-placeholder {" + "color:" + this._promptColor + "}";
         }
         _focusOut() {
+            if (!Input.isInputting)
+                return;
             Input.isInputting = false;
             this._focus = false;
             this._text = null;
@@ -16685,7 +16706,7 @@ window.Laya= (function (exports) {
         var gl = LayaGL.instance;
         RenderState2D.worldScissorTest && gl.disable(gl.SCISSOR_TEST);
         var ctx = Render.context;
-        var c = (ctx._submits._length == 0 || Config.preserveDrawingBuffer) ? ColorUtils.create(value).arrColor : window.Laya.stage._wgColor;
+        var c = (ctx._submits._length == 0 || Config.preserveDrawingBuffer) ? ColorUtils.create(value).arrColor : ILaya.stage._wgColor;
         if (c)
             ctx.clearBG(c[0], c[1], c[2], c[3]);
         else
@@ -17908,7 +17929,17 @@ window.Laya= (function (exports) {
                 else {
                     c2 = u[this._pos_++];
                     c3 = u[this._pos_++];
-                    strs[n++] = f(((c & 0x0F) << 18) | ((c2 & 0x7F) << 12) | ((c3 << 6) & 0x7F) | (u[this._pos_++] & 0x7F));
+                    const _code = ((c & 0x0F) << 18) | ((c2 & 0x7F) << 12) | ((c3 & 0x7F) << 6) | (u[this._pos_++] & 0x7F);
+                    if (_code >= 0x10000) {
+                        const _offset = _code - 0x10000;
+                        const _lead = 0xd800 | (_offset >> 10);
+                        const _trail = 0xdc00 | (_offset & 0x3ff);
+                        strs[n++] = f(_lead);
+                        strs[n++] = f(_trail);
+                    }
+                    else {
+                        strs[n++] = f(_code);
+                    }
                 }
             }
             strs.length = n;
@@ -17968,6 +17999,21 @@ window.Laya= (function (exports) {
                     this._ensureWrite(this._pos_ + 2);
                     this._u8d_.set([0xC0 | (c >> 6), 0x80 | (c & 0x3F)], this._pos_);
                     this._pos_ += 2;
+                }
+                else if (c >= 0xD800 && c <= 0xDBFF) {
+                    i++;
+                    const c2 = value.charCodeAt(i);
+                    if (!Number.isNaN(c2) && c2 >= 0xDC00 && c2 <= 0xDFFF) {
+                        const _p1 = (c & 0x3FF) + 0x40;
+                        const _p2 = c2 & 0x3FF;
+                        const _b1 = 0xF0 | ((_p1 >> 8) & 0x3F);
+                        const _b2 = 0x80 | ((_p1 >> 2) & 0x3F);
+                        const _b3 = 0x80 | ((_p1 & 0x3) << 4) | ((_p2 >> 6) & 0xF);
+                        const _b4 = 0x80 | (_p2 & 0x3F);
+                        this._ensureWrite(this._pos_ + 4);
+                        this._u8d_.set([_b1, _b2, _b3, _b4], this._pos_);
+                        this._pos_ += 4;
+                    }
                 }
                 else if (c <= 0xFFFF) {
                     this._ensureWrite(this._pos_ + 3);
@@ -19802,6 +19848,7 @@ window.Laya= (function (exports) {
             this._ease = null;
             this._props = null;
             this._delayParam = null;
+            this.repeat = 1;
             if (this._usedPool) {
                 this.update = null;
                 Pool.recover("tween", this);
@@ -20123,10 +20170,8 @@ window.Laya= (function (exports) {
                 this.owner._destroyComponent(this);
         }
         _destroy() {
-            if (this.owner.activeInHierarchy && this._enabled) {
+            if (this.owner.activeInHierarchy && this._enabled)
                 this._setActive(false);
-                (this._isScript()) && (this.onDisable());
-            }
             this._onDestroy();
             this._destroyed = true;
             if (this.onReset !== Component.prototype.onReset) {
@@ -20605,12 +20650,10 @@ window.Laya= (function (exports) {
     ClassUtils.regClass("laya.display.FrameAnimation", FrameAnimation);
     ClassUtils.regClass("Laya.FrameAnimation", FrameAnimation);
 
-    var supportWeakMap = !!WeakMap;
     class WeakObject {
         constructor() {
-            this._obj = WeakObject.supportWeakMap ? new Browser.window.WeakMap() : {};
-            if (!WeakObject.supportWeakMap)
-                WeakObject._maps.push(this);
+            this._obj = {};
+            WeakObject._maps.push(this);
         }
         static __init__() {
             WeakObject.I = new WeakObject();
@@ -20626,15 +20669,7 @@ window.Laya= (function (exports) {
         set(key, value) {
             if (key == null)
                 return;
-            if (WeakObject.supportWeakMap) {
-                var objKey = key;
-                if (typeof (key) == 'string' || typeof (key) == 'number') {
-                    objKey = WeakObject._keys[key];
-                    if (!objKey)
-                        objKey = WeakObject._keys[key] = { k: key };
-                }
-                this._obj.set(objKey, value);
-            }
+            if (WeakObject.supportWeakMap) ;
             else {
                 if (typeof (key) == 'string' || typeof (key) == 'number') {
                     this._obj[key] = value;
@@ -20648,12 +20683,7 @@ window.Laya= (function (exports) {
         get(key) {
             if (key == null)
                 return null;
-            if (WeakObject.supportWeakMap) {
-                var objKey = (typeof (key) == 'string' || typeof (key) == 'number') ? WeakObject._keys[key] : key;
-                if (!objKey)
-                    return null;
-                return this._obj.get(objKey);
-            }
+            if (WeakObject.supportWeakMap) ;
             else {
                 if (typeof (key) == 'string' || typeof (key) == 'number')
                     return this._obj[key];
@@ -20663,12 +20693,7 @@ window.Laya= (function (exports) {
         del(key) {
             if (key == null)
                 return;
-            if (WeakObject.supportWeakMap) {
-                var objKey = (typeof (key) == 'string' || typeof (key) == 'number') ? WeakObject._keys[key] : key;
-                if (!objKey)
-                    return;
-                this._obj.delete(objKey);
-            }
+            if (WeakObject.supportWeakMap) ;
             else {
                 if (typeof (key) == 'string' || typeof (key) == 'number')
                     delete this._obj[key];
@@ -20679,10 +20704,7 @@ window.Laya= (function (exports) {
         has(key) {
             if (key == null)
                 return false;
-            if (WeakObject.supportWeakMap) {
-                var objKey = (typeof (key) == 'string' || typeof (key) == 'number') ? WeakObject._keys[key] : key;
-                return this._obj.has(objKey);
-            }
+            if (WeakObject.supportWeakMap) ;
             else {
                 if (typeof (key) == 'string' || typeof (key) == 'number')
                     return this._obj[key] != null;
@@ -20690,9 +20712,8 @@ window.Laya= (function (exports) {
             }
         }
     }
-    WeakObject.supportWeakMap = supportWeakMap;
+    WeakObject.supportWeakMap = false;
     WeakObject.delInterval = 10 * 60 * 1000;
-    WeakObject._keys = {};
     WeakObject._maps = [];
 
     class SceneUtils {
@@ -21460,7 +21481,7 @@ window.Laya= (function (exports) {
         clear() {
             this.texture = null;
             this.shader = null;
-            this.defines._value = this.subID + (WebGL.shaderHighPrecision ? ShaderDefines2D.SHADERDEFINE_FSHIGHPRECISION : 0);
+            this.defines._value = this.subID;
         }
     }
 
@@ -22230,7 +22251,7 @@ window.Laya= (function (exports) {
     Laya.lateTimer = null;
     Laya.timer = null;
     Laya.loader = null;
-    Laya.version = "2.3.0beta";
+    Laya.version = "2.4.0beta";
     Laya._isinit = false;
     Laya.isWXOpenDataContext = false;
     Laya.isWXPosMsg = false;
@@ -25092,8 +25113,8 @@ window.Laya= (function (exports) {
                         tTween = this._tweenDic[p];
                         tTween.complete();
                     }
-                    this._complete();
                     this.pause();
+                    this._complete();
                     return;
                 }
             }

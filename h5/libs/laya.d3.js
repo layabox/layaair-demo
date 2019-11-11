@@ -152,10 +152,11 @@
 	    static normalize(s, out) {
 	        var len = s.length();
 	        if (len > 0) {
-	            out.x = s.x * len;
-	            out.y = s.y * len;
-	            out.z = s.z * len;
-	            out.w = s.w * len;
+	            var inverse = 1.0 / len;
+	            out.x = s.x * inverse;
+	            out.y = s.y * inverse;
+	            out.z = s.z * inverse;
+	            out.w = s.w * inverse;
 	        }
 	    }
 	    static add(a, b, out) {
@@ -469,7 +470,7 @@
 	        this.isAlpha = false;
 	        this.premultipliedAlpha = true;
 	        this.isStencil = true;
-	        this.enbaleMultiLight = true;
+	        this.enableMultiLight = true;
 	        this.octreeCulling = false;
 	        this.octreeInitialSize = 64.0;
 	        this.octreeInitialCenter = new Vector3(0, 0, 0);
@@ -514,9 +515,6 @@
 	            console.warn("Config3D: if the area light(PointLight、SpotLight) count is large than " + maxAreaLightCountWithZ + ",maybe the far away culster will ingonre some light.");
 	        this._maxAreaLightCountPerClusterAverage = Math.min(maxAreaLightCountWithZ, this._maxLightCount);
 	    }
-	    _checkMaxLightCountPerCluster(maxLightCountPerCluster, clusterCountZ) {
-	        return Math.ceil((maxLightCountPerCluster / 4) + 1) * clusterCountZ < 2048;
-	    }
 	    cloneTo(dest) {
 	        var destConfig3D = dest;
 	        destConfig3D._defaultPhysicsMemory = this._defaultPhysicsMemory;
@@ -532,7 +530,7 @@
 	        destConfig3D.octreeLooseness = this.octreeLooseness;
 	        destConfig3D.debugFrustumCulling = this.debugFrustumCulling;
 	        destConfig3D.maxLightCount = this.maxLightCount;
-	        destConfig3D.enbaleMultiLight = this.enbaleMultiLight;
+	        destConfig3D.enableMultiLight = this.enableMultiLight;
 	        var lightClusterCount = destConfig3D.lightClusterCount;
 	        this.lightClusterCount.cloneTo(lightClusterCount);
 	        destConfig3D.lightClusterCount = lightClusterCount;
@@ -548,6 +546,7 @@
 
 	class ILaya3D {
 	}
+	ILaya3D.Shader3D = null;
 	ILaya3D.Scene3D = null;
 	ILaya3D.MeshRenderStaticBatchManager = null;
 	ILaya3D.MeshRenderDynamicBatchManager = null;
@@ -689,15 +688,15 @@
 	    }
 	    static createFromTranslation(trans, out) {
 	        var e = out.elements;
-	        out[0] = 1;
-	        out[1] = 0;
-	        out[2] = 0;
-	        out[3] = 0;
-	        out[4] = 1;
-	        out[5] = 0;
-	        out[6] = trans.x;
-	        out[7] = trans.y;
-	        out[8] = 1;
+	        e[0] = 1;
+	        e[1] = 0;
+	        e[2] = 0;
+	        e[3] = 0;
+	        e[4] = 1;
+	        e[5] = 0;
+	        e[6] = trans.x;
+	        e[7] = trans.y;
+	        e[8] = 1;
 	    }
 	    static createFromRotation(rad, out) {
 	        var e = out.elements;
@@ -3481,6 +3480,11 @@
 	    }
 	}
 
+	class Physics3D {
+	}
+	Physics3D._bullet = null;
+	Physics3D._enablePhysics = false;
+
 	class Utils3D {
 	    static _createFloatTextureBuffer(width, height) {
 	        var floatTex = new Laya.Texture2D(width, height, Laya.TextureFormat.R32G32B32A32, false, false);
@@ -3491,12 +3495,13 @@
 	        return floatTex;
 	    }
 	    static _convertToLayaVec3(bVector, out, inverseX) {
-	        out.x = inverseX ? -bVector.x() : bVector.x();
-	        out.y = bVector.y();
-	        out.z = bVector.z();
+	        var bullet = Physics3D._bullet;
+	        out.x = inverseX ? -bullet.btVector3_z(bVector) : bullet.btVector3_x(bVector);
+	        out.y = bullet.btVector3_y(bVector);
+	        out.z = bullet.btVector3_z(bVector);
 	    }
 	    static _convertToBulletVec3(lVector, out, inverseX) {
-	        out.setValue(inverseX ? -lVector.x : lVector.x, lVector.y, lVector.z);
+	        Physics3D._bullet.btVector3_setValue(out, inverseX ? -lVector.x : lVector.x, lVector.y, lVector.z);
 	    }
 	    static _rotationTransformScaleSkinAnimation(tx, ty, tz, qx, qy, qz, qw, sx, sy, sz, outArray, outOffset) {
 	        var re = Utils3D._tempArray16_0;
@@ -3697,6 +3702,15 @@
 	        result[resultOffset] = (coordinateX * transformElem[0]) + (coordinateY * transformElem[4]) + (coordinateZ * transformElem[8]) + transformElem[12] / w;
 	        result[resultOffset + 1] = (coordinateX * transformElem[1]) + (coordinateY * transformElem[5]) + (coordinateZ * transformElem[9]) + transformElem[13] / w;
 	        result[resultOffset + 2] = (coordinateX * transformElem[2]) + (coordinateY * transformElem[6]) + (coordinateZ * transformElem[10]) + transformElem[14] / w;
+	    }
+	    static transformVector3ArrayToVector3ArrayNormal(source, sourceOffset, transform, result, resultOffset) {
+	        var coordinateX = source[sourceOffset + 0];
+	        var coordinateY = source[sourceOffset + 1];
+	        var coordinateZ = source[sourceOffset + 2];
+	        var transformElem = transform.elements;
+	        result[resultOffset] = coordinateX * transformElem[0] + coordinateY * transformElem[4] + coordinateZ * transformElem[8];
+	        result[resultOffset + 1] = coordinateX * transformElem[1] + coordinateY * transformElem[5] + coordinateZ * transformElem[9];
+	        result[resultOffset + 2] = coordinateX * transformElem[2] + coordinateY * transformElem[6] + coordinateZ * transformElem[10];
 	    }
 	    static transformLightingMapTexcoordArray(source, sourceOffset, lightingMapScaleOffset, result, resultOffset) {
 	        result[resultOffset + 0] = source[sourceOffset + 0] * lightingMapScaleOffset.x + lightingMapScaleOffset.z;
@@ -4204,13 +4218,17 @@
 	AnimationClip._tempQuaternion0 = new Quaternion();
 
 	class AnimatorPlayState {
+	    constructor() {
+	        this._currentState = null;
+	    }
 	    get normalizedTime() {
 	        return this._normalizedTime;
 	    }
 	    get duration() {
 	        return this._duration;
 	    }
-	    constructor() {
+	    get animatorState() {
+	        return this._currentState;
 	    }
 	    _resetPlayState(startTime) {
 	        this._finish = false;
@@ -4232,23 +4250,22 @@
 	    constructor(name) {
 	        this._defaultState = null;
 	        this._referenceCount = 0;
-	        this._statesMap = {};
-	        this.playOnWake = true;
 	        this._playType = -1;
-	        this._crossMark = 0;
 	        this._crossDuration = -1;
-	        this._crossNodesOwnersIndicesMap = {};
+	        this._crossMark = 0;
 	        this._crossNodesOwnersCount = 0;
 	        this._crossNodesOwners = [];
-	        this._currentPlayState = null;
+	        this._crossNodesOwnersIndicesMap = {};
+	        this._srcCrossClipNodeIndices = [];
+	        this._destCrossClipNodeIndices = [];
+	        this._statesMap = {};
 	        this._states = [];
 	        this._playStateInfo = new AnimatorPlayState();
 	        this._crossPlayStateInfo = new AnimatorPlayState();
-	        this._srcCrossClipNodeIndices = [];
-	        this._destCrossClipNodeIndices = [];
-	        this.name = name;
-	        this.defaultWeight = 1.0;
 	        this.blendingMode = AnimatorControllerLayer.BLENDINGMODE_OVERRIDE;
+	        this.defaultWeight = 1.0;
+	        this.playOnWake = true;
+	        this.name = name;
 	    }
 	    get defaultState() {
 	        return this._defaultState;
@@ -4285,6 +4302,9 @@
 	    }
 	    _clearReference() {
 	        this._removeReference(-this._referenceCount);
+	    }
+	    getCurrentPlayState() {
+	        return this._playStateInfo;
 	    }
 	    getAnimatorState(name) {
 	        var state = this._statesMap[name];
@@ -5184,7 +5204,7 @@
 	            addtive = controllerLayer.blendingMode !== AnimatorControllerLayer.BLENDINGMODE_OVERRIDE;
 	            switch (controllerLayer._playType) {
 	                case 0:
-	                    var animatorState = controllerLayer._currentPlayState;
+	                    var animatorState = playStateInfo._currentState;
 	                    var clip = animatorState._clip;
 	                    var speed = this._speed * animatorState.speed;
 	                    var finish = playStateInfo._finish;
@@ -5197,7 +5217,7 @@
 	                    }
 	                    break;
 	                case 1:
-	                    animatorState = controllerLayer._currentPlayState;
+	                    animatorState = playStateInfo._currentState;
 	                    clip = animatorState._clip;
 	                    var crossClipState = controllerLayer._crossPlayState;
 	                    var crossClip = crossClipState._clip;
@@ -5213,7 +5233,7 @@
 	                            this._updateClipDatas(crossClipState, addtive, crossPlayStateInfo, timerScale * crossSpeed);
 	                            this._setClipDatasToNode(crossClipState, addtive, controllerLayer.defaultWeight, i === 0);
 	                            controllerLayer._playType = 0;
-	                            controllerLayer._currentPlayState = crossClipState;
+	                            playStateInfo._currentState = crossClipState;
 	                            crossPlayStateInfo._cloneTo(playStateInfo);
 	                        }
 	                    }
@@ -5248,7 +5268,7 @@
 	                            this._updateClipDatas(crossClipState, addtive, crossPlayStateInfo, timerScale * crossSpeed);
 	                            this._setClipDatasToNode(crossClipState, addtive, 1.0, i === 0);
 	                            controllerLayer._playType = 0;
-	                            controllerLayer._currentPlayState = crossClipState;
+	                            playStateInfo._currentState = crossClipState;
 	                            crossPlayStateInfo._cloneTo(playStateInfo);
 	                        }
 	                        else {
@@ -5310,17 +5330,14 @@
 	    getControllerLayer(layerInex = 0) {
 	        return this._controllerLayers[layerInex];
 	    }
-	    getCurrentAnimatorPlayState(layerInex = 0) {
-	        return this._controllerLayers[layerInex]._playStateInfo;
-	    }
 	    play(name = null, layerIndex = 0, normalizedTime = Number.NEGATIVE_INFINITY) {
 	        var controllerLayer = this._controllerLayers[layerIndex];
 	        if (controllerLayer) {
 	            var defaultState = controllerLayer.defaultState;
 	            if (!name && !defaultState)
-	                throw new Error("Animator:must have  default clip value,please set clip property.");
-	            var curPlayState = controllerLayer._currentPlayState;
+	                throw new Error("Animator:must have default clip value,please set clip property.");
 	            var playStateInfo = controllerLayer._playStateInfo;
+	            var curPlayState = playStateInfo._currentState;
 	            var animatorState = name ? controllerLayer._statesMap[name] : defaultState;
 	            var clipDuration = animatorState._clip._duration;
 	            if (curPlayState !== animatorState) {
@@ -5330,7 +5347,7 @@
 	                    playStateInfo._resetPlayState(0.0);
 	                (curPlayState !== null && curPlayState !== animatorState) && (this._revertDefaultKeyframeNodes(curPlayState));
 	                controllerLayer._playType = 0;
-	                controllerLayer._currentPlayState = animatorState;
+	                playStateInfo._currentState = animatorState;
 	            }
 	            else {
 	                if (normalizedTime !== Number.NEGATIVE_INFINITY) {
@@ -5361,7 +5378,7 @@
 	                var crossPlayStateInfo = controllerLayer._crossPlayStateInfo;
 	                var crossNodeOwners = controllerLayer._crossNodesOwners;
 	                var crossNodeOwnerIndicesMap = controllerLayer._crossNodesOwnersIndicesMap;
-	                var srcAnimatorState = controllerLayer._currentPlayState;
+	                var srcAnimatorState = controllerLayer._playStateInfo._currentState;
 	                var destNodeOwners = destAnimatorState._nodeOwners;
 	                var destCrossClipNodeIndices = controllerLayer._destCrossClipNodeIndices;
 	                var destClip = destAnimatorState._clip;
@@ -5573,6 +5590,9 @@
 	            return false;
 	        }
 	    }
+	    getCurrentAnimatorPlayState(layerInex = 0) {
+	        return this._controllerLayers[layerInex]._playStateInfo;
+	    }
 	    _updateAnimationNodeWorldMatix(localPositions, localRotations, localScales, worldMatrixs, parentIndices) {
 	        Laya.LayaGL.instance.updateAnimationNodeWorldMatix(localPositions, localRotations, localScales, parentIndices, worldMatrixs);
 	    }
@@ -5597,6 +5617,7 @@
 
 	class RenderContext3D {
 	    constructor() {
+	        this.invertY = false;
 	    }
 	}
 	RenderContext3D._instance = new RenderContext3D();
@@ -5605,6 +5626,7 @@
 	    constructor(width, height, format = Laya.RenderTextureFormat.R8G8B8, depthStencilFormat = Laya.RenderTextureDepthFormat.DEPTH_16) {
 	        super(format, false);
 	        this._inPool = false;
+	        this._isCameraTarget = false;
 	        this._glTextureType = Laya.LayaGL.instance.TEXTURE_2D;
 	        this._width = width;
 	        this._height = height;
@@ -5705,12 +5727,14 @@
 	        var gl = Laya.LayaGL.instance;
 	        gl.bindFramebuffer(gl.FRAMEBUFFER, this._frameBuffer);
 	        RenderTexture._currentActive = this;
+	        (this._isCameraTarget) && (RenderContext3D._instance.invertY = true);
 	        this._readyed = false;
 	    }
 	    _end() {
 	        var gl = Laya.LayaGL.instance;
 	        gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 	        RenderTexture._currentActive = null;
+	        (this._isCameraTarget) && (RenderContext3D._instance.invertY = false);
 	        this._readyed = true;
 	    }
 	    getData(x, y, width, height, out) {
@@ -5780,8 +5804,13 @@
 	            this._length = size;
 	        }
 	        else {
-	            mask[index] |= define._value;
-	            this._length = Math.max(this._length, size);
+	            if (size > this._length) {
+	                mask[index] = define._value;
+	                this._length = size;
+	            }
+	            else {
+	                mask[index] |= define._value;
+	            }
 	        }
 	    }
 	    remove(define) {
@@ -5865,6 +5894,111 @@
 	    }
 	}
 
+	class ShaderVariantInfo {
+	    constructor(shader, subShaderIndex, passIndex, defines) {
+	        this._subShaderIndex = 0;
+	        this._passIndex = 0;
+	        this.setValue(shader, subShaderIndex, passIndex, defines);
+	    }
+	    setValue(shader, subShaderIndex, passIndex, defineNames) {
+	        if (shader) {
+	            var subShader = shader.getSubShaderAt(subShaderIndex);
+	            if (subShader) {
+	                var pass = subShader._passes[passIndex];
+	                if (pass) {
+	                    var validDefine = pass._validDefine;
+	                    for (var i = 0, n = defineNames.length; i < n; i++) {
+	                        var defname = defineNames[i];
+	                        if (!validDefine.has(ILaya3D.Shader3D.getDefineByName(defname)))
+	                            throw `ShaderVariantInfo:Invalid defineName ${defname} in ${shader._name} subShaderIndex of ${subShaderIndex} passIndex of ${passIndex}.`;
+	                    }
+	                }
+	                else {
+	                    throw `ShaderVariantInfo:Shader don't have passIndex of ${passIndex}.`;
+	                }
+	            }
+	            else {
+	                throw `ShaderVariantInfo:Shader don't have subShaderIndex of ${subShaderIndex}.`;
+	            }
+	        }
+	        else {
+	            throw `ShaderVariantInfo:Shader can't be null.`;
+	        }
+	        this._shader = shader;
+	        this._subShaderIndex = subShaderIndex;
+	        this._passIndex = passIndex;
+	        this._defineNames = defineNames;
+	    }
+	    equal(other) {
+	        if (this._shader !== other._shader || this._subShaderIndex !== other._subShaderIndex || this._passIndex !== other._passIndex) {
+	            return false;
+	        }
+	        else {
+	            var defines = this._defineNames;
+	            var otherDefines = other._defineNames;
+	            for (var i = 0, n = this._defineNames.length; i < n; i++) {
+	                if (defines[i] !== otherDefines[i])
+	                    return false;
+	            }
+	            return true;
+	        }
+	    }
+	    clone() {
+	        var dest = new ShaderVariantInfo(this._shader, this._subShaderIndex, this._passIndex, this._defineNames.slice());
+	        return dest;
+	    }
+	}
+	class ShaderVariantInfoCollection {
+	    constructor() {
+	        this._allCompiled = false;
+	        this._variants = [];
+	    }
+	    get allCompiled() {
+	        return this._allCompiled;
+	    }
+	    get variantCount() {
+	        return this._variants.length;
+	    }
+	    add(variant) {
+	        for (var i = 0, n = this._variants.length; i < n; i++) {
+	            if (this._variants[i].equal(variant))
+	                return false;
+	        }
+	        this._variants.push(variant.clone());
+	        this._allCompiled = false;
+	        return true;
+	    }
+	    remove(variant) {
+	        for (var i = 0, n = this._variants.length; i < n; i++) {
+	            if (this._variants[i].equal(variant)) {
+	                this._variants.splice(i, 1);
+	                return true;
+	            }
+	        }
+	        return false;
+	    }
+	    contatins(variant) {
+	        for (var i = 0, n = this._variants.length; i < n; i++) {
+	            if (this._variants[i].equal(variant))
+	                return true;
+	        }
+	        return false;
+	    }
+	    clear() {
+	        this._variants.length = 0;
+	    }
+	    compile() {
+	        if (!this._allCompiled) {
+	            var variants = this._variants;
+	            for (var i = 0, n = variants.length; i < n; i++) {
+	                var variant = variants[i];
+	                ILaya3D.Shader3D.compileShaderByDefineNames(variant._shader._name, variant._subShaderIndex, variant._passIndex, variant._defineNames);
+	            }
+	            this._allCompiled = true;
+	        }
+	    }
+	}
+
 	class Shader3D {
 	    constructor(name, attributeMap, uniformMap, enableInstancing) {
 	        this._attributeMap = null;
@@ -5935,36 +6069,6 @@
 	                    compileDefineDatas.clear();
 	                    for (var i = 0, n = defineNames.length; i < n; i++)
 	                        compileDefineDatas.add(Shader3D.getDefineByName(defineNames[i]));
-	                    (Laya.WebGL.shaderHighPrecision) && (compileDefineDatas.add(Shader3D.SHADERDEFINE_HIGHPRECISION));
-	                    (Config3D._config._multiLighting) || (compileDefineDatas.add(Shader3D.SHADERDEFINE_LEGACYSINGALLIGHTING));
-	                    pass.withCompile(compileDefineDatas);
-	                }
-	                else {
-	                    console.warn("Shader3D: unknown passIndex.");
-	                }
-	            }
-	            else {
-	                console.warn("Shader3D: unknown subShaderIndex.");
-	            }
-	        }
-	        else {
-	            console.warn("Shader3D: unknown shader name.");
-	        }
-	    }
-	    static compileShader(shaderName, subShaderIndex, passIndex, ...defineMask) {
-	        var shader = Shader3D.find(shaderName);
-	        if (shader) {
-	            var subShader = shader.getSubShaderAt(subShaderIndex);
-	            if (subShader) {
-	                var pass = subShader._passes[passIndex];
-	                if (pass) {
-	                    var compileDefineDatas = Shader3D._compileDefineDatas;
-	                    var mask = compileDefineDatas._mask;
-	                    mask.length = 0;
-	                    for (var i = 0, n = defineMask.length; i < n; i++)
-	                        mask.push(defineMask[i]);
-	                    compileDefineDatas._length = defineMask.length;
-	                    (Laya.WebGL.shaderHighPrecision) && (compileDefineDatas.add(Shader3D.SHADERDEFINE_HIGHPRECISION));
 	                    (Config3D._config._multiLighting) || (compileDefineDatas.add(Shader3D.SHADERDEFINE_LEGACYSINGALLIGHTING));
 	                    pass.withCompile(compileDefineDatas);
 	                }
@@ -5992,6 +6096,34 @@
 	    }
 	    getSubShaderAt(index) {
 	        return this._subShaders[index];
+	    }
+	    static compileShader(shaderName, subShaderIndex, passIndex, ...defineMask) {
+	        var shader = Shader3D.find(shaderName);
+	        if (shader) {
+	            var subShader = shader.getSubShaderAt(subShaderIndex);
+	            if (subShader) {
+	                var pass = subShader._passes[passIndex];
+	                if (pass) {
+	                    var compileDefineDatas = Shader3D._compileDefineDatas;
+	                    var mask = compileDefineDatas._mask;
+	                    mask.length = 0;
+	                    for (var i = 0, n = defineMask.length; i < n; i++)
+	                        mask.push(defineMask[i]);
+	                    compileDefineDatas._length = defineMask.length;
+	                    (Config3D._config._multiLighting) || (compileDefineDatas.add(Shader3D.SHADERDEFINE_LEGACYSINGALLIGHTING));
+	                    pass.withCompile(compileDefineDatas);
+	                }
+	                else {
+	                    console.warn("Shader3D: unknown passIndex.");
+	                }
+	            }
+	            else {
+	                console.warn("Shader3D: unknown subShaderIndex.");
+	            }
+	        }
+	        else {
+	            console.warn("Shader3D: unknown shader name.");
+	        }
 	    }
 	}
 	Shader3D._compileDefineDatas = new DefineDatas();
@@ -6021,6 +6153,7 @@
 	Shader3D._preCompileShader = {};
 	Shader3D._maskMap = [];
 	Shader3D.debugMode = true;
+	Shader3D.debugShaderVariantInfoCollection = new ShaderVariantInfoCollection();
 
 	class ShaderData {
 	    constructor(ownerResource = null) {
@@ -6374,7 +6507,8 @@
 	        this.needRenewArrayBufferForNative(index);
 	        var lastValue = this._nativeArray[index];
 	        this._nativeArray[index] = value;
-	        this._int32Data[index] = value._glTexture.id;
+	        var glTexture = value._getSource() || value.defaulteTexture._getSource();
+	        this._int32Data[index] = glTexture.id;
 	        if (this._ownerResource && this._ownerResource.referenceCount > 0) {
 	            (lastValue) && (lastValue._removeReference());
 	            (value) && (value._addReference());
@@ -6419,8 +6553,8 @@
 	    constructor() {
 	        this._compositeShader = Shader3D.find("PostProcessComposite");
 	        this._compositeShaderData = new ShaderData();
-	        this._context = null;
 	        this._effects = [];
+	        this._context = null;
 	        this._context = new PostProcessRenderContext();
 	        this._context.compositeShaderData = this._compositeShaderData;
 	    }
@@ -6437,8 +6571,9 @@
 	        var noteValue = ShaderData._SET_RUNTIME_VALUE_MODE_REFERENCE_;
 	        Laya.ILaya.Render.supportWebGLPlusRendering && ShaderData.setRuntimeValueMode(false);
 	        var camera = this._context.camera;
+	        var viewport = camera.viewport;
 	        var screenTexture = RenderTexture.createFromPool(RenderContext3D.clientWidth, RenderContext3D.clientHeight, camera._getRenderTextureFormat(), Laya.RenderTextureDepthFormat.DEPTHSTENCIL_NONE);
-	        var cameraTarget = camera._renderTexture;
+	        var cameraTarget = camera._internalRenderTexture;
 	        this._context.command.clear();
 	        this._context.source = screenTexture;
 	        this._context.destination = cameraTarget;
@@ -6448,10 +6583,12 @@
 	        for (var i = 0, n = this._effects.length; i < n; i++)
 	            this._effects[i].render(this._context);
 	        this._compositeShaderData.addDefine(PostProcess.SHADERDEFINE_FINALPASS);
-	        var offScreenTexture = camera.renderTarget;
-	        var dest = offScreenTexture ? offScreenTexture : null;
+	        var offScreenTex = camera._offScreenRenderTexture;
+	        var dest = offScreenTex ? offScreenTex : null;
 	        this._context.destination = dest;
-	        this._context.command.blitScreenTriangle(this._context.source, dest, this._compositeShader, this._compositeShaderData);
+	        var canvasWidth = camera._getCanvasWidth(), canvasHeight = camera._getCanvasHeight();
+	        camera._screenOffsetScale.setValue(viewport.x / canvasWidth, viewport.y / canvasHeight, viewport.width / canvasWidth, viewport.height / canvasHeight);
+	        this._context.command.blitScreenTriangle(this._context.source, dest, camera._screenOffsetScale, this._compositeShader, this._compositeShaderData);
 	        RenderTexture.recoverToPool(screenTexture);
 	        var tempRenderTextures = this._context.deferredReleaseTextures;
 	        for (i = 0, n = tempRenderTextures.length; i < n; i++)
@@ -6794,20 +6931,20 @@
 	}
 	Avatar.AVATAR = "AVATAR";
 
-	class BaseMaterial extends Laya.Resource {
+	class Material extends Laya.Resource {
 	    constructor() {
 	        super();
 	        this._shaderValues = null;
 	        this._disablePublicDefineDatas = new DefineDatas();
 	        this._shaderValues = new ShaderData(this);
-	        this.renderQueue = BaseMaterial.RENDERQUEUE_OPAQUE;
+	        this.renderQueue = Material.RENDERQUEUE_OPAQUE;
 	        this._alphaTest = false;
 	    }
 	    static load(url, complete) {
-	        Laya.Laya.loader.create(url, complete, null, BaseMaterial.MATERIAL);
+	        Laya.Laya.loader.create(url, complete, null, Material.MATERIAL);
 	    }
 	    static __initDefine__() {
-	        BaseMaterial.SHADERDEFINE_ALPHATEST = Shader3D.getDefineByName("ALPHATEST");
+	        Material.SHADERDEFINE_ALPHATEST = Shader3D.getDefineByName("ALPHATEST");
 	    }
 	    static _parse(data, propertyParams = null, constructParams = null) {
 	        var jsonData = data;
@@ -6896,11 +7033,14 @@
 	        }
 	        return material;
 	    }
+	    get shaderData() {
+	        return this._shaderValues;
+	    }
 	    get alphaTestValue() {
-	        return this._shaderValues.getNumber(BaseMaterial.ALPHATESTVALUE);
+	        return this._shaderValues.getNumber(Material.ALPHATESTVALUE);
 	    }
 	    set alphaTestValue(value) {
-	        this._shaderValues.setNumber(BaseMaterial.ALPHATESTVALUE, value);
+	        this._shaderValues.setNumber(Material.ALPHATESTVALUE, value);
 	    }
 	    get alphaTest() {
 	        return this._alphaTest;
@@ -6908,9 +7048,9 @@
 	    set alphaTest(value) {
 	        this._alphaTest = value;
 	        if (value)
-	            this._shaderValues.addDefine(BaseMaterial.SHADERDEFINE_ALPHATEST);
+	            this._shaderValues.addDefine(Material.SHADERDEFINE_ALPHATEST);
 	        else
-	            this._shaderValues.removeDefine(BaseMaterial.SHADERDEFINE_ALPHATEST);
+	            this._shaderValues.removeDefine(Material.SHADERDEFINE_ALPHATEST);
 	    }
 	    _removeTetxureReference() {
 	        var data = this._shaderValues.getData();
@@ -6919,6 +7059,11 @@
 	            if (value && value instanceof Laya.BaseTexture)
 	                value._removeReference();
 	        }
+	    }
+	    _disposeResource() {
+	        if (this._referenceCount > 0)
+	            this._removeTetxureReference();
+	        this._shaderValues = null;
 	    }
 	    _addReference(count = 1) {
 	        super._addReference(count);
@@ -6933,11 +7078,6 @@
 	        super._removeReference(count);
 	        this._removeTetxureReference();
 	    }
-	    _disposeResource() {
-	        if (this._referenceCount > 0)
-	            this._removeTetxureReference();
-	        this._shaderValues = null;
-	    }
 	    setShaderName(name) {
 	        this._shader = Shader3D.find(name);
 	        if (!this._shader)
@@ -6951,12 +7091,27 @@
 	        this._shaderValues.cloneTo(destBaseMaterial._shaderValues);
 	    }
 	    clone() {
-	        var dest = new BaseMaterial();
+	        var dest = new Material();
 	        this.cloneTo(dest);
 	        return dest;
 	    }
 	    get _defineDatas() {
 	        return this._shaderValues._defineDatas;
+	    }
+	}
+	Material.MATERIAL = "MATERIAL";
+	Material.RENDERQUEUE_OPAQUE = 2000;
+	Material.RENDERQUEUE_ALPHATEST = 2450;
+	Material.RENDERQUEUE_TRANSPARENT = 3000;
+	Material.ALPHATESTVALUE = Shader3D.propertyNameToID("u_AlphaTestValue");
+	Material.SHADERDEFINE_ALPHATEST = null;
+
+	class BaseMaterial {
+	    static load(url, complete) {
+	        Laya.Laya.loader.create(url, complete, null, Material.MATERIAL);
+	    }
+	    static __initDefine__() {
+	        BaseMaterial.SHADERDEFINE_ALPHATEST = Material.SHADERDEFINE_ALPHATEST;
 	    }
 	}
 	BaseMaterial.MATERIAL = "MATERIAL";
@@ -7039,7 +7194,7 @@
 	RenderState.DEPTHTEST_GEQUAL = 0x0206;
 	RenderState.DEPTHTEST_ALWAYS = 0x0207;
 
-	class BlinnPhongMaterial extends BaseMaterial {
+	class BlinnPhongMaterial extends Material {
 	    constructor() {
 	        super();
 	        this._enableVertexColor = false;
@@ -7050,7 +7205,7 @@
 	        sv.setVector(BlinnPhongMaterial.ALBEDOCOLOR, new Vector4(1.0, 1.0, 1.0, 1.0));
 	        sv.setVector(BlinnPhongMaterial.MATERIALSPECULAR, new Vector4(1.0, 1.0, 1.0, 1.0));
 	        sv.setNumber(BlinnPhongMaterial.SHININESS, 0.078125);
-	        sv.setNumber(BaseMaterial.ALPHATESTVALUE, 0.5);
+	        sv.setNumber(Material.ALPHATESTVALUE, 0.5);
 	        sv.setVector(BlinnPhongMaterial.TILINGOFFSET, new Vector4(1.0, 1.0, 0.0, 0.0));
 	        this._enableLighting = true;
 	        this.renderMode = BlinnPhongMaterial.RENDERMODE_OPAQUE;
@@ -7174,14 +7329,14 @@
 	        switch (value) {
 	            case BlinnPhongMaterial.RENDERMODE_OPAQUE:
 	                this.alphaTest = false;
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_OPAQUE;
+	                this.renderQueue = Material.RENDERQUEUE_OPAQUE;
 	                this.depthWrite = true;
 	                this.cull = RenderState.CULL_BACK;
 	                this.blend = RenderState.BLEND_DISABLE;
 	                this.depthTest = RenderState.DEPTHTEST_LESS;
 	                break;
 	            case BlinnPhongMaterial.RENDERMODE_CUTOUT:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_ALPHATEST;
+	                this.renderQueue = Material.RENDERQUEUE_ALPHATEST;
 	                this.alphaTest = true;
 	                this.depthWrite = true;
 	                this.cull = RenderState.CULL_BACK;
@@ -7189,7 +7344,7 @@
 	                this.depthTest = RenderState.DEPTHTEST_LESS;
 	                break;
 	            case BlinnPhongMaterial.RENDERMODE_TRANSPARENT:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	                this.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	                this.alphaTest = false;
 	                this.depthWrite = false;
 	                this.cull = RenderState.CULL_BACK;
@@ -7441,7 +7596,7 @@
 	BlinnPhongMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
 	BlinnPhongMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
-	class EffectMaterial extends BaseMaterial {
+	class EffectMaterial extends Material {
 	    constructor() {
 	        super();
 	        this.setShaderName("Effect");
@@ -7517,7 +7672,7 @@
 	    set renderMode(value) {
 	        switch (value) {
 	            case EffectMaterial.RENDERMODE_ADDTIVE:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	                this.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	                this.alphaTest = false;
 	                this.depthWrite = false;
 	                this.cull = RenderState.CULL_NONE;
@@ -7528,7 +7683,7 @@
 	                this._shaderValues.addDefine(EffectMaterial.SHADERDEFINE_ADDTIVEFOG);
 	                break;
 	            case EffectMaterial.RENDERMODE_ALPHABLENDED:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	                this.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	                this.alphaTest = false;
 	                this.depthWrite = false;
 	                this.cull = RenderState.CULL_NONE;
@@ -7621,41 +7776,41 @@
 	        }
 	        this._shaderValues.setVector(EffectMaterial.TILINGOFFSET, value);
 	    }
-	    set depthWrite(value) {
-	        this._shaderValues.setBool(EffectMaterial.DEPTH_WRITE, value);
-	    }
 	    get depthWrite() {
 	        return this._shaderValues.getBool(EffectMaterial.DEPTH_WRITE);
 	    }
-	    set cull(value) {
-	        this._shaderValues.setInt(EffectMaterial.CULL, value);
+	    set depthWrite(value) {
+	        this._shaderValues.setBool(EffectMaterial.DEPTH_WRITE, value);
 	    }
 	    get cull() {
 	        return this._shaderValues.getInt(EffectMaterial.CULL);
 	    }
-	    set blend(value) {
-	        this._shaderValues.setInt(EffectMaterial.BLEND, value);
+	    set cull(value) {
+	        this._shaderValues.setInt(EffectMaterial.CULL, value);
 	    }
 	    get blend() {
 	        return this._shaderValues.getInt(EffectMaterial.BLEND);
 	    }
-	    set blendSrc(value) {
-	        this._shaderValues.setInt(EffectMaterial.BLEND_SRC, value);
+	    set blend(value) {
+	        this._shaderValues.setInt(EffectMaterial.BLEND, value);
 	    }
 	    get blendSrc() {
 	        return this._shaderValues.getInt(EffectMaterial.BLEND_SRC);
 	    }
-	    set blendDst(value) {
-	        this._shaderValues.setInt(EffectMaterial.BLEND_DST, value);
+	    set blendSrc(value) {
+	        this._shaderValues.setInt(EffectMaterial.BLEND_SRC, value);
 	    }
 	    get blendDst() {
 	        return this._shaderValues.getInt(EffectMaterial.BLEND_DST);
 	    }
-	    set depthTest(value) {
-	        this._shaderValues.setInt(EffectMaterial.DEPTH_TEST, value);
+	    set blendDst(value) {
+	        this._shaderValues.setInt(EffectMaterial.BLEND_DST, value);
 	    }
 	    get depthTest() {
 	        return this._shaderValues.getInt(EffectMaterial.DEPTH_TEST);
+	    }
+	    set depthTest(value) {
+	        this._shaderValues.setInt(EffectMaterial.DEPTH_TEST, value);
 	    }
 	    clone() {
 	        var dest = new EffectMaterial();
@@ -7675,7 +7830,7 @@
 	EffectMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
 	EffectMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
-	class ExtendTerrainMaterial extends BaseMaterial {
+	class ExtendTerrainMaterial extends Material {
 	    constructor() {
 	        super();
 	        this._enableLighting = true;
@@ -7694,6 +7849,9 @@
 	    }
 	    set splatAlphaTexture(value) {
 	        this._shaderValues.setTexture(ExtendTerrainMaterial.SPLATALPHATEXTURE, value);
+	    }
+	    get diffuseTexture1() {
+	        return this._shaderValues.getTexture(ExtendTerrainMaterial.DIFFUSETEXTURE1);
 	    }
 	    set diffuseTexture1(value) {
 	        this._shaderValues.setTexture(ExtendTerrainMaterial.DIFFUSETEXTURE1, value);
@@ -7726,6 +7884,97 @@
 	    set diffuseTexture5(value) {
 	        this._shaderValues.setTexture(ExtendTerrainMaterial.DIFFUSETEXTURE5, value);
 	        this._setDetailNum(5);
+	    }
+	    set diffuseScaleOffset1(scaleOffset1) {
+	        this._shaderValues.setVector(ExtendTerrainMaterial.DIFFUSESCALEOFFSET1, scaleOffset1);
+	    }
+	    set diffuseScaleOffset2(scaleOffset2) {
+	        this._shaderValues.setVector(ExtendTerrainMaterial.DIFFUSESCALEOFFSET2, scaleOffset2);
+	    }
+	    set diffuseScaleOffset3(scaleOffset3) {
+	        this._shaderValues.setVector(ExtendTerrainMaterial.DIFFUSESCALEOFFSET3, scaleOffset3);
+	    }
+	    set diffuseScaleOffset4(scaleOffset4) {
+	        this._shaderValues.setVector(ExtendTerrainMaterial.DIFFUSESCALEOFFSET4, scaleOffset4);
+	    }
+	    set diffuseScaleOffset5(scaleOffset5) {
+	        this._shaderValues.setVector(ExtendTerrainMaterial.DIFFUSESCALEOFFSET5, scaleOffset5);
+	    }
+	    get enableLighting() {
+	        return this._enableLighting;
+	    }
+	    set enableLighting(value) {
+	        if (this._enableLighting !== value) {
+	            if (value) {
+	                this._disablePublicDefineDatas.remove(Scene3DShaderDeclaration.SHADERDEFINE_POINTLIGHT);
+	                this._disablePublicDefineDatas.remove(Scene3DShaderDeclaration.SHADERDEFINE_SPOTLIGHT);
+	                this._disablePublicDefineDatas.remove(Scene3DShaderDeclaration.SHADERDEFINE_DIRECTIONLIGHT);
+	            }
+	            else {
+	                this._disablePublicDefineDatas.add(Scene3DShaderDeclaration.SHADERDEFINE_POINTLIGHT);
+	                this._disablePublicDefineDatas.add(Scene3DShaderDeclaration.SHADERDEFINE_SPOTLIGHT);
+	                this._disablePublicDefineDatas.add(Scene3DShaderDeclaration.SHADERDEFINE_DIRECTIONLIGHT);
+	            }
+	            this._enableLighting = value;
+	        }
+	    }
+	    set renderMode(value) {
+	        switch (value) {
+	            case ExtendTerrainMaterial.RENDERMODE_OPAQUE:
+	                this.renderQueue = Material.RENDERQUEUE_OPAQUE;
+	                this.depthWrite = true;
+	                this.cull = RenderState.CULL_BACK;
+	                this.blend = RenderState.BLEND_DISABLE;
+	                this.depthTest = RenderState.DEPTHTEST_LESS;
+	                break;
+	            case ExtendTerrainMaterial.RENDERMODE_TRANSPARENT:
+	                this.renderQueue = Material.RENDERQUEUE_OPAQUE;
+	                this.depthWrite = false;
+	                this.cull = RenderState.CULL_BACK;
+	                this.blend = RenderState.BLEND_ENABLE_ALL;
+	                this.blendSrc = RenderState.BLENDPARAM_SRC_ALPHA;
+	                this.blendDst = RenderState.BLENDPARAM_ONE_MINUS_SRC_ALPHA;
+	                this.depthTest = RenderState.DEPTHTEST_LEQUAL;
+	                break;
+	            default:
+	                throw new Error("ExtendTerrainMaterial:renderMode value error.");
+	        }
+	    }
+	    get depthWrite() {
+	        return this._shaderValues.getBool(ExtendTerrainMaterial.DEPTH_WRITE);
+	    }
+	    set depthWrite(value) {
+	        this._shaderValues.setBool(ExtendTerrainMaterial.DEPTH_WRITE, value);
+	    }
+	    get cull() {
+	        return this._shaderValues.getInt(ExtendTerrainMaterial.CULL);
+	    }
+	    set cull(value) {
+	        this._shaderValues.setInt(ExtendTerrainMaterial.CULL, value);
+	    }
+	    get blend() {
+	        return this._shaderValues.getInt(ExtendTerrainMaterial.BLEND);
+	    }
+	    set blend(value) {
+	        this._shaderValues.setInt(ExtendTerrainMaterial.BLEND, value);
+	    }
+	    get blendSrc() {
+	        return this._shaderValues.getInt(ExtendTerrainMaterial.BLEND_SRC);
+	    }
+	    set blendSrc(value) {
+	        this._shaderValues.setInt(ExtendTerrainMaterial.BLEND_SRC, value);
+	    }
+	    get blendDst() {
+	        return this._shaderValues.getInt(ExtendTerrainMaterial.BLEND_DST);
+	    }
+	    set blendDst(value) {
+	        this._shaderValues.setInt(ExtendTerrainMaterial.BLEND_DST, value);
+	    }
+	    get depthTest() {
+	        return this._shaderValues.getInt(ExtendTerrainMaterial.DEPTH_TEST);
+	    }
+	    set depthTest(value) {
+	        this._shaderValues.setInt(ExtendTerrainMaterial.DEPTH_TEST, value);
 	    }
 	    _setDetailNum(value) {
 	        switch (value) {
@@ -7766,97 +8015,6 @@
 	                break;
 	        }
 	    }
-	    set diffuseScaleOffset1(scaleOffset1) {
-	        this._shaderValues.setVector(ExtendTerrainMaterial.DIFFUSESCALEOFFSET1, scaleOffset1);
-	    }
-	    set diffuseScaleOffset2(scaleOffset2) {
-	        this._shaderValues.setVector(ExtendTerrainMaterial.DIFFUSESCALEOFFSET2, scaleOffset2);
-	    }
-	    set diffuseScaleOffset3(scaleOffset3) {
-	        this._shaderValues.setVector(ExtendTerrainMaterial.DIFFUSESCALEOFFSET3, scaleOffset3);
-	    }
-	    set diffuseScaleOffset4(scaleOffset4) {
-	        this._shaderValues.setVector(ExtendTerrainMaterial.DIFFUSESCALEOFFSET4, scaleOffset4);
-	    }
-	    set diffuseScaleOffset5(scaleOffset5) {
-	        this._shaderValues.setVector(ExtendTerrainMaterial.DIFFUSESCALEOFFSET5, scaleOffset5);
-	    }
-	    get enableLighting() {
-	        return this._enableLighting;
-	    }
-	    set enableLighting(value) {
-	        if (this._enableLighting !== value) {
-	            if (value) {
-	                this._disablePublicDefineDatas.remove(Scene3DShaderDeclaration.SHADERDEFINE_POINTLIGHT);
-	                this._disablePublicDefineDatas.remove(Scene3DShaderDeclaration.SHADERDEFINE_SPOTLIGHT);
-	                this._disablePublicDefineDatas.remove(Scene3DShaderDeclaration.SHADERDEFINE_DIRECTIONLIGHT);
-	            }
-	            else {
-	                this._disablePublicDefineDatas.add(Scene3DShaderDeclaration.SHADERDEFINE_POINTLIGHT);
-	                this._disablePublicDefineDatas.add(Scene3DShaderDeclaration.SHADERDEFINE_SPOTLIGHT);
-	                this._disablePublicDefineDatas.add(Scene3DShaderDeclaration.SHADERDEFINE_DIRECTIONLIGHT);
-	            }
-	            this._enableLighting = value;
-	        }
-	    }
-	    set renderMode(value) {
-	        switch (value) {
-	            case ExtendTerrainMaterial.RENDERMODE_OPAQUE:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_OPAQUE;
-	                this.depthWrite = true;
-	                this.cull = RenderState.CULL_BACK;
-	                this.blend = RenderState.BLEND_DISABLE;
-	                this.depthTest = RenderState.DEPTHTEST_LESS;
-	                break;
-	            case ExtendTerrainMaterial.RENDERMODE_TRANSPARENT:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_OPAQUE;
-	                this.depthWrite = false;
-	                this.cull = RenderState.CULL_BACK;
-	                this.blend = RenderState.BLEND_ENABLE_ALL;
-	                this.blendSrc = RenderState.BLENDPARAM_SRC_ALPHA;
-	                this.blendDst = RenderState.BLENDPARAM_ONE_MINUS_SRC_ALPHA;
-	                this.depthTest = RenderState.DEPTHTEST_LEQUAL;
-	                break;
-	            default:
-	                throw new Error("ExtendTerrainMaterial:renderMode value error.");
-	        }
-	    }
-	    set depthWrite(value) {
-	        this._shaderValues.setBool(ExtendTerrainMaterial.DEPTH_WRITE, value);
-	    }
-	    get depthWrite() {
-	        return this._shaderValues.getBool(ExtendTerrainMaterial.DEPTH_WRITE);
-	    }
-	    set cull(value) {
-	        this._shaderValues.setInt(ExtendTerrainMaterial.CULL, value);
-	    }
-	    get cull() {
-	        return this._shaderValues.getInt(ExtendTerrainMaterial.CULL);
-	    }
-	    set blend(value) {
-	        this._shaderValues.setInt(ExtendTerrainMaterial.BLEND, value);
-	    }
-	    get blend() {
-	        return this._shaderValues.getInt(ExtendTerrainMaterial.BLEND);
-	    }
-	    set blendSrc(value) {
-	        this._shaderValues.setInt(ExtendTerrainMaterial.BLEND_SRC, value);
-	    }
-	    get blendSrc() {
-	        return this._shaderValues.getInt(ExtendTerrainMaterial.BLEND_SRC);
-	    }
-	    set blendDst(value) {
-	        this._shaderValues.setInt(ExtendTerrainMaterial.BLEND_DST, value);
-	    }
-	    get blendDst() {
-	        return this._shaderValues.getInt(ExtendTerrainMaterial.BLEND_DST);
-	    }
-	    set depthTest(value) {
-	        this._shaderValues.setInt(ExtendTerrainMaterial.DEPTH_TEST, value);
-	    }
-	    get depthTest() {
-	        return this._shaderValues.getInt(ExtendTerrainMaterial.DEPTH_TEST);
-	    }
 	    clone() {
 	        var dest = new ExtendTerrainMaterial();
 	        this.cloneTo(dest);
@@ -7883,7 +8041,7 @@
 	ExtendTerrainMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
 	ExtendTerrainMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
-	class PBRSpecularMaterial extends BaseMaterial {
+	class PBRSpecularMaterial extends Material {
 	    constructor() {
 	        super();
 	        this.setShaderName("PBRSpecular");
@@ -7900,7 +8058,7 @@
 	        this._shaderValues.setNumber(PBRSpecularMaterial.NORMALSCALE, 1.0);
 	        this._shaderValues.setNumber(PBRSpecularMaterial.PARALLAXSCALE, 0.001);
 	        this._shaderValues.setBool(PBRSpecularMaterial.ENABLEEMISSION, false);
-	        this._shaderValues.setNumber(BaseMaterial.ALPHATESTVALUE, 0.5);
+	        this._shaderValues.setNumber(Material.ALPHATESTVALUE, 0.5);
 	        this.renderMode = PBRSpecularMaterial.RENDERMODE_OPAQUE;
 	    }
 	    static __initDefine__() {
@@ -8311,7 +8469,7 @@
 	        switch (value) {
 	            case PBRSpecularMaterial.RENDERMODE_OPAQUE:
 	                this.alphaTest = false;
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_OPAQUE;
+	                this.renderQueue = Material.RENDERQUEUE_OPAQUE;
 	                this.depthWrite = true;
 	                this.cull = RenderState.CULL_BACK;
 	                this.blend = RenderState.BLEND_DISABLE;
@@ -8319,7 +8477,7 @@
 	                this._shaderValues.removeDefine(PBRSpecularMaterial.SHADERDEFINE_ALPHAPREMULTIPLY);
 	                break;
 	            case PBRSpecularMaterial.RENDERMODE_CUTOUT:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_ALPHATEST;
+	                this.renderQueue = Material.RENDERQUEUE_ALPHATEST;
 	                this.alphaTest = true;
 	                this.depthWrite = true;
 	                this.cull = RenderState.CULL_BACK;
@@ -8328,7 +8486,7 @@
 	                this._shaderValues.removeDefine(PBRSpecularMaterial.SHADERDEFINE_ALPHAPREMULTIPLY);
 	                break;
 	            case PBRSpecularMaterial.RENDERMODE_FADE:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	                this.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	                this.alphaTest = false;
 	                this.depthWrite = false;
 	                this.cull = RenderState.CULL_BACK;
@@ -8339,7 +8497,7 @@
 	                this._shaderValues.removeDefine(PBRSpecularMaterial.SHADERDEFINE_ALPHAPREMULTIPLY);
 	                break;
 	            case PBRSpecularMaterial.RENDERMODE_TRANSPARENT:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	                this.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	                this.alphaTest = false;
 	                this.depthWrite = false;
 	                this.cull = RenderState.CULL_BACK;
@@ -8433,7 +8591,7 @@
 	PBRSpecularMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
 	PBRSpecularMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
-	class PBRStandardMaterial extends BaseMaterial {
+	class PBRStandardMaterial extends Material {
 	    constructor() {
 	        super();
 	        this.setShaderName("PBRStandard");
@@ -8450,7 +8608,7 @@
 	        this._shaderValues.setNumber(PBRStandardMaterial.PARALLAXSCALE, 0.001);
 	        this._shaderValues.setBool(PBRStandardMaterial.ENABLEEMISSION, false);
 	        this._shaderValues.setBool(PBRStandardMaterial.ENABLEREFLECT, true);
-	        this._shaderValues.setNumber(BaseMaterial.ALPHATESTVALUE, 0.5);
+	        this._shaderValues.setNumber(Material.ALPHATESTVALUE, 0.5);
 	        this._disablePublicDefineDatas.remove(Scene3DShaderDeclaration.SHADERDEFINE_REFLECTMAP);
 	        this.renderMode = PBRStandardMaterial.RENDERMODE_OPAQUE;
 	    }
@@ -8848,7 +9006,7 @@
 	        switch (value) {
 	            case PBRStandardMaterial.RENDERMODE_OPAQUE:
 	                this.alphaTest = false;
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_OPAQUE;
+	                this.renderQueue = Material.RENDERQUEUE_OPAQUE;
 	                this.depthWrite = true;
 	                this.cull = RenderState.CULL_BACK;
 	                this.blend = RenderState.BLEND_DISABLE;
@@ -8856,7 +9014,7 @@
 	                this._shaderValues.removeDefine(PBRStandardMaterial.SHADERDEFINE_ALPHAPREMULTIPLY);
 	                break;
 	            case PBRStandardMaterial.RENDERMODE_CUTOUT:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_ALPHATEST;
+	                this.renderQueue = Material.RENDERQUEUE_ALPHATEST;
 	                this.alphaTest = true;
 	                this.depthWrite = true;
 	                this.cull = RenderState.CULL_BACK;
@@ -8865,7 +9023,7 @@
 	                this._shaderValues.removeDefine(PBRStandardMaterial.SHADERDEFINE_ALPHAPREMULTIPLY);
 	                break;
 	            case PBRStandardMaterial.RENDERMODE_FADE:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	                this.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	                this.alphaTest = false;
 	                this.depthWrite = false;
 	                this.cull = RenderState.CULL_BACK;
@@ -8877,7 +9035,7 @@
 	                break;
 	                break;
 	            case PBRStandardMaterial.RENDERMODE_TRANSPARENT:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	                this.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	                this.alphaTest = false;
 	                this.depthWrite = false;
 	                this.cull = RenderState.CULL_BACK;
@@ -8970,7 +9128,7 @@
 	PBRStandardMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
 	PBRStandardMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
-	class SkyBoxMaterial extends BaseMaterial {
+	class SkyBoxMaterial extends Material {
 	    constructor() {
 	        super();
 	        this.setShaderName("SkyBox");
@@ -9015,7 +9173,7 @@
 	SkyBoxMaterial.ROTATION = Shader3D.propertyNameToID("u_Rotation");
 	SkyBoxMaterial.TEXTURECUBE = Shader3D.propertyNameToID("u_CubeTexture");
 
-	class SkyProceduralMaterial extends BaseMaterial {
+	class SkyProceduralMaterial extends Material {
 	    constructor() {
 	        super();
 	        this.setShaderName("SkyBoxProcedural");
@@ -9109,7 +9267,7 @@
 	SkyProceduralMaterial.GROUNDTINT = Shader3D.propertyNameToID("u_GroundTint");
 	SkyProceduralMaterial.EXPOSURE = Shader3D.propertyNameToID("u_Exposure");
 
-	class UnlitMaterial extends BaseMaterial {
+	class UnlitMaterial extends Material {
 	    constructor() {
 	        super();
 	        this._albedoColor = new Vector4(1.0, 1.0, 1.0, 1.0);
@@ -9303,14 +9461,14 @@
 	        switch (value) {
 	            case UnlitMaterial.RENDERMODE_OPAQUE:
 	                this.alphaTest = false;
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_OPAQUE;
+	                this.renderQueue = Material.RENDERQUEUE_OPAQUE;
 	                this.depthWrite = true;
 	                this.cull = RenderState.CULL_BACK;
 	                this.blend = RenderState.BLEND_DISABLE;
 	                this.depthTest = RenderState.DEPTHTEST_LESS;
 	                break;
 	            case UnlitMaterial.RENDERMODE_CUTOUT:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_ALPHATEST;
+	                this.renderQueue = Material.RENDERQUEUE_ALPHATEST;
 	                this.alphaTest = true;
 	                this.depthWrite = true;
 	                this.cull = RenderState.CULL_BACK;
@@ -9318,7 +9476,7 @@
 	                this.depthTest = RenderState.DEPTHTEST_LESS;
 	                break;
 	            case UnlitMaterial.RENDERMODE_TRANSPARENT:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	                this.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	                this.alphaTest = false;
 	                this.depthWrite = false;
 	                this.cull = RenderState.CULL_BACK;
@@ -9387,7 +9545,7 @@
 	UnlitMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
 	UnlitMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
-	class WaterPrimaryMaterial extends BaseMaterial {
+	class WaterPrimaryMaterial extends Material {
 	    constructor() {
 	        super();
 	        this.setShaderName("WaterPrimary");
@@ -10189,18 +10347,14 @@
 	        if (this.destroyed)
 	            throw new Error("Sprite3D: Can't be cloned if the Sprite3D has destroyed.");
 	        var destSprite3D = destObject;
+	        var trans = this._transform;
+	        var destTrans = destSprite3D._transform;
 	        destSprite3D.name = this.name;
 	        destSprite3D.destroyed = this.destroyed;
 	        destSprite3D.active = this.active;
-	        var destLocalPosition = destSprite3D.transform.localPosition;
-	        this.transform.localPosition.cloneTo(destLocalPosition);
-	        destSprite3D.transform.localPosition = destLocalPosition;
-	        var destLocalRotation = destSprite3D.transform.localRotation;
-	        this.transform.localRotation.cloneTo(destLocalRotation);
-	        destSprite3D.transform.localRotation = destLocalRotation;
-	        var destLocalScale = destSprite3D.transform.localScale;
-	        this.transform.localScale.cloneTo(destLocalScale);
-	        destSprite3D.transform.localScale = destLocalScale;
+	        destTrans.localPosition = trans.localPosition;
+	        destTrans.localRotation = trans.localRotation;
+	        destTrans.localScale = trans.localScale;
 	        destSprite3D._isStatic = this._isStatic;
 	        destSprite3D.layer = this.layer;
 	        super._cloneTo(destSprite3D, srcRoot, dstRoot);
@@ -10254,15 +10408,11 @@
 	    }
 	    _onInActive() {
 	        super._onInActive();
-	        var scene3D = this._scene;
-	        scene3D._removeRenderObject(this._render);
-	        (this._render.castShadow) && (scene3D._removeShadowCastRenderObject(this._render));
+	        this._scene._removeRenderObject(this._render);
 	    }
 	    _onActive() {
 	        super._onActive();
-	        var scene3D = this._scene;
-	        scene3D._addRenderObject(this._render);
-	        (this._render.castShadow) && (scene3D._addShadowCastRenderObject(this._render));
+	        this._scene._addRenderObject(this._render);
 	    }
 	    _onActiveInScene() {
 	        super._onActiveInScene();
@@ -10421,14 +10571,18 @@
 	            Utils3D._drawBound(debugTool, renders[i].bounds._getBoundBox(), color);
 	        }
 	    }
-	    static _traversalCulling(camera, scene, context, renderList, customShader, replacementTag) {
-	        var validCount = renderList.length;
+	    static _traversalCulling(camera, scene, context, renderList, customShader, replacementTag, isShadowCasterCull) {
 	        var renders = renderList.elements;
 	        var boundFrustum = camera.boundFrustum;
 	        var camPos = camera._transform.position;
-	        for (var i = 0; i < validCount; i++) {
+	        for (var i = 0, n = renderList.length; i < n; i++) {
 	            var render = renders[i];
-	            if (camera._isLayerVisible(render._owner._layer) && render._enable) {
+	            var canPass;
+	            if (isShadowCasterCull)
+	                canPass = render._castShadow && render._enable;
+	            else
+	                canPass = camera._isLayerVisible(render._owner._layer) && render._enable;
+	            if (canPass) {
 	                Laya.Stat.frustumCulling++;
 	                if (!camera.useOcclusionCulling || render._needRender(boundFrustum, context)) {
 	                    render._visible = true;
@@ -10446,10 +10600,11 @@
 	            }
 	        }
 	    }
-	    static renderObjectCulling(camera, scene, context, renderList, customShader, replacementTag) {
+	    static renderObjectCulling(camera, scene, context, customShader, replacementTag, isShadowCasterCull) {
 	        var i, n;
 	        var opaqueQueue = scene._opaqueQueue;
 	        var transparentQueue = scene._transparentQueue;
+	        var renderList = scene._renders;
 	        opaqueQueue.clear();
 	        transparentQueue.clear();
 	        var staticBatchManagers = StaticBatchManager._managers;
@@ -10462,9 +10617,9 @@
 	        if (octree) {
 	            octree.updateMotionObjects();
 	            octree.shrinkRootIfPossible();
-	            octree.getCollidingWithFrustum(context, customShader, replacementTag);
+	            octree.getCollidingWithFrustum(context, customShader, replacementTag, isShadowCasterCull);
 	        }
-	        FrustumCulling._traversalCulling(camera, scene, context, renderList, customShader, replacementTag);
+	        FrustumCulling._traversalCulling(camera, scene, context, renderList, customShader, replacementTag, isShadowCasterCull);
 	        if (FrustumCulling.debugFrustumCulling) {
 	            var debugTool = scene._debugTool;
 	            debugTool.clear();
@@ -10597,9 +10752,9 @@
 	            return false;
 	        }
 	    }
-	    setData(buffer, bufferOffset = 0, dataStartIndex = 0, dataCount = 4294967295) {
+	    setData(buffer, bufferOffset = 0, dataStartIndex = 0, dataCount = Number.MAX_SAFE_INTEGER) {
 	        this.bind();
-	        var needSubData = dataStartIndex !== 0 || dataCount !== 4294967295;
+	        var needSubData = dataStartIndex !== 0 || dataCount !== Number.MAX_SAFE_INTEGER;
 	        if (needSubData) {
 	            var subData = new Uint8Array(buffer, dataStartIndex, dataCount);
 	            Laya.LayaGL.instance.bufferSubData(this._bufferType, bufferOffset, subData);
@@ -10719,6 +10874,11 @@
 	VertexDeclaration._uniqueIDCounter = 1;
 
 	class VertexElement {
+	    constructor(offset, elementFormat, elementUsage) {
+	        this._offset = offset;
+	        this._elementFormat = elementFormat;
+	        this._elementUsage = elementUsage;
+	    }
 	    get offset() {
 	        return this._offset;
 	    }
@@ -10727,11 +10887,6 @@
 	    }
 	    get elementUsage() {
 	        return this._elementUsage;
-	    }
-	    constructor(offset, elementFormat, elementUsage) {
-	        this._offset = offset;
-	        this._elementFormat = elementFormat;
-	        this._elementUsage = elementUsage;
 	    }
 	}
 
@@ -11583,28 +11738,29 @@
 	            return Plane.PlaneIntersectionType_Back;
 	        return Plane.PlaneIntersectionType_Intersecting;
 	    }
-	    static intersectsRayAndPlaneRD(ray, plane, out) {
+	    static intersectsRayAndPlaneRD(ray, plane) {
 	        var planeNor = plane.normal;
 	        var direction = Vector3.dot(planeNor, ray.direction);
-	        if (MathUtils3D.isZero(direction)) {
-	            out = 0;
-	            return false;
-	        }
+	        if (Math.abs(direction) < MathUtils3D.zeroTolerance)
+	            return -1;
 	        var position = Vector3.dot(planeNor, ray.origin);
-	        out = (-plane.distance - position) / direction;
-	        if (out < 0) {
-	            out = 0;
-	            return false;
+	        var distance = (-plane.distance - position) / direction;
+	        if (distance < 0) {
+	            if (distance < -MathUtils3D.zeroTolerance)
+	                return -1;
+	            distance = 0;
 	        }
-	        return true;
+	        return distance;
 	    }
 	    static intersectsRayAndPlaneRP(ray, plane, out) {
-	        var distance;
-	        if (!CollisionUtils.intersectsRayAndPlaneRD(ray, plane, distance)) {
+	        var distance = CollisionUtils.intersectsRayAndPlaneRD(ray, plane);
+	        if (distance == -1) {
+	            out.setValue(0, 0, 0);
 	            return false;
 	        }
-	        Vector3.scale(ray.direction, distance, CollisionUtils._tempV30);
-	        Vector3.add(ray.origin, CollisionUtils._tempV30, CollisionUtils._tempV31);
+	        var scaDis = CollisionUtils._tempV30;
+	        Vector3.scale(ray.direction, distance, scaDis);
+	        Vector3.add(ray.origin, scaDis, out);
 	        return true;
 	    }
 	    static intersectsRayAndBoxRD(ray, box) {
@@ -12508,10 +12664,10 @@
 	    static supportRenderTextureFormat(format) {
 	        switch (format) {
 	            case Laya.RenderTextureFormat.R16G16B16A16:
-	                if (!Laya.LayaGL.layaGPUInstance._isWebGL2 && !Laya.LayaGL.layaGPUInstance._oesTextureHalfFloat && !Laya.LayaGL.layaGPUInstance._oesTextureHalfFloatLinear)
-	                    return false;
-	                else
+	                if (Laya.LayaGL.layaGPUInstance._isWebGL2 || Laya.LayaGL.layaGPUInstance._oesTextureHalfFloat && Laya.LayaGL.layaGPUInstance._oesTextureHalfFloatLinear)
 	                    return true;
+	                else
+	                    return false;
 	            default:
 	                return true;
 	        }
@@ -12593,6 +12749,12 @@
 	    }
 	}
 
+	(function (IndexFormat) {
+	    IndexFormat[IndexFormat["UInt8"] = 0] = "UInt8";
+	    IndexFormat[IndexFormat["UInt16"] = 1] = "UInt16";
+	    IndexFormat[IndexFormat["UInt32"] = 2] = "UInt32";
+	})(exports.IndexFormat || (exports.IndexFormat = {}));
+
 	class IndexBuffer3D extends Laya.Buffer {
 	    constructor(indexType, indexCount, bufferUsage = 0x88E4, canRead = false) {
 	        super();
@@ -12601,16 +12763,22 @@
 	        this._bufferUsage = bufferUsage;
 	        this._bufferType = Laya.LayaGL.instance.ELEMENT_ARRAY_BUFFER;
 	        this._canRead = canRead;
-	        var byteLength;
-	        if (indexType == IndexBuffer3D.INDEXTYPE_USHORT)
-	            this._indexTypeByteCount = 2;
-	        else if (indexType == IndexBuffer3D.INDEXTYPE_UBYTE)
-	            this._indexTypeByteCount = 1;
-	        else
-	            throw new Error("unidentification index type.");
-	        byteLength = this._indexTypeByteCount * indexCount;
-	        this._byteLength = byteLength;
+	        switch (indexType) {
+	            case exports.IndexFormat.UInt32:
+	                this._indexTypeByteCount = 4;
+	                break;
+	            case exports.IndexFormat.UInt16:
+	                this._indexTypeByteCount = 2;
+	                break;
+	            case exports.IndexFormat.UInt8:
+	                this._indexTypeByteCount = 1;
+	                break;
+	            default:
+	                throw new Error("unidentification index type.");
+	        }
+	        var byteLength = this._indexTypeByteCount * indexCount;
 	        var curBufSta = Laya.BufferStateBase._curBindedBufferState;
+	        this._byteLength = byteLength;
 	        if (curBufSta) {
 	            if (curBufSta._bindedIndexBuffer === this) {
 	                Laya.LayaGL.instance.bufferData(this._bufferType, byteLength, this._bufferUsage);
@@ -12627,10 +12795,17 @@
 	            Laya.LayaGL.instance.bufferData(this._bufferType, byteLength, this._bufferUsage);
 	        }
 	        if (canRead) {
-	            if (indexType == IndexBuffer3D.INDEXTYPE_USHORT)
-	                this._buffer = new Uint16Array(indexCount);
-	            else if (indexType == IndexBuffer3D.INDEXTYPE_UBYTE)
-	                this._buffer = new Uint8Array(indexCount);
+	            switch (indexType) {
+	                case exports.IndexFormat.UInt32:
+	                    this._buffer = new Uint32Array(indexCount);
+	                    break;
+	                case exports.IndexFormat.UInt16:
+	                    this._buffer = new Uint16Array(indexCount);
+	                    break;
+	                case exports.IndexFormat.UInt8:
+	                    this._buffer = new Uint8Array(indexCount);
+	                    break;
+	            }
 	        }
 	    }
 	    get indexType() {
@@ -12671,16 +12846,19 @@
 	        }
 	    }
 	    setData(data, bufferOffset = 0, dataStartIndex = 0, dataCount = 4294967295) {
-	        var byteCount;
-	        if (this._indexType == IndexBuffer3D.INDEXTYPE_USHORT) {
-	            byteCount = 2;
-	            if (dataStartIndex !== 0 || dataCount !== 4294967295)
-	                data = new Uint16Array(data.buffer, dataStartIndex * byteCount, dataCount);
-	        }
-	        else if (this._indexType == IndexBuffer3D.INDEXTYPE_UBYTE) {
-	            byteCount = 1;
-	            if (dataStartIndex !== 0 || dataCount !== 4294967295)
-	                data = new Uint8Array(data.buffer, dataStartIndex * byteCount, dataCount);
+	        var byteCount = this._indexTypeByteCount;
+	        if (dataStartIndex !== 0 || dataCount !== 4294967295) {
+	            switch (this._indexType) {
+	                case exports.IndexFormat.UInt32:
+	                    data = new Uint32Array(data.buffer, dataStartIndex * byteCount, dataCount);
+	                    break;
+	                case exports.IndexFormat.UInt16:
+	                    data = new Uint16Array(data.buffer, dataStartIndex * byteCount, dataCount);
+	                    break;
+	                case exports.IndexFormat.UInt8:
+	                    data = new Uint8Array(data.buffer, dataStartIndex * byteCount, dataCount);
+	                    break;
+	            }
 	        }
 	        var curBufSta = Laya.BufferStateBase._curBindedBufferState;
 	        if (curBufSta) {
@@ -12722,8 +12900,6 @@
 	        this._buffer = null;
 	    }
 	}
-	IndexBuffer3D.INDEXTYPE_UBYTE = "ubyte";
-	IndexBuffer3D.INDEXTYPE_USHORT = "ushort";
 
 	class SkyMesh {
 	    constructor() {
@@ -12733,9 +12909,6 @@
 	}
 
 	class SkyBox extends SkyMesh {
-	    static __init__() {
-	        SkyBox.instance = new SkyBox();
-	    }
 	    constructor() {
 	        super();
 	        var gl = Laya.LayaGL.instance;
@@ -12755,7 +12928,7 @@
 	        var verDec = VertexMesh.getVertexDeclaration("POSITION");
 	        this._vertexBuffer = new VertexBuffer3D(verDec.vertexStride * 8, gl.STATIC_DRAW, false);
 	        this._vertexBuffer.vertexDeclaration = verDec;
-	        this._indexBuffer = new IndexBuffer3D(IndexBuffer3D.INDEXTYPE_UBYTE, 36, gl.STATIC_DRAW, false);
+	        this._indexBuffer = new IndexBuffer3D(exports.IndexFormat.UInt8, 36, gl.STATIC_DRAW, false);
 	        this._vertexBuffer.setData(vertices.buffer);
 	        this._indexBuffer.setData(indices);
 	        var bufferState = new BufferState();
@@ -12764,6 +12937,9 @@
 	        bufferState.applyIndexBuffer(this._indexBuffer);
 	        bufferState.unBind();
 	        this._bufferState = bufferState;
+	    }
+	    static __init__() {
+	        SkyBox.instance = new SkyBox();
 	    }
 	    _render(state) {
 	        var gl = Laya.LayaGL.instance;
@@ -12798,11 +12974,11 @@
 	    _isAvailable() {
 	        return this._material && this._mesh ? true : false;
 	    }
-	    _render(state) {
+	    _render(context) {
 	        if (this._material && this._mesh) {
 	            var gl = Laya.LayaGL.instance;
-	            var scene = state.scene;
-	            var camera = state.camera;
+	            var scene = context.scene;
+	            var camera = context.camera;
 	            var noteValue = ShaderData._SET_RUNTIME_VALUE_MODE_REFERENCE_;
 	            Laya.ILaya.Render.supportWebGLPlusRendering && ShaderData.setRuntimeValueMode(false);
 	            Laya.WebGLContext.setCullFace(gl, false);
@@ -12810,7 +12986,7 @@
 	            Laya.WebGLContext.setDepthMask(gl, false);
 	            var comDef = SkyRenderer._compileDefine;
 	            this._material._shaderValues._defineDatas.cloneTo(comDef);
-	            var shader = state.shader = this._material._shader.getSubShaderAt(0)._passes[0].withCompile(comDef);
+	            var shader = context.shader = this._material._shader.getSubShaderAt(0)._passes[0].withCompile(comDef);
 	            var switchShader = shader.bind();
 	            var switchShaderLoop = (Laya.Stat.loopCount !== shader._uploadMark);
 	            var uploadScene = (shader._uploadScene !== scene) || switchShaderLoop;
@@ -12818,7 +12994,7 @@
 	                shader.uploadUniforms(shader._sceneUniformParamsMap, scene._shaderValues, uploadScene);
 	                shader._uploadScene = scene;
 	            }
-	            var renderTar = camera._getInternalRenderTexture();
+	            var renderTex = camera._getRenderTexture();
 	            var uploadCamera = (shader._uploadCamera !== camera) || switchShaderLoop;
 	            if (uploadCamera || switchShader) {
 	                var viewMatrix = SkyRenderer._tempMatrix0;
@@ -12835,7 +13011,7 @@
 	                projectionMatrix.elements[10] = epsilon - 1.0;
 	                projectionMatrix.elements[11] = -1.0;
 	                projectionMatrix.elements[14] = -0;
-	                camera._applyViewProject(state, viewMatrix, projectionMatrix, renderTar ? true : false);
+	                camera._applyViewProject(context, viewMatrix, projectionMatrix);
 	                shader.uploadUniforms(shader._cameraUniformParamsMap, camera._shaderValues, uploadCamera);
 	                shader._uploadCamera = camera;
 	            }
@@ -12845,11 +13021,11 @@
 	                shader._uploadMaterial = this._material;
 	            }
 	            this._mesh._bufferState.bind();
-	            this._mesh._render(state);
+	            this._mesh._render(context);
 	            Laya.ILaya.Render.supportWebGLPlusRendering && ShaderData.setRuntimeValueMode(noteValue);
 	            Laya.WebGLContext.setDepthFunc(gl, gl.LESS);
 	            Laya.WebGLContext.setDepthMask(gl, true);
-	            camera._applyViewProject(state, camera.viewMatrix, camera.projectionMatrix, renderTar ? true : false);
+	            camera._applyViewProject(context, camera.viewMatrix, camera.projectionMatrix);
 	        }
 	    }
 	    destroy() {
@@ -12879,7 +13055,6 @@
 	        this._nearPlane = nearPlane;
 	        this._farPlane = farPlane;
 	        this.cullingMask = 2147483647;
-	        this.clearFlag = BaseCamera.CLEARFLAG_SOLIDCOLOR;
 	        this.useOcclusionCulling = true;
 	    }
 	    get skyRenderer() {
@@ -12981,8 +13156,6 @@
 	    }
 	    _parse(data, spriteMap) {
 	        super._parse(data, spriteMap);
-	        var clearFlagData = data.clearFlag;
-	        (clearFlagData !== undefined) && (this.clearFlag = clearFlagData);
 	        this.orthographic = data.orthographic;
 	        (data.orthographicVerticalSize !== undefined) && (this.orthographicVerticalSize = data.orthographicVerticalSize);
 	        (data.fieldOfView !== undefined) && (this.fieldOfView = data.fieldOfView);
@@ -13016,13 +13189,13 @@
 	BaseCamera.PROJECTION_PARAMS = Shader3D.propertyNameToID("u_ProjectionParams");
 	BaseCamera.RENDERINGTYPE_DEFERREDLIGHTING = "DEFERREDLIGHTING";
 	BaseCamera.RENDERINGTYPE_FORWARDRENDERING = "FORWARDRENDERING";
+	BaseCamera._invertYScaleMatrix = new Matrix4x4(1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+	BaseCamera._invertYProjectionMatrix = new Matrix4x4();
+	BaseCamera._invertYProjectionViewMatrix = new Matrix4x4();
 	BaseCamera.CLEARFLAG_SOLIDCOLOR = 0;
 	BaseCamera.CLEARFLAG_SKY = 1;
 	BaseCamera.CLEARFLAG_DEPTHONLY = 2;
 	BaseCamera.CLEARFLAG_NONE = 3;
-	BaseCamera._invertYScaleMatrix = new Matrix4x4(1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-	BaseCamera._invertYProjectionMatrix = new Matrix4x4();
-	BaseCamera._invertYProjectionViewMatrix = new Matrix4x4();
 
 	class ScreenQuad extends Laya.Resource {
 	    constructor() {
@@ -13071,8 +13244,8 @@
 	    }
 	}
 	ScreenQuad.SCREENQUAD_POSITION_UV = 0;
-	ScreenQuad._vertices = new Float32Array([1, 1, 1, 0, 1, -1, 1, 1, -1, 1, 0, 0, -1, -1, 0, 1]);
-	ScreenQuad._verticesInvertUV = new Float32Array([1, 1, 1, 1, 1, -1, 1, 0, -1, 1, 0, 1, -1, -1, 0, 0]);
+	ScreenQuad._vertices = new Float32Array([1, 1, 1, 1, 1, -1, 1, 0, -1, 1, 0, 1, -1, -1, 0, 0]);
+	ScreenQuad._verticesInvertUV = new Float32Array([1, 1, 1, 0, 1, -1, 1, 1, -1, 1, 0, 0, -1, -1, 0, 1]);
 
 	class ScreenTriangle extends Laya.Resource {
 	    constructor() {
@@ -13121,8 +13294,8 @@
 	    }
 	}
 	ScreenTriangle.SCREENTRIANGLE_POSITION_UV = 0;
-	ScreenTriangle._vertices = new Float32Array([-1, -1, 0, 1, -1, 3, 0, -1, 3, -1, 2, 1]);
-	ScreenTriangle._verticesInvertUV = new Float32Array([-1, -1, 0, 0, -1, 3, 0, 2, 3, -1, 2, 0]);
+	ScreenTriangle._vertices = new Float32Array([-1, -1, 0, 0, -1, 3, 0, 2, 3, -1, 2, 0]);
+	ScreenTriangle._verticesInvertUV = new Float32Array([-1, -1, 0, 1, -1, 3, 0, -1, 3, -1, 2, 1]);
 
 	class Command {
 	    constructor() {
@@ -13139,8 +13312,10 @@
 	    }
 	}
 	Command.SCREENTEXTURE_NAME = "u_MainTex";
+	Command.SCREENTEXTUREOFFSETSCALE_NAME = "u_OffsetScale";
 	Command.MAINTEXTURE_TEXELSIZE_NAME = "u_MainTex_TexelSize";
 	Command.SCREENTEXTURE_ID = Shader3D.propertyNameToID(Command.SCREENTEXTURE_NAME);
+	Command.SCREENTEXTUREOFFSETSCALE_ID = Shader3D.propertyNameToID(Command.SCREENTEXTUREOFFSETSCALE_NAME);
 	Command.MAINTEXTURE_TEXELSIZE_ID = Shader3D.propertyNameToID(Command.MAINTEXTURE_TEXELSIZE_NAME);
 
 	class BlitScreenQuadCMD extends Command {
@@ -13148,17 +13323,19 @@
 	        super(...arguments);
 	        this._source = null;
 	        this._dest = null;
+	        this._offsetScale = null;
 	        this._shader = null;
 	        this._shaderData = null;
 	        this._subShader = 0;
 	        this._sourceTexelSize = new Vector4();
 	        this._screenType = 0;
 	    }
-	    static create(source, dest, shader = null, shaderData = null, subShader = 0, screenType = BlitScreenQuadCMD._SCREENTYPE_QUAD) {
+	    static create(source, dest, offsetScale = null, shader = null, shaderData = null, subShader = 0, screenType = BlitScreenQuadCMD._SCREENTYPE_QUAD) {
 	        var cmd;
 	        cmd = BlitScreenQuadCMD._pool.length > 0 ? BlitScreenQuadCMD._pool.pop() : new BlitScreenQuadCMD();
 	        cmd._source = source;
 	        cmd._dest = dest;
+	        cmd._offsetScale = offsetScale;
 	        cmd._shader = shader;
 	        cmd._shaderData = shaderData;
 	        cmd._subShader = subShader;
@@ -13171,6 +13348,7 @@
 	        var dest = this._dest;
 	        Laya.LayaGL.instance.viewport(0, 0, dest ? dest.width : RenderContext3D.clientWidth, dest ? dest.height : RenderContext3D.clientHeight);
 	        shaderData.setTexture(Command.SCREENTEXTURE_ID, this._source);
+	        shaderData.setVector(Command.SCREENTEXTUREOFFSETSCALE_ID, this._offsetScale || BlitScreenQuadCMD._defaultOffsetScale);
 	        this._sourceTexelSize.setValue(1.0 / this._source.width, 1.0 / this._source.height, this._source.width, this._source.height);
 	        shaderData.setVector(Command.MAINTEXTURE_TEXELSIZE_ID, this._sourceTexelSize);
 	        (dest) && (dest._start());
@@ -13186,11 +13364,12 @@
 	            shaderPass.uploadRenderStateFrontFace(shaderData, false, null);
 	            switch (this._screenType) {
 	                case BlitScreenQuadCMD._SCREENTYPE_QUAD:
-	                    dest ? ScreenQuad.instance.renderInvertUV() : ScreenQuad.instance.render();
+	                    RenderContext3D._instance.invertY ? ScreenQuad.instance.renderInvertUV() : ScreenQuad.instance.render();
 	                    break;
 	                case BlitScreenQuadCMD._SCREENTYPE_TRIANGLE:
-	                    dest ? ScreenTriangle.instance.renderInvertUV() : ScreenTriangle.instance.render();
+	                    RenderContext3D._instance.invertY ? ScreenTriangle.instance.renderInvertUV() : ScreenTriangle.instance.render();
 	                    break;
+	                default:
 	                    throw "BlitScreenQuadCMD:unknown screen Type.";
 	            }
 	        }
@@ -13198,7 +13377,9 @@
 	    }
 	    recover() {
 	        BlitScreenQuadCMD._pool.push(this);
+	        this._source = null;
 	        this._dest = null;
+	        this._offsetScale = null;
 	        this._shader = null;
 	        this._shaderData = null;
 	        super.recover();
@@ -13208,6 +13389,7 @@
 	BlitScreenQuadCMD._SCREENTYPE_TRIANGLE = 1;
 	BlitScreenQuadCMD._compileDefine = new DefineDatas();
 	BlitScreenQuadCMD._pool = [];
+	BlitScreenQuadCMD._defaultOffsetScale = new Vector4(0, 0, 1, 1);
 
 	class SetRenderTargetCMD extends Command {
 	    constructor() {
@@ -13269,11 +13451,11 @@
 	    setShaderDataTexture(shaderData, nameID, source) {
 	        this._commands.push(SetShaderDataTextureCMD.create(shaderData, nameID, source));
 	    }
-	    blitScreenQuad(source, dest, shader = null, shaderData = null, subShader = 0) {
-	        this._commands.push(BlitScreenQuadCMD.create(source, dest, shader, shaderData, subShader, BlitScreenQuadCMD._SCREENTYPE_QUAD));
+	    blitScreenQuad(source, dest, offsetScale = null, shader = null, shaderData = null, subShader = 0) {
+	        this._commands.push(BlitScreenQuadCMD.create(source, dest, offsetScale, shader, shaderData, subShader, BlitScreenQuadCMD._SCREENTYPE_QUAD));
 	    }
-	    blitScreenTriangle(source, dest, shader = null, shaderData = null, subShader = 0) {
-	        this._commands.push(BlitScreenQuadCMD.create(source, dest, shader, shaderData, subShader, BlitScreenQuadCMD._SCREENTYPE_TRIANGLE));
+	    blitScreenTriangle(source, dest, offsetScale = null, shader = null, shaderData = null, subShader = 0) {
+	        this._commands.push(BlitScreenQuadCMD.create(source, dest, offsetScale, shader, shaderData, subShader, BlitScreenQuadCMD._SCREENTYPE_TRIANGLE));
 	    }
 	    setRenderTarget(renderTexture) {
 	        this._commands.push(SetRenderTargetCMD.create(renderTexture));
@@ -13285,6 +13467,13 @@
 	    }
 	}
 
+	var CameraClearFlags;
+	(function (CameraClearFlags) {
+	    CameraClearFlags[CameraClearFlags["SolidColor"] = 0] = "SolidColor";
+	    CameraClearFlags[CameraClearFlags["Sky"] = 1] = "Sky";
+	    CameraClearFlags[CameraClearFlags["DepthOnly"] = 2] = "DepthOnly";
+	    CameraClearFlags[CameraClearFlags["Nothing"] = 3] = "Nothing";
+	})(CameraClearFlags || (CameraClearFlags = {}));
 	class Camera extends BaseCamera {
 	    constructor(aspectRatio = 0, nearPlane = 0.3, farPlane = 1000) {
 	        super(nearPlane, farPlane);
@@ -13294,10 +13483,12 @@
 	        this._viewportParams = new Vector4();
 	        this._projectionParams = new Vector4();
 	        this._offScreenRenderTexture = null;
-	        this._renderTexture = null;
+	        this._internalRenderTexture = null;
 	        this._postProcessCommandBuffers = [];
 	        this._clusterPlaneCacheFlag = new Vector2(-1, -1);
+	        this._screenOffsetScale = new Vector4();
 	        this.enableRender = true;
+	        this.clearFlag = CameraClearFlags.SolidColor;
 	        this._viewMatrix = new Matrix4x4();
 	        this._projectionMatrix = new Matrix4x4();
 	        this._projectionViewMatrix = new Matrix4x4();
@@ -13430,7 +13621,10 @@
 	        return this._offScreenRenderTexture;
 	    }
 	    set renderTarget(value) {
-	        if (this._offScreenRenderTexture !== value) {
+	        var lastValue = this._offScreenRenderTexture;
+	        if (lastValue !== value) {
+	            (lastValue) && (lastValue._isCameraTarget = false);
+	            (value) && (value._isCameraTarget = true);
 	            this._offScreenRenderTexture = value;
 	            this._calculateProjectionMatrix();
 	        }
@@ -13448,15 +13642,11 @@
 	        return this._enableHDR;
 	    }
 	    set enableHDR(value) {
-	        if (value) {
-	            if (SystemUtils.supportRenderTextureFormat(Laya.RenderTextureFormat.R16G16B16A16))
-	                this._enableHDR = true;
-	            else
-	                console.warn("Camera:can't enable HDR in this device.");
+	        if (value && !SystemUtils.supportRenderTextureFormat(Laya.RenderTextureFormat.R16G16B16A16)) {
+	            console.warn("Camera:can't enable HDR in this device.");
+	            return;
 	        }
-	        else {
-	            this._enableHDR = false;
-	        }
+	        this._enableHDR = value;
 	    }
 	    _calculationViewport(normalizedViewport, width, height) {
 	        var lx = normalizedViewport.x * width;
@@ -13497,10 +13687,18 @@
 	    }
 	    _parse(data, spriteMap) {
 	        super._parse(data, spriteMap);
+	        var clearFlagData = data.clearFlag;
+	        (clearFlagData !== undefined) && (this.clearFlag = clearFlagData);
 	        var viewport = data.viewport;
 	        this.normalizedViewport = new Viewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 	        var enableHDR = data.enableHDR;
 	        (enableHDR !== undefined) && (this.enableHDR = enableHDR);
+	    }
+	    _getCanvasWidth() {
+	        if (this._offScreenRenderTexture)
+	            return this._offScreenRenderTexture.width;
+	        else
+	            return RenderContext3D.clientWidth;
 	    }
 	    _getCanvasHeight() {
 	        if (this._offScreenRenderTexture)
@@ -13508,8 +13706,11 @@
 	        else
 	            return RenderContext3D.clientHeight;
 	    }
-	    _getInternalRenderTexture() {
-	        return this._renderTexture || this._offScreenRenderTexture;
+	    _getRenderTexture() {
+	        return this._internalRenderTexture || this._offScreenRenderTexture;
+	    }
+	    _needInternalRenderTexture() {
+	        return this._postProcess || this._enableHDR ? true : false;
 	    }
 	    _applyPostProcessCommandBuffers() {
 	        for (var i = 0, n = this._postProcessCommandBuffers.length; i < n; i++)
@@ -13525,14 +13726,14 @@
 	        super._prepareCameraToRender();
 	        var vp = this.viewport;
 	        this._viewportParams.setValue(vp.x, vp.y, vp.width, vp.height);
-	        this._projectionParams.setValue(this._nearPlane, this._farPlane, this._getInternalRenderTexture() ? -1 : 1, 0);
+	        this._projectionParams.setValue(this._nearPlane, this._farPlane, this._getRenderTexture() ? -1 : 1, 0);
 	        this._shaderValues.setVector(BaseCamera.VIEWPORT, this._viewportParams);
 	        this._shaderValues.setVector(BaseCamera.PROJECTION_PARAMS, this._projectionParams);
 	    }
-	    _applyViewProject(context, viewMat, proMat, inverseY) {
+	    _applyViewProject(context, viewMat, proMat) {
 	        var projectView;
 	        var shaderData = this._shaderValues;
-	        if (inverseY) {
+	        if (context.invertY) {
 	            Matrix4x4.multiply(BaseCamera._invertYScaleMatrix, proMat, BaseCamera._invertYProjectionMatrix);
 	            Matrix4x4.multiply(BaseCamera._invertYProjectionMatrix, viewMat, BaseCamera._invertYProjectionViewMatrix);
 	            proMat = BaseCamera._invertYProjectionMatrix;
@@ -13588,14 +13789,17 @@
 	        }
 	    }
 	    render(shader = null, replacementTag = null) {
-	        if (!this._scene)
+	        if (!this.activeInHierarchy)
 	            return;
-	        var createRenderTexture = this._postProcess || this._enableHDR ? true : false;
-	        if (createRenderTexture)
-	            this._renderTexture = RenderTexture.createFromPool(RenderContext3D.clientWidth, RenderContext3D.clientHeight, this._getRenderTextureFormat(), Laya.RenderTextureDepthFormat.DEPTH_16, Laya.BaseTexture.FILTERMODE_BILINEAR);
+	        var viewport = this.viewport;
+	        var needInternalRT = this._needInternalRenderTexture();
 	        var gl = Laya.LayaGL.instance;
 	        var context = RenderContext3D._instance;
 	        var scene = context.scene = this._scene;
+	        if (needInternalRT)
+	            this._internalRenderTexture = RenderTexture.createFromPool(viewport.width, viewport.height, this._getRenderTextureFormat(), Laya.RenderTextureDepthFormat.DEPTH_16, Laya.BaseTexture.FILTERMODE_BILINEAR);
+	        else
+	            this._internalRenderTexture = null;
 	        if (scene.parallelSplitShadowMaps[0]) {
 	            ShaderData.setRuntimeValueMode(false);
 	            var parallelSplitShadowMap = scene.parallelSplitShadowMaps[0];
@@ -13604,46 +13808,65 @@
 	            for (var i = 0, n = parallelSplitShadowMap.shadowMapCount; i < n; i++) {
 	                var smCamera = parallelSplitShadowMap.cameras[i];
 	                context.camera = smCamera;
-	                FrustumCulling.renderObjectCulling(smCamera, scene, context, scene._castShadowRenders, shader, replacementTag);
+	                FrustumCulling.renderObjectCulling(smCamera, scene, context, shader, replacementTag, true);
 	                var shadowMap = parallelSplitShadowMap.cameras[i + 1].renderTarget;
 	                shadowMap._start();
 	                context.camera = smCamera;
+	                Camera._updateMark++;
 	                context.viewport = smCamera.viewport;
 	                smCamera._prepareCameraToRender();
-	                smCamera._applyViewProject(context, smCamera.viewMatrix, smCamera.projectionMatrix, false);
+	                smCamera._applyViewProject(context, smCamera.viewMatrix, smCamera.projectionMatrix);
 	                scene._clear(gl, context);
 	                var queue = scene._opaqueQueue;
-	                queue._render(context, false);
+	                queue._render(context);
 	                shadowMap._end();
 	            }
 	            scene._shaderValues.removeDefine(Scene3DShaderDeclaration.SHADERDEFINE_CAST_SHADOW);
 	            ShaderData.setRuntimeValueMode(true);
 	        }
 	        context.camera = this;
+	        Camera._updateMark++;
 	        scene._preRenderScript();
-	        var renderTar = this._getInternalRenderTexture();
-	        (renderTar) && (renderTar._start());
-	        context.viewport = this.viewport;
+	        if (needInternalRT && !this._offScreenRenderTexture && (this.clearFlag == CameraClearFlags.DepthOnly || this.clearFlag == CameraClearFlags.Nothing)) {
+	            if (this._enableHDR) {
+	                var grabTexture = RenderTexture.createFromPool(viewport.width, viewport.height, Laya.RenderTextureFormat.R8G8B8, Laya.RenderTextureDepthFormat.DEPTH_16, Laya.BaseTexture.FILTERMODE_BILINEAR);
+	                Laya.WebGLContext.bindTexture(gl, gl.TEXTURE_2D, grabTexture._getSource());
+	                gl.copyTexSubImage2D(gl.TEXTURE_2D, 0, 0, 0, viewport.x, RenderContext3D.clientHeight - (viewport.y + viewport.height), viewport.width, viewport.height);
+	                var blit = BlitScreenQuadCMD.create(grabTexture, this._internalRenderTexture);
+	                blit.run();
+	                blit.recover();
+	                RenderTexture.recoverToPool(grabTexture);
+	            }
+	            else {
+	                Laya.WebGLContext.bindTexture(gl, gl.TEXTURE_2D, this._internalRenderTexture._getSource());
+	                gl.copyTexSubImage2D(gl.TEXTURE_2D, 0, 0, 0, viewport.x, RenderContext3D.clientHeight - (viewport.y + viewport.height), viewport.width, viewport.height);
+	            }
+	        }
+	        var renderTex = this._getRenderTexture();
+	        (renderTex) && (renderTex._start());
+	        context.viewport = viewport;
 	        this._prepareCameraToRender();
 	        var multiLighting = Config3D._config._multiLighting;
 	        (multiLighting) && (Cluster.instance.update(this, (this._scene)));
-	        this._applyViewProject(context, this.viewMatrix, this._projectionMatrix, renderTar ? true : false);
+	        this._applyViewProject(context, this.viewMatrix, this._projectionMatrix);
 	        scene._preCulling(context, this, shader, replacementTag);
 	        scene._clear(gl, context);
 	        scene._renderScene(context);
 	        scene._postRenderScript();
-	        (renderTar) && (renderTar._end());
-	        if (createRenderTexture) {
+	        (renderTex) && (renderTex._end());
+	        if (needInternalRT) {
 	            if (this._postProcess) {
 	                this._postProcess._render();
 	                this._applyPostProcessCommandBuffers();
 	            }
 	            else if (this._enableHDR) {
-	                var blit = BlitScreenQuadCMD.create(this._renderTexture, this._offScreenRenderTexture ? this._offScreenRenderTexture : null);
+	                var canvasWidth = this._getCanvasWidth(), canvasHeight = this._getCanvasHeight();
+	                this._screenOffsetScale.setValue(viewport.x / canvasWidth, viewport.y / canvasHeight, viewport.width / canvasWidth, viewport.height / canvasHeight);
+	                var blit = BlitScreenQuadCMD.create(this._internalRenderTexture, this._offScreenRenderTexture ? this._offScreenRenderTexture : null, this._screenOffsetScale);
 	                blit.run();
 	                blit.recover();
 	            }
-	            RenderTexture.recoverToPool(this._renderTexture);
+	            RenderTexture.recoverToPool(this._internalRenderTexture);
 	        }
 	    }
 	    viewportPointToRay(point, out) {
@@ -13786,7 +14009,8 @@
 	                this.addToOpaqueRenderQueue(context, renderQueue);
 	        }
 	    }
-	    _render(context, isTarget) {
+	    _render(context) {
+	        var forceInvertFace = context.invertY;
 	        var lastStateMaterial, lastStateShaderInstance, lastStateRender;
 	        var updateMark = Camera._updateMark;
 	        var scene = context.scene;
@@ -13800,6 +14024,12 @@
 	            this.render._renderUpdateWithCamera(context, transform);
 	            this.render._updateMark = updateMark;
 	            this.render._updateRenderType = this.renderType;
+	        }
+	        else {
+	            if (this.renderType == RenderElement.RENDERTYPE_INSTANCEBATCH) {
+	                this.render._renderUpdate(context, transform);
+	                this.render._renderUpdateWithCamera(context, transform);
+	            }
 	        }
 	        if (geometry._prepareRender(context)) {
 	            var passes = this.renderSubShader._passes;
@@ -13836,14 +14066,14 @@
 	                var matValues = this.material._shaderValues;
 	                if (lastStateMaterial !== this.material || lastStateShaderInstance !== shaderIns) {
 	                    shaderIns.uploadRenderStateBlendDepth(matValues);
-	                    shaderIns.uploadRenderStateFrontFace(matValues, isTarget, this.getInvertFront());
+	                    shaderIns.uploadRenderStateFrontFace(matValues, forceInvertFace, this.getInvertFront());
 	                    lastStateMaterial = this.material;
 	                    lastStateShaderInstance = shaderIns;
 	                    lastStateRender = this.render;
 	                }
 	                else {
 	                    if (lastStateRender !== this.render) {
-	                        shaderIns.uploadRenderStateFrontFace(matValues, isTarget, this.getInvertFront());
+	                        shaderIns.uploadRenderStateFrontFace(matValues, forceInvertFace, this.getInvertFront());
 	                        lastStateRender = this.render;
 	                    }
 	                }
@@ -13853,7 +14083,6 @@
 	        }
 	        if (updateRender && this.renderType !== RenderElement.RENDERTYPE_NORMAL)
 	            this.render._revertBatchRenderUpdate(context);
-	        Camera._updateMark++;
 	    }
 	    destroy() {
 	        this._transform = null;
@@ -14237,6 +14466,9 @@
 	        else {
 	            worldMat = transform.worldMatrix;
 	        }
+	        var normalMat = SubMeshStaticBatch._tempMatrix4x42;
+	        worldMat.invert(normalMat);
+	        normalMat.transpose();
 	        var rotation = SubMeshStaticBatch._tempQuaternion0;
 	        worldMat.decomposeTransRotScale(SubMeshStaticBatch._tempVector30, rotation, SubMeshStaticBatch._tempVector31);
 	        var lightmapScaleOffset = render.lightmapScaleOffset;
@@ -14246,7 +14478,7 @@
 	            var bakeOffset = (i + batchOffset) * bakeVertexFloatCount;
 	            Utils3D.transformVector3ArrayToVector3ArrayCoordinate(oriVertexes, oriOffset + positionOffset, worldMat, batchVertices, bakeOffset + 0);
 	            if (normalOffset !== -1)
-	                Utils3D.transformVector3ArrayByQuat(oriVertexes, oriOffset + normalOffset, rotation, batchVertices, bakeOffset + 3);
+	                Utils3D.transformVector3ArrayToVector3ArrayNormal(oriVertexes, oriOffset + normalOffset, normalMat, batchVertices, bakeOffset + 3);
 	            var j, m;
 	            var bakOff = bakeOffset + 6;
 	            if (colorOffset !== -1) {
@@ -14328,7 +14560,7 @@
 	        var indexDatas = new Uint16Array(this._currentBatchIndexCount);
 	        this._vertexBuffer = new VertexBuffer3D(this._vertexDeclaration.vertexStride * this._currentBatchVertexCount, gl.STATIC_DRAW);
 	        this._vertexBuffer.vertexDeclaration = this._vertexDeclaration;
-	        this._indexBuffer = new IndexBuffer3D(IndexBuffer3D.INDEXTYPE_USHORT, this._currentBatchIndexCount, gl.STATIC_DRAW);
+	        this._indexBuffer = new IndexBuffer3D(exports.IndexFormat.UInt16, this._currentBatchIndexCount, gl.STATIC_DRAW);
 	        for (var i = 0, n = this._batchElements.length; i < n; i++) {
 	            var sprite = this._batchElements[i];
 	            var mesh = sprite.meshFilter.sharedMesh;
@@ -14424,6 +14656,7 @@
 	SubMeshStaticBatch._tempQuaternion0 = new Quaternion();
 	SubMeshStaticBatch._tempMatrix4x40 = new Matrix4x4();
 	SubMeshStaticBatch._tempMatrix4x41 = new Matrix4x4();
+	SubMeshStaticBatch._tempMatrix4x42 = new Matrix4x4();
 	SubMeshStaticBatch.maxBatchVertexCount = 65535;
 	SubMeshStaticBatch._batchIDCounter = 0;
 
@@ -14812,6 +15045,7 @@
 	        this._indexInList = -1;
 	        this._indexInCastShadowList = -1;
 	        this._boundsChange = true;
+	        this._castShadow = false;
 	        this._supportOctree = true;
 	        this._sharedMaterials = [];
 	        this._visible = true;
@@ -14842,7 +15076,6 @@
 	        this._materialsInstance = [];
 	        this._shaderValues = new ShaderData(null);
 	        this.lightmapIndex = -1;
-	        this._castShadow = false;
 	        this.receiveShadow = false;
 	        this.sortingFudge = 0.0;
 	        (owner) && (this._owner.transform.on(Laya.Event.TRANSFORM_CHANGED, this, this._onWorldMatNeedChange));
@@ -14966,15 +15199,7 @@
 	        return this._castShadow;
 	    }
 	    set castShadow(value) {
-	        if (this._castShadow !== value) {
-	            if (this._owner.activeInHierarchy) {
-	                if (value)
-	                    this._scene._addShadowCastRenderObject(this);
-	                else
-	                    this._scene._removeShadowCastRenderObject(this);
-	            }
-	            this._castShadow = value;
-	        }
+	        this._castShadow = value;
 	    }
 	    get isPartOfStaticBatch() {
 	        return this._isPartOfStaticBatch;
@@ -15288,7 +15513,7 @@
 	        this._vertices = new Float32Array(maxByteCount / 4);
 	        this._vertexBuffer = new VertexBuffer3D(maxByteCount, gl.DYNAMIC_DRAW);
 	        this._indices = new Int16Array(SubMeshDynamicBatch.maxIndicesCount);
-	        this._indexBuffer = new IndexBuffer3D(IndexBuffer3D.INDEXTYPE_USHORT, this._indices.length, gl.DYNAMIC_DRAW);
+	        this._indexBuffer = new IndexBuffer3D(exports.IndexFormat.UInt16, this._indices.length, gl.DYNAMIC_DRAW);
 	        var memorySize = this._vertexBuffer._byteLength + this._indexBuffer._byteLength;
 	        Laya.Resource._addMemory(memorySize, memorySize);
 	    }
@@ -15507,6 +15732,12 @@
 	MeshRenderDynamicBatchManager.instance = new MeshRenderDynamicBatchManager();
 
 	class MeshSprite3D extends RenderableSprite3D {
+	    constructor(mesh = null, name = null) {
+	        super(name);
+	        this._meshFilter = new MeshFilter(this);
+	        this._render = new MeshRenderer(this);
+	        (mesh) && (this._meshFilter.sharedMesh = mesh);
+	    }
 	    static __init__() {
 	        MeshSprite3DShaderDeclaration.SHADERDEFINE_UV0 = Shader3D.getDefineByName("UV");
 	        MeshSprite3DShaderDeclaration.SHADERDEFINE_COLOR = Shader3D.getDefineByName("COLOR");
@@ -15520,12 +15751,6 @@
 	    }
 	    get meshRenderer() {
 	        return this._render;
-	    }
-	    constructor(mesh = null, name = null) {
-	        super(name);
-	        this._meshFilter = new MeshFilter(this);
-	        this._render = new MeshRenderer(this);
-	        (mesh) && (this._meshFilter.sharedMesh = mesh);
 	    }
 	    _parse(data, spriteMap) {
 	        super._parse(data, spriteMap);
@@ -15863,7 +16088,1701 @@
 	    }
 	}
 
-	class ShurikenParticleMaterial extends BaseMaterial {
+	class Burst {
+	    constructor(time, minCount, maxCount) {
+	        this._time = time;
+	        this._minCount = minCount;
+	        this._maxCount = maxCount;
+	    }
+	    get time() {
+	        return this._time;
+	    }
+	    get minCount() {
+	        return this._minCount;
+	    }
+	    get maxCount() {
+	        return this._maxCount;
+	    }
+	    cloneTo(destObject) {
+	        var destBurst = destObject;
+	        destBurst._time = this._time;
+	        destBurst._minCount = this._minCount;
+	        destBurst._maxCount = this._maxCount;
+	    }
+	    clone() {
+	        var destBurst = new Burst(this._time, this._minCount, this._maxCount);
+	        this.cloneTo(destBurst);
+	        return destBurst;
+	    }
+	}
+
+	class GradientColor {
+	    constructor() {
+	        this._type = 0;
+	        this._constant = null;
+	        this._constantMin = null;
+	        this._constantMax = null;
+	        this._gradient = null;
+	        this._gradientMin = null;
+	        this._gradientMax = null;
+	    }
+	    static createByConstant(constant) {
+	        var gradientColor = new GradientColor();
+	        gradientColor._type = 0;
+	        gradientColor._constant = constant;
+	        return gradientColor;
+	    }
+	    static createByGradient(gradient) {
+	        var gradientColor = new GradientColor();
+	        gradientColor._type = 1;
+	        gradientColor._gradient = gradient;
+	        return gradientColor;
+	    }
+	    static createByRandomTwoConstant(minConstant, maxConstant) {
+	        var gradientColor = new GradientColor();
+	        gradientColor._type = 2;
+	        gradientColor._constantMin = minConstant;
+	        gradientColor._constantMax = maxConstant;
+	        return gradientColor;
+	    }
+	    static createByRandomTwoGradient(minGradient, maxGradient) {
+	        var gradientColor = new GradientColor();
+	        gradientColor._type = 3;
+	        gradientColor._gradientMin = minGradient;
+	        gradientColor._gradientMax = maxGradient;
+	        return gradientColor;
+	    }
+	    get type() {
+	        return this._type;
+	    }
+	    get constant() {
+	        return this._constant;
+	    }
+	    get constantMin() {
+	        return this._constantMin;
+	    }
+	    get constantMax() {
+	        return this._constantMax;
+	    }
+	    get gradient() {
+	        return this._gradient;
+	    }
+	    get gradientMin() {
+	        return this._gradientMin;
+	    }
+	    get gradientMax() {
+	        return this._gradientMax;
+	    }
+	    cloneTo(destObject) {
+	        var destGradientColor = destObject;
+	        destGradientColor._type = this._type;
+	        this._constant.cloneTo(destGradientColor._constant);
+	        this._constantMin.cloneTo(destGradientColor._constantMin);
+	        this._constantMax.cloneTo(destGradientColor._constantMax);
+	        this._gradient.cloneTo(destGradientColor._gradient);
+	        this._gradientMin.cloneTo(destGradientColor._gradientMin);
+	        this._gradientMax.cloneTo(destGradientColor._gradientMax);
+	    }
+	    clone() {
+	        var destGradientColor = new GradientColor();
+	        this.cloneTo(destGradientColor);
+	        return destGradientColor;
+	    }
+	}
+
+	class ColorOverLifetime {
+	    constructor(color) {
+	        this._color = color;
+	    }
+	    get color() {
+	        return this._color;
+	    }
+	    cloneTo(destObject) {
+	        var destColorOverLifetime = destObject;
+	        this._color.cloneTo(destColorOverLifetime._color);
+	        destColorOverLifetime.enable = this.enable;
+	    }
+	    clone() {
+	        var destColor;
+	        switch (this._color.type) {
+	            case 0:
+	                destColor = GradientColor.createByConstant(this._color.constant.clone());
+	                break;
+	            case 1:
+	                destColor = GradientColor.createByGradient(this._color.gradient.clone());
+	                break;
+	            case 2:
+	                destColor = GradientColor.createByRandomTwoConstant(this._color.constantMin.clone(), this._color.constantMax.clone());
+	                break;
+	            case 3:
+	                destColor = GradientColor.createByRandomTwoGradient(this._color.gradientMin.clone(), this._color.gradientMax.clone());
+	                break;
+	        }
+	        var destColorOverLifetime = new ColorOverLifetime(destColor);
+	        destColorOverLifetime.enable = this.enable;
+	        return destColorOverLifetime;
+	    }
+	}
+
+	class FrameOverTime {
+	    constructor() {
+	        this._type = 0;
+	        this._constant = 0;
+	        this._overTime = null;
+	        this._constantMin = 0;
+	        this._constantMax = 0;
+	        this._overTimeMin = null;
+	        this._overTimeMax = null;
+	    }
+	    static createByConstant(constant = 0) {
+	        var rotationOverLifetime = new FrameOverTime();
+	        rotationOverLifetime._type = 0;
+	        rotationOverLifetime._constant = constant;
+	        return rotationOverLifetime;
+	    }
+	    static createByOverTime(overTime) {
+	        var rotationOverLifetime = new FrameOverTime();
+	        rotationOverLifetime._type = 1;
+	        rotationOverLifetime._overTime = overTime;
+	        return rotationOverLifetime;
+	    }
+	    static createByRandomTwoConstant(constantMin = 0, constantMax = 0) {
+	        var rotationOverLifetime = new FrameOverTime();
+	        rotationOverLifetime._type = 2;
+	        rotationOverLifetime._constantMin = constantMin;
+	        rotationOverLifetime._constantMax = constantMax;
+	        return rotationOverLifetime;
+	    }
+	    static createByRandomTwoOverTime(gradientFrameMin, gradientFrameMax) {
+	        var rotationOverLifetime = new FrameOverTime();
+	        rotationOverLifetime._type = 3;
+	        rotationOverLifetime._overTimeMin = gradientFrameMin;
+	        rotationOverLifetime._overTimeMax = gradientFrameMax;
+	        return rotationOverLifetime;
+	    }
+	    get type() {
+	        return this._type;
+	    }
+	    get constant() {
+	        return this._constant;
+	    }
+	    get frameOverTimeData() {
+	        return this._overTime;
+	    }
+	    get constantMin() {
+	        return this._constantMin;
+	    }
+	    get constantMax() {
+	        return this._constantMax;
+	    }
+	    get frameOverTimeDataMin() {
+	        return this._overTimeMin;
+	    }
+	    get frameOverTimeDataMax() {
+	        return this._overTimeMax;
+	    }
+	    cloneTo(destObject) {
+	        var destFrameOverTime = destObject;
+	        destFrameOverTime._type = this._type;
+	        destFrameOverTime._constant = this._constant;
+	        (this._overTime) && (this._overTime.cloneTo(destFrameOverTime._overTime));
+	        destFrameOverTime._constantMin = this._constantMin;
+	        destFrameOverTime._constantMax = this._constantMax;
+	        (this._overTimeMin) && (this._overTimeMin.cloneTo(destFrameOverTime._overTimeMin));
+	        (this._overTimeMax) && (this._overTimeMax.cloneTo(destFrameOverTime._overTimeMax));
+	    }
+	    clone() {
+	        var destFrameOverTime = new FrameOverTime();
+	        this.cloneTo(destFrameOverTime);
+	        return destFrameOverTime;
+	    }
+	}
+
+	class GradientAngularVelocity {
+	    constructor() {
+	        this._type = 0;
+	        this._separateAxes = false;
+	        this._constant = 0;
+	        this._constantSeparate = null;
+	        this._gradient = null;
+	        this._gradientX = null;
+	        this._gradientY = null;
+	        this._gradientZ = null;
+	        this._gradientW = null;
+	        this._constantMin = 0;
+	        this._constantMax = 0;
+	        this._constantMinSeparate = null;
+	        this._constantMaxSeparate = null;
+	        this._gradientMin = null;
+	        this._gradientMax = null;
+	        this._gradientXMin = null;
+	        this._gradientXMax = null;
+	        this._gradientYMin = null;
+	        this._gradientYMax = null;
+	        this._gradientZMin = null;
+	        this._gradientZMax = null;
+	        this._gradientWMin = null;
+	        this._gradientWMax = null;
+	    }
+	    static createByConstant(constant) {
+	        var gradientAngularVelocity = new GradientAngularVelocity();
+	        gradientAngularVelocity._type = 0;
+	        gradientAngularVelocity._separateAxes = false;
+	        gradientAngularVelocity._constant = constant;
+	        return gradientAngularVelocity;
+	    }
+	    static createByConstantSeparate(separateConstant) {
+	        var gradientAngularVelocity = new GradientAngularVelocity();
+	        gradientAngularVelocity._type = 0;
+	        gradientAngularVelocity._separateAxes = true;
+	        gradientAngularVelocity._constantSeparate = separateConstant;
+	        return gradientAngularVelocity;
+	    }
+	    static createByGradient(gradient) {
+	        var gradientAngularVelocity = new GradientAngularVelocity();
+	        gradientAngularVelocity._type = 1;
+	        gradientAngularVelocity._separateAxes = false;
+	        gradientAngularVelocity._gradient = gradient;
+	        return gradientAngularVelocity;
+	    }
+	    static createByGradientSeparate(gradientX, gradientY, gradientZ) {
+	        var gradientAngularVelocity = new GradientAngularVelocity();
+	        gradientAngularVelocity._type = 1;
+	        gradientAngularVelocity._separateAxes = true;
+	        gradientAngularVelocity._gradientX = gradientX;
+	        gradientAngularVelocity._gradientY = gradientY;
+	        gradientAngularVelocity._gradientZ = gradientZ;
+	        return gradientAngularVelocity;
+	    }
+	    static createByRandomTwoConstant(constantMin, constantMax) {
+	        var gradientAngularVelocity = new GradientAngularVelocity();
+	        gradientAngularVelocity._type = 2;
+	        gradientAngularVelocity._separateAxes = false;
+	        gradientAngularVelocity._constantMin = constantMin;
+	        gradientAngularVelocity._constantMax = constantMax;
+	        return gradientAngularVelocity;
+	    }
+	    static createByRandomTwoConstantSeparate(separateConstantMin, separateConstantMax) {
+	        var gradientAngularVelocity = new GradientAngularVelocity();
+	        gradientAngularVelocity._type = 2;
+	        gradientAngularVelocity._separateAxes = true;
+	        gradientAngularVelocity._constantMinSeparate = separateConstantMin;
+	        gradientAngularVelocity._constantMaxSeparate = separateConstantMax;
+	        return gradientAngularVelocity;
+	    }
+	    static createByRandomTwoGradient(gradientMin, gradientMax) {
+	        var gradientAngularVelocity = new GradientAngularVelocity();
+	        gradientAngularVelocity._type = 3;
+	        gradientAngularVelocity._separateAxes = false;
+	        gradientAngularVelocity._gradientMin = gradientMin;
+	        gradientAngularVelocity._gradientMax = gradientMax;
+	        return gradientAngularVelocity;
+	    }
+	    static createByRandomTwoGradientSeparate(gradientXMin, gradientXMax, gradientYMin, gradientYMax, gradientZMin, gradientZMax, gradientWMin, gradientWMax) {
+	        var gradientAngularVelocity = new GradientAngularVelocity();
+	        gradientAngularVelocity._type = 3;
+	        gradientAngularVelocity._separateAxes = true;
+	        gradientAngularVelocity._gradientXMin = gradientXMin;
+	        gradientAngularVelocity._gradientXMax = gradientXMax;
+	        gradientAngularVelocity._gradientYMin = gradientYMin;
+	        gradientAngularVelocity._gradientYMax = gradientYMax;
+	        gradientAngularVelocity._gradientZMin = gradientZMin;
+	        gradientAngularVelocity._gradientZMax = gradientZMax;
+	        gradientAngularVelocity._gradientWMin = gradientWMin;
+	        gradientAngularVelocity._gradientWMax = gradientWMax;
+	        return gradientAngularVelocity;
+	    }
+	    get type() {
+	        return this._type;
+	    }
+	    get separateAxes() {
+	        return this._separateAxes;
+	    }
+	    get constant() {
+	        return this._constant;
+	    }
+	    get constantSeparate() {
+	        return this._constantSeparate;
+	    }
+	    get gradient() {
+	        return this._gradient;
+	    }
+	    get gradientX() {
+	        return this._gradientX;
+	    }
+	    get gradientY() {
+	        return this._gradientY;
+	    }
+	    get gradientZ() {
+	        return this._gradientZ;
+	    }
+	    get gradientW() {
+	        return this._gradientW;
+	    }
+	    get constantMin() {
+	        return this._constantMin;
+	    }
+	    get constantMax() {
+	        return this._constantMax;
+	    }
+	    get constantMinSeparate() {
+	        return this._constantMinSeparate;
+	    }
+	    get constantMaxSeparate() {
+	        return this._constantMaxSeparate;
+	    }
+	    get gradientMin() {
+	        return this._gradientMin;
+	    }
+	    get gradientMax() {
+	        return this._gradientMax;
+	    }
+	    get gradientXMin() {
+	        return this._gradientXMin;
+	    }
+	    get gradientXMax() {
+	        return this._gradientXMax;
+	    }
+	    get gradientYMin() {
+	        return this._gradientYMin;
+	    }
+	    get gradientYMax() {
+	        return this._gradientYMax;
+	    }
+	    get gradientZMin() {
+	        return this._gradientZMin;
+	    }
+	    get gradientZMax() {
+	        return this._gradientZMax;
+	    }
+	    get gradientWMin() {
+	        return this._gradientWMin;
+	    }
+	    get gradientWMax() {
+	        return this._gradientWMax;
+	    }
+	    cloneTo(destObject) {
+	        var destGradientAngularVelocity = destObject;
+	        destGradientAngularVelocity._type = this._type;
+	        destGradientAngularVelocity._separateAxes = this._separateAxes;
+	        destGradientAngularVelocity._constant = this._constant;
+	        this._constantSeparate.cloneTo(destGradientAngularVelocity._constantSeparate);
+	        this._gradient.cloneTo(destGradientAngularVelocity._gradient);
+	        this._gradientX.cloneTo(destGradientAngularVelocity._gradientX);
+	        this._gradientY.cloneTo(destGradientAngularVelocity._gradientY);
+	        this._gradientZ.cloneTo(destGradientAngularVelocity._gradientZ);
+	        destGradientAngularVelocity._constantMin = this._constantMin;
+	        destGradientAngularVelocity._constantMax = this._constantMax;
+	        this._constantMinSeparate.cloneTo(destGradientAngularVelocity._constantMinSeparate);
+	        this._constantMaxSeparate.cloneTo(destGradientAngularVelocity._constantMaxSeparate);
+	        this._gradientMin.cloneTo(destGradientAngularVelocity._gradientMin);
+	        this._gradientMax.cloneTo(destGradientAngularVelocity._gradientMax);
+	        this._gradientXMin.cloneTo(destGradientAngularVelocity._gradientXMin);
+	        this._gradientXMax.cloneTo(destGradientAngularVelocity._gradientXMax);
+	        this._gradientYMin.cloneTo(destGradientAngularVelocity._gradientYMin);
+	        this._gradientYMax.cloneTo(destGradientAngularVelocity._gradientYMax);
+	        this._gradientZMin.cloneTo(destGradientAngularVelocity._gradientZMin);
+	        this._gradientZMax.cloneTo(destGradientAngularVelocity._gradientZMax);
+	    }
+	    clone() {
+	        var destGradientAngularVelocity = new GradientAngularVelocity();
+	        this.cloneTo(destGradientAngularVelocity);
+	        return destGradientAngularVelocity;
+	    }
+	}
+
+	class GradientDataInt {
+	    constructor() {
+	        this._currentLength = 0;
+	        this._elements = new Float32Array(8);
+	    }
+	    get gradientCount() {
+	        return this._currentLength / 2;
+	    }
+	    add(key, value) {
+	        if (this._currentLength < 8) {
+	            if ((this._currentLength === 6) && ((key !== 1))) {
+	                key = 1;
+	                console.log("Warning:the forth key is  be force set to 1.");
+	            }
+	            this._elements[this._currentLength++] = key;
+	            this._elements[this._currentLength++] = value;
+	        }
+	        else {
+	            console.log("Warning:data count must lessEqual than 4");
+	        }
+	    }
+	    cloneTo(destObject) {
+	        var destGradientDataInt = destObject;
+	        destGradientDataInt._currentLength = this._currentLength;
+	        var destElements = destGradientDataInt._elements;
+	        for (var i = 0, n = this._elements.length; i < n; i++) {
+	            destElements[i] = this._elements[i];
+	        }
+	    }
+	    clone() {
+	        var destGradientDataInt = new GradientDataInt();
+	        this.cloneTo(destGradientDataInt);
+	        return destGradientDataInt;
+	    }
+	}
+
+	class GradientDataNumber {
+	    constructor() {
+	        this._currentLength = 0;
+	        this._elements = new Float32Array(8);
+	    }
+	    get gradientCount() {
+	        return this._currentLength / 2;
+	    }
+	    add(key, value) {
+	        if (this._currentLength < 8) {
+	            if ((this._currentLength === 6) && ((key !== 1))) {
+	                key = 1;
+	                console.log("GradientDataNumber warning:the forth key is  be force set to 1.");
+	            }
+	            this._elements[this._currentLength++] = key;
+	            this._elements[this._currentLength++] = value;
+	        }
+	        else {
+	            console.log("GradientDataNumber warning:data count must lessEqual than 4");
+	        }
+	    }
+	    getKeyByIndex(index) {
+	        return this._elements[index * 2];
+	    }
+	    getValueByIndex(index) {
+	        return this._elements[index * 2 + 1];
+	    }
+	    getAverageValue() {
+	        var total = 0;
+	        for (var i = 0, n = this._currentLength - 2; i < n; i += 2) {
+	            var subValue = this._elements[i + 1];
+	            subValue += this._elements[i + 3];
+	            subValue = subValue * (this._elements[i + 2] - this._elements[i]);
+	        }
+	        return total / 2;
+	    }
+	    cloneTo(destObject) {
+	        var destGradientDataNumber = destObject;
+	        destGradientDataNumber._currentLength = this._currentLength;
+	        var destElements = destGradientDataNumber._elements;
+	        for (var i = 0, n = this._elements.length; i < n; i++)
+	            destElements[i] = this._elements[i];
+	    }
+	    clone() {
+	        var destGradientDataNumber = new GradientDataNumber();
+	        this.cloneTo(destGradientDataNumber);
+	        return destGradientDataNumber;
+	    }
+	}
+
+	class GradientSize {
+	    constructor() {
+	        this._type = 0;
+	        this._separateAxes = false;
+	        this._gradient = null;
+	        this._gradientX = null;
+	        this._gradientY = null;
+	        this._gradientZ = null;
+	        this._constantMin = 0;
+	        this._constantMax = 0;
+	        this._constantMinSeparate = null;
+	        this._constantMaxSeparate = null;
+	        this._gradientMin = null;
+	        this._gradientMax = null;
+	        this._gradientXMin = null;
+	        this._gradientXMax = null;
+	        this._gradientYMin = null;
+	        this._gradientYMax = null;
+	        this._gradientZMin = null;
+	        this._gradientZMax = null;
+	    }
+	    static createByGradient(gradient) {
+	        var gradientSize = new GradientSize();
+	        gradientSize._type = 0;
+	        gradientSize._separateAxes = false;
+	        gradientSize._gradient = gradient;
+	        return gradientSize;
+	    }
+	    static createByGradientSeparate(gradientX, gradientY, gradientZ) {
+	        var gradientSize = new GradientSize();
+	        gradientSize._type = 0;
+	        gradientSize._separateAxes = true;
+	        gradientSize._gradientX = gradientX;
+	        gradientSize._gradientY = gradientY;
+	        gradientSize._gradientZ = gradientZ;
+	        return gradientSize;
+	    }
+	    static createByRandomTwoConstant(constantMin, constantMax) {
+	        var gradientSize = new GradientSize();
+	        gradientSize._type = 1;
+	        gradientSize._separateAxes = false;
+	        gradientSize._constantMin = constantMin;
+	        gradientSize._constantMax = constantMax;
+	        return gradientSize;
+	    }
+	    static createByRandomTwoConstantSeparate(constantMinSeparate, constantMaxSeparate) {
+	        var gradientSize = new GradientSize();
+	        gradientSize._type = 1;
+	        gradientSize._separateAxes = true;
+	        gradientSize._constantMinSeparate = constantMinSeparate;
+	        gradientSize._constantMaxSeparate = constantMaxSeparate;
+	        return gradientSize;
+	    }
+	    static createByRandomTwoGradient(gradientMin, gradientMax) {
+	        var gradientSize = new GradientSize();
+	        gradientSize._type = 2;
+	        gradientSize._separateAxes = false;
+	        gradientSize._gradientMin = gradientMin;
+	        gradientSize._gradientMax = gradientMax;
+	        return gradientSize;
+	    }
+	    static createByRandomTwoGradientSeparate(gradientXMin, gradientXMax, gradientYMin, gradientYMax, gradientZMin, gradientZMax) {
+	        var gradientSize = new GradientSize();
+	        gradientSize._type = 2;
+	        gradientSize._separateAxes = true;
+	        gradientSize._gradientXMin = gradientXMin;
+	        gradientSize._gradientXMax = gradientXMax;
+	        gradientSize._gradientYMin = gradientYMin;
+	        gradientSize._gradientYMax = gradientYMax;
+	        gradientSize._gradientZMin = gradientZMin;
+	        gradientSize._gradientZMax = gradientZMax;
+	        return gradientSize;
+	    }
+	    get type() {
+	        return this._type;
+	    }
+	    get separateAxes() {
+	        return this._separateAxes;
+	    }
+	    get gradient() {
+	        return this._gradient;
+	    }
+	    get gradientX() {
+	        return this._gradientX;
+	    }
+	    get gradientY() {
+	        return this._gradientY;
+	    }
+	    get gradientZ() {
+	        return this._gradientZ;
+	    }
+	    get constantMin() {
+	        return this._constantMin;
+	    }
+	    get constantMax() {
+	        return this._constantMax;
+	    }
+	    get constantMinSeparate() {
+	        return this._constantMinSeparate;
+	    }
+	    get constantMaxSeparate() {
+	        return this._constantMaxSeparate;
+	    }
+	    get gradientMin() {
+	        return this._gradientMin;
+	    }
+	    get gradientMax() {
+	        return this._gradientMax;
+	    }
+	    get gradientXMin() {
+	        return this._gradientXMin;
+	    }
+	    get gradientXMax() {
+	        return this._gradientXMax;
+	    }
+	    get gradientYMin() {
+	        return this._gradientYMin;
+	    }
+	    get gradientYMax() {
+	        return this._gradientYMax;
+	    }
+	    get gradientZMin() {
+	        return this._gradientZMin;
+	    }
+	    get gradientZMax() {
+	        return this._gradientZMax;
+	    }
+	    getMaxSizeInGradient() {
+	        var i, n;
+	        var maxSize = -Number.MAX_VALUE;
+	        switch (this._type) {
+	            case 0:
+	                if (this._separateAxes) {
+	                    for (i = 0, n = this._gradientX.gradientCount; i < n; i++)
+	                        maxSize = Math.max(maxSize, this._gradientX.getValueByIndex(i));
+	                    for (i = 0, n = this._gradientY.gradientCount; i < n; i++)
+	                        maxSize = Math.max(maxSize, this._gradientY.getValueByIndex(i));
+	                }
+	                else {
+	                    for (i = 0, n = this._gradient.gradientCount; i < n; i++)
+	                        maxSize = Math.max(maxSize, this._gradient.getValueByIndex(i));
+	                }
+	                break;
+	            case 1:
+	                if (this._separateAxes) {
+	                    maxSize = Math.max(this._constantMinSeparate.x, this._constantMaxSeparate.x);
+	                    maxSize = Math.max(maxSize, this._constantMinSeparate.y);
+	                    maxSize = Math.max(maxSize, this._constantMaxSeparate.y);
+	                }
+	                else {
+	                    maxSize = Math.max(this._constantMin, this._constantMax);
+	                }
+	                break;
+	            case 2:
+	                if (this._separateAxes) {
+	                    for (i = 0, n = this._gradientXMin.gradientCount; i < n; i++)
+	                        maxSize = Math.max(maxSize, this._gradientXMin.getValueByIndex(i));
+	                    for (i = 0, n = this._gradientXMax.gradientCount; i < n; i++)
+	                        maxSize = Math.max(maxSize, this._gradientXMax.getValueByIndex(i));
+	                    for (i = 0, n = this._gradientYMin.gradientCount; i < n; i++)
+	                        maxSize = Math.max(maxSize, this._gradientYMin.getValueByIndex(i));
+	                    for (i = 0, n = this._gradientZMax.gradientCount; i < n; i++)
+	                        maxSize = Math.max(maxSize, this._gradientZMax.getValueByIndex(i));
+	                }
+	                else {
+	                    for (i = 0, n = this._gradientMin.gradientCount; i < n; i++)
+	                        maxSize = Math.max(maxSize, this._gradientMin.getValueByIndex(i));
+	                    for (i = 0, n = this._gradientMax.gradientCount; i < n; i++)
+	                        maxSize = Math.max(maxSize, this._gradientMax.getValueByIndex(i));
+	                }
+	                break;
+	        }
+	        return maxSize;
+	    }
+	    cloneTo(destObject) {
+	        var destGradientSize = destObject;
+	        destGradientSize._type = this._type;
+	        destGradientSize._separateAxes = this._separateAxes;
+	        this._gradient.cloneTo(destGradientSize._gradient);
+	        this._gradientX.cloneTo(destGradientSize._gradientX);
+	        this._gradientY.cloneTo(destGradientSize._gradientY);
+	        this._gradientZ.cloneTo(destGradientSize._gradientZ);
+	        destGradientSize._constantMin = this._constantMin;
+	        destGradientSize._constantMax = this._constantMax;
+	        this._constantMinSeparate.cloneTo(destGradientSize._constantMinSeparate);
+	        this._constantMaxSeparate.cloneTo(destGradientSize._constantMaxSeparate);
+	        this._gradientMin.cloneTo(destGradientSize._gradientMin);
+	        this._gradientMax.cloneTo(destGradientSize._gradientMax);
+	        this._gradientXMin.cloneTo(destGradientSize._gradientXMin);
+	        this._gradientXMax.cloneTo(destGradientSize._gradientXMax);
+	        this._gradientYMin.cloneTo(destGradientSize._gradientYMin);
+	        this._gradientYMax.cloneTo(destGradientSize._gradientYMax);
+	        this._gradientZMin.cloneTo(destGradientSize._gradientZMin);
+	        this._gradientZMax.cloneTo(destGradientSize._gradientZMax);
+	    }
+	    clone() {
+	        var destGradientSize = new GradientSize();
+	        this.cloneTo(destGradientSize);
+	        return destGradientSize;
+	    }
+	}
+
+	class GradientVelocity {
+	    constructor() {
+	        this._type = 0;
+	        this._constant = null;
+	        this._gradientX = null;
+	        this._gradientY = null;
+	        this._gradientZ = null;
+	        this._constantMin = null;
+	        this._constantMax = null;
+	        this._gradientXMin = null;
+	        this._gradientXMax = null;
+	        this._gradientYMin = null;
+	        this._gradientYMax = null;
+	        this._gradientZMin = null;
+	        this._gradientZMax = null;
+	    }
+	    static createByConstant(constant) {
+	        var gradientVelocity = new GradientVelocity();
+	        gradientVelocity._type = 0;
+	        gradientVelocity._constant = constant;
+	        return gradientVelocity;
+	    }
+	    static createByGradient(gradientX, gradientY, gradientZ) {
+	        var gradientVelocity = new GradientVelocity();
+	        gradientVelocity._type = 1;
+	        gradientVelocity._gradientX = gradientX;
+	        gradientVelocity._gradientY = gradientY;
+	        gradientVelocity._gradientZ = gradientZ;
+	        return gradientVelocity;
+	    }
+	    static createByRandomTwoConstant(constantMin, constantMax) {
+	        var gradientVelocity = new GradientVelocity();
+	        gradientVelocity._type = 2;
+	        gradientVelocity._constantMin = constantMin;
+	        gradientVelocity._constantMax = constantMax;
+	        return gradientVelocity;
+	    }
+	    static createByRandomTwoGradient(gradientXMin, gradientXMax, gradientYMin, gradientYMax, gradientZMin, gradientZMax) {
+	        var gradientVelocity = new GradientVelocity();
+	        gradientVelocity._type = 3;
+	        gradientVelocity._gradientXMin = gradientXMin;
+	        gradientVelocity._gradientXMax = gradientXMax;
+	        gradientVelocity._gradientYMin = gradientYMin;
+	        gradientVelocity._gradientYMax = gradientYMax;
+	        gradientVelocity._gradientZMin = gradientZMin;
+	        gradientVelocity._gradientZMax = gradientZMax;
+	        return gradientVelocity;
+	    }
+	    get type() {
+	        return this._type;
+	    }
+	    get constant() {
+	        return this._constant;
+	    }
+	    get gradientX() {
+	        return this._gradientX;
+	    }
+	    get gradientY() {
+	        return this._gradientY;
+	    }
+	    get gradientZ() {
+	        return this._gradientZ;
+	    }
+	    get constantMin() {
+	        return this._constantMin;
+	    }
+	    get constantMax() {
+	        return this._constantMax;
+	    }
+	    get gradientXMin() {
+	        return this._gradientXMin;
+	    }
+	    get gradientXMax() {
+	        return this._gradientXMax;
+	    }
+	    get gradientYMin() {
+	        return this._gradientYMin;
+	    }
+	    get gradientYMax() {
+	        return this._gradientYMax;
+	    }
+	    get gradientZMin() {
+	        return this._gradientZMin;
+	    }
+	    get gradientZMax() {
+	        return this._gradientZMax;
+	    }
+	    cloneTo(destObject) {
+	        var destGradientVelocity = destObject;
+	        destGradientVelocity._type = this._type;
+	        this._constant.cloneTo(destGradientVelocity._constant);
+	        this._gradientX.cloneTo(destGradientVelocity._gradientX);
+	        this._gradientY.cloneTo(destGradientVelocity._gradientY);
+	        this._gradientZ.cloneTo(destGradientVelocity._gradientZ);
+	        this._constantMin.cloneTo(destGradientVelocity._constantMin);
+	        this._constantMax.cloneTo(destGradientVelocity._constantMax);
+	        this._gradientXMin.cloneTo(destGradientVelocity._gradientXMin);
+	        this._gradientXMax.cloneTo(destGradientVelocity._gradientXMax);
+	        this._gradientYMin.cloneTo(destGradientVelocity._gradientYMin);
+	        this._gradientYMax.cloneTo(destGradientVelocity._gradientYMax);
+	        this._gradientZMin.cloneTo(destGradientVelocity._gradientZMin);
+	        this._gradientZMax.cloneTo(destGradientVelocity._gradientZMax);
+	    }
+	    clone() {
+	        var destGradientVelocity = new GradientVelocity();
+	        this.cloneTo(destGradientVelocity);
+	        return destGradientVelocity;
+	    }
+	}
+
+	class RotationOverLifetime {
+	    constructor(angularVelocity) {
+	        this._angularVelocity = angularVelocity;
+	    }
+	    get angularVelocity() {
+	        return this._angularVelocity;
+	    }
+	    cloneTo(destObject) {
+	        var destRotationOverLifetime = destObject;
+	        this._angularVelocity.cloneTo(destRotationOverLifetime._angularVelocity);
+	        destRotationOverLifetime.enable = this.enable;
+	    }
+	    clone() {
+	        var destAngularVelocity;
+	        switch (this._angularVelocity.type) {
+	            case 0:
+	                if (this._angularVelocity.separateAxes)
+	                    destAngularVelocity = GradientAngularVelocity.createByConstantSeparate(this._angularVelocity.constantSeparate.clone());
+	                else
+	                    destAngularVelocity = GradientAngularVelocity.createByConstant(this._angularVelocity.constant);
+	                break;
+	            case 1:
+	                if (this._angularVelocity.separateAxes)
+	                    destAngularVelocity = GradientAngularVelocity.createByGradientSeparate(this._angularVelocity.gradientX.clone(), this._angularVelocity.gradientY.clone(), this._angularVelocity.gradientZ.clone());
+	                else
+	                    destAngularVelocity = GradientAngularVelocity.createByGradient(this._angularVelocity.gradient.clone());
+	                break;
+	            case 2:
+	                if (this._angularVelocity.separateAxes)
+	                    destAngularVelocity = GradientAngularVelocity.createByRandomTwoConstantSeparate(this._angularVelocity.constantMinSeparate.clone(), this._angularVelocity.constantMaxSeparate.clone());
+	                else
+	                    destAngularVelocity = GradientAngularVelocity.createByRandomTwoConstant(this._angularVelocity.constantMin, this._angularVelocity.constantMax);
+	                break;
+	            case 3:
+	                if (this._angularVelocity.separateAxes)
+	                    destAngularVelocity = GradientAngularVelocity.createByRandomTwoGradientSeparate(this._angularVelocity.gradientXMin.clone(), this._angularVelocity.gradientYMin.clone(), this._angularVelocity.gradientZMin.clone(), this._angularVelocity.gradientWMin.clone(), this._angularVelocity.gradientXMax.clone(), this._angularVelocity.gradientYMax.clone(), this._angularVelocity.gradientZMax.clone(), this._angularVelocity.gradientWMax.clone());
+	                else
+	                    destAngularVelocity = GradientAngularVelocity.createByRandomTwoGradient(this._angularVelocity.gradientMin.clone(), this._angularVelocity.gradientMax.clone());
+	                break;
+	        }
+	        var destRotationOverLifetime = new RotationOverLifetime(destAngularVelocity);
+	        destRotationOverLifetime.enable = this.enable;
+	        return destRotationOverLifetime;
+	    }
+	}
+
+	class BaseShape {
+	    constructor() {
+	        this.enable = true;
+	        this.randomDirection = 0;
+	    }
+	    _getShapeBoundBox(boundBox) {
+	        throw new Error("BaseShape: must override it.");
+	    }
+	    _getSpeedBoundBox(boundBox) {
+	        throw new Error("BaseShape: must override it.");
+	    }
+	    generatePositionAndDirection(position, direction, rand = null, randomSeeds = null) {
+	        throw new Error("BaseShape: must override it.");
+	    }
+	    _calculateProceduralBounds(boundBox, emitterPosScale, minMaxBounds) {
+	        this._getShapeBoundBox(boundBox);
+	        var min = boundBox.min;
+	        var max = boundBox.max;
+	        Vector3.multiply(min, emitterPosScale, min);
+	        Vector3.multiply(max, emitterPosScale, max);
+	        var speedBounds = new BoundBox(new Vector3(), new Vector3());
+	        if (this.randomDirection) {
+	            speedBounds.min = new Vector3(-1, -1, -1);
+	            speedBounds.max = new Vector3(1, 1, 1);
+	        }
+	        else {
+	            this._getSpeedBoundBox(speedBounds);
+	        }
+	        var maxSpeedBound = new BoundBox(new Vector3(), new Vector3());
+	        var maxSpeedMin = maxSpeedBound.min;
+	        var maxSpeedMax = maxSpeedBound.max;
+	        Vector3.scale(speedBounds.min, minMaxBounds.y, maxSpeedMin);
+	        Vector3.scale(speedBounds.max, minMaxBounds.y, maxSpeedMax);
+	        Vector3.add(boundBox.min, maxSpeedMin, maxSpeedMin);
+	        Vector3.add(boundBox.max, maxSpeedMax, maxSpeedMax);
+	        Vector3.min(boundBox.min, maxSpeedMin, boundBox.min);
+	        Vector3.max(boundBox.max, maxSpeedMin, boundBox.max);
+	        var minSpeedBound = new BoundBox(new Vector3(), new Vector3());
+	        var minSpeedMin = minSpeedBound.min;
+	        var minSpeedMax = minSpeedBound.max;
+	        Vector3.scale(speedBounds.min, minMaxBounds.x, minSpeedMin);
+	        Vector3.scale(speedBounds.max, minMaxBounds.x, minSpeedMax);
+	        Vector3.min(minSpeedBound.min, minSpeedMax, maxSpeedMin);
+	        Vector3.max(minSpeedBound.min, minSpeedMax, maxSpeedMax);
+	        Vector3.min(boundBox.min, maxSpeedMin, boundBox.min);
+	        Vector3.max(boundBox.max, maxSpeedMin, boundBox.max);
+	    }
+	    cloneTo(destObject) {
+	        var destShape = destObject;
+	        destShape.enable = this.enable;
+	    }
+	    clone() {
+	        var destShape = new BaseShape();
+	        this.cloneTo(destShape);
+	        return destShape;
+	    }
+	}
+
+	class ShapeUtils {
+	    static _randomPointUnitArcCircle(arc, out, rand = null) {
+	        var angle;
+	        if (rand)
+	            angle = rand.getFloat() * arc;
+	        else
+	            angle = Math.random() * arc;
+	        out.x = Math.cos(angle);
+	        out.y = Math.sin(angle);
+	    }
+	    static _randomPointInsideUnitArcCircle(arc, out, rand = null) {
+	        ShapeUtils._randomPointUnitArcCircle(arc, out, rand);
+	        var range;
+	        if (rand)
+	            range = Math.pow(rand.getFloat(), 1.0 / 2.0);
+	        else
+	            range = Math.pow(Math.random(), 1.0 / 2.0);
+	        out.x = out.x * range;
+	        out.y = out.y * range;
+	    }
+	    static _randomPointUnitCircle(out, rand = null) {
+	        var angle;
+	        if (rand)
+	            angle = rand.getFloat() * Math.PI * 2;
+	        else
+	            angle = Math.random() * Math.PI * 2;
+	        out.x = Math.cos(angle);
+	        out.y = Math.sin(angle);
+	    }
+	    static _randomPointInsideUnitCircle(out, rand = null) {
+	        ShapeUtils._randomPointUnitCircle(out);
+	        var range;
+	        if (rand)
+	            range = Math.pow(rand.getFloat(), 1.0 / 2.0);
+	        else
+	            range = Math.pow(Math.random(), 1.0 / 2.0);
+	        out.x = out.x * range;
+	        out.y = out.y * range;
+	    }
+	    static _randomPointUnitSphere(out, rand = null) {
+	        var z;
+	        var a;
+	        if (rand) {
+	            z = out.z = rand.getFloat() * 2 - 1.0;
+	            a = rand.getFloat() * Math.PI * 2;
+	        }
+	        else {
+	            z = out.z = Math.random() * 2 - 1.0;
+	            a = Math.random() * Math.PI * 2;
+	        }
+	        var r = Math.sqrt(1.0 - z * z);
+	        out.x = r * Math.cos(a);
+	        out.y = r * Math.sin(a);
+	    }
+	    static _randomPointInsideUnitSphere(out, rand = null) {
+	        ShapeUtils._randomPointUnitSphere(out);
+	        var range;
+	        if (rand)
+	            range = Math.pow(rand.getFloat(), 1.0 / 3.0);
+	        else
+	            range = Math.pow(Math.random(), 1.0 / 3.0);
+	        out.x = out.x * range;
+	        out.y = out.y * range;
+	        out.z = out.z * range;
+	    }
+	    static _randomPointInsideHalfUnitBox(out, rand = null) {
+	        if (rand) {
+	            out.x = (rand.getFloat() - 0.5);
+	            out.y = (rand.getFloat() - 0.5);
+	            out.z = (rand.getFloat() - 0.5);
+	        }
+	        else {
+	            out.x = (Math.random() - 0.5);
+	            out.y = (Math.random() - 0.5);
+	            out.z = (Math.random() - 0.5);
+	        }
+	    }
+	    constructor() {
+	    }
+	}
+
+	class BoxShape extends BaseShape {
+	    constructor() {
+	        super();
+	        this.x = 1.0;
+	        this.y = 1.0;
+	        this.z = 1.0;
+	    }
+	    _getShapeBoundBox(boundBox) {
+	        var min = boundBox.min;
+	        min.x = -this.x * 0.5;
+	        min.y = -this.y * 0.5;
+	        min.z = -this.z * 0.5;
+	        var max = boundBox.max;
+	        max.x = this.x * 0.5;
+	        max.y = this.y * 0.5;
+	        max.z = this.z * 0.5;
+	    }
+	    _getSpeedBoundBox(boundBox) {
+	        var min = boundBox.min;
+	        min.x = 0.0;
+	        min.y = 0.0;
+	        min.z = 0.0;
+	        var max = boundBox.max;
+	        max.x = 0.0;
+	        max.y = 1.0;
+	        max.z = 0.0;
+	    }
+	    generatePositionAndDirection(position, direction, rand = null, randomSeeds = null) {
+	        if (rand) {
+	            rand.seed = randomSeeds[16];
+	            ShapeUtils._randomPointInsideHalfUnitBox(position, rand);
+	            randomSeeds[16] = rand.seed;
+	        }
+	        else {
+	            ShapeUtils._randomPointInsideHalfUnitBox(position);
+	        }
+	        position.x = this.x * position.x;
+	        position.y = this.y * position.y;
+	        position.z = this.z * position.z;
+	        if (this.randomDirection) {
+	            if (rand) {
+	                rand.seed = randomSeeds[17];
+	                ShapeUtils._randomPointUnitSphere(direction, rand);
+	                randomSeeds[17] = rand.seed;
+	            }
+	            else {
+	                ShapeUtils._randomPointUnitSphere(direction);
+	            }
+	        }
+	        else {
+	            direction.x = 0.0;
+	            direction.y = 0.0;
+	            direction.z = 1.0;
+	        }
+	    }
+	    cloneTo(destObject) {
+	        super.cloneTo(destObject);
+	        var destShape = destObject;
+	        destShape.x = this.x;
+	        destShape.y = this.y;
+	        destShape.z = this.z;
+	        destShape.randomDirection = this.randomDirection;
+	    }
+	    clone() {
+	        var destShape = new BoxShape();
+	        this.cloneTo(destShape);
+	        return destShape;
+	    }
+	}
+
+	class CircleShape extends BaseShape {
+	    constructor() {
+	        super();
+	        this.radius = 1.0;
+	        this.arc = 360.0 / 180.0 * Math.PI;
+	        this.emitFromEdge = false;
+	    }
+	    _getShapeBoundBox(boundBox) {
+	        var min = boundBox.min;
+	        min.x = min.z = -this.radius;
+	        min.y = 0;
+	        var max = boundBox.max;
+	        max.x = max.z = this.radius;
+	        max.y = 0;
+	    }
+	    _getSpeedBoundBox(boundBox) {
+	        var min = boundBox.min;
+	        min.x = min.y = -1;
+	        min.z = 0;
+	        var max = boundBox.max;
+	        max.x = max.y = 1;
+	        max.z = 0;
+	    }
+	    generatePositionAndDirection(position, direction, rand = null, randomSeeds = null) {
+	        var positionPoint = CircleShape._tempPositionPoint;
+	        if (rand) {
+	            rand.seed = randomSeeds[16];
+	            if (this.emitFromEdge)
+	                ShapeUtils._randomPointUnitArcCircle(this.arc, CircleShape._tempPositionPoint, rand);
+	            else
+	                ShapeUtils._randomPointInsideUnitArcCircle(this.arc, CircleShape._tempPositionPoint, rand);
+	            randomSeeds[16] = rand.seed;
+	        }
+	        else {
+	            if (this.emitFromEdge)
+	                ShapeUtils._randomPointUnitArcCircle(this.arc, CircleShape._tempPositionPoint);
+	            else
+	                ShapeUtils._randomPointInsideUnitArcCircle(this.arc, CircleShape._tempPositionPoint);
+	        }
+	        position.x = -positionPoint.x;
+	        position.y = positionPoint.y;
+	        position.z = 0;
+	        Vector3.scale(position, this.radius, position);
+	        if (this.randomDirection) {
+	            if (rand) {
+	                rand.seed = randomSeeds[17];
+	                ShapeUtils._randomPointUnitSphere(direction, rand);
+	                randomSeeds[17] = rand.seed;
+	            }
+	            else {
+	                ShapeUtils._randomPointUnitSphere(direction);
+	            }
+	        }
+	        else {
+	            position.cloneTo(direction);
+	        }
+	    }
+	    cloneTo(destObject) {
+	        super.cloneTo(destObject);
+	        var destShape = destObject;
+	        destShape.radius = this.radius;
+	        destShape.arc = this.arc;
+	        destShape.emitFromEdge = this.emitFromEdge;
+	        destShape.randomDirection = this.randomDirection;
+	    }
+	    clone() {
+	        var destShape = new CircleShape();
+	        this.cloneTo(destShape);
+	        return destShape;
+	    }
+	}
+	CircleShape._tempPositionPoint = new Vector2();
+
+	class ConeShape extends BaseShape {
+	    constructor() {
+	        super();
+	        this.angle = 25.0 / 180.0 * Math.PI;
+	        this.radius = 1.0;
+	        this.length = 5.0;
+	        this.emitType = 0;
+	    }
+	    _getShapeBoundBox(boundBox) {
+	        const coneRadius2 = this.radius + this.length * Math.sin(this.angle);
+	        const coneLength = this.length * Math.cos(this.angle);
+	        var min = boundBox.min;
+	        min.x = min.y = -coneRadius2;
+	        min.z = 0;
+	        var max = boundBox.max;
+	        max.x = max.y = coneRadius2;
+	        max.z = coneLength;
+	    }
+	    _getSpeedBoundBox(boundBox) {
+	        const sinA = Math.sin(this.angle);
+	        var min = boundBox.min;
+	        min.x = min.y = -sinA;
+	        min.z = 0;
+	        var max = boundBox.max;
+	        max.x = max.y = sinA;
+	        max.z = 1;
+	    }
+	    generatePositionAndDirection(position, direction, rand = null, randomSeeds = null) {
+	        var positionPointE = ConeShape._tempPositionPoint;
+	        var positionX;
+	        var positionY;
+	        var directionPointE;
+	        var dirCosA = Math.cos(this.angle);
+	        var dirSinA = Math.sin(this.angle);
+	        switch (this.emitType) {
+	            case 0:
+	                if (rand) {
+	                    rand.seed = randomSeeds[16];
+	                    ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempPositionPoint, rand);
+	                    randomSeeds[16] = rand.seed;
+	                }
+	                else {
+	                    ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempPositionPoint);
+	                }
+	                positionX = positionPointE.x;
+	                positionY = positionPointE.y;
+	                position.x = positionX * this.radius;
+	                position.y = positionY * this.radius;
+	                position.z = 0;
+	                if (this.randomDirection) {
+	                    if (rand) {
+	                        rand.seed = randomSeeds[17];
+	                        ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempDirectionPoint, rand);
+	                        randomSeeds[17] = rand.seed;
+	                    }
+	                    else {
+	                        ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempDirectionPoint);
+	                    }
+	                    directionPointE = ConeShape._tempDirectionPoint;
+	                    direction.x = directionPointE.x * dirSinA;
+	                    direction.y = directionPointE.y * dirSinA;
+	                }
+	                else {
+	                    direction.x = positionX * dirSinA;
+	                    direction.y = positionY * dirSinA;
+	                }
+	                direction.z = dirCosA;
+	                break;
+	            case 1:
+	                if (rand) {
+	                    rand.seed = randomSeeds[16];
+	                    ShapeUtils._randomPointUnitCircle(ConeShape._tempPositionPoint, rand);
+	                    randomSeeds[16] = rand.seed;
+	                }
+	                else {
+	                    ShapeUtils._randomPointUnitCircle(ConeShape._tempPositionPoint);
+	                }
+	                positionX = positionPointE.x;
+	                positionY = positionPointE.y;
+	                position.x = positionX * this.radius;
+	                position.y = positionY * this.radius;
+	                position.z = 0;
+	                if (this.randomDirection) {
+	                    if (rand) {
+	                        rand.seed = randomSeeds[17];
+	                        ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempDirectionPoint, rand);
+	                        randomSeeds[17] = rand.seed;
+	                    }
+	                    else {
+	                        ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempDirectionPoint);
+	                    }
+	                    directionPointE = ConeShape._tempDirectionPoint;
+	                    direction.x = directionPointE.x * dirSinA;
+	                    direction.y = directionPointE.y * dirSinA;
+	                }
+	                else {
+	                    direction.x = positionX * dirSinA;
+	                    direction.y = positionY * dirSinA;
+	                }
+	                direction.z = dirCosA;
+	                break;
+	            case 2:
+	                if (rand) {
+	                    rand.seed = randomSeeds[16];
+	                    ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempPositionPoint, rand);
+	                }
+	                else {
+	                    ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempPositionPoint);
+	                }
+	                positionX = positionPointE.x;
+	                positionY = positionPointE.y;
+	                position.x = positionX * this.radius;
+	                position.y = positionY * this.radius;
+	                position.z = 0;
+	                direction.x = positionX * dirSinA;
+	                direction.y = positionY * dirSinA;
+	                direction.z = dirCosA;
+	                Vector3.normalize(direction, direction);
+	                if (rand) {
+	                    Vector3.scale(direction, this.length * rand.getFloat(), direction);
+	                    randomSeeds[16] = rand.seed;
+	                }
+	                else {
+	                    Vector3.scale(direction, this.length * Math.random(), direction);
+	                }
+	                Vector3.add(position, direction, position);
+	                if (this.randomDirection) {
+	                    if (rand) {
+	                        rand.seed = randomSeeds[17];
+	                        ShapeUtils._randomPointUnitSphere(direction, rand);
+	                        randomSeeds[17] = rand.seed;
+	                    }
+	                    else {
+	                        ShapeUtils._randomPointUnitSphere(direction);
+	                    }
+	                }
+	                break;
+	            case 3:
+	                if (rand) {
+	                    rand.seed = randomSeeds[16];
+	                    ShapeUtils._randomPointUnitCircle(ConeShape._tempPositionPoint, rand);
+	                }
+	                else {
+	                    ShapeUtils._randomPointUnitCircle(ConeShape._tempPositionPoint);
+	                }
+	                positionX = positionPointE.x;
+	                positionY = positionPointE.y;
+	                position.x = positionX * this.radius;
+	                position.y = positionY * this.radius;
+	                position.z = 0;
+	                direction.x = positionX * dirSinA;
+	                direction.y = positionY * dirSinA;
+	                direction.z = dirCosA;
+	                Vector3.normalize(direction, direction);
+	                if (rand) {
+	                    Vector3.scale(direction, this.length * rand.getFloat(), direction);
+	                    randomSeeds[16] = rand.seed;
+	                }
+	                else {
+	                    Vector3.scale(direction, this.length * Math.random(), direction);
+	                }
+	                Vector3.add(position, direction, position);
+	                if (this.randomDirection) {
+	                    if (rand) {
+	                        rand.seed = randomSeeds[17];
+	                        ShapeUtils._randomPointUnitSphere(direction, rand);
+	                        randomSeeds[17] = rand.seed;
+	                    }
+	                    else {
+	                        ShapeUtils._randomPointUnitSphere(direction);
+	                    }
+	                }
+	                break;
+	            default:
+	                throw new Error("ConeShape:emitType is invalid.");
+	        }
+	    }
+	    cloneTo(destObject) {
+	        super.cloneTo(destObject);
+	        var destShape = destObject;
+	        destShape.angle = this.angle;
+	        destShape.radius = this.radius;
+	        destShape.length = this.length;
+	        destShape.emitType = this.emitType;
+	        destShape.randomDirection = this.randomDirection;
+	    }
+	    clone() {
+	        var destShape = new ConeShape();
+	        this.cloneTo(destShape);
+	        return destShape;
+	    }
+	}
+	ConeShape._tempPositionPoint = new Vector2();
+	ConeShape._tempDirectionPoint = new Vector2();
+
+	class HemisphereShape extends BaseShape {
+	    constructor() {
+	        super();
+	        this.radius = 1.0;
+	        this.emitFromShell = false;
+	    }
+	    _getShapeBoundBox(boundBox) {
+	        var min = boundBox.min;
+	        min.x = min.y = min.z = -this.radius;
+	        var max = boundBox.max;
+	        max.x = max.y = this.radius;
+	        max.z = 0;
+	    }
+	    _getSpeedBoundBox(boundBox) {
+	        var min = boundBox.min;
+	        min.x = min.y = -1;
+	        min.z = 0;
+	        var max = boundBox.max;
+	        max.x = max.y = max.z = 1;
+	    }
+	    generatePositionAndDirection(position, direction, rand = null, randomSeeds = null) {
+	        if (rand) {
+	            rand.seed = randomSeeds[16];
+	            if (this.emitFromShell)
+	                ShapeUtils._randomPointUnitSphere(position, rand);
+	            else
+	                ShapeUtils._randomPointInsideUnitSphere(position, rand);
+	            randomSeeds[16] = rand.seed;
+	        }
+	        else {
+	            if (this.emitFromShell)
+	                ShapeUtils._randomPointUnitSphere(position);
+	            else
+	                ShapeUtils._randomPointInsideUnitSphere(position);
+	        }
+	        Vector3.scale(position, this.radius, position);
+	        var z = position.z;
+	        (z < 0.0) && (position.z = z * -1.0);
+	        if (this.randomDirection) {
+	            if (rand) {
+	                rand.seed = randomSeeds[17];
+	                ShapeUtils._randomPointUnitSphere(direction, rand);
+	                randomSeeds[17] = rand.seed;
+	            }
+	            else {
+	                ShapeUtils._randomPointUnitSphere(direction);
+	            }
+	        }
+	        else {
+	            position.cloneTo(direction);
+	        }
+	    }
+	    cloneTo(destObject) {
+	        super.cloneTo(destObject);
+	        var destShape = destObject;
+	        destShape.radius = this.radius;
+	        destShape.emitFromShell = this.emitFromShell;
+	        destShape.randomDirection = this.randomDirection;
+	    }
+	    clone() {
+	        var destShape = new HemisphereShape();
+	        this.cloneTo(destShape);
+	        return destShape;
+	    }
+	}
+
+	class SphereShape extends BaseShape {
+	    constructor() {
+	        super();
+	        this.radius = 1.0;
+	        this.emitFromShell = false;
+	    }
+	    _getShapeBoundBox(boundBox) {
+	        var min = boundBox.min;
+	        min.x = min.y = min.z = -this.radius;
+	        var max = boundBox.max;
+	        max.x = max.y = max.z = this.radius;
+	    }
+	    _getSpeedBoundBox(boundBox) {
+	        var min = boundBox.min;
+	        min.x = min.y = min.z = -1;
+	        var max = boundBox.max;
+	        max.x = max.y = max.z = 1;
+	    }
+	    generatePositionAndDirection(position, direction, rand = null, randomSeeds = null) {
+	        if (rand) {
+	            rand.seed = randomSeeds[16];
+	            if (this.emitFromShell)
+	                ShapeUtils._randomPointUnitSphere(position, rand);
+	            else
+	                ShapeUtils._randomPointInsideUnitSphere(position, rand);
+	            randomSeeds[16] = rand.seed;
+	        }
+	        else {
+	            if (this.emitFromShell)
+	                ShapeUtils._randomPointUnitSphere(position);
+	            else
+	                ShapeUtils._randomPointInsideUnitSphere(position);
+	        }
+	        Vector3.scale(position, this.radius, position);
+	        if (this.randomDirection) {
+	            if (rand) {
+	                rand.seed = randomSeeds[17];
+	                ShapeUtils._randomPointUnitSphere(direction, rand);
+	                randomSeeds[17] = rand.seed;
+	            }
+	            else {
+	                ShapeUtils._randomPointUnitSphere(direction);
+	            }
+	        }
+	        else {
+	            position.cloneTo(direction);
+	        }
+	    }
+	    cloneTo(destObject) {
+	        super.cloneTo(destObject);
+	        var destShape = destObject;
+	        destShape.radius = this.radius;
+	        destShape.emitFromShell = this.emitFromShell;
+	        destShape.randomDirection = this.randomDirection;
+	    }
+	    clone() {
+	        var destShape = new SphereShape();
+	        this.cloneTo(destShape);
+	        return destShape;
+	    }
+	}
+
+	class SizeOverLifetime {
+	    constructor(size) {
+	        this._size = size;
+	    }
+	    get size() {
+	        return this._size;
+	    }
+	    cloneTo(destObject) {
+	        var destSizeOverLifetime = destObject;
+	        this._size.cloneTo(destSizeOverLifetime._size);
+	        destSizeOverLifetime.enable = this.enable;
+	    }
+	    clone() {
+	        var destSize;
+	        switch (this._size.type) {
+	            case 0:
+	                if (this._size.separateAxes)
+	                    destSize = GradientSize.createByGradientSeparate(this._size.gradientX.clone(), this._size.gradientY.clone(), this._size.gradientZ.clone());
+	                else
+	                    destSize = GradientSize.createByGradient(this._size.gradient.clone());
+	                break;
+	            case 1:
+	                if (this._size.separateAxes)
+	                    destSize = GradientSize.createByRandomTwoConstantSeparate(this._size.constantMinSeparate.clone(), this._size.constantMaxSeparate.clone());
+	                else
+	                    destSize = GradientSize.createByRandomTwoConstant(this._size.constantMin, this._size.constantMax);
+	                break;
+	            case 2:
+	                if (this._size.separateAxes)
+	                    destSize = GradientSize.createByRandomTwoGradientSeparate(this._size.gradientXMin.clone(), this._size.gradientYMin.clone(), this._size.gradientZMin.clone(), this._size.gradientXMax.clone(), this._size.gradientYMax.clone(), this._size.gradientZMax.clone());
+	                else
+	                    destSize = GradientSize.createByRandomTwoGradient(this._size.gradientMin.clone(), this._size.gradientMax.clone());
+	                break;
+	        }
+	        var destSizeOverLifetime = new SizeOverLifetime(destSize);
+	        destSizeOverLifetime.enable = this.enable;
+	        return destSizeOverLifetime;
+	    }
+	}
+
+	class StartFrame {
+	    constructor() {
+	        this._type = 0;
+	        this._constant = 0;
+	        this._constantMin = 0;
+	        this._constantMax = 0;
+	    }
+	    static createByConstant(constant = 0) {
+	        var rotationOverLifetime = new StartFrame();
+	        rotationOverLifetime._type = 0;
+	        rotationOverLifetime._constant = constant;
+	        return rotationOverLifetime;
+	    }
+	    static createByRandomTwoConstant(constantMin = 0, constantMax = 0) {
+	        var rotationOverLifetime = new StartFrame();
+	        rotationOverLifetime._type = 1;
+	        rotationOverLifetime._constantMin = constantMin;
+	        rotationOverLifetime._constantMax = constantMax;
+	        return rotationOverLifetime;
+	    }
+	    get type() {
+	        return this._type;
+	    }
+	    get constant() {
+	        return this._constant;
+	    }
+	    get constantMin() {
+	        return this._constantMin;
+	    }
+	    get constantMax() {
+	        return this._constantMax;
+	    }
+	    cloneTo(destObject) {
+	        var destStartFrame = destObject;
+	        destStartFrame._type = this._type;
+	        destStartFrame._constant = this._constant;
+	        destStartFrame._constantMin = this._constantMin;
+	        destStartFrame._constantMax = this._constantMax;
+	    }
+	    clone() {
+	        var destStartFrame = new StartFrame();
+	        this.cloneTo(destStartFrame);
+	        return destStartFrame;
+	    }
+	}
+
+	class TextureSheetAnimation {
+	    constructor(frame, startFrame) {
+	        this.type = 0;
+	        this.randomRow = false;
+	        this.rowIndex = 0;
+	        this.cycles = 0;
+	        this.enableUVChannels = 0;
+	        this.enable = false;
+	        this.tiles = new Vector2(1, 1);
+	        this.type = 0;
+	        this.randomRow = true;
+	        this.rowIndex = 0;
+	        this.cycles = 1;
+	        this.enableUVChannels = 1;
+	        this._frame = frame;
+	        this._startFrame = startFrame;
+	    }
+	    get frame() {
+	        return this._frame;
+	    }
+	    get startFrame() {
+	        return this._startFrame;
+	    }
+	    cloneTo(destObject) {
+	        var destTextureSheetAnimation = destObject;
+	        this.tiles.cloneTo(destTextureSheetAnimation.tiles);
+	        destTextureSheetAnimation.type = this.type;
+	        destTextureSheetAnimation.randomRow = this.randomRow;
+	        destTextureSheetAnimation.rowIndex = this.rowIndex;
+	        destTextureSheetAnimation.cycles = this.cycles;
+	        destTextureSheetAnimation.enableUVChannels = this.enableUVChannels;
+	        destTextureSheetAnimation.enable = this.enable;
+	        this._frame.cloneTo(destTextureSheetAnimation._frame);
+	        this._startFrame.cloneTo(destTextureSheetAnimation._startFrame);
+	    }
+	    clone() {
+	        var destFrame;
+	        switch (this._frame.type) {
+	            case 0:
+	                destFrame = FrameOverTime.createByConstant(this._frame.constant);
+	                break;
+	            case 1:
+	                destFrame = FrameOverTime.createByOverTime(this._frame.frameOverTimeData.clone());
+	                break;
+	            case 2:
+	                destFrame = FrameOverTime.createByRandomTwoConstant(this._frame.constantMin, this._frame.constantMax);
+	                break;
+	            case 3:
+	                destFrame = FrameOverTime.createByRandomTwoOverTime(this._frame.frameOverTimeDataMin.clone(), this._frame.frameOverTimeDataMax.clone());
+	                break;
+	        }
+	        var destStartFrame;
+	        switch (this._startFrame.type) {
+	            case 0:
+	                destStartFrame = StartFrame.createByConstant(this._startFrame.constant);
+	                break;
+	            case 1:
+	                destStartFrame = StartFrame.createByRandomTwoConstant(this._startFrame.constantMin, this._startFrame.constantMax);
+	                break;
+	        }
+	        var destTextureSheetAnimation = new TextureSheetAnimation(destFrame, destStartFrame);
+	        this.cloneTo(destTextureSheetAnimation);
+	        return destTextureSheetAnimation;
+	    }
+	}
+
+	class VelocityOverLifetime {
+	    constructor(velocity) {
+	        this.enable = false;
+	        this.space = 0;
+	        this._velocity = velocity;
+	    }
+	    get velocity() {
+	        return this._velocity;
+	    }
+	    cloneTo(destObject) {
+	        var destVelocityOverLifetime = destObject;
+	        this._velocity.cloneTo(destVelocityOverLifetime._velocity);
+	        destVelocityOverLifetime.enable = this.enable;
+	        destVelocityOverLifetime.space = this.space;
+	    }
+	    clone() {
+	        var destVelocity;
+	        switch (this._velocity.type) {
+	            case 0:
+	                destVelocity = GradientVelocity.createByConstant(this._velocity.constant.clone());
+	                break;
+	            case 1:
+	                destVelocity = GradientVelocity.createByGradient(this._velocity.gradientX.clone(), this._velocity.gradientY.clone(), this._velocity.gradientZ.clone());
+	                break;
+	            case 2:
+	                destVelocity = GradientVelocity.createByRandomTwoConstant(this._velocity.constantMin.clone(), this._velocity.constantMax.clone());
+	                break;
+	            case 3:
+	                destVelocity = GradientVelocity.createByRandomTwoGradient(this._velocity.gradientXMin.clone(), this._velocity.gradientYMin.clone(), this._velocity.gradientZMin.clone(), this._velocity.gradientXMax.clone(), this._velocity.gradientYMax.clone(), this._velocity.gradientZMax.clone());
+	                break;
+	        }
+	        var destVelocityOverLifetime = new VelocityOverLifetime(destVelocity);
+	        destVelocityOverLifetime.enable = this.enable;
+	        destVelocityOverLifetime.space = this.space;
+	        return destVelocityOverLifetime;
+	    }
+	}
+
+	class ShuriKenParticle3DShaderDeclaration {
+	}
+	ShuriKenParticle3DShaderDeclaration.WORLDPOSITION = Shader3D.propertyNameToID("u_WorldPosition");
+	ShuriKenParticle3DShaderDeclaration.WORLDROTATION = Shader3D.propertyNameToID("u_WorldRotation");
+	ShuriKenParticle3DShaderDeclaration.POSITIONSCALE = Shader3D.propertyNameToID("u_PositionScale");
+	ShuriKenParticle3DShaderDeclaration.SIZESCALE = Shader3D.propertyNameToID("u_SizeScale");
+	ShuriKenParticle3DShaderDeclaration.SCALINGMODE = Shader3D.propertyNameToID("u_ScalingMode");
+	ShuriKenParticle3DShaderDeclaration.GRAVITY = Shader3D.propertyNameToID("u_Gravity");
+	ShuriKenParticle3DShaderDeclaration.THREEDSTARTROTATION = Shader3D.propertyNameToID("u_ThreeDStartRotation");
+	ShuriKenParticle3DShaderDeclaration.STRETCHEDBILLBOARDLENGTHSCALE = Shader3D.propertyNameToID("u_StretchedBillboardLengthScale");
+	ShuriKenParticle3DShaderDeclaration.STRETCHEDBILLBOARDSPEEDSCALE = Shader3D.propertyNameToID("u_StretchedBillboardSpeedScale");
+	ShuriKenParticle3DShaderDeclaration.SIMULATIONSPACE = Shader3D.propertyNameToID("u_SimulationSpace");
+	ShuriKenParticle3DShaderDeclaration.CURRENTTIME = Shader3D.propertyNameToID("u_CurrentTime");
+	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYCONST = Shader3D.propertyNameToID("u_VOLVelocityConst");
+	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYGRADIENTX = Shader3D.propertyNameToID("u_VOLVelocityGradientX");
+	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYGRADIENTY = Shader3D.propertyNameToID("u_VOLVelocityGradientY");
+	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYGRADIENTZ = Shader3D.propertyNameToID("u_VOLVelocityGradientZ");
+	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYCONSTMAX = Shader3D.propertyNameToID("u_VOLVelocityConstMax");
+	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYGRADIENTXMAX = Shader3D.propertyNameToID("u_VOLVelocityGradientMaxX");
+	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYGRADIENTYMAX = Shader3D.propertyNameToID("u_VOLVelocityGradientMaxY");
+	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYGRADIENTZMAX = Shader3D.propertyNameToID("u_VOLVelocityGradientMaxZ");
+	ShuriKenParticle3DShaderDeclaration.VOLSPACETYPE = Shader3D.propertyNameToID("u_VOLSpaceType");
+	ShuriKenParticle3DShaderDeclaration.COLOROVERLIFEGRADIENTALPHAS = Shader3D.propertyNameToID("u_ColorOverLifeGradientAlphas");
+	ShuriKenParticle3DShaderDeclaration.COLOROVERLIFEGRADIENTCOLORS = Shader3D.propertyNameToID("u_ColorOverLifeGradientColors");
+	ShuriKenParticle3DShaderDeclaration.MAXCOLOROVERLIFEGRADIENTALPHAS = Shader3D.propertyNameToID("u_MaxColorOverLifeGradientAlphas");
+	ShuriKenParticle3DShaderDeclaration.MAXCOLOROVERLIFEGRADIENTCOLORS = Shader3D.propertyNameToID("u_MaxColorOverLifeGradientColors");
+	ShuriKenParticle3DShaderDeclaration.SOLSIZEGRADIENT = Shader3D.propertyNameToID("u_SOLSizeGradient");
+	ShuriKenParticle3DShaderDeclaration.SOLSIZEGRADIENTX = Shader3D.propertyNameToID("u_SOLSizeGradientX");
+	ShuriKenParticle3DShaderDeclaration.SOLSIZEGRADIENTY = Shader3D.propertyNameToID("u_SOLSizeGradientY");
+	ShuriKenParticle3DShaderDeclaration.SOLSizeGradientZ = Shader3D.propertyNameToID("u_SOLSizeGradientZ");
+	ShuriKenParticle3DShaderDeclaration.SOLSizeGradientMax = Shader3D.propertyNameToID("u_SOLSizeGradientMax");
+	ShuriKenParticle3DShaderDeclaration.SOLSIZEGRADIENTXMAX = Shader3D.propertyNameToID("u_SOLSizeGradientMaxX");
+	ShuriKenParticle3DShaderDeclaration.SOLSIZEGRADIENTYMAX = Shader3D.propertyNameToID("u_SOLSizeGradientMaxY");
+	ShuriKenParticle3DShaderDeclaration.SOLSizeGradientZMAX = Shader3D.propertyNameToID("u_SOLSizeGradientMaxZ");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYCONST = Shader3D.propertyNameToID("u_ROLAngularVelocityConst");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYCONSTSEPRARATE = Shader3D.propertyNameToID("u_ROLAngularVelocityConstSeprarate");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENT = Shader3D.propertyNameToID("u_ROLAngularVelocityGradient");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTX = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientX");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTY = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientY");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTZ = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientZ");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYCONSTMAX = Shader3D.propertyNameToID("u_ROLAngularVelocityConstMax");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYCONSTMAXSEPRARATE = Shader3D.propertyNameToID("u_ROLAngularVelocityConstMaxSeprarate");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTMAX = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientMax");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTXMAX = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientMaxX");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTYMAX = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientMaxY");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTZMAX = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientMaxZ");
+	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTWMAX = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientMaxW");
+	ShuriKenParticle3DShaderDeclaration.TEXTURESHEETANIMATIONCYCLES = Shader3D.propertyNameToID("u_TSACycles");
+	ShuriKenParticle3DShaderDeclaration.TEXTURESHEETANIMATIONSUBUVLENGTH = Shader3D.propertyNameToID("u_TSASubUVLength");
+	ShuriKenParticle3DShaderDeclaration.TEXTURESHEETANIMATIONGRADIENTUVS = Shader3D.propertyNameToID("u_TSAGradientUVs");
+	ShuriKenParticle3DShaderDeclaration.TEXTURESHEETANIMATIONGRADIENTMAXUVS = Shader3D.propertyNameToID("u_TSAMaxGradientUVs");
+
+	class ShurikenParticleMaterial extends Material {
 	    constructor() {
 	        super();
 	        this.setShaderName("PARTICLESHURIKEN");
@@ -15939,7 +17858,7 @@
 	    set renderMode(value) {
 	        switch (value) {
 	            case ShurikenParticleMaterial.RENDERMODE_ADDTIVE:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	                this.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	                this.depthWrite = false;
 	                this.cull = RenderState.CULL_NONE;
 	                this.blend = RenderState.BLEND_ENABLE_ALL;
@@ -15949,7 +17868,7 @@
 	                this._shaderValues.addDefine(ShurikenParticleMaterial.SHADERDEFINE_ADDTIVEFOG);
 	                break;
 	            case ShurikenParticleMaterial.RENDERMODE_ALPHABLENDED:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	                this.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	                this.depthWrite = false;
 	                this.cull = RenderState.CULL_NONE;
 	                this.blend = RenderState.BLEND_ENABLE_ALL;
@@ -16127,88 +18046,21 @@
 	Physics3DUtils.COLLISIONFILTERGROUP_ALLFILTER = -1;
 	Physics3DUtils.gravity = new Vector3(0, -9.81, 0);
 
-	class ShuriKenParticle3DShaderDeclaration {
-	}
-	ShuriKenParticle3DShaderDeclaration.WORLDPOSITION = Shader3D.propertyNameToID("u_WorldPosition");
-	ShuriKenParticle3DShaderDeclaration.WORLDROTATION = Shader3D.propertyNameToID("u_WorldRotation");
-	ShuriKenParticle3DShaderDeclaration.POSITIONSCALE = Shader3D.propertyNameToID("u_PositionScale");
-	ShuriKenParticle3DShaderDeclaration.SIZESCALE = Shader3D.propertyNameToID("u_SizeScale");
-	ShuriKenParticle3DShaderDeclaration.SCALINGMODE = Shader3D.propertyNameToID("u_ScalingMode");
-	ShuriKenParticle3DShaderDeclaration.GRAVITY = Shader3D.propertyNameToID("u_Gravity");
-	ShuriKenParticle3DShaderDeclaration.THREEDSTARTROTATION = Shader3D.propertyNameToID("u_ThreeDStartRotation");
-	ShuriKenParticle3DShaderDeclaration.STRETCHEDBILLBOARDLENGTHSCALE = Shader3D.propertyNameToID("u_StretchedBillboardLengthScale");
-	ShuriKenParticle3DShaderDeclaration.STRETCHEDBILLBOARDSPEEDSCALE = Shader3D.propertyNameToID("u_StretchedBillboardSpeedScale");
-	ShuriKenParticle3DShaderDeclaration.SIMULATIONSPACE = Shader3D.propertyNameToID("u_SimulationSpace");
-	ShuriKenParticle3DShaderDeclaration.CURRENTTIME = Shader3D.propertyNameToID("u_CurrentTime");
-	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYCONST = Shader3D.propertyNameToID("u_VOLVelocityConst");
-	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYGRADIENTX = Shader3D.propertyNameToID("u_VOLVelocityGradientX");
-	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYGRADIENTY = Shader3D.propertyNameToID("u_VOLVelocityGradientY");
-	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYGRADIENTZ = Shader3D.propertyNameToID("u_VOLVelocityGradientZ");
-	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYCONSTMAX = Shader3D.propertyNameToID("u_VOLVelocityConstMax");
-	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYGRADIENTXMAX = Shader3D.propertyNameToID("u_VOLVelocityGradientMaxX");
-	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYGRADIENTYMAX = Shader3D.propertyNameToID("u_VOLVelocityGradientMaxY");
-	ShuriKenParticle3DShaderDeclaration.VOLVELOCITYGRADIENTZMAX = Shader3D.propertyNameToID("u_VOLVelocityGradientMaxZ");
-	ShuriKenParticle3DShaderDeclaration.VOLSPACETYPE = Shader3D.propertyNameToID("u_VOLSpaceType");
-	ShuriKenParticle3DShaderDeclaration.COLOROVERLIFEGRADIENTALPHAS = Shader3D.propertyNameToID("u_ColorOverLifeGradientAlphas");
-	ShuriKenParticle3DShaderDeclaration.COLOROVERLIFEGRADIENTCOLORS = Shader3D.propertyNameToID("u_ColorOverLifeGradientColors");
-	ShuriKenParticle3DShaderDeclaration.MAXCOLOROVERLIFEGRADIENTALPHAS = Shader3D.propertyNameToID("u_MaxColorOverLifeGradientAlphas");
-	ShuriKenParticle3DShaderDeclaration.MAXCOLOROVERLIFEGRADIENTCOLORS = Shader3D.propertyNameToID("u_MaxColorOverLifeGradientColors");
-	ShuriKenParticle3DShaderDeclaration.SOLSIZEGRADIENT = Shader3D.propertyNameToID("u_SOLSizeGradient");
-	ShuriKenParticle3DShaderDeclaration.SOLSIZEGRADIENTX = Shader3D.propertyNameToID("u_SOLSizeGradientX");
-	ShuriKenParticle3DShaderDeclaration.SOLSIZEGRADIENTY = Shader3D.propertyNameToID("u_SOLSizeGradientY");
-	ShuriKenParticle3DShaderDeclaration.SOLSizeGradientZ = Shader3D.propertyNameToID("u_SOLSizeGradientZ");
-	ShuriKenParticle3DShaderDeclaration.SOLSizeGradientMax = Shader3D.propertyNameToID("u_SOLSizeGradientMax");
-	ShuriKenParticle3DShaderDeclaration.SOLSIZEGRADIENTXMAX = Shader3D.propertyNameToID("u_SOLSizeGradientMaxX");
-	ShuriKenParticle3DShaderDeclaration.SOLSIZEGRADIENTYMAX = Shader3D.propertyNameToID("u_SOLSizeGradientMaxY");
-	ShuriKenParticle3DShaderDeclaration.SOLSizeGradientZMAX = Shader3D.propertyNameToID("u_SOLSizeGradientMaxZ");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYCONST = Shader3D.propertyNameToID("u_ROLAngularVelocityConst");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYCONSTSEPRARATE = Shader3D.propertyNameToID("u_ROLAngularVelocityConstSeprarate");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENT = Shader3D.propertyNameToID("u_ROLAngularVelocityGradient");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTX = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientX");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTY = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientY");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTZ = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientZ");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYCONSTMAX = Shader3D.propertyNameToID("u_ROLAngularVelocityConstMax");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYCONSTMAXSEPRARATE = Shader3D.propertyNameToID("u_ROLAngularVelocityConstMaxSeprarate");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTMAX = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientMax");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTXMAX = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientMaxX");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTYMAX = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientMaxY");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTZMAX = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientMaxZ");
-	ShuriKenParticle3DShaderDeclaration.ROLANGULARVELOCITYGRADIENTWMAX = Shader3D.propertyNameToID("u_ROLAngularVelocityGradientMaxW");
-	ShuriKenParticle3DShaderDeclaration.TEXTURESHEETANIMATIONCYCLES = Shader3D.propertyNameToID("u_TSACycles");
-	ShuriKenParticle3DShaderDeclaration.TEXTURESHEETANIMATIONSUBUVLENGTH = Shader3D.propertyNameToID("u_TSASubUVLength");
-	ShuriKenParticle3DShaderDeclaration.TEXTURESHEETANIMATIONGRADIENTUVS = Shader3D.propertyNameToID("u_TSAGradientUVs");
-	ShuriKenParticle3DShaderDeclaration.TEXTURESHEETANIMATIONGRADIENTMAXUVS = Shader3D.propertyNameToID("u_TSAMaxGradientUVs");
-
 	class ShurikenParticleRenderer extends BaseRender {
 	    constructor(owner) {
 	        super(owner);
 	        this._finalGravity = new Vector3();
 	        this._tempRotationMatrix = new Matrix4x4();
-	        this._renderMode = 0;
 	        this._mesh = null;
 	        this.stretchedBillboardCameraSpeedScale = 0;
 	        this.stretchedBillboardSpeedScale = 0;
-	        this.stretchedBillboardLengthScale = 0;
+	        this.stretchedBillboardLengthScale = 2;
 	        this._defaultBoundBox = new BoundBox(new Vector3(), new Vector3());
-	        this._renderMode = -1;
-	        this.stretchedBillboardCameraSpeedScale = 0.0;
-	        this.stretchedBillboardSpeedScale = 0.0;
-	        this.stretchedBillboardLengthScale = 1.0;
+	        this.renderMode = 0;
 	        this._supportOctree = false;
 	    }
 	    get renderMode() {
 	        return this._renderMode;
-	    }
-	    get mesh() {
-	        return this._mesh;
-	    }
-	    set mesh(value) {
-	        if (this._mesh !== value) {
-	            (this._mesh) && (this._mesh._removeReference());
-	            this._mesh = value;
-	            (value) && (value._addReference());
-	            this._owner.particleSystem._initBufferDatas();
-	        }
 	    }
 	    set renderMode(value) {
 	        if (this._renderMode !== value) {
@@ -16250,6 +18102,18 @@
 	                default:
 	                    throw new Error("ShurikenParticleRender: unknown renderMode Value.");
 	            }
+	            var parSys = this._owner.particleSystem;
+	            (parSys) && (parSys._initBufferDatas());
+	        }
+	    }
+	    get mesh() {
+	        return this._mesh;
+	    }
+	    set mesh(value) {
+	        if (this._mesh !== value) {
+	            (this._mesh) && (this._mesh._removeReference());
+	            this._mesh = value;
+	            (value) && (value._addReference());
 	            this._owner.particleSystem._initBufferDatas();
 	        }
 	    }
@@ -16365,6 +18229,23 @@
 	VertexShuriKenParticle.PARTICLE_SIMULATIONWORLDROTATION = 14;
 
 	class VertexShurikenParticleBillboard extends VertexShuriKenParticle {
+	    constructor(cornerTextureCoordinate, positionStartLifeTime, velocity, startColor, startSize, startRotation0, startRotation1, startRotation2, ageAddScale, time, startSpeed, randoms0, randoms1, simulationWorldPostion) {
+	        super();
+	        this._cornerTextureCoordinate = cornerTextureCoordinate;
+	        this._positionStartLifeTime = positionStartLifeTime;
+	        this._velocity = velocity;
+	        this._startColor = startColor;
+	        this._startSize = startSize;
+	        this._startRotation0 = startRotation0;
+	        this._startRotation1 = startRotation1;
+	        this._startRotation2 = startRotation2;
+	        this._startLifeTime = ageAddScale;
+	        this._time = time;
+	        this._startSpeed = startSpeed;
+	        this._randoms0 = this.random0;
+	        this._randoms1 = this.random1;
+	        this._simulationWorldPostion = simulationWorldPostion;
+	    }
 	    static get vertexDeclaration() {
 	        return VertexShurikenParticleBillboard._vertexDeclaration;
 	    }
@@ -16423,6 +18304,9 @@
 	    get simulationWorldPostion() {
 	        return this._simulationWorldPostion;
 	    }
+	}
+
+	class VertexShurikenParticleMesh extends VertexShuriKenParticle {
 	    constructor(cornerTextureCoordinate, positionStartLifeTime, velocity, startColor, startSize, startRotation0, startRotation1, startRotation2, ageAddScale, time, startSpeed, randoms0, randoms1, simulationWorldPostion) {
 	        super();
 	        this._cornerTextureCoordinate = cornerTextureCoordinate;
@@ -16440,9 +18324,6 @@
 	        this._randoms1 = this.random1;
 	        this._simulationWorldPostion = simulationWorldPostion;
 	    }
-	}
-
-	class VertexShurikenParticleMesh extends VertexShuriKenParticle {
 	    static __init__() {
 	        VertexShurikenParticleMesh._vertexDeclaration = new VertexDeclaration(172, [new VertexElement(0, VertexElementFormat.Vector3, VertexShuriKenParticle.PARTICLE_POSITION0),
 	            new VertexElement(12, VertexElementFormat.Vector4, VertexShuriKenParticle.PARTICLE_COLOR0),
@@ -16502,23 +18383,6 @@
 	    }
 	    get simulationWorldPostion() {
 	        return this._simulationWorldPostion;
-	    }
-	    constructor(cornerTextureCoordinate, positionStartLifeTime, velocity, startColor, startSize, startRotation0, startRotation1, startRotation2, ageAddScale, time, startSpeed, randoms0, randoms1, simulationWorldPostion) {
-	        super();
-	        this._cornerTextureCoordinate = cornerTextureCoordinate;
-	        this._positionStartLifeTime = positionStartLifeTime;
-	        this._velocity = velocity;
-	        this._startColor = startColor;
-	        this._startSize = startSize;
-	        this._startRotation0 = startRotation0;
-	        this._startRotation1 = startRotation1;
-	        this._startRotation2 = startRotation2;
-	        this._startLifeTime = ageAddScale;
-	        this._time = time;
-	        this._startSpeed = startSpeed;
-	        this._randoms0 = this.random0;
-	        this._randoms1 = this.random1;
-	        this._simulationWorldPostion = simulationWorldPostion;
 	    }
 	}
 
@@ -16626,6 +18490,11 @@
 	}
 
 	class Emission {
+	    constructor() {
+	        this._emissionRate = 10;
+	        this._destroyed = false;
+	        this._bursts = [];
+	    }
 	    set emissionRate(value) {
 	        if (value < 0)
 	            throw new Error("ParticleBaseShape:emissionRate value must large or equal than 0.");
@@ -16636,11 +18505,6 @@
 	    }
 	    get destroyed() {
 	        return this._destroyed;
-	    }
-	    constructor() {
-	        this._destroyed = false;
-	        this.emissionRate = 10;
-	        this._bursts = [];
 	    }
 	    destroy() {
 	        this._bursts = null;
@@ -16685,62 +18549,12 @@
 	                destBursts[i] = this._bursts[i].clone();
 	        }
 	        destEmission._emissionRate = this._emissionRate;
-	        destEmission.enbale = this.enbale;
+	        destEmission.enable = this.enable;
 	    }
 	    clone() {
 	        var destEmission = new Emission();
 	        this.cloneTo(destEmission);
 	        return destEmission;
-	    }
-	}
-
-	class GradientDataNumber {
-	    constructor() {
-	        this._currentLength = 0;
-	        this._elements = new Float32Array(8);
-	    }
-	    get gradientCount() {
-	        return this._currentLength / 2;
-	    }
-	    add(key, value) {
-	        if (this._currentLength < 8) {
-	            if ((this._currentLength === 6) && ((key !== 1))) {
-	                key = 1;
-	                console.log("GradientDataNumber warning:the forth key is  be force set to 1.");
-	            }
-	            this._elements[this._currentLength++] = key;
-	            this._elements[this._currentLength++] = value;
-	        }
-	        else {
-	            console.log("GradientDataNumber warning:data count must lessEqual than 4");
-	        }
-	    }
-	    getKeyByIndex(index) {
-	        return this._elements[index * 2];
-	    }
-	    getValueByIndex(index) {
-	        return this._elements[index * 2 + 1];
-	    }
-	    getAverageValue() {
-	        var total = 0;
-	        for (var i = 0, n = this._currentLength - 2; i < n; i += 2) {
-	            var subValue = this._elements[i + 1];
-	            subValue += this._elements[i + 3];
-	            subValue = subValue * (this._elements[i + 2] - this._elements[i]);
-	        }
-	        return total / 2;
-	    }
-	    cloneTo(destObject) {
-	        var destGradientDataNumber = destObject;
-	        destGradientDataNumber._currentLength = this._currentLength;
-	        var destElements = destGradientDataNumber._elements;
-	        for (var i = 0, n = this._elements.length; i < n; i++)
-	            destElements[i] = this._elements[i];
-	    }
-	    clone() {
-	        var destGradientDataNumber = new GradientDataNumber();
-	        this.cloneTo(destGradientDataNumber);
-	        return destGradientDataNumber;
 	    }
 	}
 
@@ -16817,7 +18631,7 @@
 	                break;
 	        }
 	        var colorOverLifetime = particleSystem.colorOverLifetime;
-	        if (colorOverLifetime && colorOverLifetime.enbale) {
+	        if (colorOverLifetime && colorOverLifetime.enable) {
 	            var color = colorOverLifetime.color;
 	            switch (color.type) {
 	                case 0:
@@ -16888,7 +18702,7 @@
 	                break;
 	        }
 	        var sizeOverLifetime = particleSystem.sizeOverLifetime;
-	        if (sizeOverLifetime && sizeOverLifetime.enbale && sizeOverLifetime.size.type === 1) {
+	        if (sizeOverLifetime && sizeOverLifetime.enable && sizeOverLifetime.size.type === 1) {
 	            var size = sizeOverLifetime.size;
 	            if (size.separateAxes) {
 	                if (autoRandomSeed) {
@@ -17093,7 +18907,6 @@
 	class ShurikenParticleSystem extends GeometryElement {
 	    constructor(owner) {
 	        super();
-	        this._tempRotationMatrix = new Matrix4x4();
 	        this._boundingSphere = null;
 	        this._boundingBox = null;
 	        this._boundingBoxCorners = null;
@@ -17172,9 +18985,9 @@
 	        this.startRotationConstantMaxSeparate = null;
 	        this.randomizeRotationDirection = 0;
 	        this.startColorType = 0;
-	        this.startColorConstant = null;
-	        this.startColorConstantMin = null;
-	        this.startColorConstantMax = null;
+	        this.startColorConstant = new Vector4(1, 1, 1, 1);
+	        this.startColorConstantMin = new Vector4(0, 0, 0, 0);
+	        this.startColorConstantMax = new Vector4(1, 1, 1, 1);
 	        this.gravityModifier = 0;
 	        this.simulationSpace = 0;
 	        this.simulationSpeed = 1.0;
@@ -17237,11 +19050,6 @@
 	        this.startRotationConstantMax = 0.0;
 	        this.startRotationConstantMinSeparate = new Vector3(0, 0, 0);
 	        this.startRotationConstantMaxSeparate = new Vector3(0, 0, 0);
-	        this.randomizeRotationDirection = 0.0;
-	        this.startColorType = 0;
-	        this.startColorConstant = new Vector4(1, 1, 1, 1);
-	        this.startColorConstantMin = new Vector4(1, 1, 1, 1);
-	        this.startColorConstantMax = new Vector4(1, 1, 1, 1);
 	        this.gravityModifier = 0.0;
 	        this.simulationSpace = 1;
 	        this.scaleMode = 0;
@@ -17252,8 +19060,9 @@
 	        this._randomSeeds = new Uint32Array(ShurikenParticleSystem._RANDOMOFFSET.length);
 	        this.isPerformanceMode = true;
 	        this._emission = new Emission();
-	        this._emission.enbale = true;
+	        this._emission.enable = true;
 	    }
+	    ;
 	    get maxParticles() {
 	        return this._bufferMaxParticles - 1;
 	    }
@@ -17403,7 +19212,7 @@
 	        if (value) {
 	            var velocity = value.velocity;
 	            var velocityType = velocity.type;
-	            if (value.enbale) {
+	            if (value.enable) {
 	                switch (velocityType) {
 	                    case 0:
 	                        shaDat.addDefine(ShuriKenParticle3DShaderDeclaration.SHADERDEFINE_VELOCITYOVERLIFETIMECONSTANT);
@@ -17464,7 +19273,7 @@
 	        var shaDat = this._owner._render._shaderValues;
 	        if (value) {
 	            var color = value.color;
-	            if (value.enbale) {
+	            if (value.enable) {
 	                switch (color.type) {
 	                    case 1:
 	                        shaDat.addDefine(ShuriKenParticle3DShaderDeclaration.SHADERDEFINE_COLOROVERLIFETIME);
@@ -17515,7 +19324,7 @@
 	            var size = value.size;
 	            var sizeSeparate = size.separateAxes;
 	            var sizeType = size.type;
-	            if (value.enbale) {
+	            if (value.enable) {
 	                switch (sizeType) {
 	                    case 0:
 	                        if (sizeSeparate)
@@ -17583,7 +19392,7 @@
 	                return;
 	            var rotationSeparate = rotation.separateAxes;
 	            var rotationType = rotation.type;
-	            if (value.enbale) {
+	            if (value.enable) {
 	                if (rotationSeparate)
 	                    shaDat.addDefine(ShuriKenParticle3DShaderDeclaration.SHADERDEFINE_ROTATIONOVERLIFETIMESEPERATE);
 	                else
@@ -17781,7 +19590,7 @@
 	        }
 	        var startMinVelocity = new Vector3(minDirection.x * minStartSpeed, minDirection.y * minStartSpeed, minDirection.z * minStartSpeed);
 	        var startMaxVelocity = new Vector3(maxDirection.x * maxStartSpeed, maxDirection.y * maxStartSpeed, maxDirection.z * maxStartSpeed);
-	        if (this._velocityOverLifetime && this._velocityOverLifetime.enbale) {
+	        if (this._velocityOverLifetime && this._velocityOverLifetime.enable) {
 	            var lifeMinVelocity;
 	            var lifeMaxVelocity;
 	            var velocity = this._velocityOverLifetime.velocity;
@@ -17831,7 +19640,7 @@
 	                break;
 	        }
 	        var minStratPosition, maxStratPosition;
-	        if (this._velocityOverLifetime && this._velocityOverLifetime.enbale) ;
+	        if (this._velocityOverLifetime && this._velocityOverLifetime.enable) ;
 	        else {
 	            minStratPosition = new Vector3(startMinVelocity.x * maxStartLifeTime, startMinVelocity.y * maxStartLifeTime, startMinVelocity.z * maxStartLifeTime);
 	            maxStratPosition = new Vector3(startMaxVelocity.x * maxStartLifeTime, startMaxVelocity.y * maxStartLifeTime, startMaxVelocity.z * maxStartLifeTime);
@@ -17889,7 +19698,7 @@
 	            case 3:
 	                break;
 	        }
-	        if (this._sizeOverLifetime && this._sizeOverLifetime.enbale) {
+	        if (this._sizeOverLifetime && this._sizeOverLifetime.enable) {
 	            var size = this._sizeOverLifetime.size;
 	            maxSize *= this._sizeOverLifetime.size.getMaxSizeInGradient();
 	        }
@@ -17907,7 +19716,7 @@
 	                var maxStretchVelocity = ShurikenParticleSystem._tempVector32;
 	                var minStretchVelocity = ShurikenParticleSystem._tempVector33;
 	                var minStretchPosition = ShurikenParticleSystem._tempVector34;
-	                if (this._velocityOverLifetime && this._velocityOverLifetime.enbale) ;
+	                if (this._velocityOverLifetime && this._velocityOverLifetime.enable) ;
 	                else {
 	                    Vector3.multiply(velocityScale, startMaxVelocity, maxStretchVelocity);
 	                    Vector3.multiply(velocityScale, startMinVelocity, minStretchVelocity);
@@ -17978,7 +19787,7 @@
 	        if (this._totalDelayTime < this._playStartDelay) {
 	            return;
 	        }
-	        if (this._emission.enbale && this._isEmitting && !this._isPaused)
+	        if (this._emission.enable && this._isEmitting && !this._isPaused)
 	            this._advanceTime(elapsedTime, this._currentTime);
 	    }
 	    _updateParticlesSimulationRestart(time) {
@@ -17996,7 +19805,7 @@
 	            this._totalDelayTime = delayTime;
 	            return;
 	        }
-	        if (this._emission.enbale)
+	        if (this._emission.enable)
 	            this._advanceTime(time, time);
 	    }
 	    _retireActiveParticles() {
@@ -18121,7 +19930,7 @@
 	                    this._indexStride = mesh._indexBuffer.indexCount;
 	                    var indexDatas = mesh._indexBuffer.getData();
 	                    var indexCount = this._bufferMaxParticles * this._indexStride;
-	                    this._indexBuffer = new IndexBuffer3D(IndexBuffer3D.INDEXTYPE_USHORT, indexCount, gl.STATIC_DRAW);
+	                    this._indexBuffer = new IndexBuffer3D(exports.IndexFormat.UInt16, indexCount, gl.STATIC_DRAW);
 	                    indices = new Uint16Array(indexCount);
 	                    memorySize = vbMemorySize + indexCount * 2;
 	                    indexOffset = 0;
@@ -18170,7 +19979,7 @@
 	                    this._vertices[perPartOffset + 3] = 0;
 	                }
 	                this._indexStride = 6;
-	                this._indexBuffer = new IndexBuffer3D(IndexBuffer3D.INDEXTYPE_USHORT, this._bufferMaxParticles * 6, gl.STATIC_DRAW);
+	                this._indexBuffer = new IndexBuffer3D(exports.IndexFormat.UInt16, this._bufferMaxParticles * 6, gl.STATIC_DRAW);
 	                indices = new Uint16Array(this._bufferMaxParticles * 6);
 	                for (i = 0; i < this._bufferMaxParticles; i++) {
 	                    indexOffset = i * 6;
@@ -18276,7 +20085,7 @@
 	                break;
 	        }
 	        var randomVelocityX, randomVelocityY, randomVelocityZ, randomColor, randomSize, randomRotation, randomTextureAnimation;
-	        var needRandomVelocity = this._velocityOverLifetime && this._velocityOverLifetime.enbale;
+	        var needRandomVelocity = this._velocityOverLifetime && this._velocityOverLifetime.enable;
 	        if (needRandomVelocity) {
 	            var velocityType = this._velocityOverLifetime.velocity.type;
 	            if (velocityType === 2 || velocityType === 3) {
@@ -18300,7 +20109,7 @@
 	        else {
 	            needRandomVelocity = false;
 	        }
-	        var needRandomColor = this._colorOverLifetime && this._colorOverLifetime.enbale;
+	        var needRandomColor = this._colorOverLifetime && this._colorOverLifetime.enable;
 	        if (needRandomColor) {
 	            var colorType = this._colorOverLifetime.color.type;
 	            if (colorType === 3) {
@@ -18320,7 +20129,7 @@
 	        else {
 	            needRandomColor = false;
 	        }
-	        var needRandomSize = this._sizeOverLifetime && this._sizeOverLifetime.enbale;
+	        var needRandomSize = this._sizeOverLifetime && this._sizeOverLifetime.enable;
 	        if (needRandomSize) {
 	            var sizeType = this._sizeOverLifetime.size.type;
 	            if (sizeType === 3) {
@@ -18340,7 +20149,7 @@
 	        else {
 	            needRandomSize = false;
 	        }
-	        var needRandomRotation = this._rotationOverLifetime && this._rotationOverLifetime.enbale;
+	        var needRandomRotation = this._rotationOverLifetime && this._rotationOverLifetime.enable;
 	        if (needRandomRotation) {
 	            var rotationType = this._rotationOverLifetime.angularVelocity.type;
 	            if (rotationType === 2 || rotationType === 3) {
@@ -18686,1602 +20495,18 @@
 	ShurikenParticleSystem._tempDirection = new Vector3();
 	ShurikenParticleSystem._type = GeometryElement._typeCounter++;
 
-	class Burst {
-	    get time() {
-	        return this._time;
-	    }
-	    get minCount() {
-	        return this._minCount;
-	    }
-	    get maxCount() {
-	        return this._maxCount;
-	    }
-	    constructor(time, minCount, maxCount) {
-	        this._time = time;
-	        this._minCount = minCount;
-	        this._maxCount = maxCount;
-	    }
-	    cloneTo(destObject) {
-	        var destBurst = destObject;
-	        destBurst._time = this._time;
-	        destBurst._minCount = this._minCount;
-	        destBurst._maxCount = this._maxCount;
-	    }
-	    clone() {
-	        var destBurst = new Burst(this._time, this._minCount, this._maxCount);
-	        this.cloneTo(destBurst);
-	        return destBurst;
-	    }
-	}
-
-	class GradientColor {
-	    constructor() {
-	        this._type = 0;
-	        this._constant = null;
-	        this._constantMin = null;
-	        this._constantMax = null;
-	        this._gradient = null;
-	        this._gradientMin = null;
-	        this._gradientMax = null;
-	    }
-	    static createByConstant(constant) {
-	        var gradientColor = new GradientColor();
-	        gradientColor._type = 0;
-	        gradientColor._constant = constant;
-	        return gradientColor;
-	    }
-	    static createByGradient(gradient) {
-	        var gradientColor = new GradientColor();
-	        gradientColor._type = 1;
-	        gradientColor._gradient = gradient;
-	        return gradientColor;
-	    }
-	    static createByRandomTwoConstant(minConstant, maxConstant) {
-	        var gradientColor = new GradientColor();
-	        gradientColor._type = 2;
-	        gradientColor._constantMin = minConstant;
-	        gradientColor._constantMax = maxConstant;
-	        return gradientColor;
-	    }
-	    static createByRandomTwoGradient(minGradient, maxGradient) {
-	        var gradientColor = new GradientColor();
-	        gradientColor._type = 3;
-	        gradientColor._gradientMin = minGradient;
-	        gradientColor._gradientMax = maxGradient;
-	        return gradientColor;
-	    }
-	    get type() {
-	        return this._type;
-	    }
-	    get constant() {
-	        return this._constant;
-	    }
-	    get constantMin() {
-	        return this._constantMin;
-	    }
-	    get constantMax() {
-	        return this._constantMax;
-	    }
-	    get gradient() {
-	        return this._gradient;
-	    }
-	    get gradientMin() {
-	        return this._gradientMin;
-	    }
-	    get gradientMax() {
-	        return this._gradientMax;
-	    }
-	    cloneTo(destObject) {
-	        var destGradientColor = destObject;
-	        destGradientColor._type = this._type;
-	        this._constant.cloneTo(destGradientColor._constant);
-	        this._constantMin.cloneTo(destGradientColor._constantMin);
-	        this._constantMax.cloneTo(destGradientColor._constantMax);
-	        this._gradient.cloneTo(destGradientColor._gradient);
-	        this._gradientMin.cloneTo(destGradientColor._gradientMin);
-	        this._gradientMax.cloneTo(destGradientColor._gradientMax);
-	    }
-	    clone() {
-	        var destGradientColor = new GradientColor();
-	        this.cloneTo(destGradientColor);
-	        return destGradientColor;
-	    }
-	}
-
-	class ColorOverLifetime {
-	    get color() {
-	        return this._color;
-	    }
-	    constructor(color) {
-	        this._color = color;
-	    }
-	    cloneTo(destObject) {
-	        var destColorOverLifetime = destObject;
-	        this._color.cloneTo(destColorOverLifetime._color);
-	        destColorOverLifetime.enbale = this.enbale;
-	    }
-	    clone() {
-	        var destColor;
-	        switch (this._color.type) {
-	            case 0:
-	                destColor = GradientColor.createByConstant(this._color.constant.clone());
-	                break;
-	            case 1:
-	                destColor = GradientColor.createByGradient(this._color.gradient.clone());
-	                break;
-	            case 2:
-	                destColor = GradientColor.createByRandomTwoConstant(this._color.constantMin.clone(), this._color.constantMax.clone());
-	                break;
-	            case 3:
-	                destColor = GradientColor.createByRandomTwoGradient(this._color.gradientMin.clone(), this._color.gradientMax.clone());
-	                break;
-	        }
-	        var destColorOverLifetime = new ColorOverLifetime(destColor);
-	        destColorOverLifetime.enbale = this.enbale;
-	        return destColorOverLifetime;
-	    }
-	}
-
-	class FrameOverTime {
-	    constructor() {
-	        this._type = 0;
-	        this._constant = 0;
-	        this._overTime = null;
-	        this._constantMin = 0;
-	        this._constantMax = 0;
-	        this._overTimeMin = null;
-	        this._overTimeMax = null;
-	    }
-	    static createByConstant(constant) {
-	        var rotationOverLifetime = new FrameOverTime();
-	        rotationOverLifetime._type = 0;
-	        rotationOverLifetime._constant = constant;
-	        return rotationOverLifetime;
-	    }
-	    static createByOverTime(overTime) {
-	        var rotationOverLifetime = new FrameOverTime();
-	        rotationOverLifetime._type = 1;
-	        rotationOverLifetime._overTime = overTime;
-	        return rotationOverLifetime;
-	    }
-	    static createByRandomTwoConstant(constantMin, constantMax) {
-	        var rotationOverLifetime = new FrameOverTime();
-	        rotationOverLifetime._type = 2;
-	        rotationOverLifetime._constantMin = constantMin;
-	        rotationOverLifetime._constantMax = constantMax;
-	        return rotationOverLifetime;
-	    }
-	    static createByRandomTwoOverTime(gradientFrameMin, gradientFrameMax) {
-	        var rotationOverLifetime = new FrameOverTime();
-	        rotationOverLifetime._type = 3;
-	        rotationOverLifetime._overTimeMin = gradientFrameMin;
-	        rotationOverLifetime._overTimeMax = gradientFrameMax;
-	        return rotationOverLifetime;
-	    }
-	    get type() {
-	        return this._type;
-	    }
-	    get constant() {
-	        return this._constant;
-	    }
-	    get frameOverTimeData() {
-	        return this._overTime;
-	    }
-	    get constantMin() {
-	        return this._constantMin;
-	    }
-	    get constantMax() {
-	        return this._constantMax;
-	    }
-	    get frameOverTimeDataMin() {
-	        return this._overTimeMin;
-	    }
-	    get frameOverTimeDataMax() {
-	        return this._overTimeMax;
-	    }
-	    cloneTo(destObject) {
-	        var destFrameOverTime = destObject;
-	        destFrameOverTime._type = this._type;
-	        destFrameOverTime._constant = this._constant;
-	        (this._overTime) && (this._overTime.cloneTo(destFrameOverTime._overTime));
-	        destFrameOverTime._constantMin = this._constantMin;
-	        destFrameOverTime._constantMax = this._constantMax;
-	        (this._overTimeMin) && (this._overTimeMin.cloneTo(destFrameOverTime._overTimeMin));
-	        (this._overTimeMax) && (this._overTimeMax.cloneTo(destFrameOverTime._overTimeMax));
-	    }
-	    clone() {
-	        var destFrameOverTime = new FrameOverTime();
-	        this.cloneTo(destFrameOverTime);
-	        return destFrameOverTime;
-	    }
-	}
-
-	class GradientAngularVelocity {
-	    constructor() {
-	        this._type = 0;
-	        this._separateAxes = false;
-	        this._constant = 0;
-	        this._constantSeparate = null;
-	        this._gradient = null;
-	        this._gradientX = null;
-	        this._gradientY = null;
-	        this._gradientZ = null;
-	        this._gradientW = null;
-	        this._constantMin = 0;
-	        this._constantMax = 0;
-	        this._constantMinSeparate = null;
-	        this._constantMaxSeparate = null;
-	        this._gradientMin = null;
-	        this._gradientMax = null;
-	        this._gradientXMin = null;
-	        this._gradientXMax = null;
-	        this._gradientYMin = null;
-	        this._gradientYMax = null;
-	        this._gradientZMin = null;
-	        this._gradientZMax = null;
-	        this._gradientWMin = null;
-	        this._gradientWMax = null;
-	    }
-	    static createByConstant(constant) {
-	        var gradientAngularVelocity = new GradientAngularVelocity();
-	        gradientAngularVelocity._type = 0;
-	        gradientAngularVelocity._separateAxes = false;
-	        gradientAngularVelocity._constant = constant;
-	        return gradientAngularVelocity;
-	    }
-	    static createByConstantSeparate(separateConstant) {
-	        var gradientAngularVelocity = new GradientAngularVelocity();
-	        gradientAngularVelocity._type = 0;
-	        gradientAngularVelocity._separateAxes = true;
-	        gradientAngularVelocity._constantSeparate = separateConstant;
-	        return gradientAngularVelocity;
-	    }
-	    static createByGradient(gradient) {
-	        var gradientAngularVelocity = new GradientAngularVelocity();
-	        gradientAngularVelocity._type = 1;
-	        gradientAngularVelocity._separateAxes = false;
-	        gradientAngularVelocity._gradient = gradient;
-	        return gradientAngularVelocity;
-	    }
-	    static createByGradientSeparate(gradientX, gradientY, gradientZ) {
-	        var gradientAngularVelocity = new GradientAngularVelocity();
-	        gradientAngularVelocity._type = 1;
-	        gradientAngularVelocity._separateAxes = true;
-	        gradientAngularVelocity._gradientX = gradientX;
-	        gradientAngularVelocity._gradientY = gradientY;
-	        gradientAngularVelocity._gradientZ = gradientZ;
-	        return gradientAngularVelocity;
-	    }
-	    static createByRandomTwoConstant(constantMin, constantMax) {
-	        var gradientAngularVelocity = new GradientAngularVelocity();
-	        gradientAngularVelocity._type = 2;
-	        gradientAngularVelocity._separateAxes = false;
-	        gradientAngularVelocity._constantMin = constantMin;
-	        gradientAngularVelocity._constantMax = constantMax;
-	        return gradientAngularVelocity;
-	    }
-	    static createByRandomTwoConstantSeparate(separateConstantMin, separateConstantMax) {
-	        var gradientAngularVelocity = new GradientAngularVelocity();
-	        gradientAngularVelocity._type = 2;
-	        gradientAngularVelocity._separateAxes = true;
-	        gradientAngularVelocity._constantMinSeparate = separateConstantMin;
-	        gradientAngularVelocity._constantMaxSeparate = separateConstantMax;
-	        return gradientAngularVelocity;
-	    }
-	    static createByRandomTwoGradient(gradientMin, gradientMax) {
-	        var gradientAngularVelocity = new GradientAngularVelocity();
-	        gradientAngularVelocity._type = 3;
-	        gradientAngularVelocity._separateAxes = false;
-	        gradientAngularVelocity._gradientMin = gradientMin;
-	        gradientAngularVelocity._gradientMax = gradientMax;
-	        return gradientAngularVelocity;
-	    }
-	    static createByRandomTwoGradientSeparate(gradientXMin, gradientXMax, gradientYMin, gradientYMax, gradientZMin, gradientZMax, gradientWMin, gradientWMax) {
-	        var gradientAngularVelocity = new GradientAngularVelocity();
-	        gradientAngularVelocity._type = 3;
-	        gradientAngularVelocity._separateAxes = true;
-	        gradientAngularVelocity._gradientXMin = gradientXMin;
-	        gradientAngularVelocity._gradientXMax = gradientXMax;
-	        gradientAngularVelocity._gradientYMin = gradientYMin;
-	        gradientAngularVelocity._gradientYMax = gradientYMax;
-	        gradientAngularVelocity._gradientZMin = gradientZMin;
-	        gradientAngularVelocity._gradientZMax = gradientZMax;
-	        gradientAngularVelocity._gradientWMin = gradientWMin;
-	        gradientAngularVelocity._gradientWMax = gradientWMax;
-	        return gradientAngularVelocity;
-	    }
-	    get type() {
-	        return this._type;
-	    }
-	    get separateAxes() {
-	        return this._separateAxes;
-	    }
-	    get constant() {
-	        return this._constant;
-	    }
-	    get constantSeparate() {
-	        return this._constantSeparate;
-	    }
-	    get gradient() {
-	        return this._gradient;
-	    }
-	    get gradientX() {
-	        return this._gradientX;
-	    }
-	    get gradientY() {
-	        return this._gradientY;
-	    }
-	    get gradientZ() {
-	        return this._gradientZ;
-	    }
-	    get gradientW() {
-	        return this._gradientW;
-	    }
-	    get constantMin() {
-	        return this._constantMin;
-	    }
-	    get constantMax() {
-	        return this._constantMax;
-	    }
-	    get constantMinSeparate() {
-	        return this._constantMinSeparate;
-	    }
-	    get constantMaxSeparate() {
-	        return this._constantMaxSeparate;
-	    }
-	    get gradientMin() {
-	        return this._gradientMin;
-	    }
-	    get gradientMax() {
-	        return this._gradientMax;
-	    }
-	    get gradientXMin() {
-	        return this._gradientXMin;
-	    }
-	    get gradientXMax() {
-	        return this._gradientXMax;
-	    }
-	    get gradientYMin() {
-	        return this._gradientYMin;
-	    }
-	    get gradientYMax() {
-	        return this._gradientYMax;
-	    }
-	    get gradientZMin() {
-	        return this._gradientZMin;
-	    }
-	    get gradientZMax() {
-	        return this._gradientZMax;
-	    }
-	    get gradientWMin() {
-	        return this._gradientWMin;
-	    }
-	    get gradientWMax() {
-	        return this._gradientWMax;
-	    }
-	    cloneTo(destObject) {
-	        var destGradientAngularVelocity = destObject;
-	        destGradientAngularVelocity._type = this._type;
-	        destGradientAngularVelocity._separateAxes = this._separateAxes;
-	        destGradientAngularVelocity._constant = this._constant;
-	        this._constantSeparate.cloneTo(destGradientAngularVelocity._constantSeparate);
-	        this._gradient.cloneTo(destGradientAngularVelocity._gradient);
-	        this._gradientX.cloneTo(destGradientAngularVelocity._gradientX);
-	        this._gradientY.cloneTo(destGradientAngularVelocity._gradientY);
-	        this._gradientZ.cloneTo(destGradientAngularVelocity._gradientZ);
-	        destGradientAngularVelocity._constantMin = this._constantMin;
-	        destGradientAngularVelocity._constantMax = this._constantMax;
-	        this._constantMinSeparate.cloneTo(destGradientAngularVelocity._constantMinSeparate);
-	        this._constantMaxSeparate.cloneTo(destGradientAngularVelocity._constantMaxSeparate);
-	        this._gradientMin.cloneTo(destGradientAngularVelocity._gradientMin);
-	        this._gradientMax.cloneTo(destGradientAngularVelocity._gradientMax);
-	        this._gradientXMin.cloneTo(destGradientAngularVelocity._gradientXMin);
-	        this._gradientXMax.cloneTo(destGradientAngularVelocity._gradientXMax);
-	        this._gradientYMin.cloneTo(destGradientAngularVelocity._gradientYMin);
-	        this._gradientYMax.cloneTo(destGradientAngularVelocity._gradientYMax);
-	        this._gradientZMin.cloneTo(destGradientAngularVelocity._gradientZMin);
-	        this._gradientZMax.cloneTo(destGradientAngularVelocity._gradientZMax);
-	    }
-	    clone() {
-	        var destGradientAngularVelocity = new GradientAngularVelocity();
-	        this.cloneTo(destGradientAngularVelocity);
-	        return destGradientAngularVelocity;
-	    }
-	}
-
-	class GradientDataInt {
-	    constructor() {
-	        this._currentLength = 0;
-	        this._elements = new Float32Array(8);
-	    }
-	    get gradientCount() {
-	        return this._currentLength / 2;
-	    }
-	    add(key, value) {
-	        if (this._currentLength < 8) {
-	            if ((this._currentLength === 6) && ((key !== 1))) {
-	                key = 1;
-	                console.log("Warning:the forth key is  be force set to 1.");
-	            }
-	            this._elements[this._currentLength++] = key;
-	            this._elements[this._currentLength++] = value;
-	        }
-	        else {
-	            console.log("Warning:data count must lessEqual than 4");
-	        }
-	    }
-	    cloneTo(destObject) {
-	        var destGradientDataInt = destObject;
-	        destGradientDataInt._currentLength = this._currentLength;
-	        var destElements = destGradientDataInt._elements;
-	        for (var i = 0, n = this._elements.length; i < n; i++) {
-	            destElements[i] = this._elements[i];
-	        }
-	    }
-	    clone() {
-	        var destGradientDataInt = new GradientDataInt();
-	        this.cloneTo(destGradientDataInt);
-	        return destGradientDataInt;
-	    }
-	}
-
-	class GradientSize {
-	    constructor() {
-	        this._type = 0;
-	        this._separateAxes = false;
-	        this._gradient = null;
-	        this._gradientX = null;
-	        this._gradientY = null;
-	        this._gradientZ = null;
-	        this._constantMin = 0;
-	        this._constantMax = 0;
-	        this._constantMinSeparate = null;
-	        this._constantMaxSeparate = null;
-	        this._gradientMin = null;
-	        this._gradientMax = null;
-	        this._gradientXMin = null;
-	        this._gradientXMax = null;
-	        this._gradientYMin = null;
-	        this._gradientYMax = null;
-	        this._gradientZMin = null;
-	        this._gradientZMax = null;
-	    }
-	    static createByGradient(gradient) {
-	        var gradientSize = new GradientSize();
-	        gradientSize._type = 0;
-	        gradientSize._separateAxes = false;
-	        gradientSize._gradient = gradient;
-	        return gradientSize;
-	    }
-	    static createByGradientSeparate(gradientX, gradientY, gradientZ) {
-	        var gradientSize = new GradientSize();
-	        gradientSize._type = 0;
-	        gradientSize._separateAxes = true;
-	        gradientSize._gradientX = gradientX;
-	        gradientSize._gradientY = gradientY;
-	        gradientSize._gradientZ = gradientZ;
-	        return gradientSize;
-	    }
-	    static createByRandomTwoConstant(constantMin, constantMax) {
-	        var gradientSize = new GradientSize();
-	        gradientSize._type = 1;
-	        gradientSize._separateAxes = false;
-	        gradientSize._constantMin = constantMin;
-	        gradientSize._constantMax = constantMax;
-	        return gradientSize;
-	    }
-	    static createByRandomTwoConstantSeparate(constantMinSeparate, constantMaxSeparate) {
-	        var gradientSize = new GradientSize();
-	        gradientSize._type = 1;
-	        gradientSize._separateAxes = true;
-	        gradientSize._constantMinSeparate = constantMinSeparate;
-	        gradientSize._constantMaxSeparate = constantMaxSeparate;
-	        return gradientSize;
-	    }
-	    static createByRandomTwoGradient(gradientMin, gradientMax) {
-	        var gradientSize = new GradientSize();
-	        gradientSize._type = 2;
-	        gradientSize._separateAxes = false;
-	        gradientSize._gradientMin = gradientMin;
-	        gradientSize._gradientMax = gradientMax;
-	        return gradientSize;
-	    }
-	    static createByRandomTwoGradientSeparate(gradientXMin, gradientXMax, gradientYMin, gradientYMax, gradientZMin, gradientZMax) {
-	        var gradientSize = new GradientSize();
-	        gradientSize._type = 2;
-	        gradientSize._separateAxes = true;
-	        gradientSize._gradientXMin = gradientXMin;
-	        gradientSize._gradientXMax = gradientXMax;
-	        gradientSize._gradientYMin = gradientYMin;
-	        gradientSize._gradientYMax = gradientYMax;
-	        gradientSize._gradientZMin = gradientZMin;
-	        gradientSize._gradientZMax = gradientZMax;
-	        return gradientSize;
-	    }
-	    get type() {
-	        return this._type;
-	    }
-	    get separateAxes() {
-	        return this._separateAxes;
-	    }
-	    get gradient() {
-	        return this._gradient;
-	    }
-	    get gradientX() {
-	        return this._gradientX;
-	    }
-	    get gradientY() {
-	        return this._gradientY;
-	    }
-	    get gradientZ() {
-	        return this._gradientZ;
-	    }
-	    get constantMin() {
-	        return this._constantMin;
-	    }
-	    get constantMax() {
-	        return this._constantMax;
-	    }
-	    get constantMinSeparate() {
-	        return this._constantMinSeparate;
-	    }
-	    get constantMaxSeparate() {
-	        return this._constantMaxSeparate;
-	    }
-	    get gradientMin() {
-	        return this._gradientMin;
-	    }
-	    get gradientMax() {
-	        return this._gradientMax;
-	    }
-	    get gradientXMin() {
-	        return this._gradientXMin;
-	    }
-	    get gradientXMax() {
-	        return this._gradientXMax;
-	    }
-	    get gradientYMin() {
-	        return this._gradientYMin;
-	    }
-	    get gradientYMax() {
-	        return this._gradientYMax;
-	    }
-	    get gradientZMin() {
-	        return this._gradientZMin;
-	    }
-	    get gradientZMax() {
-	        return this._gradientZMax;
-	    }
-	    getMaxSizeInGradient() {
-	        var i, n;
-	        var maxSize = -Number.MAX_VALUE;
-	        switch (this._type) {
-	            case 0:
-	                if (this._separateAxes) {
-	                    for (i = 0, n = this._gradientX.gradientCount; i < n; i++)
-	                        maxSize = Math.max(maxSize, this._gradientX.getValueByIndex(i));
-	                    for (i = 0, n = this._gradientY.gradientCount; i < n; i++)
-	                        maxSize = Math.max(maxSize, this._gradientY.getValueByIndex(i));
-	                }
-	                else {
-	                    for (i = 0, n = this._gradient.gradientCount; i < n; i++)
-	                        maxSize = Math.max(maxSize, this._gradient.getValueByIndex(i));
-	                }
-	                break;
-	            case 1:
-	                if (this._separateAxes) {
-	                    maxSize = Math.max(this._constantMinSeparate.x, this._constantMaxSeparate.x);
-	                    maxSize = Math.max(maxSize, this._constantMinSeparate.y);
-	                    maxSize = Math.max(maxSize, this._constantMaxSeparate.y);
-	                }
-	                else {
-	                    maxSize = Math.max(this._constantMin, this._constantMax);
-	                }
-	                break;
-	            case 2:
-	                if (this._separateAxes) {
-	                    for (i = 0, n = this._gradientXMin.gradientCount; i < n; i++)
-	                        maxSize = Math.max(maxSize, this._gradientXMin.getValueByIndex(i));
-	                    for (i = 0, n = this._gradientXMax.gradientCount; i < n; i++)
-	                        maxSize = Math.max(maxSize, this._gradientXMax.getValueByIndex(i));
-	                    for (i = 0, n = this._gradientYMin.gradientCount; i < n; i++)
-	                        maxSize = Math.max(maxSize, this._gradientYMin.getValueByIndex(i));
-	                    for (i = 0, n = this._gradientZMax.gradientCount; i < n; i++)
-	                        maxSize = Math.max(maxSize, this._gradientZMax.getValueByIndex(i));
-	                }
-	                else {
-	                    for (i = 0, n = this._gradientMin.gradientCount; i < n; i++)
-	                        maxSize = Math.max(maxSize, this._gradientMin.getValueByIndex(i));
-	                    for (i = 0, n = this._gradientMax.gradientCount; i < n; i++)
-	                        maxSize = Math.max(maxSize, this._gradientMax.getValueByIndex(i));
-	                }
-	                break;
-	        }
-	        return maxSize;
-	    }
-	    cloneTo(destObject) {
-	        var destGradientSize = destObject;
-	        destGradientSize._type = this._type;
-	        destGradientSize._separateAxes = this._separateAxes;
-	        this._gradient.cloneTo(destGradientSize._gradient);
-	        this._gradientX.cloneTo(destGradientSize._gradientX);
-	        this._gradientY.cloneTo(destGradientSize._gradientY);
-	        this._gradientZ.cloneTo(destGradientSize._gradientZ);
-	        destGradientSize._constantMin = this._constantMin;
-	        destGradientSize._constantMax = this._constantMax;
-	        this._constantMinSeparate.cloneTo(destGradientSize._constantMinSeparate);
-	        this._constantMaxSeparate.cloneTo(destGradientSize._constantMaxSeparate);
-	        this._gradientMin.cloneTo(destGradientSize._gradientMin);
-	        this._gradientMax.cloneTo(destGradientSize._gradientMax);
-	        this._gradientXMin.cloneTo(destGradientSize._gradientXMin);
-	        this._gradientXMax.cloneTo(destGradientSize._gradientXMax);
-	        this._gradientYMin.cloneTo(destGradientSize._gradientYMin);
-	        this._gradientYMax.cloneTo(destGradientSize._gradientYMax);
-	        this._gradientZMin.cloneTo(destGradientSize._gradientZMin);
-	        this._gradientZMax.cloneTo(destGradientSize._gradientZMax);
-	    }
-	    clone() {
-	        var destGradientSize = new GradientSize();
-	        this.cloneTo(destGradientSize);
-	        return destGradientSize;
-	    }
-	}
-
-	class GradientVelocity {
-	    constructor() {
-	        this._type = 0;
-	        this._constant = null;
-	        this._gradientX = null;
-	        this._gradientY = null;
-	        this._gradientZ = null;
-	        this._constantMin = null;
-	        this._constantMax = null;
-	        this._gradientXMin = null;
-	        this._gradientXMax = null;
-	        this._gradientYMin = null;
-	        this._gradientYMax = null;
-	        this._gradientZMin = null;
-	        this._gradientZMax = null;
-	    }
-	    static createByConstant(constant) {
-	        var gradientVelocity = new GradientVelocity();
-	        gradientVelocity._type = 0;
-	        gradientVelocity._constant = constant;
-	        return gradientVelocity;
-	    }
-	    static createByGradient(gradientX, gradientY, gradientZ) {
-	        var gradientVelocity = new GradientVelocity();
-	        gradientVelocity._type = 1;
-	        gradientVelocity._gradientX = gradientX;
-	        gradientVelocity._gradientY = gradientY;
-	        gradientVelocity._gradientZ = gradientZ;
-	        return gradientVelocity;
-	    }
-	    static createByRandomTwoConstant(constantMin, constantMax) {
-	        var gradientVelocity = new GradientVelocity();
-	        gradientVelocity._type = 2;
-	        gradientVelocity._constantMin = constantMin;
-	        gradientVelocity._constantMax = constantMax;
-	        return gradientVelocity;
-	    }
-	    static createByRandomTwoGradient(gradientXMin, gradientXMax, gradientYMin, gradientYMax, gradientZMin, gradientZMax) {
-	        var gradientVelocity = new GradientVelocity();
-	        gradientVelocity._type = 3;
-	        gradientVelocity._gradientXMin = gradientXMin;
-	        gradientVelocity._gradientXMax = gradientXMax;
-	        gradientVelocity._gradientYMin = gradientYMin;
-	        gradientVelocity._gradientYMax = gradientYMax;
-	        gradientVelocity._gradientZMin = gradientZMin;
-	        gradientVelocity._gradientZMax = gradientZMax;
-	        return gradientVelocity;
-	    }
-	    get type() {
-	        return this._type;
-	    }
-	    get constant() {
-	        return this._constant;
-	    }
-	    get gradientX() {
-	        return this._gradientX;
-	    }
-	    get gradientY() {
-	        return this._gradientY;
-	    }
-	    get gradientZ() {
-	        return this._gradientZ;
-	    }
-	    get constantMin() {
-	        return this._constantMin;
-	    }
-	    get constantMax() {
-	        return this._constantMax;
-	    }
-	    get gradientXMin() {
-	        return this._gradientXMin;
-	    }
-	    get gradientXMax() {
-	        return this._gradientXMax;
-	    }
-	    get gradientYMin() {
-	        return this._gradientYMin;
-	    }
-	    get gradientYMax() {
-	        return this._gradientYMax;
-	    }
-	    get gradientZMin() {
-	        return this._gradientZMin;
-	    }
-	    get gradientZMax() {
-	        return this._gradientZMax;
-	    }
-	    cloneTo(destObject) {
-	        var destGradientVelocity = destObject;
-	        destGradientVelocity._type = this._type;
-	        this._constant.cloneTo(destGradientVelocity._constant);
-	        this._gradientX.cloneTo(destGradientVelocity._gradientX);
-	        this._gradientY.cloneTo(destGradientVelocity._gradientY);
-	        this._gradientZ.cloneTo(destGradientVelocity._gradientZ);
-	        this._constantMin.cloneTo(destGradientVelocity._constantMin);
-	        this._constantMax.cloneTo(destGradientVelocity._constantMax);
-	        this._gradientXMin.cloneTo(destGradientVelocity._gradientXMin);
-	        this._gradientXMax.cloneTo(destGradientVelocity._gradientXMax);
-	        this._gradientYMin.cloneTo(destGradientVelocity._gradientYMin);
-	        this._gradientYMax.cloneTo(destGradientVelocity._gradientYMax);
-	        this._gradientZMin.cloneTo(destGradientVelocity._gradientZMin);
-	        this._gradientZMax.cloneTo(destGradientVelocity._gradientZMax);
-	    }
-	    clone() {
-	        var destGradientVelocity = new GradientVelocity();
-	        this.cloneTo(destGradientVelocity);
-	        return destGradientVelocity;
-	    }
-	}
-
-	class RotationOverLifetime {
-	    get angularVelocity() {
-	        return this._angularVelocity;
-	    }
-	    constructor(angularVelocity) {
-	        this._angularVelocity = angularVelocity;
-	    }
-	    cloneTo(destObject) {
-	        var destRotationOverLifetime = destObject;
-	        this._angularVelocity.cloneTo(destRotationOverLifetime._angularVelocity);
-	        destRotationOverLifetime.enbale = this.enbale;
-	    }
-	    clone() {
-	        var destAngularVelocity;
-	        switch (this._angularVelocity.type) {
-	            case 0:
-	                if (this._angularVelocity.separateAxes)
-	                    destAngularVelocity = GradientAngularVelocity.createByConstantSeparate(this._angularVelocity.constantSeparate.clone());
-	                else
-	                    destAngularVelocity = GradientAngularVelocity.createByConstant(this._angularVelocity.constant);
-	                break;
-	            case 1:
-	                if (this._angularVelocity.separateAxes)
-	                    destAngularVelocity = GradientAngularVelocity.createByGradientSeparate(this._angularVelocity.gradientX.clone(), this._angularVelocity.gradientY.clone(), this._angularVelocity.gradientZ.clone());
-	                else
-	                    destAngularVelocity = GradientAngularVelocity.createByGradient(this._angularVelocity.gradient.clone());
-	                break;
-	            case 2:
-	                if (this._angularVelocity.separateAxes)
-	                    destAngularVelocity = GradientAngularVelocity.createByRandomTwoConstantSeparate(this._angularVelocity.constantMinSeparate.clone(), this._angularVelocity.constantMaxSeparate.clone());
-	                else
-	                    destAngularVelocity = GradientAngularVelocity.createByRandomTwoConstant(this._angularVelocity.constantMin, this._angularVelocity.constantMax);
-	                break;
-	            case 3:
-	                if (this._angularVelocity.separateAxes)
-	                    destAngularVelocity = GradientAngularVelocity.createByRandomTwoGradientSeparate(this._angularVelocity.gradientXMin.clone(), this._angularVelocity.gradientYMin.clone(), this._angularVelocity.gradientZMin.clone(), this._angularVelocity.gradientWMin.clone(), this._angularVelocity.gradientXMax.clone(), this._angularVelocity.gradientYMax.clone(), this._angularVelocity.gradientZMax.clone(), this._angularVelocity.gradientWMax.clone());
-	                else
-	                    destAngularVelocity = GradientAngularVelocity.createByRandomTwoGradient(this._angularVelocity.gradientMin.clone(), this._angularVelocity.gradientMax.clone());
-	                break;
-	        }
-	        var destRotationOverLifetime = new RotationOverLifetime(destAngularVelocity);
-	        destRotationOverLifetime.enbale = this.enbale;
-	        return destRotationOverLifetime;
-	    }
-	}
-
-	class BaseShape {
-	    constructor() {
-	    }
-	    _getShapeBoundBox(boundBox) {
-	        throw new Error("BaseShape: must override it.");
-	    }
-	    _getSpeedBoundBox(boundBox) {
-	        throw new Error("BaseShape: must override it.");
-	    }
-	    generatePositionAndDirection(position, direction, rand = null, randomSeeds = null) {
-	        throw new Error("BaseShape: must override it.");
-	    }
-	    _calculateProceduralBounds(boundBox, emitterPosScale, minMaxBounds) {
-	        this._getShapeBoundBox(boundBox);
-	        var min = boundBox.min;
-	        var max = boundBox.max;
-	        Vector3.multiply(min, emitterPosScale, min);
-	        Vector3.multiply(max, emitterPosScale, max);
-	        var speedBounds = new BoundBox(new Vector3(), new Vector3());
-	        if (this.randomDirection) {
-	            speedBounds.min = new Vector3(-1, -1, -1);
-	            speedBounds.max = new Vector3(1, 1, 1);
-	        }
-	        else {
-	            this._getSpeedBoundBox(speedBounds);
-	        }
-	        var maxSpeedBound = new BoundBox(new Vector3(), new Vector3());
-	        var maxSpeedMin = maxSpeedBound.min;
-	        var maxSpeedMax = maxSpeedBound.max;
-	        Vector3.scale(speedBounds.min, minMaxBounds.y, maxSpeedMin);
-	        Vector3.scale(speedBounds.max, minMaxBounds.y, maxSpeedMax);
-	        Vector3.add(boundBox.min, maxSpeedMin, maxSpeedMin);
-	        Vector3.add(boundBox.max, maxSpeedMax, maxSpeedMax);
-	        Vector3.min(boundBox.min, maxSpeedMin, boundBox.min);
-	        Vector3.max(boundBox.max, maxSpeedMin, boundBox.max);
-	        var minSpeedBound = new BoundBox(new Vector3(), new Vector3());
-	        var minSpeedMin = minSpeedBound.min;
-	        var minSpeedMax = minSpeedBound.max;
-	        Vector3.scale(speedBounds.min, minMaxBounds.x, minSpeedMin);
-	        Vector3.scale(speedBounds.max, minMaxBounds.x, minSpeedMax);
-	        Vector3.min(minSpeedBound.min, minSpeedMax, maxSpeedMin);
-	        Vector3.max(minSpeedBound.min, minSpeedMax, maxSpeedMax);
-	        Vector3.min(boundBox.min, maxSpeedMin, boundBox.min);
-	        Vector3.max(boundBox.max, maxSpeedMin, boundBox.max);
-	    }
-	    cloneTo(destObject) {
-	        var destShape = destObject;
-	        destShape.enable = this.enable;
-	    }
-	    clone() {
-	        var destShape = new BaseShape();
-	        this.cloneTo(destShape);
-	        return destShape;
-	    }
-	}
-
-	class ShapeUtils {
-	    static _randomPointUnitArcCircle(arc, out, rand = null) {
-	        var angle;
-	        if (rand)
-	            angle = rand.getFloat() * arc;
-	        else
-	            angle = Math.random() * arc;
-	        out.x = Math.cos(angle);
-	        out.y = Math.sin(angle);
-	    }
-	    static _randomPointInsideUnitArcCircle(arc, out, rand = null) {
-	        ShapeUtils._randomPointUnitArcCircle(arc, out, rand);
-	        var range;
-	        if (rand)
-	            range = Math.pow(rand.getFloat(), 1.0 / 2.0);
-	        else
-	            range = Math.pow(Math.random(), 1.0 / 2.0);
-	        out.x = out.x * range;
-	        out.y = out.y * range;
-	    }
-	    static _randomPointUnitCircle(out, rand = null) {
-	        var angle;
-	        if (rand)
-	            angle = rand.getFloat() * Math.PI * 2;
-	        else
-	            angle = Math.random() * Math.PI * 2;
-	        out.x = Math.cos(angle);
-	        out.y = Math.sin(angle);
-	    }
-	    static _randomPointInsideUnitCircle(out, rand = null) {
-	        ShapeUtils._randomPointUnitCircle(out);
-	        var range;
-	        if (rand)
-	            range = Math.pow(rand.getFloat(), 1.0 / 2.0);
-	        else
-	            range = Math.pow(Math.random(), 1.0 / 2.0);
-	        out.x = out.x * range;
-	        out.y = out.y * range;
-	    }
-	    static _randomPointUnitSphere(out, rand = null) {
-	        var z;
-	        var a;
-	        if (rand) {
-	            z = out.z = rand.getFloat() * 2 - 1.0;
-	            a = rand.getFloat() * Math.PI * 2;
-	        }
-	        else {
-	            z = out.z = Math.random() * 2 - 1.0;
-	            a = Math.random() * Math.PI * 2;
-	        }
-	        var r = Math.sqrt(1.0 - z * z);
-	        out.x = r * Math.cos(a);
-	        out.y = r * Math.sin(a);
-	    }
-	    static _randomPointInsideUnitSphere(out, rand = null) {
-	        ShapeUtils._randomPointUnitSphere(out);
-	        var range;
-	        if (rand)
-	            range = Math.pow(rand.getFloat(), 1.0 / 3.0);
-	        else
-	            range = Math.pow(Math.random(), 1.0 / 3.0);
-	        out.x = out.x * range;
-	        out.y = out.y * range;
-	        out.z = out.z * range;
-	    }
-	    static _randomPointInsideHalfUnitBox(out, rand = null) {
-	        if (rand) {
-	            out.x = (rand.getFloat() - 0.5);
-	            out.y = (rand.getFloat() - 0.5);
-	            out.z = (rand.getFloat() - 0.5);
-	        }
-	        else {
-	            out.x = (Math.random() - 0.5);
-	            out.y = (Math.random() - 0.5);
-	            out.z = (Math.random() - 0.5);
-	        }
-	    }
-	    constructor() {
-	    }
-	}
-
-	class BoxShape extends BaseShape {
-	    constructor() {
-	        super();
-	        this.x = 1.0;
-	        this.y = 1.0;
-	        this.z = 1.0;
-	        this.randomDirection = false;
-	    }
-	    _getShapeBoundBox(boundBox) {
-	        var min = boundBox.min;
-	        min.x = -this.x * 0.5;
-	        min.y = -this.y * 0.5;
-	        min.z = -this.z * 0.5;
-	        var max = boundBox.max;
-	        max.x = this.x * 0.5;
-	        max.y = this.y * 0.5;
-	        max.z = this.z * 0.5;
-	    }
-	    _getSpeedBoundBox(boundBox) {
-	        var min = boundBox.min;
-	        min.x = 0.0;
-	        min.y = 0.0;
-	        min.z = 0.0;
-	        var max = boundBox.max;
-	        max.x = 0.0;
-	        max.y = 1.0;
-	        max.z = 0.0;
-	    }
-	    generatePositionAndDirection(position, direction, rand = null, randomSeeds = null) {
-	        if (rand) {
-	            rand.seed = randomSeeds[16];
-	            ShapeUtils._randomPointInsideHalfUnitBox(position, rand);
-	            randomSeeds[16] = rand.seed;
-	        }
-	        else {
-	            ShapeUtils._randomPointInsideHalfUnitBox(position);
-	        }
-	        position.x = this.x * position.x;
-	        position.y = this.y * position.y;
-	        position.z = this.z * position.z;
-	        if (this.randomDirection) {
-	            if (rand) {
-	                rand.seed = randomSeeds[17];
-	                ShapeUtils._randomPointUnitSphere(direction, rand);
-	                randomSeeds[17] = rand.seed;
-	            }
-	            else {
-	                ShapeUtils._randomPointUnitSphere(direction);
-	            }
-	        }
-	        else {
-	            direction.x = 0.0;
-	            direction.y = 0.0;
-	            direction.z = 1.0;
-	        }
-	    }
-	    cloneTo(destObject) {
-	        super.cloneTo(destObject);
-	        var destShape = destObject;
-	        destShape.x = this.x;
-	        destShape.y = this.y;
-	        destShape.z = this.z;
-	        destShape.randomDirection = this.randomDirection;
-	    }
-	    clone() {
-	        var destShape = new BoxShape();
-	        this.cloneTo(destShape);
-	        return destShape;
-	    }
-	}
-
-	class CircleShape extends BaseShape {
-	    constructor() {
-	        super();
-	        this.radius = 1.0;
-	        this.arc = 360.0 / 180.0 * Math.PI;
-	        this.emitFromEdge = false;
-	        this.randomDirection = false;
-	    }
-	    _getShapeBoundBox(boundBox) {
-	        var min = boundBox.min;
-	        min.x = min.z = -this.radius;
-	        min.y = 0;
-	        var max = boundBox.max;
-	        max.x = max.z = this.radius;
-	        max.y = 0;
-	    }
-	    _getSpeedBoundBox(boundBox) {
-	        var min = boundBox.min;
-	        min.x = min.y = -1;
-	        min.z = 0;
-	        var max = boundBox.max;
-	        max.x = max.y = 1;
-	        max.z = 0;
-	    }
-	    generatePositionAndDirection(position, direction, rand = null, randomSeeds = null) {
-	        var positionPoint = CircleShape._tempPositionPoint;
-	        if (rand) {
-	            rand.seed = randomSeeds[16];
-	            if (this.emitFromEdge)
-	                ShapeUtils._randomPointUnitArcCircle(this.arc, CircleShape._tempPositionPoint, rand);
-	            else
-	                ShapeUtils._randomPointInsideUnitArcCircle(this.arc, CircleShape._tempPositionPoint, rand);
-	            randomSeeds[16] = rand.seed;
-	        }
-	        else {
-	            if (this.emitFromEdge)
-	                ShapeUtils._randomPointUnitArcCircle(this.arc, CircleShape._tempPositionPoint);
-	            else
-	                ShapeUtils._randomPointInsideUnitArcCircle(this.arc, CircleShape._tempPositionPoint);
-	        }
-	        position.x = -positionPoint.x;
-	        position.y = positionPoint.y;
-	        position.z = 0;
-	        Vector3.scale(position, this.radius, position);
-	        if (this.randomDirection) {
-	            if (rand) {
-	                rand.seed = randomSeeds[17];
-	                ShapeUtils._randomPointUnitSphere(direction, rand);
-	                randomSeeds[17] = rand.seed;
-	            }
-	            else {
-	                ShapeUtils._randomPointUnitSphere(direction);
-	            }
-	        }
-	        else {
-	            position.cloneTo(direction);
-	        }
-	    }
-	    cloneTo(destObject) {
-	        super.cloneTo(destObject);
-	        var destShape = destObject;
-	        destShape.radius = this.radius;
-	        destShape.arc = this.arc;
-	        destShape.emitFromEdge = this.emitFromEdge;
-	        destShape.randomDirection = this.randomDirection;
-	    }
-	    clone() {
-	        var destShape = new CircleShape();
-	        this.cloneTo(destShape);
-	        return destShape;
-	    }
-	}
-	CircleShape._tempPositionPoint = new Vector2();
-
-	class ConeShape extends BaseShape {
-	    constructor() {
-	        super();
-	        this.angle = 25.0 / 180.0 * Math.PI;
-	        this.radius = 1.0;
-	        this.length = 5.0;
-	        this.emitType = 0;
-	        this.randomDirection = false;
-	    }
-	    _getShapeBoundBox(boundBox) {
-	        const coneRadius2 = this.radius + this.length * Math.sin(this.angle);
-	        const coneLength = this.length * Math.cos(this.angle);
-	        var min = boundBox.min;
-	        min.x = min.y = -coneRadius2;
-	        min.z = 0;
-	        var max = boundBox.max;
-	        max.x = max.y = coneRadius2;
-	        max.z = coneLength;
-	    }
-	    _getSpeedBoundBox(boundBox) {
-	        const sinA = Math.sin(this.angle);
-	        var min = boundBox.min;
-	        min.x = min.y = -sinA;
-	        min.z = 0;
-	        var max = boundBox.max;
-	        max.x = max.y = sinA;
-	        max.z = 1;
-	    }
-	    generatePositionAndDirection(position, direction, rand = null, randomSeeds = null) {
-	        var positionPointE = ConeShape._tempPositionPoint;
-	        var positionX;
-	        var positionY;
-	        var directionPointE;
-	        var dirCosA = Math.cos(this.angle);
-	        var dirSinA = Math.sin(this.angle);
-	        switch (this.emitType) {
-	            case 0:
-	                if (rand) {
-	                    rand.seed = randomSeeds[16];
-	                    ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempPositionPoint, rand);
-	                    randomSeeds[16] = rand.seed;
-	                }
-	                else {
-	                    ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempPositionPoint);
-	                }
-	                positionX = positionPointE.x;
-	                positionY = positionPointE.y;
-	                position.x = positionX * this.radius;
-	                position.y = positionY * this.radius;
-	                position.z = 0;
-	                if (this.randomDirection) {
-	                    if (rand) {
-	                        rand.seed = randomSeeds[17];
-	                        ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempDirectionPoint, rand);
-	                        randomSeeds[17] = rand.seed;
-	                    }
-	                    else {
-	                        ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempDirectionPoint);
-	                    }
-	                    directionPointE = ConeShape._tempDirectionPoint;
-	                    direction.x = directionPointE.x * dirSinA;
-	                    direction.y = directionPointE.y * dirSinA;
-	                }
-	                else {
-	                    direction.x = positionX * dirSinA;
-	                    direction.y = positionY * dirSinA;
-	                }
-	                direction.z = dirCosA;
-	                break;
-	            case 1:
-	                if (rand) {
-	                    rand.seed = randomSeeds[16];
-	                    ShapeUtils._randomPointUnitCircle(ConeShape._tempPositionPoint, rand);
-	                    randomSeeds[16] = rand.seed;
-	                }
-	                else {
-	                    ShapeUtils._randomPointUnitCircle(ConeShape._tempPositionPoint);
-	                }
-	                positionX = positionPointE.x;
-	                positionY = positionPointE.y;
-	                position.x = positionX * this.radius;
-	                position.y = positionY * this.radius;
-	                position.z = 0;
-	                if (this.randomDirection) {
-	                    if (rand) {
-	                        rand.seed = randomSeeds[17];
-	                        ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempDirectionPoint, rand);
-	                        randomSeeds[17] = rand.seed;
-	                    }
-	                    else {
-	                        ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempDirectionPoint);
-	                    }
-	                    directionPointE = ConeShape._tempDirectionPoint;
-	                    direction.x = directionPointE.x * dirSinA;
-	                    direction.y = directionPointE.y * dirSinA;
-	                }
-	                else {
-	                    direction.x = positionX * dirSinA;
-	                    direction.y = positionY * dirSinA;
-	                }
-	                direction.z = dirCosA;
-	                break;
-	            case 2:
-	                if (rand) {
-	                    rand.seed = randomSeeds[16];
-	                    ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempPositionPoint, rand);
-	                }
-	                else {
-	                    ShapeUtils._randomPointInsideUnitCircle(ConeShape._tempPositionPoint);
-	                }
-	                positionX = positionPointE.x;
-	                positionY = positionPointE.y;
-	                position.x = positionX * this.radius;
-	                position.y = positionY * this.radius;
-	                position.z = 0;
-	                direction.x = positionX * dirSinA;
-	                direction.y = positionY * dirSinA;
-	                direction.z = dirCosA;
-	                Vector3.normalize(direction, direction);
-	                if (rand) {
-	                    Vector3.scale(direction, this.length * rand.getFloat(), direction);
-	                    randomSeeds[16] = rand.seed;
-	                }
-	                else {
-	                    Vector3.scale(direction, this.length * Math.random(), direction);
-	                }
-	                Vector3.add(position, direction, position);
-	                if (this.randomDirection) {
-	                    if (rand) {
-	                        rand.seed = randomSeeds[17];
-	                        ShapeUtils._randomPointUnitSphere(direction, rand);
-	                        randomSeeds[17] = rand.seed;
-	                    }
-	                    else {
-	                        ShapeUtils._randomPointUnitSphere(direction);
-	                    }
-	                }
-	                break;
-	            case 3:
-	                if (rand) {
-	                    rand.seed = randomSeeds[16];
-	                    ShapeUtils._randomPointUnitCircle(ConeShape._tempPositionPoint, rand);
-	                }
-	                else {
-	                    ShapeUtils._randomPointUnitCircle(ConeShape._tempPositionPoint);
-	                }
-	                positionX = positionPointE.x;
-	                positionY = positionPointE.y;
-	                position.x = positionX * this.radius;
-	                position.y = positionY * this.radius;
-	                position.z = 0;
-	                direction.x = positionX * dirSinA;
-	                direction.y = positionY * dirSinA;
-	                direction.z = dirCosA;
-	                Vector3.normalize(direction, direction);
-	                if (rand) {
-	                    Vector3.scale(direction, this.length * rand.getFloat(), direction);
-	                    randomSeeds[16] = rand.seed;
-	                }
-	                else {
-	                    Vector3.scale(direction, this.length * Math.random(), direction);
-	                }
-	                Vector3.add(position, direction, position);
-	                if (this.randomDirection) {
-	                    if (rand) {
-	                        rand.seed = randomSeeds[17];
-	                        ShapeUtils._randomPointUnitSphere(direction, rand);
-	                        randomSeeds[17] = rand.seed;
-	                    }
-	                    else {
-	                        ShapeUtils._randomPointUnitSphere(direction);
-	                    }
-	                }
-	                break;
-	            default:
-	                throw new Error("ConeShape:emitType is invalid.");
-	        }
-	    }
-	    cloneTo(destObject) {
-	        super.cloneTo(destObject);
-	        var destShape = destObject;
-	        destShape.angle = this.angle;
-	        destShape.radius = this.radius;
-	        destShape.length = this.length;
-	        destShape.emitType = this.emitType;
-	        destShape.randomDirection = this.randomDirection;
-	    }
-	    clone() {
-	        var destShape = new ConeShape();
-	        this.cloneTo(destShape);
-	        return destShape;
-	    }
-	}
-	ConeShape._tempPositionPoint = new Vector2();
-	ConeShape._tempDirectionPoint = new Vector2();
-
-	class HemisphereShape extends BaseShape {
-	    constructor() {
-	        super();
-	        this.radius = 1.0;
-	        this.emitFromShell = false;
-	        this.randomDirection = false;
-	    }
-	    _getShapeBoundBox(boundBox) {
-	        var min = boundBox.min;
-	        min.x = min.y = min.z = -this.radius;
-	        var max = boundBox.max;
-	        max.x = max.y = this.radius;
-	        max.z = 0;
-	    }
-	    _getSpeedBoundBox(boundBox) {
-	        var min = boundBox.min;
-	        min.x = min.y = -1;
-	        min.z = 0;
-	        var max = boundBox.max;
-	        max.x = max.y = max.z = 1;
-	    }
-	    generatePositionAndDirection(position, direction, rand = null, randomSeeds = null) {
-	        if (rand) {
-	            rand.seed = randomSeeds[16];
-	            if (this.emitFromShell)
-	                ShapeUtils._randomPointUnitSphere(position, rand);
-	            else
-	                ShapeUtils._randomPointInsideUnitSphere(position, rand);
-	            randomSeeds[16] = rand.seed;
-	        }
-	        else {
-	            if (this.emitFromShell)
-	                ShapeUtils._randomPointUnitSphere(position);
-	            else
-	                ShapeUtils._randomPointInsideUnitSphere(position);
-	        }
-	        Vector3.scale(position, this.radius, position);
-	        var z = position.z;
-	        (z < 0.0) && (position.z = z * -1.0);
-	        if (this.randomDirection) {
-	            if (rand) {
-	                rand.seed = randomSeeds[17];
-	                ShapeUtils._randomPointUnitSphere(direction, rand);
-	                randomSeeds[17] = rand.seed;
-	            }
-	            else {
-	                ShapeUtils._randomPointUnitSphere(direction);
-	            }
-	        }
-	        else {
-	            position.cloneTo(direction);
-	        }
-	    }
-	    cloneTo(destObject) {
-	        super.cloneTo(destObject);
-	        var destShape = destObject;
-	        destShape.radius = this.radius;
-	        destShape.emitFromShell = this.emitFromShell;
-	        destShape.randomDirection = this.randomDirection;
-	    }
-	    clone() {
-	        var destShape = new HemisphereShape();
-	        this.cloneTo(destShape);
-	        return destShape;
-	    }
-	}
-
-	class SphereShape extends BaseShape {
-	    constructor() {
-	        super();
-	        this.radius = 1.0;
-	        this.emitFromShell = false;
-	        this.randomDirection = false;
-	    }
-	    _getShapeBoundBox(boundBox) {
-	        var min = boundBox.min;
-	        min.x = min.y = min.z = -this.radius;
-	        var max = boundBox.max;
-	        max.x = max.y = max.z = this.radius;
-	    }
-	    _getSpeedBoundBox(boundBox) {
-	        var min = boundBox.min;
-	        min.x = min.y = min.z = -1;
-	        var max = boundBox.max;
-	        max.x = max.y = max.z = 1;
-	    }
-	    generatePositionAndDirection(position, direction, rand = null, randomSeeds = null) {
-	        if (rand) {
-	            rand.seed = randomSeeds[16];
-	            if (this.emitFromShell)
-	                ShapeUtils._randomPointUnitSphere(position, rand);
-	            else
-	                ShapeUtils._randomPointInsideUnitSphere(position, rand);
-	            randomSeeds[16] = rand.seed;
-	        }
-	        else {
-	            if (this.emitFromShell)
-	                ShapeUtils._randomPointUnitSphere(position);
-	            else
-	                ShapeUtils._randomPointInsideUnitSphere(position);
-	        }
-	        Vector3.scale(position, this.radius, position);
-	        if (this.randomDirection) {
-	            if (rand) {
-	                rand.seed = randomSeeds[17];
-	                ShapeUtils._randomPointUnitSphere(direction, rand);
-	                randomSeeds[17] = rand.seed;
-	            }
-	            else {
-	                ShapeUtils._randomPointUnitSphere(direction);
-	            }
-	        }
-	        else {
-	            position.cloneTo(direction);
-	        }
-	    }
-	    cloneTo(destObject) {
-	        super.cloneTo(destObject);
-	        var destShape = destObject;
-	        destShape.radius = this.radius;
-	        destShape.emitFromShell = this.emitFromShell;
-	        destShape.randomDirection = this.randomDirection;
-	    }
-	    clone() {
-	        var destShape = new SphereShape();
-	        this.cloneTo(destShape);
-	        return destShape;
-	    }
-	}
-
-	class SizeOverLifetime {
-	    get size() {
-	        return this._size;
-	    }
-	    constructor(size) {
-	        this._size = size;
-	    }
-	    cloneTo(destObject) {
-	        var destSizeOverLifetime = destObject;
-	        this._size.cloneTo(destSizeOverLifetime._size);
-	        destSizeOverLifetime.enbale = this.enbale;
-	    }
-	    clone() {
-	        var destSize;
-	        switch (this._size.type) {
-	            case 0:
-	                if (this._size.separateAxes)
-	                    destSize = GradientSize.createByGradientSeparate(this._size.gradientX.clone(), this._size.gradientY.clone(), this._size.gradientZ.clone());
-	                else
-	                    destSize = GradientSize.createByGradient(this._size.gradient.clone());
-	                break;
-	            case 1:
-	                if (this._size.separateAxes)
-	                    destSize = GradientSize.createByRandomTwoConstantSeparate(this._size.constantMinSeparate.clone(), this._size.constantMaxSeparate.clone());
-	                else
-	                    destSize = GradientSize.createByRandomTwoConstant(this._size.constantMin, this._size.constantMax);
-	                break;
-	            case 2:
-	                if (this._size.separateAxes)
-	                    destSize = GradientSize.createByRandomTwoGradientSeparate(this._size.gradientXMin.clone(), this._size.gradientYMin.clone(), this._size.gradientZMin.clone(), this._size.gradientXMax.clone(), this._size.gradientYMax.clone(), this._size.gradientZMax.clone());
-	                else
-	                    destSize = GradientSize.createByRandomTwoGradient(this._size.gradientMin.clone(), this._size.gradientMax.clone());
-	                break;
-	        }
-	        var destSizeOverLifetime = new SizeOverLifetime(destSize);
-	        destSizeOverLifetime.enbale = this.enbale;
-	        return destSizeOverLifetime;
-	    }
-	}
-
-	class StartFrame {
-	    constructor() {
-	        this._type = 0;
-	        this._constant = 0;
-	        this._constantMin = 0;
-	        this._constantMax = 0;
-	    }
-	    static createByConstant(constant) {
-	        var rotationOverLifetime = new StartFrame();
-	        rotationOverLifetime._type = 0;
-	        rotationOverLifetime._constant = constant;
-	        return rotationOverLifetime;
-	    }
-	    static createByRandomTwoConstant(constantMin, constantMax) {
-	        var rotationOverLifetime = new StartFrame();
-	        rotationOverLifetime._type = 1;
-	        rotationOverLifetime._constantMin = constantMin;
-	        rotationOverLifetime._constantMax = constantMax;
-	        return rotationOverLifetime;
-	    }
-	    get type() {
-	        return this._type;
-	    }
-	    get constant() {
-	        return this._constant;
-	    }
-	    get constantMin() {
-	        return this._constantMin;
-	    }
-	    get constantMax() {
-	        return this._constantMax;
-	    }
-	    cloneTo(destObject) {
-	        var destStartFrame = destObject;
-	        destStartFrame._type = this._type;
-	        destStartFrame._constant = this._constant;
-	        destStartFrame._constantMin = this._constantMin;
-	        destStartFrame._constantMax = this._constantMax;
-	    }
-	    clone() {
-	        var destStartFrame = new StartFrame();
-	        this.cloneTo(destStartFrame);
-	        return destStartFrame;
-	    }
-	}
-
-	class TextureSheetAnimation {
-	    constructor(frame, startFrame) {
-	        this.type = 0;
-	        this.randomRow = false;
-	        this.rowIndex = 0;
-	        this.cycles = 0;
-	        this.enableUVChannels = 0;
-	        this.enable = false;
-	        this.tiles = new Vector2(1, 1);
-	        this.type = 0;
-	        this.randomRow = true;
-	        this.rowIndex = 0;
-	        this.cycles = 1;
-	        this.enableUVChannels = 1;
-	        this._frame = frame;
-	        this._startFrame = startFrame;
-	    }
-	    get frame() {
-	        return this._frame;
-	    }
-	    get startFrame() {
-	        return this._startFrame;
-	    }
-	    cloneTo(destObject) {
-	        var destTextureSheetAnimation = destObject;
-	        this.tiles.cloneTo(destTextureSheetAnimation.tiles);
-	        destTextureSheetAnimation.type = this.type;
-	        destTextureSheetAnimation.randomRow = this.randomRow;
-	        destTextureSheetAnimation.rowIndex = this.rowIndex;
-	        destTextureSheetAnimation.cycles = this.cycles;
-	        destTextureSheetAnimation.enableUVChannels = this.enableUVChannels;
-	        destTextureSheetAnimation.enable = this.enable;
-	        this._frame.cloneTo(destTextureSheetAnimation._frame);
-	        this._startFrame.cloneTo(destTextureSheetAnimation._startFrame);
-	    }
-	    clone() {
-	        var destFrame;
-	        switch (this._frame.type) {
-	            case 0:
-	                destFrame = FrameOverTime.createByConstant(this._frame.constant);
-	                break;
-	            case 1:
-	                destFrame = FrameOverTime.createByOverTime(this._frame.frameOverTimeData.clone());
-	                break;
-	            case 2:
-	                destFrame = FrameOverTime.createByRandomTwoConstant(this._frame.constantMin, this._frame.constantMax);
-	                break;
-	            case 3:
-	                destFrame = FrameOverTime.createByRandomTwoOverTime(this._frame.frameOverTimeDataMin.clone(), this._frame.frameOverTimeDataMax.clone());
-	                break;
-	        }
-	        var destStartFrame;
-	        switch (this._startFrame.type) {
-	            case 0:
-	                destStartFrame = StartFrame.createByConstant(this._startFrame.constant);
-	                break;
-	            case 1:
-	                destStartFrame = StartFrame.createByRandomTwoConstant(this._startFrame.constantMin, this._startFrame.constantMax);
-	                break;
-	        }
-	        var destTextureSheetAnimation = new TextureSheetAnimation(destFrame, destStartFrame);
-	        this.cloneTo(destTextureSheetAnimation);
-	        return destTextureSheetAnimation;
-	    }
-	}
-
-	class VelocityOverLifetime {
-	    constructor(velocity) {
-	        this.enbale = false;
-	        this.space = 0;
-	        this._velocity = velocity;
-	    }
-	    get velocity() {
-	        return this._velocity;
-	    }
-	    cloneTo(destObject) {
-	        var destVelocityOverLifetime = destObject;
-	        this._velocity.cloneTo(destVelocityOverLifetime._velocity);
-	        destVelocityOverLifetime.enbale = this.enbale;
-	        destVelocityOverLifetime.space = this.space;
-	    }
-	    clone() {
-	        var destVelocity;
-	        switch (this._velocity.type) {
-	            case 0:
-	                destVelocity = GradientVelocity.createByConstant(this._velocity.constant.clone());
-	                break;
-	            case 1:
-	                destVelocity = GradientVelocity.createByGradient(this._velocity.gradientX.clone(), this._velocity.gradientY.clone(), this._velocity.gradientZ.clone());
-	                break;
-	            case 2:
-	                destVelocity = GradientVelocity.createByRandomTwoConstant(this._velocity.constantMin.clone(), this._velocity.constantMax.clone());
-	                break;
-	            case 3:
-	                destVelocity = GradientVelocity.createByRandomTwoGradient(this._velocity.gradientXMin.clone(), this._velocity.gradientYMin.clone(), this._velocity.gradientZMin.clone(), this._velocity.gradientXMax.clone(), this._velocity.gradientYMax.clone(), this._velocity.gradientZMax.clone());
-	                break;
-	        }
-	        var destVelocityOverLifetime = new VelocityOverLifetime(destVelocity);
-	        destVelocityOverLifetime.enbale = this.enbale;
-	        destVelocityOverLifetime.space = this.space;
-	        return destVelocityOverLifetime;
-	    }
-	}
-
 	class ShuriKenParticle3D extends RenderableSprite3D {
+	    constructor() {
+	        super(null);
+	        this._render = new ShurikenParticleRenderer(this);
+	        this._particleSystem = new ShurikenParticleSystem(this);
+	        var elements = this._render._renderElements;
+	        var element = elements[0] = new RenderElement();
+	        element.setTransform(this._transform);
+	        element.render = this._render;
+	        element.setGeometry(this._particleSystem);
+	        element.material = ShurikenParticleMaterial.defaultMaterial;
+	    }
 	    static __init__() {
 	        ShuriKenParticle3DShaderDeclaration.SHADERDEFINE_RENDERMODE_BILLBOARD = Shader3D.getDefineByName("SPHERHBILLBOARD");
 	        ShuriKenParticle3DShaderDeclaration.SHADERDEFINE_RENDERMODE_STRETCHEDBILLBOARD = Shader3D.getDefineByName("STRETCHEDBILLBOARD");
@@ -20314,88 +20539,316 @@
 	    get particleRenderer() {
 	        return this._render;
 	    }
-	    constructor() {
-	        super(null);
-	        this._render = new ShurikenParticleRenderer(this);
-	        this._particleSystem = new ShurikenParticleSystem(this);
-	        var elements = this._render._renderElements;
-	        var element = elements[0] = new RenderElement();
-	        element.setTransform(this._transform);
-	        element.render = this._render;
-	        element.setGeometry(this._particleSystem);
-	        element.material = ShurikenParticleMaterial.defaultMaterial;
-	    }
-	    static _initStartLife(gradientData) {
-	        var gradient = new GradientDataNumber();
-	        var startLifetimesData = gradientData.startLifetimes;
-	        for (var i = 0, n = startLifetimesData.length; i < n; i++) {
-	            var valueData = startLifetimesData[i];
-	            gradient.add(valueData.key, valueData.value);
-	        }
-	        return gradient;
-	    }
-	    _initParticleVelocity(gradientData) {
-	        var gradient = new GradientDataNumber();
-	        var velocitysData = gradientData.velocitys;
-	        for (var i = 0, n = velocitysData.length; i < n; i++) {
-	            var valueData = velocitysData[i];
-	            gradient.add(valueData.key, valueData.value);
-	        }
-	        return gradient;
-	    }
-	    _initParticleColor(gradientColorData) {
-	        var gradientColor = new Gradient(4, 4);
-	        var alphasData = gradientColorData.alphas;
-	        var i, n;
-	        for (i = 0, n = alphasData.length; i < n; i++) {
-	            var alphaData = alphasData[i];
-	            if ((i === 3) && ((alphaData.key !== 1))) {
-	                alphaData.key = 1;
-	                console.log("GradientDataColor warning:the forth key is  be force set to 1.");
+	    _parseModule(module, moduleData) {
+	        for (var t in moduleData) {
+	            switch (t) {
+	                case "bases":
+	                    var bases = moduleData.bases;
+	                    for (var k in bases)
+	                        module[k] = bases[k];
+	                    break;
+	                case "vector2s":
+	                    var vector2s = moduleData.vector2s;
+	                    for (var k in vector2s) {
+	                        var vec2 = module[k];
+	                        var vec2Data = vector2s[k];
+	                        vec2.setValue(vec2Data[0], vec2Data[1]);
+	                        module[k] = vec2;
+	                    }
+	                    break;
+	                case "vector3s":
+	                    var vector3s = moduleData.vector3s;
+	                    for (var k in vector3s) {
+	                        var vec3 = module[k];
+	                        var vec3Data = vector3s[k];
+	                        vec3.setValue(vec3Data[0], vec3Data[1], vec3Data[2]);
+	                        module[k] = vec3;
+	                    }
+	                    break;
+	                case "vector4s":
+	                    var vector4s = moduleData.vector4s;
+	                    for (var k in vector4s) {
+	                        var vec4 = module[k];
+	                        var vec4Data = vector4s[k];
+	                        vec4.setValue(vec4Data[0], vec4Data[1], vec4Data[2], vec4Data[3]);
+	                        module[k] = vec4;
+	                    }
+	                    break;
+	                case "gradientDataNumbers":
+	                    var gradientDataNumbers = moduleData.gradientDataNumbers;
+	                    for (var k in gradientDataNumbers) {
+	                        var gradientNumber = module[k];
+	                        var gradientNumberData = moduleData[k];
+	                        for (var i = 0, n = gradientNumberData.length; i < n; i++) {
+	                            var valueData = gradientNumberData[i];
+	                            gradientNumber.add(valueData.key, valueData.value);
+	                        }
+	                        module[k] = gradientNumber;
+	                    }
+	                    break;
+	                case "resources":
+	                    var resources = moduleData.resources;
+	                    for (var k in resources)
+	                        module[k] = Laya.Loader.getRes(resources[k]);
+	                    break;
+	                case "bursts":
+	                    var burstsData = moduleData.bursts;
+	                    for (var i = 0, n = burstsData.length; i < n; i++) {
+	                        var brust = burstsData[i];
+	                        module.addBurst(new Burst(brust.time, brust.min, brust.max));
+	                    }
+	                    break;
+	                case "randomSeed":
+	                    module.randomSeed[0] = moduleData.randomSeed;
+	                    break;
+	                case "shapeType":
+	                case "type":
+	                case "color":
+	                case "size":
+	                case "frame":
+	                case "startFrame":
+	                case "angularVelocity":
+	                case "velocity":
+	                    break;
+	                default:
+	                    throw "ShurikenParticle3D:unknown type.";
 	            }
-	            gradientColor.addColorAlpha(alphaData.key, alphaData.value);
 	        }
-	        var rgbsData = gradientColorData.rgbs;
-	        for (i = 0, n = rgbsData.length; i < n; i++) {
-	            var rgbData = rgbsData[i];
-	            var rgbValue = rgbData.value;
-	            if ((i === 3) && ((rgbData.key !== 1))) {
-	                rgbData.key = 1;
-	                console.log("GradientDataColor warning:the forth key is  be force set to 1.");
-	            }
-	            gradientColor.addColorRGB(rgbData.key, new Color(rgbValue[0], rgbValue[1], rgbValue[2], 1.0));
-	        }
-	        return gradientColor;
-	    }
-	    _initParticleSize(gradientSizeData) {
-	        var gradientSize = new GradientDataNumber();
-	        var sizesData = gradientSizeData.sizes;
-	        for (var i = 0, n = sizesData.length; i < n; i++) {
-	            var valueData = sizesData[i];
-	            gradientSize.add(valueData.key, valueData.value);
-	        }
-	        return gradientSize;
-	    }
-	    _initParticleRotation(gradientData) {
-	        var gradient = new GradientDataNumber();
-	        var angularVelocitysData = gradientData.angularVelocitys;
-	        for (var i = 0, n = angularVelocitysData.length; i < n; i++) {
-	            var valueData = angularVelocitysData[i];
-	            gradient.add(valueData.key, valueData.value / 180.0 * Math.PI);
-	        }
-	        return gradient;
-	    }
-	    _initParticleFrame(overTimeFramesData) {
-	        var overTimeFrame = new GradientDataInt();
-	        var framesData = overTimeFramesData.frames;
-	        for (var i = 0, n = framesData.length; i < n; i++) {
-	            var frameData = framesData[i];
-	            overTimeFrame.add(frameData.key, frameData.value);
-	        }
-	        return overTimeFrame;
 	    }
 	    _parse(data, spriteMap) {
 	        super._parse(data, spriteMap);
+	        if (data.main) {
+	            var particleSystem = this.particleSystem;
+	            var particleRender = this.particleRenderer;
+	            this._parseModule(particleRender, data.renderer);
+	            this._parseModule(particleSystem, data.main);
+	            this._parseModule(particleSystem.emission, data.emission);
+	            var shapeData = data.shape;
+	            if (shapeData) {
+	                var shape;
+	                switch (shapeData.shapeType) {
+	                    case 0:
+	                        shape = new SphereShape();
+	                        break;
+	                    case 1:
+	                        shape = new HemisphereShape();
+	                        break;
+	                    case 2:
+	                        shape = new ConeShape();
+	                        break;
+	                    case 3:
+	                        shape = new BoxShape();
+	                        break;
+	                    case 7:
+	                        shape = new CircleShape();
+	                        break;
+	                    default:
+	                        throw "ShuriKenParticle3D:unknown shape type.";
+	                }
+	                this._parseModule(shape, shapeData);
+	                particleSystem.shape = shape;
+	            }
+	            var velocityOverLifetimeData = data.velocityOverLifetime;
+	            if (velocityOverLifetimeData) {
+	                var velocityData = velocityOverLifetimeData.velocity;
+	                var velocity;
+	                switch (velocityData.type) {
+	                    case 0:
+	                        var constantData = velocityData.constant;
+	                        velocity = GradientVelocity.createByConstant(constantData ? new Vector3(constantData[0], constantData[1], constantData[2]) : new Vector3(0, 0, 0));
+	                        break;
+	                    case 1:
+	                        velocity = GradientVelocity.createByGradient(this._initParticleVelocity(velocityData.gradientX), this._initParticleVelocity(velocityData.gradientY), this._initParticleVelocity(velocityData.gradientZ));
+	                        break;
+	                    case 2:
+	                        var constantMinData = velocityData.constantMin;
+	                        var constantMaxData = velocityData.constantMax;
+	                        velocity = GradientVelocity.createByRandomTwoConstant(constantMinData ? new Vector3(constantMinData[0], constantMinData[1], constantMinData[2]) : new Vector3(0, 0, 0), constantMaxData ? new Vector3(constantMaxData[0], constantMaxData[1], constantMaxData[2]) : new Vector3(0, 0, 0));
+	                        break;
+	                    case 3:
+	                        velocity = GradientVelocity.createByRandomTwoGradient(this._initParticleVelocity(velocityData.gradientXMin), this._initParticleVelocity(velocityData.gradientXMax), this._initParticleVelocity(velocityData.gradientYMin), this._initParticleVelocity(velocityData.gradientYMax), this._initParticleVelocity(velocityData.gradientZMin), this._initParticleVelocity(velocityData.gradientZMax));
+	                        break;
+	                }
+	                var velocityOverLifetime = new VelocityOverLifetime(velocity);
+	                this._parseModule(velocityOverLifetime, velocityOverLifetimeData);
+	                particleSystem.velocityOverLifetime = velocityOverLifetime;
+	            }
+	            var colorOverLifetimeData = data.colorOverLifetime;
+	            if (colorOverLifetimeData) {
+	                var colorData = colorOverLifetimeData.color;
+	                var color;
+	                switch (colorData.type) {
+	                    case 0:
+	                        var constColorData = colorData.constant;
+	                        color = GradientColor.createByConstant(constColorData ? new Vector4(constColorData[0], constColorData[1], constColorData[2], constColorData[3]) : new Vector4(0, 0, 0, 0));
+	                        break;
+	                    case 1:
+	                        color = GradientColor.createByGradient(this._initParticleColor(colorData.gradient));
+	                        break;
+	                    case 2:
+	                        var minConstColorData = colorData.constantMin;
+	                        var maxConstColorData = colorData.constantMax;
+	                        color = GradientColor.createByRandomTwoConstant(minConstColorData ? new Vector4(minConstColorData[0], minConstColorData[1], minConstColorData[2], minConstColorData[3]) : new Vector4(0, 0, 0, 0), minConstColorData ? new Vector4(maxConstColorData[0], maxConstColorData[1], maxConstColorData[2], maxConstColorData[3]) : new Vector4(0, 0, 0, 0));
+	                        break;
+	                    case 3:
+	                        color = GradientColor.createByRandomTwoGradient(this._initParticleColor(colorData.gradientMin), this._initParticleColor(colorData.gradientMax));
+	                        break;
+	                }
+	                var colorOverLifetime = new ColorOverLifetime(color);
+	                this._parseModule(colorOverLifetime, colorOverLifetimeData);
+	                particleSystem.colorOverLifetime = colorOverLifetime;
+	            }
+	            var sizeOverLifetimeData = data.sizeOverLifetime;
+	            if (sizeOverLifetimeData) {
+	                var sizeData = sizeOverLifetimeData.size;
+	                var size;
+	                switch (sizeData.type) {
+	                    case 0:
+	                        if (sizeData.separateAxes) {
+	                            size = GradientSize.createByGradientSeparate(this._initParticleSize(sizeData.gradientX), this._initParticleSize(sizeData.gradientY), this._initParticleSize(sizeData.gradientZ));
+	                        }
+	                        else {
+	                            size = GradientSize.createByGradient(this._initParticleSize(sizeData.gradient));
+	                        }
+	                        break;
+	                    case 1:
+	                        if (sizeData.separateAxes) {
+	                            var constantMinSeparateData = sizeData.constantMinSeparate;
+	                            var constantMaxSeparateData = sizeData.constantMaxSeparate;
+	                            size = GradientSize.createByRandomTwoConstantSeparate(constantMinSeparateData ? new Vector3(constantMinSeparateData[0], constantMinSeparateData[1], constantMinSeparateData[2]) : new Vector3(0, 0, 0), constantMaxSeparateData ? new Vector3(constantMaxSeparateData[0], constantMaxSeparateData[1], constantMaxSeparateData[2]) : new Vector3(0, 0, 0));
+	                        }
+	                        else {
+	                            size = GradientSize.createByRandomTwoConstant(sizeData.constantMin || 0, sizeData.constantMax || 0);
+	                        }
+	                        break;
+	                    case 2:
+	                        if (sizeData.separateAxes) {
+	                            size = GradientSize.createByRandomTwoGradientSeparate(this._initParticleSize(sizeData.gradientXMin), this._initParticleSize(sizeData.gradientYMin), this._initParticleSize(sizeData.gradientZMin), this._initParticleSize(sizeData.gradientXMax), this._initParticleSize(sizeData.gradientYMax), this._initParticleSize(sizeData.gradientZMax));
+	                        }
+	                        else {
+	                            size = GradientSize.createByRandomTwoGradient(this._initParticleSize(sizeData.gradientMin), this._initParticleSize(sizeData.gradientMax));
+	                        }
+	                        break;
+	                }
+	                var sizeOverLifetime = new SizeOverLifetime(size);
+	                this._parseModule(sizeOverLifetime, sizeOverLifetimeData);
+	                particleSystem.sizeOverLifetime = sizeOverLifetime;
+	            }
+	            var rotationOverLifetimeData = data.rotationOverLifetime;
+	            if (rotationOverLifetimeData) {
+	                var angularVelocityData = rotationOverLifetimeData.angularVelocity;
+	                var angularVelocity;
+	                switch (angularVelocityData.type) {
+	                    case 0:
+	                        if (angularVelocityData.separateAxes) {
+	                            var conSep = angularVelocityData.constantSeparate;
+	                            angularVelocity = GradientAngularVelocity.createByConstantSeparate(conSep ? new Vector3(conSep[0], conSep[1], conSep[2]) : new Vector3(0, 0, Math.PI / 4));
+	                        }
+	                        else {
+	                            angularVelocity = GradientAngularVelocity.createByConstant(angularVelocityData.constant || Math.PI / 4);
+	                        }
+	                        break;
+	                    case 1:
+	                        if (angularVelocityData.separateAxes) {
+	                            angularVelocity = GradientAngularVelocity.createByGradientSeparate(this._initParticleRotation(angularVelocityData.gradientX), this._initParticleRotation(angularVelocityData.gradientY), this._initParticleRotation(angularVelocityData.gradientZ));
+	                        }
+	                        else {
+	                            angularVelocity = GradientAngularVelocity.createByGradient(this._initParticleRotation(angularVelocityData.gradient));
+	                        }
+	                        break;
+	                    case 2:
+	                        if (angularVelocityData.separateAxes) {
+	                            var minSep = angularVelocityData.constantMinSeparate;
+	                            var maxSep = angularVelocityData.constantMaxSeparate;
+	                            angularVelocity = GradientAngularVelocity.createByRandomTwoConstantSeparate(minSep ? new Vector3(minSep[0], minSep[1], minSep[2]) : new Vector3(0, 0, 0), maxSep ? new Vector3(maxSep[0], maxSep[1], maxSep[2]) : new Vector3(0, 0, Math.PI / 4));
+	                        }
+	                        else {
+	                            angularVelocity = GradientAngularVelocity.createByRandomTwoConstant(angularVelocityData.constantMin || 0, angularVelocityData.constantMax || Math.PI / 4);
+	                        }
+	                        break;
+	                    case 3:
+	                        if (angularVelocityData.separateAxes) ;
+	                        else {
+	                            angularVelocity = GradientAngularVelocity.createByRandomTwoGradient(this._initParticleRotation(angularVelocityData.gradientMin), this._initParticleRotation(angularVelocityData.gradientMax));
+	                        }
+	                        break;
+	                }
+	                var rotationOverLifetime = new RotationOverLifetime(angularVelocity);
+	                this._parseModule(rotationOverLifetime, rotationOverLifetimeData);
+	                particleSystem.rotationOverLifetime = rotationOverLifetime;
+	            }
+	            var textureSheetAnimationData = data.textureSheetAnimation;
+	            if (textureSheetAnimationData) {
+	                var frameData = textureSheetAnimationData.frame;
+	                var frameOverTime;
+	                switch (frameData.type) {
+	                    case 0:
+	                        frameOverTime = FrameOverTime.createByConstant(frameData.constant);
+	                        break;
+	                    case 1:
+	                        frameOverTime = FrameOverTime.createByOverTime(this._initParticleFrame(frameData.overTime));
+	                        break;
+	                    case 2:
+	                        frameOverTime = FrameOverTime.createByRandomTwoConstant(frameData.constantMin, frameData.constantMax);
+	                        break;
+	                    case 3:
+	                        frameOverTime = FrameOverTime.createByRandomTwoOverTime(this._initParticleFrame(frameData.overTimeMin), this._initParticleFrame(frameData.overTimeMax));
+	                        break;
+	                }
+	                var startFrameData = textureSheetAnimationData.startFrame;
+	                var startFrame;
+	                switch (startFrameData.type) {
+	                    case 0:
+	                        startFrame = StartFrame.createByConstant(startFrameData.constant);
+	                        break;
+	                    case 1:
+	                        startFrame = StartFrame.createByRandomTwoConstant(startFrameData.constantMin, startFrameData.constantMax);
+	                        break;
+	                }
+	                var textureSheetAnimation = new TextureSheetAnimation(frameOverTime, startFrame);
+	                this._parseModule(textureSheetAnimation, textureSheetAnimationData);
+	                particleSystem.textureSheetAnimation = textureSheetAnimation;
+	            }
+	        }
+	        else {
+	            this._parseOld(data);
+	        }
+	    }
+	    _activeHierarchy(activeChangeComponents) {
+	        super._activeHierarchy(activeChangeComponents);
+	        (this.particleSystem.playOnAwake) && (this.particleSystem.play());
+	    }
+	    _inActiveHierarchy(activeChangeComponents) {
+	        super._inActiveHierarchy(activeChangeComponents);
+	        (this.particleSystem.isAlive) && (this.particleSystem.simulate(0, true));
+	    }
+	    _cloneTo(destObject, srcSprite, dstSprite) {
+	        var destShuriKenParticle3D = destObject;
+	        var destParticleSystem = destShuriKenParticle3D._particleSystem;
+	        this._particleSystem.cloneTo(destParticleSystem);
+	        var destParticleRender = destShuriKenParticle3D._render;
+	        var particleRender = this._render;
+	        destParticleRender.sharedMaterials = particleRender.sharedMaterials;
+	        destParticleRender.enable = particleRender.enable;
+	        destParticleRender.renderMode = particleRender.renderMode;
+	        destParticleRender.mesh = particleRender.mesh;
+	        destParticleRender.stretchedBillboardCameraSpeedScale = particleRender.stretchedBillboardCameraSpeedScale;
+	        destParticleRender.stretchedBillboardSpeedScale = particleRender.stretchedBillboardSpeedScale;
+	        destParticleRender.stretchedBillboardLengthScale = particleRender.stretchedBillboardLengthScale;
+	        destParticleRender.sortingFudge = particleRender.sortingFudge;
+	        super._cloneTo(destObject, srcSprite, dstSprite);
+	    }
+	    destroy(destroyChild = true) {
+	        if (this.destroyed)
+	            return;
+	        super.destroy(destroyChild);
+	        this._particleSystem.destroy();
+	        this._particleSystem = null;
+	    }
+	    _create() {
+	        return new ShuriKenParticle3D();
+	    }
+	    _parseOld(data) {
 	        const anglelToRad = Math.PI / 180.0;
 	        var i, n;
 	        var particleRender = this.particleRenderer;
@@ -20510,10 +20963,10 @@
 	                    var brust = burstsData[i];
 	                    emission.addBurst(new Burst(brust.time, brust.min, brust.max));
 	                }
-	            emission.enbale = emissionData.enable;
+	            emission.enable = emissionData.enable;
 	        }
 	        else {
-	            emission.enbale = false;
+	            emission.enable = false;
 	        }
 	        var shapeData = data.shape;
 	        if (shapeData) {
@@ -20593,7 +21046,7 @@
 	            }
 	            var velocityOverLifetime = new VelocityOverLifetime(velocity);
 	            velocityOverLifetime.space = velocityOverLifetimeData.space;
-	            velocityOverLifetime.enbale = velocityOverLifetimeData.enable;
+	            velocityOverLifetime.enable = velocityOverLifetimeData.enable;
 	            particleSystem.velocityOverLifetime = velocityOverLifetime;
 	        }
 	        var colorOverLifetimeData = data.colorOverLifetime;
@@ -20618,7 +21071,7 @@
 	                    break;
 	            }
 	            var colorOverLifetime = new ColorOverLifetime(color);
-	            colorOverLifetime.enbale = colorOverLifetimeData.enable;
+	            colorOverLifetime.enable = colorOverLifetimeData.enable;
 	            particleSystem.colorOverLifetime = colorOverLifetime;
 	        }
 	        var sizeOverLifetimeData = data.sizeOverLifetime;
@@ -20654,7 +21107,7 @@
 	                    break;
 	            }
 	            var sizeOverLifetime = new SizeOverLifetime(size);
-	            sizeOverLifetime.enbale = sizeOverLifetimeData.enable;
+	            sizeOverLifetime.enable = sizeOverLifetimeData.enable;
 	            particleSystem.sizeOverLifetime = sizeOverLifetime;
 	        }
 	        var rotationOverLifetimeData = data.rotationOverLifetime;
@@ -20697,7 +21150,7 @@
 	                    break;
 	            }
 	            var rotationOverLifetime = new RotationOverLifetime(angularVelocity);
-	            rotationOverLifetime.enbale = rotationOverLifetimeData.enable;
+	            rotationOverLifetime.enable = rotationOverLifetimeData.enable;
 	            particleSystem.rotationOverLifetime = rotationOverLifetime;
 	        }
 	        var textureSheetAnimationData = data.textureSheetAnimation;
@@ -20740,43 +21193,110 @@
 	            particleSystem.textureSheetAnimation = textureSheetAnimation;
 	        }
 	    }
-	    _activeHierarchy(activeChangeComponents) {
-	        super._activeHierarchy(activeChangeComponents);
-	        (this.particleSystem.playOnAwake) && (this.particleSystem.play());
+	    _initParticleColor(gradientColorData) {
+	        var gradientColor = new Gradient(4, 4);
+	        if (!gradientColorData) {
+	            gradientColor.addColorAlpha(0, 1);
+	            gradientColor.addColorAlpha(1, 1);
+	            gradientColor.addColorRGB(0, new Color(1.0, 1.0, 1.0, 1.0));
+	            gradientColor.addColorRGB(1, new Color(1.0, 1.0, 1.0, 1.0));
+	        }
+	        else {
+	            var alphasData = gradientColorData.alphas;
+	            var i, n;
+	            if (!alphasData) {
+	                gradientColor.addColorAlpha(0, 1);
+	                gradientColor.addColorAlpha(1, 1);
+	            }
+	            else {
+	                for (i = 0, n = alphasData.length; i < n; i++) {
+	                    if (i == 3 && n > 4) {
+	                        i = n - 1;
+	                        console.warn("GradientDataColor warning:alpha data length is large than 4, will ignore the middle data.");
+	                    }
+	                    var alphaData = alphasData[i];
+	                    gradientColor.addColorAlpha(alphaData.key, alphaData.value);
+	                }
+	            }
+	            var rgbsData = gradientColorData.rgbs;
+	            if (!rgbsData) {
+	                gradientColor.addColorRGB(0, new Color(1.0, 1.0, 1.0, 1.0));
+	                gradientColor.addColorRGB(1, new Color(1.0, 1.0, 1.0, 1.0));
+	            }
+	            else {
+	                for (i = 0, n = rgbsData.length; i < n; i++) {
+	                    if (i == 3 && n > 4) {
+	                        i = n - 1;
+	                        console.warn("GradientDataColor warning:rgb data length is large than 4, will ignore the middle data.");
+	                    }
+	                    var rgbData = rgbsData[i];
+	                    var rgbValue = rgbData.value;
+	                    gradientColor.addColorRGB(rgbData.key, new Color(rgbValue[0], rgbValue[1], rgbValue[2], 1.0));
+	                }
+	            }
+	        }
+	        return gradientColor;
 	    }
-	    _inActiveHierarchy(activeChangeComponents) {
-	        super._inActiveHierarchy(activeChangeComponents);
-	        (this.particleSystem.isAlive) && (this.particleSystem.simulate(0, true));
+	    _initParticleFrame(overTimeFramesData) {
+	        var overTimeFrame = new GradientDataInt();
+	        if (overTimeFramesData) {
+	            var framesData = overTimeFramesData.frames;
+	            for (var i = 0, n = framesData.length; i < n; i++) {
+	                var frameData = framesData[i];
+	                overTimeFrame.add(frameData.key, frameData.value);
+	            }
+	        }
+	        else {
+	            overTimeFrame.add(0, 0);
+	            overTimeFrame.add(1, 1);
+	        }
+	        return overTimeFrame;
 	    }
-	    _cloneTo(destObject, srcSprite, dstSprite) {
-	        var destShuriKenParticle3D = destObject;
-	        var destParticleSystem = destShuriKenParticle3D._particleSystem;
-	        this._particleSystem.cloneTo(destParticleSystem);
-	        var destParticleRender = destShuriKenParticle3D._render;
-	        var particleRender = this._render;
-	        destParticleRender.sharedMaterials = particleRender.sharedMaterials;
-	        destParticleRender.enable = particleRender.enable;
-	        destParticleRender.renderMode = particleRender.renderMode;
-	        destParticleRender.mesh = particleRender.mesh;
-	        destParticleRender.stretchedBillboardCameraSpeedScale = particleRender.stretchedBillboardCameraSpeedScale;
-	        destParticleRender.stretchedBillboardSpeedScale = particleRender.stretchedBillboardSpeedScale;
-	        destParticleRender.stretchedBillboardLengthScale = particleRender.stretchedBillboardLengthScale;
-	        destParticleRender.sortingFudge = particleRender.sortingFudge;
-	        super._cloneTo(destObject, srcSprite, dstSprite);
+	    static _initStartLife(gradientData) {
+	        var gradient = new GradientDataNumber();
+	        var startLifetimesData = gradientData.startLifetimes;
+	        for (var i = 0, n = startLifetimesData.length; i < n; i++) {
+	            var valueData = startLifetimesData[i];
+	            gradient.add(valueData.key, valueData.value);
+	        }
+	        return gradient;
 	    }
-	    destroy(destroyChild = true) {
-	        if (this.destroyed)
-	            return;
-	        super.destroy(destroyChild);
-	        this._particleSystem.destroy();
-	        this._particleSystem = null;
+	    _initParticleVelocity(gradientData) {
+	        var gradient = new GradientDataNumber();
+	        var velocitysData = gradientData.velocitys;
+	        for (var i = 0, n = velocitysData.length; i < n; i++) {
+	            var valueData = velocitysData[i];
+	            gradient.add(valueData.key, valueData.value);
+	        }
+	        return gradient;
 	    }
-	    _create() {
-	        return new ShuriKenParticle3D();
+	    _initParticleSize(gradientSizeData) {
+	        var gradientSize = new GradientDataNumber();
+	        if (gradientSizeData) {
+	            var sizesData = gradientSizeData.sizes;
+	            for (var i = 0, n = sizesData.length; i < n; i++) {
+	                var valueData = sizesData[i];
+	                gradientSize.add(valueData.key, valueData.value);
+	            }
+	        }
+	        else {
+	            gradientSize.add(0, 0);
+	            gradientSize.add(1, 1);
+	        }
+	        return gradientSize;
+	    }
+	    _initParticleRotation(gradientData) {
+	        var gradient = new GradientDataNumber();
+	        var angularVelocitysData = gradientData.angularVelocitys;
+	        for (var i = 0, n = angularVelocitysData.length; i < n; i++) {
+	            var valueData = angularVelocitysData[i];
+	            gradient.add(valueData.key, valueData.value / 180.0 * Math.PI);
+	        }
+	        return gradient;
 	    }
 	}
 
-	class PixelLineMaterial extends BaseMaterial {
+	class PixelLineMaterial extends Material {
 	    constructor() {
 	        super();
 	        this.setShaderName("LineShader");
@@ -20841,6 +21361,8 @@
 	PixelLineMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
 	class PixelLineVertex {
+	    constructor() {
+	    }
 	    static get vertexDeclaration() {
 	        return PixelLineVertex._vertexDeclaration;
 	    }
@@ -20850,31 +21372,6 @@
 	    }
 	    get vertexDeclaration() {
 	        return PixelLineVertex._vertexDeclaration;
-	    }
-	    constructor() {
-	    }
-	}
-
-	class CastShadowList extends SingletonList {
-	    constructor() {
-	        super();
-	    }
-	    add(element) {
-	        var index = element._indexInCastShadowList;
-	        if (index !== -1)
-	            throw "CastShadowList:element has  in  CastShadowList.";
-	        this._add(element);
-	        element._indexInCastShadowList = this.length++;
-	    }
-	    remove(element) {
-	        var index = element._indexInCastShadowList;
-	        this.length--;
-	        if (index !== this.length) {
-	            var end = this.elements[this.length];
-	            this.elements[index] = end;
-	            end._indexInCastShadowList = index;
-	        }
-	        element._indexInCastShadowList = -1;
 	    }
 	}
 
@@ -20898,6 +21395,12 @@
 	            end._setIndexInList(index);
 	        }
 	        element._setIndexInList(-1);
+	    }
+	    clear() {
+	        var elements = this.elements;
+	        for (var i, n = this.length; i < n; i++)
+	            elements[i]._setIndexInList(-1);
+	        this.length = 0;
 	    }
 	}
 
@@ -21067,11 +21570,6 @@
 	    }
 	}
 
-	class Physics3D {
-	}
-	Physics3D._physics3D = null;
-	Physics3D._enbalePhysics = false;
-
 	class ColliderShape {
 	    constructor() {
 	        this._scale = new Vector3(1, 1, 1);
@@ -21086,10 +21584,11 @@
 	        this.needsCustomCollisionCallback = false;
 	    }
 	    static __init__() {
-	        ColliderShape._nativeScale = new Physics3D._physics3D.btVector3(1, 1, 1);
-	        ColliderShape._nativeVector30 = new Physics3D._physics3D.btVector3(0, 0, 0);
-	        ColliderShape._nativQuaternion0 = new Physics3D._physics3D.btQuaternion(0, 0, 0, 1);
-	        ColliderShape._nativeTransform0 = new Physics3D._physics3D.btTransform();
+	        var bt = Physics3D._bullet;
+	        ColliderShape._btScale = bt.btVector3_create(1, 1, 1);
+	        ColliderShape._btVector30 = bt.btVector3_create(0, 0, 0);
+	        ColliderShape._btQuaternion0 = bt.btQuaternion_create(0, 0, 0, 1);
+	        ColliderShape._btTransform0 = bt.btTransform_create();
 	    }
 	    static _createAffineTransformation(trans, rot, outE) {
 	        var x = rot.x, y = rot.y, z = rot.z, w = rot.w, x2 = x + x, y2 = y + y, z2 = z + z;
@@ -21136,8 +21635,9 @@
 	            this.updateLocalTransformations();
 	        }
 	        else {
-	            ColliderShape._nativeScale.setValue(value.x, value.y, value.z);
-	            this._nativeShape.setLocalScaling(ColliderShape._nativeScale);
+	            var bt = Physics3D._bullet;
+	            bt.btVector3_setValue(ColliderShape._btScale, value.x, value.y, value.z);
+	            bt.btCollisionShape_setLocalScaling(this._btShape, ColliderShape._btScale);
 	        }
 	    }
 	    _addReference() {
@@ -21167,9 +21667,9 @@
 	        return null;
 	    }
 	    destroy() {
-	        if (this._nativeShape) {
-	            Physics3D._physics3D.destroy(this._nativeShape);
-	            this._nativeShape = null;
+	        if (this._btShape) {
+	            Physics3D._bullet.btCollisionShape_destroy(this._btShape);
+	            this._btShape = null;
 	        }
 	    }
 	}
@@ -21187,8 +21687,18 @@
 	ColliderShape._tempVector30 = new Vector3();
 
 	class BoxColliderShape extends ColliderShape {
+	    constructor(sizeX = 1.0, sizeY = 1.0, sizeZ = 1.0) {
+	        super();
+	        this._sizeX = sizeX;
+	        this._sizeY = sizeY;
+	        this._sizeZ = sizeZ;
+	        this._type = ColliderShape.SHAPETYPES_BOX;
+	        var bt = Physics3D._bullet;
+	        bt.btVector3_setValue(BoxColliderShape._btSize, sizeX / 2, sizeY / 2, sizeZ / 2);
+	        this._btShape = bt.btBoxShape_create(BoxColliderShape._btSize);
+	    }
 	    static __init__() {
-	        BoxColliderShape._nativeSize = new Physics3D._physics3D.btVector3(0, 0, 0);
+	        BoxColliderShape._btSize = Physics3D._bullet.btVector3_create(0, 0, 0);
 	    }
 	    get sizeX() {
 	        return this._sizeX;
@@ -21198,15 +21708,6 @@
 	    }
 	    get sizeZ() {
 	        return this._sizeZ;
-	    }
-	    constructor(sizeX = 1.0, sizeY = 1.0, sizeZ = 1.0) {
-	        super();
-	        this._sizeX = sizeX;
-	        this._sizeY = sizeY;
-	        this._sizeZ = sizeZ;
-	        this._type = ColliderShape.SHAPETYPES_BOX;
-	        BoxColliderShape._nativeSize.setValue(sizeX / 2, sizeY / 2, sizeZ / 2);
-	        this._nativeShape = new Physics3D._physics3D.btBoxShape(BoxColliderShape._nativeSize);
 	    }
 	    clone() {
 	        var dest = new BoxColliderShape(this._sizeX, this._sizeY, this._sizeZ);
@@ -21222,15 +21723,16 @@
 	        this._length = length;
 	        this._orientation = orientation;
 	        this._type = ColliderShape.SHAPETYPES_CAPSULE;
+	        var bt = Physics3D._bullet;
 	        switch (orientation) {
 	            case ColliderShape.SHAPEORIENTATION_UPX:
-	                this._nativeShape = new Physics3D._physics3D.btCapsuleShapeX(radius, length - radius * 2);
+	                this._btShape = bt.btCapsuleShapeX_create(radius, length - radius * 2);
 	                break;
 	            case ColliderShape.SHAPEORIENTATION_UPY:
-	                this._nativeShape = new Physics3D._physics3D.btCapsuleShape(radius, length - radius * 2);
+	                this._btShape = bt.btCapsuleShape_create(radius, length - radius * 2);
 	                break;
 	            case ColliderShape.SHAPEORIENTATION_UPZ:
-	                this._nativeShape = new Physics3D._physics3D.btCapsuleShapeZ(radius, length - radius * 2);
+	                this._btShape = bt.btCapsuleShapeZ_create(radius, length - radius * 2);
 	                break;
 	            default:
 	                throw "CapsuleColliderShape:unknown orientation.";
@@ -21278,13 +21780,14 @@
 	        super();
 	        this._childColliderShapes = [];
 	        this._type = ColliderShape.SHAPETYPES_COMPOUND;
-	        this._nativeShape = new Physics3D._physics3D.btCompoundShape();
+	        this._btShape = Physics3D._bullet.btCompoundShape_create();
 	    }
 	    static __init__() {
-	        CompoundColliderShape._nativeVector3One = new Physics3D._physics3D.btVector3(1, 1, 1);
-	        CompoundColliderShape._nativeTransform = new Physics3D._physics3D.btTransform();
-	        CompoundColliderShape._nativeOffset = new Physics3D._physics3D.btVector3(0, 0, 0);
-	        CompoundColliderShape._nativRotation = new Physics3D._physics3D.btQuaternion(0, 0, 0, 1);
+	        var bt = Physics3D._bullet;
+	        CompoundColliderShape._btVector3One = bt.btVector3_create(1, 1, 1);
+	        CompoundColliderShape._btTransform = bt.btTransform_create();
+	        CompoundColliderShape._btOffset = bt.btVector3_create(0, 0, 0);
+	        CompoundColliderShape._btRotation = bt.btQuaternion_create(0, 0, 0, 1);
 	    }
 	    _clearChildShape(shape) {
 	        shape._attatched = false;
@@ -21296,16 +21799,17 @@
 	    _removeReference() {
 	    }
 	    _updateChildTransform(shape) {
+	        var bt = Physics3D._bullet;
 	        var offset = shape.localOffset;
 	        var rotation = shape.localRotation;
-	        var nativeOffset = ColliderShape._nativeVector30;
-	        var nativeQuaternion = ColliderShape._nativQuaternion0;
-	        var nativeTransform = ColliderShape._nativeTransform0;
-	        nativeOffset.setValue(-offset.x, offset.y, offset.z);
-	        nativeQuaternion.setValue(-rotation.x, rotation.y, rotation.z, -rotation.w);
-	        nativeTransform.setOrigin(nativeOffset);
-	        nativeTransform.setRotation(nativeQuaternion);
-	        this._nativeShape.updateChildTransform(shape._indexInCompound, nativeTransform, true);
+	        var btOffset = ColliderShape._btVector30;
+	        var btQuaternion = ColliderShape._btQuaternion0;
+	        var btTransform = ColliderShape._btTransform0;
+	        bt.btVector3_setValue(btOffset, -offset.x, offset.y, offset.z);
+	        bt.btQuaternion_setValue(btQuaternion, -rotation.x, rotation.y, rotation.z, -rotation.w);
+	        bt.btTransform_setOrigin(btTransform, btOffset);
+	        bt.btTransform_setRotation(btTransform, btQuaternion);
+	        bt.btCompoundShape_updateChildTransform(this._btShape, shape._indexInCompound, btTransform, true);
 	    }
 	    addChildShape(shape) {
 	        if (shape._attatched)
@@ -21316,14 +21820,15 @@
 	        this._childColliderShapes.push(shape);
 	        var offset = shape.localOffset;
 	        var rotation = shape.localRotation;
-	        CompoundColliderShape._nativeOffset.setValue(-offset.x, offset.y, offset.z);
-	        CompoundColliderShape._nativRotation.setValue(-rotation.x, rotation.y, rotation.z, -rotation.w);
-	        CompoundColliderShape._nativeTransform.setOrigin(CompoundColliderShape._nativeOffset);
-	        CompoundColliderShape._nativeTransform.setRotation(CompoundColliderShape._nativRotation);
-	        var nativeScale = this._nativeShape.getLocalScaling();
-	        this._nativeShape.setLocalScaling(CompoundColliderShape._nativeVector3One);
-	        this._nativeShape.addChildShape(CompoundColliderShape._nativeTransform, shape._nativeShape);
-	        this._nativeShape.setLocalScaling(nativeScale);
+	        var bt = Physics3D._bullet;
+	        bt.btVector3_setValue(CompoundColliderShape._btOffset, -offset.x, offset.y, offset.z);
+	        bt.btQuaternion_setValue(CompoundColliderShape._btRotation, -rotation.x, rotation.y, rotation.z, -rotation.w);
+	        bt.btTransform_setOrigin(CompoundColliderShape._btTransform, CompoundColliderShape._btOffset);
+	        bt.btTransform_setRotation(CompoundColliderShape._btTransform, CompoundColliderShape._btRotation);
+	        var btScale = bt.btCollisionShape_getLocalScaling(this._btShape);
+	        bt.btCollisionShape_setLocalScaling(this._btShape, CompoundColliderShape._btVector3One);
+	        bt.btCompoundShape_addChildShape(this._btShape, CompoundColliderShape._btTransform, shape._btShape);
+	        bt.btCollisionShape_setLocalScaling(this._btShape, btScale);
 	        (this._attatchedCollisionObject) && (this._attatchedCollisionObject.colliderShape = this);
 	    }
 	    removeChildShape(shape) {
@@ -21334,13 +21839,13 @@
 	            endShape._indexInCompound = index;
 	            this._childColliderShapes[index] = endShape;
 	            this._childColliderShapes.pop();
-	            this._nativeShape.removeChildShapeByIndex(index);
+	            Physics3D._bullet.btCompoundShape_removeChildShapeByIndex(this._btShape, index);
 	        }
 	    }
 	    clearChildShape() {
 	        for (var i = 0, n = this._childColliderShapes.length; i < n; i++) {
 	            this._clearChildShape(this._childColliderShapes[i]);
-	            this._nativeShape.removeChildShapeByIndex(0);
+	            Physics3D._bullet.btCompoundShape_removeChildShapeByIndex(this._btShape, 0);
 	        }
 	        this._childColliderShapes.length = 0;
 	    }
@@ -21377,15 +21882,16 @@
 	        this._height = height;
 	        this._orientation = orientation;
 	        this._type = ColliderShape.SHAPETYPES_CYLINDER;
+	        var bt = Physics3D._bullet;
 	        switch (orientation) {
 	            case ColliderShape.SHAPEORIENTATION_UPX:
-	                this._nativeShape = new Physics3D._physics3D.btConeShapeX(radius, height);
+	                this._btShape = bt.btConeShapeX_create(radius, height);
 	                break;
 	            case ColliderShape.SHAPEORIENTATION_UPY:
-	                this._nativeShape = new Physics3D._physics3D.btConeShape(radius, height);
+	                this._btShape = bt.btConeShape_create(radius, height);
 	                break;
 	            case ColliderShape.SHAPEORIENTATION_UPZ:
-	                this._nativeShape = new Physics3D._physics3D.btConeShapeZ(radius, height);
+	                this._btShape = bt.btConeShapeZ_create(radius, height);
 	                break;
 	            default:
 	                throw "ConeColliderShape:unknown orientation.";
@@ -21416,25 +21922,26 @@
 	        this._height = height;
 	        this._orientation = orientation;
 	        this._type = ColliderShape.SHAPETYPES_CYLINDER;
+	        var bt = Physics3D._bullet;
 	        switch (orientation) {
 	            case ColliderShape.SHAPEORIENTATION_UPX:
-	                CylinderColliderShape._nativeSize.setValue(height / 2, radius, radius);
-	                this._nativeShape = new Physics3D._physics3D.btCylinderShapeX(CylinderColliderShape._nativeSize);
+	                bt.btVector3_setValue(CylinderColliderShape._btSize, height / 2, radius, radius);
+	                this._btShape = bt.btCylinderShapeX_create(CylinderColliderShape._btSize);
 	                break;
 	            case ColliderShape.SHAPEORIENTATION_UPY:
-	                CylinderColliderShape._nativeSize.setValue(radius, height / 2, radius);
-	                this._nativeShape = new Physics3D._physics3D.btCylinderShape(CylinderColliderShape._nativeSize);
+	                bt.btVector3_setValue(CylinderColliderShape._btSize, radius, height / 2, radius);
+	                this._btShape = bt.btCylinderShape_create(CylinderColliderShape._btSize);
 	                break;
 	            case ColliderShape.SHAPEORIENTATION_UPZ:
-	                CylinderColliderShape._nativeSize.setValue(radius, radius, height / 2);
-	                this._nativeShape = new Physics3D._physics3D.btCylinderShapeZ(CylinderColliderShape._nativeSize);
+	                bt.btVector3_setValue(CylinderColliderShape._btSize, radius, radius, height / 2);
+	                this._btShape = bt.btCylinderShapeZ_create(CylinderColliderShape._btSize);
 	                break;
 	            default:
 	                throw "CapsuleColliderShape:unknown orientation.";
 	        }
 	    }
 	    static __init__() {
-	        CylinderColliderShape._nativeSize = new Physics3D._physics3D.btVector3(0, 0, 0);
+	        CylinderColliderShape._btSize = Physics3D._bullet.btVector3_create(0, 0, 0);
 	    }
 	    get radius() {
 	        return this._radius;
@@ -21463,13 +21970,13 @@
 	    }
 	    set mesh(value) {
 	        if (this._mesh !== value) {
-	            var physics3D = Physics3D._physics3D;
+	            var bt = Physics3D._bullet;
 	            if (this._mesh) {
-	                physics3D.destroy(this._nativeShape);
+	                bt.destroy(this._btShape);
 	            }
 	            if (value) {
-	                this._nativeShape = new Physics3D._physics3D.btGImpactMeshShape(value._getPhysicMesh());
-	                this._nativeShape.updateBound();
+	                this._btShape = bt.btGImpactMeshShape_create(value._getPhysicMesh());
+	                bt.btGImpactShapeInterface_updateBound(this._btShape);
 	            }
 	            this._mesh = value;
 	        }
@@ -21485,9 +21992,10 @@
 	            this.updateLocalTransformations();
 	        }
 	        else {
-	            ColliderShape._nativeScale.setValue(value.x, value.y, value.z);
-	            this._nativeShape.setLocalScaling(ColliderShape._nativeScale);
-	            this._nativeShape.updateBound();
+	            var bt = Physics3D._bullet;
+	            bt.btVector3_setValue(ColliderShape._btScale, value.x, value.y, value.z);
+	            bt.btCollisionShape_setLocalScaling(this._btShape, ColliderShape._btScale);
+	            bt.btGImpactShapeInterface_updateBound(this._btShape);
 	        }
 	    }
 	    cloneTo(destObject) {
@@ -21502,23 +22010,22 @@
 	        return dest;
 	    }
 	    destroy() {
-	        if (this._nativeShape) {
-	            var physics3D = Physics3D._physics3D;
-	            physics3D.destroy(this._nativeShape);
-	            this._nativeShape = null;
+	        if (this._btShape) {
+	            Physics3D._bullet.btCollisionShape_destroy(this._btShape);
+	            this._btShape = null;
 	        }
 	    }
 	}
 
 	class SphereColliderShape extends ColliderShape {
-	    get radius() {
-	        return this._radius;
-	    }
 	    constructor(radius = 0.5) {
 	        super();
 	        this._radius = radius;
 	        this._type = ColliderShape.SHAPETYPES_SPHERE;
-	        this._nativeShape = new Physics3D._physics3D.btSphereShape(radius);
+	        this._btShape = Physics3D._bullet.btSphereShape_create(radius);
+	    }
+	    get radius() {
+	        return this._radius;
 	    }
 	    clone() {
 	        var dest = new SphereColliderShape(this._radius);
@@ -21547,8 +22054,9 @@
 	        PhysicsComponent._physicObjectsMap[this.id] = this;
 	    }
 	    static __init__() {
-	        PhysicsComponent._nativeVector30 = new Physics3D._physics3D.btVector3(0, 0, 0);
-	        PhysicsComponent._nativeQuaternion0 = new Physics3D._physics3D.btQuaternion(0, 0, 0, 1);
+	        var bt = Physics3D._bullet;
+	        PhysicsComponent._btVector30 = bt.btVector3_create(0, 0, 0);
+	        PhysicsComponent._btQuaternion0 = bt.btQuaternion_create(0, 0, 0, 1);
 	    }
 	    static _createAffineTransformationArray(tranX, tranY, tranZ, rotX, rotY, rotZ, rotW, scale, outE) {
 	        var x2 = rotX + rotX, y2 = rotY + rotY, z2 = rotZ + rotZ;
@@ -21630,38 +22138,38 @@
 	    }
 	    set restitution(value) {
 	        this._restitution = value;
-	        this._nativeColliderObject && this._nativeColliderObject.setRestitution(value);
+	        this._btColliderObject && Physics3D._bullet.btCollisionObject_setRestitution(this._btColliderObject, value);
 	    }
 	    get friction() {
 	        return this._friction;
 	    }
 	    set friction(value) {
 	        this._friction = value;
-	        this._nativeColliderObject && this._nativeColliderObject.setFriction(value);
+	        this._btColliderObject && Physics3D._bullet.btCollisionObject_setFriction(this._btColliderObject, value);
 	    }
 	    get rollingFriction() {
-	        return this._nativeColliderObject.getRollingFriction();
+	        return this._rollingFriction;
 	    }
 	    set rollingFriction(value) {
 	        this._rollingFriction = value;
-	        this._nativeColliderObject && this._nativeColliderObject.setRollingFriction(value);
+	        this._btColliderObject && Physics3D._bullet.btCollisionObject_setRollingFriction(this._btColliderObject, value);
 	    }
 	    get ccdMotionThreshold() {
 	        return this._ccdMotionThreshold;
 	    }
 	    set ccdMotionThreshold(value) {
 	        this._ccdMotionThreshold = value;
-	        this._nativeColliderObject && this._nativeColliderObject.setCcdMotionThreshold(value);
+	        this._btColliderObject && Physics3D._bullet.btCollisionObject_setCcdMotionThreshold(this._btColliderObject, value);
 	    }
 	    get ccdSweptSphereRadius() {
 	        return this._ccdSweptSphereRadius;
 	    }
 	    set ccdSweptSphereRadius(value) {
 	        this._ccdSweptSphereRadius = value;
-	        this._nativeColliderObject && this._nativeColliderObject.setCcdSweptSphereRadius(value);
+	        this._btColliderObject && Physics3D._bullet.btCollisionObject_setCcdSweptSphereRadius(this._btColliderObject, value);
 	    }
 	    get isActive() {
-	        return this._nativeColliderObject ? this._nativeColliderObject.isActive() : false;
+	        return this._btColliderObject ? Physics3D._bullet.btCollisionObject_isActive(this._btColliderObject) : false;
 	    }
 	    get enabled() {
 	        return super.enabled;
@@ -21698,8 +22206,8 @@
 	                value._attatched = true;
 	                value._attatchedCollisionObject = this;
 	            }
-	            if (this._nativeColliderObject) {
-	                this._nativeColliderObject.setCollisionShape(value._nativeShape);
+	            if (this._btColliderObject) {
+	                Physics3D._bullet.btCollisionObject_setCollisionShape(this._btColliderObject, value._btShape);
 	                var canInSimulation = this._simulation && this._enabled;
 	                (canInSimulation && lastColliderShape) && (this._removeFromSimulation());
 	                this._onShapeChange(value);
@@ -21741,15 +22249,6 @@
 	            }
 	        }
 	    }
-	    _isValid() {
-	        return this._simulation && this._colliderShape && this._enabled;
-	    }
-	    _parse(data) {
-	        (data.collisionGroup != null) && (this.collisionGroup = data.collisionGroup);
-	        (data.canCollideWith != null) && (this.canCollideWith = data.canCollideWith);
-	        (data.ccdMotionThreshold != null) && (this.ccdMotionThreshold = data.ccdMotionThreshold);
-	        (data.ccdSweptSphereRadius != null) && (this.ccdSweptSphereRadius = data.ccdSweptSphereRadius);
-	    }
 	    _parseShape(shapesData) {
 	        var shapeCount = shapesData.length;
 	        if (shapeCount === 1) {
@@ -21768,6 +22267,40 @@
 	    _onScaleChange(scale) {
 	        this._colliderShape._setScale(scale);
 	    }
+	    _onEnable() {
+	        this._simulation = this.owner._scene.physicsSimulation;
+	        Physics3D._bullet.btCollisionObject_setContactProcessingThreshold(this._btColliderObject, 1e30);
+	        if (this._colliderShape && this._enabled) {
+	            this._derivePhysicsTransformation(true);
+	            this._addToSimulation();
+	        }
+	    }
+	    _onDisable() {
+	        if (this._colliderShape && this._enabled) {
+	            this._removeFromSimulation();
+	            (this._inPhysicUpdateListIndex !== -1) && (this._simulation._physicsUpdateList.remove(this));
+	        }
+	        this._simulation = null;
+	    }
+	    _onDestroy() {
+	        delete PhysicsComponent._physicObjectsMap[this.id];
+	        Physics3D._bullet.btCollisionObject_destroy(this._btColliderObject);
+	        this._colliderShape.destroy();
+	        super._onDestroy();
+	        this._btColliderObject = null;
+	        this._colliderShape = null;
+	        this._simulation = null;
+	        this.owner.transform.off(Laya.Event.TRANSFORM_CHANGED, this, this._onTransformChanged);
+	    }
+	    _isValid() {
+	        return this._simulation && this._colliderShape && this._enabled;
+	    }
+	    _parse(data) {
+	        (data.collisionGroup != null) && (this.collisionGroup = data.collisionGroup);
+	        (data.canCollideWith != null) && (this.canCollideWith = data.canCollideWith);
+	        (data.ccdMotionThreshold != null) && (this.ccdMotionThreshold = data.ccdMotionThreshold);
+	        (data.ccdSweptSphereRadius != null) && (this.ccdSweptSphereRadius = data.ccdSweptSphereRadius);
+	    }
 	    _setTransformFlag(type, value) {
 	        if (value)
 	            this._transformFlag |= type;
@@ -21782,39 +22315,42 @@
 	    _removeFromSimulation() {
 	    }
 	    _derivePhysicsTransformation(force) {
-	        this._innerDerivePhysicsTransformation(this._nativeColliderObject.getWorldTransform(), force);
+	        this._innerDerivePhysicsTransformation(Physics3D._bullet.btCollisionObject_getWorldTransform(this._btColliderObject), force);
 	    }
 	    _innerDerivePhysicsTransformation(physicTransformOut, force) {
+	        var bt = Physics3D._bullet;
 	        var transform = this.owner._transform;
 	        var rotation = transform.rotation;
+	        var scale = transform.getWorldLossyScale();
 	        if (force || this._getTransformFlag(Transform3D.TRANSFORM_WORLDPOSITION)) {
 	            var shapeOffset = this._colliderShape.localOffset;
 	            var position = transform.position;
-	            var nativePosition = PhysicsComponent._nativeVector30;
+	            var btPosition = PhysicsComponent._btVector30;
 	            if (shapeOffset.x !== 0 || shapeOffset.y !== 0 || shapeOffset.z !== 0) {
 	                var physicPosition = PhysicsComponent._tempVector30;
-	                PhysicsComponent.physicVector3TransformQuat(shapeOffset, rotation.x, rotation.y, rotation.z, rotation.w, physicPosition);
+	                Vector3.transformQuat(shapeOffset, rotation, physicPosition);
+	                Vector3.multiply(physicPosition, scale, physicPosition);
 	                Vector3.add(position, physicPosition, physicPosition);
-	                nativePosition.setValue(-physicPosition.x, physicPosition.y, physicPosition.z);
+	                bt.btVector3_setValue(btPosition, -physicPosition.x, physicPosition.y, physicPosition.z);
 	            }
 	            else {
-	                nativePosition.setValue(-position.x, position.y, position.z);
+	                bt.btVector3_setValue(btPosition, -position.x, position.y, position.z);
 	            }
-	            physicTransformOut.setOrigin(nativePosition);
+	            bt.btTransform_setOrigin(physicTransformOut, btPosition);
 	            this._setTransformFlag(Transform3D.TRANSFORM_WORLDPOSITION, false);
 	        }
 	        if (force || this._getTransformFlag(Transform3D.TRANSFORM_WORLDQUATERNION)) {
 	            var shapeRotation = this._colliderShape.localRotation;
-	            var nativeRotation = PhysicsComponent._nativeQuaternion0;
+	            var btRotation = PhysicsComponent._btQuaternion0;
 	            if (shapeRotation.x !== 0 || shapeRotation.y !== 0 || shapeRotation.z !== 0 || shapeRotation.w !== 1) {
 	                var physicRotation = PhysicsComponent._tempQuaternion0;
 	                PhysicsComponent.physicQuaternionMultiply(rotation.x, rotation.y, rotation.z, rotation.w, shapeRotation, physicRotation);
-	                nativeRotation.setValue(-physicRotation.x, physicRotation.y, physicRotation.z, -physicRotation.w);
+	                bt.btQuaternion_setValue(btRotation, -physicRotation.x, physicRotation.y, physicRotation.z, -physicRotation.w);
 	            }
 	            else {
-	                nativeRotation.setValue(-rotation.x, rotation.y, rotation.z, -rotation.w);
+	                bt.btQuaternion_setValue(btRotation, -rotation.x, rotation.y, rotation.z, -rotation.w);
 	            }
-	            physicTransformOut.setRotation(nativeRotation);
+	            bt.btTransform_setRotation(physicTransformOut, btRotation);
 	            this._setTransformFlag(Transform3D.TRANSFORM_WORLDQUATERNION, false);
 	        }
 	        if (force || this._getTransformFlag(Transform3D.TRANSFORM_WORLDSCALE)) {
@@ -21823,68 +22359,55 @@
 	        }
 	    }
 	    _updateTransformComponent(physicsTransform) {
+	        var bt = Physics3D._bullet;
 	        var localOffset = this._colliderShape.localOffset;
 	        var localRotation = this._colliderShape.localRotation;
 	        var transform = this.owner._transform;
 	        var position = transform.position;
 	        var rotation = transform.rotation;
-	        var nativePosition = physicsTransform.getOrigin();
-	        var nativeRotation = physicsTransform.getRotation();
-	        var nativeRotX = -nativeRotation.x();
-	        var nativeRotY = nativeRotation.y();
-	        var nativeRotZ = nativeRotation.z();
-	        var nativeRotW = -nativeRotation.w();
+	        var btPosition = bt.btTransform_getOrigin(physicsTransform);
+	        var btRotation = bt.btTransform_getRotation(physicsTransform);
+	        var btRotX = -bt.btQuaternion_x(btRotation);
+	        var btRotY = bt.btQuaternion_y(btRotation);
+	        var btRotZ = bt.btQuaternion_z(btRotation);
+	        var btRotW = -bt.btQuaternion_w(btRotation);
 	        if (localOffset.x !== 0 || localOffset.y !== 0 || localOffset.z !== 0) {
 	            var rotShapePosition = PhysicsComponent._tempVector30;
-	            PhysicsComponent.physicVector3TransformQuat(localOffset, nativeRotX, nativeRotY, nativeRotZ, nativeRotW, rotShapePosition);
-	            position.x = -nativePosition.x() - rotShapePosition.x;
-	            position.y = nativePosition.y() - rotShapePosition.y;
-	            position.z = nativePosition.z() - rotShapePosition.z;
+	            PhysicsComponent.physicVector3TransformQuat(localOffset, btRotX, btRotY, btRotZ, btRotW, rotShapePosition);
+	            position.x = -bt.btVector3_x(btPosition) - rotShapePosition.x;
+	            position.y = bt.btVector3_y(btPosition) - rotShapePosition.y;
+	            position.z = bt.btVector3_z(btPosition) - rotShapePosition.z;
 	        }
 	        else {
-	            position.x = -nativePosition.x();
-	            position.y = nativePosition.y();
-	            position.z = nativePosition.z();
+	            position.x = -bt.btVector3_x(btPosition);
+	            position.y = bt.btVector3_y(btPosition);
+	            position.z = bt.btVector3_z(btPosition);
 	        }
 	        transform.position = position;
 	        if (localRotation.x !== 0 || localRotation.y !== 0 || localRotation.z !== 0 || localRotation.w !== 1) {
 	            var invertShapeRotaion = PhysicsComponent._tempQuaternion0;
 	            localRotation.invert(invertShapeRotaion);
-	            PhysicsComponent.physicQuaternionMultiply(nativeRotX, nativeRotY, nativeRotZ, nativeRotW, invertShapeRotaion, rotation);
+	            PhysicsComponent.physicQuaternionMultiply(btRotX, btRotY, btRotZ, btRotW, invertShapeRotaion, rotation);
 	        }
 	        else {
-	            rotation.x = nativeRotX;
-	            rotation.y = nativeRotY;
-	            rotation.z = nativeRotZ;
-	            rotation.w = nativeRotW;
+	            rotation.x = btRotX;
+	            rotation.y = btRotY;
+	            rotation.z = btRotZ;
+	            rotation.w = btRotW;
 	        }
 	        transform.rotation = rotation;
 	    }
-	    _onEnable() {
-	        this._simulation = this.owner._scene.physicsSimulation;
-	        this._nativeColliderObject.setContactProcessingThreshold(1e30);
-	        if (this._colliderShape && this._enabled) {
-	            this._derivePhysicsTransformation(true);
-	            this._addToSimulation();
-	        }
-	    }
-	    _onDisable() {
-	        if (this._colliderShape && this._enabled) {
-	            this._removeFromSimulation();
-	            (this._inPhysicUpdateListIndex !== -1) && (this._simulation._physicsUpdateList.remove(this));
-	        }
-	        this._simulation = null;
-	    }
 	    _onShapeChange(colShape) {
-	        var btColObj = this._nativeColliderObject;
-	        var flags = btColObj.getCollisionFlags();
+	        var btColObj = this._btColliderObject;
+	        var bt = Physics3D._bullet;
+	        var flags = bt.btCollisionObject_getCollisionFlags(btColObj);
 	        if (colShape.needsCustomCollisionCallback) {
 	            if ((flags & PhysicsComponent.COLLISIONFLAGS_CUSTOM_MATERIAL_CALLBACK) === 0)
-	                btColObj.setCollisionFlags(flags | PhysicsComponent.COLLISIONFLAGS_CUSTOM_MATERIAL_CALLBACK);
+	                bt.btCollisionObject_setCollisionFlags(btColObj, flags | PhysicsComponent.COLLISIONFLAGS_CUSTOM_MATERIAL_CALLBACK);
 	        }
 	        else {
 	            if ((flags & PhysicsComponent.COLLISIONFLAGS_CUSTOM_MATERIAL_CALLBACK) > 0)
-	                btColObj.setCollisionFlags(flags ^ PhysicsComponent.COLLISIONFLAGS_CUSTOM_MATERIAL_CALLBACK);
+	                bt.btCollisionObject_setCollisionFlags(btColObj, flags ^ PhysicsComponent.COLLISIONFLAGS_CUSTOM_MATERIAL_CALLBACK);
 	        }
 	    }
 	    _onAdded() {
@@ -21895,17 +22418,6 @@
 	        this.ccdMotionThreshold = this._ccdMotionThreshold;
 	        this.ccdSweptSphereRadius = this._ccdSweptSphereRadius;
 	        this.owner.transform.on(Laya.Event.TRANSFORM_CHANGED, this, this._onTransformChanged);
-	    }
-	    _onDestroy() {
-	        var physics3D = Physics3D._physics3D;
-	        delete PhysicsComponent._physicObjectsMap[this.id];
-	        physics3D.destroy(this._nativeColliderObject);
-	        this._colliderShape.destroy();
-	        super._onDestroy();
-	        this._nativeColliderObject = null;
-	        this._colliderShape = null;
-	        this._simulation = null;
-	        this.owner.transform.off(Laya.Event.TRANSFORM_CHANGED, this, this._onTransformChanged);
 	    }
 	    _onTransformChanged(flag) {
 	        if (PhysicsComponent._addUpdateList) {
@@ -21952,8 +22464,8 @@
 	class PhysicsSimulation {
 	    constructor(configuration, flags = 0) {
 	        this._gravity = new Vector3(0, -10, 0);
-	        this._nativeVector3Zero = new Physics3D._physics3D.btVector3(0, 0, 0);
-	        this._nativeDefaultQuaternion = new Physics3D._physics3D.btQuaternion(0, 0, 0, -1);
+	        this._btVector3Zero = Physics3D._bullet.btVector3_create(0, 0, 0);
+	        this._btDefaultQuaternion = Physics3D._bullet.btQuaternion_create(0, 0, 0, -1);
 	        this._collisionsUtils = new CollisionTool();
 	        this._previousFrameCollisions = [];
 	        this._currentFrameCollisions = [];
@@ -21964,152 +22476,158 @@
 	        this.fixedTimeStep = 1.0 / 60.0;
 	        this.maxSubSteps = configuration.maxSubSteps;
 	        this.fixedTimeStep = configuration.fixedTimeStep;
-	        var physics3D = Physics3D._physics3D;
-	        this._nativeCollisionConfiguration = new physics3D.btDefaultCollisionConfiguration();
-	        this._nativeDispatcher = new physics3D.btCollisionDispatcher(this._nativeCollisionConfiguration);
-	        this._nativeBroadphase = new physics3D.btDbvtBroadphase();
-	        this._nativeBroadphase.getOverlappingPairCache().setInternalGhostPairCallback(new physics3D.btGhostPairCallback());
+	        var bt = Physics3D._bullet;
+	        this._btCollisionConfiguration = bt.btDefaultCollisionConfiguration_create();
+	        this._btDispatcher = bt.btCollisionDispatcher_create(this._btCollisionConfiguration);
+	        this._btBroadphase = bt.btDbvtBroadphase_create();
+	        bt.btOverlappingPairCache_setInternalGhostPairCallback(bt.btDbvtBroadphase_getOverlappingPairCache(this._btBroadphase), bt.btGhostPairCallback_create());
 	        var conFlags = configuration.flags;
 	        if (conFlags & PhysicsSimulation.PHYSICSENGINEFLAGS_COLLISIONSONLY) {
-	            this._nativeCollisionWorld = new physics3D.btCollisionWorld(this._nativeDispatcher, this._nativeBroadphase, this._nativeCollisionConfiguration);
+	            this._btCollisionWorld = new bt.btCollisionWorld(this._btDispatcher, this._btBroadphase, this._btCollisionConfiguration);
 	        }
 	        else if (conFlags & PhysicsSimulation.PHYSICSENGINEFLAGS_SOFTBODYSUPPORT) {
 	            throw "PhysicsSimulation:SoftBody processing is not yet available";
 	        }
 	        else {
-	            var solver = new physics3D.btSequentialImpulseConstraintSolver();
-	            this._nativeDiscreteDynamicsWorld = new physics3D.btDiscreteDynamicsWorld(this._nativeDispatcher, this._nativeBroadphase, solver, this._nativeCollisionConfiguration);
-	            this._nativeCollisionWorld = this._nativeDiscreteDynamicsWorld;
+	            var solver = bt.btSequentialImpulseConstraintSolver_create();
+	            this._btDiscreteDynamicsWorld = bt.btDiscreteDynamicsWorld_create(this._btDispatcher, this._btBroadphase, solver, this._btCollisionConfiguration);
+	            this._btCollisionWorld = this._btDiscreteDynamicsWorld;
 	        }
-	        if (this._nativeDiscreteDynamicsWorld) {
-	            this._nativeSolverInfo = this._nativeDiscreteDynamicsWorld.getSolverInfo();
-	            this._nativeDispatchInfo = this._nativeDiscreteDynamicsWorld.getDispatchInfo();
+	        if (this._btDiscreteDynamicsWorld) {
+	            this._btSolverInfo = bt.btDynamicsWorld_getSolverInfo(this._btDiscreteDynamicsWorld);
+	            this._btDispatchInfo = bt.btCollisionWorld_getDispatchInfo(this._btDiscreteDynamicsWorld);
 	        }
-	        this._nativeClosestRayResultCallback = new physics3D.ClosestRayResultCallback(this._nativeVector3Zero, this._nativeVector3Zero);
-	        this._nativeAllHitsRayResultCallback = new physics3D.AllHitsRayResultCallback(this._nativeVector3Zero, this._nativeVector3Zero);
-	        this._nativeClosestConvexResultCallback = new physics3D.ClosestConvexResultCallback(this._nativeVector3Zero, this._nativeVector3Zero);
-	        this._nativeAllConvexResultCallback = new physics3D.AllConvexResultCallback(this._nativeVector3Zero, this._nativeVector3Zero);
-	        physics3D._btGImpactCollisionAlgorithm_RegisterAlgorithm(this._nativeDispatcher.a);
+	        this._btClosestRayResultCallback = bt.ClosestRayResultCallback_create(this._btVector3Zero, this._btVector3Zero);
+	        this._btAllHitsRayResultCallback = bt.AllHitsRayResultCallback_create(this._btVector3Zero, this._btVector3Zero);
+	        this._btClosestConvexResultCallback = bt.ClosestConvexResultCallback_create(this._btVector3Zero, this._btVector3Zero);
+	        this._btAllConvexResultCallback = bt.AllConvexResultCallback_create(this._btVector3Zero, this._btVector3Zero);
+	        bt.btGImpactCollisionAlgorithm_RegisterAlgorithm(this._btDispatcher);
 	    }
 	    static __init__() {
-	        PhysicsSimulation._nativeTempVector30 = new Physics3D._physics3D.btVector3(0, 0, 0);
-	        PhysicsSimulation._nativeTempVector31 = new Physics3D._physics3D.btVector3(0, 0, 0);
-	        PhysicsSimulation._nativeTempQuaternion0 = new Physics3D._physics3D.btQuaternion(0, 0, 0, 1);
-	        PhysicsSimulation._nativeTempQuaternion1 = new Physics3D._physics3D.btQuaternion(0, 0, 0, 1);
-	        PhysicsSimulation._nativeTempTransform0 = new Physics3D._physics3D.btTransform();
-	        PhysicsSimulation._nativeTempTransform1 = new Physics3D._physics3D.btTransform();
+	        var bt = Physics3D._bullet;
+	        PhysicsSimulation._btTempVector30 = bt.btVector3_create(0, 0, 0);
+	        PhysicsSimulation._btTempVector31 = bt.btVector3_create(0, 0, 0);
+	        PhysicsSimulation._btTempQuaternion0 = bt.btQuaternion_create(0, 0, 0, 1);
+	        PhysicsSimulation._btTempQuaternion1 = bt.btQuaternion_create(0, 0, 0, 1);
+	        PhysicsSimulation._btTempTransform0 = bt.btTransform_create();
+	        PhysicsSimulation._btTempTransform1 = bt.btTransform_create();
 	    }
 	    static createConstraint() {
 	    }
 	    get continuousCollisionDetection() {
-	        return this._nativeDispatchInfo.get_m_useContinuous();
+	        return Physics3D._bullet.btCollisionWorld_get_m_useContinuous(this._btDispatchInfo);
 	    }
 	    set continuousCollisionDetection(value) {
-	        this._nativeDispatchInfo.set_m_useContinuous(value);
+	        Physics3D._bullet.btCollisionWorld_set_m_useContinuous(this._btDispatchInfo, value);
 	    }
 	    get gravity() {
-	        if (!this._nativeDiscreteDynamicsWorld)
+	        if (!this._btDiscreteDynamicsWorld)
 	            throw "Simulation:Cannot perform this action when the physics engine is set to CollisionsOnly";
 	        return this._gravity;
 	    }
 	    set gravity(value) {
-	        if (!this._nativeDiscreteDynamicsWorld)
+	        if (!this._btDiscreteDynamicsWorld)
 	            throw "Simulation:Cannot perform this action when the physics engine is set to CollisionsOnly";
 	        this._gravity = value;
-	        var nativeGravity = PhysicsSimulation._nativeTempVector30;
-	        nativeGravity.setValue(-value.x, value.y, value.z);
-	        this._nativeDiscreteDynamicsWorld.setGravity(nativeGravity);
+	        var bt = Physics3D._bullet;
+	        var btGravity = PhysicsSimulation._btTempVector30;
+	        bt.btVector3_setValue(btGravity, -value.x, value.y, value.z);
+	        bt.btDiscreteDynamicsWorld_setGravity(this._btDiscreteDynamicsWorld, btGravity);
 	    }
 	    get speculativeContactRestitution() {
-	        if (!this._nativeDiscreteDynamicsWorld)
+	        if (!this._btDiscreteDynamicsWorld)
 	            throw "Simulation:Cannot Cannot perform this action when the physics engine is set to CollisionsOnly";
-	        return this._nativeDiscreteDynamicsWorld.getApplySpeculativeContactRestitution();
+	        return Physics3D._bullet.btDiscreteDynamicsWorld_getApplySpeculativeContactRestitution(this._btDiscreteDynamicsWorld);
 	    }
 	    set speculativeContactRestitution(value) {
-	        if (!this._nativeDiscreteDynamicsWorld)
+	        if (!this._btDiscreteDynamicsWorld)
 	            throw "Simulation:Cannot Cannot perform this action when the physics engine is set to CollisionsOnly";
-	        this._nativeDiscreteDynamicsWorld.setApplySpeculativeContactRestitution(value);
+	        Physics3D._bullet.btDiscreteDynamicsWorld_setApplySpeculativeContactRestitution(this._btDiscreteDynamicsWorld, value);
 	    }
 	    _simulate(deltaTime) {
 	        this._updatedRigidbodies = 0;
-	        if (this._nativeDiscreteDynamicsWorld)
-	            this._nativeDiscreteDynamicsWorld.stepSimulation(deltaTime, this.maxSubSteps, this.fixedTimeStep);
+	        var bt = Physics3D._bullet;
+	        if (this._btDiscreteDynamicsWorld)
+	            bt.btDiscreteDynamicsWorld_stepSimulation(this._btDiscreteDynamicsWorld, deltaTime, this.maxSubSteps, this.fixedTimeStep);
 	        else
-	            this._nativeCollisionWorld.PerformDiscreteCollisionDetection();
+	            bt.PerformDiscreteCollisionDetection(this._btCollisionWorld);
 	    }
 	    _destroy() {
-	        var physics3D = Physics3D._physics3D;
-	        if (this._nativeDiscreteDynamicsWorld) {
-	            physics3D.destroy(this._nativeDiscreteDynamicsWorld);
-	            this._nativeDiscreteDynamicsWorld = null;
+	        var bt = Physics3D._bullet;
+	        if (this._btDiscreteDynamicsWorld) {
+	            bt.btCollisionWorld_destroy(this._btDiscreteDynamicsWorld);
+	            this._btDiscreteDynamicsWorld = null;
 	        }
 	        else {
-	            physics3D.destroy(this._nativeCollisionWorld);
-	            this._nativeCollisionWorld = null;
+	            bt.btCollisionWorld_destroy(this._btCollisionWorld);
+	            this._btCollisionWorld = null;
 	        }
-	        physics3D.destroy(this._nativeBroadphase);
-	        this._nativeBroadphase = null;
-	        physics3D.destroy(this._nativeDispatcher);
-	        this._nativeDispatcher = null;
-	        physics3D.destroy(this._nativeCollisionConfiguration);
-	        this._nativeCollisionConfiguration = null;
+	        bt.btDbvtBroadphase_destroy(this._btBroadphase);
+	        this._btBroadphase = null;
+	        bt.btCollisionDispatcher_destroy(this._btDispatcher);
+	        this._btDispatcher = null;
+	        bt.btDefaultCollisionConfiguration_destroy(this._btCollisionConfiguration);
+	        this._btCollisionConfiguration = null;
 	    }
 	    _addPhysicsCollider(component, group, mask) {
-	        this._nativeCollisionWorld.addCollisionObject(component._nativeColliderObject, group, mask);
+	        Physics3D._bullet.btCollisionWorld_addCollisionObject(this._btCollisionWorld, component._btColliderObject, group, mask);
 	    }
 	    _removePhysicsCollider(component) {
-	        this._nativeCollisionWorld.removeCollisionObject(component._nativeColliderObject);
+	        Physics3D._bullet.btCollisionWorld_removeCollisionObject(this._btCollisionWorld, component._btColliderObject);
 	    }
 	    _addRigidBody(rigidBody, group, mask) {
-	        if (!this._nativeDiscreteDynamicsWorld)
+	        if (!this._btDiscreteDynamicsWorld)
 	            throw "Simulation:Cannot perform this action when the physics engine is set to CollisionsOnly";
-	        this._nativeCollisionWorld.addRigidBody(rigidBody._nativeColliderObject, group, mask);
+	        Physics3D._bullet.btDiscreteDynamicsWorld_addRigidBody(this._btCollisionWorld, rigidBody._btColliderObject, group, mask);
 	    }
 	    _removeRigidBody(rigidBody) {
-	        if (!this._nativeDiscreteDynamicsWorld)
+	        if (!this._btDiscreteDynamicsWorld)
 	            throw "Simulation:Cannot perform this action when the physics engine is set to CollisionsOnly";
-	        this._nativeCollisionWorld.removeRigidBody(rigidBody._nativeColliderObject);
+	        Physics3D._bullet.btDiscreteDynamicsWorld_removeRigidBody(this._btCollisionWorld, rigidBody._btColliderObject);
 	    }
 	    _addCharacter(character, group, mask) {
-	        if (!this._nativeDiscreteDynamicsWorld)
+	        if (!this._btDiscreteDynamicsWorld)
 	            throw "Simulation:Cannot perform this action when the physics engine is set to CollisionsOnly";
-	        this._nativeCollisionWorld.addCollisionObject(character._nativeColliderObject, group, mask);
-	        this._nativeCollisionWorld.addAction(character._nativeKinematicCharacter);
+	        var bt = Physics3D._bullet;
+	        bt.btCollisionWorld_addCollisionObject(this._btCollisionWorld, character._btColliderObject, group, mask);
+	        bt.btDynamicsWorld_addAction(this._btCollisionWorld, character._btKinematicCharacter);
 	    }
 	    _removeCharacter(character) {
-	        if (!this._nativeDiscreteDynamicsWorld)
+	        if (!this._btDiscreteDynamicsWorld)
 	            throw "Simulation:Cannot perform this action when the physics engine is set to CollisionsOnly";
-	        this._nativeCollisionWorld.removeCollisionObject(character._nativeColliderObject);
-	        this._nativeCollisionWorld.removeAction(character._nativeKinematicCharacter);
+	        var bt = Physics3D._bullet;
+	        bt.btCollisionWorld_removeCollisionObject(this._btCollisionWorld, character._btColliderObject);
+	        bt.btDynamicsWorld_removeAction(this._btCollisionWorld, character._btKinematicCharacter);
 	    }
 	    raycastFromTo(from, to, out = null, collisonGroup = Physics3DUtils.COLLISIONFILTERGROUP_ALLFILTER, collisionMask = Physics3DUtils.COLLISIONFILTERGROUP_ALLFILTER) {
-	        var rayResultCall = this._nativeClosestRayResultCallback;
-	        var rayFrom = PhysicsSimulation._nativeTempVector30;
-	        var rayTo = PhysicsSimulation._nativeTempVector31;
-	        rayFrom.setValue(-from.x, from.y, from.z);
-	        rayTo.setValue(-to.x, to.y, to.z);
-	        rayResultCall.set_m_rayFromWorld(rayFrom);
-	        rayResultCall.set_m_rayToWorld(rayTo);
-	        rayResultCall.set_m_collisionFilterGroup(collisonGroup);
-	        rayResultCall.set_m_collisionFilterMask(collisionMask);
-	        rayResultCall.set_m_collisionObject(null);
-	        rayResultCall.set_m_closestHitFraction(1);
-	        this._nativeCollisionWorld.rayTest(rayFrom, rayTo, rayResultCall);
-	        if (rayResultCall.hasHit()) {
+	        var bt = Physics3D._bullet;
+	        var rayResultCall = this._btClosestRayResultCallback;
+	        var rayFrom = PhysicsSimulation._btTempVector30;
+	        var rayTo = PhysicsSimulation._btTempVector31;
+	        bt.btVector3_setValue(rayFrom, -from.x, from.y, from.z);
+	        bt.btVector3_setValue(rayTo, -to.x, to.y, to.z);
+	        bt.ClosestRayResultCallback_set_m_rayFromWorld(rayResultCall, rayFrom);
+	        bt.ClosestRayResultCallback_set_m_rayToWorld(rayResultCall, rayTo);
+	        bt.RayResultCallback_set_m_collisionFilterGroup(rayResultCall, collisonGroup);
+	        bt.RayResultCallback_set_m_collisionFilterMask(rayResultCall, collisionMask);
+	        bt.RayResultCallback_set_m_collisionObject(rayResultCall, null);
+	        bt.RayResultCallback_set_m_closestHitFraction(rayResultCall, 1);
+	        bt.btCollisionWorld_rayTest(this._btCollisionWorld, rayFrom, rayTo, rayResultCall);
+	        if (bt.RayResultCallback_hasHit(rayResultCall)) {
 	            if (out) {
 	                out.succeeded = true;
-	                out.collider = PhysicsComponent._physicObjectsMap[rayResultCall.get_m_collisionObject().getUserIndex()];
-	                out.hitFraction = rayResultCall.get_m_closestHitFraction();
-	                var nativePoint = rayResultCall.get_m_hitPointWorld();
+	                out.collider = PhysicsComponent._physicObjectsMap[bt.btCollisionObject_getUserIndex(bt.RayResultCallback_get_m_collisionObject(rayResultCall))];
+	                out.hitFraction = bt.RayResultCallback_get_m_closestHitFraction(rayResultCall);
+	                var btPoint = bt.ClosestRayResultCallback_get_m_hitPointWorld(rayResultCall);
 	                var point = out.point;
-	                point.x = -nativePoint.x();
-	                point.y = nativePoint.y();
-	                point.z = nativePoint.z();
-	                var nativeNormal = rayResultCall.get_m_hitNormalWorld();
+	                point.x = -bt.btVector3_x(btPoint);
+	                point.y = bt.btVector3_y(btPoint);
+	                point.z = bt.btVector3_z(btPoint);
+	                var btNormal = bt.ClosestRayResultCallback_get_m_hitPointWorld(rayResultCall);
 	                var normal = out.normal;
-	                normal.x = -nativeNormal.x();
-	                normal.y = nativeNormal.y();
-	                normal.z = nativeNormal.z();
+	                normal.x = -bt.btVector3_x(btNormal);
+	                normal.y = bt.btVector3_y(btNormal);
+	                normal.z = bt.btVector3_z(btNormal);
 	            }
 	            return true;
 	        }
@@ -22120,44 +22638,45 @@
 	        }
 	    }
 	    raycastAllFromTo(from, to, out, collisonGroup = Physics3DUtils.COLLISIONFILTERGROUP_ALLFILTER, collisionMask = Physics3DUtils.COLLISIONFILTERGROUP_ALLFILTER) {
-	        var rayResultCall = this._nativeAllHitsRayResultCallback;
-	        var rayFrom = PhysicsSimulation._nativeTempVector30;
-	        var rayTo = PhysicsSimulation._nativeTempVector31;
+	        var bt = Physics3D._bullet;
+	        var rayResultCall = this._btAllHitsRayResultCallback;
+	        var rayFrom = PhysicsSimulation._btTempVector30;
+	        var rayTo = PhysicsSimulation._btTempVector31;
 	        out.length = 0;
-	        rayFrom.setValue(-from.x, from.y, from.z);
-	        rayTo.setValue(-to.x, to.y, to.z);
-	        rayResultCall.set_m_rayFromWorld(rayFrom);
-	        rayResultCall.set_m_rayToWorld(rayTo);
-	        rayResultCall.set_m_collisionFilterGroup(collisonGroup);
-	        rayResultCall.set_m_collisionFilterMask(collisionMask);
-	        var collisionObjects = rayResultCall.get_m_collisionObjects();
-	        var nativePoints = rayResultCall.get_m_hitPointWorld();
-	        var nativeNormals = rayResultCall.get_m_hitNormalWorld();
-	        var nativeFractions = rayResultCall.get_m_hitFractions();
-	        collisionObjects.clear();
-	        nativePoints.clear();
-	        nativeNormals.clear();
-	        nativeFractions.clear();
-	        this._nativeCollisionWorld.rayTest(rayFrom, rayTo, rayResultCall);
-	        var count = collisionObjects.size();
+	        bt.btVector3_setValue(rayFrom, -from.x, from.y, from.z);
+	        bt.btVector3_setValue(rayTo, -to.x, to.y, to.z);
+	        bt.AllHitsRayResultCallback_set_m_rayFromWorld(rayResultCall, rayFrom);
+	        bt.AllHitsRayResultCallback_set_m_rayToWorld(rayResultCall, rayTo);
+	        bt.RayResultCallback_set_m_collisionFilterGroup(rayResultCall, collisonGroup);
+	        bt.RayResultCallback_set_m_collisionFilterMask(rayResultCall, collisionMask);
+	        var collisionObjects = bt.AllHitsRayResultCallback_get_m_collisionObjects(rayResultCall);
+	        var btPoints = bt.AllHitsRayResultCallback_get_m_hitPointWorld(rayResultCall);
+	        var btNormals = bt.AllHitsRayResultCallback_get_m_hitNormalWorld(rayResultCall);
+	        var btFractions = bt.AllHitsRayResultCallback_get_m_hitFractions(rayResultCall);
+	        bt.tBtCollisionObjectArray_clear(collisionObjects);
+	        bt.tVector3Array_clear(btPoints);
+	        bt.tVector3Array_clear(btNormals);
+	        bt.tScalarArray_clear(btFractions);
+	        bt.btCollisionWorld_rayTest(this._btCollisionWorld, rayFrom, rayTo, rayResultCall);
+	        var count = bt.tBtCollisionObjectArray_size(collisionObjects);
 	        if (count > 0) {
 	            this._collisionsUtils.recoverAllHitResultsPool();
 	            for (var i = 0; i < count; i++) {
 	                var hitResult = this._collisionsUtils.getHitResult();
 	                out.push(hitResult);
 	                hitResult.succeeded = true;
-	                hitResult.collider = PhysicsComponent._physicObjectsMap[collisionObjects.at(i).getUserIndex()];
-	                hitResult.hitFraction = nativeFractions.at(i);
-	                var nativePoint = nativePoints.at(i);
+	                hitResult.collider = PhysicsComponent._physicObjectsMap[bt.btCollisionObject_getUserIndex(bt.tBtCollisionObjectArray_at(collisionObjects, i))];
+	                hitResult.hitFraction = bt.tScalarArray_at(btFractions, i);
+	                var btPoint = bt.tVector3Array_at(btPoints, i);
 	                var pointE = hitResult.point;
-	                pointE.x = -nativePoint.x();
-	                pointE.y = nativePoint.y();
-	                pointE.z = nativePoint.z();
-	                var nativeNormal = nativeNormals.at(i);
-	                var normalE = hitResult.normal;
-	                normalE.x = -nativeNormal.x();
-	                normalE.y = nativeNormal.y();
-	                normalE.z = nativeNormal.z();
+	                pointE.x = -bt.btVector3_x(btPoint);
+	                pointE.y = bt.btVector3_y(btPoint);
+	                pointE.z = bt.btVector3_z(btPoint);
+	                var btNormal = bt.tVector3Array_at(btNormals, i);
+	                var normal = hitResult.normal;
+	                normal.x = -bt.btVector3_x(btNormal);
+	                normal.y = bt.btVector3_y(btNormal);
+	                normal.z = bt.btVector3_z(btNormal);
 	            }
 	            return true;
 	        }
@@ -22182,52 +22701,53 @@
 	        return this.raycastAllFromTo(from, to, out, collisonGroup, collisionMask);
 	    }
 	    shapeCast(shape, fromPosition, toPosition, out = null, fromRotation = null, toRotation = null, collisonGroup = Physics3DUtils.COLLISIONFILTERGROUP_ALLFILTER, collisionMask = Physics3DUtils.COLLISIONFILTERGROUP_ALLFILTER, allowedCcdPenetration = 0.0) {
-	        var convexResultCall = this._nativeClosestConvexResultCallback;
-	        var convexPosFrom = PhysicsSimulation._nativeTempVector30;
-	        var convexPosTo = PhysicsSimulation._nativeTempVector31;
-	        var convexRotFrom = PhysicsSimulation._nativeTempQuaternion0;
-	        var convexRotTo = PhysicsSimulation._nativeTempQuaternion1;
-	        var convexTransform = PhysicsSimulation._nativeTempTransform0;
-	        var convexTransTo = PhysicsSimulation._nativeTempTransform1;
-	        var sweepShape = shape._nativeShape;
-	        convexPosFrom.setValue(-fromPosition.x, fromPosition.y, fromPosition.z);
-	        convexPosTo.setValue(-toPosition.x, toPosition.y, toPosition.z);
-	        convexResultCall.set_m_collisionFilterGroup(collisonGroup);
-	        convexResultCall.set_m_collisionFilterMask(collisionMask);
-	        convexTransform.setOrigin(convexPosFrom);
-	        convexTransTo.setOrigin(convexPosTo);
+	        var bt = Physics3D._bullet;
+	        var convexResultCall = this._btClosestConvexResultCallback;
+	        var convexPosFrom = PhysicsSimulation._btTempVector30;
+	        var convexPosTo = PhysicsSimulation._btTempVector31;
+	        var convexRotFrom = PhysicsSimulation._btTempQuaternion0;
+	        var convexRotTo = PhysicsSimulation._btTempQuaternion1;
+	        var convexTransform = PhysicsSimulation._btTempTransform0;
+	        var convexTransTo = PhysicsSimulation._btTempTransform1;
+	        var sweepShape = shape._btShape;
+	        bt.btVector3_setValue(convexPosFrom, -fromPosition.x, fromPosition.y, fromPosition.z);
+	        bt.btVector3_setValue(convexPosTo, -toPosition.x, toPosition.y, toPosition.z);
+	        bt.ConvexResultCallback_set_m_collisionFilterGroup(convexResultCall, collisonGroup);
+	        bt.ConvexResultCallback_set_m_collisionFilterMask(convexResultCall, collisionMask);
+	        bt.btTransform_setOrigin(convexTransform, convexPosFrom);
+	        bt.btTransform_setOrigin(convexTransTo, convexPosTo);
 	        if (fromRotation) {
-	            convexRotFrom.setValue(-fromRotation.x, fromRotation.y, fromRotation.z, -fromRotation.w);
-	            convexTransform.setRotation(convexRotFrom);
+	            bt.btQuaternion_setValue(convexRotFrom, -fromRotation.x, fromRotation.y, fromRotation.z, -fromRotation.w);
+	            bt.btTransform_setRotation(convexTransform, convexRotFrom);
 	        }
 	        else {
-	            convexTransform.setRotation(this._nativeDefaultQuaternion);
+	            bt.btTransform_setRotation(convexTransform, this._btDefaultQuaternion);
 	        }
 	        if (toRotation) {
-	            convexRotTo.setValue(-toRotation.x, toRotation.y, toRotation.z, -toRotation.w);
-	            convexTransTo.setRotation(convexRotTo);
+	            bt.btQuaternion_setValue(convexRotTo, -toRotation.x, toRotation.y, toRotation.z, -toRotation.w);
+	            bt.btTransform_setRotation(convexTransTo, convexRotTo);
 	        }
 	        else {
-	            convexTransTo.setRotation(this._nativeDefaultQuaternion);
+	            bt.btTransform_setRotation(convexTransTo, this._btDefaultQuaternion);
 	        }
-	        convexResultCall.set_m_hitCollisionObject(null);
-	        convexResultCall.set_m_closestHitFraction(1);
-	        this._nativeCollisionWorld.convexSweepTest(sweepShape, convexTransform, convexTransTo, convexResultCall, allowedCcdPenetration);
-	        if (convexResultCall.hasHit()) {
+	        bt.ClosestConvexResultCallback_set_m_hitCollisionObject(convexResultCall, null);
+	        bt.ConvexResultCallback_set_m_closestHitFraction(convexResultCall, 1);
+	        bt.btCollisionWorld_convexSweepTest(this._btCollisionWorld, sweepShape, convexTransform, convexTransTo, convexResultCall, allowedCcdPenetration);
+	        if (bt.ConvexResultCallback_hasHit(convexResultCall)) {
 	            if (out) {
 	                out.succeeded = true;
-	                out.collider = PhysicsComponent._physicObjectsMap[convexResultCall.get_m_hitCollisionObject().getUserIndex()];
-	                out.hitFraction = convexResultCall.get_m_closestHitFraction();
-	                var nativePoint = convexResultCall.get_m_hitPointWorld();
-	                var nativeNormal = convexResultCall.get_m_hitNormalWorld();
+	                out.collider = PhysicsComponent._physicObjectsMap[bt.btCollisionObject_getUserIndex(bt.ClosestConvexResultCallback_get_m_hitCollisionObject(convexResultCall))];
+	                out.hitFraction = bt.ConvexResultCallback_get_m_closestHitFraction(convexResultCall);
+	                var btPoint = bt.ClosestConvexResultCallback_get_m_hitPointWorld(convexResultCall);
+	                var btNormal = bt.ClosestConvexResultCallback_get_m_hitNormalWorld(convexResultCall);
 	                var point = out.point;
 	                var normal = out.normal;
-	                point.x = -nativePoint.x();
-	                point.y = nativePoint.y();
-	                point.z = nativePoint.z();
-	                normal.x = -nativeNormal.x();
-	                normal.y = nativeNormal.y();
-	                normal.z = nativeNormal.z();
+	                point.x = -bt.btVector3_x(btPoint);
+	                point.y = bt.btVector3_y(btPoint);
+	                point.z = bt.btVector3_z(btPoint);
+	                normal.x = -bt.btVector3_x(btNormal);
+	                normal.y = bt.btVector3_y(btNormal);
+	                normal.z = bt.btVector3_z(btNormal);
 	            }
 	            return true;
 	        }
@@ -22238,59 +22758,60 @@
 	        }
 	    }
 	    shapeCastAll(shape, fromPosition, toPosition, out, fromRotation = null, toRotation = null, collisonGroup = Physics3DUtils.COLLISIONFILTERGROUP_ALLFILTER, collisionMask = Physics3DUtils.COLLISIONFILTERGROUP_ALLFILTER, allowedCcdPenetration = 0.0) {
-	        var convexResultCall = this._nativeAllConvexResultCallback;
-	        var convexPosFrom = PhysicsSimulation._nativeTempVector30;
-	        var convexPosTo = PhysicsSimulation._nativeTempVector31;
-	        var convexRotFrom = PhysicsSimulation._nativeTempQuaternion0;
-	        var convexRotTo = PhysicsSimulation._nativeTempQuaternion1;
-	        var convexTransform = PhysicsSimulation._nativeTempTransform0;
-	        var convexTransTo = PhysicsSimulation._nativeTempTransform1;
-	        var sweepShape = shape._nativeShape;
+	        var bt = Physics3D._bullet;
+	        var convexResultCall = this._btAllConvexResultCallback;
+	        var convexPosFrom = PhysicsSimulation._btTempVector30;
+	        var convexPosTo = PhysicsSimulation._btTempVector31;
+	        var convexRotFrom = PhysicsSimulation._btTempQuaternion0;
+	        var convexRotTo = PhysicsSimulation._btTempQuaternion1;
+	        var convexTransform = PhysicsSimulation._btTempTransform0;
+	        var convexTransTo = PhysicsSimulation._btTempTransform1;
+	        var sweepShape = shape._btShape;
 	        out.length = 0;
-	        convexPosFrom.setValue(-fromPosition.x, fromPosition.y, fromPosition.z);
-	        convexPosTo.setValue(-toPosition.x, toPosition.y, toPosition.z);
-	        convexResultCall.set_m_collisionFilterGroup(collisonGroup);
-	        convexResultCall.set_m_collisionFilterMask(collisionMask);
-	        convexTransform.setOrigin(convexPosFrom);
-	        convexTransTo.setOrigin(convexPosTo);
+	        bt.btVector3_setValue(convexPosFrom, -fromPosition.x, fromPosition.y, fromPosition.z);
+	        bt.btVector3_setValue(convexPosTo, -toPosition.x, toPosition.y, toPosition.z);
+	        bt.ConvexResultCallback_set_m_collisionFilterGroup(convexResultCall, collisonGroup);
+	        bt.ConvexResultCallback_set_m_collisionFilterMask(convexResultCall, collisionMask);
+	        bt.btTransform_setOrigin(convexTransform, convexPosFrom);
+	        bt.btTransform_setOrigin(convexTransTo, convexPosTo);
 	        if (fromRotation) {
-	            convexRotFrom.setValue(-fromRotation.x, fromRotation.y, fromRotation.z, -fromRotation.w);
-	            convexTransform.setRotation(convexRotFrom);
+	            bt.btQuaternion_setValue(convexRotFrom, -fromRotation.x, fromRotation.y, fromRotation.z, -fromRotation.w);
+	            bt.btTransform_setRotation(convexTransform, convexRotFrom);
 	        }
 	        else {
-	            convexTransform.setRotation(this._nativeDefaultQuaternion);
+	            bt.btTransform_setRotation(convexTransform, this._btDefaultQuaternion);
 	        }
 	        if (toRotation) {
-	            convexRotTo.setValue(-toRotation.x, toRotation.y, toRotation.z, -toRotation.w);
-	            convexTransTo.setRotation(convexRotTo);
+	            bt.btQuaternion_setValue(convexRotTo, -toRotation.x, toRotation.y, toRotation.z, -toRotation.w);
+	            bt.btTransform_setRotation(convexTransTo, convexRotTo);
 	        }
 	        else {
-	            convexTransTo.setRotation(this._nativeDefaultQuaternion);
+	            bt.btTransform_setRotation(convexTransTo, this._btDefaultQuaternion);
 	        }
-	        var collisionObjects = convexResultCall.get_m_collisionObjects();
-	        collisionObjects.clear();
-	        this._nativeCollisionWorld.convexSweepTest(sweepShape, convexTransform, convexTransTo, convexResultCall, allowedCcdPenetration);
-	        var count = collisionObjects.size();
+	        var collisionObjects = bt.AllConvexResultCallback_get_m_collisionObjects(convexResultCall);
+	        bt.tBtCollisionObjectArray_clear(collisionObjects);
+	        bt.btCollisionWorld_convexSweepTest(this._btCollisionWorld, sweepShape, convexTransform, convexTransTo, convexResultCall, allowedCcdPenetration);
+	        var count = bt.tBtCollisionObjectArray_size(collisionObjects);
 	        if (count > 0) {
-	            var nativePoints = convexResultCall.get_m_hitPointWorld();
-	            var nativeNormals = convexResultCall.get_m_hitNormalWorld();
-	            var nativeFractions = convexResultCall.get_m_hitFractions();
+	            var btPoints = bt.AllConvexResultCallback_get_m_hitPointWorld(convexResultCall);
+	            var btNormals = bt.AllConvexResultCallback_get_m_hitNormalWorld(convexResultCall);
+	            var btFractions = bt.AllConvexResultCallback_get_m_hitFractions(convexResultCall);
 	            for (var i = 0; i < count; i++) {
 	                var hitResult = this._collisionsUtils.getHitResult();
 	                out.push(hitResult);
 	                hitResult.succeeded = true;
-	                hitResult.collider = PhysicsComponent._physicObjectsMap[collisionObjects.at(i).getUserIndex()];
-	                hitResult.hitFraction = nativeFractions.at(i);
-	                var nativePoint = nativePoints.at(i);
+	                hitResult.collider = PhysicsComponent._physicObjectsMap[bt.btCollisionObject_getUserIndex(bt.tBtCollisionObjectArray_at(collisionObjects, i))];
+	                hitResult.hitFraction = bt.tScalarArray_at(btFractions, i);
+	                var btPoint = bt.tVector3Array_at(btPoints, i);
 	                var point = hitResult.point;
-	                point.x = -nativePoint.x();
-	                point.y = nativePoint.y();
-	                point.z = nativePoint.z();
-	                var nativeNormal = nativeNormals.at(i);
+	                point.x = -bt.btVector3_x(btPoint);
+	                point.y = bt.btVector3_y(btPoint);
+	                point.z = bt.btVector3_z(btPoint);
+	                var btNormal = bt.tVector3Array_at(btNormals, i);
 	                var normal = hitResult.normal;
-	                normal.x = -nativeNormal.x();
-	                normal.y = nativeNormal.y();
-	                normal.z = nativeNormal.z();
+	                normal.x = -bt.btVector3_x(btNormal);
+	                normal.y = bt.btVector3_y(btNormal);
+	                normal.z = bt.btVector3_z(btNormal);
 	            }
 	            return true;
 	        }
@@ -22299,15 +22820,13 @@
 	        }
 	    }
 	    addConstraint(constraint, disableCollisionsBetweenLinkedBodies = false) {
-	        if (!this._nativeDiscreteDynamicsWorld)
+	        if (!this._btDiscreteDynamicsWorld)
 	            throw "Cannot perform this action when the physics engine is set to CollisionsOnly";
-	        this._nativeDiscreteDynamicsWorld.addConstraint(constraint._nativeConstraint, disableCollisionsBetweenLinkedBodies);
 	        constraint._simulation = this;
 	    }
 	    removeConstraint(constraint) {
-	        if (!this._nativeDiscreteDynamicsWorld)
+	        if (!this._btDiscreteDynamicsWorld)
 	            throw "Cannot perform this action when the physics engine is set to CollisionsOnly";
-	        this._nativeDiscreteDynamicsWorld.removeConstraint(constraint._nativeConstraint);
 	    }
 	    _updatePhysicsTransformFromRender() {
 	        var elements = this._physicsUpdateList.elements;
@@ -22321,7 +22840,7 @@
 	    _updateCharacters() {
 	        for (var i = 0, n = this._characters.length; i < n; i++) {
 	            var character = this._characters[i];
-	            character._updateTransformComponent(character._nativeColliderObject.getWorldTransform());
+	            character._updateTransformComponent(Physics3D._bullet.btCollisionObject_getWorldTransform(character._btColliderObject));
 	        }
 	    }
 	    _updateCollisions() {
@@ -22331,20 +22850,21 @@
 	        this._currentFrameCollisions.length = 0;
 	        this._previousFrameCollisions = previous;
 	        var loopCount = Laya.Stat.loopCount;
-	        var numManifolds = this._nativeDispatcher.getNumManifolds();
+	        var bt = Physics3D._bullet;
+	        var numManifolds = bt.btDispatcher_getNumManifolds(this._btDispatcher);
 	        for (var i = 0; i < numManifolds; i++) {
-	            var contactManifold = this._nativeDispatcher.getManifoldByIndexInternal(i);
-	            var componentA = PhysicsComponent._physicObjectsMap[contactManifold.getBody0().getUserIndex()];
-	            var componentB = PhysicsComponent._physicObjectsMap[contactManifold.getBody1().getUserIndex()];
+	            var contactManifold = bt.btDispatcher_getManifoldByIndexInternal(this._btDispatcher, i);
+	            var componentA = PhysicsComponent._physicObjectsMap[bt.btCollisionObject_getUserIndex(bt.btPersistentManifold_getBody0(contactManifold))];
+	            var componentB = PhysicsComponent._physicObjectsMap[bt.btCollisionObject_getUserIndex(bt.btPersistentManifold_getBody1(contactManifold))];
 	            var collision = null;
 	            var isFirstCollision;
 	            var contacts = null;
 	            var isTrigger = componentA.isTrigger || componentB.isTrigger;
 	            if (isTrigger && (componentA.owner._needProcessTriggers || componentB.owner._needProcessTriggers)) {
-	                var numContacts = contactManifold.getNumContacts();
+	                var numContacts = bt.btPersistentManifold_getNumContacts(contactManifold);
 	                for (var j = 0; j < numContacts; j++) {
-	                    var pt = contactManifold.getContactPoint(j);
-	                    var distance = pt.getDistance();
+	                    var pt = bt.btPersistentManifold_getContactPoint(contactManifold, j);
+	                    var distance = bt.btManifoldPoint_getDistance(pt);
 	                    if (distance <= 0) {
 	                        collision = this._collisionsUtils.getCollision(componentA, componentB);
 	                        contacts = collision.contacts;
@@ -22359,30 +22879,30 @@
 	            }
 	            else if (componentA.owner._needProcessCollisions || componentB.owner._needProcessCollisions) {
 	                if (componentA._enableProcessCollisions || componentB._enableProcessCollisions) {
-	                    numContacts = contactManifold.getNumContacts();
+	                    numContacts = bt.btPersistentManifold_getNumContacts(contactManifold);
 	                    for (j = 0; j < numContacts; j++) {
-	                        pt = contactManifold.getContactPoint(j);
-	                        distance = pt.getDistance();
+	                        pt = bt.btPersistentManifold_getContactPoint(contactManifold, j);
+	                        distance = bt.btManifoldPoint_getDistance(pt);
 	                        if (distance <= 0) {
 	                            var contactPoint = this._collisionsUtils.getContactPoints();
 	                            contactPoint.colliderA = componentA;
 	                            contactPoint.colliderB = componentB;
 	                            contactPoint.distance = distance;
-	                            var nativeNormal = pt.get_m_normalWorldOnB();
+	                            var btNormal = bt.btManifoldPoint_get_m_normalWorldOnB(pt);
 	                            var normal = contactPoint.normal;
-	                            normal.x = -nativeNormal.x();
-	                            normal.y = nativeNormal.y();
-	                            normal.z = nativeNormal.z();
-	                            var nativePostionA = pt.get_m_positionWorldOnA();
+	                            normal.x = -bt.btVector3_x(btNormal);
+	                            normal.y = bt.btVector3_y(btNormal);
+	                            normal.z = bt.btVector3_z(btNormal);
+	                            var btPostionA = bt.btManifoldPoint_get_m_positionWorldOnA(pt);
 	                            var positionOnA = contactPoint.positionOnA;
-	                            positionOnA.x = -nativePostionA.x();
-	                            positionOnA.y = nativePostionA.y();
-	                            positionOnA.z = nativePostionA.z();
-	                            var nativePostionB = pt.get_m_positionWorldOnB();
+	                            positionOnA.x = -bt.btVector3_x(btPostionA);
+	                            positionOnA.y = bt.btVector3_y(btPostionA);
+	                            positionOnA.z = bt.btVector3_z(btPostionA);
+	                            var btPostionB = bt.btManifoldPoint_get_m_positionWorldOnB(pt);
 	                            var positionOnB = contactPoint.positionOnB;
-	                            positionOnB.x = -nativePostionB.x();
-	                            positionOnB.y = nativePostionB.y();
-	                            positionOnB.z = nativePostionB.z();
+	                            positionOnB.x = -bt.btVector3_x(btPostionB);
+	                            positionOnB.y = bt.btVector3_y(btPostionB);
+	                            positionOnB.z = bt.btVector3_z(btPostionB);
 	                            if (!collision) {
 	                                collision = this._collisionsUtils.getCollision(componentA, componentB);
 	                                contacts = collision.contacts;
@@ -22536,9 +23056,9 @@
 	        }
 	    }
 	    clearForces() {
-	        if (!this._nativeDiscreteDynamicsWorld)
+	        if (!this._btDiscreteDynamicsWorld)
 	            throw "Cannot perform this action when the physics engine is set to CollisionsOnly";
-	        this._nativeDiscreteDynamicsWorld.clearForces();
+	        Physics3D._bullet.btDiscreteDynamicsWorld_clearForces(this._btDiscreteDynamicsWorld);
 	    }
 	}
 	PhysicsSimulation.PHYSICSENGINEFLAGS_NONE = 0x0;
@@ -22595,7 +23115,7 @@
 	        canvas.removeEventListener("touchmove", this._pushEventList, true);
 	        canvas.removeEventListener("touchcancel", this._pushEventList, true);
 	        this._eventList.length = 0;
-	        this._touches.length = 0;
+	        this._touches.clear();
 	    }
 	    touchCount() {
 	        return this._touches.length;
@@ -22740,7 +23260,7 @@
 	        }
 	    }
 	    _update() {
-	        var enablePhysics = Physics3D._enbalePhysics && !PhysicsSimulation.disableSimulation;
+	        var enablePhysics = Physics3D._enablePhysics && !PhysicsSimulation.disableSimulation;
 	        var i, n, j, m;
 	        n = this._eventList.length;
 	        var cameras = this._scene._cameraPool;
@@ -22830,6 +23350,10 @@
 	}
 
 	class VertexPositionTexture0 {
+	    constructor(position, textureCoordinate0) {
+	        this._position = position;
+	        this._textureCoordinate0 = textureCoordinate0;
+	    }
 	    static get vertexDeclaration() {
 	        return VertexPositionTexture0._vertexDeclaration;
 	    }
@@ -22845,10 +23369,6 @@
 	    }
 	    get vertexDeclaration() {
 	        return VertexPositionTexture0._vertexDeclaration;
-	    }
-	    constructor(position, textureCoordinate0) {
-	        this._position = position;
-	        this._textureCoordinate0 = textureCoordinate0;
 	    }
 	}
 
@@ -22894,7 +23414,7 @@
 	        }
 	        this._vertexBuffer = new VertexBuffer3D(vertices.length * 4, gl.STATIC_DRAW, false);
 	        this._vertexBuffer.vertexDeclaration = vertexDeclaration;
-	        this._indexBuffer = new IndexBuffer3D(IndexBuffer3D.INDEXTYPE_USHORT, indices.length, gl.STATIC_DRAW, false);
+	        this._indexBuffer = new IndexBuffer3D(exports.IndexFormat.UInt16, indices.length, gl.STATIC_DRAW, false);
 	        this._vertexBuffer.setData(vertices.buffer);
 	        this._indexBuffer.setData(indices);
 	        var bufferState = new BufferState();
@@ -23206,6 +23726,12 @@
 	}
 
 	class PixelLineSprite3D extends RenderableSprite3D {
+	    constructor(maxCount = 2, name = null) {
+	        super(name);
+	        this._geometryFilter = new PixelLineFilter(this, maxCount);
+	        this._render = new PixelLineRenderer(this);
+	        this._changeRenderObjects(this._render, 0, PixelLineMaterial.defaultMaterial);
+	    }
 	    get maxLineCount() {
 	        return this._geometryFilter._maxLineCount;
 	    }
@@ -23224,12 +23750,6 @@
 	    }
 	    get pixelLineRenderer() {
 	        return this._render;
-	    }
-	    constructor(maxCount = 2, name = null) {
-	        super(name);
-	        this._geometryFilter = new PixelLineFilter(this, maxCount);
-	        this._render = new PixelLineRenderer(this);
-	        this._changeRenderObjects(this._render, 0, PixelLineMaterial.defaultMaterial);
 	    }
 	    _changeRenderObjects(sender, index, material) {
 	        var renderObjects = this._render._renderElements;
@@ -23334,10 +23854,10 @@
 	                this._quickSort(index, right);
 	        }
 	    }
-	    _render(context, isTarget) {
+	    _render(context) {
 	        var elements = this.elements.elements;
 	        for (var i = 0, n = this.elements.length; i < n; i++)
-	            elements[i]._render(context, isTarget);
+	            elements[i]._render(context);
 	    }
 	    clear() {
 	        this.elements.length = 0;
@@ -23605,7 +24125,7 @@
 	                return false;
 	        }
 	    }
-	    _getCollidingWithFrustum(context, frustum, testVisible, camPos, customShader, replacementTag) {
+	    _getCollidingWithFrustum(context, frustum, testVisible, camPos, customShader, replacementTag, isShadowCasterCull) {
 	        if (testVisible) {
 	            var type = frustum.containsBoundBox(this._bounds);
 	            Laya.Stat.octreeNodeCulling++;
@@ -23618,7 +24138,12 @@
 	        var scene = context.scene;
 	        for (var i = 0, n = this._objects.length; i < n; i++) {
 	            var render = this._objects[i];
-	            if (camera._isLayerVisible(render._owner.layer) && render._enable) {
+	            var canPass;
+	            if (isShadowCasterCull)
+	                canPass = render._castShadow && render._enable;
+	            else
+	                canPass = camera._isLayerVisible(render._owner._layer) && render._enable;
+	            if (canPass) {
 	                if (testVisible) {
 	                    Laya.Stat.frustumCulling++;
 	                    if (!render._needRender(frustum, context))
@@ -23635,7 +24160,7 @@
 	        if (this._children != null) {
 	            for (i = 0; i < 8; i++) {
 	                var child = this._children[i];
-	                child && child._getCollidingWithFrustum(context, frustum, testVisible, camPos, customShader, replacementTag);
+	                child && child._getCollidingWithFrustum(context, frustum, testVisible, camPos, customShader, replacementTag, isShadowCasterCull);
 	            }
 	        }
 	    }
@@ -23788,10 +24313,10 @@
 	            }
 	        }
 	    }
-	    getCollidingWithFrustum(context, customShader, replacementTag) {
+	    getCollidingWithFrustum(context, customShader, replacementTag, isShadowCasterCull) {
 	        var cameraPos = context.camera.transform.position;
 	        var boundFrustum = context.camera.boundFrustum;
-	        this._getCollidingWithFrustum(context, boundFrustum, true, cameraPos, customShader, replacementTag);
+	        this._getCollidingWithFrustum(context, boundFrustum, true, cameraPos, customShader, replacementTag, isShadowCasterCull);
 	    }
 	    isCollidingWithBoundBox(checkBound) {
 	        if (!(CollisionUtils.intersectsBoxAndBox(this._bounds, checkBound)))
@@ -24026,8 +24551,8 @@
 	    getCollidingWithRay(ray, result, maxDistance = Number.MAX_VALUE) {
 	        this._rootNode.getCollidingWithRay(ray, result, maxDistance);
 	    }
-	    getCollidingWithFrustum(context, shader, replacementTag) {
-	        this._rootNode.getCollidingWithFrustum(context, shader, replacementTag);
+	    getCollidingWithFrustum(context, shader, replacementTag, isShadowCasterCull) {
+	        this._rootNode.getCollidingWithFrustum(context, shader, replacementTag, isShadowCasterCull);
 	    }
 	    getMaxBounds() {
 	        return this._rootNode.getBound();
@@ -24065,13 +24590,12 @@
 	        this._scriptPool = new Array();
 	        this._tempScriptPool = new Array();
 	        this._needClearScriptPool = false;
-	        this._castShadowRenders = new CastShadowList();
 	        this.currentCreationLayer = Math.pow(2, 0);
 	        this.enableLight = true;
 	        this._key = new Laya.SubmitKey();
 	        this._time = 0;
 	        this._pickIdToSprite = new Object();
-	        if (Physics3D._enbalePhysics)
+	        if (Physics3D._enablePhysics)
 	            this._physicsSimulation = new PhysicsSimulation(Scene3D.physicsSettings);
 	        this._shaderValues = new ShaderData(null);
 	        this.parallelSplitShadowMaps = [];
@@ -24081,7 +24605,6 @@
 	        this.fogColor = new Vector3(0.7, 0.7, 0.7);
 	        this.ambientColor = new Vector3(0.212, 0.227, 0.259);
 	        this.reflectionIntensity = 1.0;
-	        (Laya.WebGL.shaderHighPrecision) && (this._shaderValues.addDefine(Shader3D.SHADERDEFINE_HIGHPRECISION));
 	        (Config3D._config._multiLighting) || (this._shaderValues.addDefine(Shader3D.SHADERDEFINE_LEGACYSINGALLIGHTING));
 	        if (Laya.Render.supportWebGLPlusCulling) {
 	            this._cullingBufferIndices = new Int32Array(1024);
@@ -24095,7 +24618,7 @@
 	        if (FrustumCulling.debugFrustumCulling) {
 	            this._debugTool = new PixelLineSprite3D();
 	            var lineMaterial = new PixelLineMaterial();
-	            lineMaterial.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	            lineMaterial.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	            lineMaterial.alphaTest = false;
 	            lineMaterial.depthWrite = false;
 	            lineMaterial.cull = RenderState.CULL_BACK;
@@ -24240,7 +24763,7 @@
 	        this._time += delta;
 	        this._shaderValues.setNumber(Scene3D.TIME, this._time);
 	        var simulation = this._physicsSimulation;
-	        if (Physics3D._enbalePhysics && !PhysicsSimulation.disableSimulation) {
+	        if (Physics3D._enablePhysics && !PhysicsSimulation.disableSimulation) {
 	            simulation._updatePhysicsTransformFromRender();
 	            PhysicsComponent._addUpdateList = false;
 	            simulation._simulate(delta);
@@ -24488,16 +25011,23 @@
 	        this._cameraPool.splice(this._cameraPool.indexOf(camera), 1);
 	    }
 	    _preCulling(context, camera, shader, replacementTag) {
-	        FrustumCulling.renderObjectCulling(camera, this, context, this._renders, shader, replacementTag);
+	        FrustumCulling.renderObjectCulling(camera, this, context, shader, replacementTag, false);
 	    }
 	    _clear(gl, state) {
 	        var viewport = state.viewport;
 	        var camera = state.camera;
-	        var renderTexture = camera._getInternalRenderTexture();
+	        var renderTex = camera._getRenderTexture();
+	        var vpX, vpY;
 	        var vpW = viewport.width;
 	        var vpH = viewport.height;
-	        var vpX = viewport.x;
-	        var vpY = camera._getCanvasHeight() - viewport.y - vpH;
+	        if (camera._needInternalRenderTexture()) {
+	            vpX = 0;
+	            vpY = 0;
+	        }
+	        else {
+	            vpX = viewport.x;
+	            vpY = camera._getCanvasHeight() - viewport.y - vpH;
+	        }
 	        gl.viewport(vpX, vpY, vpW, vpH);
 	        var flag;
 	        var clearFlag = camera.clearFlag;
@@ -24512,9 +25042,9 @@
 	                    gl.clearColor(clearColor.x, clearColor.y, clearColor.z, clearColor.w);
 	                else
 	                    gl.clearColor(0, 0, 0, 0);
-	                if (renderTexture) {
+	                if (renderTex) {
 	                    flag = gl.COLOR_BUFFER_BIT;
-	                    switch (renderTexture.depthStencilFormat) {
+	                    switch (renderTex.depthStencilFormat) {
 	                        case Laya.RenderTextureDepthFormat.DEPTH_16:
 	                            flag |= gl.DEPTH_BUFFER_BIT;
 	                            break;
@@ -24538,8 +25068,8 @@
 	            case BaseCamera.CLEARFLAG_DEPTHONLY:
 	                gl.enable(gl.SCISSOR_TEST);
 	                gl.scissor(vpX, vpY, vpW, vpH);
-	                if (renderTexture) {
-	                    switch (renderTexture.depthStencilFormat) {
+	                if (renderTex) {
+	                    switch (renderTex.depthStencilFormat) {
 	                        case Laya.RenderTextureDepthFormat.DEPTH_16:
 	                            flag = gl.DEPTH_BUFFER_BIT;
 	                            break;
@@ -24566,20 +25096,19 @@
 	    }
 	    _renderScene(context) {
 	        var camera = context.camera;
-	        var renderTar = camera._getInternalRenderTexture();
-	        renderTar ? this._opaqueQueue._render(context, true) : this._opaqueQueue._render(context, false);
+	        this._opaqueQueue._render(context);
 	        if (camera.clearFlag === BaseCamera.CLEARFLAG_SKY) {
 	            if (camera.skyRenderer._isAvailable())
 	                camera.skyRenderer._render(context);
 	            else if (this._skyRenderer._isAvailable())
 	                this._skyRenderer._render(context);
 	        }
-	        renderTar ? this._transparentQueue._render(context, true) : this._transparentQueue._render(context, false);
+	        this._transparentQueue._render(context);
 	        if (FrustumCulling.debugFrustumCulling) {
 	            var renderElements = this._debugTool._render._renderElements;
 	            for (var i = 0, n = renderElements.length; i < n; i++) {
 	                renderElements[i]._update(this, context, null, null);
-	                renderElements[i]._render(context, false);
+	                renderElements[i]._render(context);
 	            }
 	        }
 	    }
@@ -24669,18 +25198,6 @@
 	            }
 	        }
 	    }
-	    _addShadowCastRenderObject(render) {
-	        if (this._octree) ;
-	        else {
-	            this._castShadowRenders.add(render);
-	        }
-	    }
-	    _removeShadowCastRenderObject(render) {
-	        if (this._octree) ;
-	        else {
-	            this._castShadowRenders.remove(render);
-	        }
-	    }
 	    _getRenderQueue(index) {
 	        if (index <= 2500)
 	            return this._opaqueQueue;
@@ -24722,7 +25239,6 @@
 	        this._lightmaps = null;
 	        this._shaderValues = null;
 	        this._renders = null;
-	        this._castShadowRenders = null;
 	        this._cameraPool = null;
 	        this._octree = null;
 	        this.parallelSplitShadowMaps = null;
@@ -25180,7 +25696,7 @@
 	SkinnedMeshSprite3D._tempArray0 = [];
 	SkinnedMeshSprite3D.BONES = Shader3D.propertyNameToID("u_Bones");
 
-	class TrailMaterial extends BaseMaterial {
+	class TrailMaterial extends Material {
 	    constructor() {
 	        super();
 	        this.setShaderName("Trail");
@@ -25256,7 +25772,7 @@
 	    set renderMode(value) {
 	        switch (value) {
 	            case TrailMaterial.RENDERMODE_ADDTIVE:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	                this.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	                this.alphaTest = false;
 	                this.depthWrite = false;
 	                this.cull = RenderState.CULL_NONE;
@@ -25267,7 +25783,7 @@
 	                this._shaderValues.addDefine(TrailMaterial.SHADERDEFINE_ADDTIVEFOG);
 	                break;
 	            case TrailMaterial.RENDERMODE_ALPHABLENDED:
-	                this.renderQueue = BaseMaterial.RENDERQUEUE_TRANSPARENT;
+	                this.renderQueue = Material.RENDERQUEUE_TRANSPARENT;
 	                this.alphaTest = false;
 	                this.depthWrite = false;
 	                this.cull = RenderState.CULL_NONE;
@@ -25425,8 +25941,6 @@
 	})(exports.TrailAlignment || (exports.TrailAlignment = {}));
 
 	class VertexTrail {
-	    constructor() {
-	    }
 	    static get vertexDeclaration1() {
 	        return VertexTrail._vertexDeclaration1;
 	    }
@@ -25472,12 +25986,9 @@
 	        this._segementCount = this._increaseSegementCount;
 	        this._resizeData(this._segementCount, this._bufferState);
 	        var bounds = this._owner._owner.trailRenderer.bounds;
-	        var min = bounds.getMin();
-	        var max = bounds.getMax();
-	        min.setValue(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
-	        max.setValue(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
-	        bounds.setMin(min);
-	        bounds.setMax(max);
+	        var sprite3dPosition = this._owner._owner.transform.position;
+	        bounds.setMin(sprite3dPosition);
+	        bounds.setMax(sprite3dPosition);
 	        Laya.Render.supportWebGLPlusCulling && this._calculateBoundingBoxForNative();
 	    }
 	    _resizeData(segementCount, bufferState) {
@@ -25944,6 +26455,11 @@
 	}
 
 	class TrailSprite3D extends RenderableSprite3D {
+	    constructor(name = null) {
+	        super(name);
+	        this._render = new TrailRenderer(this);
+	        this._geometryFilter = new TrailFilter(this);
+	    }
 	    static __init__() {
 	    }
 	    get trailFilter() {
@@ -25951,11 +26467,6 @@
 	    }
 	    get trailRenderer() {
 	        return this._render;
-	    }
-	    constructor(name = null) {
-	        super(name);
-	        this._render = new TrailRenderer(this);
-	        this._geometryFilter = new TrailFilter(this);
 	    }
 	    _parse(data, spriteMap) {
 	        super._parse(data, spriteMap);
@@ -26015,6 +26526,7 @@
 	        destTrailFilter.minVertexDistance = this.trailFilter.minVertexDistance;
 	        destTrailFilter.widthMultiplier = this.trailFilter.widthMultiplier;
 	        destTrailFilter.textureMode = this.trailFilter.textureMode;
+	        destTrailFilter.alignment = this.trailFilter.alignment;
 	        var widthCurveData = this.trailFilter.widthCurve;
 	        var widthCurve = [];
 	        for (i = 0, j = widthCurveData.length; i < j; i++) {
@@ -26078,6 +26590,18 @@
 	VertexPositionTerrain.TERRAIN_TEXTURECOORDINATE0 = 2;
 	VertexPositionTerrain.TERRAIN_TEXTURECOORDINATE1 = 3;
 
+	class BulletInteractive {
+	}
+	BulletInteractive._interactive = {
+	    "getWorldTransform": (rigidBodyID, worldTransPointer) => {
+	    },
+	    "setWorldTransform": (rigidBodyID, worldTransPointer) => {
+	        var rigidBody = PhysicsComponent._physicObjectsMap[rigidBodyID];
+	        rigidBody._simulation._updatedRigidbodies++;
+	        rigidBody._updateTransformComponent(worldTransPointer);
+	    }
+	};
+
 	class CharacterController extends PhysicsComponent {
 	    constructor(stepheight = 0.1, upAxis = null, collisionGroup = Physics3DUtils.COLLISIONFILTERGROUP_DEFAULTFILTER, canCollideWith = Physics3DUtils.COLLISIONFILTERGROUP_ALLFILTER) {
 	        super(collisionGroup, canCollideWith);
@@ -26086,45 +26610,46 @@
 	        this._jumpSpeed = 10.0;
 	        this._fallSpeed = 55.0;
 	        this._gravity = new Vector3(0, -9.8 * 3, 0);
-	        this._nativeKinematicCharacter = null;
+	        this._btKinematicCharacter = null;
 	        this._stepHeight = stepheight;
 	        (upAxis) && (this._upAxis = upAxis);
 	    }
 	    static __init__() {
-	        CharacterController._nativeTempVector30 = new Physics3D._physics3D.btVector3(0, 0, 0);
+	        CharacterController._btTempVector30 = Physics3D._bullet.btVector3_create(0, 0, 0);
 	    }
 	    get fallSpeed() {
 	        return this._fallSpeed;
 	    }
 	    set fallSpeed(value) {
 	        this._fallSpeed = value;
-	        this._nativeKinematicCharacter.setFallSpeed(value);
+	        Physics3D._bullet.btKinematicCharacterController_setFallSpeed(this._btKinematicCharacter, value);
 	    }
 	    get jumpSpeed() {
 	        return this._jumpSpeed;
 	    }
 	    set jumpSpeed(value) {
 	        this._jumpSpeed = value;
-	        this._nativeKinematicCharacter.setJumpSpeed(value);
+	        Physics3D._bullet.btKinematicCharacterController_setJumpSpeed(this._btKinematicCharacter, value);
 	    }
 	    get gravity() {
 	        return this._gravity;
 	    }
 	    set gravity(value) {
 	        this._gravity = value;
-	        var nativeGravity = CharacterController._nativeTempVector30;
-	        nativeGravity.setValue(-value.x, value.y, value.z);
-	        this._nativeKinematicCharacter.setGravity(nativeGravity);
+	        var bt = Physics3D._bullet;
+	        var btGravity = CharacterController._btTempVector30;
+	        bt.btVector3_setValue(btGravity, -value.x, value.y, value.z);
+	        bt.btKinematicCharacterController_setGravity(this._btKinematicCharacter, btGravity);
 	    }
 	    get maxSlope() {
 	        return this._maxSlope;
 	    }
 	    set maxSlope(value) {
 	        this._maxSlope = value;
-	        this._nativeKinematicCharacter.setMaxSlope((value / 180) * Math.PI);
+	        Physics3D._bullet.btKinematicCharacterController_setMaxSlope(this._btKinematicCharacter, (value / 180) * Math.PI);
 	    }
 	    get isGrounded() {
-	        return this._nativeKinematicCharacter.onGround();
+	        return Physics3D._bullet.btKinematicCharacterController_onGround(this._btKinematicCharacter);
 	    }
 	    get stepHeight() {
 	        return this._stepHeight;
@@ -26141,12 +26666,12 @@
 	        this._constructCharacter();
 	    }
 	    _constructCharacter() {
-	        var physics3D = Physics3D._physics3D;
-	        if (this._nativeKinematicCharacter)
-	            physics3D.destroy(this._nativeKinematicCharacter);
-	        var nativeUpAxis = CharacterController._nativeTempVector30;
-	        nativeUpAxis.setValue(this._upAxis.x, this._upAxis.y, this._upAxis.z);
-	        this._nativeKinematicCharacter = new physics3D.btKinematicCharacterController(this._nativeColliderObject, this._colliderShape._nativeShape, this._stepHeight, nativeUpAxis);
+	        var bt = Physics3D._bullet;
+	        if (this._btKinematicCharacter)
+	            bt.btKinematicCharacterController_destroy(this._btKinematicCharacter);
+	        var btUpAxis = CharacterController._btTempVector30;
+	        bt.btVector3_setValue(btUpAxis, this._upAxis.x, this._upAxis.y, this._upAxis.z);
+	        this._btKinematicCharacter = bt.btKinematicCharacterController_create(this._btColliderObject, this._colliderShape._btShape, this._stepHeight, btUpAxis);
 	        this.fallSpeed = this._fallSpeed;
 	        this.maxSlope = this._maxSlope;
 	        this.jumpSpeed = this._jumpSpeed;
@@ -26157,11 +26682,11 @@
 	        this._constructCharacter();
 	    }
 	    _onAdded() {
-	        var physics3D = Physics3D._physics3D;
-	        var ghostObject = new physics3D.btPairCachingGhostObject();
-	        ghostObject.setUserIndex(this.id);
-	        ghostObject.setCollisionFlags(PhysicsComponent.COLLISIONFLAGS_CHARACTER_OBJECT);
-	        this._nativeColliderObject = ghostObject;
+	        var bt = Physics3D._bullet;
+	        var ghostObject = bt.btPairCachingGhostObject_create();
+	        bt.btCollisionObject_setUserIndex(ghostObject, this.id);
+	        bt.btCollisionObject_setCollisionFlags(ghostObject, PhysicsComponent.COLLISIONFLAGS_CHARACTER_OBJECT);
+	        this._btColliderObject = ghostObject;
 	        if (this._colliderShape)
 	            this._constructCharacter();
 	        super._onAdded();
@@ -26186,23 +26711,26 @@
 	        destCharacterController.gravity = this._gravity;
 	    }
 	    _onDestroy() {
-	        Physics3D._physics3D.destroy(this._nativeKinematicCharacter);
+	        Physics3D._bullet.btKinematicCharacterController_destroy(this._btKinematicCharacter);
 	        super._onDestroy();
-	        this._nativeKinematicCharacter = null;
+	        this._btKinematicCharacter = null;
 	    }
 	    move(movement) {
-	        var nativeMovement = CharacterController._nativeVector30;
-	        nativeMovement.setValue(-movement.x, movement.y, movement.z);
-	        this._nativeKinematicCharacter.setWalkDirection(nativeMovement);
+	        var btMovement = CharacterController._btVector30;
+	        var bt = Physics3D._bullet;
+	        bt.btVector3_setValue(btMovement, -movement.x, movement.y, movement.z);
+	        bt.btKinematicCharacterController_setWalkDirection(this._btKinematicCharacter, btMovement);
 	    }
 	    jump(velocity = null) {
+	        var bt = Physics3D._bullet;
+	        var btVelocity = CharacterController._btVector30;
 	        if (velocity) {
-	            var nativeVelocity = CharacterController._nativeVector30;
-	            Utils3D._convertToBulletVec3(velocity, nativeVelocity, true);
-	            this._nativeKinematicCharacter.jump(nativeVelocity);
+	            Utils3D._convertToBulletVec3(velocity, btVelocity, true);
+	            bt.btKinematicCharacterController_jump(this._btKinematicCharacter, btVelocity);
 	        }
 	        else {
-	            this._nativeKinematicCharacter.jump();
+	            bt.btVector3_setValue(btVelocity, 0, 0, 0);
+	            bt.btKinematicCharacterController_jump(this._btKinematicCharacter, btVelocity);
 	        }
 	    }
 	}
@@ -26220,15 +26748,16 @@
 	    }
 	    set isTrigger(value) {
 	        this._isTrigger = value;
-	        if (this._nativeColliderObject) {
-	            var flags = this._nativeColliderObject.getCollisionFlags();
+	        var bt = Physics3D._bullet;
+	        if (this._btColliderObject) {
+	            var flags = bt.btCollisionObject_getCollisionFlags(this._btColliderObject);
 	            if (value) {
 	                if ((flags & PhysicsComponent.COLLISIONFLAGS_NO_CONTACT_RESPONSE) === 0)
-	                    this._nativeColliderObject.setCollisionFlags(flags | PhysicsComponent.COLLISIONFLAGS_NO_CONTACT_RESPONSE);
+	                    bt.btCollisionObject_setCollisionFlags(this._btColliderObject, flags | PhysicsComponent.COLLISIONFLAGS_NO_CONTACT_RESPONSE);
 	            }
 	            else {
 	                if ((flags & PhysicsComponent.COLLISIONFLAGS_NO_CONTACT_RESPONSE) !== 0)
-	                    this._nativeColliderObject.setCollisionFlags(flags ^ PhysicsComponent.COLLISIONFLAGS_NO_CONTACT_RESPONSE);
+	                    bt.btCollisionObject_setCollisionFlags(this._btColliderObject, flags ^ PhysicsComponent.COLLISIONFLAGS_NO_CONTACT_RESPONSE);
 	            }
 	        }
 	    }
@@ -26270,11 +26799,11 @@
 	        this._parseShape(data.shapes);
 	    }
 	    _onAdded() {
-	        var physics3D = Physics3D._physics3D;
-	        var btColObj = new physics3D.btCollisionObject();
-	        btColObj.setUserIndex(this.id);
-	        btColObj.forceActivationState(PhysicsComponent.ACTIVATIONSTATE_DISABLE_SIMULATION);
-	        var flags = btColObj.getCollisionFlags();
+	        var bt = Physics3D._bullet;
+	        var btColObj = bt.btCollisionObject_create();
+	        bt.btCollisionObject_setUserIndex(btColObj, this.id);
+	        bt.btCollisionObject_forceActivationState(btColObj, PhysicsComponent.ACTIVATIONSTATE_DISABLE_SIMULATION);
+	        var flags = bt.btCollisionObject_getCollisionFlags(btColObj);
 	        if (this.owner.isStatic) {
 	            if ((flags & PhysicsComponent.COLLISIONFLAGS_KINEMATIC_OBJECT) > 0)
 	                flags = flags ^ PhysicsComponent.COLLISIONFLAGS_KINEMATIC_OBJECT;
@@ -26285,8 +26814,8 @@
 	                flags = flags ^ PhysicsComponent.COLLISIONFLAGS_STATIC_OBJECT;
 	            flags = flags | PhysicsComponent.COLLISIONFLAGS_KINEMATIC_OBJECT;
 	        }
-	        btColObj.setCollisionFlags(flags);
-	        this._nativeColliderObject = btColObj;
+	        bt.btCollisionObject_setCollisionFlags(btColObj, flags);
+	        this._btColliderObject = btColObj;
 	        super._onAdded();
 	    }
 	}
@@ -26309,13 +26838,14 @@
 	        this._detectCollisions = true;
 	    }
 	    static __init__() {
-	        Rigidbody3D._nativeTempVector30 = new Physics3D._physics3D.btVector3(0, 0, 0);
-	        Rigidbody3D._nativeTempVector31 = new Physics3D._physics3D.btVector3(0, 0, 0);
-	        Rigidbody3D._nativeVector3Zero = new Physics3D._physics3D.btVector3(0, 0, 0);
-	        Rigidbody3D._nativeInertia = new Physics3D._physics3D.btVector3(0, 0, 0);
-	        Rigidbody3D._nativeImpulse = new Physics3D._physics3D.btVector3(0, 0, 0);
-	        Rigidbody3D._nativeImpulseOffset = new Physics3D._physics3D.btVector3(0, 0, 0);
-	        Rigidbody3D._nativeGravity = new Physics3D._physics3D.btVector3(0, 0, 0);
+	        var bt = Physics3D._bullet;
+	        Rigidbody3D._btTempVector30 = bt.btVector3_create(0, 0, 0);
+	        Rigidbody3D._btTempVector31 = bt.btVector3_create(0, 0, 0);
+	        Rigidbody3D._btVector3Zero = bt.btVector3_create(0, 0, 0);
+	        Rigidbody3D._btInertia = bt.btVector3_create(0, 0, 0);
+	        Rigidbody3D._btImpulse = bt.btVector3_create(0, 0, 0);
+	        Rigidbody3D._btImpulseOffset = bt.btVector3_create(0, 0, 0);
+	        Rigidbody3D._btGravity = bt.btVector3_create(0, 0, 0);
 	    }
 	    get mass() {
 	        return this._mass;
@@ -26330,30 +26860,31 @@
 	    }
 	    set isKinematic(value) {
 	        this._isKinematic = value;
+	        var bt = Physics3D._bullet;
 	        var canInSimulation = !!(this._simulation && this._enabled && this._colliderShape);
 	        canInSimulation && this._removeFromSimulation();
-	        var natColObj = this._nativeColliderObject;
-	        var flags = natColObj.getCollisionFlags();
+	        var natColObj = this._btColliderObject;
+	        var flags = bt.btCollisionObject_getCollisionFlags(natColObj);
 	        if (value) {
 	            flags = flags | PhysicsComponent.COLLISIONFLAGS_KINEMATIC_OBJECT;
-	            natColObj.setCollisionFlags(flags);
-	            this._nativeColliderObject.forceActivationState(PhysicsComponent.ACTIVATIONSTATE_DISABLE_DEACTIVATION);
+	            bt.btCollisionObject_setCollisionFlags(natColObj, flags);
+	            bt.btCollisionObject_forceActivationState(this._btColliderObject, PhysicsComponent.ACTIVATIONSTATE_DISABLE_DEACTIVATION);
 	            this._enableProcessCollisions = false;
 	            this._updateMass(0);
 	        }
 	        else {
 	            if ((flags & PhysicsComponent.COLLISIONFLAGS_KINEMATIC_OBJECT) > 0)
 	                flags = flags ^ PhysicsComponent.COLLISIONFLAGS_KINEMATIC_OBJECT;
-	            natColObj.setCollisionFlags(flags);
-	            this._nativeColliderObject.setActivationState(PhysicsComponent.ACTIVATIONSTATE_ACTIVE_TAG);
+	            bt.btCollisionObject_setCollisionFlags(natColObj, flags);
+	            bt.btCollisionObject_setActivationState(this._btColliderObject, PhysicsComponent.ACTIVATIONSTATE_ACTIVE_TAG);
 	            this._enableProcessCollisions = true;
 	            this._updateMass(this._mass);
 	        }
-	        var nativeZero = Rigidbody3D._nativeVector3Zero;
-	        natColObj.setInterpolationLinearVelocity(nativeZero);
-	        natColObj.setLinearVelocity(nativeZero);
-	        natColObj.setInterpolationAngularVelocity(nativeZero);
-	        natColObj.setAngularVelocity(nativeZero);
+	        var btZero = Rigidbody3D._btVector3Zero;
+	        bt.btCollisionObject_setInterpolationLinearVelocity(natColObj, btZero);
+	        bt.btRigidBody_setLinearVelocity(natColObj, btZero);
+	        bt.btCollisionObject_setInterpolationAngularVelocity(natColObj, btZero);
+	        bt.btRigidBody_setAngularVelocity(natColObj, btZero);
 	        canInSimulation && this._addToSimulation();
 	    }
 	    get linearDamping() {
@@ -26361,31 +26892,32 @@
 	    }
 	    set linearDamping(value) {
 	        this._linearDamping = value;
-	        if (this._nativeColliderObject)
-	            this._nativeColliderObject.setDamping(value, this._angularDamping);
+	        if (this._btColliderObject)
+	            Physics3D._bullet.btRigidBody_setDamping(this._btColliderObject, value, this._angularDamping);
 	    }
 	    get angularDamping() {
 	        return this._angularDamping;
 	    }
 	    set angularDamping(value) {
 	        this._angularDamping = value;
-	        if (this._nativeColliderObject)
-	            this._nativeColliderObject.setDamping(this._linearDamping, value);
+	        if (this._btColliderObject)
+	            Physics3D._bullet.btRigidBody_setDamping(this._btColliderObject, this._linearDamping, value);
 	    }
 	    get overrideGravity() {
 	        return this._overrideGravity;
 	    }
 	    set overrideGravity(value) {
 	        this._overrideGravity = value;
-	        if (this._nativeColliderObject) {
-	            var flag = this._nativeColliderObject.getFlags();
+	        var bt = Physics3D._bullet;
+	        if (this._btColliderObject) {
+	            var flag = bt.btRigidBody_getFlags(this._btColliderObject);
 	            if (value) {
 	                if ((flag & Rigidbody3D._BT_DISABLE_WORLD_GRAVITY) === 0)
-	                    this._nativeColliderObject.setFlags(flag | Rigidbody3D._BT_DISABLE_WORLD_GRAVITY);
+	                    bt.btRigidBody_setFlags(this._btColliderObject, flag | Rigidbody3D._BT_DISABLE_WORLD_GRAVITY);
 	            }
 	            else {
 	                if ((flag & Rigidbody3D._BT_DISABLE_WORLD_GRAVITY) > 0)
-	                    this._nativeColliderObject.setFlags(flag ^ Rigidbody3D._BT_DISABLE_WORLD_GRAVITY);
+	                    bt.btRigidBody_setFlags(this._btColliderObject, flag ^ Rigidbody3D._BT_DISABLE_WORLD_GRAVITY);
 	            }
 	        }
 	    }
@@ -26394,75 +26926,76 @@
 	    }
 	    set gravity(value) {
 	        this._gravity = value;
-	        Rigidbody3D._nativeGravity.setValue(-value.x, value.y, value.z);
-	        this._nativeColliderObject.setGravity(Rigidbody3D._nativeGravity);
+	        var bt = Physics3D._bullet;
+	        bt.btVector3_setValue(Rigidbody3D._btGravity, -value.x, value.y, value.z);
+	        bt.btRigidBody_setGravity(this._btColliderObject, Rigidbody3D._btGravity);
 	    }
 	    get totalForce() {
-	        if (this._nativeColliderObject) {
-	            var nativeTotalForce = this._nativeColliderObject.getTotalForce();
-	            Utils3D._convertToLayaVec3(nativeTotalForce, this._totalForce, true);
+	        if (this._btColliderObject) {
+	            var btTotalForce = Physics3D._bullet.btRigidBody_getTotalForce(this._btColliderObject);
+	            Utils3D._convertToLayaVec3(btTotalForce, this._totalForce, true);
 	            return this._totalForce;
 	        }
 	        return null;
 	    }
 	    get linearFactor() {
-	        if (this._nativeColliderObject)
+	        if (this._btColliderObject)
 	            return this._linearFactor;
 	        return null;
 	    }
 	    set linearFactor(value) {
 	        this._linearFactor = value;
-	        if (this._nativeColliderObject) {
-	            var nativeValue = Rigidbody3D._nativeTempVector30;
-	            Utils3D._convertToBulletVec3(value, nativeValue, false);
-	            this._nativeColliderObject.setLinearFactor(nativeValue);
+	        if (this._btColliderObject) {
+	            var btValue = Rigidbody3D._btTempVector30;
+	            Utils3D._convertToBulletVec3(value, btValue, false);
+	            Physics3D._bullet.btRigidBody_setLinearFactor(this._btColliderObject, btValue);
 	        }
 	    }
 	    get linearVelocity() {
-	        if (this._nativeColliderObject)
-	            Utils3D._convertToLayaVec3(this._nativeColliderObject.getLinearVelocity(), this._linearVelocity, true);
+	        if (this._btColliderObject)
+	            Utils3D._convertToLayaVec3(Physics3D._bullet.btRigidBody_getLinearVelocity(this._btColliderObject), this._linearVelocity, true);
 	        return this._linearVelocity;
 	    }
 	    set linearVelocity(value) {
 	        this._linearVelocity = value;
-	        if (this._nativeColliderObject) {
-	            var nativeValue = Rigidbody3D._nativeTempVector30;
-	            Utils3D._convertToBulletVec3(value, nativeValue, true);
+	        if (this._btColliderObject) {
+	            var btValue = Rigidbody3D._btTempVector30;
+	            Utils3D._convertToBulletVec3(value, btValue, true);
 	            (this.isSleeping) && (this.wakeUp());
-	            this._nativeColliderObject.setLinearVelocity(nativeValue);
+	            Physics3D._bullet.btRigidBody_setLinearVelocity(this._btColliderObject, btValue);
 	        }
 	    }
 	    get angularFactor() {
-	        if (this._nativeColliderObject)
+	        if (this._btColliderObject)
 	            return this._angularFactor;
 	        return null;
 	    }
 	    set angularFactor(value) {
 	        this._angularFactor = value;
-	        if (this._nativeColliderObject) {
-	            var nativeValue = Rigidbody3D._nativeTempVector30;
-	            Utils3D._convertToBulletVec3(value, nativeValue, false);
-	            this._nativeColliderObject.setAngularFactor(nativeValue);
+	        if (this._btColliderObject) {
+	            var btValue = Rigidbody3D._btTempVector30;
+	            Utils3D._convertToBulletVec3(value, btValue, false);
+	            Physics3D._bullet.btRigidBody_setAngularFactor(this._btColliderObject, btValue);
 	        }
 	    }
 	    get angularVelocity() {
-	        if (this._nativeColliderObject)
-	            Utils3D._convertToLayaVec3(this._nativeColliderObject.getAngularVelocity(), this._angularVelocity, true);
+	        if (this._btColliderObject)
+	            Utils3D._convertToLayaVec3(Physics3D._bullet.btRigidBody_getAngularVelocity(this._btColliderObject), this._angularVelocity, true);
 	        return this._angularVelocity;
 	    }
 	    set angularVelocity(value) {
 	        this._angularVelocity = value;
-	        if (this._nativeColliderObject) {
-	            var nativeValue = Rigidbody3D._nativeTempVector30;
-	            Utils3D._convertToBulletVec3(value, nativeValue, true);
+	        if (this._btColliderObject) {
+	            var btValue = Rigidbody3D._btTempVector30;
+	            Utils3D._convertToBulletVec3(value, btValue, true);
 	            (this.isSleeping) && (this.wakeUp());
-	            this._nativeColliderObject.setAngularVelocity(nativeValue);
+	            Physics3D._bullet.btRigidBody_setAngularVelocity(this._btColliderObject, btValue);
 	        }
 	    }
 	    get totalTorque() {
-	        if (this._nativeColliderObject) {
-	            var nativeTotalTorque = this._nativeColliderObject.getTotalTorque();
-	            Utils3D._convertToLayaVec3(nativeTotalTorque, this._totalTorque, true);
+	        if (this._btColliderObject) {
+	            var btTotalTorque = Physics3D._bullet.btRigidBody_getTotalTorque(this._btColliderObject);
+	            Utils3D._convertToLayaVec3(btTotalTorque, this._totalTorque, true);
 	            return this._totalTorque;
 	        }
 	        return null;
@@ -26480,74 +27013,45 @@
 	        }
 	    }
 	    get isSleeping() {
-	        if (this._nativeColliderObject)
-	            return this._nativeColliderObject.getActivationState() === PhysicsComponent.ACTIVATIONSTATE_ISLAND_SLEEPING;
+	        if (this._btColliderObject)
+	            return Physics3D._bullet.btCollisionObject_getActivationState(this._btColliderObject) === PhysicsComponent.ACTIVATIONSTATE_ISLAND_SLEEPING;
 	        return false;
 	    }
 	    get sleepLinearVelocity() {
-	        return this._nativeColliderObject.getLinearSleepingThreshold();
+	        return Physics3D._bullet.btRigidBody_getLinearSleepingThreshold(this._btColliderObject);
 	    }
 	    set sleepLinearVelocity(value) {
-	        this._nativeColliderObject.setSleepingThresholds(value, this._nativeColliderObject.getAngularSleepingThreshold());
+	        var bt = Physics3D._bullet;
+	        bt.btRigidBody_setSleepingThresholds(this._btColliderObject, value, bt.btRigidBody_getAngularSleepingThreshold(this._btColliderObject));
 	    }
 	    get sleepAngularVelocity() {
-	        return this._nativeColliderObject.getAngularSleepingThreshold();
+	        return Physics3D._bullet.btRigidBody_getAngularSleepingThreshold(this._btColliderObject);
 	    }
 	    set sleepAngularVelocity(value) {
-	        this._nativeColliderObject.setSleepingThresholds(this._nativeColliderObject.getLinearSleepingThreshold(), value);
+	        var bt = Physics3D._bullet;
+	        bt.btRigidBody_setSleepingThresholds(this._btColliderObject, bt.btRigidBody_getLinearSleepingThreshold(this._btColliderObject), value);
 	    }
 	    _updateMass(mass) {
-	        if (this._nativeColliderObject && this._colliderShape) {
-	            this._colliderShape._nativeShape.calculateLocalInertia(mass, Rigidbody3D._nativeInertia);
-	            this._nativeColliderObject.setMassProps(mass, Rigidbody3D._nativeInertia);
-	            this._nativeColliderObject.updateInertiaTensor();
+	        if (this._btColliderObject && this._colliderShape) {
+	            var bt = Physics3D._bullet;
+	            bt.btCollisionShape_calculateLocalInertia(this._colliderShape._btShape, mass, Rigidbody3D._btInertia);
+	            bt.btRigidBody_setMassProps(this._btColliderObject, mass, Rigidbody3D._btInertia);
+	            bt.btRigidBody_updateInertiaTensor(this._btColliderObject);
 	        }
-	    }
-	    _delegateMotionStateGetWorldTransform(worldTransPointer) {
-	    }
-	    _delegateMotionStateSetWorldTransform(worldTransPointer) {
-	        var rigidBody = this._rigidbody;
-	        rigidBody._simulation._updatedRigidbodies++;
-	        var physics3D = Physics3D._physics3D;
-	        var worldTrans = physics3D.wrapPointer(worldTransPointer, physics3D.btTransform);
-	        rigidBody._updateTransformComponent(worldTrans);
-	    }
-	    _delegateMotionStateGetWorldTransformNative(ridgidBody3D, worldTransPointer) {
-	    }
-	    _delegateMotionStateSetWorldTransformNative(rigidBody3D, worldTransPointer) {
-	        var rigidBody = rigidBody3D;
-	        rigidBody._simulation._updatedRigidbodies++;
-	        var physics3D = Physics3D._physics3D;
-	        var worldTrans = physics3D.wrapPointer(worldTransPointer, physics3D.btTransform);
-	        rigidBody._updateTransformComponent(worldTrans);
 	    }
 	    _onScaleChange(scale) {
 	        super._onScaleChange(scale);
 	        this._updateMass(this._isKinematic ? 0 : this._mass);
 	    }
-	    _delegateMotionStateClear() {
-	        this._rigidbody = null;
-	    }
 	    _onAdded() {
-	        var physics3D = Physics3D._physics3D;
-	        var motionState = new physics3D.LayaMotionState();
-	        var isConchApp = (window.conch != null);
-	        if (isConchApp && physics3D.LayaMotionState.prototype.setRigidbody) {
-	            motionState.setRigidbody(this);
-	            motionState.setNativeGetWorldTransform(this._delegateMotionStateGetWorldTransformNative);
-	            motionState.setNativeSetWorldTransform(this._delegateMotionStateSetWorldTransformNative);
-	        }
-	        else {
-	            motionState.getWorldTransform = this._delegateMotionStateGetWorldTransform;
-	            motionState.setWorldTransform = this._delegateMotionStateSetWorldTransform;
-	        }
-	        motionState.clear = this._delegateMotionStateClear;
-	        motionState._rigidbody = this;
-	        this._nativeMotionState = motionState;
-	        var constructInfo = new physics3D.btRigidBodyConstructionInfo(0.0, motionState, null, Rigidbody3D._nativeVector3Zero);
-	        var btRigid = new physics3D.btRigidBody(constructInfo);
-	        btRigid.setUserIndex(this.id);
-	        this._nativeColliderObject = btRigid;
+	        var bt = Physics3D._bullet;
+	        var motionState = bt.layaMotionState_create();
+	        bt.layaMotionState_set_rigidBodyID(motionState, this._id);
+	        this._btLayaMotionState = motionState;
+	        var constructInfo = bt.btRigidBodyConstructionInfo_create(0.0, motionState, null, Rigidbody3D._btVector3Zero);
+	        var btRigid = bt.btRigidBody_create(constructInfo);
+	        bt.btCollisionObject_setUserIndex(btRigid, this.id);
+	        this._btColliderObject = btRigid;
 	        super._onAdded();
 	        this.mass = this._mass;
 	        this.linearFactor = this._linearFactor;
@@ -26557,7 +27061,7 @@
 	        this.overrideGravity = this._overrideGravity;
 	        this.gravity = this._gravity;
 	        this.isKinematic = this._isKinematic;
-	        physics3D.destroy(constructInfo);
+	        bt.btRigidBodyConstructionInfo_destroy(constructInfo);
 	    }
 	    _onShapeChange(colShape) {
 	        super._onShapeChange(colShape);
@@ -26565,7 +27069,8 @@
 	            this._updateMass(0);
 	        }
 	        else {
-	            this._nativeColliderObject.setCenterOfMassTransform(this._nativeColliderObject.getWorldTransform());
+	            var bt = Physics3D._bullet;
+	            bt.btRigidBody_setCenterOfMassTransform(this._btColliderObject, bt.btCollisionObject_getWorldTransform(this._btColliderObject));
 	            this._updateMass(this._mass);
 	        }
 	    }
@@ -26587,11 +27092,9 @@
 	        this._parseShape(data.shapes);
 	    }
 	    _onDestroy() {
-	        var physics3D = Physics3D._physics3D;
-	        this._nativeMotionState.clear();
-	        physics3D.destroy(this._nativeMotionState);
+	        Physics3D._bullet.btMotionState_destroy(this._btLayaMotionState);
 	        super._onDestroy();
-	        this._nativeMotionState = null;
+	        this._btLayaMotionState = null;
 	        this._gravity = null;
 	        this._totalTorque = null;
 	        this._linearVelocity = null;
@@ -26621,58 +27124,62 @@
 	        destRigidbody3D.detectCollisions = this._detectCollisions;
 	    }
 	    applyForce(force, localOffset = null) {
-	        if (this._nativeColliderObject == null)
+	        if (this._btColliderObject == null)
 	            throw "Attempted to call a Physics function that is avaliable only when the Entity has been already added to the Scene.";
-	        var nativeForce = Rigidbody3D._nativeTempVector30;
-	        nativeForce.setValue(-force.x, force.y, force.z);
+	        var bt = Physics3D._bullet;
+	        var btForce = Rigidbody3D._btTempVector30;
+	        bt.btVector3_setValue(btForce, -force.x, force.y, force.z);
 	        if (localOffset) {
-	            var nativeOffset = Rigidbody3D._nativeTempVector31;
-	            nativeOffset.setValue(-localOffset.x, localOffset.y, localOffset.z);
-	            this._nativeColliderObject.applyForce(nativeForce, nativeOffset);
+	            var btOffset = Rigidbody3D._btTempVector31;
+	            bt.btVector3_setValue(btOffset, -localOffset.x, localOffset.y, localOffset.z);
+	            bt.btRigidBody_applyForce(this._btColliderObject, btForce, btOffset);
 	        }
 	        else {
-	            this._nativeColliderObject.applyCentralForce(nativeForce);
+	            bt.btRigidBody_applyCentralForce(this._btColliderObject, btForce);
 	        }
 	    }
 	    applyTorque(torque) {
-	        if (this._nativeColliderObject == null)
+	        if (this._btColliderObject == null)
 	            throw "Attempted to call a Physics function that is avaliable only when the Entity has been already added to the Scene.";
-	        var nativeTorque = Rigidbody3D._nativeTempVector30;
-	        nativeTorque.setValue(-torque.x, torque.y, torque.z);
-	        this._nativeColliderObject.applyTorque(nativeTorque);
+	        var bullet = Physics3D._bullet;
+	        var btTorque = Rigidbody3D._btTempVector30;
+	        bullet.btVector3_setValue(btTorque, -torque.x, torque.y, torque.z);
+	        bullet.btRigidBody_applyTorque(this._btColliderObject, btTorque);
 	    }
 	    applyImpulse(impulse, localOffset = null) {
-	        if (this._nativeColliderObject == null)
+	        if (this._btColliderObject == null)
 	            throw "Attempted to call a Physics function that is avaliable only when the Entity has been already added to the Scene.";
-	        Rigidbody3D._nativeImpulse.setValue(-impulse.x, impulse.y, impulse.z);
+	        var bt = Physics3D._bullet;
+	        bt.btVector3_setValue(Rigidbody3D._btImpulse, -impulse.x, impulse.y, impulse.z);
 	        if (localOffset) {
-	            Rigidbody3D._nativeImpulseOffset.setValue(-localOffset.x, localOffset.y, localOffset.z);
-	            this._nativeColliderObject.applyImpulse(Rigidbody3D._nativeImpulse, Rigidbody3D._nativeImpulseOffset);
+	            bt.btVector3_setValue(Rigidbody3D._btImpulseOffset, -localOffset.x, localOffset.y, localOffset.z);
+	            bt.btRigidBody_applyImpulse(this._btColliderObject, Rigidbody3D._btImpulse, Rigidbody3D._btImpulseOffset);
 	        }
 	        else {
-	            this._nativeColliderObject.applyCentralImpulse(Rigidbody3D._nativeImpulse);
+	            bt.btRigidBody_applyCentralImpulse(this._btColliderObject, Rigidbody3D._btImpulse);
 	        }
 	    }
 	    applyTorqueImpulse(torqueImpulse) {
-	        if (this._nativeColliderObject == null)
+	        if (this._btColliderObject == null)
 	            throw "Attempted to call a Physics function that is avaliable only when the Entity has been already added to the Scene.";
-	        var nativeTorqueImpulse = Rigidbody3D._nativeTempVector30;
-	        nativeTorqueImpulse.setValue(-torqueImpulse.x, torqueImpulse.y, torqueImpulse.z);
-	        this._nativeColliderObject.applyTorqueImpulse(nativeTorqueImpulse);
+	        var bt = Physics3D._bullet;
+	        var btTorqueImpulse = Rigidbody3D._btTempVector30;
+	        bt.btVector3_setValue(btTorqueImpulse, -torqueImpulse.x, torqueImpulse.y, torqueImpulse.z);
+	        bt.btRigidBody_applyTorqueImpulse(this._btColliderObject, btTorqueImpulse);
 	    }
 	    wakeUp() {
-	        this._nativeColliderObject && (this._nativeColliderObject.activate(false));
+	        this._btColliderObject && (Physics3D._bullet.btCollisionObject_activate(this._btColliderObject, false));
 	    }
 	    clearForces() {
-	        var rigidBody = this._nativeColliderObject;
+	        var rigidBody = this._btColliderObject;
 	        if (rigidBody == null)
 	            throw "Attempted to call a Physics function that is avaliable only when the Entity has been already added to the Scene.";
 	        rigidBody.clearForces();
-	        var nativeZero = Rigidbody3D._nativeVector3Zero;
-	        rigidBody.setInterpolationLinearVelocity(nativeZero);
-	        rigidBody.setLinearVelocity(nativeZero);
-	        rigidBody.setInterpolationAngularVelocity(nativeZero);
-	        rigidBody.setAngularVelocity(nativeZero);
+	        var btZero = Rigidbody3D._btVector3Zero;
+	        rigidBody.setInterpolationLinearVelocity(btZero);
+	        rigidBody.setLinearVelocity(btZero);
+	        rigidBody.setInterpolationAngularVelocity(btZero);
+	        rigidBody.setAngularVelocity(btZero);
 	    }
 	}
 	Rigidbody3D.TYPE_STATIC = 0;
@@ -26682,16 +27189,17 @@
 	Rigidbody3D._BT_ENABLE_GYROPSCOPIC_FORCE = 2;
 
 	class StaticPlaneColliderShape extends ColliderShape {
-	    static __init__() {
-	        StaticPlaneColliderShape._nativeNormal = new Physics3D._physics3D.btVector3(0, 0, 0);
-	    }
 	    constructor(normal, offset) {
 	        super();
 	        this._normal = normal;
 	        this._offset = offset;
 	        this._type = ColliderShape.SHAPETYPES_STATICPLANE;
-	        StaticPlaneColliderShape._nativeNormal.setValue(-normal.x, normal.y, normal.z);
-	        this._nativeShape = new Physics3D._physics3D.btStaticPlaneShape(StaticPlaneColliderShape._nativeNormal, offset);
+	        var bt = Physics3D._bullet;
+	        bt.btVector3_setValue(StaticPlaneColliderShape._btNormal, -normal.x, normal.y, normal.z);
+	        this._btShape = bt.btStaticPlaneShape_create(StaticPlaneColliderShape._btNormal, offset);
+	    }
+	    static __init__() {
+	        StaticPlaneColliderShape._btNormal = Physics3D._bullet.btVector3_create(0, 0, 0);
 	    }
 	    clone() {
 	        var dest = new StaticPlaneColliderShape(this._normal, this._offset);
@@ -26725,19 +27233,35 @@
 	        return true;
 	    }
 	    _render(state) {
+	        var mesh = this._mesh;
+	        if (mesh.indexFormat === exports.IndexFormat.UInt32 && !Laya.LayaGL.layaGPUInstance.supportElementIndexUint32()) {
+	            console.warn("SubMesh:this device do not support IndexFormat.UInt32.");
+	            return;
+	        }
 	        var gl = Laya.LayaGL.instance;
-	        this._mesh._bufferState.bind();
 	        var skinnedDatas = state.renderElement.render._skinnedData;
+	        var glIndexFormat;
+	        switch (mesh.indexFormat) {
+	            case exports.IndexFormat.UInt32:
+	                glIndexFormat = gl.UNSIGNED_INT;
+	                break;
+	            case exports.IndexFormat.UInt16:
+	                glIndexFormat = gl.UNSIGNED_SHORT;
+	                break;
+	            case exports.IndexFormat.UInt8:
+	                glIndexFormat = gl.UNSIGNED_BYTE;
+	                break;
+	        }
+	        mesh._bufferState.bind();
 	        if (skinnedDatas) {
 	            var subSkinnedDatas = skinnedDatas[this._indexInMesh];
-	            var boneIndicesListCount = this._boneIndicesList.length;
-	            for (var i = 0; i < boneIndicesListCount; i++) {
+	            for (var i = 0, n = this._boneIndicesList.length; i < n; i++) {
 	                state.shader.uploadCustomUniform(SkinnedMeshSprite3D.BONES, subSkinnedDatas[i]);
-	                gl.drawElements(gl.TRIANGLES, this._subIndexBufferCount[i], gl.UNSIGNED_SHORT, this._subIndexBufferStart[i] * 2);
+	                gl.drawElements(gl.TRIANGLES, this._subIndexBufferCount[i], glIndexFormat, this._subIndexBufferStart[i] * 2);
 	            }
 	        }
 	        else {
-	            gl.drawElements(gl.TRIANGLES, this._indexCount, gl.UNSIGNED_SHORT, this._indexStart * 2);
+	            gl.drawElements(gl.TRIANGLES, this._indexCount, glIndexFormat, this._indexStart * 2);
 	        }
 	        Laya.Stat.trianglesFaces += this._indexCount / 3;
 	        Laya.Stat.renderBatches++;
@@ -26857,7 +27381,7 @@
 	        var ibStart = offset + LoadModelV04._readData.getUint32();
 	        var ibLength = LoadModelV04._readData.getUint32();
 	        var ibDatas = new Uint16Array(arrayBuffer.slice(ibStart, ibStart + ibLength));
-	        var indexBuffer = new IndexBuffer3D(IndexBuffer3D.INDEXTYPE_USHORT, ibLength / 2, gl.STATIC_DRAW, true);
+	        var indexBuffer = new IndexBuffer3D(exports.IndexFormat.UInt16, ibLength / 2, gl.STATIC_DRAW, true);
 	        indexBuffer.setData(ibDatas);
 	        LoadModelV04._mesh._indexBuffer = indexBuffer;
 	        memorySize += indexBuffer.indexCount * 2;
@@ -26991,12 +27515,13 @@
 	        var i;
 	        var memorySize = 0;
 	        var name = LoadModelV05._readString();
-	        var arrayBuffer = LoadModelV05._readData.__getBuffer();
-	        var vertexBufferCount = LoadModelV05._readData.getInt16();
+	        var reader = LoadModelV05._readData;
+	        var arrayBuffer = reader.__getBuffer();
+	        var vertexBufferCount = reader.getInt16();
 	        var offset = LoadModelV05._DATA.offset;
 	        for (i = 0; i < vertexBufferCount; i++) {
-	            var vbStart = offset + LoadModelV05._readData.getUint32();
-	            var vertexCount = LoadModelV05._readData.getUint32();
+	            var vbStart = offset + reader.getUint32();
+	            var vertexCount = reader.getUint32();
 	            var vertexFlag = LoadModelV05._readString();
 	            var vertexDeclaration = VertexMesh.getVertexDeclaration(vertexFlag, false);
 	            var vertexStride = vertexDeclaration.vertexStride;
@@ -27005,6 +27530,7 @@
 	            var uint8Data;
 	            var subVertexFlags = vertexFlag.split(",");
 	            var subVertexCount = subVertexFlags.length;
+	            var mesh = LoadModelV05._mesh;
 	            switch (LoadModelV05._version) {
 	                case "LAYAMODEL:05":
 	                    vertexData = arrayBuffer.slice(vbStart, vbStart + vertexCount * vertexStride);
@@ -27015,8 +27541,8 @@
 	                    vertexData = new ArrayBuffer(vertexStride * vertexCount);
 	                    floatData = new Float32Array(vertexData);
 	                    uint8Data = new Uint8Array(vertexData);
-	                    var lastPosition = LoadModelV05._readData.pos;
-	                    LoadModelV05._readData.pos = vbStart;
+	                    var lastPosition = reader.pos;
+	                    reader.pos = vbStart;
 	                    for (var j = 0; j < vertexCount; j++) {
 	                        var subOffset;
 	                        var verOffset = j * vertexStride;
@@ -27024,107 +27550,117 @@
 	                            switch (subVertexFlags[k]) {
 	                                case "POSITION":
 	                                    subOffset = verOffset / 4;
-	                                    floatData[subOffset] = HalfFloatUtils.convertToNumber(LoadModelV05._readData.getUint16());
-	                                    floatData[subOffset + 1] = HalfFloatUtils.convertToNumber(LoadModelV05._readData.getUint16());
-	                                    floatData[subOffset + 2] = HalfFloatUtils.convertToNumber(LoadModelV05._readData.getUint16());
+	                                    floatData[subOffset] = HalfFloatUtils.convertToNumber(reader.getUint16());
+	                                    floatData[subOffset + 1] = HalfFloatUtils.convertToNumber(reader.getUint16());
+	                                    floatData[subOffset + 2] = HalfFloatUtils.convertToNumber(reader.getUint16());
 	                                    verOffset += 12;
 	                                    break;
 	                                case "NORMAL":
 	                                    subOffset = verOffset / 4;
-	                                    floatData[subOffset] = LoadModelV05._readData.getUint8() / 127.5 - 1;
-	                                    floatData[subOffset + 1] = LoadModelV05._readData.getUint8() / 127.5 - 1;
-	                                    floatData[subOffset + 2] = LoadModelV05._readData.getUint8() / 127.5 - 1;
+	                                    floatData[subOffset] = reader.getUint8() / 127.5 - 1;
+	                                    floatData[subOffset + 1] = reader.getUint8() / 127.5 - 1;
+	                                    floatData[subOffset + 2] = reader.getUint8() / 127.5 - 1;
 	                                    verOffset += 12;
 	                                    break;
 	                                case "COLOR":
 	                                    subOffset = verOffset / 4;
-	                                    floatData[subOffset] = LoadModelV05._readData.getUint8() / 255;
-	                                    floatData[subOffset + 1] = LoadModelV05._readData.getUint8() / 255;
-	                                    floatData[subOffset + 2] = LoadModelV05._readData.getUint8() / 255;
-	                                    floatData[subOffset + 3] = LoadModelV05._readData.getUint8() / 255;
+	                                    floatData[subOffset] = reader.getUint8() / 255;
+	                                    floatData[subOffset + 1] = reader.getUint8() / 255;
+	                                    floatData[subOffset + 2] = reader.getUint8() / 255;
+	                                    floatData[subOffset + 3] = reader.getUint8() / 255;
 	                                    verOffset += 16;
 	                                    break;
 	                                case "UV":
 	                                    subOffset = verOffset / 4;
-	                                    floatData[subOffset] = HalfFloatUtils.convertToNumber(LoadModelV05._readData.getUint16());
-	                                    floatData[subOffset + 1] = HalfFloatUtils.convertToNumber(LoadModelV05._readData.getUint16());
+	                                    floatData[subOffset] = HalfFloatUtils.convertToNumber(reader.getUint16());
+	                                    floatData[subOffset + 1] = HalfFloatUtils.convertToNumber(reader.getUint16());
 	                                    verOffset += 8;
 	                                    break;
 	                                case "UV1":
 	                                    subOffset = verOffset / 4;
-	                                    floatData[subOffset] = HalfFloatUtils.convertToNumber(LoadModelV05._readData.getUint16());
-	                                    floatData[subOffset + 1] = HalfFloatUtils.convertToNumber(LoadModelV05._readData.getUint16());
+	                                    floatData[subOffset] = HalfFloatUtils.convertToNumber(reader.getUint16());
+	                                    floatData[subOffset + 1] = HalfFloatUtils.convertToNumber(reader.getUint16());
 	                                    verOffset += 8;
 	                                    break;
 	                                case "BLENDWEIGHT":
 	                                    subOffset = verOffset / 4;
-	                                    floatData[subOffset] = LoadModelV05._readData.getUint8() / 255;
-	                                    floatData[subOffset + 1] = LoadModelV05._readData.getUint8() / 255;
-	                                    floatData[subOffset + 2] = LoadModelV05._readData.getUint8() / 255;
-	                                    floatData[subOffset + 3] = LoadModelV05._readData.getUint8() / 255;
+	                                    floatData[subOffset] = reader.getUint8() / 255;
+	                                    floatData[subOffset + 1] = reader.getUint8() / 255;
+	                                    floatData[subOffset + 2] = reader.getUint8() / 255;
+	                                    floatData[subOffset + 3] = reader.getUint8() / 255;
 	                                    verOffset += 16;
 	                                    break;
 	                                case "BLENDINDICES":
-	                                    uint8Data[verOffset] = LoadModelV05._readData.getUint8();
-	                                    uint8Data[verOffset + 1] = LoadModelV05._readData.getUint8();
-	                                    uint8Data[verOffset + 2] = LoadModelV05._readData.getUint8();
-	                                    uint8Data[verOffset + 3] = LoadModelV05._readData.getUint8();
+	                                    uint8Data[verOffset] = reader.getUint8();
+	                                    uint8Data[verOffset + 1] = reader.getUint8();
+	                                    uint8Data[verOffset + 2] = reader.getUint8();
+	                                    uint8Data[verOffset + 3] = reader.getUint8();
 	                                    verOffset += 4;
 	                                    break;
 	                                case "TANGENT":
 	                                    subOffset = verOffset / 4;
-	                                    floatData[subOffset] = LoadModelV05._readData.getUint8() / 127.5 - 1;
-	                                    floatData[subOffset + 1] = LoadModelV05._readData.getUint8() / 127.5 - 1;
-	                                    floatData[subOffset + 2] = LoadModelV05._readData.getUint8() / 127.5 - 1;
-	                                    floatData[subOffset + 3] = LoadModelV05._readData.getUint8() / 127.5 - 1;
+	                                    floatData[subOffset] = reader.getUint8() / 127.5 - 1;
+	                                    floatData[subOffset + 1] = reader.getUint8() / 127.5 - 1;
+	                                    floatData[subOffset + 2] = reader.getUint8() / 127.5 - 1;
+	                                    floatData[subOffset + 3] = reader.getUint8() / 127.5 - 1;
 	                                    verOffset += 16;
 	                                    break;
 	                            }
 	                        }
 	                    }
-	                    LoadModelV05._readData.pos = lastPosition;
+	                    reader.pos = lastPosition;
 	                    break;
 	            }
 	            var vertexBuffer = new VertexBuffer3D(vertexData.byteLength, gl.STATIC_DRAW, true);
 	            vertexBuffer.vertexDeclaration = vertexDeclaration;
 	            vertexBuffer.setData(vertexData);
-	            LoadModelV05._mesh._vertexBuffer = vertexBuffer;
-	            LoadModelV05._mesh._vertexCount += vertexBuffer._byteLength / vertexDeclaration.vertexStride;
+	            var vertexCount = vertexBuffer._byteLength / vertexDeclaration.vertexStride;
+	            if (vertexCount > 65535)
+	                mesh._indexFormat = exports.IndexFormat.UInt32;
+	            else
+	                mesh._indexFormat = exports.IndexFormat.UInt16;
+	            mesh._vertexBuffer = vertexBuffer;
+	            mesh._vertexCount += vertexCount;
 	            memorySize += floatData.length * 4;
 	        }
-	        var ibStart = offset + LoadModelV05._readData.getUint32();
-	        var ibLength = LoadModelV05._readData.getUint32();
-	        var ibDatas = new Uint16Array(arrayBuffer.slice(ibStart, ibStart + ibLength));
-	        var indexBuffer = new IndexBuffer3D(IndexBuffer3D.INDEXTYPE_USHORT, ibLength / 2, gl.STATIC_DRAW, true);
+	        var ibStart = offset + reader.getUint32();
+	        var ibLength = reader.getUint32();
+	        var ibDatas;
+	        if (mesh.indexFormat == exports.IndexFormat.UInt32)
+	            ibDatas = new Uint32Array(arrayBuffer.slice(ibStart, ibStart + ibLength));
+	        else
+	            ibDatas = new Uint16Array(arrayBuffer.slice(ibStart, ibStart + ibLength));
+	        var indexBuffer = new IndexBuffer3D(mesh.indexFormat, ibDatas.length, gl.STATIC_DRAW, true);
 	        indexBuffer.setData(ibDatas);
-	        LoadModelV05._mesh._indexBuffer = indexBuffer;
-	        LoadModelV05._mesh._setBuffer(LoadModelV05._mesh._vertexBuffer, indexBuffer);
+	        mesh._indexBuffer = indexBuffer;
+	        mesh._setBuffer(mesh._vertexBuffer, indexBuffer);
 	        memorySize += indexBuffer.indexCount * 2;
-	        LoadModelV05._mesh._setCPUMemory(memorySize);
-	        LoadModelV05._mesh._setGPUMemory(memorySize);
-	        var boneNames = LoadModelV05._mesh._boneNames = [];
-	        var boneCount = LoadModelV05._readData.getUint16();
+	        mesh._setCPUMemory(memorySize);
+	        mesh._setGPUMemory(memorySize);
+	        var boneNames = mesh._boneNames = [];
+	        var boneCount = reader.getUint16();
 	        boneNames.length = boneCount;
 	        for (i = 0; i < boneCount; i++)
-	            boneNames[i] = LoadModelV05._strings[LoadModelV05._readData.getUint16()];
-	        var bindPoseDataStart = LoadModelV05._readData.getUint32();
-	        var bindPoseDataLength = LoadModelV05._readData.getUint32();
+	            boneNames[i] = LoadModelV05._strings[reader.getUint16()];
+	        var bindPoseDataStart = reader.getUint32();
+	        var bindPoseDataLength = reader.getUint32();
 	        var bindPoseDatas = new Float32Array(arrayBuffer.slice(offset + bindPoseDataStart, offset + bindPoseDataStart + bindPoseDataLength));
 	        var bindPoseFloatCount = bindPoseDatas.length;
-	        var bindPoseBuffer = LoadModelV05._mesh._inverseBindPosesBuffer = new ArrayBuffer(bindPoseFloatCount * 4);
-	        LoadModelV05._mesh._inverseBindPoses = [];
+	        var bindPoseBuffer = mesh._inverseBindPosesBuffer = new ArrayBuffer(bindPoseFloatCount * 4);
+	        mesh._inverseBindPoses = [];
 	        for (i = 0; i < bindPoseFloatCount; i += 16) {
 	            var inverseGlobalBindPose = new Matrix4x4(bindPoseDatas[i + 0], bindPoseDatas[i + 1], bindPoseDatas[i + 2], bindPoseDatas[i + 3], bindPoseDatas[i + 4], bindPoseDatas[i + 5], bindPoseDatas[i + 6], bindPoseDatas[i + 7], bindPoseDatas[i + 8], bindPoseDatas[i + 9], bindPoseDatas[i + 10], bindPoseDatas[i + 11], bindPoseDatas[i + 12], bindPoseDatas[i + 13], bindPoseDatas[i + 14], bindPoseDatas[i + 15], new Float32Array(bindPoseBuffer, i * 4, 16));
-	            LoadModelV05._mesh._inverseBindPoses[i / 16] = inverseGlobalBindPose;
+	            mesh._inverseBindPoses[i / 16] = inverseGlobalBindPose;
 	        }
 	        return true;
 	    }
 	    static READ_SUBMESH() {
-	        var arrayBuffer = LoadModelV05._readData.__getBuffer();
+	        var reader = LoadModelV05._readData;
+	        var arrayBuffer = reader.__getBuffer();
 	        var subMesh = new SubMesh(LoadModelV05._mesh);
-	        LoadModelV05._readData.getInt16();
-	        var ibStart = LoadModelV05._readData.getUint32();
-	        var ibCount = LoadModelV05._readData.getUint32();
+	        reader.getInt16();
+	        var ibStart = reader.getUint32();
+	        var ibCount = reader.getUint32();
 	        var indexBuffer = LoadModelV05._mesh._indexBuffer;
 	        subMesh._indexBuffer = indexBuffer;
 	        subMesh._setIndexRange(ibStart, ibCount);
@@ -27134,7 +27670,7 @@
 	        var subIndexBufferStart = subMesh._subIndexBufferStart;
 	        var subIndexBufferCount = subMesh._subIndexBufferCount;
 	        var boneIndicesList = subMesh._boneIndicesList;
-	        var drawCount = LoadModelV05._readData.getUint16();
+	        var drawCount = reader.getUint16();
 	        subIndexBufferStart.length = drawCount;
 	        subIndexBufferCount.length = drawCount;
 	        boneIndicesList.length = drawCount;
@@ -27142,10 +27678,10 @@
 	        var bindPoseIndices = LoadModelV05._bindPoseIndices;
 	        var subMeshIndex = LoadModelV05._subMeshes.length;
 	        for (var i = 0; i < drawCount; i++) {
-	            subIndexBufferStart[i] = LoadModelV05._readData.getUint32();
-	            subIndexBufferCount[i] = LoadModelV05._readData.getUint32();
-	            var boneDicofs = LoadModelV05._readData.getUint32();
-	            var boneDicCount = LoadModelV05._readData.getUint32();
+	            subIndexBufferStart[i] = reader.getUint32();
+	            subIndexBufferCount[i] = reader.getUint32();
+	            var boneDicofs = reader.getUint32();
+	            var boneDicCount = reader.getUint32();
 	            var boneIndices = boneIndicesList[i] = new Uint16Array(arrayBuffer.slice(offset + boneDicofs, offset + boneDicofs + boneDicCount));
 	            for (var j = 0, m = boneIndices.length; j < m; j++) {
 	                var index = boneIndices[j];
@@ -27208,16 +27744,17 @@
 	        this._vertexBuffer = null;
 	        this._indexBuffer = null;
 	        this._vertexCount = 0;
+	        this._indexFormat = exports.IndexFormat.UInt16;
 	        this._isReadable = isReadable;
 	        this._subMeshes = [];
 	        this._skinDataPathMarks = [];
 	    }
 	    static __init__() {
-	        var physics3D = Physics3D._physics3D;
+	        var physics3D = Physics3D._bullet;
 	        if (physics3D) {
-	            Mesh._nativeTempVector30 = new physics3D.btVector3(0, 0, 0);
-	            Mesh._nativeTempVector31 = new physics3D.btVector3(0, 0, 0);
-	            Mesh._nativeTempVector32 = new physics3D.btVector3(0, 0, 0);
+	            Mesh._nativeTempVector30 = physics3D.btVector3_create(0, 0, 0);
+	            Mesh._nativeTempVector31 = physics3D.btVector3_create(0, 0, 0);
+	            Mesh._nativeTempVector32 = physics3D.btVector3_create(0, 0, 0);
 	        }
 	    }
 	    static _parse(data, propertyParams = null, constructParams = null) {
@@ -27246,6 +27783,9 @@
 	    set bounds(value) {
 	        if (this._bounds !== value)
 	            value.cloneTo(this._bounds);
+	    }
+	    get indexFormat() {
+	        return this._indexFormat;
 	    }
 	    _getPositionElement(vertexBuffer) {
 	        var vertexElements = vertexBuffer.vertexDeclaration._vertexElements;
@@ -27370,6 +27910,8 @@
 	                default:
 	                    throw "Mesh:Unknown elementUsage.";
 	            }
+	            this._minVerticesUpdate = 0;
+	            this._maxVerticesUpdate = Number.MAX_SAFE_INTEGER;
 	        }
 	        else {
 	            console.warn("Mesh: the mesh don't have  this VertexElement.");
@@ -27378,19 +27920,19 @@
 	    _disposeResource() {
 	        for (var i = 0, n = this._subMeshes.length; i < n; i++)
 	            this._subMeshes[i].destroy();
-	        this._nativeTriangleMesh && window.Physics3D.destroy(this._nativeTriangleMesh);
+	        this._btTriangleMesh && Physics3D._bullet.btStridingMeshInterface_destroy(this._btTriangleMesh);
 	        this._vertexBuffer.destroy();
 	        this._indexBuffer.destroy();
-	        this._setCPUMemory(0);
-	        this._setGPUMemory(0);
 	        this._bufferState.destroy();
 	        this._instanceBufferState.destroy();
+	        this._setCPUMemory(0);
+	        this._setGPUMemory(0);
 	        this._bufferState = null;
 	        this._instanceBufferState = null;
 	        this._vertexBuffer = null;
 	        this._indexBuffer = null;
 	        this._subMeshes = null;
-	        this._nativeTriangleMesh = null;
+	        this._btTriangleMesh = null;
 	        this._indexBuffer = null;
 	        this._boneNames = null;
 	        this._inverseBindPoses = null;
@@ -27416,9 +27958,9 @@
 	        instanceBufferState.unBind();
 	    }
 	    _getPhysicMesh() {
-	        if (!this._nativeTriangleMesh) {
-	            var physics3D = window.Physics3D;
-	            var triangleMesh = new physics3D.btTriangleMesh();
+	        if (!this._btTriangleMesh) {
+	            var bt = Physics3D._bullet;
+	            var triangleMesh = bt.btTriangleMesh_create();
 	            var nativePositio0 = Mesh._nativeTempVector30;
 	            var nativePositio1 = Mesh._nativeTempVector31;
 	            var nativePositio2 = Mesh._nativeTempVector32;
@@ -27441,18 +27983,18 @@
 	                Utils3D._convertToBulletVec3(position0, nativePositio0, true);
 	                Utils3D._convertToBulletVec3(position1, nativePositio1, true);
 	                Utils3D._convertToBulletVec3(position2, nativePositio2, true);
-	                triangleMesh.addTriangle(nativePositio0, nativePositio1, nativePositio2, true);
+	                bt.btTriangleMesh_addTriangle(triangleMesh, nativePositio0, nativePositio1, nativePositio2, true);
 	            }
-	            this._nativeTriangleMesh = triangleMesh;
+	            this._btTriangleMesh = triangleMesh;
 	        }
-	        return this._nativeTriangleMesh;
+	        return this._btTriangleMesh;
 	    }
 	    _uploadVerticesData() {
 	        var min = this._minVerticesUpdate;
 	        var max = this._maxVerticesUpdate;
 	        if (min !== -1 && max !== -1) {
-	            var offset = min * 4;
-	            this._vertexBuffer.setData(this._vertexBuffer.getUint8Data().buffer, offset, offset, (max - min) * 4);
+	            var offset = min;
+	            this._vertexBuffer.setData(this._vertexBuffer.getUint8Data().buffer, offset, offset, max - min);
 	            this._minVerticesUpdate = -1;
 	            this._maxVerticesUpdate = -1;
 	        }
@@ -27594,7 +28136,20 @@
 	            throw "Mesh:can't get indices on subMesh,mesh's isReadable must be true.";
 	    }
 	    setIndices(indices) {
-	        this._indexBuffer.setData(indices);
+	        var format;
+	        if (indices instanceof Uint32Array)
+	            format = exports.IndexFormat.UInt32;
+	        else if (indices instanceof Uint16Array)
+	            format = exports.IndexFormat.UInt16;
+	        else if (indices instanceof Uint8Array)
+	            format = exports.IndexFormat.UInt8;
+	        var indexBuffer = this._indexBuffer;
+	        if (this._indexFormat !== format || indexBuffer.indexCount !== indices.length) {
+	            indexBuffer.destroy();
+	            this._indexBuffer = indexBuffer = new IndexBuffer3D(format, indices.length, Laya.LayaGL.instance.STATIC_DRAW, this._isReadable);
+	        }
+	        indexBuffer.setData(indices);
+	        this._indexFormat = format;
 	    }
 	    calculateBounds() {
 	        if (this._isReadable) {
@@ -27638,7 +28193,7 @@
 	        destMesh._vertexBuffer = destVB;
 	        destMesh._vertexCount = this._vertexCount;
 	        var ib = this._indexBuffer;
-	        var destIB = new IndexBuffer3D(IndexBuffer3D.INDEXTYPE_USHORT, ib.indexCount, ib.bufferUsage, ib.canRead);
+	        var destIB = new IndexBuffer3D(exports.IndexFormat.UInt16, ib.indexCount, ib.bufferUsage, ib.canRead);
 	        destIB.setData(ib.getData().slice());
 	        destMesh._indexBuffer = destIB;
 	        destMesh._setBuffer(destMesh._vertexBuffer, destIB);
@@ -27701,7 +28256,7 @@
 	        vertexBuffer.setData(vertices.buffer);
 	        mesh._vertexBuffer = vertexBuffer;
 	        mesh._vertexCount = vertexBuffer._byteLength / vertexDeclaration.vertexStride;
-	        var indexBuffer = new IndexBuffer3D(IndexBuffer3D.INDEXTYPE_USHORT, indices.length, gl.STATIC_DRAW, true);
+	        var indexBuffer = new IndexBuffer3D(exports.IndexFormat.UInt16, indices.length, gl.STATIC_DRAW, true);
 	        indexBuffer.setData(indices);
 	        mesh._indexBuffer = indexBuffer;
 	        mesh._setBuffer(vertexBuffer, indexBuffer);
@@ -28096,10 +28651,9 @@
 	    }
 	    static createQuad(long = 1, width = 1) {
 	        var vertexDeclaration = VertexMesh.getVertexDeclaration("POSITION,NORMAL,UV");
-	        var vertexFloatStride = vertexDeclaration.vertexStride / 4;
 	        var halfLong = long / 2;
 	        var halfWidth = width / 2;
-	        var vertices = new Float32Array([halfLong, halfWidth, 0, 0, 0, 1, 0, 0, halfLong, halfWidth, 0, 0, 0, 1, 1, 0, -halfLong, -halfWidth, 0, 0, 0, 1, 0, 1, halfLong, -halfWidth, 0, 0, 0, 1, 1, 1]);
+	        var vertices = new Float32Array([-halfLong, halfWidth, 0, 0, 0, 1, 0, 0, halfLong, halfWidth, 0, 0, 0, 1, 1, 0, -halfLong, -halfWidth, 0, 0, 0, 1, 0, 1, halfLong, -halfWidth, 0, 0, 0, 1, 1, 1]);
 	        var indices = new Uint16Array([0, 1, 2, 3, 2, 1]);
 	        return PrimitiveMesh._createMesh(vertexDeclaration, vertices, indices);
 	    }
@@ -28296,65 +28850,65 @@
 	}
 	TextureCube.TEXTURECUBE = "TEXTURECUBE";
 
-	var BlitScreenPS = "#ifdef FSHIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\nuniform sampler2D u_MainTex;\r\nvarying vec2 v_Texcoord0;\r\n\r\nvoid main() {\r\n\tgl_FragColor = texture2D(u_MainTex, v_Texcoord0);\r\n}\r\n\r\n";
+	var BlitScreenPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\nuniform sampler2D u_MainTex;\r\nvarying vec2 v_Texcoord0;\r\n\r\nvoid main() {\r\n\tgl_FragColor = texture2D(u_MainTex, v_Texcoord0);\r\n}\r\n\r\n";
 
-	var BlitScreenVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_PositionTexcoord;\r\nvarying vec2 v_Texcoord0;\r\n\r\nvoid main() {\r\n\tgl_Position = vec4(a_PositionTexcoord.xy, 0.0, 1.0);\r\n\tv_Texcoord0 = a_PositionTexcoord.zw;\r\n\tgl_Position = remapGLPositionZ(gl_Position);\r\n}";
+	var BlitScreenVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_PositionTexcoord;\r\nuniform vec4 u_OffsetScale;\r\nvarying vec2 v_Texcoord0;\r\n\r\nvoid main() {\t\r\n\tgl_Position = vec4(u_OffsetScale.x*2.0-1.0+(a_PositionTexcoord.x+1.0)*u_OffsetScale.z,(1.0-((u_OffsetScale.y*2.0-1.0+(-a_PositionTexcoord.y+1.0)*u_OffsetScale.w)+1.0)/2.0)*2.0-1.0, 0.0, 1.0);\t\r\n\tv_Texcoord0 = a_PositionTexcoord.zw;\r\n\tgl_Position = remapGLPositionZ(gl_Position);\r\n}";
 
-	var EffectPS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#ifdef COLOR\r\n\tvarying vec4 v_Color;\r\n#endif\r\nvarying vec2 v_Texcoord0;\r\n\r\n#ifdef MAINTEXTURE\r\n\tuniform sampler2D u_AlbedoTexture;\r\n#endif\r\n\r\nuniform vec4 u_AlbedoColor;\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\t#ifdef ADDTIVEFOG\r\n\t#else\r\n\t\tuniform vec3 u_FogColor;\r\n\t#endif\r\n#endif\r\n\r\nvoid main()\r\n{\r\n\tvec4 color =  2.0 * u_AlbedoColor;\r\n\t#ifdef COLOR\r\n\t\tcolor *= v_Color;\r\n\t#endif\r\n\t#ifdef MAINTEXTURE\r\n\t\tcolor *= texture2D(u_AlbedoTexture, v_Texcoord0);\r\n\t#endif\r\n\t\r\n\tgl_FragColor = color;\r\n\t\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact = clamp((1.0 / gl_FragCoord.w - u_FogStart) / u_FogRange, 0.0, 1.0);\r\n\t\t#ifdef ADDTIVEFOG\r\n\t\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0), lerpFact);\r\n\t\t#else\r\n\t\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, u_FogColor, lerpFact);\r\n\t\t#endif\r\n\t#endif\r\n}\r\n\r\n";
+	var EffectPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#ifdef COLOR\r\n\tvarying vec4 v_Color;\r\n#endif\r\nvarying vec2 v_Texcoord0;\r\n\r\n#ifdef MAINTEXTURE\r\n\tuniform sampler2D u_AlbedoTexture;\r\n#endif\r\n\r\nuniform vec4 u_AlbedoColor;\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\t#ifdef ADDTIVEFOG\r\n\t#else\r\n\t\tuniform vec3 u_FogColor;\r\n\t#endif\r\n#endif\r\n\r\nvoid main()\r\n{\r\n\tvec4 color =  2.0 * u_AlbedoColor;\r\n\t#ifdef COLOR\r\n\t\tcolor *= v_Color;\r\n\t#endif\r\n\t#ifdef MAINTEXTURE\r\n\t\tcolor *= texture2D(u_AlbedoTexture, v_Texcoord0);\r\n\t#endif\r\n\t\r\n\tgl_FragColor = color;\r\n\t\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact = clamp((1.0 / gl_FragCoord.w - u_FogStart) / u_FogRange, 0.0, 1.0);\r\n\t\t#ifdef ADDTIVEFOG\r\n\t\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0), lerpFact);\r\n\t\t#else\r\n\t\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, u_FogColor, lerpFact);\r\n\t\t#endif\r\n\t#endif\r\n}\r\n\r\n";
 
 	var EffectVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nattribute vec4 a_Color;\r\nattribute vec2 a_Texcoord0;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_MvpMatrix;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\n\r\n#ifdef COLOR\r\n\tvarying vec4 v_Color;\r\n#endif\r\nvarying vec2 v_Texcoord0;\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\nvoid main()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform = u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\tposition=skinTransform*a_Position;\r\n\t#else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\t\r\n\t#ifdef TILINGOFFSET\r\n\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t#else\r\n\t\tv_Texcoord0=a_Texcoord0;\r\n\t#endif\r\n\t\t\r\n\t#ifdef COLOR\r\n\t\tv_Color = a_Color;\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
 
-	var extendTerrainPS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(FOG)\r\n\tuniform vec3 u_CameraPos;\r\n\tvarying vec3 v_Normal;\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\n\r\n#ifdef DIRECTIONLIGHT\r\n\tuniform DirectionLight u_DirectionLight;\r\n#endif\r\n\r\n#ifdef POINTLIGHT\r\n\tuniform PointLight u_PointLight;\r\n#endif\r\n\r\n#ifdef SPOTLIGHT\r\n\tuniform SpotLight u_SpotLight;\r\n#endif\r\n\r\n#include \"ShadowHelper.glsl\"\r\n#ifdef RECEIVESHADOW\r\n\t#if defined(SHADOWMAP_PSSM2)||defined(SHADOWMAP_PSSM3)\r\n\tuniform mat4 u_lightShadowVP[4];\r\n\t#endif\r\n\t#ifdef SHADOWMAP_PSSM1 \r\n\tvarying vec4 v_lightMVPPos;\r\n\t#endif\r\n#endif\r\nvarying float v_posViewZ;\r\n\r\nuniform vec3 u_AmbientColor;\r\n\r\nuniform sampler2D u_SplatAlphaTexture;\r\n\r\nuniform sampler2D u_DiffuseTexture1;\r\nuniform sampler2D u_DiffuseTexture2;\r\nuniform sampler2D u_DiffuseTexture3;\r\nuniform sampler2D u_DiffuseTexture4;\r\nuniform sampler2D u_DiffuseTexture5;\r\n\r\nuniform vec4 u_DiffuseScaleOffset1;\r\nuniform vec4 u_DiffuseScaleOffset2;\r\nuniform vec4 u_DiffuseScaleOffset3;\r\nuniform vec4 u_DiffuseScaleOffset4;\r\nuniform vec4 u_DiffuseScaleOffset5;\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\n#ifdef LIGHTMAP\r\n\tuniform sampler2D u_LightMap;\r\n\tvarying vec2 v_LightMapUV;\r\n#endif\r\n\r\nvoid main()\r\n{\r\n\tvec4 splatAlpha = vec4(1.0);\r\n\t#ifdef ExtendTerrain_DETAIL_NUM1\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r;\r\n\t#endif\r\n\t#ifdef ExtendTerrain_DETAIL_NUM2\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tvec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScaleOffset2.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r + color2.xyz * (1.0 - splatAlpha.r);\r\n\t#endif\r\n\t#ifdef ExtendTerrain_DETAIL_NUM3\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tvec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScaleOffset2.xy);\r\n\t\tvec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScaleOffset3.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * (1.0 - splatAlpha.r - splatAlpha.g);\r\n\t#endif\r\n\t#ifdef ExtendTerrain_DETAIL_NUM4\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tvec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScaleOffset2.xy);\r\n\t\tvec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScaleOffset3.xy);\r\n\t\tvec4 color4 = texture2D(u_DiffuseTexture4, v_Texcoord0 * u_DiffuseScaleOffset4.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * splatAlpha.b + color4.xyz * (1.0 - splatAlpha.r - splatAlpha.g - splatAlpha.b);\r\n\t#endif\r\n\t#ifdef ExtendTerrain_DETAIL_NUM5\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tvec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScaleOffset2.xy);\r\n\t\tvec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScaleOffset3.xy);\r\n\t\tvec4 color4 = texture2D(u_DiffuseTexture4, v_Texcoord0 * u_DiffuseScaleOffset4.xy);\r\n\t\tvec4 color5 = texture2D(u_DiffuseTexture5, v_Texcoord0 * u_DiffuseScaleOffset5.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * splatAlpha.b + color4.xyz * splatAlpha.a + color5.xyz * (1.0 - splatAlpha.r - splatAlpha.g - splatAlpha.b - splatAlpha.a);\r\n\t#endif\r\n\t\tgl_FragColor.w = splatAlpha.a;\r\n\t\t\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n    vec3 normal = v_Normal;\r\n\tvec3 dif, spe;\r\n#endif\r\n\r\nvec3 diffuse = vec3(0.0);\r\nvec3 specular= vec3(0.0);\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(FOG)\r\n\tvec3 toEye;\r\n\t#ifdef FOG\r\n\t\ttoEye=u_CameraPos-v_PositionWorld;\r\n\t\tfloat toEyeLength=length(toEye);\r\n\t\ttoEye/=toEyeLength;\r\n\t#else\r\n\t\ttoEye=normalize(u_CameraPos-v_PositionWorld);\r\n\t#endif\r\n#endif\r\n\r\n#ifdef DIRECTIONLIGHT\r\n\tLayaAirBlinnPhongDiectionLight(vec3(0.0), 1.0, normal, vec3(1.0), toEye,u_DirectionLight, dif, spe);\r\n\tdiffuse+=dif;\r\n\tspecular+=spe;\r\n#endif\r\n \r\n#ifdef POINTLIGHT\r\n\tLayaAirBlinnPhongPointLight(v_PositionWorld, vec3(0.0), 1.0, normal, vec3(1.0), toEye, u_PointLight, dif, spe);\r\n\tdiffuse+=dif;\r\n\tspecular+=spe;\r\n#endif\r\n\r\n#ifdef SPOTLIGHT\r\n\tLayaAirBlinnPhongSpotLight(v_PositionWorld, vec3(0.0), 1.0, normal, vec3(1.0), toEye, u_SpotLight, dif, spe);\r\n\tdiffuse+=dif;\r\n\tspecular+=spe;\r\n#endif\r\n\r\nvec3 globalDiffuse = u_AmbientColor;\r\n#ifdef LIGHTMAP\r\n\tglobalDiffuse += DecodeLightmap(texture2D(u_LightMap, v_LightMapUV));\r\n#endif\r\n\r\n#ifdef RECEIVESHADOW\r\n\tfloat shadowValue = 1.0;\r\n\t#ifdef SHADOWMAP_PSSM3\r\n\t\tshadowValue = getShadowPSSM3( u_shadowMap1,u_shadowMap2,u_shadowMap3,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t#endif\r\n\t#ifdef SHADOWMAP_PSSM2\r\n\t\tshadowValue = getShadowPSSM2( u_shadowMap1,u_shadowMap2,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t#endif \r\n\t#ifdef SHADOWMAP_PSSM1\r\n\t\tshadowValue = getShadowPSSM1( u_shadowMap1,v_lightMVPPos,u_shadowPSSMDistance,u_shadowPCFoffset,v_posViewZ,0.001);\r\n\t#endif\r\n\tgl_FragColor = vec4(gl_FragColor.rgb * (globalDiffuse + diffuse) * shadowValue, gl_FragColor.a);\r\n#else\r\n\tgl_FragColor = vec4(gl_FragColor.rgb * (globalDiffuse + diffuse), gl_FragColor.a);\r\n#endif\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t#ifdef RECEIVESHADOW\r\n\t\tgl_FragColor.rgb += specular * shadowValue;\r\n\t#else\r\n\t\tgl_FragColor.rgb += specular;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef FOG\r\n\tfloat lerpFact=clamp((toEyeLength-u_FogStart)/u_FogRange,0.0,1.0);\r\n\tgl_FragColor.rgb=mix(gl_FragColor.rgb,u_FogColor,lerpFact);\r\n#endif\r\n}\r\n\r\n\r\n\r\n\r\n\r\n";
+	var extendTerrainPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(FOG)\r\n\tuniform vec3 u_CameraPos;\r\n\tvarying vec3 v_Normal;\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tuniform DirectionLight u_DirectionLight;\r\n\t\t#endif\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tuniform PointLight u_PointLight;\r\n\t\t#endif\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tuniform SpotLight u_SpotLight;\r\n\t\t#endif\r\n\t#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n\t#endif\r\n#endif\r\n\r\n#include \"ShadowHelper.glsl\"\r\n#ifdef RECEIVESHADOW\r\n\t#if defined(SHADOWMAP_PSSM2)||defined(SHADOWMAP_PSSM3)\r\n\tuniform mat4 u_lightShadowVP[4];\r\n\t#endif\r\n\t#ifdef SHADOWMAP_PSSM1 \r\n\tvarying vec4 v_lightMVPPos;\r\n\t#endif\r\n#endif\r\nvarying float v_posViewZ;\r\n\r\nuniform vec3 u_AmbientColor;\r\n\r\nuniform sampler2D u_SplatAlphaTexture;\r\n\r\nuniform sampler2D u_DiffuseTexture1;\r\nuniform sampler2D u_DiffuseTexture2;\r\nuniform sampler2D u_DiffuseTexture3;\r\nuniform sampler2D u_DiffuseTexture4;\r\nuniform sampler2D u_DiffuseTexture5;\r\n\r\nuniform vec4 u_DiffuseScaleOffset1;\r\nuniform vec4 u_DiffuseScaleOffset2;\r\nuniform vec4 u_DiffuseScaleOffset3;\r\nuniform vec4 u_DiffuseScaleOffset4;\r\nuniform vec4 u_DiffuseScaleOffset5;\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\n#ifdef LIGHTMAP\r\n\tuniform sampler2D u_LightMap;\r\n\tvarying vec2 v_LightMapUV;\r\n#endif\r\n\r\nvoid main()\r\n{\r\n\tvec4 splatAlpha = vec4(1.0);\r\n\t#ifdef ExtendTerrain_DETAIL_NUM1\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r;\r\n\t#endif\r\n\t#ifdef ExtendTerrain_DETAIL_NUM2\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tvec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScaleOffset2.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r + color2.xyz * (1.0 - splatAlpha.r);\r\n\t#endif\r\n\t#ifdef ExtendTerrain_DETAIL_NUM3\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tvec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScaleOffset2.xy);\r\n\t\tvec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScaleOffset3.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * (1.0 - splatAlpha.r - splatAlpha.g);\r\n\t#endif\r\n\t#ifdef ExtendTerrain_DETAIL_NUM4\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tvec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScaleOffset2.xy);\r\n\t\tvec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScaleOffset3.xy);\r\n\t\tvec4 color4 = texture2D(u_DiffuseTexture4, v_Texcoord0 * u_DiffuseScaleOffset4.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * splatAlpha.b + color4.xyz * (1.0 - splatAlpha.r - splatAlpha.g - splatAlpha.b);\r\n\t#endif\r\n\t#ifdef ExtendTerrain_DETAIL_NUM5\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tvec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScaleOffset2.xy);\r\n\t\tvec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScaleOffset3.xy);\r\n\t\tvec4 color4 = texture2D(u_DiffuseTexture4, v_Texcoord0 * u_DiffuseScaleOffset4.xy);\r\n\t\tvec4 color5 = texture2D(u_DiffuseTexture5, v_Texcoord0 * u_DiffuseScaleOffset5.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * splatAlpha.b + color4.xyz * splatAlpha.a + color5.xyz * (1.0 - splatAlpha.r - splatAlpha.g - splatAlpha.b - splatAlpha.a);\r\n\t#endif\r\n\t\tgl_FragColor.w = splatAlpha.a;\r\n\t\t\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 normal = v_Normal;\r\n\t\tvec3 dif, spe;\r\n\t#endif\r\n\r\n\tvec3 diffuse = vec3(0.0);\r\n\tvec3 specular= vec3(0.0);\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(FOG)\r\n\t\tvec3 toEye;\r\n\t\t#ifdef FOG\r\n\t\t\ttoEye=u_CameraPos-v_PositionWorld;\r\n\t\t\tfloat toEyeLength=length(toEye);\r\n\t\t\ttoEye/=toEyeLength;\r\n\t\t#else\r\n\t\t\ttoEye=normalize(u_CameraPos-v_PositionWorld);\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tLayaAirBlinnPhongDiectionLight(vec3(0.0),1.0,normal,vec3(1.0),toEye,u_DirectionLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,vec3(0.0),1.0,normal,vec3(1.0),toEye,u_PointLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,vec3(0.0),1.0,normal,vec3(1.0),toEye,u_SpotLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\tLayaAirBlinnPhongDiectionLight(vec3(0.0),1.0,normal,vec3(1.0),toEye,directionLight,dif,spe);\r\n\t\t\t\tdiffuse+=dif;\r\n\t\t\t\tspecular+=spe;\r\n\t\t\t}\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,vec3(0.0),1.0,normal,vec3(1.0),toEye,pointLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,vec3(0.0),1.0,normal,vec3(1.0),toEye\t,spotLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\nvec3 globalDiffuse = u_AmbientColor;\r\n#ifdef LIGHTMAP\r\n\tglobalDiffuse += DecodeLightmap(texture2D(u_LightMap, v_LightMapUV));\r\n#endif\r\n\r\n#ifdef RECEIVESHADOW\r\n\tfloat shadowValue = 1.0;\r\n\t#ifdef SHADOWMAP_PSSM3\r\n\t\tshadowValue = getShadowPSSM3( u_shadowMap1,u_shadowMap2,u_shadowMap3,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t#endif\r\n\t#ifdef SHADOWMAP_PSSM2\r\n\t\tshadowValue = getShadowPSSM2( u_shadowMap1,u_shadowMap2,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t#endif \r\n\t#ifdef SHADOWMAP_PSSM1\r\n\t\tshadowValue = getShadowPSSM1( u_shadowMap1,v_lightMVPPos,u_shadowPSSMDistance,u_shadowPCFoffset,v_posViewZ,0.001);\r\n\t#endif\r\n\tgl_FragColor = vec4(gl_FragColor.rgb * (globalDiffuse + diffuse) * shadowValue, gl_FragColor.a);\r\n#else\r\n\tgl_FragColor = vec4(gl_FragColor.rgb * (globalDiffuse + diffuse), gl_FragColor.a);\r\n#endif\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t#ifdef RECEIVESHADOW\r\n\t\tgl_FragColor.rgb += specular * shadowValue;\r\n\t#else\r\n\t\tgl_FragColor.rgb += specular;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef FOG\r\n\tfloat lerpFact=clamp((toEyeLength-u_FogStart)/u_FogRange,0.0,1.0);\r\n\tgl_FragColor.rgb=mix(gl_FragColor.rgb,u_FogColor,lerpFact);\r\n#endif\r\n}\r\n\r\n\r\n\r\n\r\n\r\n";
 
 	var extendTerrainVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nattribute vec2 a_Texcoord0;\r\n\r\nuniform mat4 u_MvpMatrix;\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(LIGHTMAP)\r\n\tattribute vec3 a_Normal;\r\n\tvarying vec3 v_Normal;\r\n#endif\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(FOG)||(defined(RECEIVESHADOW)&&defined(SHADOWMAP_PSSM1))\r\n\tuniform mat4 u_WorldMat;\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tvarying vec2 v_LightMapUV;\r\n\tuniform vec4 u_LightmapScaleOffset;\r\n#endif\r\n\r\n#ifdef RECEIVESHADOW\r\n\tvarying float v_posViewZ;\r\n\t#ifdef SHADOWMAP_PSSM1 \r\n\t\tvarying vec4 v_lightMVPPos;\r\n\t\tuniform mat4 u_lightShadowVP[4];\r\n\t#endif\r\n#endif\r\n\r\nvoid main()\r\n{\r\n\tgl_Position = u_MvpMatrix * a_Position;\r\n  \r\n\tv_Texcoord0 = a_Texcoord0;\r\n  \r\n\t#ifdef LIGHTMAP\r\n\t\tv_LightMapUV = vec2(a_Texcoord0.x, 1.0 - a_Texcoord0.y) * u_LightmapScaleOffset.xy + u_LightmapScaleOffset.zw;\r\n\t\tv_LightMapUV.y = 1.0 - v_LightMapUV.y;\r\n\t#endif\r\n  \r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tv_Normal = a_Normal;\r\n\t#endif\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(FOG)||(defined(RECEIVESHADOW)&&defined(SHADOWMAP_PSSM1))\r\n\t\tv_PositionWorld=(u_WorldMat*a_Position).xyz;\r\n\t#endif\r\n\r\n\t#ifdef RECEIVESHADOW\r\n\t\tv_posViewZ = gl_Position.w;\r\n\t\t#ifdef SHADOWMAP_PSSM1\r\n\t\t\tv_lightMVPPos = u_lightShadowVP[0] * vec4(v_PositionWorld,1.0);\r\n\t\t#endif\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
 
 	var LightingGLSL = "struct DirectionLight {\r\n\tvec3 color;\r\n\tvec3 direction;\r\n};\r\n\r\nstruct PointLight {\r\n\tvec3 color;\r\n\tvec3 position;\r\n\tfloat range;\r\n};\r\n\r\nstruct SpotLight {\r\n\tvec3 color;\r\n\tvec3 position;\r\n\tfloat range;\r\n\tvec3 direction;\r\n\tfloat spot;\r\n};\r\n\r\n\r\n\r\nconst int c_ClusterBufferWidth = CLUSTER_X_COUNT*CLUSTER_Y_COUNT;\r\nconst int c_ClusterBufferHeight = CLUSTER_Z_COUNT*(1+int(ceil(float(MAX_LIGHT_COUNT_PER_CLUSTER)/4.0)));\r\nconst int c_ClusterBufferFloatWidth = c_ClusterBufferWidth*4;\r\n\r\nivec4 getClusterInfo(sampler2D clusterBuffer,mat4 viewMatrix,vec4 viewport,vec3 position,vec4 fragCoord,vec4 projectParams)\r\n{\r\n\tvec3 viewPos = vec3(viewMatrix*vec4(position, 1.0)); //position in viewspace\r\n\r\n\tint clusterXIndex = int(floor(fragCoord.x/ (float(viewport.z)/float(CLUSTER_X_COUNT))));\r\n    int clusterYIndex = int(floor((viewport.w * (projectParams.z <0.0? 0.0 : 1.0) - fragCoord.y * projectParams.z)/ (float(viewport.w)/float(CLUSTER_Y_COUNT))));//Maybe Flipped ProjectMatrix\r\n\tfloat zSliceParam =float(CLUSTER_Z_COUNT)/log2(projectParams.y / projectParams.x);\r\n \tint clusterZIndex = int(floor(log2(-viewPos.z) * zSliceParam- log2(projectParams.x) * zSliceParam));//projectParams x:cameraNear y:cameraFar\r\n\r\n\tvec2 uv= vec2((float(clusterXIndex + clusterYIndex * CLUSTER_X_COUNT)+0.5)/float(c_ClusterBufferWidth),\r\n\t\t\t\t(float(clusterZIndex)+0.5)/float(c_ClusterBufferHeight));\r\n\tvec4 clusterPixel=texture2D(clusterBuffer, uv);\r\n\treturn ivec4(clusterPixel);//X:Point Count Y:Spot Count Z、W:Light Offset\r\n}\r\n\r\n\r\nint getLightIndex(sampler2D clusterBuffer,int offset,int index) \r\n{\r\n\tint totalOffset=offset+index;\r\n\tint row=totalOffset/c_ClusterBufferFloatWidth;\r\n\tint lastRowFloat=totalOffset-row*c_ClusterBufferFloatWidth;\r\n\tint col=lastRowFloat/4;\r\n\tvec2 uv=vec2((float(col)+0.5)/float(c_ClusterBufferWidth),\r\n\t\t\t\t(float(row)+0.5)/float(c_ClusterBufferHeight));\r\n\tvec4 texel = texture2D(clusterBuffer, uv);\r\n    int pixelComponent = lastRowFloat-col*4;\r\n    if (pixelComponent == 0) \r\n      return int(texel.x);\r\n    else if (pixelComponent == 1) \r\n      return int(texel.y);\r\n    else if (pixelComponent == 2) \r\n      return int(texel.z);\r\n    else if (pixelComponent == 3) \r\n      return int(texel.w);\r\n}\r\n\r\nDirectionLight getDirectionLight(sampler2D lightBuffer,int index) \r\n{\r\n    DirectionLight light;\r\n    float v = (float(index)+0.5)/ float(MAX_LIGHT_COUNT);\r\n    vec4 p1 = texture2D(lightBuffer, vec2(0.125,v));\r\n    vec4 p2 = texture2D(lightBuffer, vec2(0.375,v));\r\n\tlight.color=p1.rgb;\r\n    light.direction = p2.rgb;\r\n    return light;\r\n}\r\n\r\nPointLight getPointLight(sampler2D lightBuffer,sampler2D clusterBuffer,ivec4 clusterInfo,int index) \r\n{\r\n    PointLight light;\r\n\tint pointIndex=getLightIndex(clusterBuffer,clusterInfo.z*c_ClusterBufferFloatWidth+clusterInfo.w,index);\r\n    float v = (float(pointIndex)+0.5)/ float(MAX_LIGHT_COUNT);\r\n    vec4 p1 = texture2D(lightBuffer, vec2(0.125,v));\r\n    vec4 p2 = texture2D(lightBuffer, vec2(0.375,v));\r\n\tlight.color=p1.rgb;\r\n\tlight.range = p1.a;\r\n    light.position = p2.rgb;\r\n    return light;\r\n}\r\n\r\nSpotLight getSpotLight(sampler2D lightBuffer,sampler2D clusterBuffer,ivec4 clusterInfo,int index) \r\n{\r\n    SpotLight light;\r\n\tint spoIndex=getLightIndex(clusterBuffer,clusterInfo.z*c_ClusterBufferFloatWidth+clusterInfo.w,clusterInfo.x+index);\r\n    float v = (float(spoIndex)+0.5)/ float(MAX_LIGHT_COUNT);\r\n    vec4 p1 = texture2D(lightBuffer, vec2(0.125,v));\r\n    vec4 p2 = texture2D(lightBuffer, vec2(0.375,v));\r\n\tvec4 p3 = texture2D(lightBuffer, vec2(0.625,v));\r\n    light.color = p1.rgb;\r\n\tlight.range=p1.a;\r\n    light.position = p2.rgb;\r\n\tlight.spot = p2.a;\r\n\tlight.direction = p3.rgb;\r\n    return light;\r\n}\r\n\r\n\r\n\r\n// Laya中使用衰减纹理\r\nfloat LayaAttenuation(in vec3 L,in float invLightRadius) {\r\n\tfloat fRatio = clamp(length(L) * invLightRadius,0.0,1.0);\r\n\tfRatio *= fRatio;\r\n\treturn 1.0 / (1.0 + 25.0 * fRatio)* clamp(4.0*(1.0 - fRatio),0.0,1.0); //fade to black as if 4 pixel texture\r\n}\r\n\r\n// Same as Just Cause 2 and Crysis 2 (you can read GPU Pro 1 book for more information)\r\nfloat BasicAttenuation(in vec3 L,in float invLightRadius) {\r\n\tvec3 distance = L * invLightRadius;\r\n\tfloat attenuation = clamp(1.0 - dot(distance, distance),0.0,1.0); // Equals float attenuation = saturate(1.0f - dot(L, L) / (lightRadius *  lightRadius));\r\n\treturn attenuation * attenuation;\r\n}\r\n\r\n// Inspired on http://fools.slindev.com/viewtopic.php?f=11&t=21&view=unread#unread\r\nfloat NaturalAttenuation(in vec3 L,in float invLightRadius) {\r\n\tfloat attenuationFactor = 30.0;\r\n\tvec3 distance = L * invLightRadius;\r\n\tfloat attenuation = dot(distance, distance); // Equals float attenuation = dot(L, L) / (lightRadius *  lightRadius);\r\n\tattenuation = 1.0 / (attenuation * attenuationFactor + 1.0);\r\n\t// Second we move down the function therewith it reaches zero at abscissa 1:\r\n\tattenuationFactor = 1.0 / (attenuationFactor + 1.0); //attenuationFactor contains now the value we have to subtract\r\n\tattenuation = max(attenuation - attenuationFactor, 0.0); // The max fixes a bug.\r\n\t// Finally we expand the equation along the y-axis so that it starts with a function value of 1 again.\r\n\tattenuation /= 1.0 - attenuationFactor;\r\n\treturn attenuation;\r\n}\r\n\r\nvoid LayaAirBlinnPhongLight (in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir,in vec3 lightColor, in vec3 lightVec,out vec3 diffuseColor,out vec3 specularColor) {\r\n\tmediump vec3 h = normalize(viewDir-lightVec);\r\n\tlowp float ln = max (0.0, dot (-lightVec,normal));\r\n\tfloat nh = max (0.0, dot (h,normal));\r\n\tdiffuseColor=lightColor * ln;\r\n\tspecularColor=lightColor *specColor*pow (nh, specColorIntensity*128.0) * gloss;\r\n}\r\n\r\nvoid LayaAirBlinnPhongDiectionLight (in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir, in DirectionLight light,out vec3 diffuseColor,out vec3 specularColor) {\r\n\tvec3 lightVec=normalize(light.direction);\r\n\tLayaAirBlinnPhongLight(specColor,specColorIntensity,normal,gloss,viewDir,light.color,lightVec,diffuseColor,specularColor);\r\n}\r\n\r\nvoid LayaAirBlinnPhongPointLight (in vec3 pos,in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir, in PointLight light,out vec3 diffuseColor,out vec3 specularColor) {\r\n\tvec3 lightVec =  pos-light.position;\r\n\tLayaAirBlinnPhongLight(specColor,specColorIntensity,normal,gloss,viewDir,light.color,lightVec/length(lightVec),diffuseColor,specularColor);\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range);\r\n\tdiffuseColor *= attenuate;\r\n\tspecularColor*= attenuate;\r\n}\r\n\r\nvoid LayaAirBlinnPhongSpotLight (in vec3 pos,in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir, in SpotLight light,out vec3 diffuseColor,out vec3 specularColor) {\r\n\tvec3 lightVec =  pos-light.position;\r\n\tvec3 normalLightVec=lightVec/length(lightVec);\r\n\tLayaAirBlinnPhongLight(specColor,specColorIntensity,normal,gloss,viewDir,light.color,normalLightVec,diffuseColor,specularColor);\r\n\tvec2 cosAngles=cos(vec2(light.spot,light.spot*0.5)*0.5);//ConeAttenuation\r\n\tfloat dl=dot(normalize(light.direction),normalLightVec);\r\n\tdl*=smoothstep(cosAngles[0],cosAngles[1],dl);\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range)*dl;\r\n\tdiffuseColor *=attenuate;\r\n\tspecularColor *=attenuate;\r\n}\r\n\r\nvec3 NormalSampleToWorldSpace(vec3 normalMapSample, vec3 unitNormal, vec3 tangent,vec3 binormal) {\r\n\tvec3 normalT =vec3(2.0*normalMapSample.x - 1.0,1.0-2.0*normalMapSample.y,2.0*normalMapSample.z - 1.0);\r\n\r\n\t// Build orthonormal basis.\r\n\tvec3 N = normalize(unitNormal);\r\n\tvec3 T = normalize(tangent);\r\n\tvec3 B = normalize(binormal);\r\n\tmat3 TBN = mat3(T, B, N);\r\n\r\n\t// Transform from tangent space to world space.\r\n\tvec3 bumpedNormal = TBN*normalT;\r\n\r\n\treturn bumpedNormal;\r\n}\r\n\r\nvec3 NormalSampleToWorldSpace1(vec4 normalMapSample, vec3 tangent, vec3 binormal, vec3 unitNormal) {\r\n\tvec3 normalT;\r\n\tnormalT.x = 2.0 * normalMapSample.x - 1.0;\r\n\tnormalT.y = 1.0 - 2.0 * normalMapSample.y;\r\n\tnormalT.z = sqrt(1.0 - clamp(dot(normalT.xy, normalT.xy), 0.0, 1.0));\r\n\r\n\tvec3 T = normalize(tangent);\r\n\tvec3 B = normalize(binormal);\r\n\tvec3 N = normalize(unitNormal);\r\n\tmat3 TBN = mat3(T, B, N);\r\n\r\n\t// Transform from tangent space to world space.\r\n\tvec3 bumpedNormal = TBN * normalize(normalT);\r\n\r\n\treturn bumpedNormal;\r\n}\r\n\r\nvec3 DecodeLightmap(vec4 color) {\r\n\treturn color.rgb*color.a*5.0;\r\n}\r\n\r\nvec2 TransformUV(vec2 texcoord,vec4 tilingOffset) {\r\n\tvec2 transTexcoord=vec2(texcoord.x,texcoord.y-1.0)*tilingOffset.xy+vec2(tilingOffset.z,-tilingOffset.w);\r\n\ttransTexcoord.y+=1.0;\r\n\treturn transTexcoord;\r\n}\r\n\r\nvec4 remapGLPositionZ(vec4 position) {\r\n\tposition.z=position.z * 2.0 - position.w;\r\n\treturn position;\r\n}\r\n\r\nmat3 inverse(mat3 m) {\r\n  float a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];\r\n  float a10 = m[1][0], a11 = m[1][1], a12 = m[1][2];\r\n  float a20 = m[2][0], a21 = m[2][1], a22 = m[2][2];\r\n\r\n  float b01 = a22 * a11 - a12 * a21;\r\n  float b11 = -a22 * a10 + a12 * a20;\r\n  float b21 = a21 * a10 - a11 * a20;\r\n\r\n  float det = a00 * b01 + a01 * b11 + a02 * b21;\r\n\r\n  return mat3(b01, (-a22 * a01 + a02 * a21), (a12 * a01 - a02 * a11),\r\n              b11, (a22 * a00 - a02 * a20), (-a12 * a00 + a02 * a10),\r\n              b21, (-a21 * a00 + a01 * a20), (a11 * a00 - a01 * a10)) / det;\r\n}\r\n\r\n";
 
-	var linePS = "#ifdef HIGHPRECISION\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\nvarying vec4 v_Color;\r\nuniform vec4 u_Color;\r\n\r\nvoid main()\r\n{\r\n  gl_FragColor = v_Color * u_Color; \r\n}\r\n\r\n";
+	var linePS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\nvarying vec4 v_Color;\r\nuniform vec4 u_Color;\r\n\r\nvoid main()\r\n{\r\n  gl_FragColor = v_Color * u_Color; \r\n}\r\n\r\n";
 
 	var lineVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nuniform mat4 u_MvpMatrix;\r\nuniform vec4 u_Color;\r\nattribute vec4 a_Color;\r\nvarying vec4 v_Color;\r\n\r\n\r\nvoid main()\r\n{\r\n\tgl_Position = u_MvpMatrix * a_Position;\r\n\tv_Color=a_Color*u_Color;\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
 
-	var MeshBlinnPhongPS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\nuniform vec4 u_DiffuseColor;\r\n\r\n#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef ALPHATEST\r\n\tuniform float u_AlphaTestValue;\r\n#endif\r\n\r\n#ifdef DIFFUSEMAP\r\n\tuniform sampler2D u_DiffuseTexture;\r\n#endif\r\n\r\n\r\n#if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tvarying vec2 v_LightMapUV;\r\n\tuniform sampler2D u_LightMap;\r\n#endif\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\tvarying vec3 v_Normal;\r\n\tvarying vec3 v_ViewDir; \r\n\r\n\tuniform vec3 u_MaterialSpecular;\r\n\tuniform float u_Shininess;\r\n\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tuniform DirectionLight u_DirectionLight;\r\n\t\t#endif\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tuniform PointLight u_PointLight;\r\n\t\t#endif\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tuniform SpotLight u_SpotLight;\r\n\t\t#endif\r\n\t#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n\t#endif\r\n\r\n\t#ifdef SPECULARMAP \r\n\t\tuniform sampler2D u_SpecularTexture;\r\n\t#endif\r\n\t#ifdef NORMALMAP \r\n\t\tuniform sampler2D u_NormalTexture;\r\n\t\tvarying vec3 v_Tangent;\r\n\t\tvarying vec3 v_Binormal;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\n\r\nuniform vec3 u_AmbientColor;\r\n\r\n#if defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(RECEIVESHADOW)\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n#include \"ShadowHelper.glsl\"\r\nvarying float v_posViewZ;\r\n#ifdef RECEIVESHADOW\r\n\t#if defined(SHADOWMAP_PSSM2)||defined(SHADOWMAP_PSSM3)\r\n\t\tuniform mat4 u_lightShadowVP[4];\r\n\t#endif\r\n\t#ifdef SHADOWMAP_PSSM1 \r\n\t\tvarying vec4 v_lightMVPPos;\r\n\t#endif\r\n#endif\r\n\r\nvoid main_castShadow()\r\n{\r\n\t//gl_FragColor=vec4(v_posViewZ,0.0,0.0,1.0);\r\n\tgl_FragColor=packDepth(v_posViewZ);\r\n\t#if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t\tfloat alpha = texture2D(u_DiffuseTexture,v_Texcoord0).w;\r\n\t\tif( alpha < u_AlphaTestValue )\r\n\t\t{\r\n\t\t\tdiscard;\r\n\t\t}\r\n\t#endif\r\n}\r\nvoid main_normal()\r\n{\r\n\tvec3 globalDiffuse=u_AmbientColor;\r\n\t#ifdef LIGHTMAP\t\r\n\t\tglobalDiffuse += DecodeLightmap(texture2D(u_LightMap, v_LightMapUV));\r\n\t#endif\r\n\t\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 normal;\r\n\t\t#if (defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&defined(NORMALMAP)\r\n\t\t\tvec3 normalMapSample = texture2D(u_NormalTexture, v_Texcoord0).rgb;\r\n\t\t\tnormal = normalize(NormalSampleToWorldSpace(normalMapSample, v_Normal, v_Tangent,v_Binormal));\r\n\t\t#else\r\n\t\t\tnormal = normalize(v_Normal);\r\n\t\t#endif\r\n\t\tvec3 viewDir= normalize(v_ViewDir);\r\n\t#endif\r\n\t\r\n\tvec4 mainColor=u_DiffuseColor;\r\n\t#ifdef DIFFUSEMAP\r\n\t\tvec4 difTexColor=texture2D(u_DiffuseTexture, v_Texcoord0);\r\n\t\tmainColor=mainColor*difTexColor;\r\n\t#endif \r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tmainColor=mainColor*v_Color;\r\n\t#endif \r\n    \r\n\t#ifdef ALPHATEST\r\n\t\tif(mainColor.a<u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n  \r\n\t\r\n\tvec3 diffuse = vec3(0.0);\r\n\tvec3 specular= vec3(0.0);\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 dif,spe;\r\n\t\t#ifdef SPECULARMAP\r\n\t\t\tvec3 gloss=texture2D(u_SpecularTexture, v_Texcoord0).rgb;\r\n\t\t#else\r\n\t\t\t#ifdef DIFFUSEMAP\r\n\t\t\t\tvec3 gloss=vec3(difTexColor.a);\r\n\t\t\t#else\r\n\t\t\t\tvec3 gloss=vec3(1.0);\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tLayaAirBlinnPhongDiectionLight(u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_DirectionLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_PointLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_SpotLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\tLayaAirBlinnPhongDiectionLight(u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,directionLight,dif,spe);\r\n\t\t\t\tdiffuse+=dif;\r\n\t\t\t\tspecular+=spe;\r\n\t\t\t}\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,pointLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,spotLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#ifdef RECEIVESHADOW\r\n\t\tfloat shadowValue = 1.0;\r\n\t\t#ifdef SHADOWMAP_PSSM3\r\n\t\t\tshadowValue = getShadowPSSM3(u_shadowMap1,u_shadowMap2,u_shadowMap3,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t\t#endif\r\n\t\t#ifdef SHADOWMAP_PSSM2\r\n\t\t\tshadowValue = getShadowPSSM2(u_shadowMap1,u_shadowMap2,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t\t#endif \r\n\t\t#ifdef SHADOWMAP_PSSM1\r\n\t\t\tshadowValue = getShadowPSSM1(u_shadowMap1,v_lightMVPPos,u_shadowPSSMDistance,u_shadowPCFoffset,v_posViewZ,0.001);\r\n\t\t#endif\r\n\t\tgl_FragColor =vec4(mainColor.rgb*(globalDiffuse + diffuse*shadowValue),mainColor.a);\r\n\t#else\r\n\t\tgl_FragColor =vec4(mainColor.rgb*(globalDiffuse + diffuse),mainColor.a);\r\n\t#endif\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t#ifdef RECEIVESHADOW\r\n\t\t\tgl_FragColor.rgb+=specular*shadowValue;\r\n\t\t#else\r\n\t\t\tgl_FragColor.rgb+=specular;\r\n\t\t#endif\r\n\t#endif\r\n\t  \r\n\t#ifdef FOG\r\n\t\tfloat lerpFact=clamp((1.0/gl_FragCoord.w-u_FogStart)/u_FogRange,0.0,1.0);\r\n\t\tgl_FragColor.rgb=mix(gl_FragColor.rgb,u_FogColor,lerpFact);\r\n\t#endif\r\n}\r\n\r\nvoid main()\r\n{\r\n\t#ifdef CASTSHADOW\t\t\r\n\t\tmain_castShadow();\r\n\t#else\r\n\t\tmain_normal();\r\n\t#endif  \r\n}\r\n\r\n";
+	var MeshBlinnPhongPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\nuniform vec4 u_DiffuseColor;\r\n\r\n#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef ALPHATEST\r\n\tuniform float u_AlphaTestValue;\r\n#endif\r\n\r\n#ifdef DIFFUSEMAP\r\n\tuniform sampler2D u_DiffuseTexture;\r\n#endif\r\n\r\n\r\n#if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tvarying vec2 v_LightMapUV;\r\n\tuniform sampler2D u_LightMap;\r\n#endif\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\tvarying vec3 v_Normal;\r\n\tvarying vec3 v_ViewDir; \r\n\r\n\tuniform vec3 u_MaterialSpecular;\r\n\tuniform float u_Shininess;\r\n\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tuniform DirectionLight u_DirectionLight;\r\n\t\t#endif\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tuniform PointLight u_PointLight;\r\n\t\t#endif\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tuniform SpotLight u_SpotLight;\r\n\t\t#endif\r\n\t#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n\t#endif\r\n\r\n\t#ifdef SPECULARMAP \r\n\t\tuniform sampler2D u_SpecularTexture;\r\n\t#endif\r\n\t#ifdef NORMALMAP \r\n\t\tuniform sampler2D u_NormalTexture;\r\n\t\tvarying vec3 v_Tangent;\r\n\t\tvarying vec3 v_Binormal;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\n\r\nuniform vec3 u_AmbientColor;\r\n\r\n#if defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(RECEIVESHADOW)\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n#include \"ShadowHelper.glsl\"\r\nvarying float v_posViewZ;\r\n#ifdef RECEIVESHADOW\r\n\t#if defined(SHADOWMAP_PSSM2)||defined(SHADOWMAP_PSSM3)\r\n\t\tuniform mat4 u_lightShadowVP[4];\r\n\t#endif\r\n\t#ifdef SHADOWMAP_PSSM1 \r\n\t\tvarying vec4 v_lightMVPPos;\r\n\t#endif\r\n#endif\r\n\r\nvoid main_castShadow()\r\n{\r\n\t//gl_FragColor=vec4(v_posViewZ,0.0,0.0,1.0);\r\n\tgl_FragColor=packDepth(v_posViewZ);\r\n\t#if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t\tfloat alpha = texture2D(u_DiffuseTexture,v_Texcoord0).w;\r\n\t\tif( alpha < u_AlphaTestValue )\r\n\t\t{\r\n\t\t\tdiscard;\r\n\t\t}\r\n\t#endif\r\n}\r\nvoid main_normal()\r\n{\r\n\tvec3 globalDiffuse=u_AmbientColor;\r\n\t#ifdef LIGHTMAP\t\r\n\t\tglobalDiffuse += DecodeLightmap(texture2D(u_LightMap, v_LightMapUV));\r\n\t#endif\r\n\t\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 normal;\r\n\t\t#if (defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&defined(NORMALMAP)\r\n\t\t\tvec3 normalMapSample = texture2D(u_NormalTexture, v_Texcoord0).rgb;\r\n\t\t\tnormal = normalize(NormalSampleToWorldSpace(normalMapSample, v_Normal, v_Tangent,v_Binormal));\r\n\t\t#else\r\n\t\t\tnormal = normalize(v_Normal);\r\n\t\t#endif\r\n\t\tvec3 viewDir= normalize(v_ViewDir);\r\n\t#endif\r\n\t\r\n\tvec4 mainColor=u_DiffuseColor;\r\n\t#ifdef DIFFUSEMAP\r\n\t\tvec4 difTexColor=texture2D(u_DiffuseTexture, v_Texcoord0);\r\n\t\tmainColor=mainColor*difTexColor;\r\n\t#endif \r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tmainColor=mainColor*v_Color;\r\n\t#endif \r\n    \r\n\t#ifdef ALPHATEST\r\n\t\tif(mainColor.a<u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n  \r\n\t\r\n\tvec3 diffuse = vec3(0.0);\r\n\tvec3 specular= vec3(0.0);\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 dif,spe;\r\n\t\t#ifdef SPECULARMAP\r\n\t\t\tvec3 gloss=texture2D(u_SpecularTexture, v_Texcoord0).rgb;\r\n\t\t#else\r\n\t\t\t#ifdef DIFFUSEMAP\r\n\t\t\t\tvec3 gloss=vec3(difTexColor.a);\r\n\t\t\t#else\r\n\t\t\t\tvec3 gloss=vec3(1.0);\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tLayaAirBlinnPhongDiectionLight(u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_DirectionLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_PointLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_SpotLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\tLayaAirBlinnPhongDiectionLight(u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,directionLight,dif,spe);\r\n\t\t\t\tdiffuse+=dif;\r\n\t\t\t\tspecular+=spe;\r\n\t\t\t}\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,pointLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,spotLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#ifdef RECEIVESHADOW\r\n\t\tfloat shadowValue = 1.0;\r\n\t\t#ifdef SHADOWMAP_PSSM3\r\n\t\t\tshadowValue = getShadowPSSM3(u_shadowMap1,u_shadowMap2,u_shadowMap3,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t\t#endif\r\n\t\t#ifdef SHADOWMAP_PSSM2\r\n\t\t\tshadowValue = getShadowPSSM2(u_shadowMap1,u_shadowMap2,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t\t#endif \r\n\t\t#ifdef SHADOWMAP_PSSM1\r\n\t\t\tshadowValue = getShadowPSSM1(u_shadowMap1,v_lightMVPPos,u_shadowPSSMDistance,u_shadowPCFoffset,v_posViewZ,0.001);\r\n\t\t#endif\r\n\t\tgl_FragColor =vec4(mainColor.rgb*(globalDiffuse + diffuse*shadowValue),mainColor.a);\r\n\t#else\r\n\t\tgl_FragColor =vec4(mainColor.rgb*(globalDiffuse + diffuse),mainColor.a);\r\n\t#endif\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t#ifdef RECEIVESHADOW\r\n\t\t\tgl_FragColor.rgb+=specular*shadowValue;\r\n\t\t#else\r\n\t\t\tgl_FragColor.rgb+=specular;\r\n\t\t#endif\r\n\t#endif\r\n\t  \r\n\t#ifdef FOG\r\n\t\tfloat lerpFact=clamp((1.0/gl_FragCoord.w-u_FogStart)/u_FogRange,0.0,1.0);\r\n\t\tgl_FragColor.rgb=mix(gl_FragColor.rgb,u_FogColor,lerpFact);\r\n\t#endif\r\n}\r\n\r\nvoid main()\r\n{\r\n\t#ifdef CASTSHADOW\t\t\r\n\t\tmain_castShadow();\r\n\t#else\r\n\t\tmain_normal();\r\n\t#endif  \r\n}\r\n\r\n";
 
 	var MeshBlinnPhongVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_MvpMatrix;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\n\r\n\r\n#if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))||(defined(LIGHTMAP)&&defined(UV))\r\n\tattribute vec2 a_Texcoord0;\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#if defined(LIGHTMAP)&&defined(UV1)\r\n\tattribute vec2 a_Texcoord1;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tuniform vec4 u_LightmapScaleOffset;\r\n\tvarying vec2 v_LightMapUV;\r\n#endif\r\n\r\n#ifdef COLOR\r\n\tattribute vec4 a_Color;\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\tattribute vec3 a_Normal;\r\n\tvarying vec3 v_Normal; \r\n\tuniform vec3 u_CameraPos;\r\n\tvarying vec3 v_ViewDir; \r\n#endif\r\n\r\n#if (defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&defined(NORMALMAP)\r\n\tattribute vec4 a_Tangent0;\r\n\tvarying vec3 v_Tangent;\r\n\tvarying vec3 v_Binormal;\r\n#endif\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(RECEIVESHADOW)\r\n\t#ifdef GPU_INSTANCE\r\n\t\tattribute mat4 a_WorldMat;\r\n\t#else\r\n\t\tuniform mat4 u_WorldMat;\r\n\t#endif\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\nvarying float v_posViewZ;\r\n#ifdef RECEIVESHADOW\r\n  #ifdef SHADOWMAP_PSSM1 \r\n  varying vec4 v_lightMVPPos;\r\n  uniform mat4 u_lightShadowVP[4];\r\n  #endif\r\n#endif\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif\r\n\r\nvoid main_castShadow()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform = u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\tposition=skinTransform*a_Position;\r\n\t#else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\t\r\n\t//TODO没考虑UV动画呢\r\n\t#if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t\tv_Texcoord0=a_Texcoord0;\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n\tv_posViewZ = gl_Position.z;\r\n}\r\n\r\nvoid main_normal()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform = u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\tposition=skinTransform*a_Position;\r\n\t#else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\t\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(RECEIVESHADOW)\r\n\t\tmat4 worldMat;\r\n\t\t#ifdef GPU_INSTANCE\r\n\t\t\tworldMat = a_WorldMat;\r\n\t\t#else\r\n\t\t\tworldMat = u_WorldMat;\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tmat3 worldInvMat;\r\n\t\t#ifdef BONE\r\n\t\t\tworldInvMat=inverse(mat3(worldMat*skinTransform));\r\n\t\t#else\r\n\t\t\tworldInvMat=inverse(mat3(worldMat));\r\n\t\t#endif  \r\n\t\tv_Normal=a_Normal*worldInvMat;\r\n\t\t#if (defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&defined(NORMALMAP)\r\n\t\t\tv_Tangent=a_Tangent0.xyz*worldInvMat;\r\n\t\t\tv_Binormal=cross(v_Normal,v_Tangent)*a_Tangent0.w;\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(RECEIVESHADOW)\r\n\t\tv_PositionWorld=(worldMat*position).xyz;\r\n\t#endif\r\n\t\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tv_ViewDir=u_CameraPos-v_PositionWorld;\r\n\t#endif\r\n\r\n\t#if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))\r\n\t\t#ifdef TILINGOFFSET\r\n\t\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t\t#else\r\n\t\t\tv_Texcoord0=a_Texcoord0;\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#ifdef LIGHTMAP\r\n\t\t#ifdef SCALEOFFSETLIGHTINGMAPUV\r\n\t\t\t#ifdef UV1\r\n\t\t\t\tv_LightMapUV=vec2(a_Texcoord1.x,1.0-a_Texcoord1.y)*u_LightmapScaleOffset.xy+u_LightmapScaleOffset.zw;\r\n\t\t\t#else\r\n\t\t\t\tv_LightMapUV=vec2(a_Texcoord0.x,1.0-a_Texcoord0.y)*u_LightmapScaleOffset.xy+u_LightmapScaleOffset.zw;\r\n\t\t\t#endif \r\n\t\t\tv_LightMapUV.y=1.0-v_LightMapUV.y;\r\n\t\t#else\r\n\t\t\t#ifdef UV1\r\n\t\t\t\tv_LightMapUV=a_Texcoord1;\r\n\t\t\t#else\r\n\t\t\t\tv_LightMapUV=a_Texcoord0;\r\n\t\t\t#endif \r\n\t\t#endif \r\n\t#endif\r\n\r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tv_Color=a_Color;\r\n\t#endif\r\n\r\n\t#ifdef RECEIVESHADOW\r\n\t\tv_posViewZ = gl_Position.w;\r\n\t\t#ifdef SHADOWMAP_PSSM1 \r\n\t\t\tv_lightMVPPos = u_lightShadowVP[0] * vec4(v_PositionWorld,1.0);\r\n\t\t#endif\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n\r\nvoid main()\r\n{\r\n\t#ifdef CASTSHADOW\r\n\t\tmain_castShadow();\r\n\t#else\r\n\t\tmain_normal();\r\n\t#endif\r\n}";
 
-	var ParticleShuriKenPS = "#ifdef HIGHPRECISION\r\n  precision highp float;\r\n#else\r\n  precision mediump float;\r\n#endif\r\n\r\nvarying vec4 v_Color;\r\nvarying vec2 v_TextureCoordinate;\r\nuniform sampler2D u_texture;\r\nuniform vec4 u_Tintcolor;\r\n\r\n#ifdef RENDERMODE_MESH\r\n\tvarying vec4 v_MeshColor;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\t#ifdef ADDTIVEFOG\r\n\t#else\r\n\t\tuniform vec3 u_FogColor;\r\n\t#endif\r\n#endif\r\n\r\n\r\nvoid main()\r\n{\t\r\n\t#ifdef RENDERMODE_MESH\r\n\t\tgl_FragColor=v_MeshColor;\r\n\t#else\r\n\t\tgl_FragColor=vec4(1.0);\t\r\n\t#endif\r\n\t\t\r\n\t#ifdef DIFFUSEMAP\r\n\t\t#ifdef TINTCOLOR\r\n\t\t\tgl_FragColor*=texture2D(u_texture,v_TextureCoordinate)*u_Tintcolor*2.0*v_Color;\r\n\t\t#else\r\n\t\t\tgl_FragColor*=texture2D(u_texture,v_TextureCoordinate)*v_Color;\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef TINTCOLOR\r\n\t\t\tgl_FragColor*=u_Tintcolor*2.0*v_Color;\r\n\t\t#else\r\n\t\t\tgl_FragColor*=v_Color;\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact=clamp((1.0/gl_FragCoord.w-u_FogStart)/u_FogRange,0.0,1.0);\r\n\t\t#ifdef ADDTIVEFOG\r\n\t\t\tgl_FragColor.rgb=mix(gl_FragColor.rgb,vec3(0.0,0.0,0.0),lerpFact);\r\n\t\t#else\r\n\t\t\tgl_FragColor.rgb=mix(gl_FragColor.rgb,u_FogColor,lerpFact);\r\n\t\t#endif\r\n\t#endif\r\n}";
+	var ParticleShuriKenPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n  precision highp float;\r\n#else\r\n  precision mediump float;\r\n#endif\r\n\r\nvarying vec4 v_Color;\r\nvarying vec2 v_TextureCoordinate;\r\nuniform sampler2D u_texture;\r\nuniform vec4 u_Tintcolor;\r\n\r\n#ifdef RENDERMODE_MESH\r\n\tvarying vec4 v_MeshColor;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\t#ifdef ADDTIVEFOG\r\n\t#else\r\n\t\tuniform vec3 u_FogColor;\r\n\t#endif\r\n#endif\r\n\r\n\r\nvoid main()\r\n{\t\r\n\t#ifdef RENDERMODE_MESH\r\n\t\tgl_FragColor=v_MeshColor;\r\n\t#else\r\n\t\tgl_FragColor=vec4(1.0);\t\r\n\t#endif\r\n\t\t\r\n\t#ifdef DIFFUSEMAP\r\n\t\t#ifdef TINTCOLOR\r\n\t\t\tgl_FragColor*=texture2D(u_texture,v_TextureCoordinate)*u_Tintcolor*2.0*v_Color;\r\n\t\t#else\r\n\t\t\tgl_FragColor*=texture2D(u_texture,v_TextureCoordinate)*v_Color;\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef TINTCOLOR\r\n\t\t\tgl_FragColor*=u_Tintcolor*2.0*v_Color;\r\n\t\t#else\r\n\t\t\tgl_FragColor*=v_Color;\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact=clamp((1.0/gl_FragCoord.w-u_FogStart)/u_FogRange,0.0,1.0);\r\n\t\t#ifdef ADDTIVEFOG\r\n\t\t\tgl_FragColor.rgb=mix(gl_FragColor.rgb,vec3(0.0,0.0,0.0),lerpFact);\r\n\t\t#else\r\n\t\t\tgl_FragColor.rgb=mix(gl_FragColor.rgb,u_FogColor,lerpFact);\r\n\t\t#endif\r\n\t#endif\r\n}";
 
-	var ParticleShuriKenVS = "#include \"Lighting.glsl\";\r\n\r\n#ifdef HIGHPRECISION\r\n  precision highp float;\r\n#else\r\n  precision mediump float;\r\n#endif\r\n\r\n#if defined(SPHERHBILLBOARD)||defined(STRETCHEDBILLBOARD)||defined(HORIZONTALBILLBOARD)||defined(VERTICALBILLBOARD)\r\n\tattribute vec4 a_CornerTextureCoordinate;\r\n#endif\r\n#ifdef RENDERMODE_MESH\r\n\tattribute vec3 a_MeshPosition;\r\n\tattribute vec4 a_MeshColor;\r\n\tattribute vec2 a_MeshTextureCoordinate;\r\n\tvarying vec4 v_MeshColor;\r\n#endif\r\n\r\nattribute vec4 a_ShapePositionStartLifeTime;\r\nattribute vec4 a_DirectionTime;\r\nattribute vec4 a_StartColor;\r\nattribute vec3 a_StartSize;\r\nattribute vec3 a_StartRotation0;\r\nattribute float a_StartSpeed;\r\n#if defined(COLOROVERLIFETIME)||defined(RANDOMCOLOROVERLIFETIME)||defined(SIZEOVERLIFETIMERANDOMCURVES)||defined(SIZEOVERLIFETIMERANDOMCURVESSEPERATE)||defined(ROTATIONOVERLIFETIMERANDOMCONSTANTS)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\n  attribute vec4 a_Random0;\r\n#endif\r\n#if defined(TEXTURESHEETANIMATIONRANDOMCURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n  attribute vec4 a_Random1;\r\n#endif\r\nattribute vec3 a_SimulationWorldPostion;\r\nattribute vec4 a_SimulationWorldRotation;\r\n\r\nvarying vec4 v_Color;\r\n#ifdef DIFFUSEMAP\r\n\tvarying vec2 v_TextureCoordinate;\r\n#endif\r\n\r\nuniform float u_CurrentTime;\r\nuniform vec3 u_Gravity;\r\n\r\nuniform vec3 u_WorldPosition;\r\nuniform vec4 u_WorldRotation;\r\nuniform bool u_ThreeDStartRotation;\r\nuniform int u_ScalingMode;\r\nuniform vec3 u_PositionScale;\r\nuniform vec3 u_SizeScale;\r\nuniform mat4 u_View;\r\nuniform mat4 u_Projection;\r\n\r\n#ifdef STRETCHEDBILLBOARD\r\n\tuniform vec3 u_CameraPos;\r\n#endif\r\nuniform vec3 u_CameraDirection;//TODO:只有几种广告牌模式需要用\r\nuniform vec3 u_CameraUp;\r\n\r\nuniform  float u_StretchedBillboardLengthScale;\r\nuniform  float u_StretchedBillboardSpeedScale;\r\nuniform int u_SimulationSpace;\r\n\r\n#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n  uniform  int  u_VOLSpaceType;\r\n#endif\r\n#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)\r\n  uniform  vec3 u_VOLVelocityConst;\r\n#endif\r\n#if defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n  uniform  vec2 u_VOLVelocityGradientX[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientY[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientZ[4];//x为key,y为速度\r\n#endif\r\n#ifdef VELOCITYOVERLIFETIMERANDOMCONSTANT\r\n  uniform  vec3 u_VOLVelocityConstMax;\r\n#endif\r\n#ifdef VELOCITYOVERLIFETIMERANDOMCURVE\r\n  uniform  vec2 u_VOLVelocityGradientMaxX[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientMaxY[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientMaxZ[4];//x为key,y为速度\r\n#endif\r\n\r\n#ifdef COLOROVERLIFETIME\r\n  uniform  vec4 u_ColorOverLifeGradientColors[4];//x为key,yzw为Color\r\n  uniform  vec2 u_ColorOverLifeGradientAlphas[4];//x为key,y为Alpha\r\n#endif\r\n#ifdef RANDOMCOLOROVERLIFETIME\r\n  uniform  vec4 u_ColorOverLifeGradientColors[4];//x为key,yzw为Color\r\n  uniform  vec2 u_ColorOverLifeGradientAlphas[4];//x为key,y为Alpha\r\n  uniform  vec4 u_MaxColorOverLifeGradientColors[4];//x为key,yzw为Color\r\n  uniform  vec2 u_MaxColorOverLifeGradientAlphas[4];//x为key,y为Alpha\r\n#endif\r\n\r\n\r\n#if defined(SIZEOVERLIFETIMECURVE)||defined(SIZEOVERLIFETIMERANDOMCURVES)\r\n  uniform  vec2 u_SOLSizeGradient[4];//x为key,y为尺寸\r\n#endif\r\n#ifdef SIZEOVERLIFETIMERANDOMCURVES\r\n  uniform  vec2 u_SOLSizeGradientMax[4];//x为key,y为尺寸\r\n#endif\r\n#if defined(SIZEOVERLIFETIMECURVESEPERATE)||defined(SIZEOVERLIFETIMERANDOMCURVESSEPERATE)\r\n  uniform  vec2 u_SOLSizeGradientX[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientY[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientZ[4];//x为key,y为尺寸\r\n#endif\r\n#ifdef SIZEOVERLIFETIMERANDOMCURVESSEPERATE\r\n  uniform  vec2 u_SOLSizeGradientMaxX[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientMaxY[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientMaxZ[4];//x为key,y为尺寸\r\n#endif\r\n\r\n\r\n#ifdef ROTATIONOVERLIFETIME\r\n  #if defined(ROTATIONOVERLIFETIMECONSTANT)||defined(ROTATIONOVERLIFETIMERANDOMCONSTANTS)\r\n    uniform  float u_ROLAngularVelocityConst;\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n    uniform  float u_ROLAngularVelocityConstMax;\r\n  #endif\r\n  #if defined(ROTATIONOVERLIFETIMECURVE)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\n    uniform  vec2 u_ROLAngularVelocityGradient[4];//x为key,y为旋转\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n    uniform  vec2 u_ROLAngularVelocityGradientMax[4];//x为key,y为旋转\r\n  #endif\r\n#endif\r\n#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n  #if defined(ROTATIONOVERLIFETIMECONSTANT)||defined(ROTATIONOVERLIFETIMERANDOMCONSTANTS)\r\n    uniform  vec3 u_ROLAngularVelocityConstSeprarate;\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n    uniform  vec3 u_ROLAngularVelocityConstMaxSeprarate;\r\n  #endif\r\n  #if defined(ROTATIONOVERLIFETIMECURVE)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\n    uniform  vec2 u_ROLAngularVelocityGradientX[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientY[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientZ[4];\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n    uniform  vec2 u_ROLAngularVelocityGradientMaxX[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientMaxY[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientMaxZ[4];\r\n\tuniform  vec2 u_ROLAngularVelocityGradientMaxW[4];\r\n  #endif\r\n#endif\r\n\r\n#if defined(TEXTURESHEETANIMATIONCURVE)||defined(TEXTURESHEETANIMATIONRANDOMCURVE)\r\n  uniform  float u_TSACycles;\r\n  uniform  vec2 u_TSASubUVLength;\r\n  uniform  vec2 u_TSAGradientUVs[4];//x为key,y为frame\r\n#endif\r\n#ifdef TEXTURESHEETANIMATIONRANDOMCURVE\r\n  uniform  vec2 u_TSAMaxGradientUVs[4];//x为key,y为frame\r\n#endif\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif\r\n\r\nvec3 rotationByEuler(in vec3 vector,in vec3 rot)\r\n{\r\n\tfloat halfRoll = rot.z * 0.5;\r\n    float halfPitch = rot.x * 0.5;\r\n\tfloat halfYaw = rot.y * 0.5;\r\n\r\n\tfloat sinRoll = sin(halfRoll);\r\n\tfloat cosRoll = cos(halfRoll);\r\n\tfloat sinPitch = sin(halfPitch);\r\n\tfloat cosPitch = cos(halfPitch);\r\n\tfloat sinYaw = sin(halfYaw);\r\n\tfloat cosYaw = cos(halfYaw);\r\n\r\n\tfloat quaX = (cosYaw * sinPitch * cosRoll) + (sinYaw * cosPitch * sinRoll);\r\n\tfloat quaY = (sinYaw * cosPitch * cosRoll) - (cosYaw * sinPitch * sinRoll);\r\n\tfloat quaZ = (cosYaw * cosPitch * sinRoll) - (sinYaw * sinPitch * cosRoll);\r\n\tfloat quaW = (cosYaw * cosPitch * cosRoll) + (sinYaw * sinPitch * sinRoll);\r\n\t\r\n\t//vec4 q=vec4(quaX,quaY,quaZ,quaW);\r\n\t//vec3 temp = cross(q.xyz, vector) + q.w * vector;\r\n\t//return (cross(temp, -q.xyz) + dot(q.xyz,vector) * q.xyz + q.w * temp);\r\n\t\r\n\tfloat x = quaX + quaX;\r\n    float y = quaY + quaY;\r\n    float z = quaZ + quaZ;\r\n    float wx = quaW * x;\r\n    float wy = quaW * y;\r\n    float wz = quaW * z;\r\n\tfloat xx = quaX * x;\r\n    float xy = quaX * y;\r\n\tfloat xz = quaX * z;\r\n    float yy = quaY * y;\r\n    float yz = quaY * z;\r\n    float zz = quaZ * z;\r\n\r\n    return vec3(((vector.x * ((1.0 - yy) - zz)) + (vector.y * (xy - wz))) + (vector.z * (xz + wy)),\r\n                ((vector.x * (xy + wz)) + (vector.y * ((1.0 - xx) - zz))) + (vector.z * (yz - wx)),\r\n                ((vector.x * (xz - wy)) + (vector.y * (yz + wx))) + (vector.z * ((1.0 - xx) - yy)));\r\n\t\r\n}\r\n\r\n//假定axis已经归一化\r\nvec3 rotationByAxis(in vec3 vector,in vec3 axis, in float angle)\r\n{\r\n\tfloat halfAngle = angle * 0.5;\r\n\tfloat sin = sin(halfAngle);\r\n\t\r\n\tfloat quaX = axis.x * sin;\r\n\tfloat quaY = axis.y * sin;\r\n\tfloat quaZ = axis.z * sin;\r\n\tfloat quaW = cos(halfAngle);\r\n\t\r\n\t//vec4 q=vec4(quaX,quaY,quaZ,quaW);\r\n\t//vec3 temp = cross(q.xyz, vector) + q.w * vector;\r\n\t//return (cross(temp, -q.xyz) + dot(q.xyz,vector) * q.xyz + q.w * temp);\r\n\t\r\n\tfloat x = quaX + quaX;\r\n    float y = quaY + quaY;\r\n    float z = quaZ + quaZ;\r\n    float wx = quaW * x;\r\n    float wy = quaW * y;\r\n    float wz = quaW * z;\r\n\tfloat xx = quaX * x;\r\n    float xy = quaX * y;\r\n\tfloat xz = quaX * z;\r\n    float yy = quaY * y;\r\n    float yz = quaY * z;\r\n    float zz = quaZ * z;\r\n\r\n    return vec3(((vector.x * ((1.0 - yy) - zz)) + (vector.y * (xy - wz))) + (vector.z * (xz + wy)),\r\n                ((vector.x * (xy + wz)) + (vector.y * ((1.0 - xx) - zz))) + (vector.z * (yz - wx)),\r\n                ((vector.x * (xz - wy)) + (vector.y * (yz + wx))) + (vector.z * ((1.0 - xx) - yy)));\r\n\t\r\n}\r\n\r\nvec3 rotationByQuaternions(in vec3 v,in vec4 q) \r\n{\r\n\treturn v + 2.0 * cross(q.xyz, cross(q.xyz, v) + q.w * v);\r\n}\r\n\r\n \r\n#if defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)||defined(SIZEOVERLIFETIMECURVE)||defined(SIZEOVERLIFETIMECURVESEPERATE)||defined(SIZEOVERLIFETIMERANDOMCURVES)||defined(SIZEOVERLIFETIMERANDOMCURVESSEPERATE)\r\nfloat getCurValueFromGradientFloat(in vec2 gradientNumbers[4],in float normalizedAge)\r\n{\r\n\tfloat curValue;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientNumber=gradientNumbers[i];\r\n\t\tfloat key=gradientNumber.x;\r\n\t\tif(key>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec2 lastGradientNumber=gradientNumbers[i-1];\r\n\t\t\tfloat lastKey=lastGradientNumber.x;\r\n\t\t\tfloat age=(normalizedAge-lastKey)/(key-lastKey);\r\n\t\t\tcurValue=mix(lastGradientNumber.y,gradientNumber.y,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\treturn curValue;\r\n}\r\n#endif\r\n\r\n#if defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)||defined(ROTATIONOVERLIFETIMECURVE)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\nfloat getTotalValueFromGradientFloat(in vec2 gradientNumbers[4],in float normalizedAge)\r\n{\r\n\tfloat totalValue=0.0;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientNumber=gradientNumbers[i];\r\n\t\tfloat key=gradientNumber.x;\r\n\t\tvec2 lastGradientNumber=gradientNumbers[i-1];\r\n\t\tfloat lastValue=lastGradientNumber.y;\r\n\t\t\r\n\t\tif(key>=normalizedAge){\r\n\t\t\tfloat lastKey=lastGradientNumber.x;\r\n\t\t\tfloat age=(normalizedAge-lastKey)/(key-lastKey);\r\n\t\t\ttotalValue+=(lastValue+mix(lastValue,gradientNumber.y,age))/2.0*a_ShapePositionStartLifeTime.w*(normalizedAge-lastKey);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t\telse{\r\n\t\t\ttotalValue+=(lastValue+gradientNumber.y)/2.0*a_ShapePositionStartLifeTime.w*(key-lastGradientNumber.x);\r\n\t\t}\r\n\t}\r\n\treturn totalValue;\r\n}\r\n#endif\r\n\r\n#if defined(COLOROVERLIFETIME)||defined(RANDOMCOLOROVERLIFETIME)\r\nvec4 getColorFromGradient(in vec2 gradientAlphas[4],in vec4 gradientColors[4],in float normalizedAge)\r\n{\r\n\tvec4 overTimeColor;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientAlpha=gradientAlphas[i];\r\n\t\tfloat alphaKey=gradientAlpha.x;\r\n\t\tif(alphaKey>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec2 lastGradientAlpha=gradientAlphas[i-1];\r\n\t\t\tfloat lastAlphaKey=lastGradientAlpha.x;\r\n\t\t\tfloat age=(normalizedAge-lastAlphaKey)/(alphaKey-lastAlphaKey);\r\n\t\t\toverTimeColor.a=mix(lastGradientAlpha.y,gradientAlpha.y,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\t\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec4 gradientColor=gradientColors[i];\r\n\t\tfloat colorKey=gradientColor.x;\r\n\t\tif(colorKey>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec4 lastGradientColor=gradientColors[i-1];\r\n\t\t\tfloat lastColorKey=lastGradientColor.x;\r\n\t\t\tfloat age=(normalizedAge-lastColorKey)/(colorKey-lastColorKey);\r\n\t\t\toverTimeColor.rgb=mix(gradientColors[i-1].yzw,gradientColor.yzw,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\treturn overTimeColor;\r\n}\r\n#endif\r\n\r\n\r\n#if defined(TEXTURESHEETANIMATIONCURVE)||defined(TEXTURESHEETANIMATIONRANDOMCURVE)\r\nfloat getFrameFromGradient(in vec2 gradientFrames[4],in float normalizedAge)\r\n{\r\n\tfloat overTimeFrame;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientFrame=gradientFrames[i];\r\n\t\tfloat key=gradientFrame.x;\r\n\t\tif(key>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec2 lastGradientFrame=gradientFrames[i-1];\r\n\t\t\tfloat lastKey=lastGradientFrame.x;\r\n\t\t\tfloat age=(normalizedAge-lastKey)/(key-lastKey);\r\n\t\t\toverTimeFrame=mix(lastGradientFrame.y,gradientFrame.y,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\treturn floor(overTimeFrame);\r\n}\r\n#endif\r\n\r\n#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\nvec3 computeParticleLifeVelocity(in float normalizedAge)\r\n{\r\n  vec3 outLifeVelocity;\r\n  #ifdef VELOCITYOVERLIFETIMECONSTANT\r\n\t outLifeVelocity=u_VOLVelocityConst; \r\n  #endif\r\n  #ifdef VELOCITYOVERLIFETIMECURVE\r\n     outLifeVelocity= vec3(getCurValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge));\r\n  #endif\r\n  #ifdef VELOCITYOVERLIFETIMERANDOMCONSTANT\r\n\t outLifeVelocity=mix(u_VOLVelocityConst,u_VOLVelocityConstMax,vec3(a_Random1.y,a_Random1.z,a_Random1.w)); \r\n  #endif\r\n  #ifdef VELOCITYOVERLIFETIMERANDOMCURVE\r\n     outLifeVelocity=vec3(mix(getCurValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientMaxX,normalizedAge),a_Random1.y),\r\n\t                 mix(getCurValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientMaxY,normalizedAge),a_Random1.z),\r\n\t\t\t\t\t mix(getCurValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientMaxZ,normalizedAge),a_Random1.w));\r\n  #endif\r\n\t\t\t\t\t\r\n  return outLifeVelocity;\r\n} \r\n#endif\r\n\r\nvec3 computeParticlePosition(in vec3 startVelocity, in vec3 lifeVelocity,in float age,in float normalizedAge,vec3 gravityVelocity,vec4 worldRotation)\r\n{\r\n   vec3 startPosition;\r\n   vec3 lifePosition;\r\n   #if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n\t#ifdef VELOCITYOVERLIFETIMECONSTANT\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=lifeVelocity*age;\r\n\t#endif\r\n\t#ifdef VELOCITYOVERLIFETIMECURVE\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=vec3(getTotalValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge));\r\n\t#endif\r\n\t#ifdef VELOCITYOVERLIFETIMERANDOMCONSTANT\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=lifeVelocity*age;\r\n\t#endif\r\n\t#ifdef VELOCITYOVERLIFETIMERANDOMCURVE\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=vec3(mix(getTotalValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientMaxX,normalizedAge),a_Random1.y)\r\n\t      ,mix(getTotalValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientMaxY,normalizedAge),a_Random1.z)\r\n\t      ,mix(getTotalValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientMaxZ,normalizedAge),a_Random1.w));\r\n\t#endif\r\n\t\r\n\tvec3 finalPosition;\r\n\tif(u_VOLSpaceType==0){\r\n\t  if(u_ScalingMode!=2)\r\n\t   finalPosition =rotationByQuaternions(u_PositionScale*(a_ShapePositionStartLifeTime.xyz+startPosition+lifePosition),worldRotation);\r\n\t  else\r\n\t   finalPosition =rotationByQuaternions(u_PositionScale*a_ShapePositionStartLifeTime.xyz+startPosition+lifePosition,worldRotation);\r\n\t}\r\n\telse{\r\n\t  if(u_ScalingMode!=2)\r\n\t    finalPosition = rotationByQuaternions(u_PositionScale*(a_ShapePositionStartLifeTime.xyz+startPosition),worldRotation)+lifePosition;\r\n\t  else\r\n\t    finalPosition = rotationByQuaternions(u_PositionScale*a_ShapePositionStartLifeTime.xyz+startPosition,worldRotation)+lifePosition;\r\n\t}\r\n  #else\r\n\t startPosition=startVelocity*age;\r\n\t vec3 finalPosition;\r\n\t if(u_ScalingMode!=2)\r\n\t\t\tfinalPosition = rotationByQuaternions(u_PositionScale*(a_ShapePositionStartLifeTime.xyz+startPosition),worldRotation);\r\n\t else\r\n\t   \tfinalPosition = rotationByQuaternions(u_PositionScale*a_ShapePositionStartLifeTime.xyz+startPosition,worldRotation);\r\n  #endif\r\n  \r\n  if(u_SimulationSpace==0)\r\n    finalPosition=finalPosition+a_SimulationWorldPostion;\r\n  else if(u_SimulationSpace==1) \r\n    finalPosition=finalPosition+u_WorldPosition;\r\n  \r\n  finalPosition+=0.5*gravityVelocity*age;\r\n \r\n  return  finalPosition;\r\n}\r\n\r\n\r\nvec4 computeParticleColor(in vec4 color,in float normalizedAge)\r\n{\r\n\t#ifdef COLOROVERLIFETIME\r\n\t  color*=getColorFromGradient(u_ColorOverLifeGradientAlphas,u_ColorOverLifeGradientColors,normalizedAge);\r\n\t#endif\r\n\t\r\n\t#ifdef RANDOMCOLOROVERLIFETIME\r\n\t  color*=mix(getColorFromGradient(u_ColorOverLifeGradientAlphas,u_ColorOverLifeGradientColors,normalizedAge),getColorFromGradient(u_MaxColorOverLifeGradientAlphas,u_MaxColorOverLifeGradientColors,normalizedAge),a_Random0.y);\r\n\t#endif\r\n\r\n    return color;\r\n}\r\n\r\nvec2 computeParticleSizeBillbard(in vec2 size,in float normalizedAge)\r\n{\r\n\t#ifdef SIZEOVERLIFETIMECURVE\r\n\t\tsize*=getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge);\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVES\r\n\t    size*=mix(getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMax,normalizedAge),a_Random0.z); \r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMECURVESEPERATE\r\n\t\tsize*=vec2(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge));\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVESSEPERATE\r\n\t    size*=vec2(mix(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxX,normalizedAge),a_Random0.z)\r\n\t    ,mix(getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxY,normalizedAge),a_Random0.z));\r\n\t#endif\r\n\treturn size;\r\n}\r\n\r\n#ifdef RENDERMODE_MESH\r\nvec3 computeParticleSizeMesh(in vec3 size,in float normalizedAge)\r\n{\r\n\t#ifdef SIZEOVERLIFETIMECURVE\r\n\t\tsize*=getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge);\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVES\r\n\t    size*=mix(getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMax,normalizedAge),a_Random0.z); \r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMECURVESEPERATE\r\n\t\tsize*=vec3(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientZ,normalizedAge));\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVESSEPERATE\r\n\t    size*=vec3(mix(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxX,normalizedAge),a_Random0.z)\r\n\t    ,mix(getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxY,normalizedAge),a_Random0.z)\r\n\t\t,mix(getCurValueFromGradientFloat(u_SOLSizeGradientZ,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxZ,normalizedAge),a_Random0.z));\r\n\t#endif\r\n\treturn size;\r\n}\r\n#endif\r\n\r\nfloat computeParticleRotationFloat(in float rotation,in float age,in float normalizedAge)\r\n{ \r\n\t#ifdef ROTATIONOVERLIFETIME\r\n\t\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tfloat ageRot=u_ROLAngularVelocityConst*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge);\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tfloat ageRot=mix(u_ROLAngularVelocityConst,u_ROLAngularVelocityConstMax,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMax,normalizedAge),a_Random0.w);\r\n\t\t#endif\r\n\t#endif\r\n\t#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n\t\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tfloat ageRot=u_ROLAngularVelocityConstSeprarate.z*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge);\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tfloat ageRot=mix(u_ROLAngularVelocityConstSeprarate.z,u_ROLAngularVelocityConstMaxSeprarate.z,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxZ,normalizedAge),a_Random0.w));\r\n\t\t#endif\r\n\t#endif\r\n\treturn rotation;\r\n}\r\n\r\n#if defined(RENDERMODE_MESH)&&(defined(ROTATIONOVERLIFETIME)||defined(ROTATIONOVERLIFETIMESEPERATE))\r\nvec3 computeParticleRotationVec3(in vec3 rotation,in float age,in float normalizedAge)\r\n{ \r\n\t#ifdef ROTATIONOVERLIFETIME\r\n\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tfloat ageRot=u_ROLAngularVelocityConst*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge);\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tfloat ageRot=mix(u_ROLAngularVelocityConst,u_ROLAngularVelocityConstMax,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMax,normalizedAge),a_Random0.w);\r\n\t\t#endif\r\n\t#endif\r\n\t#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n\t\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tvec3 ageRot=u_ROLAngularVelocityConstSeprarate*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=vec3(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge));\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tvec3 ageRot=mix(u_ROLAngularVelocityConstSeprarate,u_ROLAngularVelocityConstMaxSeprarate,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=vec3(mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxX,normalizedAge),a_Random0.w)\r\n\t        ,mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxY,normalizedAge),a_Random0.w)\r\n\t        ,mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxZ,normalizedAge),a_Random0.w));\r\n\t\t#endif\r\n\t#endif\r\n\treturn rotation;\r\n}\r\n#endif\r\n\r\nvec2 computeParticleUV(in vec2 uv,in float normalizedAge)\r\n{ \r\n\t#ifdef TEXTURESHEETANIMATIONCURVE\r\n\t\tfloat cycleNormalizedAge=normalizedAge*u_TSACycles;\r\n\t\tfloat frame=getFrameFromGradient(u_TSAGradientUVs,cycleNormalizedAge-floor(cycleNormalizedAge));\r\n\t\tfloat totalULength=frame*u_TSASubUVLength.x;\r\n\t\tfloat floorTotalULength=floor(totalULength);\r\n\t    uv.x+=totalULength-floorTotalULength;\r\n\t\tuv.y+=floorTotalULength*u_TSASubUVLength.y;\r\n    #endif\r\n\t#ifdef TEXTURESHEETANIMATIONRANDOMCURVE\r\n\t\tfloat cycleNormalizedAge=normalizedAge*u_TSACycles;\r\n\t\tfloat uvNormalizedAge=cycleNormalizedAge-floor(cycleNormalizedAge);\r\n\t    float frame=floor(mix(getFrameFromGradient(u_TSAGradientUVs,uvNormalizedAge),getFrameFromGradient(u_TSAMaxGradientUVs,uvNormalizedAge),a_Random1.x));\r\n\t\tfloat totalULength=frame*u_TSASubUVLength.x;\r\n\t\tfloat floorTotalULength=floor(totalULength);\r\n\t    uv.x+=totalULength-floorTotalULength;\r\n\t\tuv.y+=floorTotalULength*u_TSASubUVLength.y;\r\n    #endif\r\n\treturn uv;\r\n}\r\n\r\nvoid main()\r\n{\r\n\tfloat age = u_CurrentTime - a_DirectionTime.w;\r\n\tfloat normalizedAge = age/a_ShapePositionStartLifeTime.w;\r\n\tvec3 lifeVelocity;\r\n\tif(normalizedAge<1.0)\r\n\t{ \r\n\t\tvec3 startVelocity=a_DirectionTime.xyz*a_StartSpeed;\r\n\t\t#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n\t\t\tlifeVelocity= computeParticleLifeVelocity(normalizedAge);//计算粒子生命周期速度\r\n\t\t#endif \r\n\t\tvec3 gravityVelocity=u_Gravity*age;\r\n\t\t\r\n\t\tvec4 worldRotation;\r\n\t\tif(u_SimulationSpace==0)\r\n\t\t\tworldRotation=a_SimulationWorldRotation;\r\n\t\telse\r\n\t\t\tworldRotation=u_WorldRotation;\r\n\t\t\r\n\t\tvec3 center=computeParticlePosition(startVelocity, lifeVelocity, age, normalizedAge,gravityVelocity,worldRotation);//计算粒子位置\r\n\t\r\n\t\r\n\t\t#ifdef SPHERHBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tvec3 cameraUpVector =normalize(u_CameraUp);//TODO:是否外面归一化\r\n\t\t\tvec3 sideVector = normalize(cross(u_CameraDirection,cameraUpVector));\r\n\t\t\tvec3 upVector = normalize(cross(sideVector,u_CameraDirection));\r\n\t\t\tcorner*=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\t#if defined(ROTATIONOVERLIFETIME)||defined(ROTATIONOVERLIFETIMESEPERATE)\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tvec3 rotation=vec3(a_StartRotation0.xy,computeParticleRotationFloat(a_StartRotation0.z,age,normalizedAge));\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*rotationByEuler(corner.x*sideVector+corner.y*upVector,rotation);\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\tfloat rot = computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\t\t\tfloat c = cos(rot);\r\n\t\t\t\t\tfloat s = sin(rot);\r\n\t\t\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\t\t\tcorner=rotation*corner;\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*(corner.x*sideVector+corner.y*upVector);\r\n\t\t\t\t}\r\n\t\t\t#else\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*rotationByEuler(corner.x*sideVector+corner.y*upVector,a_StartRotation0);\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\tfloat c = cos(a_StartRotation0.x);\r\n\t\t\t\t\tfloat s = sin(a_StartRotation0.x);\r\n\t\t\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\t\t\tcorner=rotation*corner;\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*(corner.x*sideVector+corner.y*upVector);\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef STRETCHEDBILLBOARD\r\n\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\tvec3 velocity;\r\n\t\t#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n\t\t\tif(u_VOLSpaceType==0)\r\n\t\t\tvelocity=rotationByQuaternions(u_SizeScale*(startVelocity+lifeVelocity),worldRotation)+gravityVelocity;\r\n\t\t\telse\r\n\t\t\tvelocity=rotationByQuaternions(u_SizeScale*startVelocity,worldRotation)+lifeVelocity+gravityVelocity;\r\n\t\t#else\r\n\t\t\tvelocity= rotationByQuaternions(u_SizeScale*startVelocity,worldRotation)+gravityVelocity;\r\n\t\t#endif\t\r\n\t\t\tvec3 cameraUpVector = normalize(velocity);\r\n\t\t\tvec3 direction = normalize(center-u_CameraPos);\r\n\t\t\tvec3 sideVector = normalize(cross(direction,normalize(velocity)));\r\n\t\t\t\r\n\t\t\tsideVector=u_SizeScale.xzy*sideVector;\r\n\t\t\tcameraUpVector=length(vec3(u_SizeScale.x,0.0,0.0))*cameraUpVector;\r\n\t\t\t\r\n\t\t\tvec2 size=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\t\r\n\t\t\tconst mat2 rotaionZHalfPI=mat2(0.0, -1.0, 1.0, 0.0);\r\n\t\t\tcorner=rotaionZHalfPI*corner;\r\n\t\t\tcorner.y=corner.y-abs(corner.y);\r\n\t\t\t\r\n\t\t\tfloat speed=length(velocity);//TODO:\r\n\t\t\tcenter +=sign(u_SizeScale.x)*(sign(u_StretchedBillboardLengthScale)*size.x*corner.x*sideVector+(speed*u_StretchedBillboardSpeedScale+size.y*u_StretchedBillboardLengthScale)*corner.y*cameraUpVector);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef HORIZONTALBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tconst vec3 cameraUpVector=vec3(0.0,0.0,1.0);\r\n\t\t\tconst vec3 sideVector = vec3(-1.0,0.0,0.0);\r\n\t\t\t\r\n\t\t\tfloat rot = computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\tfloat c = cos(rot);\r\n\t\t\tfloat s = sin(rot);\r\n\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\tcorner=rotation*corner*cos(0.78539816339744830961566084581988);//TODO:临时缩小cos45,不确定U3D原因\r\n\t\t\tcorner*=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\tcenter +=u_SizeScale.xzy*(corner.x*sideVector+ corner.y*cameraUpVector);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef VERTICALBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tconst vec3 cameraUpVector =vec3(0.0,1.0,0.0);\r\n\t\t\tvec3 sideVector = normalize(cross(u_CameraDirection,cameraUpVector));\r\n\t\t\t\r\n\t\t\tfloat rot = computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\tfloat c = cos(rot);\r\n\t\t\tfloat s = sin(rot);\r\n\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\tcorner=rotation*corner*cos(0.78539816339744830961566084581988);//TODO:临时缩小cos45,不确定U3D原因\r\n\t\t\tcorner*=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\tcenter +=u_SizeScale.xzy*(corner.x*sideVector+ corner.y*cameraUpVector);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef RENDERMODE_MESH\r\n\t\t\tvec3 size=computeParticleSizeMesh(a_StartSize,normalizedAge);\r\n\t\t\t#if defined(ROTATIONOVERLIFETIME)||defined(ROTATIONOVERLIFETIMESEPERATE)\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tvec3 rotation=vec3(a_StartRotation0.xy,computeParticleRotationFloat(a_StartRotation0.z, age,normalizedAge));\r\n\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByEuler(a_MeshPosition*size,rotation),worldRotation);\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\t#ifdef ROTATIONOVERLIFETIME\r\n\t\t\t\t\t\tfloat angle=computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\t\t\t\tif(a_ShapePositionStartLifeTime.x!=0.0||a_ShapePositionStartLifeTime.y!=0.0){\r\n\t\t\t\t\t\t\tcenter+= (rotationByQuaternions(rotationByAxis(u_SizeScale*a_MeshPosition*size,normalize(cross(vec3(0.0,0.0,1.0),vec3(a_ShapePositionStartLifeTime.xy,0.0))),angle),worldRotation));//已验证\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\telse{\r\n\t\t\t\t\t\t\t#ifdef SHAPE\r\n\t\t\t\t\t\t\t\tcenter+= u_SizeScale.xzy*(rotationByQuaternions(rotationByAxis(a_MeshPosition*size,vec3(0.0,-1.0,0.0),angle),worldRotation));\r\n\t\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\t\t\tcenter+=rotationByAxis(u_SizeScale*a_MeshPosition*size,vec3(0.0,0.0,-1.0),angle);//已验证\r\n\t\t\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\t\t\tcenter+=rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,0.0,-1.0),angle),worldRotation);//已验证\r\n\t\t\t\t\t\t\t#endif\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t#endif\r\n\t\t\t\t\t#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n\t\t\t\t\t\t//TODO:是否应合并if(u_ThreeDStartRotation)分支代码,待测试\r\n\t\t\t\t\t\tvec3 angle=computeParticleRotationVec3(vec3(0.0,0.0,-a_StartRotation0.x), age,normalizedAge);\r\n\t\t\t\t\t\tcenter+= (rotationByQuaternions(rotationByEuler(u_SizeScale*a_MeshPosition*size,vec3(angle.x,angle.y,angle.z)),worldRotation));//已验证\r\n\t\t\t\t\t#endif\t\t\r\n\t\t\t\t}\r\n\t\t\t#else\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByEuler(a_MeshPosition*size,a_StartRotation0),worldRotation);//已验证\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\tif(a_ShapePositionStartLifeTime.x!=0.0||a_ShapePositionStartLifeTime.y!=0.0){\r\n\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\tcenter+= rotationByAxis(u_SizeScale*a_MeshPosition*size,normalize(cross(vec3(0.0,0.0,1.0),vec3(a_ShapePositionStartLifeTime.xy,0.0))),a_StartRotation0.x);\r\n\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\tcenter+= (rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,normalize(cross(vec3(0.0,0.0,1.0),vec3(a_ShapePositionStartLifeTime.xy,0.0))),a_StartRotation0.x),worldRotation));//已验证\r\n\t\t\t\t\t}\r\n\t\t\t\t\telse{\r\n\t\t\t\t\t\t#ifdef SHAPE\r\n\t\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\t\tcenter+= u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,-1.0,0.0),a_StartRotation0.x);\r\n\t\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,-1.0,0.0),a_StartRotation0.x),worldRotation);\t\r\n\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\t\tcenter+= rotationByAxis(u_SizeScale*a_MeshPosition*size,vec3(0.0,0.0,-1.0),a_StartRotation0.x);\r\n\t\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,0.0,-1.0),a_StartRotation0.x),worldRotation);//已验证\r\n\t\t\t\t\t\t#endif\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\tv_MeshColor=a_MeshColor;\r\n\t\t#endif\r\n\t\r\n\t\tgl_Position=u_Projection*u_View*vec4(center,1.0);\r\n\t\tv_Color = computeParticleColor(a_StartColor, normalizedAge);\r\n\t\t#ifdef DIFFUSEMAP\r\n\t\t\t#if defined(SPHERHBILLBOARD)||defined(STRETCHEDBILLBOARD)||defined(HORIZONTALBILLBOARD)||defined(VERTICALBILLBOARD)\r\n\t\t\t\tv_TextureCoordinate =computeParticleUV(a_CornerTextureCoordinate.zw, normalizedAge);\r\n\t\t\t#endif\r\n\t\t\t#ifdef RENDERMODE_MESH\r\n\t\t\t\tv_TextureCoordinate =computeParticleUV(a_MeshTextureCoordinate, normalizedAge);\r\n\t\t\t#endif\r\n\t\t\t\r\n\t\t\t#ifdef TILINGOFFSET\r\n\t\t\t\tv_TextureCoordinate=TransformUV(v_TextureCoordinate,u_TilingOffset);\r\n\t\t\t#endif\r\n\t\t#endif\r\n   \t}\r\n   \telse\r\n\t{\r\n\t\tgl_Position=vec4(2.0,2.0,2.0,1.0);//Discard use out of X(-1,1),Y(-1,1),Z(0,1)\r\n\t}\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n\r\n";
+	var ParticleShuriKenVS = "#include \"Lighting.glsl\";\r\n\r\n#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n  precision highp float;\r\n#else\r\n  precision mediump float;\r\n#endif\r\n\r\n#if defined(SPHERHBILLBOARD)||defined(STRETCHEDBILLBOARD)||defined(HORIZONTALBILLBOARD)||defined(VERTICALBILLBOARD)\r\n\tattribute vec4 a_CornerTextureCoordinate;\r\n#endif\r\n#ifdef RENDERMODE_MESH\r\n\tattribute vec3 a_MeshPosition;\r\n\tattribute vec4 a_MeshColor;\r\n\tattribute vec2 a_MeshTextureCoordinate;\r\n\tvarying vec4 v_MeshColor;\r\n#endif\r\n\r\nattribute vec4 a_ShapePositionStartLifeTime;\r\nattribute vec4 a_DirectionTime;\r\nattribute vec4 a_StartColor;\r\nattribute vec3 a_StartSize;\r\nattribute vec3 a_StartRotation0;\r\nattribute float a_StartSpeed;\r\n#if defined(COLOROVERLIFETIME)||defined(RANDOMCOLOROVERLIFETIME)||defined(SIZEOVERLIFETIMERANDOMCURVES)||defined(SIZEOVERLIFETIMERANDOMCURVESSEPERATE)||defined(ROTATIONOVERLIFETIMERANDOMCONSTANTS)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\n  attribute vec4 a_Random0;\r\n#endif\r\n#if defined(TEXTURESHEETANIMATIONRANDOMCURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n  attribute vec4 a_Random1;\r\n#endif\r\nattribute vec3 a_SimulationWorldPostion;\r\nattribute vec4 a_SimulationWorldRotation;\r\n\r\nvarying vec4 v_Color;\r\n#ifdef DIFFUSEMAP\r\n\tvarying vec2 v_TextureCoordinate;\r\n#endif\r\n\r\nuniform float u_CurrentTime;\r\nuniform vec3 u_Gravity;\r\n\r\nuniform vec3 u_WorldPosition;\r\nuniform vec4 u_WorldRotation;\r\nuniform bool u_ThreeDStartRotation;\r\nuniform int u_ScalingMode;\r\nuniform vec3 u_PositionScale;\r\nuniform vec3 u_SizeScale;\r\nuniform mat4 u_View;\r\nuniform mat4 u_Projection;\r\n\r\n#ifdef STRETCHEDBILLBOARD\r\n\tuniform vec3 u_CameraPos;\r\n#endif\r\nuniform vec3 u_CameraDirection;//TODO:只有几种广告牌模式需要用\r\nuniform vec3 u_CameraUp;\r\n\r\nuniform  float u_StretchedBillboardLengthScale;\r\nuniform  float u_StretchedBillboardSpeedScale;\r\nuniform int u_SimulationSpace;\r\n\r\n#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n  uniform  int  u_VOLSpaceType;\r\n#endif\r\n#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)\r\n  uniform  vec3 u_VOLVelocityConst;\r\n#endif\r\n#if defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n  uniform  vec2 u_VOLVelocityGradientX[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientY[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientZ[4];//x为key,y为速度\r\n#endif\r\n#ifdef VELOCITYOVERLIFETIMERANDOMCONSTANT\r\n  uniform  vec3 u_VOLVelocityConstMax;\r\n#endif\r\n#ifdef VELOCITYOVERLIFETIMERANDOMCURVE\r\n  uniform  vec2 u_VOLVelocityGradientMaxX[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientMaxY[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientMaxZ[4];//x为key,y为速度\r\n#endif\r\n\r\n#ifdef COLOROVERLIFETIME\r\n  uniform  vec4 u_ColorOverLifeGradientColors[4];//x为key,yzw为Color\r\n  uniform  vec2 u_ColorOverLifeGradientAlphas[4];//x为key,y为Alpha\r\n#endif\r\n#ifdef RANDOMCOLOROVERLIFETIME\r\n  uniform  vec4 u_ColorOverLifeGradientColors[4];//x为key,yzw为Color\r\n  uniform  vec2 u_ColorOverLifeGradientAlphas[4];//x为key,y为Alpha\r\n  uniform  vec4 u_MaxColorOverLifeGradientColors[4];//x为key,yzw为Color\r\n  uniform  vec2 u_MaxColorOverLifeGradientAlphas[4];//x为key,y为Alpha\r\n#endif\r\n\r\n\r\n#if defined(SIZEOVERLIFETIMECURVE)||defined(SIZEOVERLIFETIMERANDOMCURVES)\r\n  uniform  vec2 u_SOLSizeGradient[4];//x为key,y为尺寸\r\n#endif\r\n#ifdef SIZEOVERLIFETIMERANDOMCURVES\r\n  uniform  vec2 u_SOLSizeGradientMax[4];//x为key,y为尺寸\r\n#endif\r\n#if defined(SIZEOVERLIFETIMECURVESEPERATE)||defined(SIZEOVERLIFETIMERANDOMCURVESSEPERATE)\r\n  uniform  vec2 u_SOLSizeGradientX[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientY[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientZ[4];//x为key,y为尺寸\r\n#endif\r\n#ifdef SIZEOVERLIFETIMERANDOMCURVESSEPERATE\r\n  uniform  vec2 u_SOLSizeGradientMaxX[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientMaxY[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientMaxZ[4];//x为key,y为尺寸\r\n#endif\r\n\r\n\r\n#ifdef ROTATIONOVERLIFETIME\r\n  #if defined(ROTATIONOVERLIFETIMECONSTANT)||defined(ROTATIONOVERLIFETIMERANDOMCONSTANTS)\r\n    uniform  float u_ROLAngularVelocityConst;\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n    uniform  float u_ROLAngularVelocityConstMax;\r\n  #endif\r\n  #if defined(ROTATIONOVERLIFETIMECURVE)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\n    uniform  vec2 u_ROLAngularVelocityGradient[4];//x为key,y为旋转\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n    uniform  vec2 u_ROLAngularVelocityGradientMax[4];//x为key,y为旋转\r\n  #endif\r\n#endif\r\n#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n  #if defined(ROTATIONOVERLIFETIMECONSTANT)||defined(ROTATIONOVERLIFETIMERANDOMCONSTANTS)\r\n    uniform  vec3 u_ROLAngularVelocityConstSeprarate;\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n    uniform  vec3 u_ROLAngularVelocityConstMaxSeprarate;\r\n  #endif\r\n  #if defined(ROTATIONOVERLIFETIMECURVE)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\n    uniform  vec2 u_ROLAngularVelocityGradientX[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientY[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientZ[4];\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n    uniform  vec2 u_ROLAngularVelocityGradientMaxX[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientMaxY[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientMaxZ[4];\r\n\tuniform  vec2 u_ROLAngularVelocityGradientMaxW[4];\r\n  #endif\r\n#endif\r\n\r\n#if defined(TEXTURESHEETANIMATIONCURVE)||defined(TEXTURESHEETANIMATIONRANDOMCURVE)\r\n  uniform  float u_TSACycles;\r\n  uniform  vec2 u_TSASubUVLength;\r\n  uniform  vec2 u_TSAGradientUVs[4];//x为key,y为frame\r\n#endif\r\n#ifdef TEXTURESHEETANIMATIONRANDOMCURVE\r\n  uniform  vec2 u_TSAMaxGradientUVs[4];//x为key,y为frame\r\n#endif\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif\r\n\r\nvec3 rotationByEuler(in vec3 vector,in vec3 rot)\r\n{\r\n\tfloat halfRoll = rot.z * 0.5;\r\n    float halfPitch = rot.x * 0.5;\r\n\tfloat halfYaw = rot.y * 0.5;\r\n\r\n\tfloat sinRoll = sin(halfRoll);\r\n\tfloat cosRoll = cos(halfRoll);\r\n\tfloat sinPitch = sin(halfPitch);\r\n\tfloat cosPitch = cos(halfPitch);\r\n\tfloat sinYaw = sin(halfYaw);\r\n\tfloat cosYaw = cos(halfYaw);\r\n\r\n\tfloat quaX = (cosYaw * sinPitch * cosRoll) + (sinYaw * cosPitch * sinRoll);\r\n\tfloat quaY = (sinYaw * cosPitch * cosRoll) - (cosYaw * sinPitch * sinRoll);\r\n\tfloat quaZ = (cosYaw * cosPitch * sinRoll) - (sinYaw * sinPitch * cosRoll);\r\n\tfloat quaW = (cosYaw * cosPitch * cosRoll) + (sinYaw * sinPitch * sinRoll);\r\n\t\r\n\t//vec4 q=vec4(quaX,quaY,quaZ,quaW);\r\n\t//vec3 temp = cross(q.xyz, vector) + q.w * vector;\r\n\t//return (cross(temp, -q.xyz) + dot(q.xyz,vector) * q.xyz + q.w * temp);\r\n\t\r\n\tfloat x = quaX + quaX;\r\n    float y = quaY + quaY;\r\n    float z = quaZ + quaZ;\r\n    float wx = quaW * x;\r\n    float wy = quaW * y;\r\n    float wz = quaW * z;\r\n\tfloat xx = quaX * x;\r\n    float xy = quaX * y;\r\n\tfloat xz = quaX * z;\r\n    float yy = quaY * y;\r\n    float yz = quaY * z;\r\n    float zz = quaZ * z;\r\n\r\n    return vec3(((vector.x * ((1.0 - yy) - zz)) + (vector.y * (xy - wz))) + (vector.z * (xz + wy)),\r\n                ((vector.x * (xy + wz)) + (vector.y * ((1.0 - xx) - zz))) + (vector.z * (yz - wx)),\r\n                ((vector.x * (xz - wy)) + (vector.y * (yz + wx))) + (vector.z * ((1.0 - xx) - yy)));\r\n\t\r\n}\r\n\r\n//假定axis已经归一化\r\nvec3 rotationByAxis(in vec3 vector,in vec3 axis, in float angle)\r\n{\r\n\tfloat halfAngle = angle * 0.5;\r\n\tfloat sin = sin(halfAngle);\r\n\t\r\n\tfloat quaX = axis.x * sin;\r\n\tfloat quaY = axis.y * sin;\r\n\tfloat quaZ = axis.z * sin;\r\n\tfloat quaW = cos(halfAngle);\r\n\t\r\n\t//vec4 q=vec4(quaX,quaY,quaZ,quaW);\r\n\t//vec3 temp = cross(q.xyz, vector) + q.w * vector;\r\n\t//return (cross(temp, -q.xyz) + dot(q.xyz,vector) * q.xyz + q.w * temp);\r\n\t\r\n\tfloat x = quaX + quaX;\r\n    float y = quaY + quaY;\r\n    float z = quaZ + quaZ;\r\n    float wx = quaW * x;\r\n    float wy = quaW * y;\r\n    float wz = quaW * z;\r\n\tfloat xx = quaX * x;\r\n    float xy = quaX * y;\r\n\tfloat xz = quaX * z;\r\n    float yy = quaY * y;\r\n    float yz = quaY * z;\r\n    float zz = quaZ * z;\r\n\r\n    return vec3(((vector.x * ((1.0 - yy) - zz)) + (vector.y * (xy - wz))) + (vector.z * (xz + wy)),\r\n                ((vector.x * (xy + wz)) + (vector.y * ((1.0 - xx) - zz))) + (vector.z * (yz - wx)),\r\n                ((vector.x * (xz - wy)) + (vector.y * (yz + wx))) + (vector.z * ((1.0 - xx) - yy)));\r\n\t\r\n}\r\n\r\nvec3 rotationByQuaternions(in vec3 v,in vec4 q) \r\n{\r\n\treturn v + 2.0 * cross(q.xyz, cross(q.xyz, v) + q.w * v);\r\n}\r\n\r\n \r\n#if defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)||defined(SIZEOVERLIFETIMECURVE)||defined(SIZEOVERLIFETIMECURVESEPERATE)||defined(SIZEOVERLIFETIMERANDOMCURVES)||defined(SIZEOVERLIFETIMERANDOMCURVESSEPERATE)\r\nfloat getCurValueFromGradientFloat(in vec2 gradientNumbers[4],in float normalizedAge)\r\n{\r\n\tfloat curValue;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientNumber=gradientNumbers[i];\r\n\t\tfloat key=gradientNumber.x;\r\n\t\tif(key>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec2 lastGradientNumber=gradientNumbers[i-1];\r\n\t\t\tfloat lastKey=lastGradientNumber.x;\r\n\t\t\tfloat age=(normalizedAge-lastKey)/(key-lastKey);\r\n\t\t\tcurValue=mix(lastGradientNumber.y,gradientNumber.y,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\treturn curValue;\r\n}\r\n#endif\r\n\r\n#if defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)||defined(ROTATIONOVERLIFETIMECURVE)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\nfloat getTotalValueFromGradientFloat(in vec2 gradientNumbers[4],in float normalizedAge)\r\n{\r\n\tfloat totalValue=0.0;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientNumber=gradientNumbers[i];\r\n\t\tfloat key=gradientNumber.x;\r\n\t\tvec2 lastGradientNumber=gradientNumbers[i-1];\r\n\t\tfloat lastValue=lastGradientNumber.y;\r\n\t\t\r\n\t\tif(key>=normalizedAge){\r\n\t\t\tfloat lastKey=lastGradientNumber.x;\r\n\t\t\tfloat age=(normalizedAge-lastKey)/(key-lastKey);\r\n\t\t\ttotalValue+=(lastValue+mix(lastValue,gradientNumber.y,age))/2.0*a_ShapePositionStartLifeTime.w*(normalizedAge-lastKey);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t\telse{\r\n\t\t\ttotalValue+=(lastValue+gradientNumber.y)/2.0*a_ShapePositionStartLifeTime.w*(key-lastGradientNumber.x);\r\n\t\t}\r\n\t}\r\n\treturn totalValue;\r\n}\r\n#endif\r\n\r\n#if defined(COLOROVERLIFETIME)||defined(RANDOMCOLOROVERLIFETIME)\r\nvec4 getColorFromGradient(in vec2 gradientAlphas[4],in vec4 gradientColors[4],in float normalizedAge)\r\n{\r\n\tvec4 overTimeColor;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientAlpha=gradientAlphas[i];\r\n\t\tfloat alphaKey=gradientAlpha.x;\r\n\t\tif(alphaKey>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec2 lastGradientAlpha=gradientAlphas[i-1];\r\n\t\t\tfloat lastAlphaKey=lastGradientAlpha.x;\r\n\t\t\tfloat age=(normalizedAge-lastAlphaKey)/(alphaKey-lastAlphaKey);\r\n\t\t\toverTimeColor.a=mix(lastGradientAlpha.y,gradientAlpha.y,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\t\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec4 gradientColor=gradientColors[i];\r\n\t\tfloat colorKey=gradientColor.x;\r\n\t\tif(colorKey>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec4 lastGradientColor=gradientColors[i-1];\r\n\t\t\tfloat lastColorKey=lastGradientColor.x;\r\n\t\t\tfloat age=(normalizedAge-lastColorKey)/(colorKey-lastColorKey);\r\n\t\t\toverTimeColor.rgb=mix(gradientColors[i-1].yzw,gradientColor.yzw,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\treturn overTimeColor;\r\n}\r\n#endif\r\n\r\n\r\n#if defined(TEXTURESHEETANIMATIONCURVE)||defined(TEXTURESHEETANIMATIONRANDOMCURVE)\r\nfloat getFrameFromGradient(in vec2 gradientFrames[4],in float normalizedAge)\r\n{\r\n\tfloat overTimeFrame;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientFrame=gradientFrames[i];\r\n\t\tfloat key=gradientFrame.x;\r\n\t\tif(key>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec2 lastGradientFrame=gradientFrames[i-1];\r\n\t\t\tfloat lastKey=lastGradientFrame.x;\r\n\t\t\tfloat age=(normalizedAge-lastKey)/(key-lastKey);\r\n\t\t\toverTimeFrame=mix(lastGradientFrame.y,gradientFrame.y,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\treturn floor(overTimeFrame);\r\n}\r\n#endif\r\n\r\n#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\nvec3 computeParticleLifeVelocity(in float normalizedAge)\r\n{\r\n  vec3 outLifeVelocity;\r\n  #ifdef VELOCITYOVERLIFETIMECONSTANT\r\n\t outLifeVelocity=u_VOLVelocityConst; \r\n  #endif\r\n  #ifdef VELOCITYOVERLIFETIMECURVE\r\n     outLifeVelocity= vec3(getCurValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge));\r\n  #endif\r\n  #ifdef VELOCITYOVERLIFETIMERANDOMCONSTANT\r\n\t outLifeVelocity=mix(u_VOLVelocityConst,u_VOLVelocityConstMax,vec3(a_Random1.y,a_Random1.z,a_Random1.w)); \r\n  #endif\r\n  #ifdef VELOCITYOVERLIFETIMERANDOMCURVE\r\n     outLifeVelocity=vec3(mix(getCurValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientMaxX,normalizedAge),a_Random1.y),\r\n\t                 mix(getCurValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientMaxY,normalizedAge),a_Random1.z),\r\n\t\t\t\t\t mix(getCurValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientMaxZ,normalizedAge),a_Random1.w));\r\n  #endif\r\n\t\t\t\t\t\r\n  return outLifeVelocity;\r\n} \r\n#endif\r\n\r\nvec3 computeParticlePosition(in vec3 startVelocity, in vec3 lifeVelocity,in float age,in float normalizedAge,vec3 gravityVelocity,vec4 worldRotation)\r\n{\r\n   vec3 startPosition;\r\n   vec3 lifePosition;\r\n   #if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n\t#ifdef VELOCITYOVERLIFETIMECONSTANT\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=lifeVelocity*age;\r\n\t#endif\r\n\t#ifdef VELOCITYOVERLIFETIMECURVE\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=vec3(getTotalValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge));\r\n\t#endif\r\n\t#ifdef VELOCITYOVERLIFETIMERANDOMCONSTANT\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=lifeVelocity*age;\r\n\t#endif\r\n\t#ifdef VELOCITYOVERLIFETIMERANDOMCURVE\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=vec3(mix(getTotalValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientMaxX,normalizedAge),a_Random1.y)\r\n\t      ,mix(getTotalValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientMaxY,normalizedAge),a_Random1.z)\r\n\t      ,mix(getTotalValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientMaxZ,normalizedAge),a_Random1.w));\r\n\t#endif\r\n\t\r\n\tvec3 finalPosition;\r\n\tif(u_VOLSpaceType==0){\r\n\t  if(u_ScalingMode!=2)\r\n\t   finalPosition =rotationByQuaternions(u_PositionScale*(a_ShapePositionStartLifeTime.xyz+startPosition+lifePosition),worldRotation);\r\n\t  else\r\n\t   finalPosition =rotationByQuaternions(u_PositionScale*a_ShapePositionStartLifeTime.xyz+startPosition+lifePosition,worldRotation);\r\n\t}\r\n\telse{\r\n\t  if(u_ScalingMode!=2)\r\n\t    finalPosition = rotationByQuaternions(u_PositionScale*(a_ShapePositionStartLifeTime.xyz+startPosition),worldRotation)+lifePosition;\r\n\t  else\r\n\t    finalPosition = rotationByQuaternions(u_PositionScale*a_ShapePositionStartLifeTime.xyz+startPosition,worldRotation)+lifePosition;\r\n\t}\r\n  #else\r\n\t startPosition=startVelocity*age;\r\n\t vec3 finalPosition;\r\n\t if(u_ScalingMode!=2)\r\n\t\t\tfinalPosition = rotationByQuaternions(u_PositionScale*(a_ShapePositionStartLifeTime.xyz+startPosition),worldRotation);\r\n\t else\r\n\t   \tfinalPosition = rotationByQuaternions(u_PositionScale*a_ShapePositionStartLifeTime.xyz+startPosition,worldRotation);\r\n  #endif\r\n  \r\n  if(u_SimulationSpace==0)\r\n    finalPosition=finalPosition+a_SimulationWorldPostion;\r\n  else if(u_SimulationSpace==1) \r\n    finalPosition=finalPosition+u_WorldPosition;\r\n  \r\n  finalPosition+=0.5*gravityVelocity*age;\r\n \r\n  return  finalPosition;\r\n}\r\n\r\n\r\nvec4 computeParticleColor(in vec4 color,in float normalizedAge)\r\n{\r\n\t#ifdef COLOROVERLIFETIME\r\n\t  color*=getColorFromGradient(u_ColorOverLifeGradientAlphas,u_ColorOverLifeGradientColors,normalizedAge);\r\n\t#endif\r\n\t\r\n\t#ifdef RANDOMCOLOROVERLIFETIME\r\n\t  color*=mix(getColorFromGradient(u_ColorOverLifeGradientAlphas,u_ColorOverLifeGradientColors,normalizedAge),getColorFromGradient(u_MaxColorOverLifeGradientAlphas,u_MaxColorOverLifeGradientColors,normalizedAge),a_Random0.y);\r\n\t#endif\r\n\r\n    return color;\r\n}\r\n\r\nvec2 computeParticleSizeBillbard(in vec2 size,in float normalizedAge)\r\n{\r\n\t#ifdef SIZEOVERLIFETIMECURVE\r\n\t\tsize*=getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge);\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVES\r\n\t    size*=mix(getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMax,normalizedAge),a_Random0.z); \r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMECURVESEPERATE\r\n\t\tsize*=vec2(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge));\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVESSEPERATE\r\n\t    size*=vec2(mix(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxX,normalizedAge),a_Random0.z)\r\n\t    ,mix(getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxY,normalizedAge),a_Random0.z));\r\n\t#endif\r\n\treturn size;\r\n}\r\n\r\n#ifdef RENDERMODE_MESH\r\nvec3 computeParticleSizeMesh(in vec3 size,in float normalizedAge)\r\n{\r\n\t#ifdef SIZEOVERLIFETIMECURVE\r\n\t\tsize*=getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge);\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVES\r\n\t    size*=mix(getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMax,normalizedAge),a_Random0.z); \r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMECURVESEPERATE\r\n\t\tsize*=vec3(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientZ,normalizedAge));\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVESSEPERATE\r\n\t    size*=vec3(mix(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxX,normalizedAge),a_Random0.z)\r\n\t    ,mix(getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxY,normalizedAge),a_Random0.z)\r\n\t\t,mix(getCurValueFromGradientFloat(u_SOLSizeGradientZ,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxZ,normalizedAge),a_Random0.z));\r\n\t#endif\r\n\treturn size;\r\n}\r\n#endif\r\n\r\nfloat computeParticleRotationFloat(in float rotation,in float age,in float normalizedAge)\r\n{ \r\n\t#ifdef ROTATIONOVERLIFETIME\r\n\t\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tfloat ageRot=u_ROLAngularVelocityConst*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge);\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tfloat ageRot=mix(u_ROLAngularVelocityConst,u_ROLAngularVelocityConstMax,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMax,normalizedAge),a_Random0.w);\r\n\t\t#endif\r\n\t#endif\r\n\t#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n\t\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tfloat ageRot=u_ROLAngularVelocityConstSeprarate.z*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge);\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tfloat ageRot=mix(u_ROLAngularVelocityConstSeprarate.z,u_ROLAngularVelocityConstMaxSeprarate.z,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxZ,normalizedAge),a_Random0.w));\r\n\t\t#endif\r\n\t#endif\r\n\treturn rotation;\r\n}\r\n\r\n#if defined(RENDERMODE_MESH)&&(defined(ROTATIONOVERLIFETIME)||defined(ROTATIONOVERLIFETIMESEPERATE))\r\nvec3 computeParticleRotationVec3(in vec3 rotation,in float age,in float normalizedAge)\r\n{ \r\n\t#ifdef ROTATIONOVERLIFETIME\r\n\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tfloat ageRot=u_ROLAngularVelocityConst*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge);\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tfloat ageRot=mix(u_ROLAngularVelocityConst,u_ROLAngularVelocityConstMax,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMax,normalizedAge),a_Random0.w);\r\n\t\t#endif\r\n\t#endif\r\n\t#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n\t\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tvec3 ageRot=u_ROLAngularVelocityConstSeprarate*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=vec3(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge));\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tvec3 ageRot=mix(u_ROLAngularVelocityConstSeprarate,u_ROLAngularVelocityConstMaxSeprarate,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=vec3(mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxX,normalizedAge),a_Random0.w)\r\n\t        ,mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxY,normalizedAge),a_Random0.w)\r\n\t        ,mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxZ,normalizedAge),a_Random0.w));\r\n\t\t#endif\r\n\t#endif\r\n\treturn rotation;\r\n}\r\n#endif\r\n\r\nvec2 computeParticleUV(in vec2 uv,in float normalizedAge)\r\n{ \r\n\t#ifdef TEXTURESHEETANIMATIONCURVE\r\n\t\tfloat cycleNormalizedAge=normalizedAge*u_TSACycles;\r\n\t\tfloat frame=getFrameFromGradient(u_TSAGradientUVs,cycleNormalizedAge-floor(cycleNormalizedAge));\r\n\t\tfloat totalULength=frame*u_TSASubUVLength.x;\r\n\t\tfloat floorTotalULength=floor(totalULength);\r\n\t    uv.x+=totalULength-floorTotalULength;\r\n\t\tuv.y+=floorTotalULength*u_TSASubUVLength.y;\r\n    #endif\r\n\t#ifdef TEXTURESHEETANIMATIONRANDOMCURVE\r\n\t\tfloat cycleNormalizedAge=normalizedAge*u_TSACycles;\r\n\t\tfloat uvNormalizedAge=cycleNormalizedAge-floor(cycleNormalizedAge);\r\n\t    float frame=floor(mix(getFrameFromGradient(u_TSAGradientUVs,uvNormalizedAge),getFrameFromGradient(u_TSAMaxGradientUVs,uvNormalizedAge),a_Random1.x));\r\n\t\tfloat totalULength=frame*u_TSASubUVLength.x;\r\n\t\tfloat floorTotalULength=floor(totalULength);\r\n\t    uv.x+=totalULength-floorTotalULength;\r\n\t\tuv.y+=floorTotalULength*u_TSASubUVLength.y;\r\n    #endif\r\n\treturn uv;\r\n}\r\n\r\nvoid main()\r\n{\r\n\tfloat age = u_CurrentTime - a_DirectionTime.w;\r\n\tfloat normalizedAge = age/a_ShapePositionStartLifeTime.w;\r\n\tvec3 lifeVelocity;\r\n\tif(normalizedAge<1.0)\r\n\t{ \r\n\t\tvec3 startVelocity=a_DirectionTime.xyz*a_StartSpeed;\r\n\t\t#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n\t\t\tlifeVelocity= computeParticleLifeVelocity(normalizedAge);//计算粒子生命周期速度\r\n\t\t#endif \r\n\t\tvec3 gravityVelocity=u_Gravity*age;\r\n\t\t\r\n\t\tvec4 worldRotation;\r\n\t\tif(u_SimulationSpace==0)\r\n\t\t\tworldRotation=a_SimulationWorldRotation;\r\n\t\telse\r\n\t\t\tworldRotation=u_WorldRotation;\r\n\t\t\r\n\t\tvec3 center=computeParticlePosition(startVelocity, lifeVelocity, age, normalizedAge,gravityVelocity,worldRotation);//计算粒子位置\r\n\t\r\n\t\r\n\t\t#ifdef SPHERHBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tvec3 cameraUpVector =normalize(u_CameraUp);//TODO:是否外面归一化\r\n\t\t\tvec3 sideVector = normalize(cross(u_CameraDirection,cameraUpVector));\r\n\t\t\tvec3 upVector = normalize(cross(sideVector,u_CameraDirection));\r\n\t\t\tcorner*=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\t#if defined(ROTATIONOVERLIFETIME)||defined(ROTATIONOVERLIFETIMESEPERATE)\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tvec3 rotation=vec3(a_StartRotation0.xy,computeParticleRotationFloat(a_StartRotation0.z,age,normalizedAge));\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*rotationByEuler(corner.x*sideVector+corner.y*upVector,rotation);\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\tfloat rot = computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\t\t\tfloat c = cos(rot);\r\n\t\t\t\t\tfloat s = sin(rot);\r\n\t\t\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\t\t\tcorner=rotation*corner;\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*(corner.x*sideVector+corner.y*upVector);\r\n\t\t\t\t}\r\n\t\t\t#else\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*rotationByEuler(corner.x*sideVector+corner.y*upVector,a_StartRotation0);\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\tfloat c = cos(a_StartRotation0.x);\r\n\t\t\t\t\tfloat s = sin(a_StartRotation0.x);\r\n\t\t\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\t\t\tcorner=rotation*corner;\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*(corner.x*sideVector+corner.y*upVector);\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef STRETCHEDBILLBOARD\r\n\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\tvec3 velocity;\r\n\t\t#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n\t\t\tif(u_VOLSpaceType==0)\r\n\t\t\tvelocity=rotationByQuaternions(u_SizeScale*(startVelocity+lifeVelocity),worldRotation)+gravityVelocity;\r\n\t\t\telse\r\n\t\t\tvelocity=rotationByQuaternions(u_SizeScale*startVelocity,worldRotation)+lifeVelocity+gravityVelocity;\r\n\t\t#else\r\n\t\t\tvelocity= rotationByQuaternions(u_SizeScale*startVelocity,worldRotation)+gravityVelocity;\r\n\t\t#endif\t\r\n\t\t\tvec3 cameraUpVector = normalize(velocity);\r\n\t\t\tvec3 direction = normalize(center-u_CameraPos);\r\n\t\t\tvec3 sideVector = normalize(cross(direction,normalize(velocity)));\r\n\t\t\t\r\n\t\t\tsideVector=u_SizeScale.xzy*sideVector;\r\n\t\t\tcameraUpVector=length(vec3(u_SizeScale.x,0.0,0.0))*cameraUpVector;\r\n\t\t\t\r\n\t\t\tvec2 size=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\t\r\n\t\t\tconst mat2 rotaionZHalfPI=mat2(0.0, -1.0, 1.0, 0.0);\r\n\t\t\tcorner=rotaionZHalfPI*corner;\r\n\t\t\tcorner.y=corner.y-abs(corner.y);\r\n\t\t\t\r\n\t\t\tfloat speed=length(velocity);//TODO:\r\n\t\t\tcenter +=sign(u_SizeScale.x)*(sign(u_StretchedBillboardLengthScale)*size.x*corner.x*sideVector+(speed*u_StretchedBillboardSpeedScale+size.y*u_StretchedBillboardLengthScale)*corner.y*cameraUpVector);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef HORIZONTALBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tconst vec3 cameraUpVector=vec3(0.0,0.0,1.0);\r\n\t\t\tconst vec3 sideVector = vec3(-1.0,0.0,0.0);\r\n\t\t\t\r\n\t\t\tfloat rot = computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\tfloat c = cos(rot);\r\n\t\t\tfloat s = sin(rot);\r\n\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\tcorner=rotation*corner*cos(0.78539816339744830961566084581988);//TODO:临时缩小cos45,不确定U3D原因\r\n\t\t\tcorner*=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\tcenter +=u_SizeScale.xzy*(corner.x*sideVector+ corner.y*cameraUpVector);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef VERTICALBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tconst vec3 cameraUpVector =vec3(0.0,1.0,0.0);\r\n\t\t\tvec3 sideVector = normalize(cross(u_CameraDirection,cameraUpVector));\r\n\t\t\t\r\n\t\t\tfloat rot = computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\tfloat c = cos(rot);\r\n\t\t\tfloat s = sin(rot);\r\n\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\tcorner=rotation*corner*cos(0.78539816339744830961566084581988);//TODO:临时缩小cos45,不确定U3D原因\r\n\t\t\tcorner*=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\tcenter +=u_SizeScale.xzy*(corner.x*sideVector+ corner.y*cameraUpVector);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef RENDERMODE_MESH\r\n\t\t\tvec3 size=computeParticleSizeMesh(a_StartSize,normalizedAge);\r\n\t\t\t#if defined(ROTATIONOVERLIFETIME)||defined(ROTATIONOVERLIFETIMESEPERATE)\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tvec3 rotation=vec3(a_StartRotation0.xy,computeParticleRotationFloat(a_StartRotation0.z, age,normalizedAge));\r\n\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByEuler(a_MeshPosition*size,rotation),worldRotation);\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\t#ifdef ROTATIONOVERLIFETIME\r\n\t\t\t\t\t\tfloat angle=computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\t\t\t\tif(a_ShapePositionStartLifeTime.x!=0.0||a_ShapePositionStartLifeTime.y!=0.0){\r\n\t\t\t\t\t\t\tcenter+= (rotationByQuaternions(rotationByAxis(u_SizeScale*a_MeshPosition*size,normalize(cross(vec3(0.0,0.0,1.0),vec3(a_ShapePositionStartLifeTime.xy,0.0))),angle),worldRotation));//已验证\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\telse{\r\n\t\t\t\t\t\t\t#ifdef SHAPE\r\n\t\t\t\t\t\t\t\tcenter+= u_SizeScale.xzy*(rotationByQuaternions(rotationByAxis(a_MeshPosition*size,vec3(0.0,-1.0,0.0),angle),worldRotation));\r\n\t\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\t\t\tcenter+=rotationByAxis(u_SizeScale*a_MeshPosition*size,vec3(0.0,0.0,-1.0),angle);//已验证\r\n\t\t\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\t\t\tcenter+=rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,0.0,-1.0),angle),worldRotation);//已验证\r\n\t\t\t\t\t\t\t#endif\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t#endif\r\n\t\t\t\t\t#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n\t\t\t\t\t\t//TODO:是否应合并if(u_ThreeDStartRotation)分支代码,待测试\r\n\t\t\t\t\t\tvec3 angle=computeParticleRotationVec3(vec3(0.0,0.0,-a_StartRotation0.x), age,normalizedAge);\r\n\t\t\t\t\t\tcenter+= (rotationByQuaternions(rotationByEuler(u_SizeScale*a_MeshPosition*size,vec3(angle.x,angle.y,angle.z)),worldRotation));//已验证\r\n\t\t\t\t\t#endif\t\t\r\n\t\t\t\t}\r\n\t\t\t#else\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByEuler(a_MeshPosition*size,a_StartRotation0),worldRotation);//已验证\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\tif(a_ShapePositionStartLifeTime.x!=0.0||a_ShapePositionStartLifeTime.y!=0.0){\r\n\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\tcenter+= rotationByAxis(u_SizeScale*a_MeshPosition*size,normalize(cross(vec3(0.0,0.0,1.0),vec3(a_ShapePositionStartLifeTime.xy,0.0))),a_StartRotation0.x);\r\n\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\tcenter+= (rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,normalize(cross(vec3(0.0,0.0,1.0),vec3(a_ShapePositionStartLifeTime.xy,0.0))),a_StartRotation0.x),worldRotation));//已验证\r\n\t\t\t\t\t}\r\n\t\t\t\t\telse{\r\n\t\t\t\t\t\t#ifdef SHAPE\r\n\t\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\t\tcenter+= u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,-1.0,0.0),a_StartRotation0.x);\r\n\t\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,-1.0,0.0),a_StartRotation0.x),worldRotation);\t\r\n\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\t\tcenter+= rotationByAxis(u_SizeScale*a_MeshPosition*size,vec3(0.0,0.0,-1.0),a_StartRotation0.x);\r\n\t\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,0.0,-1.0),a_StartRotation0.x),worldRotation);//已验证\r\n\t\t\t\t\t\t#endif\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\tv_MeshColor=a_MeshColor;\r\n\t\t#endif\r\n\t\r\n\t\tgl_Position=u_Projection*u_View*vec4(center,1.0);\r\n\t\tv_Color = computeParticleColor(a_StartColor, normalizedAge);\r\n\t\t#ifdef DIFFUSEMAP\r\n\t\t\t#if defined(SPHERHBILLBOARD)||defined(STRETCHEDBILLBOARD)||defined(HORIZONTALBILLBOARD)||defined(VERTICALBILLBOARD)\r\n\t\t\t\tv_TextureCoordinate =computeParticleUV(a_CornerTextureCoordinate.zw, normalizedAge);\r\n\t\t\t#endif\r\n\t\t\t#ifdef RENDERMODE_MESH\r\n\t\t\t\tv_TextureCoordinate =computeParticleUV(a_MeshTextureCoordinate, normalizedAge);\r\n\t\t\t#endif\r\n\t\t\t\r\n\t\t\t#ifdef TILINGOFFSET\r\n\t\t\t\tv_TextureCoordinate=TransformUV(v_TextureCoordinate,u_TilingOffset);\r\n\t\t\t#endif\r\n\t\t#endif\r\n   \t}\r\n   \telse\r\n\t{\r\n\t\tgl_Position=vec4(2.0,2.0,2.0,1.0);//Discard use out of X(-1,1),Y(-1,1),Z(0,1)\r\n\t}\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n\r\n";
 
 	var BRDFGLSL = "struct LayaGI\r\n{\r\n\tvec3 diffuse;\r\n\tvec3 specular;\r\n};\r\n\r\nvec4 LayaAirBRDF(in vec3 diffuseColor, in vec3 specularColor, in float oneMinusReflectivity, in float smoothness, in vec3 normal, in vec3 viewDir, in vec3 lightDir, in vec3 lightColor, in LayaGI gi)\r\n{\r\n\tfloat perceptualRoughness = SmoothnessToPerceptualRoughness(smoothness);\r\n\tvec3 halfDir = SafeNormalize(viewDir - lightDir);\r\n\t\r\n\tfloat nv = abs(dot(normal, viewDir));\r\n\t\r\n\tfloat nl = clamp(dot(normal,   -lightDir),  0.0, 1.0);\r\n\tfloat nh = clamp(dot(normal,     halfDir),  0.0, 1.0);\r\n\tfloat lv = clamp(dot(lightDir,   viewDir),  0.0, 1.0);\r\n\tfloat lh = clamp(dot(lightDir,  -halfDir),  0.0, 1.0);\r\n\t\r\n\tfloat diffuseTerm = DisneyDiffuse(nv, nl, lh, perceptualRoughness) * nl;\r\n\t\r\n\tfloat roughness = PerceptualRoughnessToRoughness(perceptualRoughness);\r\n\t\r\n\t//#if UNITY_BRDF_GGX\r\n\t // GGX with roughtness to 0 would mean no specular at all, using max(roughness, 0.002) here to match HDrenderloop roughtness remapping.\r\n\troughness = max(roughness,0.014);\r\n\tfloat V = SmithJointGGXVisibilityTerm(nl, nv, roughness);\r\n\tfloat D = GGXTerm(nh, roughness);\r\n\t\r\n\tfloat specularTerm = V * D * PI;\r\n\t\r\n\tspecularTerm = sqrt(max(0.0001, specularTerm));\r\n\tspecularTerm = max(0.0, specularTerm * nl);\r\n\t\r\n\tfloat surfaceReduction = 1.0 - 0.28 * roughness * perceptualRoughness;\r\n\tfloat grazingTerm = clamp(smoothness + (1.0 - oneMinusReflectivity), 0.0, 1.0);\r\n\t\r\n\tvec4 color;\r\n\tcolor.rgb = diffuseColor * (gi.diffuse+lightColor * diffuseTerm) \r\n\t\t\t  + specularTerm * lightColor * FresnelTerm (specularColor, lh);\r\n\t\t\t  //+ surfaceReduction * gi.specular * FresnelLerp(specularColor, vec3(grazingTerm), nv);\r\n\t\r\n\treturn color;\r\n}\r\nvec4 LayaAirStandardReflect(in vec4 albedoColor,in float metallic,in float smoothness,in LayaGI gi)\r\n{\r\n\tvec3 diffuseColor;\r\n\tvec3 specularColor;\r\n\tfloat alpha;\r\n\tfloat oneMinusReflectivity;\r\n\tdiffuseColor = DiffuseAndSpecularFromMetallic (albedoColor.rgb, metallic, specularColor, oneMinusReflectivity);\r\n\tdiffuseColor = LayaPreMultiplyAlpha(diffuseColor, albedoColor.a, oneMinusReflectivity, alpha);\r\n\tfloat perceptualRoughness = SmoothnessToPerceptualRoughness(smoothness);\r\n\tfloat roughness = PerceptualRoughnessToRoughness(perceptualRoughness);\r\n\tfloat surfaceReduction = 1.0 - 0.28 * roughness * perceptualRoughness;\r\n\tvec4 color;\r\n\tcolor.rgb = surfaceReduction * gi.specular;\r\n\tcolor.a = alpha;\r\n\treturn color;\r\n\r\n}\r\n\r\nvec4 LayaAirSpecularReflect(in vec4 albedoColor,in vec3 specularColor,in float smoothness,in LayaGI gi)\r\n{\r\n\tfloat oneMinusReflectivity;\r\n\tvec3 diffuseColor;\r\n\tfloat alpha;\r\n\t\r\n\tdiffuseColor = EnergyConservationBetweenDiffuseAndSpecular (albedoColor.rgb, specularColor, oneMinusReflectivity);\r\n\t\r\n\tdiffuseColor = LayaPreMultiplyAlpha(diffuseColor, albedoColor.a, oneMinusReflectivity, alpha);\r\n\r\n\tfloat perceptualRoughness = SmoothnessToPerceptualRoughness(smoothness);\r\n\tfloat roughness = PerceptualRoughnessToRoughness(perceptualRoughness);\r\n\tfloat surfaceReduction = 1.0 - 0.28 * roughness * perceptualRoughness;\r\n\tvec4 color;\r\n\tcolor.rgb = surfaceReduction * gi.specular;\r\n\tcolor.a = alpha;\r\n\treturn color;\r\n}";
 
-	var PBRSpecularLightingGLSL = "#include \"PBRUtils.glsl\"\r\n#include \"BRDF.glsl\"\r\n\r\nvec4 PBRSpecularLight(in vec4 albedoColor, in vec3 specularColor, in float smoothness, in vec3 normal, in vec3 viewDir, in vec3 lightDir, in vec3 lightColor, in LayaGI gi)\r\n{\r\n\tfloat oneMinusReflectivity;\r\n\tvec3 diffuseColor;\r\n\tfloat alpha;\r\n\t\r\n\tdiffuseColor = EnergyConservationBetweenDiffuseAndSpecular (albedoColor.rgb, specularColor, oneMinusReflectivity);\r\n\t\r\n\tdiffuseColor = LayaPreMultiplyAlpha(diffuseColor, albedoColor.a, oneMinusReflectivity, alpha);\r\n\t\r\n\tvec4 color = LayaAirBRDF(diffuseColor, specularColor, oneMinusReflectivity, smoothness, normal, viewDir, lightDir, lightColor, gi);\r\n\tcolor.a = alpha;\r\n\treturn color;\r\n}\r\n\r\nvec4 PBRSpecularDiectionLight (in vec4 albedoColor, in vec3 specularColor, in float smoothness, in vec3 normal, in vec3 viewDir, in DirectionLight light, in LayaGI gi)\r\n{\r\n\tvec3 lightVec = normalize(light.direction);\r\n\treturn PBRSpecularLight(albedoColor, specularColor, smoothness, normal, viewDir, lightVec, light.color, gi);\r\n}\r\n#ifdef POINTLIGHT\r\nvec4 PBRSpecularPointLight (in vec4 albedoColor, in vec3 specularColor, in float smoothness, in vec3 normal, in vec3 viewDir, in PointLight light, in vec3 pos, in LayaGI gi)\r\n{\r\n\tvec3 lightVec = pos-light.position;\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range);\r\n\treturn PBRSpecularLight(albedoColor, specularColor, smoothness, normal, viewDir, lightVec, light.color, gi) * attenuate;\r\n}\r\n#endif\r\nvec4 PBRSpecularSpotLight (in vec4 albedoColor, in vec3 specularColor, in float smoothness, in vec3 normal, in vec3 viewDir, in SpotLight light, in vec3 pos, in LayaGI gi)\r\n{\r\n\tvec3 lightVec =  pos - light.position;\r\n\tvec3 normalLightVec = normalize(lightVec);\r\n\tvec2 cosAngles = cos(vec2(light.spot, light.spot*0.5) * 0.5);//ConeAttenuation\r\n\tfloat dl = dot(normalize(light.direction), normalLightVec);\r\n\tdl *= smoothstep(cosAngles[0], cosAngles[1], dl);\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range) * dl;\r\n\treturn PBRSpecularLight(albedoColor, specularColor, smoothness, normal, viewDir, lightVec, light.color, gi) * attenuate;\r\n}\r\n\r\n//vec4 PBRStandardSpotLight1 (in vec4 albedoColor, in float metallic, in float smoothness, in vec3 normal, in vec3 viewDir, in SpotLight light, in vec3 pos, in LayaGI gi)\r\n//{\r\n//\tvec4 lightCoord = u_SpotLightMatrix * vec4(pos, 1.0);\r\n//\t\r\n//\tfloat distance = dot(lightCoord, lightCoord);\r\n//\tfloat attenuate = (lightCoord.z < 0.0) ? texture2D(u_RangeTexture, vec2(distance)).w : 0.0;\r\n//\t//float attenuate = (lightCoord.z < 0.0) ? texture2D(u_AngleTexture, vec2(lightCoord.x / lightCoord.w + 0.5, lightCoord.y / lightCoord.w + 0.5)).r * texture2D(u_RangeTexture, vec2(distance)).w : 0.0;\r\n//\t//vec2 _uv = vec2(pos.x * 180.0/(2.0 * pos.z) + 0.5, pos.y * 180.0/(2.0 * pos.z) + 0.5);\r\n//\tvec3 lightVec = normalize(pos - light.cosition);\r\n//\treturn PBRStandardLight(albedoColor, metallic, smoothness, normal, viewDir, lightVec, light.color, gi) * attenuate;\r\n//}\r\n\r\nvec4 SpecularGloss(float albedoTextureAlpha, in vec2 uv0)\r\n{\r\n    vec4 sg;\r\n\t\r\n\t#ifdef SPECULARTEXTURE\r\n\t\tvec4 specularTextureColor = texture2D(u_SpecularTexture, uv0);\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\tsg.rgb = specularTextureColor.rgb;\r\n\t\t\tsg.a = albedoTextureAlpha;\r\n\t\t#else\r\n\t\t\tsg = specularTextureColor;\r\n\t\t#endif\r\n\t\tsg.a *= u_smoothnessScale;\r\n\t#else\r\n\t\tsg.rgb = u_SpecularColor.rgb;\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\tsg.a = albedoTextureAlpha * u_smoothnessScale;\r\n\t\t#else\r\n\t\t\tsg.a = u_smoothness;\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n    return sg;\r\n}\r\n\r\n";
+	var PBRSpecularLightingGLSL = "#include \"PBRUtils.glsl\"\r\n#include \"BRDF.glsl\"\r\n\r\nvec4 PBRSpecularLight(in vec4 albedoColor, in vec3 specularColor, in float smoothness, in vec3 normal, in vec3 viewDir, in vec3 lightDir, in vec3 lightColor, in LayaGI gi)\r\n{\r\n\tfloat oneMinusReflectivity;\r\n\tvec3 diffuseColor;\r\n\tfloat alpha;\r\n\t\r\n\tdiffuseColor = EnergyConservationBetweenDiffuseAndSpecular (albedoColor.rgb, specularColor, oneMinusReflectivity);\r\n\t\r\n\tdiffuseColor = LayaPreMultiplyAlpha(diffuseColor, albedoColor.a, oneMinusReflectivity, alpha);\r\n\t\r\n\tvec4 color = LayaAirBRDF(diffuseColor, specularColor, oneMinusReflectivity, smoothness, normal, viewDir, lightDir, lightColor, gi);\r\n\tcolor.a = alpha;\r\n\treturn color;\r\n}\r\n\r\nvec4 PBRSpecularDiectionLight (in vec4 albedoColor, in vec3 specularColor, in float smoothness, in vec3 normal, in vec3 viewDir, in DirectionLight light, in LayaGI gi,in float shadowValue)\r\n{\r\n\tvec3 lightVec = normalize(light.direction);\r\n\treturn PBRSpecularLight(albedoColor, specularColor, smoothness, normal, viewDir, lightVec, light.color*shadowValue, gi);\r\n}\r\n#ifdef POINTLIGHT\r\nvec4 PBRSpecularPointLight (in vec4 albedoColor, in vec3 specularColor, in float smoothness, in vec3 normal, in vec3 viewDir, in PointLight light, in vec3 pos, in LayaGI gi,in float shadowValue)\r\n{\r\n\tvec3 lightVec = pos-light.position;\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range);\r\n\treturn PBRSpecularLight(albedoColor, specularColor, smoothness, normal, viewDir, lightVec, light.color*shadowValue, gi) * attenuate;\r\n}\r\n#endif\r\nvec4 PBRSpecularSpotLight (in vec4 albedoColor, in vec3 specularColor, in float smoothness, in vec3 normal, in vec3 viewDir, in SpotLight light, in vec3 pos, in LayaGI gi,in float shadowValue)\r\n{\r\n\tvec3 lightVec =  pos - light.position;\r\n\tvec3 normalLightVec = normalize(lightVec);\r\n\tvec2 cosAngles = cos(vec2(light.spot, light.spot*0.5) * 0.5);//ConeAttenuation\r\n\tfloat dl = dot(normalize(light.direction), normalLightVec);\r\n\tdl *= smoothstep(cosAngles[0], cosAngles[1], dl);\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range) * dl;\r\n\treturn PBRSpecularLight(albedoColor, specularColor, smoothness, normal, viewDir, lightVec, light.color*shadowValue, gi) * attenuate;\r\n}\r\n\r\n//vec4 PBRStandardSpotLight1 (in vec4 albedoColor, in float metallic, in float smoothness, in vec3 normal, in vec3 viewDir, in SpotLight light, in vec3 pos, in LayaGI gi)\r\n//{\r\n//\tvec4 lightCoord = u_SpotLightMatrix * vec4(pos, 1.0);\r\n//\t\r\n//\tfloat distance = dot(lightCoord, lightCoord);\r\n//\tfloat attenuate = (lightCoord.z < 0.0) ? texture2D(u_RangeTexture, vec2(distance)).w : 0.0;\r\n//\t//float attenuate = (lightCoord.z < 0.0) ? texture2D(u_AngleTexture, vec2(lightCoord.x / lightCoord.w + 0.5, lightCoord.y / lightCoord.w + 0.5)).r * texture2D(u_RangeTexture, vec2(distance)).w : 0.0;\r\n//\t//vec2 _uv = vec2(pos.x * 180.0/(2.0 * pos.z) + 0.5, pos.y * 180.0/(2.0 * pos.z) + 0.5);\r\n//\tvec3 lightVec = normalize(pos - light.cosition);\r\n//\treturn PBRStandardLight(albedoColor, metallic, smoothness, normal, viewDir, lightVec, light.color, gi) * attenuate;\r\n//}\r\n\r\nvec4 SpecularGloss(float albedoTextureAlpha, in vec2 uv0)\r\n{\r\n    vec4 sg;\r\n\t\r\n\t#ifdef SPECULARTEXTURE\r\n\t\tvec4 specularTextureColor = texture2D(u_SpecularTexture, uv0);\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\tsg.rgb = specularTextureColor.rgb;\r\n\t\t\tsg.a = albedoTextureAlpha;\r\n\t\t#else\r\n\t\t\tsg = specularTextureColor;\r\n\t\t#endif\r\n\t\tsg.a *= u_smoothnessScale;\r\n\t#else\r\n\t\tsg.rgb = u_SpecularColor.rgb;\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\tsg.a = albedoTextureAlpha * u_smoothnessScale;\r\n\t\t#else\r\n\t\t\tsg.a = u_smoothness;\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n    return sg;\r\n}\r\n\r\n";
 
-	var PBRStandardLightingGLSL = "#include \"PBRUtils.glsl\"\r\n#include \"BRDF.glsl\"\r\n\r\nvec4 PBRStandardLight(in vec4 albedoColor, in float metallic, in float smoothness, in vec3 normal, in vec3 viewDir, in vec3 lightDir, in vec3 lightColor, in LayaGI gi)\r\n{\r\n\tfloat oneMinusReflectivity;\r\n\tvec3 diffuseColor;\r\n\tvec3 specularColor;\r\n\tfloat alpha;\r\n\t\r\n\tdiffuseColor = DiffuseAndSpecularFromMetallic (albedoColor.rgb, metallic, specularColor, oneMinusReflectivity);\r\n\t\r\n\tdiffuseColor = LayaPreMultiplyAlpha(diffuseColor, albedoColor.a, oneMinusReflectivity, alpha);\r\n\t\r\n\tvec4 color = LayaAirBRDF(diffuseColor, specularColor, oneMinusReflectivity, smoothness, normal, viewDir, lightDir, lightColor, gi);\r\n\tcolor.a = alpha;\r\n\treturn color;\r\n}\r\n\r\nvec4 PBRStandardDiectionLight (in vec4 albedoColor, in float metallic, in float smoothness, in vec3 normal, in vec3 viewDir, in DirectionLight light, in LayaGI gi)\r\n{\r\n\tvec3 lightVec = normalize(light.direction);\r\n\treturn PBRStandardLight(albedoColor, metallic, smoothness, normal, viewDir, lightVec, light.color, gi);\r\n}\r\n#ifdef POINTLIGHT\r\nvec4 PBRStandardPointLight (in vec4 albedoColor, in float metallic, in float smoothness, in vec3 normal, in vec3 viewDir, in PointLight light, in vec3 pos, in LayaGI gi)\r\n{\r\n\tvec3 lightVec = pos-light.position;\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range);\r\n\treturn PBRStandardLight(albedoColor, metallic, smoothness, normal, viewDir, lightVec, light.color, gi) * attenuate;\r\n}\r\n#endif\r\nvec4 PBRStandardSpotLight (in vec4 albedoColor, in float metallic, in float smoothness, in vec3 normal, in vec3 viewDir, in SpotLight light, in vec3 pos, in LayaGI gi)\r\n{\r\n\tvec3 lightVec =  pos - light.position;\r\n\tvec3 normalLightVec = normalize(lightVec);\r\n\tvec2 cosAngles = cos(vec2(light.spot, light.spot*0.5) * 0.5);//ConeAttenuation\r\n\tfloat dl = dot(normalize(light.direction), normalLightVec);\r\n\tdl *= smoothstep(cosAngles[0], cosAngles[1], dl);\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range) * dl;\r\n\treturn PBRStandardLight(albedoColor, metallic, smoothness, normal, viewDir, lightVec, light.color, gi) * attenuate;\r\n\t\r\n}\r\n\r\n//vec4 PBRStandardSpotLight1 (in vec4 albedoColor, in float metallic, in float smoothness, in vec3 normal, in vec3 viewDir, in SpotLight light, in vec3 pos, in LayaGI gi)\r\n//{\r\n//\tvec4 lightCoord = u_SpotLightMatrix * vec4(pos, 1.0);\r\n//\t\r\n//\tfloat distance = dot(lightCoord, lightCoord);\r\n//\tfloat attenuate = (lightCoord.z < 0.0) ? texture2D(u_RangeTexture, vec2(distance)).w : 0.0;\r\n//\t//float attenuate = (lightCoord.z < 0.0) ? texture2D(u_AngleTexture, vec2(lightCoord.x / lightCoord.w + 0.5, lightCoord.y / lightCoord.w + 0.5)).r * texture2D(u_RangeTexture, vec2(distance)).w : 0.0;\r\n//\t//vec2 _uv = vec2(pos.x * 180.0/(2.0 * pos.z) + 0.5, pos.y * 180.0/(2.0 * pos.z) + 0.5);\r\n//\tvec3 lightVec = normalize(pos - light.position);\r\n//\treturn PBRStandardLight(albedoColor, metallic, smoothness, normal, viewDir, lightVec, light.color, gi) * attenuate;\r\n//}\r\n\r\nvec2 MetallicGloss(in float albedoTextureAlpha, in vec2 uv0)\r\n{\r\n\tvec2 mg;\r\n\t\r\n\t#ifdef METALLICGLOSSTEXTURE\r\n\t\tvec4 metallicGlossTextureColor = texture2D(u_MetallicGlossTexture, uv0);\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\tmg.r = metallicGlossTextureColor.r;\r\n\t\t\tmg.g = albedoTextureAlpha;\r\n\t\t#else\r\n\t\t    mg = metallicGlossTextureColor.ra;\r\n\t\t#endif\r\n\t\tmg.g *= u_smoothnessScale;\r\n\t#else\r\n\t\tmg.r = u_metallic;\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\tmg.g = albedoTextureAlpha * u_smoothnessScale;\r\n\t\t#else\r\n\t\t\tmg.g = u_smoothness;\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n\treturn mg;\r\n}\r\n\r\n";
+	var PBRStandardLightingGLSL = "#include \"PBRUtils.glsl\"\r\n#include \"BRDF.glsl\"\r\n\r\nvec4 PBRStandardLight(in vec4 albedoColor, in float metallic, in float smoothness, in vec3 normal, in vec3 viewDir, in vec3 lightDir, in vec3 lightColor, in LayaGI gi)\r\n{\r\n\tfloat oneMinusReflectivity;\r\n\tvec3 diffuseColor;\r\n\tvec3 specularColor;\r\n\tfloat alpha;\r\n\t\r\n\tdiffuseColor = DiffuseAndSpecularFromMetallic (albedoColor.rgb, metallic, specularColor, oneMinusReflectivity);\r\n\t\r\n\tdiffuseColor = LayaPreMultiplyAlpha(diffuseColor, albedoColor.a, oneMinusReflectivity, alpha);\r\n\t\r\n\tvec4 color = LayaAirBRDF(diffuseColor, specularColor, oneMinusReflectivity, smoothness, normal, viewDir, lightDir, lightColor, gi);\r\n\tcolor.a = alpha;\r\n\treturn color;\r\n}\r\n\r\nvec4 PBRStandardDiectionLight (in vec4 albedoColor, in float metallic, in float smoothness, in vec3 normal, in vec3 viewDir, in DirectionLight light, in LayaGI gi,in float shadowValue)\r\n{\r\n\tvec3 lightVec = normalize(light.direction);\r\n\treturn PBRStandardLight(albedoColor, metallic, smoothness, normal, viewDir, lightVec, light.color*shadowValue, gi);\r\n}\r\n#ifdef POINTLIGHT\r\nvec4 PBRStandardPointLight (in vec4 albedoColor, in float metallic, in float smoothness, in vec3 normal, in vec3 viewDir, in PointLight light, in vec3 pos, in LayaGI gi,in float shadowValue)\r\n{\r\n\tvec3 lightVec = pos-light.position;\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range);\r\n\treturn PBRStandardLight(albedoColor, metallic, smoothness, normal, viewDir, lightVec, light.color*shadowValue, gi) * attenuate;\r\n}\r\n#endif\r\nvec4 PBRStandardSpotLight (in vec4 albedoColor, in float metallic, in float smoothness, in vec3 normal, in vec3 viewDir, in SpotLight light, in vec3 pos, in LayaGI gi,in float shadowValue)\r\n{\r\n\tvec3 lightVec =  pos - light.position;\r\n\tvec3 normalLightVec = normalize(lightVec);\r\n\tvec2 cosAngles = cos(vec2(light.spot, light.spot*0.5) * 0.5);//ConeAttenuation\r\n\tfloat dl = dot(normalize(light.direction), normalLightVec);\r\n\tdl *= smoothstep(cosAngles[0], cosAngles[1], dl);\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range) * dl;\r\n\treturn PBRStandardLight(albedoColor, metallic, smoothness, normal, viewDir, lightVec, light.color*shadowValue, gi) * attenuate;\r\n\t\r\n}\r\n\r\n//vec4 PBRStandardSpotLight1 (in vec4 albedoColor, in float metallic, in float smoothness, in vec3 normal, in vec3 viewDir, in SpotLight light, in vec3 pos, in LayaGI gi)\r\n//{\r\n//\tvec4 lightCoord = u_SpotLightMatrix * vec4(pos, 1.0);\r\n//\t\r\n//\tfloat distance = dot(lightCoord, lightCoord);\r\n//\tfloat attenuate = (lightCoord.z < 0.0) ? texture2D(u_RangeTexture, vec2(distance)).w : 0.0;\r\n//\t//float attenuate = (lightCoord.z < 0.0) ? texture2D(u_AngleTexture, vec2(lightCoord.x / lightCoord.w + 0.5, lightCoord.y / lightCoord.w + 0.5)).r * texture2D(u_RangeTexture, vec2(distance)).w : 0.0;\r\n//\t//vec2 _uv = vec2(pos.x * 180.0/(2.0 * pos.z) + 0.5, pos.y * 180.0/(2.0 * pos.z) + 0.5);\r\n//\tvec3 lightVec = normalize(pos - light.position);\r\n//\treturn PBRStandardLight(albedoColor, metallic, smoothness, normal, viewDir, lightVec, light.color, gi) * attenuate;\r\n//}\r\n\r\nvec2 MetallicGloss(in float albedoTextureAlpha, in vec2 uv0)\r\n{\r\n\tvec2 mg;\r\n\t\r\n\t#ifdef METALLICGLOSSTEXTURE\r\n\t\tvec4 metallicGlossTextureColor = texture2D(u_MetallicGlossTexture, uv0);\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\tmg.r = metallicGlossTextureColor.r;\r\n\t\t\tmg.g = albedoTextureAlpha;\r\n\t\t#else\r\n\t\t    mg = metallicGlossTextureColor.ra;\r\n\t\t#endif\r\n\t\tmg.g *= u_smoothnessScale;\r\n\t#else\r\n\t\tmg.r = u_metallic;\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\tmg.g = albedoTextureAlpha * u_smoothnessScale;\r\n\t\t#else\r\n\t\t\tmg.g = u_smoothness;\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n\treturn mg;\r\n}\r\n\r\n";
 
 	var PBRUtilsGLSL = "\r\nvec3 UnpackScaleNormal(in vec2 uv0)\r\n{\r\n\t#ifdef NORMALTEXTURE\r\n\t\tvec3 normalT;\r\n\t\tvec4 normalMapSample = texture2D(u_NormalTexture, uv0);\r\n\t\tnormalT.x = 2.0 * normalMapSample.x - 1.0;\r\n\t\tnormalT.y = 1.0 - 2.0 * normalMapSample.y;\r\n\t\tnormalT.xy *= u_normalScale;\r\n\t\tnormalT.z = sqrt(1.0 - clamp(dot(normalT.xy, normalT.xy), 0.0, 1.0));\r\n\t\t\r\n\t\tvec3 T = normalize(v_Tangent);\r\n\t\tvec3 B = normalize(v_Binormal);\r\n\t\tvec3 N = normalize(v_Normal);\r\n\t\tmat3 TBN = mat3(T, B, N);\r\n\t\t\r\n\t\tvec3 bumpedNormal = TBN * normalize(normalT);\r\n\t\treturn bumpedNormal;\r\n\t#else\r\n\t\treturn normalize(v_Normal);\r\n\t#endif\r\n}\r\n\r\nvec4 DielectricSpecularColor = vec4(0.220916301, 0.220916301, 0.220916301, 1.0 - 0.220916301);\r\n\r\nfloat PI = 3.14159265359;\r\n\r\nvec3 FresnelTerm (in vec3 F0, in float cosA)\r\n{\r\n\treturn F0 + (vec3(1.0) - F0) * pow(1.0 - cosA, 5.0);\r\n}\r\n\r\nvec3 FresnelLerp (in vec3 F0, in vec3 F90, float cosA)\r\n{\r\n    float t = pow(1.0 - cosA, 5.0);\r\n    return mix(F0, F90, t);\r\n}\r\n\r\nfloat PerceptualRoughnessToRoughness(in float perceptualRoughness)\r\n{\r\n\treturn perceptualRoughness * perceptualRoughness;\r\n}\r\n\r\nfloat PerceptualRoughnessToSpecularPower(in float perceptualRoughness)\r\n{\r\n\tfloat m = PerceptualRoughnessToRoughness(perceptualRoughness);\r\n\tfloat sq = max(0.0001, m * m);\r\n\tfloat n = (2.0 / sq) - 2.0;\r\n\tn = max(n, 0.0001);\r\n\treturn n;\r\n}\r\n\r\nfloat RoughnessToPerceptualRoughness(in float roughness)\r\n{\r\n\treturn sqrt(roughness);\r\n}\r\n\r\nfloat SmoothnessToRoughness(in float smoothness)\r\n{\r\n\treturn (1.0 - smoothness) * (1.0 - smoothness);\r\n}\r\n\r\nfloat SmoothnessToPerceptualRoughness(in float smoothness)\r\n{\r\n\treturn (1.0 - smoothness);\r\n}\r\n\r\nvec3 SafeNormalize(in vec3 inVec)\r\n{\r\n\tfloat dp3 = max(0.001,dot(inVec,inVec));\r\n\treturn inVec * (1.0 / sqrt(dp3));\r\n}\r\n\r\nfloat DisneyDiffuse(in float NdotV, in float NdotL, in float LdotH, in float perceptualRoughness)\r\n{\r\n\tfloat fd90 = 0.5 + 2.0 * LdotH * LdotH * perceptualRoughness;\r\n\tfloat lightScatter\t= (1.0 + (fd90 - 1.0) * pow(1.0 - NdotL,5.0));\r\n\tfloat viewScatter\t= (1.0 + (fd90 - 1.0) * pow(1.0 - NdotV,5.0));\r\n\r\n\treturn lightScatter * viewScatter;\r\n}\r\n\r\nfloat SmithJointGGXVisibilityTerm (float NdotL, float NdotV, float roughness)\r\n{\r\n\tfloat a = roughness;\r\n\tfloat lambdaV = NdotL * (NdotV * (1.0 - a) + a);\r\n\tfloat lambdaL = NdotV * (NdotL * (1.0 - a) + a);\r\n\r\n\treturn 0.5 / (lambdaV + lambdaL + 0.00001);\r\n}\r\n\r\nfloat GGXTerm (float NdotH, float roughness)\r\n{\r\n\tfloat a2 = roughness * roughness;\r\n\tfloat d = (NdotH * a2 - NdotH) * NdotH + 1.0;\r\n\treturn 0.31830988618 * a2 / (d * d + 0.0000001);\r\n}\r\n\r\nfloat OneMinusReflectivityFromMetallic(in float metallic)\r\n{\r\n\tfloat oneMinusDielectricSpec = DielectricSpecularColor.a;\r\n\treturn oneMinusDielectricSpec - metallic * oneMinusDielectricSpec;\r\n}\r\n\r\nfloat SpecularStrength(vec3 specular)\r\n{\r\n    //(SHADER_TARGET < 30)return specular.r; \r\n    return max (max (specular.r, specular.g), specular.b);\r\n}\r\n\r\nvec3 DiffuseAndSpecularFromMetallic(in vec3 diffuseColor, in float metallic, out vec3 specularColor, out float oneMinusReflectivity)\r\n{\r\n\tspecularColor = mix(DielectricSpecularColor.rgb, diffuseColor, metallic);\r\n\toneMinusReflectivity = OneMinusReflectivityFromMetallic(metallic);\r\n\treturn diffuseColor * oneMinusReflectivity;\r\n}\r\n\r\nvec3 EnergyConservationBetweenDiffuseAndSpecular(in vec3 diffuseColor, in vec3 specularColor, out float oneMinusReflectivity)\r\n{\r\n\toneMinusReflectivity = 1.0 - SpecularStrength(specularColor);\r\n\treturn diffuseColor * oneMinusReflectivity;\r\n}\r\n\r\nvec4 Occlusion(in vec2 uv0){\r\n\t#ifdef OCCLUSIONTEXTURE\r\n\t\tvec4 occlusionTextureColor = texture2D(u_OcclusionTexture, uv0);\r\n\t\tfloat occ = occlusionTextureColor.g;\r\n\t\tfloat oneMinusT = 1.0 - u_occlusionStrength;\r\n\t\tfloat lerpOneTo = oneMinusT + occ * u_occlusionStrength;\r\n\t\treturn occlusionTextureColor * lerpOneTo;\r\n\t#else\r\n\t\treturn vec4(1.0);\r\n\t#endif\r\n}\r\n\r\nvec2 ParallaxOffset(in vec3 viewDir){\r\n\t#ifdef PARALLAXTEXTURE\r\n\t\tfloat h = texture2D(u_ParallaxTexture, v_Texcoord0).g;\r\n\t\th = h * u_parallaxScale - u_parallaxScale / 2.0;\r\n\t\tvec3 v = viewDir;\r\n\t\tv.z += 0.42;\r\n\t\tvec2 offset = h * (v.xy / v.z);\r\n\t\treturn v_Texcoord0 + offset;\r\n\t#else\r\n\t\treturn v_Texcoord0;\r\n\t#endif\r\n}\r\n\r\nvec3 ReflectCubeMap(in vec3 viewDir, in vec3 normal){\r\n\t#ifdef REFLECTMAP\r\n\t\tvec3 incident = -viewDir;\r\n\t\tvec3 reflectionVector = reflect(incident, normal);\r\n\t\tvec3 reflectionColor = textureCube(u_ReflectTexture, vec3(-reflectionVector.x, reflectionVector.yz)).rgb;\r\n\t\treturn reflectionColor * u_ReflectIntensity;\r\n\t#else\r\n\t\treturn vec3(0.0);\r\n\t#endif\r\n}\r\n\r\n\r\n\r\nvec3 LayaPreMultiplyAlpha(vec3 diffColor, float alpha, float oneMinusReflectivity, out float outModifiedAlpha)\r\n{\r\n\t#ifdef ALPHAPREMULTIPLY\r\n\t\tdiffColor *= alpha;\r\n\t\toutModifiedAlpha = 1.0 - oneMinusReflectivity + alpha * oneMinusReflectivity;\r\n\t#else\r\n\t\toutModifiedAlpha = alpha;\r\n\t#endif\r\n\treturn diffColor;\r\n}\r\n\r\n";
 
-	var PBRSpecularPS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\nvarying vec2 v_Texcoord0;\r\nvarying vec3 v_Normal;\r\nvarying vec3 v_Tangent;\r\nvarying vec3 v_Binormal;\r\nvarying vec3 v_ViewDir;\r\nvarying vec3 v_PositionWorld;\r\n\r\nuniform vec3 u_AmbientColor;\r\nuniform vec4 u_AlbedoColor;\r\nuniform vec4 u_SpecularColor;\r\n\r\n#ifdef ALBEDOTEXTURE\r\n\tuniform sampler2D u_AlbedoTexture;\r\n#endif\r\n#ifdef SPECULARTEXTURE\r\n\tuniform sampler2D u_SpecularTexture;\r\n#endif\r\n#ifdef NORMALTEXTURE\r\n\tuniform sampler2D u_NormalTexture;\r\n\tuniform float u_normalScale;\r\n#endif\r\n#ifdef PARALLAXTEXTURE\r\n\tuniform sampler2D u_ParallaxTexture;\r\n\tuniform float u_parallaxScale;\r\n#endif\r\n#ifdef OCCLUSIONTEXTURE\r\n\tuniform sampler2D u_OcclusionTexture;\r\n\tuniform float u_occlusionStrength;\r\n#endif\r\n#ifdef EMISSION\r\n\t#ifdef EMISSIONTEXTURE\r\n\t\tuniform sampler2D u_EmissionTexture;\r\n\t#endif\r\n\tuniform vec4 u_EmissionColor;\r\n#endif\r\n#ifdef REFLECTMAP\r\n\tuniform samplerCube u_ReflectTexture;\r\n\tuniform float u_ReflectIntensity;\r\n#endif\r\n\r\nuniform float u_AlphaTestValue;\r\nuniform float u_metallic;\r\nuniform float u_smoothness;\r\nuniform float u_smoothnessScale;\r\n\r\n\r\n\r\n#include \"Lighting.glsl\";\r\n#include \"PBRSpecularLighting.glsl\"\r\n#include \"ShadowHelper.glsl\"\r\n\r\nvarying float v_posViewZ;\r\n#ifdef RECEIVESHADOW\r\n\t#if defined(SHADOWMAP_PSSM2)||defined(SHADOWMAP_PSSM3)\r\n\t\tuniform mat4 u_lightShadowVP[4];\r\n\t#endif\r\n\t#ifdef SHADOWMAP_PSSM1 \r\n\t\tvarying vec4 v_lightMVPPos;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef LEGACYSINGLELIGHTING\r\n\t#ifdef DIRECTIONLIGHT\r\n\t\tuniform DirectionLight u_DirectionLight;\r\n\t#endif\r\n\t#ifdef POINTLIGHT\r\n\t\tuniform PointLight u_PointLight;\r\n\t#endif\r\n\t#ifdef SPOTLIGHT\r\n\t\tuniform SpotLight u_SpotLight;\r\n\t#endif\r\n#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\nvoid main_castShadow()\r\n{\r\n\tgl_FragColor=packDepth(v_posViewZ);\r\n\t#if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t\tfloat alpha = texture2D(u_AlbedoTexture,v_Texcoord0).w;\r\n\t\tif( alpha < u_AlphaTestValue )\r\n\t\t{\r\n\t\t\tdiscard;\r\n\t\t}\r\n\t#endif\r\n}\r\n\r\nvoid main_normal()\r\n{\t\r\n\tvec3 viewDir = normalize(v_ViewDir);\r\n\t\r\n\tvec2 uv0 = ParallaxOffset(viewDir);\r\n\t\r\n\tvec4 sg;\r\n\tvec4 albedoColor;\r\n\t#ifdef ALBEDOTEXTURE\r\n\t\tvec4 albedoTextureColor = texture2D(u_AlbedoTexture, uv0);\r\n\t\talbedoColor = albedoTextureColor * u_AlbedoColor;\r\n\t\tsg = SpecularGloss(albedoTextureColor.a, uv0);\r\n\t#else\r\n\t\talbedoColor = u_AlbedoColor;\r\n\t\tsg = SpecularGloss(1.0, uv0);\r\n\t#endif\r\n\t\r\n\t#ifdef ALPHATEST\r\n\t\tif(albedoColor.a < u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n  \r\n\tvec3 normal = UnpackScaleNormal(uv0);\r\n\t\r\n\tLayaGI gi;\r\n\tgi.diffuse = u_AmbientColor * Occlusion(uv0).rgb;\r\n\tgi.specular = ReflectCubeMap(viewDir, normal);\r\n\t\r\n\t//float a = (sg.r+sg.g+sg.b) / 3.0;\r\n  \r\n\tvec4 color = vec4(0.0);\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tcolor += PBRSpecularDiectionLight(albedoColor, sg.rgb, sg.a, normal, viewDir, u_DirectionLight, gi);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tcolor.a = 0.0;\r\n\t\t\tcolor += PBRSpecularPointLight(albedoColor, sg.rgb, sg.a, normal, viewDir, u_PointLight, v_PositionWorld, gi);\r\n\t\t#endif\r\n\t\t\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tcolor.a = 0.0;\r\n\t\t\tcolor += PBRSpecularSpotLight(albedoColor, sg.rgb, sg.a, normal, viewDir, u_SpotLight, v_PositionWorld, gi);\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\tcolor.a = 0.0;\r\n\t\t\t\tcolor +=PBRSpecularDiectionLight(albedoColor, sg.rgb, sg.a, normal, viewDir, directionLight, gi);\r\n\t\t\t}\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tcolor.a = 0.0;\r\n\t\t\t\t\tcolor +=PBRSpecularPointLight(albedoColor, sg.rgb, sg.a, normal, viewDir, pointLight, v_PositionWorld, gi);\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tcolor.a = 0.0;\r\n\t\t\t\t\tcolor += PBRSpecularSpotLight(albedoColor, sg.rgb, sg.a, normal, viewDir, spotLight, v_PositionWorld, gi);\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n\t#ifdef REFLECTMAP\r\n\t \tcolor += LayaAirSpecularReflect(albedoColor,sg.rgb,sg.a,gi);\r\n\t#endif\r\n\r\n\t#ifdef EMISSION\r\n\t\tvec4 emissionColor = u_EmissionColor;\r\n\t\t#ifdef EMISSIONTEXTURE\r\n\t\t\temissionColor *=  texture2D(u_EmissionTexture, uv0);\r\n\t\t#endif\r\n\t\tcolor.rgb += emissionColor.rgb;\r\n\t#endif\r\n\t\r\n\t#ifdef RECEIVESHADOW\r\n\t\tfloat shadowValue = 1.0;\r\n\t\t#ifdef SHADOWMAP_PSSM3\r\n\t\t\tshadowValue = getShadowPSSM3( u_shadowMap1,u_shadowMap2,u_shadowMap3,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t\t#endif\r\n\t\t#ifdef SHADOWMAP_PSSM2\r\n\t\t\tshadowValue = getShadowPSSM2( u_shadowMap1,u_shadowMap2,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t\t#endif \r\n\t\t#ifdef SHADOWMAP_PSSM1\r\n\t\t\tshadowValue = getShadowPSSM1( u_shadowMap1,v_lightMVPPos,u_shadowPSSMDistance,u_shadowPCFoffset,v_posViewZ,0.001);\r\n\t\t#endif\r\n\t\tgl_FragColor = vec4(color.rgb * shadowValue, color.a);\r\n\t#else\r\n\t\tgl_FragColor = color;\r\n\t#endif\r\n\t\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact = clamp((1.0 / gl_FragCoord.w - u_FogStart) / u_FogRange, 0.0, 1.0);\r\n\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, u_FogColor, lerpFact);\r\n\t#endif\r\n}\r\n\r\nvoid main()\r\n{\r\n\t#ifdef CASTSHADOW\t\t\r\n\t\tmain_castShadow();\r\n\t#else\r\n\t\tmain_normal();\r\n\t#endif  \r\n}\r\n\r\n";
+	var PBRSpecularPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\nvarying vec2 v_Texcoord0;\r\nvarying vec3 v_Normal;\r\nvarying vec3 v_Tangent;\r\nvarying vec3 v_Binormal;\r\nvarying vec3 v_ViewDir;\r\nvarying vec3 v_PositionWorld;\r\n\r\nuniform vec3 u_AmbientColor;\r\nuniform vec4 u_AlbedoColor;\r\nuniform vec4 u_SpecularColor;\r\n\r\n#ifdef ALBEDOTEXTURE\r\n\tuniform sampler2D u_AlbedoTexture;\r\n#endif\r\n#ifdef SPECULARTEXTURE\r\n\tuniform sampler2D u_SpecularTexture;\r\n#endif\r\n#ifdef NORMALTEXTURE\r\n\tuniform sampler2D u_NormalTexture;\r\n\tuniform float u_normalScale;\r\n#endif\r\n#ifdef PARALLAXTEXTURE\r\n\tuniform sampler2D u_ParallaxTexture;\r\n\tuniform float u_parallaxScale;\r\n#endif\r\n#ifdef OCCLUSIONTEXTURE\r\n\tuniform sampler2D u_OcclusionTexture;\r\n\tuniform float u_occlusionStrength;\r\n#endif\r\n#ifdef EMISSION\r\n\t#ifdef EMISSIONTEXTURE\r\n\t\tuniform sampler2D u_EmissionTexture;\r\n\t#endif\r\n\tuniform vec4 u_EmissionColor;\r\n#endif\r\n#ifdef REFLECTMAP\r\n\tuniform samplerCube u_ReflectTexture;\r\n\tuniform float u_ReflectIntensity;\r\n#endif\r\n\r\nuniform float u_AlphaTestValue;\r\nuniform float u_metallic;\r\nuniform float u_smoothness;\r\nuniform float u_smoothnessScale;\r\n\r\n\r\n\r\n#include \"Lighting.glsl\";\r\n#include \"PBRSpecularLighting.glsl\"\r\n#include \"ShadowHelper.glsl\"\r\n\r\nvarying float v_posViewZ;\r\n#ifdef RECEIVESHADOW\r\n\t#if defined(SHADOWMAP_PSSM2)||defined(SHADOWMAP_PSSM3)\r\n\t\tuniform mat4 u_lightShadowVP[4];\r\n\t#endif\r\n\t#ifdef SHADOWMAP_PSSM1 \r\n\t\tvarying vec4 v_lightMVPPos;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef LEGACYSINGLELIGHTING\r\n\t#ifdef DIRECTIONLIGHT\r\n\t\tuniform DirectionLight u_DirectionLight;\r\n\t#endif\r\n\t#ifdef POINTLIGHT\r\n\t\tuniform PointLight u_PointLight;\r\n\t#endif\r\n\t#ifdef SPOTLIGHT\r\n\t\tuniform SpotLight u_SpotLight;\r\n\t#endif\r\n#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\nvoid main_castShadow()\r\n{\r\n\tgl_FragColor=packDepth(v_posViewZ);\r\n\t#if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t\tfloat alpha = texture2D(u_AlbedoTexture,v_Texcoord0).w;\r\n\t\tif( alpha < u_AlphaTestValue )\r\n\t\t{\r\n\t\t\tdiscard;\r\n\t\t}\r\n\t#endif\r\n}\r\n\r\nvoid main_normal()\r\n{\t\r\n\tvec3 viewDir = normalize(v_ViewDir);\r\n\t\r\n\tvec2 uv0 = ParallaxOffset(viewDir);\r\n\t\r\n\tvec4 sg;\r\n\tvec4 albedoColor;\r\n\t#ifdef ALBEDOTEXTURE\r\n\t\tvec4 albedoTextureColor = texture2D(u_AlbedoTexture, uv0);\r\n\t\talbedoColor = albedoTextureColor * u_AlbedoColor;\r\n\t\tsg = SpecularGloss(albedoTextureColor.a, uv0);\r\n\t#else\r\n\t\talbedoColor = u_AlbedoColor;\r\n\t\tsg = SpecularGloss(1.0, uv0);\r\n\t#endif\r\n\t\r\n\t#ifdef ALPHATEST\r\n\t\tif(albedoColor.a < u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n  \r\n\tvec3 normal = UnpackScaleNormal(uv0);\r\n\t\r\n\tLayaGI gi;\r\n\tgi.diffuse = u_AmbientColor * Occlusion(uv0).rgb;\r\n\tgi.specular = ReflectCubeMap(viewDir, normal);\r\n\t\r\n\t//float a = (sg.r+sg.g+sg.b) / 3.0;\r\n  \tfloat shadowValue = 1.0;\r\n\t#ifdef RECEIVESHADOW\r\n\t\t\r\n\t\t#ifdef SHADOWMAP_PSSM3\r\n\t\t\tshadowValue = getShadowPSSM3( u_shadowMap1,u_shadowMap2,u_shadowMap3,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t\t#endif\r\n\t\t#ifdef SHADOWMAP_PSSM2\r\n\t\t\tshadowValue = getShadowPSSM2( u_shadowMap1,u_shadowMap2,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t\t#endif \r\n\t\t#ifdef SHADOWMAP_PSSM1\r\n\t\t\tshadowValue = getShadowPSSM1( u_shadowMap1,v_lightMVPPos,u_shadowPSSMDistance,u_shadowPCFoffset,v_posViewZ,0.001);\r\n\t\t#endif\r\n\t#endif\r\n\tvec4 color = vec4(0.0);\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tcolor += PBRSpecularDiectionLight(albedoColor, sg.rgb, sg.a, normal, viewDir, u_DirectionLight, gi,shadowValue);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tcolor.a = 0.0;\r\n\t\t\tcolor += PBRSpecularPointLight(albedoColor, sg.rgb, sg.a, normal, viewDir, u_PointLight, v_PositionWorld, gi,shadowValue);\r\n\t\t#endif\r\n\t\t\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tcolor.a = 0.0;\r\n\t\t\tcolor += PBRSpecularSpotLight(albedoColor, sg.rgb, sg.a, normal, viewDir, u_SpotLight, v_PositionWorld, gi,shadowValue);\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\tcolor.a = 0.0;\r\n\t\t\t\tcolor +=PBRSpecularDiectionLight(albedoColor, sg.rgb, sg.a, normal, viewDir, directionLight, gi,shadowValue);\r\n\t\t\t}\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tcolor.a = 0.0;\r\n\t\t\t\t\tcolor +=PBRSpecularPointLight(albedoColor, sg.rgb, sg.a, normal, viewDir, pointLight, v_PositionWorld, gi,shadowValue);\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tcolor.a = 0.0;\r\n\t\t\t\t\tcolor += PBRSpecularSpotLight(albedoColor, sg.rgb, sg.a, normal, viewDir, spotLight, v_PositionWorld, gi,shadowValue);\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n\t#ifdef REFLECTMAP\r\n\t \tcolor += LayaAirSpecularReflect(albedoColor,sg.rgb,sg.a,gi);\r\n\t#endif\r\n\r\n\t#ifdef EMISSION\r\n\t\tvec4 emissionColor = u_EmissionColor;\r\n\t\t#ifdef EMISSIONTEXTURE\r\n\t\t\temissionColor *=  texture2D(u_EmissionTexture, uv0);\r\n\t\t#endif\r\n\t\tcolor.rgb += emissionColor.rgb;\r\n\t#endif\r\n\r\n\tgl_FragColor = color;\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact = clamp((1.0 / gl_FragCoord.w - u_FogStart) / u_FogRange, 0.0, 1.0);\r\n\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, u_FogColor, lerpFact);\r\n\t#endif\r\n}\r\n\r\nvoid main()\r\n{\r\n\t#ifdef CASTSHADOW\t\t\r\n\t\tmain_castShadow();\r\n\t#else\r\n\t\tmain_normal();\r\n\t#endif  \r\n}\r\n\r\n";
 
 	var PBRSpecularVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nattribute vec3 a_Normal;\r\nattribute vec4 a_Tangent0;\r\nattribute vec2 a_Texcoord0;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_MvpMatrix;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_WorldMat;\r\n#endif\r\nuniform vec3 u_CameraPos;\r\n\r\nvarying vec2 v_Texcoord0;\r\nvarying vec3 v_Normal;\r\nvarying vec3 v_Tangent;\r\nvarying vec3 v_Binormal;\r\nvarying vec3 v_ViewDir;\r\nvarying vec3 v_PositionWorld;\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif\r\n\r\nvarying float v_posViewZ;\r\n#ifdef RECEIVESHADOW\r\n  #ifdef SHADOWMAP_PSSM1 \r\n\t  varying vec4 v_lightMVPPos;\r\n\t  uniform mat4 u_lightShadowVP[4];\r\n  #endif\r\n#endif\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\nvoid main_castShadow()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform = u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\tposition=skinTransform*a_Position;\r\n\t#else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\t \r\n\t//TODO没考虑UV动画呢\r\n\t#if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t\tv_Texcoord0 = a_Texcoord0;\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n\tv_posViewZ = gl_Position.z;\r\n}\r\n\r\nvoid main_normal()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform = u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\tposition=skinTransform*a_Position;\r\n\t#else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\t\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(RECEIVESHADOW)||defined(REFLECTMAP)\r\n\t\tmat4 worldMat;\r\n\t\t#ifdef GPU_INSTANCE\r\n\t\t\tworldMat = a_WorldMat;\r\n\t\t#else\r\n\t\t\tworldMat = u_WorldMat;\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(REFLECTMAP)\r\n\t\tmat3 worldInvMat;\r\n\t\t#ifdef BONE\r\n\t\t\tworldInvMat=inverse(mat3(worldMat*skinTransform));\r\n\t\t#else\r\n\t\t\tworldInvMat=inverse(mat3(worldMat));\r\n\t\t#endif  \r\n\t\tv_Normal=a_Normal*worldInvMat;\r\n\t\t#if (defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))\r\n\t\t\tv_Tangent=a_Tangent0.xyz*worldInvMat;\r\n\t\t\tv_Binormal=cross(v_Normal,v_Tangent)*a_Tangent0.w;\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n\t\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(RECEIVESHADOW)||defined(REFLECTMAP)\r\n\t\tv_PositionWorld=(worldMat*position).xyz;\r\n\t#endif\r\n\t\r\n  \r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(REFLECTMAP)\r\n\t\tv_ViewDir=u_CameraPos-v_PositionWorld;\r\n\t#endif\r\n\r\n\t#ifdef TILINGOFFSET\r\n\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t#else\r\n\t\tv_Texcoord0=a_Texcoord0;\r\n\t#endif\r\n  \r\n\t#ifdef RECEIVESHADOW\r\n\t\tv_posViewZ = gl_Position.w;\r\n\t\t#ifdef SHADOWMAP_PSSM1 \r\n\t\t\tv_lightMVPPos = u_lightShadowVP[0] * vec4(v_PositionWorld,1.0);\r\n\t\t#endif\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n\r\nvoid main()\r\n{\r\n\t#ifdef CASTSHADOW\r\n\t\tmain_castShadow();\r\n\t#else\r\n\t\tmain_normal();\r\n\t#endif\r\n}";
 
-	var PBRStandardPS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\nvarying vec2 v_Texcoord0;\r\nvarying vec3 v_Normal;\r\nvarying vec3 v_Tangent;\r\nvarying vec3 v_Binormal;\r\nvarying vec3 v_ViewDir;\r\nvarying vec3 v_PositionWorld;\r\n\r\nuniform vec3 u_AmbientColor;\r\nuniform vec4 u_AlbedoColor;\r\n\r\n#ifdef ALBEDOTEXTURE\r\n\tuniform sampler2D u_AlbedoTexture;\r\n#endif\r\n#ifdef METALLICGLOSSTEXTURE\r\n\tuniform sampler2D u_MetallicGlossTexture;\r\n#endif\r\n#ifdef NORMALTEXTURE\r\n\tuniform sampler2D u_NormalTexture;\r\n\tuniform float u_normalScale;\r\n#endif\r\n#ifdef PARALLAXTEXTURE\r\n\tuniform sampler2D u_ParallaxTexture;\r\n\tuniform float u_parallaxScale;\r\n#endif\r\n#ifdef OCCLUSIONTEXTURE\r\n\tuniform sampler2D u_OcclusionTexture;\r\n\tuniform float u_occlusionStrength;\r\n#endif\r\n#ifdef EMISSION\r\n\t#ifdef EMISSIONTEXTURE\r\n\t\tuniform sampler2D u_EmissionTexture;\r\n\t#endif\r\n\tuniform vec4 u_EmissionColor;\r\n#endif\r\n#ifdef REFLECTMAP\r\n\tuniform samplerCube u_ReflectTexture;\r\n\tuniform float u_ReflectIntensity;\r\n#endif\r\n\r\nuniform float u_AlphaTestValue;\r\nuniform float u_metallic;\r\nuniform float u_smoothness;\r\nuniform float u_smoothnessScale;\r\n\r\n\r\n\r\n\r\n#include \"Lighting.glsl\";\r\n#include \"PBRStandardLighting.glsl\"\r\n#include \"ShadowHelper.glsl\"\r\n\r\nvarying float v_posViewZ;\r\n#ifdef RECEIVESHADOW\r\n\t#if defined(SHADOWMAP_PSSM2)||defined(SHADOWMAP_PSSM3)\r\n\t\tuniform mat4 u_lightShadowVP[4];\r\n\t#endif\r\n\t#ifdef SHADOWMAP_PSSM1 \r\n\t\tvarying vec4 v_lightMVPPos;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef LEGACYSINGLELIGHTING\r\n\t#ifdef DIRECTIONLIGHT\r\n\t\tuniform DirectionLight u_DirectionLight;\r\n\t#endif\r\n\t#ifdef POINTLIGHT\r\n\t\tuniform PointLight u_PointLight;\r\n\t#endif\r\n\t#ifdef SPOTLIGHT\r\n\t\tuniform SpotLight u_SpotLight;\r\n\t#endif\r\n#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\nvoid main_castShadow()\r\n{\r\n\tgl_FragColor=packDepth(v_posViewZ);\r\n\t#if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t\tfloat alpha = texture2D(u_AlbedoTexture,v_Texcoord0).w;\r\n\t\tif( alpha < u_AlphaTestValue )\r\n\t\t{\r\n\t\t\tdiscard;\r\n\t\t}\r\n\t#endif\r\n}\r\n\r\nvoid main_normal()\r\n{\t\r\n\tvec3 viewDir = normalize(v_ViewDir);\r\n\t\r\n\tvec2 uv0 = ParallaxOffset(viewDir);\r\n\t\r\n\tvec2 mg;\r\n\tvec4 albedoColor;\r\n\t#ifdef ALBEDOTEXTURE\r\n\t\tvec4 abledoTextureColor = texture2D(u_AlbedoTexture, uv0);\r\n\t\talbedoColor = abledoTextureColor * u_AlbedoColor;\r\n\t\tmg = MetallicGloss(abledoTextureColor.a, uv0);\r\n\t#else\r\n\t\talbedoColor = u_AlbedoColor;\r\n\t\tmg = MetallicGloss(1.0, uv0);\r\n\t#endif\r\n\t\r\n\t#ifdef ALPHATEST\r\n\t\tif(albedoColor.a < u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n\t\r\n\tvec3 normal = UnpackScaleNormal(uv0);\r\n  \r\n\tLayaGI gi;\r\n\tgi.diffuse = u_AmbientColor * Occlusion(uv0).rgb;\r\n\tgi.specular = ReflectCubeMap(viewDir, normal);\r\n  \r\n\tvec4 color = vec4(0.0);\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tcolor += PBRStandardDiectionLight(albedoColor, mg.r, mg.g, normal, viewDir, u_DirectionLight, gi);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tcolor.a = 0.0;\r\n\t\t\tcolor += PBRStandardPointLight(albedoColor, mg.r, mg.g, normal, viewDir, u_PointLight, v_PositionWorld, gi);\r\n\t\t#endif\r\n\t\t\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tcolor.a = 0.0;\r\n\t\t\tcolor += PBRStandardSpotLight(albedoColor, mg.r, mg.g, normal, viewDir, u_SpotLight, v_PositionWorld, gi);\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\tcolor.a = 0.0;\r\n\t\t\t\tcolor += PBRStandardDiectionLight(albedoColor, mg.r, mg.g, normal, viewDir, directionLight, gi);\r\n\t\t\t}\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tcolor.a = 0.0;\r\n\t\t\t\t\tcolor += PBRStandardPointLight(albedoColor, mg.r, mg.g, normal, viewDir, pointLight, v_PositionWorld, gi);\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tcolor.a = 0.0;\r\n\t\t\t\t\tcolor += PBRStandardSpotLight(albedoColor, mg.r, mg.g, normal, viewDir, spotLight, v_PositionWorld, gi);\r\n\t\t\t\t\t\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t\r\n\t#ifdef REFLECTMAP\r\n\t \tcolor += LayaAirStandardReflect(albedoColor,mg.r,mg.g,gi);\r\n\t#endif\r\n\r\n\t#ifdef EMISSION\r\n\t\tvec4 emissionColor = u_EmissionColor;\r\n\t\t#ifdef EMISSIONTEXTURE\r\n\t\t\temissionColor *=  texture2D(u_EmissionTexture, uv0);\r\n\t\t#endif\r\n\t\tcolor.rgb += emissionColor.rgb;\r\n\t#endif\r\n\t\r\n\t#ifdef RECEIVESHADOW\r\n\t\tfloat shadowValue = 1.0;\r\n\t\t#ifdef SHADOWMAP_PSSM3\r\n\t\t\tshadowValue = getShadowPSSM3( u_shadowMap1,u_shadowMap2,u_shadowMap3,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t\t#endif\r\n\t\t#ifdef SHADOWMAP_PSSM2\r\n\t\t\tshadowValue = getShadowPSSM2( u_shadowMap1,u_shadowMap2,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t\t#endif \r\n\t\t#ifdef SHADOWMAP_PSSM1\r\n\t\t\tshadowValue = getShadowPSSM1( u_shadowMap1,v_lightMVPPos,u_shadowPSSMDistance,u_shadowPCFoffset,v_posViewZ,0.001);\r\n\t\t#endif\r\n\t\tgl_FragColor = vec4(color.rgb * shadowValue, color.a);\r\n\t#else\r\n\t\tgl_FragColor = color;\r\n\t#endif\r\n\t\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact = clamp((1.0 / gl_FragCoord.w - u_FogStart) / u_FogRange, 0.0, 1.0);\r\n\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, u_FogColor, lerpFact);\r\n\t#endif\r\n}\r\n\r\nvoid main()\r\n{\r\n\t#ifdef CASTSHADOW\t\t\r\n\t\tmain_castShadow();\r\n\t#else\r\n\t\tmain_normal();\r\n\t#endif  \r\n}";
+	var PBRStandardPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\nvarying vec2 v_Texcoord0;\r\nvarying vec3 v_Normal;\r\nvarying vec3 v_Tangent;\r\nvarying vec3 v_Binormal;\r\nvarying vec3 v_ViewDir;\r\nvarying vec3 v_PositionWorld;\r\n\r\nuniform vec3 u_AmbientColor;\r\nuniform vec4 u_AlbedoColor;\r\n\r\n#ifdef ALBEDOTEXTURE\r\n\tuniform sampler2D u_AlbedoTexture;\r\n#endif\r\n#ifdef METALLICGLOSSTEXTURE\r\n\tuniform sampler2D u_MetallicGlossTexture;\r\n#endif\r\n#ifdef NORMALTEXTURE\r\n\tuniform sampler2D u_NormalTexture;\r\n\tuniform float u_normalScale;\r\n#endif\r\n#ifdef PARALLAXTEXTURE\r\n\tuniform sampler2D u_ParallaxTexture;\r\n\tuniform float u_parallaxScale;\r\n#endif\r\n#ifdef OCCLUSIONTEXTURE\r\n\tuniform sampler2D u_OcclusionTexture;\r\n\tuniform float u_occlusionStrength;\r\n#endif\r\n#ifdef EMISSION\r\n\t#ifdef EMISSIONTEXTURE\r\n\t\tuniform sampler2D u_EmissionTexture;\r\n\t#endif\r\n\tuniform vec4 u_EmissionColor;\r\n#endif\r\n#ifdef REFLECTMAP\r\n\tuniform samplerCube u_ReflectTexture;\r\n\tuniform float u_ReflectIntensity;\r\n#endif\r\n\r\nuniform float u_AlphaTestValue;\r\nuniform float u_metallic;\r\nuniform float u_smoothness;\r\nuniform float u_smoothnessScale;\r\n\r\n\r\n\r\n\r\n#include \"Lighting.glsl\";\r\n#include \"PBRStandardLighting.glsl\"\r\n#include \"ShadowHelper.glsl\"\r\n\r\nvarying float v_posViewZ;\r\n#ifdef RECEIVESHADOW\r\n\t#if defined(SHADOWMAP_PSSM2)||defined(SHADOWMAP_PSSM3)\r\n\t\tuniform mat4 u_lightShadowVP[4];\r\n\t#endif\r\n\t#ifdef SHADOWMAP_PSSM1 \r\n\t\tvarying vec4 v_lightMVPPos;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef LEGACYSINGLELIGHTING\r\n\t#ifdef DIRECTIONLIGHT\r\n\t\tuniform DirectionLight u_DirectionLight;\r\n\t#endif\r\n\t#ifdef POINTLIGHT\r\n\t\tuniform PointLight u_PointLight;\r\n\t#endif\r\n\t#ifdef SPOTLIGHT\r\n\t\tuniform SpotLight u_SpotLight;\r\n\t#endif\r\n#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\nvoid main_castShadow()\r\n{\r\n\tgl_FragColor=packDepth(v_posViewZ);\r\n\t#if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t\tfloat alpha = texture2D(u_AlbedoTexture,v_Texcoord0).w;\r\n\t\tif( alpha < u_AlphaTestValue )\r\n\t\t{\r\n\t\t\tdiscard;\r\n\t\t}\r\n\t#endif\r\n}\r\n\r\nvoid main_normal()\r\n{\t\r\n\tvec3 viewDir = normalize(v_ViewDir);\r\n\t\r\n\tvec2 uv0 = ParallaxOffset(viewDir);\r\n\t\r\n\tvec2 mg;\r\n\tvec4 albedoColor;\r\n\t#ifdef ALBEDOTEXTURE\r\n\t\tvec4 abledoTextureColor = texture2D(u_AlbedoTexture, uv0);\r\n\t\talbedoColor = abledoTextureColor * u_AlbedoColor;\r\n\t\tmg = MetallicGloss(abledoTextureColor.a, uv0);\r\n\t#else\r\n\t\talbedoColor = u_AlbedoColor;\r\n\t\tmg = MetallicGloss(1.0, uv0);\r\n\t#endif\r\n\t\r\n\t#ifdef ALPHATEST\r\n\t\tif(albedoColor.a < u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n\t\r\n\tvec3 normal = UnpackScaleNormal(uv0);\r\n  \r\n\tLayaGI gi;\r\n\tgi.diffuse = u_AmbientColor * Occlusion(uv0).rgb;\r\n\tgi.specular = ReflectCubeMap(viewDir, normal);\r\n  \r\n  \tfloat shadowValue = 1.0;\r\n\t#ifdef RECEIVESHADOW\r\n\t\r\n\t\t#ifdef SHADOWMAP_PSSM3\r\n\t\t\tshadowValue = getShadowPSSM3( u_shadowMap1,u_shadowMap2,u_shadowMap3,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t\t#endif\r\n\t\t#ifdef SHADOWMAP_PSSM2\r\n\t\t\tshadowValue = getShadowPSSM2( u_shadowMap1,u_shadowMap2,u_lightShadowVP,u_shadowPSSMDistance,u_shadowPCFoffset,v_PositionWorld,v_posViewZ,0.001);\r\n\t\t#endif \r\n\t\t#ifdef SHADOWMAP_PSSM1\r\n\t\t\tshadowValue = getShadowPSSM1( u_shadowMap1,v_lightMVPPos,u_shadowPSSMDistance,u_shadowPCFoffset,v_posViewZ,0.001);\r\n\t\t#endif\r\n\t#endif\r\n\r\n\tvec4 color = vec4(0.0);\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tcolor += PBRStandardDiectionLight(albedoColor, mg.r, mg.g, normal, viewDir, u_DirectionLight, gi,shadowValue);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tcolor.a = 0.0;\r\n\t\t\tcolor += PBRStandardPointLight(albedoColor, mg.r, mg.g, normal, viewDir, u_PointLight, v_PositionWorld, gi,shadowValue);\r\n\t\t#endif\r\n\t\t\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tcolor.a = 0.0;\r\n\t\t\tcolor += PBRStandardSpotLight(albedoColor, mg.r, mg.g, normal, viewDir, u_SpotLight, v_PositionWorld, gi,shadowValue);\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\tcolor.a = 0.0;\r\n\t\t\t\tcolor += PBRStandardDiectionLight(albedoColor, mg.r, mg.g, normal, viewDir, directionLight, gi,shadowValue);\r\n\t\t\t}\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tcolor.a = 0.0;\r\n\t\t\t\t\tcolor += PBRStandardPointLight(albedoColor, mg.r, mg.g, normal, viewDir, pointLight, v_PositionWorld, gi,shadowValue);\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tcolor.a = 0.0;\r\n\t\t\t\t\tcolor += PBRStandardSpotLight(albedoColor, mg.r, mg.g, normal, viewDir, spotLight, v_PositionWorld, gi,shadowValue);\r\n\t\t\t\t\t\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t\r\n\t#ifdef REFLECTMAP\r\n\t \tcolor += LayaAirStandardReflect(albedoColor,mg.r,mg.g,gi);\r\n\t#endif\r\n\r\n\t#ifdef EMISSION\r\n\t\tvec4 emissionColor = u_EmissionColor;\r\n\t\t#ifdef EMISSIONTEXTURE\r\n\t\t\temissionColor *=  texture2D(u_EmissionTexture, uv0);\r\n\t\t#endif\r\n\t\tcolor.rgb += emissionColor.rgb;\r\n\t#endif\r\n\t\r\n\t\tgl_FragColor = color;\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact = clamp((1.0 / gl_FragCoord.w - u_FogStart) / u_FogRange, 0.0, 1.0);\r\n\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, u_FogColor, lerpFact);\r\n\t#endif\r\n}\r\n\r\nvoid main()\r\n{\r\n\t#ifdef CASTSHADOW\t\t\r\n\t\tmain_castShadow();\r\n\t#else\r\n\t\tmain_normal();\r\n\t#endif  \r\n}";
 
 	var PBRStandardVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nattribute vec3 a_Normal;\r\nattribute vec4 a_Tangent0;\r\nattribute vec2 a_Texcoord0;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_MvpMatrix;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_WorldMat;\r\n#endif\r\n\r\nuniform vec3 u_CameraPos;\r\n\r\nvarying vec2 v_Texcoord0;\r\nvarying vec3 v_Normal;\r\nvarying vec3 v_Tangent;\r\nvarying vec3 v_Binormal;\r\nvarying vec3 v_ViewDir;\r\nvarying vec3 v_PositionWorld;\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif\r\n\r\nvarying float v_posViewZ;\r\n#ifdef RECEIVESHADOW\r\n  #ifdef SHADOWMAP_PSSM1 \r\n\t  varying vec4 v_lightMVPPos;\r\n\t  uniform mat4 u_lightShadowVP[4];\r\n  #endif\r\n#endif\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\nvoid main_castShadow()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform = u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\tposition=skinTransform*a_Position;\r\n\t#else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\t \r\n\t//TODO没考虑UV动画呢\r\n\t#if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t\tv_Texcoord0 = a_Texcoord0;\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n\tv_posViewZ = gl_Position.z;\r\n}\r\n\r\nvoid main_normal()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform = u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\tposition=skinTransform*a_Position;\r\n\t#else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\t\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(RECEIVESHADOW)||defined(REFLECTMAP)\r\n\t\tmat4 worldMat;\r\n\t\t#ifdef GPU_INSTANCE\r\n\t\t\tworldMat = a_WorldMat;\r\n\t\t#else\r\n\t\t\tworldMat = u_WorldMat;\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(REFLECTMAP)\r\n\t\tmat3 worldInvMat;\r\n\t\t#ifdef BONE\r\n\t\t\tworldInvMat=inverse(mat3(worldMat*skinTransform));\r\n\t\t#else\r\n\t\t\tworldInvMat=inverse(mat3(worldMat));\r\n\t\t#endif  \r\n\t\tv_Normal=a_Normal*worldInvMat;\r\n\t\t#if (defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))\r\n\t\t\tv_Tangent=a_Tangent0.xyz*worldInvMat;\r\n\t\t\tv_Binormal=cross(v_Normal,v_Tangent)*a_Tangent0.w;\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n\t\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(RECEIVESHADOW)||defined(REFLECTMAP)\r\n\t\tv_PositionWorld=(worldMat*position).xyz;\r\n\t#endif\r\n\t\r\n  \r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(REFLECTMAP)||defined(REFLECTMAP)\r\n\t\tv_ViewDir=u_CameraPos-v_PositionWorld;\r\n\t#endif\r\n\r\n\t#ifdef TILINGOFFSET\r\n\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t#else\r\n\t\tv_Texcoord0=a_Texcoord0;\r\n\t#endif\r\n  \r\n\t#ifdef RECEIVESHADOW\r\n\t\tv_posViewZ = gl_Position.w;\r\n\t\t#ifdef SHADOWMAP_PSSM1 \r\n\t\t\tv_lightMVPPos = u_lightShadowVP[0] * vec4(v_PositionWorld,1.0);\r\n\t\t#endif\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n\r\nvoid main()\r\n{\r\n\t#ifdef CASTSHADOW\r\n\t\tmain_castShadow();\r\n\t#else\r\n\t\tmain_normal();\r\n\t#endif\r\n}";
 
 	var BloomVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_PositionTexcoord;\r\nvarying vec2 v_Texcoord0;\r\n\r\nvoid main() {\r\n\tgl_Position = vec4(a_PositionTexcoord.xy, 0.0, 1.0);\r\n\tv_Texcoord0 = a_PositionTexcoord.zw;\r\n\tgl_Position = remapGLPositionZ(gl_Position);\r\n}";
 
-	var BloomDownsample13PS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform vec4 u_MainTex_TexelSize;\r\n\r\nvoid fragDownsample13() {\r\n\tmediump vec4 color = downsampleBox13Tap(u_MainTex, v_Texcoord0, u_MainTex_TexelSize.xy);\r\n\tgl_FragColor = color;\r\n}\r\n\r\nvoid main() {\r\n\tfragDownsample13();\r\n}";
+	var BloomDownsample13PS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform vec4 u_MainTex_TexelSize;\r\n\r\nvoid fragDownsample13() {\r\n\tmediump vec4 color = downsampleBox13Tap(u_MainTex, v_Texcoord0, u_MainTex_TexelSize.xy);\r\n\tgl_FragColor = color;\r\n}\r\n\r\nvoid main() {\r\n\tfragDownsample13();\r\n}";
 
-	var BloomDownsample4PS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform vec4 u_MainTex_TexelSize;\r\n\r\nvoid fragDownsample4() {\r\n\tmediump vec4 color = downsampleBox4Tap(u_MainTex, v_Texcoord0, u_MainTex_TexelSize.xy);\r\n\tgl_FragColor = color;\r\n}\r\n\r\nvoid main() {\r\n\tfragDownsample4();\r\n}";
+	var BloomDownsample4PS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform vec4 u_MainTex_TexelSize;\r\n\r\nvoid fragDownsample4() {\r\n\tmediump vec4 color = downsampleBox4Tap(u_MainTex, v_Texcoord0, u_MainTex_TexelSize.xy);\r\n\tgl_FragColor = color;\r\n}\r\n\r\nvoid main() {\r\n\tfragDownsample4();\r\n}";
 
-	var BloomPrefilter13PS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform sampler2D u_AutoExposureTex;\r\nuniform vec4 u_MainTex_TexelSize;\r\nuniform vec4 u_Threshold; // x: threshold value (linear), y: threshold - knee, z: knee * 2, w: 0.25 / knee\r\nuniform vec4 u_Params; // x: clamp, yzw: unused\r\n\r\nmediump vec4 prefilter(mediump vec4 color, vec2 uv) {\r\n\tmediump float autoExposure = texture2D(u_AutoExposureTex, uv).r;\r\n\tcolor *= autoExposure;\r\n\tcolor = min(vec4(u_Params.x), color); // clamp to max\r\n\tcolor = quadraticThreshold(color, u_Threshold.x, u_Threshold.yzw);\r\n\treturn color;\r\n}\r\n\r\nvoid fragPrefilter13() {\r\n\tmediump vec4 color = downsampleBox13Tap(u_MainTex, v_Texcoord0, u_MainTex_TexelSize.xy);\r\n\tgl_FragColor = prefilter(safeHDR(color), v_Texcoord0);\r\n}\r\n\r\nvoid main() {\r\n\tfragPrefilter13();\r\n}";
+	var BloomPrefilter13PS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform sampler2D u_AutoExposureTex;\r\nuniform vec4 u_MainTex_TexelSize;\r\nuniform vec4 u_Threshold; // x: threshold value (linear), y: threshold - knee, z: knee * 2, w: 0.25 / knee\r\nuniform vec4 u_Params; // x: clamp, yzw: unused\r\n\r\nmediump vec4 prefilter(mediump vec4 color, vec2 uv) {\r\n\tmediump float autoExposure = texture2D(u_AutoExposureTex, uv).r;\r\n\tcolor *= autoExposure;\r\n\tcolor = min(vec4(u_Params.x), color); // clamp to max\r\n\tcolor = quadraticThreshold(color, u_Threshold.x, u_Threshold.yzw);\r\n\treturn color;\r\n}\r\n\r\nvoid fragPrefilter13() {\r\n\tmediump vec4 color = downsampleBox13Tap(u_MainTex, v_Texcoord0, u_MainTex_TexelSize.xy);\r\n\tgl_FragColor = prefilter(safeHDR(color), v_Texcoord0);\r\n}\r\n\r\nvoid main() {\r\n\tfragPrefilter13();\r\n}";
 
-	var BloomPrefilter4PS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform sampler2D u_AutoExposureTex;\r\nuniform vec4 u_MainTex_TexelSize;\r\nuniform vec4 u_Threshold; // x: threshold value (linear), y: threshold - knee, z: knee * 2, w: 0.25 / knee\r\nuniform vec4 u_Params; // x: clamp, yzw: unused\r\n\r\nmediump vec4 prefilter(mediump vec4 color, vec2 uv) {\r\n\tmediump float autoExposure = texture2D(u_AutoExposureTex, uv).r;\r\n\tcolor *= autoExposure;\r\n\tcolor = min(vec4(u_Params.x), color); // clamp to max\r\n\tcolor = quadraticThreshold(color, u_Threshold.x, u_Threshold.yzw);\r\n\treturn color;\r\n}\r\n\r\nvoid fragPrefilter4() {\r\n\tmediump vec4 color = downsampleBox4Tap(u_MainTex, v_Texcoord0, u_MainTex_TexelSize.xy);\r\n\tgl_FragColor = prefilter(safeHDR(color), v_Texcoord0);\r\n}\r\n\r\nvoid main() {\r\n\tfragPrefilter4();\r\n}";
+	var BloomPrefilter4PS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform sampler2D u_AutoExposureTex;\r\nuniform vec4 u_MainTex_TexelSize;\r\nuniform vec4 u_Threshold; // x: threshold value (linear), y: threshold - knee, z: knee * 2, w: 0.25 / knee\r\nuniform vec4 u_Params; // x: clamp, yzw: unused\r\n\r\nmediump vec4 prefilter(mediump vec4 color, vec2 uv) {\r\n\tmediump float autoExposure = texture2D(u_AutoExposureTex, uv).r;\r\n\tcolor *= autoExposure;\r\n\tcolor = min(vec4(u_Params.x), color); // clamp to max\r\n\tcolor = quadraticThreshold(color, u_Threshold.x, u_Threshold.yzw);\r\n\treturn color;\r\n}\r\n\r\nvoid fragPrefilter4() {\r\n\tmediump vec4 color = downsampleBox4Tap(u_MainTex, v_Texcoord0, u_MainTex_TexelSize.xy);\r\n\tgl_FragColor = prefilter(safeHDR(color), v_Texcoord0);\r\n}\r\n\r\nvoid main() {\r\n\tfragPrefilter4();\r\n}";
 
-	var BloomUpsampleBoxPS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform sampler2D u_BloomTex;\r\n\r\nuniform vec4 u_MainTex_TexelSize;\r\nuniform float u_SampleScale;\r\n\r\nmediump vec4 combine(mediump vec4 bloom, vec2 uv) {\r\n\tmediump vec4 color = texture2D(u_BloomTex, uv);\r\n\treturn bloom + color;\r\n}\r\n\r\nvoid fragUpsampleBox() {\r\n\tmediump vec4 bloom = upsampleBox(u_MainTex, v_Texcoord0, u_MainTex_TexelSize.xy, vec4(u_SampleScale));\r\n\tgl_FragColor = combine(bloom, v_Texcoord0);\r\n}\r\n\r\nvoid main() {\r\n\tfragUpsampleBox();\r\n}";
+	var BloomUpsampleBoxPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform sampler2D u_BloomTex;\r\n\r\nuniform vec4 u_MainTex_TexelSize;\r\nuniform float u_SampleScale;\r\n\r\nmediump vec4 combine(mediump vec4 bloom, vec2 uv) {\r\n\tmediump vec4 color = texture2D(u_BloomTex, uv);\r\n\treturn bloom + color;\r\n}\r\n\r\nvoid fragUpsampleBox() {\r\n\tmediump vec4 bloom = upsampleBox(u_MainTex, v_Texcoord0, u_MainTex_TexelSize.xy, vec4(u_SampleScale));\r\n\tgl_FragColor = combine(bloom, v_Texcoord0);\r\n}\r\n\r\nvoid main() {\r\n\tfragUpsampleBox();\r\n}";
 
-	var BloomUpsampleTentPS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform sampler2D u_BloomTex;\r\n\r\nuniform vec4 u_MainTex_TexelSize;\r\nuniform float u_SampleScale;\r\n\r\nmediump vec4 combine(mediump vec4 bloom, vec2 uv) {\r\n\tmediump vec4 color = texture2D(u_BloomTex, uv);\r\n\treturn bloom + color;\r\n}\r\n\r\nvoid fragUpsampleTent() {\r\n\tmediump vec4 bloom = upsampleTent(u_MainTex, v_Texcoord0, u_MainTex_TexelSize.xy, vec4(u_SampleScale));\r\n\tgl_FragColor = combine(bloom, v_Texcoord0);\r\n}\r\n\r\nvoid main() {\r\n\tfragUpsampleTent();\r\n}";
+	var BloomUpsampleTentPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform sampler2D u_BloomTex;\r\n\r\nuniform vec4 u_MainTex_TexelSize;\r\nuniform float u_SampleScale;\r\n\r\nmediump vec4 combine(mediump vec4 bloom, vec2 uv) {\r\n\tmediump vec4 color = texture2D(u_BloomTex, uv);\r\n\treturn bloom + color;\r\n}\r\n\r\nvoid fragUpsampleTent() {\r\n\tmediump vec4 bloom = upsampleTent(u_MainTex, v_Texcoord0, u_MainTex_TexelSize.xy, vec4(u_SampleScale));\r\n\tgl_FragColor = combine(bloom, v_Texcoord0);\r\n}\r\n\r\nvoid main() {\r\n\tfragUpsampleTent();\r\n}";
 
 	var ColorsGLSL = "#include \"StdLib.glsl\";\r\n\r\n#define EPSILON 1.0e-4\r\n\r\n// Quadratic color thresholding\r\n// curve = (threshold - knee, knee * 2, 0.25 / knee)\r\nmediump vec4 quadraticThreshold(mediump vec4 color, mediump float threshold, mediump vec3 curve) {\r\n\t// Pixel brightness\r\n\tmediump float br = max3(color.r, color.g, color.b);\r\n\r\n\t// Under-threshold part: quadratic curve\r\n\tmediump float rq = clamp(br - curve.x, 0.0, curve.y);\r\n\trq = curve.z * rq * rq;\r\n\r\n\t// Combine and apply the brightness response curve.\r\n\tcolor *= max(rq, br - threshold) / max(br, EPSILON);\r\n\r\n\treturn color;\r\n}\r\n\r\n\r\n\r\n//\r\n// sRGB transfer functions\r\n// Fast path ref: http://chilliant.blogspot.com.au/2012/08/srgb-approximations-for-hlsl.html?m=1\r\n//\r\nmediump vec3 sRGBToLinear(mediump vec3 c) {\r\n\t#ifdef USE_VERY_FAST_SRGB\r\n\t\treturn c * c;\r\n\t#elif defined(USE_FAST_SRGB)\r\n\t\treturn c * (c * (c * 0.305306011 + 0.682171111) + 0.012522878);\r\n\t#else\r\n\t\tmediump vec3 linearRGBLo = c / 12.92;\r\n\t\tmediump vec3 power=vec3(2.4, 2.4, 2.4);\r\n\t\tmediump vec3 linearRGBHi = positivePow((c + 0.055) / 1.055, power);\r\n\t\tmediump vec3 linearRGB =vec3((c.r<=0.04045) ? linearRGBLo.r : linearRGBHi.r,(c.g<=0.04045) ? linearRGBLo.g : linearRGBHi.g,(c.b<=0.04045) ? linearRGBLo.b : linearRGBHi.b);\r\n\t\treturn linearRGB;\r\n\t#endif\r\n}\r\n\r\nmediump vec4 sRGBToLinear(mediump vec4 c){\r\n    return vec4(sRGBToLinear(c.rgb), c.a);\r\n}\r\n\r\n\r\n\r\nmediump vec3 linearToSRGB(mediump vec3 c) {\r\n\t#ifdef USE_VERY_FAST_SRGB\r\n\t\treturn sqrt(c);\r\n\t#elif defined(USE_FAST_SRGB)\r\n\t\treturn max(1.055 * PositivePow(c, 0.416666667) - 0.055, 0.0);\r\n\t#else\r\n\t\tmediump vec3 sRGBLo = c * 12.92;\r\n\t\tmediump vec3 power=vec3(1.0 / 2.4, 1.0 / 2.4, 1.0 / 2.4);\r\n\t\tmediump vec3 sRGBHi = (positivePow(c, power) * 1.055) - 0.055;\r\n\t\tmediump vec3 sRGB =vec3((c.r<=0.0031308) ? sRGBLo.r : sRGBHi.r,(c.g<=0.0031308) ? sRGBLo.g : sRGBHi.g,(c.b<=0.0031308) ? sRGBLo.b : sRGBHi.b);\r\n\t\treturn sRGB;\r\n\t#endif\r\n}\r\n\r\nmediump vec4 linearToSRGB(mediump vec4 c){\r\n    return vec4(linearToSRGB(c.rgb), c.a);\r\n}";
 
-	var CompositePS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform sampler2D u_BloomTex;\r\n\r\nuniform sampler2D u_AutoExposureTex;\r\nuniform sampler2D u_Bloom_DirtTex;\r\nuniform vec4 u_BloomTex_TexelSize;\r\nuniform vec4 u_Bloom_DirtTileOffset; // xy: tiling, zw: offset\r\nuniform mediump vec3 u_Bloom_Settings;// x: sampleScale, y: intensity, z: dirt intensity\r\nuniform mediump vec3 u_Bloom_Color;\r\n\r\nvoid main() {\r\n\tmediump float autoExposure = texture2D(u_AutoExposureTex, v_Texcoord0).r;\r\n\tmediump vec4 color=vec4(0.0);\r\n\tcolor = texture2D(u_MainTex, v_Texcoord0);\r\n\t\r\n\tcolor = sRGBToLinear(color);\r\n\tcolor.rgb *= autoExposure;\r\n\t\r\n\t#if defined(BLOOM)||defined(BLOOM_LOW)\r\n\t\t#ifdef BLOOM\r\n\t\t\tmediump vec4 bloom = upsampleTent(u_BloomTex, v_Texcoord0, u_BloomTex_TexelSize.xy, vec4(u_Bloom_Settings.x));\r\n\t\t#else\r\n\t\t\tmediump vec4 bloom = upsampleBox(u_BloomTex, v_Texcoord0, u_BloomTex_TexelSize.xy, vec4(u_Bloom_Settings.x));\r\n\t\t#endif\r\n\r\n\t\t// UVs should be Distort(uv * u_Bloom_DirtTileOffset.xy + u_Bloom_DirtTileOffset.zw)\r\n\t\t// but considering we use a cover-style scale on the dirt texture the difference\r\n\t\t// isn't massive so we chose to save a few ALUs here instead in case lens distortion\r\n\t\t// is active\r\n\t\tmediump vec4 dirt =vec4(texture2D(u_Bloom_DirtTex, v_Texcoord0 * u_Bloom_DirtTileOffset.xy + u_Bloom_DirtTileOffset.zw).rgb, 0.0);\r\n\r\n\t\t// Additive bloom (artist friendly)\r\n\t\tbloom *= u_Bloom_Settings.y;\r\n\t\tdirt *= u_Bloom_Settings.z;\r\n\t\tmediump vec4 bloomColor=vec4(u_Bloom_Color, 1.0);\r\n\t\tcolor += bloom * bloomColor;\r\n\t\tcolor += dirt * bloom;\r\n\t#endif\r\n\t\r\n\tmediump vec4 finalColor = color;\r\n\tfinalColor = linearToSRGB(finalColor);\r\n\t//finalColor.rgb = Dither(finalColor.rgb, v_Texcoord0);//TODO:抖动\r\n\tgl_FragColor = finalColor;\r\n}";
+	var CompositePS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Colors.glsl\";\r\n#include \"Sampling.glsl\";\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform sampler2D u_MainTex;\r\nuniform sampler2D u_BloomTex;\r\n\r\nuniform sampler2D u_AutoExposureTex;\r\nuniform sampler2D u_Bloom_DirtTex;\r\nuniform vec4 u_BloomTex_TexelSize;\r\nuniform vec4 u_Bloom_DirtTileOffset; // xy: tiling, zw: offset\r\nuniform mediump vec3 u_Bloom_Settings;// x: sampleScale, y: intensity, z: dirt intensity\r\nuniform mediump vec3 u_Bloom_Color;\r\n\r\nvoid main() {\r\n\tmediump float autoExposure = texture2D(u_AutoExposureTex, v_Texcoord0).r;\r\n\tmediump vec4 color=vec4(0.0);\r\n\tcolor = texture2D(u_MainTex, v_Texcoord0);\r\n\t\r\n\tcolor = sRGBToLinear(color);\r\n\tcolor.rgb *= autoExposure;\r\n\t\r\n\t#if defined(BLOOM)||defined(BLOOM_LOW)\r\n\t\t#ifdef BLOOM\r\n\t\t\tmediump vec4 bloom = upsampleTent(u_BloomTex, v_Texcoord0, u_BloomTex_TexelSize.xy, vec4(u_Bloom_Settings.x));\r\n\t\t#else\r\n\t\t\tmediump vec4 bloom = upsampleBox(u_BloomTex, v_Texcoord0, u_BloomTex_TexelSize.xy, vec4(u_Bloom_Settings.x));\r\n\t\t#endif\r\n\r\n\t\t// UVs should be Distort(uv * u_Bloom_DirtTileOffset.xy + u_Bloom_DirtTileOffset.zw)\r\n\t\t// but considering we use a cover-style scale on the dirt texture the difference\r\n\t\t// isn't massive so we chose to save a few ALUs here instead in case lens distortion\r\n\t\t// is active\r\n\t\tmediump vec4 dirt =vec4(texture2D(u_Bloom_DirtTex, v_Texcoord0 * u_Bloom_DirtTileOffset.xy + u_Bloom_DirtTileOffset.zw).rgb, 0.0);\r\n\r\n\t\t// Additive bloom (artist friendly)\r\n\t\tbloom *= u_Bloom_Settings.y;\r\n\t\tdirt *= u_Bloom_Settings.z;\r\n\t\tmediump vec4 bloomColor=vec4(u_Bloom_Color, 1.0);\r\n\t\tcolor += bloom * bloomColor;\r\n\t\tcolor += dirt * bloom;\r\n\t#endif\r\n\t\r\n\tmediump vec4 finalColor = color;\r\n\tfinalColor = linearToSRGB(finalColor);\r\n\t//finalColor.rgb = Dither(finalColor.rgb, v_Texcoord0);//TODO:抖动\r\n\tgl_FragColor = finalColor;\r\n}";
 
 	var CompositeVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_PositionTexcoord;\r\nvarying vec2 v_Texcoord0;\r\n\r\nvoid main() {\r\n\tgl_Position = vec4(a_PositionTexcoord.xy, 0.0, 1.0);\r\n\tv_Texcoord0 = a_PositionTexcoord.zw;\r\n\tgl_Position = remapGLPositionZ(gl_Position);\r\n}";
 
@@ -28364,23 +28918,23 @@
 
 	var ShadowHelperGLSL = "uniform sampler2D u_shadowMap1;\r\nuniform sampler2D u_shadowMap2;\r\nuniform sampler2D u_shadowMap3;\r\nuniform vec2\t  u_shadowPCFoffset;\r\nuniform vec4     u_shadowPSSMDistance;\r\nvec4 packDepth(const in float depth)\r\n{\r\n\tconst vec4 bitShift = vec4(256.0*256.0*256.0, 256.0*256.0, 256.0, 1.0);\r\n\tconst vec4 bitMask\t= vec4(0.0, 1.0/256.0, 1.0/256.0, 1.0/256.0);\r\n\tvec4 res = mod(depth*bitShift*vec4(255), vec4(256))/vec4(255);\r\n\tres -= res.xxyz * bitMask;\r\n\treturn res;\r\n}\r\nfloat unpackDepth(const in vec4 rgbaDepth)\r\n{\r\n\tconst vec4 bitShift = vec4(1.0/(256.0*256.0*256.0), 1.0/(256.0*256.0), 1.0/256.0, 1.0);\r\n\tfloat depth = dot(rgbaDepth, bitShift);\r\n\treturn depth;\r\n}\r\nfloat tex2DPCF( sampler2D shadowMap,vec2 texcoord,vec2 invsize,float zRef )\r\n{\r\n\tvec2 texelpos =texcoord / invsize;\r\n\tvec2 lerps = fract( texelpos );\r\n\tfloat sourcevals[4];\r\n\tsourcevals[0] = float( unpackDepth(texture2D(shadowMap,texcoord)) > zRef );\r\n\tsourcevals[1] = float( unpackDepth(texture2D(shadowMap,texcoord + vec2(invsize.x,0))) > zRef );\r\n\tsourcevals[2] = float( unpackDepth(texture2D(shadowMap,texcoord + vec2(0,invsize.y))) > zRef );\r\n\tsourcevals[3] = float( unpackDepth(texture2D(shadowMap,texcoord + vec2(invsize.x, invsize.y) )) > zRef );\r\n\treturn mix( mix(sourcevals[0],sourcevals[2],lerps.y),mix(sourcevals[1],sourcevals[3],lerps.y),lerps.x );\r\n}\r\nfloat getShadowPSSM3( sampler2D shadowMap1,sampler2D shadowMap2,sampler2D shadowMap3,mat4 lightShadowVP[4],vec4 pssmDistance,vec2 shadowPCFOffset,vec3 worldPos,float posViewZ,float zBias )\r\n{\r\n\tfloat value = 1.0;\r\n\tint nPSNum = int(posViewZ>pssmDistance.x);\r\n\tnPSNum += int(posViewZ>pssmDistance.y);\r\n\tnPSNum += int(posViewZ>pssmDistance.z);\r\n\t//真SB,webgl不支持在PS中直接访问数组\r\n\tmat4 lightVP;\r\n\tif( nPSNum == 0 )\r\n\t{\r\n\t\tlightVP = lightShadowVP[1];\r\n\t}\r\n\telse if( nPSNum == 1 )\r\n\t{\r\n\t\tlightVP = lightShadowVP[2];\r\n\t}\r\n\telse if( nPSNum == 2 )\r\n\t{\r\n\t\tlightVP = lightShadowVP[3];\r\n\t}\r\n\tvec4 vLightMVPPos = lightVP * vec4(worldPos,1.0);\r\n\t//为了效率，在CPU计算/2.0 + 0.5\r\n\t//vec3 vText = (vLightMVPPos.xyz / vLightMVPPos.w)/2.0 + 0.5;\r\n\tvec3 vText = vLightMVPPos.xyz / vLightMVPPos.w;\r\n\tfloat fMyZ = vText.z - zBias;\r\n\t/*\r\n\tbvec4 bInFrustumVec = bvec4 ( vText.x >= 0.0, vText.x <= 1.0, vText.y >= 0.0, vText.y <= 1.0 );\r\n\tbool bInFrustum = all( bInFrustumVec );\r\n\tbvec2 bFrustumTestVec = bvec2( bInFrustum, fMyZ <= 1.0 );\r\n\tbool bFrustumTest = all( bFrustumTestVec );\r\n\tif ( bFrustumTest ) \r\n\t*/\r\n\tif( fMyZ <= 1.0 )\r\n\t{\r\n\t\tfloat zdepth=0.0;\r\n#ifdef SHADOWMAP_PCF3\r\n\t\tif ( nPSNum == 0 )\r\n\t\t{\r\n\t\t\tvalue =  tex2DPCF( shadowMap1, vText.xy,shadowPCFOffset,fMyZ );\r\n\t\t\tvalue += tex2DPCF( shadowMap1, vText.xy+vec2(shadowPCFOffset.xy),shadowPCFOffset,\tfMyZ );\r\n\t\t\tvalue += tex2DPCF( shadowMap1, vText.xy+vec2(shadowPCFOffset.x,0),shadowPCFOffset,\tfMyZ );\r\n\t\t\tvalue += tex2DPCF( shadowMap1, vText.xy+vec2(0,shadowPCFOffset.y),shadowPCFOffset,\tfMyZ );\r\n\t\t\tvalue = value/4.0;\r\n\t\t} \r\n\t\telse if( nPSNum == 1 )\r\n\t\t{\r\n\t\t\tvalue = tex2DPCF( shadowMap2,vText.xy,shadowPCFOffset,fMyZ);\r\n\t\t}\r\n\t\telse if( nPSNum == 2 )\r\n\t\t{\r\n\t\t\tvec4 color = texture2D( shadowMap3,vText.xy );\r\n\t\t\tzdepth = unpackDepth(color);\r\n\t\t\tvalue = float(fMyZ < zdepth);\r\n\t\t}\r\n#endif\r\n#ifdef SHADOWMAP_PCF2\r\n\t\tif ( nPSNum == 0 )\r\n\t\t{\r\n\t\t\tvalue = tex2DPCF( shadowMap1,vText.xy,shadowPCFOffset,fMyZ);\r\n\t\t}\r\n\t\telse if( nPSNum == 1 )\r\n\t\t{\r\n\t\t\tvalue = tex2DPCF( shadowMap2,vText.xy,shadowPCFOffset,fMyZ);\r\n\t\t}\r\n\t\telse if( nPSNum == 2 )\r\n\t\t{\r\n\t\t\tvec4 color = texture2D( shadowMap3,vText.xy );\r\n\t\t\tzdepth = unpackDepth(color);\r\n\t\t\tvalue = float(fMyZ < zdepth);\r\n\t\t}\r\n\r\n#endif\r\n#ifdef SHADOWMAP_PCF1\r\n\t\tif ( nPSNum == 0 )\r\n\t\t{\r\n\t\t\tvalue = tex2DPCF( shadowMap1,vText.xy,shadowPCFOffset,fMyZ);\r\n\t\t}\r\n\t\telse if( nPSNum == 1 )\r\n\t\t{\r\n\t\t\tvec4 color = texture2D( shadowMap2,vText.xy );\r\n\t\t\tzdepth = unpackDepth(color);\r\n\t\t\tvalue = float(fMyZ < zdepth);\r\n\t\t}\r\n\t\telse if( nPSNum == 2 )\r\n\t\t{\r\n\t\t\tvec4 color = texture2D( shadowMap3,vText.xy );\r\n\t\t\tzdepth = unpackDepth(color);\r\n\t\t\tvalue = float(fMyZ < zdepth);\r\n\t\t}\r\n#endif\r\n#ifdef SHADOWMAP_PCF_NO\r\n\t\tvec4 color;\r\n\t\tif ( nPSNum == 0 )\r\n\t\t{\r\n\t\t\tcolor = texture2D( shadowMap1,vText.xy );\r\n\t\t}\r\n\t\telse if( nPSNum == 1 )\r\n\t\t{\r\n\t\t\tcolor = texture2D( shadowMap2,vText.xy );\r\n\t\t}\r\n\t\telse if( nPSNum == 2 )\r\n\t\t{\r\n\t\t\tcolor = texture2D( shadowMap3,vText.xy );\r\n\t\t}\r\n\t\tzdepth = unpackDepth(color);\r\n\t\tvalue = float(fMyZ < zdepth);\r\n#endif\r\n\t}\r\n\treturn value;\r\n}\r\nfloat getShadowPSSM2( sampler2D shadowMap1,sampler2D shadowMap2,mat4 lightShadowVP[4],vec4 pssmDistance,vec2 shadowPCFOffset,vec3 worldPos,float posViewZ,float zBias )\r\n{\r\n\tfloat value = 1.0;\r\n\tint nPSNum = int(posViewZ>pssmDistance.x);\r\n\tnPSNum += int(posViewZ>pssmDistance.y);\r\n\t//真SB,webgl不支持在PS中直接访问数组\r\n\tmat4 lightVP;\r\n\tif( nPSNum == 0 )\r\n\t{\r\n\t\tlightVP = lightShadowVP[1];\r\n\t}\r\n\telse if( nPSNum == 1 )\r\n\t{\r\n\t\tlightVP = lightShadowVP[2];\r\n\t}\r\n\tvec4 vLightMVPPos = lightVP * vec4(worldPos,1.0);\r\n\t//为了效率，在CPU计算/2.0 + 0.5\r\n\t//vec3 vText = (vLightMVPPos.xyz / vLightMVPPos.w)/2.0 + 0.5;\r\n\tvec3 vText = vLightMVPPos.xyz / vLightMVPPos.w;\r\n\tfloat fMyZ = vText.z - zBias;\r\n\t/*\r\n\tbvec4 bInFrustumVec = bvec4 ( vText.x >= 0.0, vText.x <= 1.0, vText.y >= 0.0, vText.y <= 1.0 );\r\n\tbool bInFrustum = all( bInFrustumVec );\r\n\tbvec2 bFrustumTestVec = bvec2( bInFrustum, fMyZ <= 1.0 );\r\n\tbool bFrustumTest = all( bFrustumTestVec );\r\n\tif ( bFrustumTest ) \r\n\t*/\r\n\tif( fMyZ <= 1.0 )\r\n\t{\r\n\t\tfloat zdepth=0.0;\r\n#ifdef SHADOWMAP_PCF3\r\n\t\tif ( nPSNum == 0 )\r\n\t\t{\r\n\t\t\tvalue =  tex2DPCF( shadowMap1, vText.xy,shadowPCFOffset,fMyZ );\r\n\t\t\tvalue += tex2DPCF( shadowMap1, vText.xy+vec2(shadowPCFOffset.xy),shadowPCFOffset,\tfMyZ );\r\n\t\t\tvalue += tex2DPCF( shadowMap1, vText.xy+vec2(shadowPCFOffset.x,0),shadowPCFOffset,\tfMyZ );\r\n\t\t\tvalue += tex2DPCF( shadowMap1, vText.xy+vec2(0,shadowPCFOffset.y),shadowPCFOffset,\tfMyZ );\r\n\t\t\tvalue = value/4.0;\r\n\t\t}\r\n\t\telse if( nPSNum == 1 )\r\n\t\t{\r\n\t\t\tvalue = tex2DPCF( shadowMap2,vText.xy,shadowPCFOffset,fMyZ);\r\n\t\t}\r\n#endif\r\n#ifdef SHADOWMAP_PCF2\r\n\t\tif ( nPSNum == 0 )\r\n\t\t{\r\n\t\t\tvalue = tex2DPCF( shadowMap1,vText.xy,shadowPCFOffset,fMyZ);\r\n\t\t}\r\n\t\telse if( nPSNum == 1 )\r\n\t\t{\r\n\t\t\tvalue = tex2DPCF( shadowMap2,vText.xy,shadowPCFOffset,fMyZ);\r\n\t\t}\r\n#endif\r\n#ifdef SHADOWMAP_PCF1\r\n\t\tif ( nPSNum == 0 )\r\n\t\t{\r\n\t\t\tvalue = tex2DPCF( shadowMap1,vText.xy,shadowPCFOffset,fMyZ);\r\n\t\t}\r\n\t\telse if( nPSNum == 1 )\r\n\t\t{\r\n\t\t\tvec4 color = texture2D( shadowMap2,vText.xy );\r\n\t\t\tzdepth = unpackDepth(color);\r\n\t\t\tvalue = float(fMyZ < zdepth);\r\n\t\t}\r\n#endif\r\n#ifdef SHADOWMAP_PCF_NO\r\n\t\tvec4 color;\r\n\t\tif ( nPSNum == 0 )\r\n\t\t{\r\n\t\t\tcolor = texture2D( shadowMap1,vText.xy );\r\n\t\t}\r\n\t\telse if( nPSNum == 1 )\r\n\t\t{\r\n\t\t\tcolor = texture2D( shadowMap2,vText.xy );\r\n\t\t}\r\n\t\tzdepth = unpackDepth(color);\r\n\t\tvalue = float(fMyZ < zdepth);\r\n#endif\r\n\t}\r\n\treturn value;\r\n}\r\nfloat getShadowPSSM1( sampler2D shadowMap1,vec4 lightMVPPos,vec4 pssmDistance,vec2 shadowPCFOffset,float posViewZ,float zBias )\r\n{\r\n\tfloat value = 1.0;\r\n\tif( posViewZ < pssmDistance.x )\r\n\t{\r\n\t\tvec3 vText = lightMVPPos.xyz / lightMVPPos.w;\r\n\t\tfloat fMyZ = vText.z - zBias;\r\n\t\t/*\r\n\t\tbvec4 bInFrustumVec = bvec4 ( vText.x >= 0.0, vText.x <= 1.0, vText.y >= 0.0, vText.y <= 1.0 );\r\n\t\tbool bInFrustum = all( bInFrustumVec );\r\n\t\tbvec2 bFrustumTestVec = bvec2( bInFrustum, fMyZ <= 1.0 );\r\n\t\tbool bFrustumTest = all( bFrustumTestVec );\r\n\t\t*/\r\n\t\tif ( fMyZ <= 1.0 ) \r\n\t\t{\r\n\t\t\tfloat zdepth=0.0;\r\n#ifdef SHADOWMAP_PCF3\r\n\t\t\tvalue =  tex2DPCF( shadowMap1, vText.xy,shadowPCFOffset,fMyZ );\r\n\t\t\tvalue += tex2DPCF( shadowMap1, vText.xy+vec2(shadowPCFOffset.xy),shadowPCFOffset,fMyZ );\r\n\t\t\tvalue += tex2DPCF( shadowMap1, vText.xy+vec2(shadowPCFOffset.x,0),shadowPCFOffset,fMyZ );\r\n\t\t\tvalue += tex2DPCF( shadowMap1, vText.xy+vec2(0,shadowPCFOffset.y),shadowPCFOffset,fMyZ );\r\n\t\t\tvalue = value/4.0;\r\n#endif\r\n#ifdef SHADOWMAP_PCF2\t\t\r\n\t\t\tvalue = tex2DPCF( shadowMap1,vText.xy,shadowPCFOffset,fMyZ);\r\n#endif\r\n#ifdef SHADOWMAP_PCF1\r\n\t\t\tvalue = tex2DPCF( shadowMap1,vText.xy,shadowPCFOffset,fMyZ);\r\n#endif\r\n#ifdef SHADOWMAP_PCF_NO\t\t\r\n\t\t\tvec4 color = texture2D( shadowMap1,vText.xy );\r\n\t\t\tzdepth = unpackDepth(color);\r\n\t\t\tvalue = float(fMyZ < zdepth);\r\n#endif\r\n\t\t}\r\n\t}\r\n\treturn value;\r\n}";
 
-	var SkyBoxPS = "#ifdef HIGHPRECISION\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\nvarying vec3 v_Texcoord;\r\n\r\nuniform samplerCube u_CubeTexture;\r\nuniform float u_Exposure;\r\nuniform vec4 u_TintColor;\r\n\r\n\r\nvoid main()\r\n{\t\r\n\tvec3 color=textureCube(u_CubeTexture, v_Texcoord).rgb*u_TintColor.rgb*u_Exposure*2.0;\r\n\tgl_FragColor=vec4(color,1.0);\r\n}\r\n\r\n";
+	var SkyBoxPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\nvarying vec3 v_Texcoord;\r\n\r\nuniform samplerCube u_CubeTexture;\r\nuniform float u_Exposure;\r\nuniform vec4 u_TintColor;\r\n\r\n\r\nvoid main()\r\n{\t\r\n\tvec3 color=textureCube(u_CubeTexture, v_Texcoord).rgb*u_TintColor.rgb*u_Exposure*2.0;\r\n\tgl_FragColor=vec4(color,1.0);\r\n}\r\n\r\n";
 
 	var SkyBoxVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nuniform mat4 u_ViewProjection;\r\nuniform float u_Rotation;\r\nvarying vec3 v_Texcoord;\r\n\r\n\r\nvec4 rotateAroundYInDegrees (vec4 vertex, float degrees)\r\n{\r\n\tfloat angle = degrees * 3.141593 / 180.0;\r\n\tfloat sina=sin(angle);\r\n\tfloat cosa=cos(angle);\r\n\tmat2 m = mat2(cosa, -sina, sina, cosa);\r\n\treturn vec4(m*vertex.xz, vertex.yw).xzyw;\r\n}\r\n\t\t\r\nvoid main()\r\n{\r\n\tvec4 position=rotateAroundYInDegrees(a_Position,u_Rotation);\r\n\tgl_Position = u_ViewProjection*position;\r\n\tv_Texcoord=vec3(-a_Position.x,a_Position.yz);//转换坐标系\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n";
 
-	var SkyBoxProceduralPS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\nconst float MIE_G = -0.990;\r\nconst float MIE_G2 = 0.9801;\r\nconst float SKY_GROUND_THRESHOLD = 0.02;\r\n\r\nuniform float u_SunSize;\r\nuniform float u_SunSizeConvergence;\r\nuniform DirectionLight u_SunLight;\r\n\r\n\r\nvarying vec3 v_GroundColor;\r\nvarying vec3 v_SkyColor;\r\n\r\n\r\n#ifdef SUN_HIGH_QUALITY\r\n\tvarying vec3 v_Vertex;\r\n#elif defined(SUN_SIMPLE)\r\n\tvarying vec3 v_RayDir;\r\n#else\r\n\tvarying float v_SkyGroundFactor;\r\n#endif\r\n\r\n#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE)\r\n\tvarying vec3 v_SunColor;\r\n#endif\r\n\r\n// Calculates the Mie phase function\r\nfloat getMiePhase(float eyeCos, float eyeCos2) {\r\n\tfloat temp = 1.0 + MIE_G2 - 2.0 * MIE_G * eyeCos;\r\n\ttemp = pow(temp, pow(u_SunSize,0.65) * 10.0);\r\n\ttemp = max(temp,1.0e-4); // prevent division by zero, esp. in half precision\r\n\ttemp = 1.5 * ((1.0 - MIE_G2) / (2.0 + MIE_G2)) * (1.0 + eyeCos2) / temp;\r\n\treturn temp;\r\n}\r\n\r\n// Calculates the sun shape\r\nfloat calcSunAttenuation(vec3 lightPos, vec3 ray) {\r\n\t#ifdef SUN_HIGH_QUALITY\r\n\t\tfloat focusedEyeCos = pow(clamp(dot(lightPos, ray),0.0,1.0), u_SunSizeConvergence);\r\n\t\treturn getMiePhase(-focusedEyeCos, focusedEyeCos * focusedEyeCos);\r\n\t#else //SUN_SIMPLE\r\n\t\tvec3 delta = lightPos - ray;\r\n\t\tfloat dist = length(delta);\r\n\t\tfloat spot = 1.0 - smoothstep(0.0, u_SunSize, dist);\r\n\t\treturn spot * spot;\r\n\t#endif\r\n}\r\n\r\nvoid main() {\r\n\t// if y > 1 [eyeRay.y < -SKY_GROUND_THRESHOLD] - ground\r\n\t// if y >= 0 and < 1 [eyeRay.y <= 0 and > -SKY_GROUND_THRESHOLD] - horizon\r\n\t// if y < 0 [eyeRay.y > 0] - sky\r\n\tvec3 col = vec3(0.0, 0.0, 0.0);\r\n\r\n\t#ifdef SUN_HIGH_QUALITY\r\n\t\tvec3 ray = normalize(v_Vertex);\r\n\t\tfloat y = ray.y / SKY_GROUND_THRESHOLD;\r\n\t#elif defined(SUN_SIMPLE) \r\n\t\tvec3 ray = v_RayDir;\r\n\t\tfloat y = ray.y / SKY_GROUND_THRESHOLD;\t\r\n\t#else\r\n\t\tfloat y = v_SkyGroundFactor;\r\n\t#endif\r\n\r\n\t// if we did precalculate color in vprog: just do lerp between them\r\n\tcol = mix(v_SkyColor, v_GroundColor, clamp(y,0.0,1.0));\r\n\r\n\t#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE)\r\n\t\tif (y < 0.0)\r\n\t\t\tcol += v_SunColor * calcSunAttenuation(-u_SunLight.direction, -ray);\r\n\t#endif\r\n\r\n\tcol = sqrt(col);//linear space convert to gamma space\r\n\tgl_FragColor=vec4(col,1.0);\r\n}\r\n\r\n";
+	var SkyBoxProceduralPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\nconst float MIE_G = -0.990;\r\nconst float MIE_G2 = 0.9801;\r\nconst float SKY_GROUND_THRESHOLD = 0.02;\r\n\r\nuniform float u_SunSize;\r\nuniform float u_SunSizeConvergence;\r\nuniform DirectionLight u_SunLight;\r\n\r\n\r\nvarying vec3 v_GroundColor;\r\nvarying vec3 v_SkyColor;\r\n\r\n\r\n#ifdef SUN_HIGH_QUALITY\r\n\tvarying vec3 v_Vertex;\r\n#elif defined(SUN_SIMPLE)\r\n\tvarying vec3 v_RayDir;\r\n#else\r\n\tvarying float v_SkyGroundFactor;\r\n#endif\r\n\r\n#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE)\r\n\tvarying vec3 v_SunColor;\r\n#endif\r\n\r\n// Calculates the Mie phase function\r\nfloat getMiePhase(float eyeCos, float eyeCos2) {\r\n\tfloat temp = 1.0 + MIE_G2 - 2.0 * MIE_G * eyeCos;\r\n\ttemp = pow(temp, pow(u_SunSize,0.65) * 10.0);\r\n\ttemp = max(temp,1.0e-4); // prevent division by zero, esp. in half precision\r\n\ttemp = 1.5 * ((1.0 - MIE_G2) / (2.0 + MIE_G2)) * (1.0 + eyeCos2) / temp;\r\n\treturn temp;\r\n}\r\n\r\n// Calculates the sun shape\r\nfloat calcSunAttenuation(vec3 lightPos, vec3 ray) {\r\n\t#ifdef SUN_HIGH_QUALITY\r\n\t\tfloat focusedEyeCos = pow(clamp(dot(lightPos, ray),0.0,1.0), u_SunSizeConvergence);\r\n\t\treturn getMiePhase(-focusedEyeCos, focusedEyeCos * focusedEyeCos);\r\n\t#else //SUN_SIMPLE\r\n\t\tvec3 delta = lightPos - ray;\r\n\t\tfloat dist = length(delta);\r\n\t\tfloat spot = 1.0 - smoothstep(0.0, u_SunSize, dist);\r\n\t\treturn spot * spot;\r\n\t#endif\r\n}\r\n\r\nvoid main() {\r\n\t// if y > 1 [eyeRay.y < -SKY_GROUND_THRESHOLD] - ground\r\n\t// if y >= 0 and < 1 [eyeRay.y <= 0 and > -SKY_GROUND_THRESHOLD] - horizon\r\n\t// if y < 0 [eyeRay.y > 0] - sky\r\n\tvec3 col = vec3(0.0, 0.0, 0.0);\r\n\r\n\t#ifdef SUN_HIGH_QUALITY\r\n\t\tvec3 ray = normalize(v_Vertex);\r\n\t\tfloat y = ray.y / SKY_GROUND_THRESHOLD;\r\n\t#elif defined(SUN_SIMPLE) \r\n\t\tvec3 ray = v_RayDir;\r\n\t\tfloat y = ray.y / SKY_GROUND_THRESHOLD;\t\r\n\t#else\r\n\t\tfloat y = v_SkyGroundFactor;\r\n\t#endif\r\n\r\n\t// if we did precalculate color in vprog: just do lerp between them\r\n\tcol = mix(v_SkyColor, v_GroundColor, clamp(y,0.0,1.0));\r\n\r\n\t#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE)\r\n\t\tif (y < 0.0)\r\n\t\t\tcol += v_SunColor * calcSunAttenuation(-u_SunLight.direction, -ray);\r\n\t#endif\r\n\r\n\tcol = sqrt(col);//linear space convert to gamma space\r\n\tgl_FragColor=vec4(col,1.0);\r\n}\r\n\r\n";
 
-	var SkyBoxProceduralVS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\n#define OUTER_RADIUS 1.025\r\n#define RAYLEIGH (mix(0.0, 0.0025, pow(u_AtmosphereThickness,2.5)))// Rayleigh constant Rayleigh为夜空光和极光亮度单位\r\n#define MIE 0.0010             // Mie constant 米氏散射\r\n#define SUN_BRIGHTNESS 20.0    // Sun brightness\r\n#define MAX_SCATTER 50.0 // Maximum scattering value, to prevent math overflows on Adrenos\r\n\r\nconst float SKY_GROUND_THRESHOLD = 0.02;\r\nconst float outerRadius = OUTER_RADIUS;\r\nconst float outerRadius2 = OUTER_RADIUS*OUTER_RADIUS;\r\nconst float innerRadius = 1.0;\r\nconst float innerRadius2 = 1.0;\r\nconst float cameraHeight = 0.0001;\r\n\r\nconst float HDSundiskIntensityFactor = 15.0;\r\nconst float simpleSundiskIntensityFactor = 27.0;\r\n\r\nconst float sunScale = 400.0 * SUN_BRIGHTNESS;\r\nconst float kmESun = MIE * SUN_BRIGHTNESS;\r\nconst float km4PI = MIE * 4.0 * 3.14159265;\r\nconst float scale = 1.0 / (OUTER_RADIUS - 1.0);\r\nconst float scaleDepth = 0.25;\r\nconst float scaleOverScaleDepth = (1.0 / (OUTER_RADIUS - 1.0)) / 0.25;\r\nconst float samples = 2.0; // THIS IS UNROLLED MANUALLY, DON'T TOUCH\r\n\r\n// RGB wavelengths        .35 (.62=158), .43 (.68=174), .525 (.75=190)\r\nconst vec3 c_DefaultScatteringWavelength = vec3(0.65, 0.57, 0.475);//默认散射波长\r\nconst vec3 c_VariableRangeForScatteringWavelength = vec3(0.15, 0.15, 0.15);//散射播放的可变范围\r\n\r\nattribute vec4 a_Position;\r\n\r\nuniform mat4 u_ViewProjection;\r\nuniform vec3 u_SkyTint;\r\nuniform vec3 u_GroundTint;\r\nuniform float u_Exposure;\r\nuniform float u_AtmosphereThickness;\r\nuniform DirectionLight u_SunLight;\r\n\r\nvarying vec3 v_GroundColor;\r\nvarying vec3 v_SkyColor;\r\n\r\n#ifdef SUN_HIGH_QUALITY\r\n\tvarying vec3 v_Vertex;\r\n#elif defined(SUN_SIMPLE)\r\n\tvarying vec3 v_RayDir;\r\n#else\r\n\tvarying float v_SkyGroundFactor;\r\n#endif\r\n\r\n#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE)\r\n\tvarying vec3 v_SunColor;\r\n#endif\r\n\r\n// Calculates the Rayleigh phase function\r\nfloat getRayleighPhase(vec3 light, vec3 ray) \r\n{\r\n\tfloat eyeCos = dot(light, ray);\r\n\treturn 0.75 + 0.75*eyeCos*eyeCos;\r\n}\r\n\r\nfloat scaleAngle(float inCos)\r\n{\r\n\tfloat x = 1.0 - inCos;\r\n\treturn 0.25 * exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25))));\r\n}\r\n\r\n\r\nvoid main () {\r\n\tgl_Position = u_ViewProjection*a_Position;\r\n\r\n\tvec3 skyTintInGammaSpace = u_SkyTint;//支持非GAMMA空间后要调整\r\n\tvec3 scatteringWavelength = mix(c_DefaultScatteringWavelength-c_VariableRangeForScatteringWavelength,c_DefaultScatteringWavelength+c_VariableRangeForScatteringWavelength,vec3(1.0) - skyTintInGammaSpace); // using Tint in sRGB+ gamma allows for more visually linear interpolation and to keep (0.5) at (128, gray in sRGB) point\r\n\tvec3 invWavelength = 1.0 / pow(scatteringWavelength, vec3(4.0));\r\n\r\n\tfloat krESun = RAYLEIGH * SUN_BRIGHTNESS;\r\n\tfloat kr4PI = RAYLEIGH * 4.0 * 3.14159265;\r\n\r\n\tvec3 cameraPos = vec3(0.0,innerRadius + cameraHeight,0.0); // The camera's current position\r\n\r\n\t// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)\r\n\tvec3 eyeRay = normalize(a_Position.xyz);\r\n\r\n\tfloat far = 0.0;\r\n\tvec3 cIn, cOut;\r\n\tif (eyeRay.y >= 0.0) {// Sky\r\n\t\t// Calculate the length of the \"atmosphere\"\r\n\t\tfar = sqrt(outerRadius2 + innerRadius2 * eyeRay.y * eyeRay.y - innerRadius2) - innerRadius * eyeRay.y;\r\n\r\n\t\t// Calculate the ray's starting position, then calculate its scattering offset\r\n\t\tfloat height = innerRadius + cameraHeight;\r\n\t\tfloat depth = exp(scaleOverScaleDepth * -cameraHeight);\r\n\t\tfloat startAngle = dot(eyeRay, cameraPos) / height;\r\n\t\tfloat startOffset = depth*scaleAngle(startAngle);\r\n\r\n\t\t// Initialize the scattering loop variables\r\n\t\tfloat sampleLength = far / samples;\r\n\t\tfloat scaledLength = sampleLength * scale;\r\n\t\tvec3 sampleRay = eyeRay * sampleLength;\r\n\t\tvec3 samplePoint = cameraPos + sampleRay * 0.5;\r\n\r\n\t\tvec3 frontColor = vec3(0.0);\r\n\t\t//unrolling this manually to avoid some platform for loop slow\r\n\t\t{\r\n\t\t\tfloat height = length(samplePoint);\r\n\t\t\tfloat depth = exp(scaleOverScaleDepth * (innerRadius - height));\r\n\t\t\tfloat lightAngle = dot(-u_SunLight.direction, samplePoint) / height;\r\n\t\t\tfloat cameraAngle = dot(eyeRay, samplePoint) / height;\r\n\t\t\tfloat scatter = (startOffset + depth*(scaleAngle(lightAngle) - scaleAngle(cameraAngle)));\r\n\t\t\tvec3 attenuate = exp(-clamp(scatter, 0.0, MAX_SCATTER) * (invWavelength * kr4PI + km4PI));\r\n\r\n\t\t\tfrontColor += attenuate * (depth * scaledLength);\r\n\t\t\tsamplePoint += sampleRay;\r\n\t\t}\r\n\t\t{\r\n\t\t\tfloat height = length(samplePoint);\r\n\t\t\tfloat depth = exp(scaleOverScaleDepth * (innerRadius - height));\r\n\t\t\tfloat lightAngle = dot(-u_SunLight.direction, samplePoint) / height;\r\n\t\t\tfloat cameraAngle = dot(eyeRay, samplePoint) / height;\r\n\t\t\tfloat scatter = (startOffset + depth*(scaleAngle(lightAngle) - scaleAngle(cameraAngle)));\r\n\t\t\tvec3 attenuate = exp(-clamp(scatter, 0.0, MAX_SCATTER) * (invWavelength * kr4PI + km4PI));\r\n\r\n\t\t\tfrontColor += attenuate * (depth * scaledLength);\r\n\t\t\tsamplePoint += sampleRay;\r\n\t\t}\r\n\r\n\t\t// Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader\r\n\t\tcIn = frontColor * (invWavelength * krESun);\r\n\t\tcOut = frontColor * kmESun;\r\n\t} else {// Ground\r\n\t\tfar = (-cameraHeight) / (min(-0.001, eyeRay.y));\r\n\t\tvec3 pos = cameraPos + far * eyeRay;\r\n\r\n\t\t// Calculate the ray's starting position, then calculate its scattering offset\r\n\t\tfloat depth = exp((-cameraHeight) * (1.0/scaleDepth));\r\n\t\tfloat cameraAngle = dot(-eyeRay, pos);\r\n\t\tfloat lightAngle = dot(-u_SunLight.direction, pos);\r\n\t\tfloat cameraScale = scaleAngle(cameraAngle);\r\n\t\tfloat lightScale = scaleAngle(lightAngle);\r\n\t\tfloat cameraOffset = depth*cameraScale;\r\n\t\tfloat temp = lightScale + cameraScale;\r\n\r\n\t\t// Initialize the scattering loop variables\r\n\t\tfloat sampleLength = far / samples;\r\n\t\tfloat scaledLength = sampleLength * scale;\r\n\t\tvec3 sampleRay = eyeRay * sampleLength;\r\n\t\tvec3 samplePoint = cameraPos + sampleRay * 0.5;\r\n\r\n\t\t// Now loop through the sample rays\r\n\t\tvec3 frontColor = vec3(0.0, 0.0, 0.0);\r\n\t\tvec3 attenuate;\r\n\r\n\t\t// Loop removed because we kept hitting SM2.0 temp variable limits. Doesn't affect the image too much.\r\n\t\t{\r\n\t\t\tfloat height = length(samplePoint);\r\n\t\t\tfloat depth = exp(scaleOverScaleDepth * (innerRadius - height));\r\n\t\t\tfloat scatter = depth*temp - cameraOffset;\r\n\t\t\tattenuate = exp(-clamp(scatter, 0.0, MAX_SCATTER) * (invWavelength * kr4PI + km4PI));\r\n\t\t\tfrontColor += attenuate * (depth * scaledLength);\r\n\t\t\tsamplePoint += sampleRay;\r\n\t\t}\r\n\r\n\t\tcIn = frontColor * (invWavelength * krESun + kmESun);\r\n\t\tcOut = clamp(attenuate, 0.0, 1.0);\r\n\t}\r\n\r\n\t#ifdef SUN_HIGH_QUALITY\r\n\t\tv_Vertex = -a_Position.xyz;\r\n\t#elif defined(SUN_SIMPLE) \r\n\t\tv_RayDir = -eyeRay;\r\n\t#else\r\n\t\tv_SkyGroundFactor = -eyeRay.y / SKY_GROUND_THRESHOLD;\r\n\t#endif\r\n\r\n\t// if we want to calculate color in vprog:\r\n\t// in case of linear: multiply by _Exposure in here (even in case of lerp it will be common multiplier, so we can skip mul in fshader)\r\n\tv_GroundColor = u_Exposure * (cIn + u_GroundTint*u_GroundTint * cOut);//u_GroundColor*u_GroundColor is gamma space convert to linear space\r\n\tv_SkyColor    = u_Exposure * (cIn * getRayleighPhase(-u_SunLight.direction, -eyeRay));\r\n\r\n\t\r\n\t// The sun should have a stable intensity in its course in the sky. Moreover it should match the highlight of a purely specular material.\r\n\t// This matching was done using the Unity3D standard shader BRDF1 on the 5/31/2017\r\n\t// Finally we want the sun to be always bright even in LDR thus the normalization of the lightColor for low intensity.\r\n\tfloat lightColorIntensity = clamp(length(u_SunLight.color), 0.25, 1.0);\r\n\r\n\t#ifdef SUN_HIGH_QUALITY \r\n\t\tv_SunColor = HDSundiskIntensityFactor * clamp(cOut,0.0,1.0) * u_SunLight.color / lightColorIntensity;\r\n\t#elif defined(SUN_SIMPLE) \r\n\t\tv_SunColor = simpleSundiskIntensityFactor * clamp(cOut * sunScale,0.0,1.0) * u_SunLight.color / lightColorIntensity;\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n";
+	var SkyBoxProceduralVS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\n#define OUTER_RADIUS 1.025\r\n#define RAYLEIGH (mix(0.0, 0.0025, pow(u_AtmosphereThickness,2.5)))// Rayleigh constant Rayleigh为夜空光和极光亮度单位\r\n#define MIE 0.0010             // Mie constant 米氏散射\r\n#define SUN_BRIGHTNESS 20.0    // Sun brightness\r\n#define MAX_SCATTER 50.0 // Maximum scattering value, to prevent math overflows on Adrenos\r\n\r\nconst float SKY_GROUND_THRESHOLD = 0.02;\r\nconst float outerRadius = OUTER_RADIUS;\r\nconst float outerRadius2 = OUTER_RADIUS*OUTER_RADIUS;\r\nconst float innerRadius = 1.0;\r\nconst float innerRadius2 = 1.0;\r\nconst float cameraHeight = 0.0001;\r\n\r\nconst float HDSundiskIntensityFactor = 15.0;\r\nconst float simpleSundiskIntensityFactor = 27.0;\r\n\r\nconst float sunScale = 400.0 * SUN_BRIGHTNESS;\r\nconst float kmESun = MIE * SUN_BRIGHTNESS;\r\nconst float km4PI = MIE * 4.0 * 3.14159265;\r\nconst float scale = 1.0 / (OUTER_RADIUS - 1.0);\r\nconst float scaleDepth = 0.25;\r\nconst float scaleOverScaleDepth = (1.0 / (OUTER_RADIUS - 1.0)) / 0.25;\r\nconst float samples = 2.0; // THIS IS UNROLLED MANUALLY, DON'T TOUCH\r\n\r\n// RGB wavelengths        .35 (.62=158), .43 (.68=174), .525 (.75=190)\r\nconst vec3 c_DefaultScatteringWavelength = vec3(0.65, 0.57, 0.475);//默认散射波长\r\nconst vec3 c_VariableRangeForScatteringWavelength = vec3(0.15, 0.15, 0.15);//散射播放的可变范围\r\n\r\nattribute vec4 a_Position;\r\n\r\nuniform mat4 u_ViewProjection;\r\nuniform vec3 u_SkyTint;\r\nuniform vec3 u_GroundTint;\r\nuniform float u_Exposure;\r\nuniform float u_AtmosphereThickness;\r\nuniform DirectionLight u_SunLight;\r\n\r\nvarying vec3 v_GroundColor;\r\nvarying vec3 v_SkyColor;\r\n\r\n#ifdef SUN_HIGH_QUALITY\r\n\tvarying vec3 v_Vertex;\r\n#elif defined(SUN_SIMPLE)\r\n\tvarying vec3 v_RayDir;\r\n#else\r\n\tvarying float v_SkyGroundFactor;\r\n#endif\r\n\r\n#if defined(SUN_HIGH_QUALITY)||defined(SUN_SIMPLE)\r\n\tvarying vec3 v_SunColor;\r\n#endif\r\n\r\n// Calculates the Rayleigh phase function\r\nfloat getRayleighPhase(vec3 light, vec3 ray) \r\n{\r\n\tfloat eyeCos = dot(light, ray);\r\n\treturn 0.75 + 0.75*eyeCos*eyeCos;\r\n}\r\n\r\nfloat scaleAngle(float inCos)\r\n{\r\n\tfloat x = 1.0 - inCos;\r\n\treturn 0.25 * exp(-0.00287 + x*(0.459 + x*(3.83 + x*(-6.80 + x*5.25))));\r\n}\r\n\r\n\r\nvoid main () {\r\n\tgl_Position = u_ViewProjection*a_Position;\r\n\r\n\tvec3 skyTintInGammaSpace = u_SkyTint;//支持非GAMMA空间后要调整\r\n\tvec3 scatteringWavelength = mix(c_DefaultScatteringWavelength-c_VariableRangeForScatteringWavelength,c_DefaultScatteringWavelength+c_VariableRangeForScatteringWavelength,vec3(1.0) - skyTintInGammaSpace); // using Tint in sRGB+ gamma allows for more visually linear interpolation and to keep (0.5) at (128, gray in sRGB) point\r\n\tvec3 invWavelength = 1.0 / pow(scatteringWavelength, vec3(4.0));\r\n\r\n\tfloat krESun = RAYLEIGH * SUN_BRIGHTNESS;\r\n\tfloat kr4PI = RAYLEIGH * 4.0 * 3.14159265;\r\n\r\n\tvec3 cameraPos = vec3(0.0,innerRadius + cameraHeight,0.0); // The camera's current position\r\n\r\n\t// Get the ray from the camera to the vertex and its length (which is the far point of the ray passing through the atmosphere)\r\n\tvec3 eyeRay = normalize(a_Position.xyz);\r\n\r\n\tfloat far = 0.0;\r\n\tvec3 cIn, cOut;\r\n\tif (eyeRay.y >= 0.0) {// Sky\r\n\t\t// Calculate the length of the \"atmosphere\"\r\n\t\tfar = sqrt(outerRadius2 + innerRadius2 * eyeRay.y * eyeRay.y - innerRadius2) - innerRadius * eyeRay.y;\r\n\r\n\t\t// Calculate the ray's starting position, then calculate its scattering offset\r\n\t\tfloat height = innerRadius + cameraHeight;\r\n\t\tfloat depth = exp(scaleOverScaleDepth * -cameraHeight);\r\n\t\tfloat startAngle = dot(eyeRay, cameraPos) / height;\r\n\t\tfloat startOffset = depth*scaleAngle(startAngle);\r\n\r\n\t\t// Initialize the scattering loop variables\r\n\t\tfloat sampleLength = far / samples;\r\n\t\tfloat scaledLength = sampleLength * scale;\r\n\t\tvec3 sampleRay = eyeRay * sampleLength;\r\n\t\tvec3 samplePoint = cameraPos + sampleRay * 0.5;\r\n\r\n\t\tvec3 frontColor = vec3(0.0);\r\n\t\t//unrolling this manually to avoid some platform for loop slow\r\n\t\t{\r\n\t\t\tfloat height = length(samplePoint);\r\n\t\t\tfloat depth = exp(scaleOverScaleDepth * (innerRadius - height));\r\n\t\t\tfloat lightAngle = dot(-u_SunLight.direction, samplePoint) / height;\r\n\t\t\tfloat cameraAngle = dot(eyeRay, samplePoint) / height;\r\n\t\t\tfloat scatter = (startOffset + depth*(scaleAngle(lightAngle) - scaleAngle(cameraAngle)));\r\n\t\t\tvec3 attenuate = exp(-clamp(scatter, 0.0, MAX_SCATTER) * (invWavelength * kr4PI + km4PI));\r\n\r\n\t\t\tfrontColor += attenuate * (depth * scaledLength);\r\n\t\t\tsamplePoint += sampleRay;\r\n\t\t}\r\n\t\t{\r\n\t\t\tfloat height = length(samplePoint);\r\n\t\t\tfloat depth = exp(scaleOverScaleDepth * (innerRadius - height));\r\n\t\t\tfloat lightAngle = dot(-u_SunLight.direction, samplePoint) / height;\r\n\t\t\tfloat cameraAngle = dot(eyeRay, samplePoint) / height;\r\n\t\t\tfloat scatter = (startOffset + depth*(scaleAngle(lightAngle) - scaleAngle(cameraAngle)));\r\n\t\t\tvec3 attenuate = exp(-clamp(scatter, 0.0, MAX_SCATTER) * (invWavelength * kr4PI + km4PI));\r\n\r\n\t\t\tfrontColor += attenuate * (depth * scaledLength);\r\n\t\t\tsamplePoint += sampleRay;\r\n\t\t}\r\n\r\n\t\t// Finally, scale the Mie and Rayleigh colors and set up the varying variables for the pixel shader\r\n\t\tcIn = frontColor * (invWavelength * krESun);\r\n\t\tcOut = frontColor * kmESun;\r\n\t} else {// Ground\r\n\t\tfar = (-cameraHeight) / (min(-0.001, eyeRay.y));\r\n\t\tvec3 pos = cameraPos + far * eyeRay;\r\n\r\n\t\t// Calculate the ray's starting position, then calculate its scattering offset\r\n\t\tfloat depth = exp((-cameraHeight) * (1.0/scaleDepth));\r\n\t\tfloat cameraAngle = dot(-eyeRay, pos);\r\n\t\tfloat lightAngle = dot(-u_SunLight.direction, pos);\r\n\t\tfloat cameraScale = scaleAngle(cameraAngle);\r\n\t\tfloat lightScale = scaleAngle(lightAngle);\r\n\t\tfloat cameraOffset = depth*cameraScale;\r\n\t\tfloat temp = lightScale + cameraScale;\r\n\r\n\t\t// Initialize the scattering loop variables\r\n\t\tfloat sampleLength = far / samples;\r\n\t\tfloat scaledLength = sampleLength * scale;\r\n\t\tvec3 sampleRay = eyeRay * sampleLength;\r\n\t\tvec3 samplePoint = cameraPos + sampleRay * 0.5;\r\n\r\n\t\t// Now loop through the sample rays\r\n\t\tvec3 frontColor = vec3(0.0, 0.0, 0.0);\r\n\t\tvec3 attenuate;\r\n\r\n\t\t// Loop removed because we kept hitting SM2.0 temp variable limits. Doesn't affect the image too much.\r\n\t\t{\r\n\t\t\tfloat height = length(samplePoint);\r\n\t\t\tfloat depth = exp(scaleOverScaleDepth * (innerRadius - height));\r\n\t\t\tfloat scatter = depth*temp - cameraOffset;\r\n\t\t\tattenuate = exp(-clamp(scatter, 0.0, MAX_SCATTER) * (invWavelength * kr4PI + km4PI));\r\n\t\t\tfrontColor += attenuate * (depth * scaledLength);\r\n\t\t\tsamplePoint += sampleRay;\r\n\t\t}\r\n\r\n\t\tcIn = frontColor * (invWavelength * krESun + kmESun);\r\n\t\tcOut = clamp(attenuate, 0.0, 1.0);\r\n\t}\r\n\r\n\t#ifdef SUN_HIGH_QUALITY\r\n\t\tv_Vertex = -a_Position.xyz;\r\n\t#elif defined(SUN_SIMPLE) \r\n\t\tv_RayDir = -eyeRay;\r\n\t#else\r\n\t\tv_SkyGroundFactor = -eyeRay.y / SKY_GROUND_THRESHOLD;\r\n\t#endif\r\n\r\n\t// if we want to calculate color in vprog:\r\n\t// in case of linear: multiply by _Exposure in here (even in case of lerp it will be common multiplier, so we can skip mul in fshader)\r\n\tv_GroundColor = u_Exposure * (cIn + u_GroundTint*u_GroundTint * cOut);//u_GroundColor*u_GroundColor is gamma space convert to linear space\r\n\tv_SkyColor    = u_Exposure * (cIn * getRayleighPhase(-u_SunLight.direction, -eyeRay));\r\n\r\n\t\r\n\t// The sun should have a stable intensity in its course in the sky. Moreover it should match the highlight of a purely specular material.\r\n\t// This matching was done using the Unity3D standard shader BRDF1 on the 5/31/2017\r\n\t// Finally we want the sun to be always bright even in LDR thus the normalization of the lightColor for low intensity.\r\n\tfloat lightColorIntensity = clamp(length(u_SunLight.color), 0.25, 1.0);\r\n\r\n\t#ifdef SUN_HIGH_QUALITY \r\n\t\tv_SunColor = HDSundiskIntensityFactor * clamp(cOut,0.0,1.0) * u_SunLight.color / lightColorIntensity;\r\n\t#elif defined(SUN_SIMPLE) \r\n\t\tv_SunColor = simpleSundiskIntensityFactor * clamp(cOut * sunScale,0.0,1.0) * u_SunLight.color / lightColorIntensity;\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n";
 
-	var TrailPS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\nuniform sampler2D u_MainTexture;\r\nuniform vec4 u_MainColor;\r\n\r\nvarying vec2 v_Texcoord0;\r\nvarying vec4 v_Color;\r\n\r\nvoid main()\r\n{\r\n\tvec4 color = 2.0 * u_MainColor * v_Color;\r\n\t#ifdef MAINTEXTURE\r\n\t\tvec4 mainTextureColor = texture2D(u_MainTexture, v_Texcoord0);\r\n\t\tcolor *= mainTextureColor;\r\n\t#endif\r\n\tgl_FragColor = color;\r\n}\r\n\r\n     ";
+	var TrailPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\nuniform sampler2D u_MainTexture;\r\nuniform vec4 u_MainColor;\r\n\r\nvarying vec2 v_Texcoord0;\r\nvarying vec4 v_Color;\r\n\r\nvoid main()\r\n{\r\n\tvec4 color = 2.0 * u_MainColor * v_Color;\r\n\t#ifdef MAINTEXTURE\r\n\t\tvec4 mainTextureColor = texture2D(u_MainTexture, v_Texcoord0);\r\n\t\tcolor *= mainTextureColor;\r\n\t#endif\r\n\tgl_FragColor = color;\r\n}\r\n\r\n     ";
 
 	var TrailVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec3 a_Position;\r\nattribute vec3 a_OffsetVector;\r\nattribute vec4 a_Color;\r\nattribute float a_Texcoord0X;\r\nattribute float a_Texcoord0Y;\r\nattribute float a_BirthTime;\r\n\r\nuniform mat4 u_View;\r\nuniform mat4 u_Projection;\r\n\r\nuniform vec4 u_TilingOffset;\r\n\r\nuniform float u_CurTime;\r\nuniform float u_LifeTime;\r\nuniform vec4 u_WidthCurve[10];\r\nuniform int u_WidthCurveKeyLength;\r\n\r\nvarying vec2 v_Texcoord0;\r\nvarying vec4 v_Color;\r\n\r\nfloat hermiteInterpolate(float t, float outTangent, float inTangent, float duration, float value1, float value2)\r\n{\r\n\tfloat t2 = t * t;\r\n\tfloat t3 = t2 * t;\r\n\tfloat a = 2.0 * t3 - 3.0 * t2 + 1.0;\r\n\tfloat b = t3 - 2.0 * t2 + t;\r\n\tfloat c = t3 - t2;\r\n\tfloat d = -2.0 * t3 + 3.0 * t2;\r\n\treturn a * value1 + b * outTangent * duration + c * inTangent * duration + d * value2;\r\n}\r\n\r\nfloat getCurWidth(in float normalizeTime)\r\n{\r\n\tfloat width;\r\n\tif(normalizeTime == 0.0){\r\n\t\twidth=u_WidthCurve[0].w;\r\n\t}\r\n\telse if(normalizeTime >= 1.0){\r\n\t\twidth=u_WidthCurve[u_WidthCurveKeyLength - 1].w;\r\n\t}\r\n\telse{\r\n\t\tfor(int i = 0; i < 10; i ++ )\r\n\t\t{\r\n\t\t\tif(normalizeTime == u_WidthCurve[i].x){\r\n\t\t\t\twidth=u_WidthCurve[i].w;\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\tvec4 lastFrame = u_WidthCurve[i];\r\n\t\t\tvec4 nextFrame = u_WidthCurve[i + 1];\r\n\t\t\tif(normalizeTime > lastFrame.x && normalizeTime < nextFrame.x)\r\n\t\t\t{\r\n\t\t\t\tfloat duration = nextFrame.x - lastFrame.x;\r\n\t\t\t\tfloat t = (normalizeTime - lastFrame.x) / duration;\r\n\t\t\t\tfloat outTangent = lastFrame.z;\r\n\t\t\t\tfloat inTangent = nextFrame.y;\r\n\t\t\t\tfloat value1 = lastFrame.w;\r\n\t\t\t\tfloat value2 = nextFrame.w;\r\n\t\t\t\twidth=hermiteInterpolate(t, outTangent, inTangent, duration, value1, value2);\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n\treturn width;\r\n}\t\r\n\r\nvoid main()\r\n{\r\n\tfloat normalizeTime = (u_CurTime - a_BirthTime) / u_LifeTime;\r\n\t\r\n\t#ifdef TILINGOFFSET\r\n\t\tv_Texcoord0 = vec2(a_Texcoord0X, 1.0 - a_Texcoord0Y) * u_TilingOffset.xy + u_TilingOffset.zw;\r\n\t#else\r\n\t\tv_Texcoord0 = vec2(a_Texcoord0X, a_Texcoord0Y);\r\n\t#endif\r\n\t\r\n\tv_Color = a_Color;\r\n\t\r\n\tgl_Position = u_Projection * u_View * vec4(a_Position + a_OffsetVector * getCurWidth(normalizeTime),1.0);\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n";
 
-	var UnlitPS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef ALBEDOTEXTURE\r\n\tuniform sampler2D u_AlbedoTexture;\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\nuniform vec4 u_AlbedoColor;\r\n\r\n#ifdef ALPHATEST\r\n\tuniform float u_AlphaTestValue;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\t#ifdef ADDTIVEFOG\r\n\t#else\r\n\t\tuniform vec3 u_FogColor;\r\n\t#endif\r\n#endif\r\n\r\nvoid main()\r\n{\r\n\tvec4 color =  u_AlbedoColor;\r\n\t#ifdef ALBEDOTEXTURE\r\n\t\tcolor *= texture2D(u_AlbedoTexture, v_Texcoord0);\r\n\t#endif\r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tcolor *= v_Color;\r\n\t#endif\r\n\t\r\n\t#ifdef ALPHATEST\r\n\t\tif(color.a < u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n\t\r\n\tgl_FragColor = color;\r\n\t\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact = clamp((1.0 / gl_FragCoord.w - u_FogStart) / u_FogRange, 0.0, 1.0);\r\n\t\t#ifdef ADDTIVEFOG\r\n\t\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0), lerpFact);\r\n\t\t#else\r\n\t\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, u_FogColor, lerpFact);\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n}\r\n\r\n";
+	var UnlitPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef ALBEDOTEXTURE\r\n\tuniform sampler2D u_AlbedoTexture;\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\nuniform vec4 u_AlbedoColor;\r\n\r\n#ifdef ALPHATEST\r\n\tuniform float u_AlphaTestValue;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\t#ifdef ADDTIVEFOG\r\n\t#else\r\n\t\tuniform vec3 u_FogColor;\r\n\t#endif\r\n#endif\r\n\r\nvoid main()\r\n{\r\n\tvec4 color =  u_AlbedoColor;\r\n\t#ifdef ALBEDOTEXTURE\r\n\t\tcolor *= texture2D(u_AlbedoTexture, v_Texcoord0);\r\n\t#endif\r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tcolor *= v_Color;\r\n\t#endif\r\n\t\r\n\t#ifdef ALPHATEST\r\n\t\tif(color.a < u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n\t\r\n\tgl_FragColor = color;\r\n\t\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact = clamp((1.0 / gl_FragCoord.w - u_FogStart) / u_FogRange, 0.0, 1.0);\r\n\t\t#ifdef ADDTIVEFOG\r\n\t\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0), lerpFact);\r\n\t\t#else\r\n\t\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, u_FogColor, lerpFact);\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n}\r\n\r\n";
 
 	var UnlitVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\n\r\nattribute vec2 a_Texcoord0;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_MvpMatrix;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\n\r\nattribute vec4 a_Color;\r\nvarying vec4 v_Color;\r\nvarying vec2 v_Texcoord0;\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\nvoid main() {\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform = u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\tposition=skinTransform*a_Position;\r\n\t#else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\r\n\t#ifdef TILINGOFFSET\r\n\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t#else\r\n\t\tv_Texcoord0=a_Texcoord0;\r\n\t#endif\r\n\r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tv_Color = a_Color;\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
 
-	var WaterPrimaryPS = "#ifdef HIGHPRECISION\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#ifdef MAINTEXTURE\r\n\tuniform sampler2D u_MainTexture;\r\n#endif\r\n\r\n#ifdef NORMALTEXTURE\r\n\tuniform sampler2D u_NormalTexture;\r\n#endif\r\n\r\nuniform vec4 u_HorizonColor;\r\n\r\nvarying vec3 v_Normal;\r\nvarying vec3 v_Tangent;\r\nvarying vec3 v_Binormal;\r\nvarying vec3 v_ViewDir;\r\nvarying vec2 v_Texcoord0;\r\nvarying vec2 v_Texcoord1;\r\n\r\n#include \"Lighting.glsl\"\r\n\r\nvoid main()\r\n{\r\n\tvec4 bumpColor1 = texture2D(u_NormalTexture, v_Texcoord0);\r\n\tvec4 bumpColor2 = texture2D(u_NormalTexture, v_Texcoord1);\r\n\t\r\n\tvec3 normal1 = NormalSampleToWorldSpace1(bumpColor1, v_Tangent, v_Binormal, v_Normal);\r\n\tvec3 normal2 = NormalSampleToWorldSpace1(bumpColor2, v_Tangent, v_Binormal, v_Normal);\r\n\t\r\n\tvec3 normal = normalize((normal1 + normal2) * 0.5);\r\n\tvec3 viewDir = normalize(v_ViewDir);\r\n\tfloat fresnel = dot(viewDir, normal);\r\n\t\r\n\tvec4 waterColor = texture2D(u_MainTexture, vec2(fresnel, fresnel));\r\n\t\r\n\tvec4 color;\r\n\tcolor.rgb = mix(waterColor.rgb, u_HorizonColor.rgb, vec3(waterColor.a));\r\n\tcolor.a = u_HorizonColor.a;\r\n\t\r\n\tgl_FragColor = color;\r\n}\r\n\r\n";
+	var WaterPrimaryPS = "#ifdef GL_FRAGMENT_PRECISION_HIGH\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#ifdef MAINTEXTURE\r\n\tuniform sampler2D u_MainTexture;\r\n#endif\r\n\r\n#ifdef NORMALTEXTURE\r\n\tuniform sampler2D u_NormalTexture;\r\n#endif\r\n\r\nuniform vec4 u_HorizonColor;\r\n\r\nvarying vec3 v_Normal;\r\nvarying vec3 v_Tangent;\r\nvarying vec3 v_Binormal;\r\nvarying vec3 v_ViewDir;\r\nvarying vec2 v_Texcoord0;\r\nvarying vec2 v_Texcoord1;\r\n\r\n#include \"Lighting.glsl\"\r\n\r\nvoid main()\r\n{\r\n\tvec4 bumpColor1 = texture2D(u_NormalTexture, v_Texcoord0);\r\n\tvec4 bumpColor2 = texture2D(u_NormalTexture, v_Texcoord1);\r\n\t\r\n\tvec3 normal1 = NormalSampleToWorldSpace1(bumpColor1, v_Tangent, v_Binormal, v_Normal);\r\n\tvec3 normal2 = NormalSampleToWorldSpace1(bumpColor2, v_Tangent, v_Binormal, v_Normal);\r\n\t\r\n\tvec3 normal = normalize((normal1 + normal2) * 0.5);\r\n\tvec3 viewDir = normalize(v_ViewDir);\r\n\tfloat fresnel = dot(viewDir, normal);\r\n\t\r\n\tvec4 waterColor = texture2D(u_MainTexture, vec2(fresnel, fresnel));\r\n\t\r\n\tvec4 color;\r\n\tcolor.rgb = mix(waterColor.rgb, u_HorizonColor.rgb, vec3(waterColor.a));\r\n\tcolor.a = u_HorizonColor.a;\r\n\t\r\n\tgl_FragColor = color;\r\n}\r\n\r\n";
 
 	var WaterPrimaryVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nattribute vec3 a_Normal;\r\nattribute vec4 a_Tangent0;\r\n\r\nuniform mat4 u_MvpMatrix;\r\nuniform mat4 u_WorldMat;\r\nuniform vec3 u_CameraPos;\r\nuniform float u_WaveScale;\r\nuniform vec4 u_WaveSpeed;\r\nuniform float u_Time;\r\n\r\nvarying vec3 v_Normal;\r\nvarying vec3 v_Tangent;\r\nvarying vec3 v_Binormal;\r\nvarying vec3 v_ViewDir;\r\nvarying vec2 v_Texcoord0;\r\nvarying vec2 v_Texcoord1;\r\n\r\nvoid main()\r\n{\r\n\tvec4 positionWorld = u_WorldMat * a_Position;\r\n\tvec4 position = u_MvpMatrix * a_Position;\r\n\t\r\n\tvec4 temp = vec4(positionWorld.x, positionWorld.z, positionWorld.x, positionWorld.z) * u_WaveScale + u_WaveSpeed * u_WaveScale * u_Time;\r\n\t\r\n\tv_Texcoord0 = temp.xy * vec2(0.4, 0.45);\r\n\tv_Texcoord1 = temp.wz;\r\n\t\r\n\tmat3 worldMat = mat3(u_WorldMat);\r\n\tv_Normal = worldMat * a_Normal;\r\n\tv_Tangent = worldMat * a_Tangent0.xyz;\r\n\tv_Binormal = cross(v_Normal, v_Tangent) * a_Tangent0.w;\r\n\t\r\n\tv_ViewDir = u_CameraPos - positionWorld.xyz;\r\n\tgl_Position = position;\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
 
@@ -28980,8 +29534,26 @@
 	                this._resizeCacheShaderMap(cacheMap[k], ++hierarchy, resizeLength);
 	        }
 	    }
+	    _addDebugShaderVariantCollection(compileDefine) {
+	        var dbugShaderVariantInfo = Shader3D._debugShaderVariantInfo;
+	        var debugSubShader = this._owner;
+	        var debugShader = debugSubShader._owner;
+	        var deugDefines = ShaderPass._debugDefineString;
+	        Shader3D._getNamesByDefineData(compileDefine, deugDefines);
+	        if (!Config3D._config._multiLighting) {
+	            var index = deugDefines.indexOf("LEGACYSINGLELIGHTING");
+	            (index !== -1) && (deugDefines.splice(index, 1));
+	        }
+	        if (dbugShaderVariantInfo)
+	            dbugShaderVariantInfo.setValue(debugShader, debugShader._subShaders.indexOf(debugSubShader), debugSubShader._passes.indexOf(this), deugDefines);
+	        else
+	            Shader3D._debugShaderVariantInfo = dbugShaderVariantInfo = new ShaderVariantInfo(debugShader, debugShader._subShaders.indexOf(debugSubShader), debugSubShader._passes.indexOf(this), deugDefines);
+	        Shader3D.debugShaderVariantInfoCollection.add(dbugShaderVariantInfo);
+	    }
 	    withCompile(compileDefine) {
 	        compileDefine._intersectionDefineDatas(this._validDefine);
+	        if (Shader3D.debugMode)
+	            this._addDebugShaderVariantCollection(compileDefine);
 	        var cacheShaders = this._cacheSharders;
 	        var maskLength = compileDefine._length;
 	        if (maskLength > this._cacheShaderHierarchy) {
@@ -29033,11 +29605,6 @@
 	        if (Shader3D.debugMode) {
 	            var defStr = "";
 	            var defMask = "";
-	            if (Laya.WebGL.shaderHighPrecision) {
-	                compileDefine.remove(Shader3D.SHADERDEFINE_HIGHPRECISION);
-	                var index = defineString.indexOf("HIGHPRECISION");
-	                (index !== -1) && (defineString.splice(index, 1));
-	            }
 	            if (!config._multiLighting) {
 	                compileDefine.remove(Shader3D.SHADERDEFINE_LEGACYSINGALLIGHTING);
 	                var index = defineString.indexOf("LEGACYSINGLELIGHTING");
@@ -29053,6 +29620,7 @@
 	    }
 	}
 	ShaderPass._defineString = [];
+	ShaderPass._debugDefineString = [];
 
 	class SubShader {
 	    constructor(attributeMap, uniformMap) {
@@ -29081,7 +29649,6 @@
 	    constructor() {
 	    }
 	    static __init__() {
-	        Shader3D.SHADERDEFINE_HIGHPRECISION = Shader3D.getDefineByName("HIGHPRECISION");
 	        Shader3D.SHADERDEFINE_LEGACYSINGALLIGHTING = Shader3D.getDefineByName("LEGACYSINGLELIGHTING");
 	        Shader3D.addInclude("Lighting.glsl", LightingGLSL);
 	        Shader3D.addInclude("ShadowHelper.glsl", ShadowHelperGLSL);
@@ -29310,7 +29877,7 @@
 	            'u_SpotLight.direction': Shader3D.PERIOD_SCENE,
 	            'u_SpotLight.range': Shader3D.PERIOD_SCENE,
 	            'u_SpotLight.spot': Shader3D.PERIOD_SCENE,
-	            'u_SpotLight.color': Shader3D.PERIOD_SCENE,
+	            'u_SpotLight.color': Shader3D.PERIOD_SCENE
 	        };
 	        stateMap = {
 	            's_Cull': Shader3D.RENDER_STATE_CULL,
@@ -29517,6 +30084,9 @@
 	            'u_MvpMatrix': Shader3D.PERIOD_SPRITE,
 	            'u_WorldMat': Shader3D.PERIOD_SPRITE,
 	            'u_CameraPos': Shader3D.PERIOD_CAMERA,
+	            'u_Viewport': Shader3D.PERIOD_CAMERA,
+	            'u_ProjectionParams': Shader3D.PERIOD_CAMERA,
+	            'u_View': Shader3D.PERIOD_CAMERA,
 	            'u_LightmapScaleOffset': Shader3D.PERIOD_SPRITE,
 	            'u_LightMap': Shader3D.PERIOD_SPRITE,
 	            'u_SplatAlphaTexture': Shader3D.PERIOD_MATERIAL,
@@ -29533,24 +30103,26 @@
 	            'u_FogStart': Shader3D.PERIOD_SCENE,
 	            'u_FogRange': Shader3D.PERIOD_SCENE,
 	            'u_FogColor': Shader3D.PERIOD_SCENE,
-	            'u_DirectionLight.Direction': Shader3D.PERIOD_SCENE,
-	            'u_DirectionLight.Color': Shader3D.PERIOD_SCENE,
-	            'u_PointLight.Position': Shader3D.PERIOD_SCENE,
-	            'u_PointLight.Range': Shader3D.PERIOD_SCENE,
-	            'u_PointLight.Attenuation': Shader3D.PERIOD_SCENE,
-	            'u_PointLight.Color': Shader3D.PERIOD_SCENE,
-	            'u_SpotLight.Position': Shader3D.PERIOD_SCENE,
-	            'u_SpotLight.Direction': Shader3D.PERIOD_SCENE,
-	            'u_SpotLight.Range': Shader3D.PERIOD_SCENE,
-	            'u_SpotLight.Spot': Shader3D.PERIOD_SCENE,
-	            'u_SpotLight.Color': Shader3D.PERIOD_SCENE,
+	            'u_DirationLightCount': Shader3D.PERIOD_SCENE,
+	            'u_LightBuffer': Shader3D.PERIOD_SCENE,
+	            'u_LightClusterBuffer': Shader3D.PERIOD_SCENE,
 	            'u_AmbientColor': Shader3D.PERIOD_SCENE,
 	            'u_shadowMap1': Shader3D.PERIOD_SCENE,
 	            'u_shadowMap2': Shader3D.PERIOD_SCENE,
 	            'u_shadowMap3': Shader3D.PERIOD_SCENE,
 	            'u_shadowPSSMDistance': Shader3D.PERIOD_SCENE,
 	            'u_lightShadowVP': Shader3D.PERIOD_SCENE,
-	            'u_shadowPCFoffset': Shader3D.PERIOD_SCENE
+	            'u_shadowPCFoffset': Shader3D.PERIOD_SCENE,
+	            'u_DirectionLight.color': Shader3D.PERIOD_SCENE,
+	            'u_DirectionLight.direction': Shader3D.PERIOD_SCENE,
+	            'u_PointLight.position': Shader3D.PERIOD_SCENE,
+	            'u_PointLight.range': Shader3D.PERIOD_SCENE,
+	            'u_PointLight.color': Shader3D.PERIOD_SCENE,
+	            'u_SpotLight.position': Shader3D.PERIOD_SCENE,
+	            'u_SpotLight.direction': Shader3D.PERIOD_SCENE,
+	            'u_SpotLight.range': Shader3D.PERIOD_SCENE,
+	            'u_SpotLight.spot': Shader3D.PERIOD_SCENE,
+	            'u_SpotLight.color': Shader3D.PERIOD_SCENE
 	        };
 	        stateMap = {
 	            's_Cull': Shader3D.RENDER_STATE_CULL,
@@ -29622,7 +30194,8 @@
 	            'a_PositionTexcoord': VertexMesh.MESH_POSITION0
 	        };
 	        uniformMap = {
-	            'u_MainTex': Shader3D.PERIOD_MATERIAL
+	            'u_MainTex': Shader3D.PERIOD_MATERIAL,
+	            'u_OffsetScale': Shader3D.PERIOD_MATERIAL
 	        };
 	        shader = Shader3D.add("BlitScreen");
 	        subShader = new SubShader(attributeMap, uniformMap);
@@ -30225,11 +30798,11 @@
 	        if (scene._lightCount < maxLightCount) {
 	            scene._lightCount++;
 	            this._addToLightQueue();
-	            this._isAlternate = true;
+	            this._isAlternate = false;
 	        }
 	        else {
 	            scene._alternateLights.add(this);
-	            this._isAlternate = false;
+	            this._isAlternate = true;
 	            console.warn("LightSprite:light count has large than maxLightCount,the latest added light will be ignore.");
 	        }
 	    }
@@ -30278,15 +30851,15 @@
 	LightSprite.LIGHTMAPBAKEDTYPE_BAKED = 2;
 
 	class DirectionLight extends LightSprite {
+	    constructor() {
+	        super();
+	        this._direction = new Vector3();
+	    }
 	    set shadow(value) {
 	        if (this._shadow !== value) {
 	            this._shadow = value;
 	            (this.scene) && (this._initShadow());
 	        }
-	    }
-	    constructor() {
-	        super();
-	        this._direction = new Vector3();
 	    }
 	    _initShadow() {
 	        if (this._shadow) {
@@ -30316,15 +30889,15 @@
 	}
 
 	class PointLight extends LightSprite {
+	    constructor() {
+	        super();
+	        this._range = 6.0;
+	    }
 	    get range() {
 	        return this._range;
 	    }
 	    set range(value) {
 	        this._range = value;
-	    }
-	    constructor() {
-	        super();
-	        this._range = 6.0;
 	    }
 	    _addToLightQueue() {
 	        this._scene._pointLights.add(this);
@@ -30339,6 +30912,12 @@
 	}
 
 	class SpotLight extends LightSprite {
+	    constructor() {
+	        super();
+	        this._spotAngle = 30.0;
+	        this._range = 10.0;
+	        this._direction = new Vector3();
+	    }
 	    get spotAngle() {
 	        return this._spotAngle;
 	    }
@@ -30350,12 +30929,6 @@
 	    }
 	    set range(value) {
 	        this._range = value;
-	    }
-	    constructor() {
-	        super();
-	        this._spotAngle = 30.0;
-	        this._range = 10.0;
-	        this._direction = new Vector3();
 	    }
 	    _addToLightQueue() {
 	        this._scene._spotLights.add(this);
@@ -30382,7 +30955,7 @@
 	                break;
 	            case "MeshSprite3D":
 	                node = new MeshSprite3D();
-	                (outBatchSprites && node._isStatic) && (outBatchSprites.push(node));
+	                (outBatchSprites && nodeData.props.isStatic) && (outBatchSprites.push(node));
 	                break;
 	            case "SkinnedMeshSprite3D":
 	                node = new SkinnedMeshSprite3D();
@@ -30486,7 +31059,7 @@
 	                break;
 	            case "MeshSprite3D":
 	                node = new MeshSprite3D();
-	                (outBatchSprites && node._isStatic) && (outBatchSprites.push(node));
+	                (outBatchSprites && nodeData.props.isStatic) && (outBatchSprites.push(node));
 	                break;
 	            case "SkinnedMeshSprite3D":
 	                node = new SkinnedMeshSprite3D();
@@ -30541,8 +31114,8 @@
 	class Laya3D {
 	    constructor() {
 	    }
-	    static get enbalePhysics() {
-	        return Physics3D._enbalePhysics;
+	    static get enablePhysics() {
+	        return Physics3D._enablePhysics;
 	    }
 	    static _cancelLoadByUrl(url) {
 	        Laya.Laya.loader.cancelLoadByUrl(url);
@@ -30574,7 +31147,8 @@
 	                return new Laya.CommandEncoder(this, reserveSize, adjustSize, isSyncToRenderThread);
 	            };
 	        }
-	        config._multiLighting = config.enbaleMultiLight && SystemUtils.supportTextureFormat(Laya.TextureFormat.R32G32B32A32);
+	        config._multiLighting = config.enableMultiLight && SystemUtils.supportTextureFormat(Laya.TextureFormat.R32G32B32A32);
+	        ILaya3D.Shader3D = Shader3D;
 	        ILaya3D.Scene3D = Scene3D;
 	        ILaya3D.MeshRenderStaticBatchManager = MeshRenderStaticBatchManager;
 	        ILaya3D.MeshRenderDynamicBatchManager = MeshRenderDynamicBatchManager;
@@ -30592,8 +31166,8 @@
 	        PixelLineVertex.__init__();
 	        SubMeshInstanceBatch.__init__();
 	        SubMeshDynamicBatch.__init__();
-	        Physics3D._physics3D = window.Physics3D;
-	        if (Physics3D._physics3D) {
+	        Physics3D._bullet = window.Physics3D;
+	        if (Physics3D._bullet) {
 	            StaticPlaneColliderShape.__init__();
 	            ColliderShape.__init__();
 	            CompoundColliderShape.__init__();
@@ -30616,6 +31190,7 @@
 	        PostProcess.__init__();
 	        Scene3D.__init__();
 	        MeshRenderStaticBatchManager.__init__();
+	        Material.__initDefine__();
 	        BaseMaterial.__initDefine__();
 	        BlinnPhongMaterial.__initDefine__();
 	        PBRStandardMaterial.__initDefine__();
@@ -30683,7 +31258,7 @@
 	        createMap["lh"] = [Laya3D.HIERARCHY, Scene3DUtils._parse];
 	        createMap["ls"] = [Laya3D.HIERARCHY, Scene3DUtils._parseScene];
 	        createMap["lm"] = [Laya3D.MESH, Mesh._parse];
-	        createMap["lmat"] = [Laya3D.MATERIAL, BaseMaterial._parse];
+	        createMap["lmat"] = [Laya3D.MATERIAL, Material._parse];
 	        createMap["ltc"] = [Laya3D.TEXTURECUBE, TextureCube._parse];
 	        createMap["jpg"] = [Laya3D.TEXTURE2D, Laya.Texture2D._parse];
 	        createMap["jpeg"] = [Laya3D.TEXTURE2D, Laya.Texture2D._parse];
@@ -30753,12 +31328,6 @@
 	            var animationClip = AnimationClip;
 	            animationClip.prototype._evaluateClipDatasRealTime = animationClip.prototype._evaluateClipDatasRealTimeForNative;
 	            skinnedMeshRender.prototype._computeSkinnedData = skinnedMeshRender.prototype._computeSkinnedDataForNative;
-	        }
-	        if (Laya.Render.isConchApp) {
-	            Laya.WebGL.shaderHighPrecision = false;
-	            var gl = Laya.LayaGL.instance;
-	            var precisionFormat = gl.getShaderPrecisionFormat(gl.FRAGMENT_SHADER, gl.HIGH_FLOAT);
-	            precisionFormat.precision ? Laya.WebGL.shaderHighPrecision = true : Laya.WebGL.shaderHighPrecision = false;
 	        }
 	    }
 	    static formatRelativePath(base, value) {
@@ -30831,9 +31400,18 @@
 	                        materials[i].path = Laya3D._addHierarchyInnerUrls(secondLevelUrls, subUrls, urlVersion, hierarchyBasePath, materials[i].path, Laya3D.MATERIAL);
 	                break;
 	            case "ShuriKenParticle3D":
-	                var parMeshPath = props.meshPath;
-	                (parMeshPath) && (props.meshPath = Laya3D._addHierarchyInnerUrls(firstLevelUrls, subUrls, urlVersion, hierarchyBasePath, parMeshPath, Laya3D.MESH));
-	                props.material.path = Laya3D._addHierarchyInnerUrls(secondLevelUrls, subUrls, urlVersion, hierarchyBasePath, props.material.path, Laya3D.MATERIAL);
+	                if (props.main) {
+	                    var resources = props.renderer.resources;
+	                    var mesh = resources.mesh;
+	                    var material = resources.material;
+	                    (mesh) && (resources.mesh = Laya3D._addHierarchyInnerUrls(firstLevelUrls, subUrls, urlVersion, hierarchyBasePath, mesh, Laya3D.MESH));
+	                    (material) && (resources.material = Laya3D._addHierarchyInnerUrls(secondLevelUrls, subUrls, urlVersion, hierarchyBasePath, material, Laya3D.MATERIAL));
+	                }
+	                else {
+	                    var parMeshPath = props.meshPath;
+	                    (parMeshPath) && (props.meshPath = Laya3D._addHierarchyInnerUrls(firstLevelUrls, subUrls, urlVersion, hierarchyBasePath, parMeshPath, Laya3D.MESH));
+	                    props.material.path = Laya3D._addHierarchyInnerUrls(secondLevelUrls, subUrls, urlVersion, hierarchyBasePath, props.material.path, Laya3D.MATERIAL);
+	                }
 	                break;
 	            case "Terrain":
 	                Laya3D._addHierarchyInnerUrls(fourthLelUrls, subUrls, urlVersion, hierarchyBasePath, props.dataPath, Laya3D.TERRAINRES);
@@ -31004,7 +31582,7 @@
 	    }
 	    static _onMateialTexturesLoaded(loader, processHandler, lmatData, subUrls) {
 	        loader._cache = loader._createCache;
-	        var mat = BaseMaterial._parse(lmatData, loader._propertyParams, loader._constructParams);
+	        var mat = Material._parse(lmatData, loader._propertyParams, loader._constructParams);
 	        Laya3D._endLoad(loader, mat, subUrls);
 	        (processHandler) && (processHandler.recover());
 	    }
@@ -31080,8 +31658,10 @@
 	        (process < 1.0) && (loader.event(Laya.Event.PROGRESS, process));
 	    }
 	    static init(width, height, config = null, compolete = null) {
-	        if (Laya3D._isInit)
+	        if (Laya3D._isInit) {
+	            compolete && compolete.run();
 	            return;
+	        }
 	        Laya3D._isInit = true;
 	        (config) && (config.cloneTo(Config3D._config));
 	        config = Config3D._config;
@@ -31094,13 +31674,13 @@
 	        Scene3D.octreeLooseness = config.octreeLooseness;
 	        var physics3D = window.Physics3D;
 	        if (physics3D == null) {
-	            Physics3D._enbalePhysics = false;
+	            Physics3D._enablePhysics = false;
 	            Laya3D.__init__(width, height, config);
 	            compolete && compolete.run();
 	        }
 	        else {
-	            Physics3D._enbalePhysics = true;
-	            physics3D(config.defaultPhysicsMemory * 1024 * 1024).then(function () {
+	            Physics3D._enablePhysics = true;
+	            physics3D(config.defaultPhysicsMemory * 16, BulletInteractive._interactive).then(function () {
 	                Laya3D.__init__(width, height, config);
 	                compolete && compolete.run();
 	            });
@@ -31124,6 +31704,29 @@
 	Laya3D._editerEnvironment = false;
 	Laya3D.physicsSettings = new PhysicsSettings();
 	window.Laya3D = Laya3D;
+
+	class CastShadowList extends SingletonList {
+	    constructor() {
+	        super();
+	    }
+	    add(element) {
+	        var index = element._indexInCastShadowList;
+	        if (index !== -1)
+	            throw "CastShadowList:element has  in  CastShadowList.";
+	        this._add(element);
+	        element._indexInCastShadowList = this.length++;
+	    }
+	    remove(element) {
+	        var index = element._indexInCastShadowList;
+	        this.length--;
+	        if (index !== this.length) {
+	            var end = this.elements[this.length];
+	            this.elements[index] = end;
+	            end._indexInCastShadowList = index;
+	        }
+	        element._indexInCastShadowList = -1;
+	    }
+	}
 
 	class AnimatorStateScript {
 	    constructor() {
@@ -31172,20 +31775,19 @@
 	    _onEnable() {
 	        this.owner._scene._addScript(this);
 	        var proto = Script3D.prototype;
-	        if (this.onKeyDown !== proto.onKeyDown) {
+	        if (this.onKeyDown !== proto.onKeyDown)
 	            Laya.Laya.stage.on(Laya.Event.KEY_DOWN, this, this.onKeyDown);
-	        }
-	        if (this.onKeyPress !== proto.onKeyPress) {
+	        if (this.onKeyPress !== proto.onKeyPress)
 	            Laya.Laya.stage.on(Laya.Event.KEY_PRESS, this, this.onKeyUp);
-	        }
-	        if (this.onKeyUp !== proto.onKeyUp) {
+	        if (this.onKeyUp !== proto.onKeyUp)
 	            Laya.Laya.stage.on(Laya.Event.KEY_UP, this, this.onKeyUp);
-	        }
+	        this.onEnable();
 	    }
 	    _onDisable() {
 	        this.owner._scene._removeScript(this);
 	        this.owner.offAllCaller(this);
 	        Laya.Laya.stage.offAllCaller(this);
+	        this.onDisable();
 	    }
 	    _isScript() {
 	        return true;
@@ -31687,7 +32289,7 @@
 	                var mipUpTexture = RenderTexture.createFromPool(tw, th, Laya.RenderTextureFormat.R8G8B8, Laya.RenderTextureDepthFormat.DEPTHSTENCIL_NONE, Laya.BaseTexture.FILTERMODE_BILINEAR);
 	                this._pyramid[upIndex] = mipUpTexture;
 	            }
-	            cmd.blitScreenTriangle(lastDownTexture, mipDownTexture, this._shader, this._shaderData, subShader);
+	            cmd.blitScreenTriangle(lastDownTexture, mipDownTexture, null, this._shader, this._shaderData, subShader);
 	            lastDownTexture = mipDownTexture;
 	            tw = Math.max(Math.floor(tw / 2), 1);
 	            th = Math.max(Math.floor(th / 2), 1);
@@ -31699,7 +32301,7 @@
 	            mipDownTexture = this._pyramid[downIndex];
 	            mipUpTexture = this._pyramid[upIndex];
 	            cmd.setShaderDataTexture(this._shaderData, BloomEffect.SHADERVALUE_BLOOMTEX, mipDownTexture);
-	            cmd.blitScreenTriangle(lastUpTexture, mipUpTexture, this._shader, this._shaderData, BloomEffect.SUBSHADER_UPSAMPLETENT + qualityOffset);
+	            cmd.blitScreenTriangle(lastUpTexture, mipUpTexture, null, this._shader, this._shaderData, BloomEffect.SUBSHADER_UPSAMPLETENT + qualityOffset);
 	            lastUpTexture = mipUpTexture;
 	        }
 	        var linearColor = this._linearColor;
@@ -31833,22 +32435,22 @@
 	        return super.enabled;
 	    }
 	    set enabled(value) {
-	        this._nativeConstraint.IsEnabled = value;
+	        this._btConstraint.IsEnabled = value;
 	        super.enabled = value;
 	    }
 	    get breakingImpulseThreshold() {
 	        return this._breakingImpulseThreshold;
 	    }
 	    set breakingImpulseThreshold(value) {
-	        this._nativeConstraint.BreakingImpulseThreshold = value;
+	        this._btConstraint.BreakingImpulseThreshold = value;
 	        this._breakingImpulseThreshold = value;
 	    }
 	    get appliedImpulse() {
 	        if (!this._feedbackEnabled) {
-	            this._nativeConstraint.EnableFeedback(true);
+	            this._btConstraint.EnableFeedback(true);
 	            this._feedbackEnabled = true;
 	        }
-	        return this._nativeConstraint.AppliedImpulse;
+	        return this._btConstraint.AppliedImpulse;
 	    }
 	    get connectedBody() {
 	        return this._connectedBody;
@@ -31857,9 +32459,9 @@
 	        this._connectedBody = value;
 	    }
 	    _onDestroy() {
-	        var physics3D = Physics3D._physics3D;
-	        physics3D.destroy(this._nativeConstraint);
-	        this._nativeConstraint = null;
+	        var physics3D = Physics3D._bullet;
+	        physics3D.destroy(this._btConstraint);
+	        this._btConstraint = null;
 	    }
 	}
 
@@ -31906,6 +32508,8 @@
 	}
 
 	class TextMesh {
+	    constructor() {
+	    }
 	    get text() {
 	        return this._text;
 	    }
@@ -31923,8 +32527,6 @@
 	    }
 	    set color(value) {
 	        this._color = value;
-	    }
-	    constructor() {
 	    }
 	    _createVertexBuffer(charCount) {
 	    }
@@ -31986,6 +32588,7 @@
 	exports.BoxColliderShape = BoxColliderShape;
 	exports.BoxShape = BoxShape;
 	exports.BufferState = BufferState;
+	exports.BulletInteractive = BulletInteractive;
 	exports.Burst = Burst;
 	exports.Camera = Camera;
 	exports.CapsuleColliderShape = CapsuleColliderShape;
@@ -32050,6 +32653,7 @@
 	exports.LightSprite = LightSprite;
 	exports.LoadModelV04 = LoadModelV04;
 	exports.LoadModelV05 = LoadModelV05;
+	exports.Material = Material;
 	exports.MathUtils3D = MathUtils3D;
 	exports.Matrix3x3 = Matrix3x3;
 	exports.Matrix4x4 = Matrix4x4;
@@ -32119,6 +32723,8 @@
 	exports.ShaderInstance = ShaderInstance;
 	exports.ShaderPass = ShaderPass;
 	exports.ShaderVariable = ShaderVariable;
+	exports.ShaderVariantInfo = ShaderVariantInfo;
+	exports.ShaderVariantInfoCollection = ShaderVariantInfoCollection;
 	exports.ShapeUtils = ShapeUtils;
 	exports.ShuriKenParticle3D = ShuriKenParticle3D;
 	exports.ShuriKenParticle3DShaderDeclaration = ShuriKenParticle3DShaderDeclaration;
@@ -32186,4 +32792,4 @@
 	exports.Viewport = Viewport;
 	exports.WaterPrimaryMaterial = WaterPrimaryMaterial;
 
-}(window.Laya = window.Laya|| {}, Laya));
+}(window.Laya = window.Laya || {}, Laya));

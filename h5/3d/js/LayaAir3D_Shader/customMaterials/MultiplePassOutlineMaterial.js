@@ -1,4 +1,4 @@
-class  MultiplePassOutlineMaterial extends Laya.BaseMaterial {
+class  MultiplePassOutlineMaterial extends Laya.Material {
     /**
      * @private
      */

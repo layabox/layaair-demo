@@ -9,7 +9,7 @@ package LayaAir3D_Shader.customMaterials {
 	 * ...
 	 * @author
 	 */
-	public class CustomTerrainMaterial extends BaseMaterial {
+	public class CustomTerrainMaterial extends Material {
 		public static var SPLATALPHATEXTURE:int = Shader3D.propertyNameToID("u_SplatAlphaTexture");
 		public static var DIFFUSETEXTURE1:int = Shader3D.propertyNameToID("u_DiffuseTexture1");
 		public static var DIFFUSETEXTURE2:int = Shader3D.propertyNameToID("u_DiffuseTexture2");

@@ -8,7 +8,7 @@ package LayaAir3D_Shader.customMaterials {
 	 * ...
 	 * @author ...
 	 */
-	public class CustomMaterial extends BaseMaterial {
+	public class CustomMaterial extends Material {
 		public static var DIFFUSETEXTURE:int = Shader3D.propertyNameToID("u_texture");
 		public static var MARGINALCOLOR:int = Shader3D.propertyNameToID("u_marginalColor");
 		

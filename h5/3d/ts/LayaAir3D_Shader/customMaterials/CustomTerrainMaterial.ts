@@ -1,4 +1,4 @@
-class CustomTerrainMaterial extends Laya.BaseMaterial {
+class CustomTerrainMaterial extends Laya.Material {
 	public static SPLATALPHATEXTURE = Laya.Shader3D.propertyNameToID("u_SplatAlphaTexture");
 	public static DIFFUSETEXTURE1 = Laya.Shader3D.propertyNameToID("u_DiffuseTexture1");
 	public static DIFFUSETEXTURE2 = Laya.Shader3D.propertyNameToID("u_DiffuseTexture2");

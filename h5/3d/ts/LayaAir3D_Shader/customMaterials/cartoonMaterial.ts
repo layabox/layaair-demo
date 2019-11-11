@@ -1,4 +1,4 @@
-export default class CartoonMaterial extends Laya.BaseMaterial {
+export default class CartoonMaterial extends Laya.Material {
 		
 	public static ALBEDOTEXTURE:number = Laya.Shader3D.propertyNameToID("u_AlbedoTexture");
 	public static BLENDTEXTURE:number = Laya.Shader3D.propertyNameToID("u_BlendTexture");

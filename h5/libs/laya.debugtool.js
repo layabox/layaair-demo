@@ -1,4 +1,4 @@
-(function (exports, Laya) {
+window.wxMiniGame = function (exports, Laya) {
 	'use strict';
 
 	class StringTool {
@@ -954,7 +954,8 @@
 	ClassTool.displayTypes = { "boolean": true, "number": true, "string": true };
 
 	class TraceTool {
-	    constructor() { }
+	    constructor() {
+	    }
 	    static closeAllLog() {
 	        var logFun;
 	        logFun = TraceTool.emptyLog;
@@ -7722,7 +7723,8 @@
 	}
 
 	class DisResizer {
-	    constructor() { }
+	    constructor() {
+	    }
 	    static init() {
 	        if (DisResizer._up)
 	            return;
@@ -7977,4 +7979,4 @@
 	exports.XML2Object = XML2Object;
 	exports.XML2ObjectNodejs = XML2ObjectNodejs;
 
-}(this.Laya = this.Laya || {}, Laya));
+} 

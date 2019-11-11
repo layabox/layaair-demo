@@ -1,4 +1,4 @@
-class CustomMaterial extends Laya.BaseMaterial {
+class CustomMaterial extends Laya.Material {
     public static DIFFUSETEXTURE: number =  Laya.Shader3D.propertyNameToID("u_texture");
     public static MARGINALCOLOR: number = Laya.Shader3D.propertyNameToID("u_marginalColor");
     constructor() {
