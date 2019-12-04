@@ -67,7 +67,7 @@ $(document).ready(function()
 
 	function parseToSearchUrl(key) {
 		var keyArr = key.split("&");
-		return "language=" + (language ? language : 'ch') + "&category=" + keyArr[0] + "&group=" + keyArr[1] + "&name=" + keyArr[2];
+		return "language=" + (language ? language : 'zh') + "&category=" + keyArr[0] + "&group=" + keyArr[1] + "&name=" + keyArr[2];
 	}
 
 	var isOldVersion = false;
@@ -77,7 +77,7 @@ $(document).ready(function()
 		// if(!isChinese)
 		// 	location.search = "language=en&category=2d&group=Sprite&name=DisplayImage";
 		// else
-		// 	location.search = "language=ch&category=2d&group=Sprite&name=DisplayImage";
+		// 	location.search = "language=zh&category=2d&group=Sprite&name=DisplayImage";
 	// } else {
 	var tmpLang = getQueryString("language");
 

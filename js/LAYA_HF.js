@@ -433,8 +433,8 @@ function laya_nav(laya) {
                             "en": "Chinese"
                         },
                         "url": {
-                            "zh": location.href.replace(/language=(en|ch)/, 'language=ch'),
-                            "en": location.href.replace(/language=(en|ch)/, 'language=ch')
+                            "zh": location.href.replace(/language=(en|zh)/, 'language=zh'),
+                            "en": location.href.replace(/language=(en|zh)/, 'language=zh')
                         },
                         "visual": {
                             "zh": 1,
@@ -448,8 +448,8 @@ function laya_nav(laya) {
                             "en": "English"
                         },
                         "url": {
-                            "zh": location.href.replace(/language=(en|ch)/, 'language=en'),
-                            "en": location.href.replace(/language=(en|ch)/, 'language=en')
+                            "zh": location.href.replace(/language=(en|zh)/, 'language=en'),
+                            "en": location.href.replace(/language=(en|zh)/, 'language=en')
                         },
                         "visual": {
                             "zh": 1,
