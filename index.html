@@ -18,11 +18,12 @@
     let search = location.search;
     let isSearchLegal = search.includes("language") && search.includes("category") && search.includes("group") && search.includes("name");
     if (!isSearchLegal) {
-        var isChinese = navigator.language.indexOf('zh') !== -1;
-        if(!isChinese)
+        let isEnglish = navigator.language.indexOf('en') !== -1 || search.indexOf("language=en") !== -1;
+        let isChinese = navigator.language.indexOf('zh') !== -1;
+        if(isEnglish)
             location.search = "language=en&category=2d&group=Sprite&name=DisplayImage";
         else
-            location.search = "language=ch&category=2d&group=Sprite&name=DisplayImage";
+            location.search = "language=zh&category=2d&group=Sprite&name=DisplayImage";
     }
     </script>
 
