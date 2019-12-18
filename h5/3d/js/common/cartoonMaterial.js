@@ -38,7 +38,7 @@ class CartoonMaterial extends Laya.Material {
 			'u_DirectionLight.Color': Laya.Shader3D.PERIOD_SCENE
 		};
 		var cartoonShader3D = Laya.Shader3D.add("CartoonShader");
-		var subShader = new Laya.SubShader(attributeMap, uniformMap,Laya.SkinnedMeshSprite3D.shaderDefines,CartoonMaterial.shaderDefines);
+		var subShader = new Laya.SubShader(attributeMap, uniformMap);
 		cartoonShader3D.addSubShader(subShader);
 		var vs1 = `attribute vec4 a_Position;
 		attribute vec3 a_Normal; 

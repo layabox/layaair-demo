@@ -80,7 +80,7 @@ class  MultiplePassOutlineMaterial extends Laya.Material {
 									};
                                 
         var customShader = Laya.Shader3D.add("MultiplePassOutlineShader");
-        var subShader = new Laya.SubShader(attributeMap, uniformMap,MultiplePassOutlineMaterial.shaderDefines);
+        var subShader = new Laya.SubShader(attributeMap, uniformMap);
         customShader.addSubShader(subShader);
         let vs1 = `
         attribute vec4 a_Position;
