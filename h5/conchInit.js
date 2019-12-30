@@ -44,6 +44,7 @@ var list = [
 	"Skeleton_SpineVine",
 	"SmartScale_T",
 	"Sound_SimpleDemo",
+	"Sprite_ScreenShot",
 	"Sprite_Cache",
 	"Sprite_Container",
 	"Sprite_DisplayImage",

@@ -7,6 +7,7 @@
 			"tr_zhCN": "Sprite",
 			"manifest": [
 				["DisplayImage", "显示图片", "Sprite.loadImage可以直接加载外部，也可以从缓冲区读取图片。Graphics.drawTexture绘制纹理。如果使用Sprite.loadImage显示图集中一张图，则图集必须已被加载", "core"],
+				["ScreenShot", "屏幕截图", "Sprite支持屏幕截图", "core,ui"],
 				["Container", "容器", "Sprite能够作为其他显示对象的容器", "core"],
 				["RoateAndScale", "旋转缩放", "设置Sprite的旋转角度和缩放系数", "core"],
 				["DrawPath", "根据数据绘制路径", "drawPath可以绘制路径点", "core"],
