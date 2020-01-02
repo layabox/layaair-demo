@@ -1970,6 +1970,18 @@ window.box2d=box2d;
     Laya.ClassUtils.regClass("laya.physics.RigidBody", RigidBody);
     Laya.ClassUtils.regClass("Laya.RigidBody", RigidBody);
 
+    class DestructionListener {
+        SayGoodbyeJoint(params) {
+            params.m_userData && (params.m_userData.isDestroy = true);
+        }
+        SayGoodbyeFixture(params) {
+        }
+        SayGoodbyeParticleGroup(params) {
+        }
+        SayGoodbyeParticle(params) {
+        }
+    }
+
     class Physics extends Laya.EventDispatcher {
         constructor() {
             super();
@@ -1997,6 +2009,7 @@ window.box2d=box2d;
                 }
                 var gravity = new box2d.b2Vec2(0, options.gravity || 500 / Physics.PIXEL_RATIO);
                 this.world = new box2d.b2World(gravity);
+                this.world.SetDestructionListener(new DestructionListener());
                 this.world.SetContactListener(new ContactListener());
                 this.allowSleeping = options.allowSleeping == null ? true : options.allowSleeping;
                 if (!options.customUpdate)
@@ -2079,7 +2092,10 @@ window.box2d=box2d;
         }
         _createJoint(def) {
             if (this.world) {
-                return this.world.CreateJoint(def);
+                let joint = this.world.CreateJoint(def);
+                joint.m_userData = {};
+                joint.m_userData.isDestroy = false;
+                return joint;
             }
             else {
                 console.error('The physical engine should be initialized first.use "Physics.enable()"');
@@ -2559,10 +2575,10 @@ window.box2d=box2d;
         _createJoint() {
         }
         _onDisable() {
-            if (this._joint) {
+            if (this._joint && this._joint.m_userData && !this._joint.m_userData.isDestroy) {
                 Physics.I._removeJoint(this._joint);
-                this._joint = null;
             }
+            this._joint = null;
         }
     }
     Laya.ClassUtils.regClass("laya.physics.joint.JointBase", JointBase);
@@ -3181,6 +3197,7 @@ window.box2d=box2d;
     exports.ChainCollider = ChainCollider;
     exports.CircleCollider = CircleCollider;
     exports.ColliderBase = ColliderBase;
+    exports.DestructionListener = DestructionListener;
     exports.DistanceJoint = DistanceJoint;
     exports.GearJoint = GearJoint;
     exports.IPhysics = IPhysics;
