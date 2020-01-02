@@ -7,6 +7,7 @@
 			"tr_zhCN": "Sprite",
 			"manifest": [
 				["DisplayImage", "Display image", "Sprite.loadImage can be loaded directly，or readable also from buffer。Graphics.drawTexture display texture. If you use Sprite.loadImage to display content，data texture should be loaded before", "core"],
+				["ScreenShot", "ScreenShot", "ScreenShot", "core,ui"],
 				["Container", "Container", "Sprite serve as a container for other display objects", "core"],
 				["RoateAndScale", "Rotate and scale", "Set the Sprite's rotation angle and scale factor", "core"],
 				["DrawPath", "DrawPath", "drawPath can draw path points", "core"],
@@ -305,7 +306,6 @@
 				"manifest": [
 					["SkinnedMeshSprite3DDemo", "SkinnedMeshSprite3DDemo", "", "core,ani,d3,ui,CameraMoveScript.js"],
 					["Sprite3DParent", "Sprite3DParent", "", "core,ani,d3,ui,CameraMoveScript.js"],
-					["ScriptSample", "ScriptSample", "", "core,ani,d3,CameraMoveScript.js"],
 					["TransformDemo", "TransformDemo", "", "core,ani,d3,CameraMoveScript.js"],
 					["Sprite3DClone", "Sprite3DClone", "", "core,ani,d3,CameraMoveScript.js" ],
 					["PixelLineSprite3DDemo", "PixelLineSprite3DDemo", "", "core,ani,d3,Tool.js,CameraMoveScript.js" ]
@@ -330,7 +330,7 @@
 					["BlinnPhong_DiffuseMap", "BlinnPhong_DiffuseMap", "", "core,ani,d3" ],
 					["BlinnPhong_NormalMap", "BlinnPhong_NormalMap", "", "core,ani,d3" ],
 					["BlinnPhong_SpecularMap", "BlinnPhong_SpecularMap", "", "core,ani,d3,CameraMoveScript.js"],
-					["PBRStandardMaterialDemo", "PBRStandardMaterial", "", "core,ani,d3,CameraMoveScript.js" ],
+					["PBRMaterialDemo", "PBRMaterialDemo", "", "core,ani,d3,CameraMoveScript.js" ],
 					["EffectMaterialDemo", "EffectMaterial", "", "core,ani,d3,CameraMoveScript.js" ],
 					["UnlitMaterialDemo", "UnlitMaterial", "", "core,ani,d3,CameraMoveScript.js" ],
 					["WaterPrimaryMaterialDemo", "WaterPrimaryMaterial", "", "core,ani,d3,physics3D,CameraMoveScript.js" ]
@@ -437,7 +437,6 @@
 		  		"manifest": [
 					["Laya3DCombineHtml", "Laya3DCombineHtml", "", "core,ani,d3" ],
 					["AStarFindPath", "AStarFindPath", "", "core,ani,d3,astar.js,CameraMoveScript.js" ],
-					["PBRDemo", "PBRDemo", "", "core,ani,d3,CameraMoveScript.js" ],
 					["Scene2DPlayer3D", "Scene2DPlayer3D", "", "core,ani,d3,ui,CameraMoveScript.js" ],
 					["Secne3DPlayer2D", "Secne3DPlayer2D", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
 					[ "PostProcessBloom", "PostProcessBloom", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
@@ -448,7 +447,9 @@
 				"prefix": "Demo",
 				"tr_zhCN": "Demo",
 				"manifest": [
-					[ "PBRDemo", "PBRDemo", "", "core,ani,d3" ]
+					[ "GhostModelShow", "GhostModelShow", "", "core,ani,d3" ],
+					[ "DamagedHelmetModelShow", "DamagedHelmetModelShow", "", "core,ani,d3,CameraMoveScript.js" ],
+					[ "CerberusModelShow", "CerberusModelShow", "", "core,ani,d3,CameraMoveScript.js" ]
 				]
 			}]
 	}

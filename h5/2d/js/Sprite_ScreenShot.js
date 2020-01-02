@@ -60,7 +60,6 @@ class Sprite_ScreenShot {
     }
 
     _onclick(e){
-		debugger;
         switch (e.target.name) {
             case this.nameArr[0]:
                 var base64Url = this._canvas.toDataURL("image/png",1);

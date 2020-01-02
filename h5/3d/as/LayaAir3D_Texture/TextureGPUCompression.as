@@ -27,7 +27,6 @@ package LayaAir3D_Texture {
 				Laya.stage.addChild(scene) as Scene3D;
 				var camera:Camera = scene.getChildByName("Main Camera") as Camera;
 				camera.addComponent(CameraMoveScript);
-				console.log(camera.clearColor);
 			}));
 		
 		}

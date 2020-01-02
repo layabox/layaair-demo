@@ -321,7 +321,7 @@
 				["BlinnPhong_DiffuseMap", "BlinnPhong-漫反射贴图", "", "core,ani,d3" ],
 				["BlinnPhong_NormalMap", "BlinnPhong-法线贴图", "", "core,ani,d3" ],
 				["BlinnPhong_SpecularMap", "BlinnPhong-高光贴图", "", "core,ani,d3,CameraMoveScript.js"],
-				["PBRStandardMaterialDemo", "PBRStandard材质", "", "core,ani,d3,CameraMoveScript.js" ],
+				["PBRMaterialDemo", "PBR材质", "", "core,ani,d3,CameraMoveScript.js" ],
 				["EffectMaterialDemo", "Effect材质", "", "core,ani,d3,CameraMoveScript.js" ],
 				["UnlitMaterialDemo", "Unlit材质", "", "core,ani,d3,CameraMoveScript.js" ],
 				["WaterPrimaryMaterialDemo", "WaterPrimary材质", "", "core,ani,d3,physics3D,CameraMoveScript.js" ]
@@ -439,7 +439,9 @@
 			"prefix": "Demo",
 			"tr_zhCN": "展示案例",
 			"manifest": [
-				[ "PBRDemo", "基于物理的渲染", "", "core,ani,d3" ]
+				[ "GhostModelShow", "幽灵模型", "", "core,ani,d3" ],
+				[ "DamagedHelmetModelShow", "损坏头盔模型", "", "core,ani,d3,CameraMoveScript.js" ],
+				[ "CerberusModelShow", "地狱犬", "", "core,ani,d3,CameraMoveScript.js" ]
 			]
     }
 

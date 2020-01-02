@@ -38,6 +38,7 @@ class MultiLight {
 
 			var camera = scene.getChildByName("Main Camera");
 			camera.addComponent(CameraMoveScript);
+			camera.transform.localPosition = new Laya.Vector3(8.937199060699333, 61.364798067809126, -66.77836086472654);
 			var moveScript = camera.addComponent(LightMoveScript);
 			moveScript.forward = new Laya.Vector3();
 			moveScript.lights = [];
