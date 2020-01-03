@@ -441,7 +441,7 @@
 			"manifest": [
 				[ "GhostModelShow", "幽灵模型", "", "core,ani,d3" ],
 				[ "DamagedHelmetModelShow", "损坏头盔模型", "", "core,ani,d3,CameraMoveScript.js" ],
-				[ "CerberusModelShow", "地狱犬", "", "core,ani,d3,CameraMoveScript.js" ]
+				[ "CerberusModelShow", "地狱犬枪模型", "", "core,ani,d3,CameraMoveScript.js" ]
 			]
     }
 
