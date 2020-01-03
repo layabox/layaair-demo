@@ -41,7 +41,7 @@
 		public function addText(size:Number, y: Number, text: String, color: String): void {
 			var cerberusText:Text = new Text();
 			cerberusText.color = color;
-			cerberusText.fontSize = size;
+			cerberusText.fontSize = size * Browser.pixelRatio;
 			cerberusText.x = size;
 			cerberusText.y = y;
 			cerberusText.text = text;

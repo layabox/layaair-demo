@@ -65,7 +65,7 @@ class DamagedHelmetModelShow {
 	addText(size, y, text,color) {
 		var cerberusText = new Laya.Text();
 		cerberusText.color = color;
-		cerberusText.fontSize = size;
+		cerberusText.fontSize = size *  Laya.Browser.pixelRatio;
 		cerberusText.x = size;
 		cerberusText.y = y;
 		cerberusText.text = text;
