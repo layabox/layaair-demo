@@ -1,44 +1,96 @@
 ﻿package {
-	import laya.display.Scene;
-	import laya.net.AtlasInfoManager;
-	import laya.net.ResourceVersion;
-	import laya.net.URL;
+	import common.CameraMoveScript;
+	import laya.d3.core.Camera;
+	import laya.d3.core.MeshSprite3D;
+	import laya.display.Stage;
+	import laya.d3.core.Sprite3D;
+	import laya.d3.math.Vector3;
+	import laya.display.Text;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.utils.Utils;
+	import laya.d3.core.scene.Scene3D;
+
+
+
+	public class DamagedHelmetModelShow {
+
+		
+		public function DamagedHelmetModelShow() {
+			Laya3D.init(0, 0);
+			Stat.show();
+			Laya.stage.scaleMode = Stage.SCALE_FULL;
+			Laya.stage.screenMode = Stage.SCREEN_NONE;
+
+			Scene3D.load("res/LayaScene_DamagedHelmetScene/Conventional/DamagedHelmetScene.ls", Handler.create(this, function (scene: Scene3D): void {
+				Laya.stage.addChild(scene);
+
+				var damagedHelmet: MeshSprite3D = scene.getChildAt(1).getChildAt(0) as MeshSprite3D;
+				var rotationScript: RotationScript = damagedHelmet.addComponent(RotationScript);
+				rotationScript.model = damagedHelmet;
+
+				var size: Number = 20;
+				this.addText(size, size * 4, "Drag the screen to rotate the model.", "#F09900");
+				size = 10;
+				this.addText(size, Laya.stage.height - size * 4, "Battle Damaged Sci-fi Helmet by theblueturtle_    www.leonardocarrion.com", "#FFFF00");
+			}));
+		}
+		
+		/**
+		 * add text.
+		 */
+		public function addText(size:Number, y: Number, text: String, color: String): void {
+			var cerberusText:Text = new Text();
+			cerberusText.color = color;
+			cerberusText.fontSize = size;
+			cerberusText.x = size;
+			cerberusText.y = y;
+			cerberusText.text = text;
+			Laya.stage.addChild(cerberusText);
+		}
+		
+
+	}
 	
-	public class Main {
-		public function Main() {
-			//根据IDE设置初始化引擎		
-			if (window["Laya3D"]) window["Laya3D"].init(GameConfig.width, GameConfig.height);
-			else Laya.init(GameConfig.width, GameConfig.height, Laya["WebGL"]);
-			Laya["Physics"] && Laya["Physics"].enable();
-			Laya["DebugPanel"] && Laya["DebugPanel"].enable();
-			Laya.stage.scaleMode = GameConfig.scaleMode;
-			Laya.stage.screenMode = GameConfig.screenMode;
-			Laya.stage.alignV = GameConfig.alignV;
-			Laya.stage.alignH = GameConfig.alignH;
-			//兼容微信不支持加载scene后缀场景
-			URL.exportSceneToJson = GameConfig.exportSceneToJson;
-			
-			//打开调试面板（IDE设置调试模式，或者url地址增加debug=true参数，均可打开调试面板）
-			if (GameConfig.debug || Utils.getQueryString("debug") == "true") Laya.enableDebugPanel();
-			if (GameConfig.physicsDebug && Laya["PhysicsDebugDraw"]) Laya["PhysicsDebugDraw"].enable();
-			if (GameConfig.stat) Stat.show();
-			Laya.alertGlobalError = true;
-			
-			//激活资源版本控制，版本文件由发布功能生成
-			ResourceVersion.enable("version.json", Handler.create(this, this.onVersionLoaded), ResourceVersion.FILENAME_VERSION);
+
+}
+
+
+import laya.d3.component.Script3D;
+import laya.d3.math.Vector3;
+import laya.events.Event;
+import laya.events.MouseManager;
+/**
+ * model rotation script.
+ */
+class RotationScript extends Script3D {
+	private var rotSpeed: Vector3 = new Vector3(0, 0.005, 0);
+	private var _lastMouseX: Number;
+	private var _mouseDown: Boolean = false;
+	private var _rotate: Vector3 = new Vector3();
+	private var _autoRotateSpeed: Vector3 = new Vector3(0, 0.25, 0);
+
+	private var model: Sprite3D;
+
+	public function RotationScript() {
+		super();
+		Laya.stage.on(Event.MOUSE_DOWN, this, function (): void {
+			this._mouseDown = true;
+			this._lastMouseX = MouseManager.instance.mouseX;
+		});
+		Laya.stage.on(Event.MOUSE_UP, this, function (): void {
+			this._mouseDown = false;
+		});
+	}
+	override public function onUpdate(): void {
+		if (this._mouseDown) {
+			var deltaX: Number = MouseManager.instance.mouseX - this._lastMouseX;
+			this._rotate.y = deltaX * 0.2;
+			this.model.transform.rotate(this._rotate, false, false);
+			this._lastMouseX = MouseManager.instance.mouseX;
 		}
-		
-		private function onVersionLoaded():void {
-			//激活大小图映射，加载小图的时候，如果发现小图在大图合集里面，则优先加载大图合集，而不是小图
-			AtlasInfoManager.enable("fileconfig.json", Handler.create(this, this.onConfigLoaded));
-		}
-		
-		private function onConfigLoaded():void {
-			//加载场景
-			GameConfig.startScene && Scene.open(GameConfig.startScene);
+		else {
+			this.model.transform.rotate(this._autoRotateSpeed, false, false);
 		}
 	}
 }
+

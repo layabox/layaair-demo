@@ -2,9 +2,35 @@
  * model rotation script.
  */
 class RotationScript extends Laya.Script3D {
-	rotSpeed = new Laya.Vector3(0, 0.005, 0);
+	
+	
+	constructor() {
+		super();
+		this._lastMouseX = 0.0;
+		this._mouseDown = false;
+		this._rotate = new Laya.Vector3();
+		this._autoRotateSpeed = new Laya.Vector3(0, 0.25, 0);
+		this.model = null;
+
+		Laya.stage.on(Laya.Event.MOUSE_DOWN, this, function () {
+			this._mouseDown = true;
+			this._lastMouseX = Laya.MouseManager.instance.mouseX;
+		});
+		Laya.stage.on(Laya.Event.MOUSE_UP, this, function () {
+			this._mouseDown = false;
+		});
+	}
+
 	onUpdate() {
-		this.owner.transform.rotate(this.rotSpeed, false);
+		if (this._mouseDown) {
+			var deltaX = Laya.MouseManager.instance.mouseX - this._lastMouseX;
+			this._rotate.y = deltaX * 0.2;
+			this.model.transform.rotate(this._rotate, false, false);
+			this._lastMouseX = Laya.MouseManager.instance.mouseX;
+		}
+		else {
+			this.model.transform.rotate(this._autoRotateSpeed, false, false);
+		}
 	}
 }
 
@@ -23,19 +49,22 @@ class DamagedHelmetModelShow {
 			moveScript.speed = 0.005;
 
 			var damagedHelmet = scene.getChildAt(1).getChildAt(0);
-			damagedHelmet.addComponent(RotationScript);
+			var rotationScript = damagedHelmet.addComponent(RotationScript);
+			rotationScript.model = damagedHelmet;
 
 			var size = 20;
-			this.addText(size, Laya.stage.height - size * 2, "Battle Damaged Sci-fi Helmet by theblueturtle_    www.leonardocarrion.com");
+			this.addText(size, size * 4, "Drag the screen to rotate the model.", "#F09900");
+			size = 10;
+			this.addText(size, Laya.stage.height - size * 4, "Battle Damaged Sci-fi Helmet by theblueturtle_    www.leonardocarrion.com", "#FFFF00");
 		}));
 
 	}
 	/**
 	 * add text.
 	 */
-	addText(size, y, text) {
+	addText(size, y, text,color) {
 		var cerberusText = new Laya.Text();
-		cerberusText.color = "#FFFF00";
+		cerberusText.color = color;
 		cerberusText.fontSize = size;
 		cerberusText.x = size;
 		cerberusText.y = y;
