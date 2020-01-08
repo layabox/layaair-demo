@@ -1,31 +1,24 @@
-﻿package LayaAir3D_Camera {
+﻿package  {
 	import common.CameraMoveScript;
 	import laya.d3.core.BaseCamera;
 	import laya.d3.core.Camera;
-	import laya.d3.core.material.PBRSpecularMaterial;
-	import laya.d3.core.MeshSprite3D;
-	import laya.d3.core.material.BlinnPhongMaterial;
+	import laya.d3.core.Sprite3D;
+	import laya.d3.core.material.UnlitMaterial;
 	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
-	import laya.d3.math.Vector4;
 	import laya.d3.resource.RenderTexture;
+	import laya.display.Sprite;
 	import laya.display.Stage;
 	import laya.events.Event;
 	import laya.net.Loader;
+	import laya.resource.Texture;
 	import laya.ui.Button;
 	import laya.utils.Browser;
 	import laya.utils.Handler;
 	import laya.utils.Stat;
-	import laya.resource.BaseTexture;
-	import laya.resource.Texture2D;
-	import laya.d3.core.Sprite3D;
-	import laya.d3.resource.models.PrimitiveMesh;
-	import laya.d3.core.material.UnlitMaterial;
-	import laya.d3.core.material.RenderState;
 	
-	public class RenderTargetCamera {
-		private var mat: UnlitMaterial;
-		public function RenderTargetCamera() {
+	public class RenderTargetTo2DSprite {
+		public function RenderTargetTo2DSprite() {
 			//初始化引擎
 			Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
@@ -53,19 +46,10 @@
 				layaMonkey.transform.position = new Vector3(-28.8, 5, -53);
 			}));
 
-			//正方体
-			var box: MeshSprite3D = scene.addChild(new MeshSprite3D(PrimitiveMesh.createPlane(6, 6)));
-			box.transform.position = new Vector3(-28.8, 8, -65);
-			box.transform.rotate(new Vector3(90, 0, 0), true, false);
-			mat = new UnlitMaterial();
-			mat.albedoColor = new Vector4(1.0, 1.0, 1.0, 1.0);
-			mat.cull = RenderState.CULL_NONE;
-			box.meshRenderer.sharedMaterial = mat;
-
 
 			Laya.loader.load(["res/threeDimen/ui/button.png"], Handler.create(this, function (): void {
-				var changeActionButton: Button = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "渲染目标"));
-				changeActionButton.size(160, 40);
+				var changeActionButton: Button = Laya.stage.addChild(new Button("res/threeDimen/ui/button.png", "渲染到2DSprite"));
+				changeActionButton.size(240, 40);
 				changeActionButton.labelBold = true;
 				changeActionButton.labelSize = 30;
 				changeActionButton.sizeGrid = "4,4,4,4";
@@ -82,8 +66,10 @@
 					renderTargetCamera.renderingOrder = -1;
 					//清除标记
 					renderTargetCamera.clearFlag = BaseCamera.CLEARFLAG_SKY;
-					//设置网格精灵的纹理
-					mat.albedoTexture = renderTargetCamera.renderTarget;
+					var rtex = new Texture(renderTargetCamera.renderTarget, Texture.DEF_UV);
+					var sp = new Sprite();
+					Laya.stage.addChild(sp);
+					sp.graphics.drawTexture(rtex);
 				});
 			}));
 		}

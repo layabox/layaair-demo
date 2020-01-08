@@ -285,6 +285,7 @@
 					["OrthographicCamera", "OrthographicCamera", "", "core,ui,ani,d3"],
 					["D3SpaceToD2Space", "D3SpaceToD2Space", "", "core,ui,ani,d3"],
 					["RenderTargetCamera", "RenderTargetCamera", "", "core,ui,ani,d3,ui,CameraMoveScript.js"],
+					["RenderTargetTo2DSprite", "RenderTargetTo2DSprite", "", "core,ui,ani,d3,CameraMoveScript.js"],
 					["PickPixel", "PickPixel", "", "core,ui,ani,d3,CameraMoveScript.js"]
 				]
 			},

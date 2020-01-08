@@ -281,6 +281,7 @@
                         result.y = tV;
                     }
                     return true;
+                    break;
                 case IMap.TiledMap.ORIENTATION_STAGGERED:
                     if (result) {
                         var cx, cy, rx, ry;
@@ -302,6 +303,7 @@
                         result.y = tV;
                     }
                     return true;
+                    break;
                 case IMap.TiledMap.ORIENTATION_ORTHOGONAL:
                     tU = screenX / tTileW;
                     tV = screenY / tTileH;
@@ -310,6 +312,7 @@
                         result.y = tV;
                     }
                     return true;
+                    break;
                 case IMap.TiledMap.ORIENTATION_HEXAGONAL:
                     var tTileHeight = tTileH * 2 / 3;
                     tV = screenY / tTileHeight;

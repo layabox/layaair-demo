@@ -276,6 +276,7 @@
 				["OrthographicCamera", "正交摄像机", "", "core,ui,ani,d3"],
 				["D3SpaceToD2Space", "3D空间转2D空间", "", "core,ui,ani,d3"],
 				["RenderTargetCamera", "渲染到纹理", "", "core,ui,ani,d3,CameraMoveScript.js"],
+				["RenderTargetTo2DSprite", "渲染到2DSprite", "", "core,ui,ani,d3,CameraMoveScript.js"],
 				["PickPixel", "拾取像素", "", "core,ui,ani,d3,CameraMoveScript.js"]
 			]
 		},
