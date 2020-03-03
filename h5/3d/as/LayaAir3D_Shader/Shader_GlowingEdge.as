@@ -132,7 +132,7 @@ package LayaAir3D_Shader {
 			//创建自定义shader
 			var customShader:Shader3D = Shader3D.add("CustomShader");
 			//为当前自定义的shader添加SubShader
-			var subShader:SubShader = new SubShader(attributeMap, uniformMap, SkinnedMeshSprite3D.shaderDefines);
+			var subShader:SubShader = new SubShader(attributeMap, uniformMap);
 			customShader.addSubShader(subShader);
 			//SubShader添加ShaderPass
 			subShader.addShaderPass(vs, ps) as ShaderPass;
