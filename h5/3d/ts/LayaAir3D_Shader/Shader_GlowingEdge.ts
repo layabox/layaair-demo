@@ -172,7 +172,7 @@ class Shader_GlowingEdge {
         //创建自定义Shader
         var customShader:Laya.Shader3D = Laya.Shader3D.add("CustomShader");
         //为Shader添加SubShader
-		var subShader:Laya.SubShader = new Laya.SubShader(attributeMap, uniformMap, Laya.SkinnedMeshSprite3D.shaderDefines);
+		var subShader:Laya.SubShader = new Laya.SubShader(attributeMap, uniformMap);
         customShader.addSubShader(subShader);
         //为SubShader添加ShaderPass
         subShader.addShaderPass(vs,ps);
