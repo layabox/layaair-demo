@@ -37,7 +37,7 @@ package LayaAir3D_Advance
 
 			//设置一个面板用来渲染
 			plane = new MeshSprite3D(PrimitiveMesh.createPlane(10, 10));
-			plane.transform.rotate(new Vector3(90, 0, 0), true, true);
+			plane.transform.rotate(new Vector3(90, 0, 0), true, false);
 			scene.addChild(plane);
 			//材质
 			mat = new UnlitMaterial();

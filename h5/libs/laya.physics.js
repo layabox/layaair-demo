@@ -2004,7 +2004,7 @@ window.box2d=box2d;
                 options || (options = {});
                 var box2d = window.box2d;
                 if (box2d == null) {
-                    console.error("Can not find box2d libs, you should reuqest box2d.js first.");
+                    console.error("Can not find box2d libs, you should request box2d.js first.");
                     return;
                 }
                 var gravity = new box2d.b2Vec2(0, options.gravity || 500 / Physics.PIXEL_RATIO);

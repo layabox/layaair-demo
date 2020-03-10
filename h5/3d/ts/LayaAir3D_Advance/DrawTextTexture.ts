@@ -38,7 +38,7 @@ export class DrawTextTexture {
 
         //设置一个面板用来渲染
         this.plane = new MeshSprite3D(PrimitiveMesh.createPlane(10, 10));
-        this.plane.transform.rotate(new Vector3(90, 0, 0), true, true);
+        this.plane.transform.rotate(new Vector3(90, 0, 0), true, false);
         scene.addChild(this.plane);
         //材质
         this.mat = new UnlitMaterial();

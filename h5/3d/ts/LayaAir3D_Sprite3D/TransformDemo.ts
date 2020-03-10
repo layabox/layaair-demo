@@ -66,9 +66,8 @@ class TransformDemo{
 		staticScale.setValue(0.3, 0.3, 0.3);
         staticMonkeyTransform.localScale = staticScale;
         //设置旋转
-        staticLayaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
-        //产生阴影
-		staticLayaMonkey.meshRenderer.castShadow = true;
+		staticLayaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
+		
 		staticLayaMonkey.removeSelf();
          
 		//克隆sprite3d

@@ -175,6 +175,12 @@
         set bold(value) {
             value ? (this._type |= HTMLStyle._BOLD) : (this._type &= ~HTMLStyle._BOLD);
         }
+        get fontWeight() {
+            return (this._type & HTMLStyle._BOLD) ? "bold" : "none";
+        }
+        set fontWeight(value) {
+            value == "bold" ? (this._type |= HTMLStyle._BOLD) : (this._type &= ~HTMLStyle._BOLD);
+        }
         get italic() {
             return (this._type & HTMLStyle._ITALIC) != 0;
         }
@@ -340,7 +346,7 @@
     }
     HTMLStyle._CSSTOVALUE = { 'letter-spacing': 'letterSpacing', 'white-space': 'whiteSpace', 'line-height': 'lineHeight', 'font-family': 'family', 'vertical-align': 'valign', 'text-decoration': 'textDecoration', 'background-color': 'bgColor', 'border-color': 'borderColor' };
     HTMLStyle._parseCSSRegExp = new RegExp("([\.\#]\\w+)\\s*{([\\s\\S]*?)}", "g");
-    HTMLStyle._inheritProps = ["italic", "align", "valign", "leading", "stroke", "strokeColor", "bold", "fontSize", "lineHeight", "wordWrap", "color"];
+    HTMLStyle._inheritProps = ["italic", "align", "valign", "leading", "letterSpacing", "stroke", "strokeColor", "bold", "fontWeight", "fontSize", "lineHeight", "wordWrap", "color"];
     HTMLStyle.ALIGN_LEFT = "left";
     HTMLStyle.ALIGN_CENTER = "center";
     HTMLStyle.ALIGN_RIGHT = "right";
@@ -976,7 +982,7 @@
             var cssStyle = this.style;
             var hasLine;
             hasLine = cssStyle.textDecoration != "none";
-            var i, len;
+            var i = 0, len;
             len = wordList.length;
             var tStartWord;
             tStartWord = wordList[i];
