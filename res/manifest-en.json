@@ -296,7 +296,7 @@
 					["DirectionLightDemo", "DirectionLight", "", "core,ani,d3,CameraMoveScript.js"],
 					["PointLightDemo", "PointLight", "", "core,ani,d3,CameraMoveScript.js"],
 					["SpotLightDemo", "SpotLight", "", "core,ani,d3,CameraMoveScript.js" ],
-					["RealTimeShadow", "RealTimeShadow", "", "core,ani,d3,CameraMoveScript.js" ],
+					["RealTimeShadow", "RealTimeShadow", "", "core,ani,d3,ui,CameraMoveScript.js" ],
 					["MultiLight", "MultiLight", "", "core,ani,d3,CameraMoveScript.js,physics3D"]
 				]
 			},
