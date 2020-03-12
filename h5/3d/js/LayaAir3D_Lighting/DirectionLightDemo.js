@@ -32,7 +32,7 @@ class DirectionLightDemo{
         state.clipStart = 40 / 150;
         state.clipEnd = 70 / 150;
         state.clip = animator.getDefaultState().clip;
-        animator.addState(state);
+        animator.getControllerLayer(0).addState(state);
         animator.play("run");
         Laya.timer.frameLoop(1, this, this.onFrameLoop);       
 	}

@@ -61,7 +61,7 @@ class Shader_GlowingEdge {
             
             (dude.getChildAt(0).getChildAt(0)).skinnedMeshRenderer.sharedMaterials = baseMaterials;
             dude.transform.position = new Laya.Vector3(0, 0.5, 0);
-            dude.transform.scale = new Laya.Vector3(0.2, 0.2, 0.2);
+            dude.transform.setWorldLossyScale(new Laya.Vector3(0.2, 0.2, 0.2));
             dude.transform.rotate(new Laya.Vector3(0, 180, 0), false, false);
         }));
         

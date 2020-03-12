@@ -65,9 +65,9 @@ class  PhysicsWorldCompoundCollider{
             var rotationEuler = transform.rotationEuler;
             rotationEuler.setValue(Math.random() * 360, Math.random() * 360, Math.random() * 360);
             transform.rotationEuler = rotationEuler;
-            var scale = transform.scale;
+            var scale = transform.getWorldLossyScale();
             scale.setValue(3, 3, 3);
-            transform.scale = scale;
+            transform.setWorldLossyScale(scale);
 
             table.meshRenderer.material = mat;
             var rigidBody = table.addComponent(Laya.Rigidbody3D);
@@ -111,7 +111,7 @@ class  PhysicsWorldCompoundCollider{
             var object = this.scene.addChild(new Laya.MeshSprite3D(mesh));
             object.transform.position = new Laya.Vector3(Math.random() * 4 - 2, 5, Math.random() * 4 - 2);
             object.transform.rotationEuler = new Laya.Vector3(Math.random() * 360, Math.random() * 360, Math.random() * 360);
-            object.transform.scale = new Laya.Vector3(0.01, 0.01, 0.01);
+            object.transform.setWorldLossyScale(new Laya.Vector3(0.01, 0.01, 0.01));
             object.meshRenderer.material = mat;
             var rigidBody = object.addComponent(Laya.Rigidbody3D);
             rigidBody.mass = 3;

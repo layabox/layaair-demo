@@ -16,7 +16,7 @@ class PhysicsWorldBaseCollider{
         camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SOLIDCOLOR;
         //方向光
         let directionLight = this.scene.addChild(new Laya.DirectionLight());
-        directionLight.diffuseColor = new Laya.Vector3(0.6, 0.6, 0.6);
+        directionLight.color = new Laya.Vector3(0.6, 0.6, 0.6);
         let mat = directionLight.transform.worldMatrix;
         mat.setForward(new Laya.Vector3(-1.0, -1.0, -1.0));
         directionLight.transform.worldMatrix = mat;

@@ -32,7 +32,7 @@ class PointLightDemo{
         state.clipStart = 75 / 150;
         state.clipEnd = 110 / 150;
         state.clip = animator.getDefaultState().clip;
-        animator.addState(state);
+        animator.getControllerLayer(0).addState(state);
         animator.play("attack");
         Laya.timer.frameLoop(1, this, this.onFrameLoop);
     }

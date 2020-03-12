@@ -74,7 +74,7 @@ class AnimatorDemo
 		//为动画状态添加动画状态脚本
 		state1.addScript(AnimatorStateScriptTest);
 		//为动画组件添加一个动作状态
-		this.animator.addState(state1);
+		this.animator.getControllerLayer(0).addState(state1);
 		
 		let state2 = new Laya.AnimatorState();
 		state2.name = "ride";
@@ -83,7 +83,7 @@ class AnimatorDemo
 		state2.clip = this.animator.getDefaultState().clip;
 		state2.clip.islooping = true;
 		state2.addScript(AnimatorStateScriptTest);
-		this.animator.addState(state2);
+		this.animator.getControllerLayer(0).addState(state2);
 		this.animator.speed = 0.0;
 		
 		let state3 = new Laya.AnimatorState();
@@ -93,7 +93,7 @@ class AnimatorDemo
 		state3.clip = this.animator.getDefaultState().clip;
 		state3.clip.islooping = true;
 		state3.addScript(AnimatorStateScriptTest);
-		this.animator.addState(state3);
+		this.animator.getControllerLayer(0).addState(state3);
 		this.animator.speed = 0.0;
 		
 		let state4 = new Laya.AnimatorState();
@@ -103,7 +103,7 @@ class AnimatorDemo
 		state4.clip = this.animator.getDefaultState().clip;
 		state4.clip.islooping = true;
 		state4.addScript(AnimatorStateScriptTest);
-		this.animator.addState(state4);
+		this.animator.getControllerLayer(0).addState(state4);
 		this.animator.speed = 0.0;
 		
 		let state5 = new Laya.AnimatorState();
@@ -113,7 +113,7 @@ class AnimatorDemo
 		state5.clip = this.animator.getDefaultState().clip;
 		state5.clip.islooping = true;
 		state5.addScript(AnimatorStateScriptTest);
-		this.animator.addState(state5);
+		this.animator.getControllerLayer(0).addState(state5);
 		this.animator.speed = 0.0;
 		
 		let state6 = new Laya.AnimatorState();
@@ -123,7 +123,7 @@ class AnimatorDemo
 		state6.clip = this.animator.getDefaultState().clip;
 		state6.clip.islooping = true;
 		state6.addScript(AnimatorStateScriptTest);
-		this.animator.addState(state6);
+		this.animator.getControllerLayer(0).addState(state6);
 		this.animator.speed = 0.0;
 		
 		this.loadUI();

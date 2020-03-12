@@ -46,7 +46,7 @@ class BoneLinkSprite3D{
         state1.clipEnd = 346 / 581;
         state1.clip = this.animator.getDefaultState().clip;
         state1.clip.islooping = true;
-        this.animator.addState(state1);
+        this.animator.getControllerLayer(0).addState(state1);
         this.animator.play("hello");
         let state2 = new Laya.AnimatorState();
         state2.name = "ride";
@@ -54,7 +54,7 @@ class BoneLinkSprite3D{
         state2.clipEnd = 33 / 581;
         state2.clip = this.animator.getDefaultState().clip;
         state2.clip.islooping = true;
-        this.animator.addState(state2);
+        this.animator.getControllerLayer(0).addState(state2);
         this.dragon1 = Laya.Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/R_kl_H_001.lh");
         this.dragon1.transform.localScale = this.dragonScale;
         this.aniSprte3D1 = this.dragon1.getChildAt(0);
@@ -65,7 +65,7 @@ class BoneLinkSprite3D{
         state3.clipEnd = 65 / 644;
         state3.clip = this.dragonAnimator1.getDefaultState().clip;
         state3.clip.islooping = true;
-        this.dragonAnimator1.addState(state3);
+        this.dragonAnimator1.getControllerLayer(0).addState(state3);
         this.dragon2 = Laya.Loader.getRes("res/threeDimen/skinModel/BoneLinkScene/R_kl_S_009.lh");
         this.dragon2.transform.localScale = this.dragonScale;
         this.aniSprte3D2 = this.dragon2.getChildAt(0);
@@ -76,7 +76,7 @@ class BoneLinkSprite3D{
         state4.clipEnd = 65 / 550;
         state4.clip = this.dragonAnimator2.getDefaultState().clip;
         state4.clip.islooping = true;
-        this.dragonAnimator2.addState(state4);
+        this.dragonAnimator2.getControllerLayer(0).addState(state4);
         this.loadUI();
     }
     loadUI(){

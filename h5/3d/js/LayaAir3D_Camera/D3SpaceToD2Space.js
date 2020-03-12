@@ -29,7 +29,6 @@ class D3SpaceToD2Space{
     animate(){
         this.position.x = Math.sin(this.scaleDelta += 0.01);
         this.layaMonkey3D.transform.position = this.position;
-        this.layaMonkey3D.transform.scale = this.scale;
         //转换坐标
         this.camera.viewport.project(this.layaMonkey3D.transform.position, this.camera.projectionViewMatrix, this.outPos);
         //赋值给2D
