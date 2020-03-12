@@ -6,7 +6,7 @@
 class RotationScript extends Laya.Script3D {
     constructor() {
         super();
-        this.autoRotateSpeed = new Laya.Vector3(0, 0.05, 0);;
+        this.autoRotateSpeed = new Laya.Vector3(0, 0.05, 0);
         this.rotation = true;
 	}
 
