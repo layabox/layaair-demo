@@ -28,17 +28,6 @@ class MouseInteraction{
         directionLight.color = new Laya.Vector3(1, 1, 1);
         directionLight.transform.rotate(new Laya.Vector3( -3.14 / 3, 0, 0));
         
-        //灯光开启阴影
-        directionLight.shadow = true;
-        //可见阴影距离
-        directionLight.shadowDistance = 3;
-        //生成阴影贴图尺寸
-        directionLight.shadowResolution = 2048;
-        //生成阴影贴图数量
-        directionLight.shadowPSSMCount = 1;
-        //模糊等级,越大越高,更耗性能
-        directionLight.shadowPCFType = 3;
-        
         //批量预加载资源
         Laya.loader.create([
             "res/threeDimen/staticModel/grid/plane.lh", 
@@ -52,8 +41,6 @@ class MouseInteraction{
         let grid = this.scene.addChild(Laya.Loader.getRes("res/threeDimen/staticModel/grid/plane.lh"));
         //指定精灵的图层
         grid.layer = 10;
-        //地面接收阴影
-        (grid.getChildAt(0)).meshRenderer.receiveShadow = true;
         //加载静态小猴子
         let staticLayaMonkey = this.scene.addChild(new Laya.MeshSprite3D(Laya.Loader.getRes("res/threeDimen/skinModel/LayaMonkey/Assets/LayaMonkey/LayaMonkey-LayaMonkey.lm")));
         //设置材质
@@ -64,9 +51,6 @@ class MouseInteraction{
         staticLayaMonkey.transform.localScale = new Laya.Vector3(0.3, 0.3, 0.3);
         //设置旋转
         staticLayaMonkey.transform.rotation = new Laya.Quaternion(0.7071068, 0, 0, -0.7071067);
-        //产生阴影
-        staticLayaMonkey.meshRenderer.castShadow = true;
-        
         
         //克隆sprite3d
         let layaMonkey_clone1 = Laya.Sprite3D.instantiate(staticLayaMonkey, this.scene, false, new Laya.Vector3(0.0, 0, 0.5));
