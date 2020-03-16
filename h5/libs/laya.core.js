@@ -1387,6 +1387,11 @@ window.Laya= (function (exports) {
     Resource._gpuMemory = 0;
 
     class Bitmap extends Resource {
+        constructor() {
+            super();
+            this._width = -1;
+            this._height = -1;
+        }
         get width() {
             return this._width;
         }
@@ -1398,11 +1403,6 @@ window.Laya= (function (exports) {
         }
         set height(height) {
             this._height = height;
-        }
-        constructor() {
-            super();
-            this._width = -1;
-            this._height = -1;
         }
         _getSource() {
             throw "Bitmap: must override it.";
@@ -2200,7 +2200,6 @@ window.Laya= (function (exports) {
                         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL, width, height);
                         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, this._depthStencilBuffer);
                         break;
-                    default:
                 }
             }
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -3183,7 +3182,8 @@ window.Laya= (function (exports) {
     }
 
     class Filter {
-        constructor() { }
+        constructor() {
+        }
         get type() { return -1; }
     }
     Filter.BLUR = 0x10;
@@ -6429,27 +6429,8 @@ window.Laya= (function (exports) {
             ILaya.stage.setGlobalRepaint();
             this.destroy();
             return;
-            if (this._texW != TextTexture.gTextRender.atlasWidth || this._texH != TextTexture.gTextRender.atlasWidth) {
-                this.destroy();
-                return;
-            }
-            this.genID++;
-            if (TextTexture.poolLen >= TextTexture.pool.length) {
-                TextTexture.pool = TextTexture.pool.concat(new Array(10));
-            }
-            this._discardTm = RenderInfo.loopStTm;
-            TextTexture.pool[TextTexture.poolLen++] = this;
         }
         static getTextTexture(w, h) {
-            return new TextTexture(w, h);
-            if (w != TextTexture.gTextRender.atlasWidth || w != TextTexture.gTextRender.atlasWidth)
-                return new TextTexture(w, h);
-            if (TextTexture.poolLen > 0) {
-                var ret = TextTexture.pool[--TextTexture.poolLen];
-                if (TextTexture.poolLen > 0)
-                    TextTexture.clean();
-                return ret;
-            }
             return new TextTexture(w, h);
         }
         destroy() {
@@ -8763,7 +8744,6 @@ window.Laya= (function (exports) {
                 case "no-repeat":
                     repeatx = repeaty = false;
                     break;
-                default: break;
             }
             var uv = this._temp4Points;
             var stu = 0;
@@ -8982,7 +8962,6 @@ window.Laya= (function (exports) {
                 mesh.vertNum += 4;
                 return true;
             }
-            return false;
         }
         transform4Points(a, m, out) {
             var tx = m.tx;
@@ -12130,12 +12109,6 @@ window.Laya= (function (exports) {
     RenderSprite.tempUV = new Array(8);
 
     class HTMLCanvas extends Bitmap {
-        get source() {
-            return this._source;
-        }
-        _getSource() {
-            return this._source;
-        }
         constructor(createCanvas = false) {
             super();
             if (createCanvas)
@@ -12144,6 +12117,12 @@ window.Laya= (function (exports) {
                 this._source = this;
             }
             this.lock = true;
+        }
+        get source() {
+            return this._source;
+        }
+        _getSource() {
+            return this._source;
         }
         clear() {
             if (this._ctx) {
@@ -14869,9 +14848,6 @@ window.Laya= (function (exports) {
                     break;
                 case 'right':
                     x -= lineWidth;
-                    break;
-                case 'left':
-                default:
                     break;
             }
             y += this._charSize.height;
@@ -20564,14 +20540,14 @@ window.Laya= (function (exports) {
     }
 
     class FrameAnimation extends AnimationBase {
-        static _sortIndexFun(objpre, objnext) {
-            return objpre.index - objnext.index;
-        }
         constructor() {
             super();
             if (FrameAnimation._sortIndexFun === undefined) {
                 FrameAnimation._sortIndexFun = MathUtil.sortByKey("index", false, true);
             }
+        }
+        static _sortIndexFun(objpre, objnext) {
+            return objpre.index - objnext.index;
         }
         _setUp(targetDic, animationData) {
             this._targetDic = targetDic;
