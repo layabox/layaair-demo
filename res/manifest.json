@@ -237,13 +237,6 @@
 				["Example_21", "Example_21", "原Pixi.js Demo", "core"],
 				["Example_23", "Example_23", "原Pixi.js Demo", "core"]
 			]
-		},
-		{
-			"prefix": "IDE",
-			"tr_zhCN": "IDE",
-			"manifest": [
-				["Project", "显示IDE创建的界面", "本例GUI由LayaAir IDE组装，使用", "core,ui,UI code"]
-			]
 		}],
 		"3d": [
 		{
