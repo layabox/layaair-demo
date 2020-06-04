@@ -7,6 +7,7 @@ loadLib("libs/laya.html.js");
 loadLib("libs/laya.tiledmap.js");
 loadLib("libs/laya.d3.js");
 loadLib("libs/astar.js");
+loadLib("libs/cannon.js");
 loadLib("libs/laya.d3Plugin.js");
 loadLib("3d/js/common/CameraMoveScript.js");
 loadLib("3d/js/common/VRCameraMoveScript.js");
