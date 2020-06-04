@@ -1387,11 +1387,6 @@ window.Laya= (function (exports) {
     Resource._gpuMemory = 0;
 
     class Bitmap extends Resource {
-        constructor() {
-            super();
-            this._width = -1;
-            this._height = -1;
-        }
         get width() {
             return this._width;
         }
@@ -1403,6 +1398,11 @@ window.Laya= (function (exports) {
         }
         set height(height) {
             this._height = height;
+        }
+        constructor() {
+            super();
+            this._width = -1;
+            this._height = -1;
         }
         _getSource() {
             throw "Bitmap: must override it.";
@@ -3183,8 +3183,7 @@ window.Laya= (function (exports) {
     }
 
     class Filter {
-        constructor() {
-        }
+        constructor() { }
         get type() { return -1; }
     }
     Filter.BLUR = 0x10;
@@ -7576,7 +7575,7 @@ window.Laya= (function (exports) {
             }
             if (ILaya.Browser.onMiniGame && !bugIOS)
                 TextRender.isWan1Wan = true;
-            this.charRender = ILaya.Render.isConchApp ? (new CharRender_Native()) : (new CharRender_Canvas(2048, 2048, TextRender.scaleFontWithCtx, !TextRender.isWan1Wan, false));
+            this.charRender = ILaya.Render.isConchApp ? (new CharRender_Native()) : (new CharRender_Canvas(TextRender.atlasWidth, TextRender.atlasWidth, TextRender.scaleFontWithCtx, !TextRender.isWan1Wan, false));
             TextRender.textRenderInst = this;
             ILaya.Laya['textRender'] = this;
             TextRender.atlasWidth2 = TextRender.atlasWidth * TextRender.atlasWidth;
@@ -7757,8 +7756,7 @@ window.Laya= (function (exports) {
                     }
                 }
                 else {
-                    var margin = ILaya.Render.isConchApp ? 0 : (font._size / 3 | 0);
-                    var isotex = TextRender.noAtlas || (strWidth + margin + margin) * this.fontScaleX > TextRender.atlasWidth;
+                    var isotex = TextRender.noAtlas || strWidth * this.fontScaleX > TextRender.atlasWidth;
                     ri = this.getCharRenderInfo(str, font, color, strokeColor, lineWidth, isotex);
                     sameTexData[0] = { texgen: ri.tex.genID, tex: ri.tex, words: [{ ri: ri, x: 0, y: 0, w: ri.bmpWidth / this.fontScaleX, h: ri.bmpHeight / this.fontScaleY }] };
                 }
@@ -10658,23 +10656,6 @@ window.Laya= (function (exports) {
     }
     Draw9GridTexture.ID = "Draw9GridTexture";
 
-    class SaveCmd {
-        static create() {
-            var cmd = Pool.getItemByClass("SaveCmd", SaveCmd);
-            return cmd;
-        }
-        recover() {
-            Pool.recover("SaveCmd", this);
-        }
-        run(context, gx, gy) {
-            context.save();
-        }
-        get cmdID() {
-            return SaveCmd.ID;
-        }
-    }
-    SaveCmd.ID = "Save";
-
     class GraphicsBounds {
         constructor() {
             this._cacheBoundsType = false;
@@ -10733,7 +10714,6 @@ window.Laya= (function (exports) {
                 cmd = cmds[i];
                 switch (cmd.cmdID) {
                     case AlphaCmd.ID:
-                    case SaveCmd.ID:
                         matrixs.push(tMatrix);
                         tMatrix = tMatrix.clone();
                         break;
@@ -11140,6 +11120,23 @@ window.Laya= (function (exports) {
     }
     FillTextCmd.ID = "FillText";
     FillTextCmd._defFontObj = new FontInfo(null);
+
+    class SaveCmd {
+        static create() {
+            var cmd = Pool.getItemByClass("SaveCmd", SaveCmd);
+            return cmd;
+        }
+        recover() {
+            Pool.recover("SaveCmd", this);
+        }
+        run(context, gx, gy) {
+            context.save();
+        }
+        get cmdID() {
+            return SaveCmd.ID;
+        }
+    }
+    SaveCmd.ID = "Save";
 
     class CacheManger {
         constructor() {
@@ -11658,17 +11655,7 @@ window.Laya= (function (exports) {
             var tex = sprite.texture;
             context.saveTransform(LayaGLQuickRunner.curMat);
             context.transformByMatrix(sprite.transform, x, y);
-            var width = sprite._width || tex.sourceWidth;
-            var height = sprite._height || tex.sourceHeight;
-            var wRate = width / tex.sourceWidth;
-            var hRate = height / tex.sourceHeight;
-            width = tex.width * wRate;
-            height = tex.height * hRate;
-            if (width <= 0 || height <= 0)
-                return null;
-            var px = -sprite.pivotX + tex.offsetX * wRate;
-            var py = -sprite.pivotY + tex.offsetY * hRate;
-            context.drawTexture(tex, px, py, width, height);
+            context.drawTexture(tex, -sprite.pivotX, -sprite.pivotY, sprite._width || tex.width, sprite._height || tex.height);
             context.restoreTransform(LayaGLQuickRunner.curMat);
         }
         static alpha_drawTexture(sprite, context, x, y) {
@@ -11878,7 +11865,7 @@ window.Laya= (function (exports) {
         }
         _custom(sprite, context, x, y) {
             sprite.customRender(context, x, y);
-            this._next._fun.call(this._next, sprite, context, 0, 0);
+            this._next._fun.call(this._next, sprite, context, x - sprite.pivotX, y - sprite.pivotY);
         }
         _clip(sprite, context, x, y) {
             var next = this._next;
@@ -11897,19 +11884,8 @@ window.Laya= (function (exports) {
         }
         _texture(sprite, context, x, y) {
             var tex = sprite.texture;
-            if (tex._getSource()) {
-                var width = sprite._width || tex.sourceWidth;
-                var height = sprite._height || tex.sourceHeight;
-                var wRate = width / tex.sourceWidth;
-                var hRate = height / tex.sourceHeight;
-                width = tex.width * wRate;
-                height = tex.height * hRate;
-                if (width <= 0 || height <= 0)
-                    return null;
-                var px = x - sprite.pivotX + tex.offsetX * wRate;
-                var py = y - sprite.pivotY + tex.offsetY * hRate;
-                context.drawTexture(tex, px, py, width, height);
-            }
+            if (tex._getSource())
+                context.drawTexture(tex, x - sprite.pivotX + tex.offsetX, y - sprite.pivotY + tex.offsetY, sprite._width || tex.width, sprite._height || tex.height);
             var next = this._next;
             if (next != RenderSprite.NORENDER)
                 next._fun.call(next, sprite, context, x, y);
@@ -12164,6 +12140,12 @@ window.Laya= (function (exports) {
     RenderSprite.tempUV = new Array(8);
 
     class HTMLCanvas extends Bitmap {
+        get source() {
+            return this._source;
+        }
+        _getSource() {
+            return this._source;
+        }
         constructor(createCanvas = false) {
             super();
             if (createCanvas)
@@ -12172,12 +12154,6 @@ window.Laya= (function (exports) {
                 this._source = this;
             }
             this.lock = true;
-        }
-        get source() {
-            return this._source;
-        }
-        _getSource() {
-            return this._source;
         }
         clear() {
             if (this._ctx) {
@@ -17266,8 +17242,17 @@ window.Laya= (function (exports) {
             }
         }
         _tryClearBuffer(sourceNode) {
+            if (!Browser.onMac) {
+                try {
+                    sourceNode.buffer = null;
+                }
+                catch (e) {
+                    WebAudioSoundChannel._tryCleanFailed = true;
+                }
+                return;
+            }
             try {
-                sourceNode.buffer = null;
+                sourceNode.buffer = ILaya.WebAudioSound._miniBuffer;
             }
             catch (e) {
                 WebAudioSoundChannel._tryCleanFailed = true;
@@ -18659,7 +18644,6 @@ window.Laya= (function (exports) {
                 this.complete(data);
             }
             else if (type === Loader.IMAGE) {
-                let tex;
                 if (data instanceof ArrayBuffer) {
                     var ext = Utils.getFileExtension(this._url);
                     let format;
@@ -18675,21 +18659,18 @@ window.Laya= (function (exports) {
                             return;
                         }
                     }
-                    tex = new Texture2D(0, 0, format, false, false);
+                    var tex = new Texture2D(0, 0, format, false, false);
                     tex.wrapModeU = exports.WarpMode.Clamp;
                     tex.wrapModeV = exports.WarpMode.Clamp;
                     tex.setCompressData(data);
                     tex._setCreateURL(this.url);
                 }
                 else if (!(data instanceof Texture2D)) {
-                    tex = new Texture2D(data.width, data.height, 1, false, false);
+                    var tex = new Texture2D(data.width, data.height, 1, false, false);
                     tex.wrapModeU = exports.WarpMode.Clamp;
                     tex.wrapModeV = exports.WarpMode.Clamp;
                     tex.loadImageSource(data, true);
                     tex._setCreateURL(data.src);
-                }
-                else {
-                    tex = data;
                 }
                 var texture = new Texture(tex);
                 texture.url = this._url;
@@ -18699,7 +18680,7 @@ window.Laya= (function (exports) {
                 this.complete(data);
             }
             else if (type === "htmlimage") {
-                let tex = new Texture2D(data.width, data.height, 1, false, false);
+                var tex = new Texture2D(data.width, data.height, 1, false, false);
                 tex.wrapModeU = exports.WarpMode.Clamp;
                 tex.wrapModeV = exports.WarpMode.Clamp;
                 tex.loadImageSource(data, true);
@@ -18744,7 +18725,7 @@ window.Laya= (function (exports) {
                 }
                 else {
                     if (!(data instanceof Texture2D)) {
-                        let tex = new Texture2D(data.width, data.height, 1, false, false);
+                        var tex = new Texture2D(data.width, data.height, 1, false, false);
                         tex.wrapModeU = BaseTexture.WARPMODE_CLAMP;
                         tex.wrapModeV = BaseTexture.WARPMODE_CLAMP;
                         tex.loadImageSource(data, true);
@@ -20297,9 +20278,7 @@ window.Laya= (function (exports) {
         }
         onReset() {
         }
-        _parse(data, interactMap = null) {
-        }
-        _parseInteractive(data = null, spriteMap = null) {
+        _parse(data) {
         }
         _cloneTo(dest) {
         }
@@ -20598,14 +20577,14 @@ window.Laya= (function (exports) {
     }
 
     class FrameAnimation extends AnimationBase {
+        static _sortIndexFun(objpre, objnext) {
+            return objpre.index - objnext.index;
+        }
         constructor() {
             super();
             if (FrameAnimation._sortIndexFun === undefined) {
                 FrameAnimation._sortIndexFun = MathUtil.sortByKey("index", false, true);
             }
-        }
-        static _sortIndexFun(objpre, objnext) {
-            return objpre.index - objnext.index;
         }
         _setUp(targetDic, animationData) {
             this._targetDic = targetDic;
@@ -22138,7 +22117,6 @@ window.Laya= (function (exports) {
             return Mouse._style.cursor;
         }
         static __init__() {
-            Mouse._style = Browser.document.body.style;
         }
         static hide() {
             if (Mouse.cursor != "none") {
@@ -22408,7 +22386,7 @@ window.Laya= (function (exports) {
     Laya.lateTimer = null;
     Laya.timer = null;
     Laya.loader = null;
-    Laya.version = "2.7.0beta";
+    Laya.version = "2.6.1beta";
     Laya._isinit = false;
     Laya.isWXOpenDataContext = false;
     Laya.isWXPosMsg = false;
@@ -24648,8 +24626,6 @@ window.Laya= (function (exports) {
             }
         }
     }
-    ClassUtils.regClass("laya.media.SoundNode", SoundNode);
-    ClassUtils.regClass("Laya.SoundNode", SoundNode);
 
     class ResourceVersion {
         static enable(manifestFile, callback, type = 2) {

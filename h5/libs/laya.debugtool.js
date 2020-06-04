@@ -964,8 +964,7 @@
 	ClassTool.displayTypes = { "boolean": true, "number": true, "string": true };
 
 	class TraceTool {
-	    constructor() {
-	    }
+	    constructor() { }
 	    static closeAllLog() {
 	        var logFun;
 	        logFun = TraceTool.emptyLog;
@@ -7729,8 +7728,7 @@
 	}
 
 	class DisResizer {
-	    constructor() {
-	    }
+	    constructor() { }
 	    static init() {
 	        if (DisResizer._up)
 	            return;

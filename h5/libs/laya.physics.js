@@ -1581,7 +1581,7 @@ window.box2d=box2d;
         _onDestroy() {
             if (this.rigidBody) {
                 if (this.fixture) {
-                    if (this.fixture.GetBody() == this.rigidBody._getOriBody()) {
+                    if (this.fixture.GetBody() == this.rigidBody.body) {
                         this.rigidBody.body.DestroyFixture(this.fixture);
                     }
                     this.fixture = null;
@@ -1806,7 +1806,7 @@ window.box2d=box2d;
         }
         _onDisable() {
             Laya.Laya.physicsTimer.clear(this, this._sysPhysicToNode);
-            this._body && IPhysics.Physics.I._removeBody(this._body);
+            IPhysics.Physics.I._removeBody(this._body);
             this._body = null;
             var owner = this.owner;
             if (owner._changeByRigidBody) {
@@ -1821,9 +1821,6 @@ window.box2d=box2d;
         getBody() {
             if (!this._body)
                 this._onAwake();
-            return this._body;
-        }
-        _getOriBody() {
             return this._body;
         }
         get body() {
