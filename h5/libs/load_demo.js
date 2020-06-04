@@ -38,6 +38,8 @@ for (var i = 0; i < script_tags.length; i++)
 		libs += "3D";
 	else if (src.indexOf("astar") > -1)
 		libs += "astar.js";
+	else if (src.indexOf("cannon") > -1)
+		libs += "cannon.js";
 	else if (src.indexOf("d3Plugin") > -1)
 		libs += "d3Plugin";
 	else if (src.indexOf("common/CameraMoveScript.js") > -1)

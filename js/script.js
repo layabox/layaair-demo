@@ -370,6 +370,9 @@ $(document).ready(function()
 			case "CustomTerrainMaterial.js":
 				d3Path = "CustomTerrainMaterial.js";
 				break;
+			case "cannon.js":
+				d3Path = "cannon.js";
+				break;
 			default:
 				d3Path = "";
 		}
@@ -418,6 +421,9 @@ $(document).ready(function()
 			case "physics":
 				libPath = "laya.physics.js";
 				break;
+			case "cannon":
+				libPath = "cannon.js";
+				break;
 			case "physics3D":
 				libPath = "laya.physics3D.js";
 				break;
@@ -426,6 +432,9 @@ $(document).ready(function()
 				break;
 			case "physics3D.wasm":
 				libPath = "laya.physics3D.wasm.js";
+				break;
+			case "cannonPhysics":
+				libPath = "laya.cannonPhysics.js";
 				break;
 			case "physicsRender":
 				libPath = "laya.physicsRender.js";

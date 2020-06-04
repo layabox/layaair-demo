@@ -297,6 +297,7 @@
 					["PointLightDemo", "PointLight", "", "core,ani,d3,CameraMoveScript.js"],
 					["SpotLightDemo", "SpotLight", "", "core,ani,d3,CameraMoveScript.js" ],
 					["RealTimeShadow", "RealTimeShadow", "", "core,ani,d3,ui,CameraMoveScript.js" ],
+					["SpotLightShadowMap", "SpotLightShadowMap", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
 					["MultiLight", "MultiLight", "", "core,ani,d3,CameraMoveScript.js,physics3D"]
 				]
 			},
@@ -371,8 +372,20 @@
 					["PhysicsWorld_Kinematic", "Kinematic", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 					["PhysicsWorld_MeshCollider", "MeshCollider", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 					["PhysicsWorld_RayShapeCast", "RayShapeCast", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["PhysicsWorld_TriggerAndCollisionEvent", "TriggerAndCollisionEvent", "","core,ui,ani,d3,CameraMoveScript.js,TriggerCollisionScript.js,physics3D" ]
+					["PhysicsWorld_TriggerAndCollisionEvent", "TriggerAndCollisionEvent", "","core,ui,ani,d3,CameraMoveScript.js,TriggerCollisionScript.js,physics3D" ],
+					["PhysicsWorld_ConstraintFixedJoint", "ConstraintFixedJoint", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["PhysicsWorld_ConfigurableJoint", "ConfigurableJoint", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ]
 		  		]
+			},
+			{
+				"prefix": "cannonPhysics3D",
+				"tr_zhCN": "cannonPhysics3D",
+				  "manifest": [
+					["CannonPhysicsWorld_BaseCollider", "BaseCollider", "", "core,d3,CameraMoveScript.js,cannon.js,cannonPhysics" ],
+					["CannonPhysicsWorld_ColliderEvent", "ColliderEvent", "", "core,d3,CameraMoveScript.js,physics3D,cannon.js,cannonPhysics" ],
+					["CannonPhysicsWorld_PhysicsProperty", "PhysicsProperty", "", "core,d3,CameraMoveScript.js,physics3D,cannon.js,cannonPhysics" ],
+					["CannonPhysicsWorld_RayCheck", "RayCheck", "", "core,d3,physics3D,CameraMoveScript.js,cannon.js,cannonPhysics" ]
+				  ]
 			},
 			{
 				"prefix": "MouseInteraction",

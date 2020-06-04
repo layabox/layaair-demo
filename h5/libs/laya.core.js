@@ -2200,6 +2200,7 @@ window.Laya= (function (exports) {
                         gl.renderbufferStorage(gl.RENDERBUFFER, gl.DEPTH_STENCIL, width, height);
                         gl.framebufferRenderbuffer(gl.FRAMEBUFFER, gl.DEPTH_STENCIL_ATTACHMENT, gl.RENDERBUFFER, this._depthStencilBuffer);
                         break;
+                    default:
                 }
             }
             gl.bindFramebuffer(gl.FRAMEBUFFER, null);
@@ -6429,8 +6430,27 @@ window.Laya= (function (exports) {
             ILaya.stage.setGlobalRepaint();
             this.destroy();
             return;
+            if (this._texW != TextTexture.gTextRender.atlasWidth || this._texH != TextTexture.gTextRender.atlasWidth) {
+                this.destroy();
+                return;
+            }
+            this.genID++;
+            if (TextTexture.poolLen >= TextTexture.pool.length) {
+                TextTexture.pool = TextTexture.pool.concat(new Array(10));
+            }
+            this._discardTm = RenderInfo.loopStTm;
+            TextTexture.pool[TextTexture.poolLen++] = this;
         }
         static getTextTexture(w, h) {
+            return new TextTexture(w, h);
+            if (w != TextTexture.gTextRender.atlasWidth || w != TextTexture.gTextRender.atlasWidth)
+                return new TextTexture(w, h);
+            if (TextTexture.poolLen > 0) {
+                var ret = TextTexture.pool[--TextTexture.poolLen];
+                if (TextTexture.poolLen > 0)
+                    TextTexture.clean();
+                return ret;
+            }
             return new TextTexture(w, h);
         }
         destroy() {
@@ -7106,7 +7126,16 @@ window.Laya= (function (exports) {
                 }
             }
             if (u.indexOf('OPPO') == -1 && u.indexOf("MiniGame") > -1 && "wx" in Browser.window) {
-                if ("qq" in Browser.window) {
+                if ("bl" in Browser.window) {
+                    window.biliMiniGame(Laya, Laya);
+                    if (!Laya["BLMiniAdapter"]) {
+                        console.error("请引入bilibili小游戏的适配库：https://ldc2.layabox.com/doc/?nav=zh-ts-5-0-0");
+                    }
+                    else {
+                        Laya["BLMiniAdapter"].enable();
+                    }
+                }
+                else if ("qq" in Browser.window) {
                     window.qqMiniGame(Laya, Laya);
                     if (!Laya["QQMiniAdapter"]) {
                         console.error("请引入手机QQ小游戏的适配库：https://ldc2.layabox.com/doc/?nav=zh-ts-5-0-0");
@@ -7218,6 +7247,10 @@ window.Laya= (function (exports) {
             else if ("qq" in Browser.window && u.indexOf('MiniGame') > -1) {
                 Browser.onQQMiniGame = true;
                 Browser.onMiniGame = false;
+            }
+            else if ("bl" in Browser.window && u.indexOf('MiniGame') > -1) {
+                Browser.onBLMiniGame = true;
+                Browser.onMiniGame = true;
             }
             Browser.onVVMiniGame = u.indexOf('VVGame') > -1;
             Browser.onKGMiniGame = u.indexOf('QuickGame') > -1;
@@ -7543,7 +7576,7 @@ window.Laya= (function (exports) {
             }
             if (ILaya.Browser.onMiniGame && !bugIOS)
                 TextRender.isWan1Wan = true;
-            this.charRender = ILaya.Render.isConchApp ? (new CharRender_Native()) : (new CharRender_Canvas(TextRender.atlasWidth, TextRender.atlasWidth, TextRender.scaleFontWithCtx, !TextRender.isWan1Wan, false));
+            this.charRender = ILaya.Render.isConchApp ? (new CharRender_Native()) : (new CharRender_Canvas(2048, 2048, TextRender.scaleFontWithCtx, !TextRender.isWan1Wan, false));
             TextRender.textRenderInst = this;
             ILaya.Laya['textRender'] = this;
             TextRender.atlasWidth2 = TextRender.atlasWidth * TextRender.atlasWidth;
@@ -7673,9 +7706,6 @@ window.Laya= (function (exports) {
                 if (this.hasFreedText(sameTexData)) {
                     sameTexData = wt.pageChars = [];
                 }
-                if (isWT && (this.fontScaleX != wt.scalex || this.fontScaleY != wt.scaley)) {
-                    sameTexData = wt.pageChars = [];
-                }
             }
             var ri = null;
             var splitTex = this.renderPerChar = (!isWT) || TextRender.forceSplitRender || isHtmlChar || (isWT && wt.splitRender);
@@ -7727,7 +7757,8 @@ window.Laya= (function (exports) {
                     }
                 }
                 else {
-                    var isotex = TextRender.noAtlas || strWidth * this.fontScaleX > TextRender.atlasWidth;
+                    var margin = ILaya.Render.isConchApp ? 0 : (font._size / 3 | 0);
+                    var isotex = TextRender.noAtlas || (strWidth + margin + margin) * this.fontScaleX > TextRender.atlasWidth;
                     ri = this.getCharRenderInfo(str, font, color, strokeColor, lineWidth, isotex);
                     sameTexData[0] = { texgen: ri.tex.genID, tex: ri.tex, words: [{ ri: ri, x: 0, y: 0, w: ri.bmpWidth / this.fontScaleX, h: ri.bmpHeight / this.fontScaleY }] };
                 }
@@ -8744,6 +8775,7 @@ window.Laya= (function (exports) {
                 case "no-repeat":
                     repeatx = repeaty = false;
                     break;
+                default: break;
             }
             var uv = this._temp4Points;
             var stu = 0;
@@ -8962,6 +8994,7 @@ window.Laya= (function (exports) {
                 mesh.vertNum += 4;
                 return true;
             }
+            return false;
         }
         transform4Points(a, m, out) {
             var tx = m.tx;
@@ -10625,6 +10658,23 @@ window.Laya= (function (exports) {
     }
     Draw9GridTexture.ID = "Draw9GridTexture";
 
+    class SaveCmd {
+        static create() {
+            var cmd = Pool.getItemByClass("SaveCmd", SaveCmd);
+            return cmd;
+        }
+        recover() {
+            Pool.recover("SaveCmd", this);
+        }
+        run(context, gx, gy) {
+            context.save();
+        }
+        get cmdID() {
+            return SaveCmd.ID;
+        }
+    }
+    SaveCmd.ID = "Save";
+
     class GraphicsBounds {
         constructor() {
             this._cacheBoundsType = false;
@@ -10683,6 +10733,7 @@ window.Laya= (function (exports) {
                 cmd = cmds[i];
                 switch (cmd.cmdID) {
                     case AlphaCmd.ID:
+                    case SaveCmd.ID:
                         matrixs.push(tMatrix);
                         tMatrix = tMatrix.clone();
                         break;
@@ -11089,23 +11140,6 @@ window.Laya= (function (exports) {
     }
     FillTextCmd.ID = "FillText";
     FillTextCmd._defFontObj = new FontInfo(null);
-
-    class SaveCmd {
-        static create() {
-            var cmd = Pool.getItemByClass("SaveCmd", SaveCmd);
-            return cmd;
-        }
-        recover() {
-            Pool.recover("SaveCmd", this);
-        }
-        run(context, gx, gy) {
-            context.save();
-        }
-        get cmdID() {
-            return SaveCmd.ID;
-        }
-    }
-    SaveCmd.ID = "Save";
 
     class CacheManger {
         constructor() {
@@ -11624,7 +11658,17 @@ window.Laya= (function (exports) {
             var tex = sprite.texture;
             context.saveTransform(LayaGLQuickRunner.curMat);
             context.transformByMatrix(sprite.transform, x, y);
-            context.drawTexture(tex, -sprite.pivotX, -sprite.pivotY, sprite._width || tex.width, sprite._height || tex.height);
+            var width = sprite._width || tex.sourceWidth;
+            var height = sprite._height || tex.sourceHeight;
+            var wRate = width / tex.sourceWidth;
+            var hRate = height / tex.sourceHeight;
+            width = tex.width * wRate;
+            height = tex.height * hRate;
+            if (width <= 0 || height <= 0)
+                return null;
+            var px = -sprite.pivotX + tex.offsetX * wRate;
+            var py = -sprite.pivotY + tex.offsetY * hRate;
+            context.drawTexture(tex, px, py, width, height);
             context.restoreTransform(LayaGLQuickRunner.curMat);
         }
         static alpha_drawTexture(sprite, context, x, y) {
@@ -11834,7 +11878,7 @@ window.Laya= (function (exports) {
         }
         _custom(sprite, context, x, y) {
             sprite.customRender(context, x, y);
-            this._next._fun.call(this._next, sprite, context, x - sprite.pivotX, y - sprite.pivotY);
+            this._next._fun.call(this._next, sprite, context, 0, 0);
         }
         _clip(sprite, context, x, y) {
             var next = this._next;
@@ -11853,8 +11897,19 @@ window.Laya= (function (exports) {
         }
         _texture(sprite, context, x, y) {
             var tex = sprite.texture;
-            if (tex._getSource())
-                context.drawTexture(tex, x - sprite.pivotX + tex.offsetX, y - sprite.pivotY + tex.offsetY, sprite._width || tex.width, sprite._height || tex.height);
+            if (tex._getSource()) {
+                var width = sprite._width || tex.sourceWidth;
+                var height = sprite._height || tex.sourceHeight;
+                var wRate = width / tex.sourceWidth;
+                var hRate = height / tex.sourceHeight;
+                width = tex.width * wRate;
+                height = tex.height * hRate;
+                if (width <= 0 || height <= 0)
+                    return null;
+                var px = x - sprite.pivotX + tex.offsetX * wRate;
+                var py = y - sprite.pivotY + tex.offsetY * hRate;
+                context.drawTexture(tex, px, py, width, height);
+            }
             var next = this._next;
             if (next != RenderSprite.NORENDER)
                 next._fun.call(next, sprite, context, x, y);
@@ -14849,6 +14904,9 @@ window.Laya= (function (exports) {
                 case 'right':
                     x -= lineWidth;
                     break;
+                case 'left':
+                default:
+                    break;
             }
             y += this._charSize.height;
             this._graphics.drawLine(x, y, x + lineWidth, y, this.underlineColor || this.color, 1);
@@ -15142,7 +15200,7 @@ window.Laya= (function (exports) {
             Input._createInputElement();
             if (ILaya.Browser.onMobile) {
                 var isTrue = false;
-                if (ILaya.Browser.onMiniGame || ILaya.Browser.onBDMiniGame || ILaya.Browser.onQGMiniGame || ILaya.Browser.onKGMiniGame || ILaya.Browser.onVVMiniGame || ILaya.Browser.onAlipayMiniGame || ILaya.Browser.onQQMiniGame) {
+                if (ILaya.Browser.onMiniGame || ILaya.Browser.onBDMiniGame || ILaya.Browser.onQGMiniGame || ILaya.Browser.onKGMiniGame || ILaya.Browser.onVVMiniGame || ILaya.Browser.onAlipayMiniGame || ILaya.Browser.onQQMiniGame || ILaya.Browser.onBLMiniGame) {
                     isTrue = true;
                 }
                 ILaya.Render.canvas.addEventListener(Input.IOS_IFRAME ? (isTrue ? "touchend" : "click") : "touchend", Input._popupInputMethod);
@@ -15305,7 +15363,7 @@ window.Laya= (function (exports) {
             this.event(Event.FOCUS);
             if (ILaya.Browser.onPC)
                 input.focus();
-            if (!ILaya.Browser.onMiniGame && !ILaya.Browser.onBDMiniGame && !ILaya.Browser.onQGMiniGame && !ILaya.Browser.onKGMiniGame && !ILaya.Browser.onVVMiniGame && !ILaya.Browser.onAlipayMiniGame && !ILaya.Browser.onQQMiniGame) {
+            if (!ILaya.Browser.onMiniGame && !ILaya.Browser.onBDMiniGame && !ILaya.Browser.onQGMiniGame && !ILaya.Browser.onKGMiniGame && !ILaya.Browser.onVVMiniGame && !ILaya.Browser.onAlipayMiniGame && !ILaya.Browser.onQQMiniGame && !ILaya.Browser.onBLMiniGame) {
                 var temp = this._text;
                 this._text = null;
             }
@@ -17208,17 +17266,8 @@ window.Laya= (function (exports) {
             }
         }
         _tryClearBuffer(sourceNode) {
-            if (!Browser.onMac) {
-                try {
-                    sourceNode.buffer = null;
-                }
-                catch (e) {
-                    WebAudioSoundChannel._tryCleanFailed = true;
-                }
-                return;
-            }
             try {
-                sourceNode.buffer = ILaya.WebAudioSound._miniBuffer;
+                sourceNode.buffer = null;
             }
             catch (e) {
                 WebAudioSoundChannel._tryCleanFailed = true;
@@ -17634,7 +17683,7 @@ window.Laya= (function (exports) {
                     return null;
             }
             var tSound;
-            if (!ILaya.Browser.onBDMiniGame && !ILaya.Browser.onMiniGame && !ILaya.Browser.onKGMiniGame && !ILaya.Browser.onQGMiniGame && !ILaya.Browser.onVVMiniGame && !ILaya.Browser.onAlipayMiniGame && !ILaya.Browser.onQQMiniGame) {
+            if (!ILaya.Browser.onBDMiniGame && !ILaya.Browser.onMiniGame && !ILaya.Browser.onKGMiniGame && !ILaya.Browser.onQGMiniGame && !ILaya.Browser.onVVMiniGame && !ILaya.Browser.onAlipayMiniGame && !ILaya.Browser.onQQMiniGame && !ILaya.Browser.onBLMiniGame) {
                 tSound = ILaya.loader.getRes(url);
             }
             if (!soundClass)
@@ -17642,7 +17691,7 @@ window.Laya= (function (exports) {
             if (!tSound) {
                 tSound = new soundClass();
                 tSound.load(url);
-                if (!ILaya.Browser.onBDMiniGame && !ILaya.Browser.onMiniGame && !ILaya.Browser.onKGMiniGame && !ILaya.Browser.onQGMiniGame && !ILaya.Browser.onVVMiniGame && !ILaya.Browser.onAlipayMiniGame && !ILaya.Browser.onQQMiniGame) {
+                if (!ILaya.Browser.onBDMiniGame && !ILaya.Browser.onMiniGame && !ILaya.Browser.onKGMiniGame && !ILaya.Browser.onQGMiniGame && !ILaya.Browser.onVVMiniGame && !ILaya.Browser.onAlipayMiniGame && !ILaya.Browser.onQQMiniGame && !ILaya.Browser.onBLMiniGame) {
                     ILaya.Loader.cacheRes(url, tSound);
                 }
             }
@@ -18318,8 +18367,8 @@ window.Laya= (function (exports) {
         send(url, data = null, method = "get", responseType = "text", headers = null) {
             this._responseType = responseType;
             this._data = null;
-            if (Browser.onVVMiniGame || Browser.onQGMiniGame || Browser.onQQMiniGame || Browser.onAlipayMiniGame) {
-                url = encodeURI(url);
+            if (Browser.onVVMiniGame || Browser.onQGMiniGame || Browser.onQQMiniGame || Browser.onAlipayMiniGame || Browser.onBLMiniGame) {
+                url = HttpRequest._urlEncode(url);
             }
             this._url = url;
             var _this = this;
@@ -18357,6 +18406,8 @@ window.Laya= (function (exports) {
             http.onload = function (e) {
                 _this._onLoad(e);
             };
+            if (Browser.onBLMiniGame && Browser.onAndroid && !data)
+                data = {};
             http.send(isJson ? JSON.stringify(data) : data);
         }
         _onProgress(e) {
@@ -18418,6 +18469,7 @@ window.Laya= (function (exports) {
             return this._http;
         }
     }
+    HttpRequest._urlEncode = encodeURI;
 
     class Loader extends EventDispatcher {
         constructor() {
@@ -18607,6 +18659,7 @@ window.Laya= (function (exports) {
                 this.complete(data);
             }
             else if (type === Loader.IMAGE) {
+                let tex;
                 if (data instanceof ArrayBuffer) {
                     var ext = Utils.getFileExtension(this._url);
                     let format;
@@ -18622,18 +18675,21 @@ window.Laya= (function (exports) {
                             return;
                         }
                     }
-                    var tex = new Texture2D(0, 0, format, false, false);
+                    tex = new Texture2D(0, 0, format, false, false);
                     tex.wrapModeU = exports.WarpMode.Clamp;
                     tex.wrapModeV = exports.WarpMode.Clamp;
                     tex.setCompressData(data);
                     tex._setCreateURL(this.url);
                 }
                 else if (!(data instanceof Texture2D)) {
-                    var tex = new Texture2D(data.width, data.height, 1, false, false);
+                    tex = new Texture2D(data.width, data.height, 1, false, false);
                     tex.wrapModeU = exports.WarpMode.Clamp;
                     tex.wrapModeV = exports.WarpMode.Clamp;
                     tex.loadImageSource(data, true);
                     tex._setCreateURL(data.src);
+                }
+                else {
+                    tex = data;
                 }
                 var texture = new Texture(tex);
                 texture.url = this._url;
@@ -18643,7 +18699,7 @@ window.Laya= (function (exports) {
                 this.complete(data);
             }
             else if (type === "htmlimage") {
-                var tex = new Texture2D(data.width, data.height, 1, false, false);
+                let tex = new Texture2D(data.width, data.height, 1, false, false);
                 tex.wrapModeU = exports.WarpMode.Clamp;
                 tex.wrapModeV = exports.WarpMode.Clamp;
                 tex.loadImageSource(data, true);
@@ -18688,7 +18744,7 @@ window.Laya= (function (exports) {
                 }
                 else {
                     if (!(data instanceof Texture2D)) {
-                        var tex = new Texture2D(data.width, data.height, 1, false, false);
+                        let tex = new Texture2D(data.width, data.height, 1, false, false);
                         tex.wrapModeU = BaseTexture.WARPMODE_CLAMP;
                         tex.wrapModeV = BaseTexture.WARPMODE_CLAMP;
                         tex.loadImageSource(data, true);
@@ -20241,7 +20297,9 @@ window.Laya= (function (exports) {
         }
         onReset() {
         }
-        _parse(data) {
+        _parse(data, interactMap = null) {
+        }
+        _parseInteractive(data = null, spriteMap = null) {
         }
         _cloneTo(dest) {
         }
@@ -21157,7 +21215,7 @@ window.Laya= (function (exports) {
             this._view = [];
         }
         show(x = 0, y = 0) {
-            if (!Browser.onMiniGame && !ILaya.Render.isConchApp && !Browser.onBDMiniGame && !Browser.onKGMiniGame && !Browser.onQGMiniGame && !Browser.onQQMiniGame && !Browser.onAlipayMiniGame)
+            if (!Browser.onMiniGame && !ILaya.Render.isConchApp && !Browser.onBDMiniGame && !Browser.onKGMiniGame && !Browser.onQGMiniGame && !Browser.onQQMiniGame && !Browser.onAlipayMiniGame && !Browser.onBLMiniGame)
                 this._useCanvas = true;
             this._show = true;
             Stat._fpsData.length = 60;
@@ -22080,6 +22138,7 @@ window.Laya= (function (exports) {
             return Mouse._style.cursor;
         }
         static __init__() {
+            Mouse._style = Browser.document.body.style;
         }
         static hide() {
             if (Mouse.cursor != "none") {
@@ -22349,7 +22408,7 @@ window.Laya= (function (exports) {
     Laya.lateTimer = null;
     Laya.timer = null;
     Laya.loader = null;
-    Laya.version = "2.6.0beta";
+    Laya.version = "2.7.0beta";
     Laya._isinit = false;
     Laya.isWXOpenDataContext = false;
     Laya.isWXPosMsg = false;
@@ -24589,6 +24648,8 @@ window.Laya= (function (exports) {
             }
         }
     }
+    ClassUtils.regClass("laya.media.SoundNode", SoundNode);
+    ClassUtils.regClass("Laya.SoundNode", SoundNode);
 
     class ResourceVersion {
         static enable(manifestFile, callback, type = 2) {

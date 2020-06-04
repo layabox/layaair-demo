@@ -288,6 +288,7 @@
 				["PointLightDemo", "点光", "", "core,ani,d3,CameraMoveScript.js"],
 				["SpotLightDemo", "聚光", "", "core,ani,d3,CameraMoveScript.js" ],
 				["RealTimeShadow", "实时阴影", "", "core,ani,d3,ui,CameraMoveScript.js" ],
+				["SpotLightShadowMap", "Spot实时阴影", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
 				["MultiLight", "多光源", "", "core,ani,d3,CameraMoveScript.js,physics3D"]
 			]
 		},
@@ -362,7 +363,19 @@
 				["PhysicsWorld_Kinematic", "刚体碰撞", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 				["PhysicsWorld_MeshCollider", "网格碰撞器", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 				["PhysicsWorld_RayShapeCast", "射线检测", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["PhysicsWorld_TriggerAndCollisionEvent", "触发和碰撞事件", "","core,ui,ani,d3,CameraMoveScript.js,TriggerCollisionScript.js,physics3D" ]
+				["PhysicsWorld_TriggerAndCollisionEvent", "触发和碰撞事件", "","core,ui,ani,d3,CameraMoveScript.js,TriggerCollisionScript.js,physics3D" ],
+				["PhysicsWorld_ConstraintFixedJoint", "固定关节", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["PhysicsWorld_ConfigurableJoint", "可配置关节", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ]
+      		]
+		},
+		{
+			"prefix": "cannonPhysics3D",
+			"tr_zhCN": "基于cannon的物理系统",
+      		"manifest": [
+				["CannonPhysicsWorld_BaseCollider", "基础碰撞器", "", "core,d3,CameraMoveScript.js,cannon.js,cannonPhysics" ],
+				["CannonPhysicsWorld_ColliderEvent", "碰撞事件", "", "core,d3,CameraMoveScript.js,physics3D,cannon.js,cannonPhysics" ],
+				["CannonPhysicsWorld_PhysicsProperty", "物理属性", "", "core,d3,CameraMoveScript.js,physics3D,cannon.js,cannonPhysics" ],
+				["CannonPhysicsWorld_RayCheck", "射线检测", "", "core,d3,physics3D,CameraMoveScript.js,cannon.js,cannonPhysics" ]
       		]
 		},
 		{

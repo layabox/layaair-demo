@@ -2110,6 +2110,16 @@
 	        len = 20;
 	        this.randomAPos(len);
 	        return;
+	        var count;
+	        count = 1;
+	        while (!this.isPosOk()) {
+	            count++;
+	            if (count >= 500) {
+	                len += 10;
+	                count = 0;
+	            }
+	            this.randomAPos(len);
+	        }
 	    }
 	    isPosOk() {
 	        var tParent;
@@ -4383,6 +4393,26 @@
 	    onMouseMove(ele, hit) {
 	        this.sendEvent(ele, Laya.Event.MOUSE_MOVE);
 	        return;
+	        if (hit && ele != this._stage && ele !== this._target) {
+	            if (this._target) {
+	                if (this._target.$_MOUSEOVER) {
+	                    this._target.$_MOUSEOVER = false;
+	                    this._target.event(Laya.Event.MOUSE_OUT);
+	                }
+	            }
+	            this._target = ele;
+	            if (!ele.$_MOUSEOVER) {
+	                ele.$_MOUSEOVER = true;
+	                this.sendEvent(ele, Laya.Event.MOUSE_OVER);
+	            }
+	        }
+	        else if (!hit && this._target && ele === this._target) {
+	            this._target = null;
+	            if (ele.$_MOUSEOVER) {
+	                ele.$_MOUSEOVER = false;
+	                this.sendEvent(ele, Laya.Event.MOUSE_OUT);
+	            }
+	        }
 	    }
 	    onMouseUp(ele, hit) {
 	        hit && this.sendEvent(ele, Laya.Event.MOUSE_UP);
@@ -5547,6 +5577,8 @@
 	                r = v;
 	                g = p;
 	                b = q;
+	                break;
+	            default:
 	                break;
 	        }
 	        return [Math.floor(r * 255.0), Math.floor(g * 255.0), Math.floor(b * 255.0)];

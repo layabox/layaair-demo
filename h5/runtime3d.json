@@ -9,6 +9,7 @@
 		"libs/laya.tiledmap.js",
 		"libs/laya.d3.js",
 		"libs/astar.js",
+		"libs/cannon.js",
 		"libs/laya.d3Plugin.js",
 		"3d/js/common/AnimatorStateScriptTest.js",
 		"3d/js/common/CustomAnimatorStateScript.js",
