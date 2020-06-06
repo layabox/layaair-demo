@@ -378,8 +378,8 @@
 		  		]
 			},
 			{
-				"prefix": "cannonPhysics3D",
-				"tr_zhCN": "cannonPhysics3D",
+				"prefix": "CannonPhysics3D",
+				"tr_zhCN": "CannonPhysics3D",
 				  "manifest": [
 					["CannonPhysicsWorld_BaseCollider", "BaseCollider", "", "core,d3,CameraMoveScript.js,cannon.js,cannonPhysics" ],
 					["CannonPhysicsWorld_ColliderEvent", "ColliderEvent", "", "core,d3,CameraMoveScript.js,physics3D,cannon.js,cannonPhysics" ],

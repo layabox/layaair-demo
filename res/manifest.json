@@ -362,7 +362,7 @@
       		]
 		},
 		{
-			"prefix": "cannonPhysics3D",
+			"prefix": "CannonPhysics3D",
 			"tr_zhCN": "基于cannon的物理系统",
       		"manifest": [
 				["CannonPhysicsWorld_BaseCollider", "基础碰撞器", "", "core,d3,CameraMoveScript.js,cannon.js,cannonPhysics" ],
