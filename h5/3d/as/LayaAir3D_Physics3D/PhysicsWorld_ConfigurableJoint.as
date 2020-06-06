@@ -11,7 +11,7 @@
 	import laya.d3.math.Vector4;
 	import laya.d3.physics.PhysicsCollider;
 	import laya.d3.physics.Rigidbody3D;
-	import laya.d3.physics.constraints.ConfigurableJoint;
+	import laya.d3.physics.constraints.ConfigurableConstraint;
 	import laya.d3.physics.constraints.FixedConstraint;
 	import laya.d3.physics.shape.BoxColliderShape;
 	import laya.d3.physics.shape.CapsuleColliderShape;
@@ -86,21 +86,21 @@
 			var boxB:MeshSprite3D = this.addRigidBodyBox(new Vector3(10, 0, 0),1);
 			boxB.meshRenderer.material.albedoColor = new Vector4(1, 0, 0, 1);
 			var boxBRigid:Rigidbody3D = boxB.getComponent(Rigidbody3D);
-			var configurableJoint:ConfigurableJoint = boxA.addComponent(ConfigurableJoint); 
-			configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-			configurableJoint.anchor = new Vector3(0, -3, 0);
-			configurableJoint.connectAnchor = new Vector3(0,0,0);
+			var configurableConstraint:ConfigurableConstraint = boxA.addComponent(ConfigurableConstraint); 
+			configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+			configurableConstraint.anchor = new Vector3(0, -3, 0);
+			configurableConstraint.connectAnchor = new Vector3(0,0,0);
 
-			configurableJoint.minLinearLimit = new Vector3(-3,0,0);
-			configurableJoint.maxLinearLimit = new Vector3(3,0,0);
-			configurableJoint.XMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-			configurableJoint.YMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.ZMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularXMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularYMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularZMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.linearLimitSpring = new Vector3(100,0,0);
-			configurableJoint.linearDamp = new Vector3(0,0,0);
+			configurableConstraint.minLinearLimit = new Vector3(-3,0,0);
+			configurableConstraint.maxLinearLimit = new Vector3(3,0,0);
+			configurableConstraint.XMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+			configurableConstraint.YMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.ZMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularXMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularYMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularZMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.linearLimitSpring = new Vector3(100,0,0);
+			configurableConstraint.linearDamp = new Vector3(0,0,0);
 		}
 
 
@@ -113,21 +113,21 @@
 			boxB.meshRenderer.material.albedoColor = new Vector4(1, 0, 0, 1);
 			var boxBRigid:Rigidbody3D = boxB.getComponent(Rigidbody3D);
 			
-			var configurableJoint:ConfigurableJoint = boxA.addComponent(ConfigurableJoint); 
-			configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-			configurableJoint.anchor = new Vector3(0, -3, 0);
-			configurableJoint.connectAnchor = new Vector3(0,0,0);
+			var configurableConstraint:ConfigurableConstraint = boxA.addComponent(ConfigurableConstraint); 
+			configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+			configurableConstraint.anchor = new Vector3(0, -3, 0);
+			configurableConstraint.connectAnchor = new Vector3(0,0,0);
 			
-			configurableJoint.minLinearLimit = new Vector3(-2,0,0);
-			configurableJoint.maxLinearLimit = new Vector3(2,0,0);
-			configurableJoint.XMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-			configurableJoint.YMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.ZMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularXMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularYMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularZMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.minLinearLimit = new Vector3(-2,0,0);
+			configurableConstraint.maxLinearLimit = new Vector3(2,0,0);
+			configurableConstraint.XMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+			configurableConstraint.YMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.ZMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularXMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularYMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularZMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 
-			configurableJoint.linearBounce = new Vector3(0.5, 0, 0);
+			configurableConstraint.linearBounce = new Vector3(0.5, 0, 0);
 			boxBRigid.applyImpulse(new Vector3(100, 0, 0));
 
 		}
@@ -140,19 +140,19 @@
 			boxB.meshRenderer.material.albedoColor = new Vector4(1, 0, 0, 1);
 			var boxBRigid:Rigidbody3D = boxB.getComponent(Rigidbody3D);
 			
-			var configurableJoint:ConfigurableJoint = boxA.addComponent(ConfigurableJoint); 
-			configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-			configurableJoint.anchor = new Vector3(0, -2, 0);
-			configurableJoint.connectAnchor = new Vector3(0,0,0);
+			var configurableConstraint:ConfigurableConstraint = boxA.addComponent(ConfigurableConstraint); 
+			configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+			configurableConstraint.anchor = new Vector3(0, -2, 0);
+			configurableConstraint.connectAnchor = new Vector3(0,0,0);
 			
-			configurableJoint.minLinearLimit = new Vector3(0,-2,0);
-			configurableJoint.maxLinearLimit = new Vector3(0,10,0);
-			configurableJoint.XMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.YMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-			configurableJoint.ZMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularXMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularYMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularZMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.minLinearLimit = new Vector3(0,-2,0);
+			configurableConstraint.maxLinearLimit = new Vector3(0,10,0);
+			configurableConstraint.XMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.YMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+			configurableConstraint.ZMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularXMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularYMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularZMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 		}
 
 		public function rotateAngularX():void{
@@ -163,19 +163,19 @@
 			boxB.meshRenderer.material.albedoColor = new Vector4(1, 0, 0, 1);
 			var boxBRigid:Rigidbody3D = boxB.getComponent(Rigidbody3D);
 			
-			var configurableJoint:ConfigurableJoint = boxA.addComponent(ConfigurableJoint); 
-			configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-			configurableJoint.anchor = new Vector3(0, -2, 0);
-			configurableJoint.connectAnchor = new Vector3(0,0,0);
+			var configurableConstraint:ConfigurableConstraint = boxA.addComponent(ConfigurableConstraint); 
+			configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+			configurableConstraint.anchor = new Vector3(0, -2, 0);
+			configurableConstraint.connectAnchor = new Vector3(0,0,0);
 
-			configurableJoint.minAngularLimit = new Vector3(-2, 0,0);
-			configurableJoint.maxAngularLimit = new Vector3(2, 0,0);
-			configurableJoint.XMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.YMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.ZMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularXMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_FREE;
-			configurableJoint.angularYMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularZMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.minAngularLimit = new Vector3(-2, 0,0);
+			configurableConstraint.maxAngularLimit = new Vector3(2, 0,0);
+			configurableConstraint.XMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.YMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.ZMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularXMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_FREE;
+			configurableConstraint.angularYMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularZMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 			boxBRigid.angularVelocity = new Vector3(5, 0, 0);
 
 		}
@@ -188,19 +188,19 @@
 			boxB.meshRenderer.material.albedoColor = new Vector4(1, 0, 0, 1);
 			var boxBRigid:Rigidbody3D = boxB.getComponent(Rigidbody3D);
 			
-			var configurableJoint:ConfigurableJoint = boxA.addComponent(ConfigurableJoint); 
-			configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-			configurableJoint.anchor = new Vector3(0, -2, 0);
-			configurableJoint.connectAnchor = new Vector3(0,0,0);
+			var configurableConstraint:ConfigurableConstraint = boxA.addComponent(ConfigurableConstraint); 
+			configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+			configurableConstraint.anchor = new Vector3(0, -2, 0);
+			configurableConstraint.connectAnchor = new Vector3(0,0,0);
 
-			configurableJoint.minAngularLimit = new Vector3(0, 0, -1);
-			configurableJoint.maxAngularLimit = new Vector3(0, 0, 1);
-			configurableJoint.XMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.YMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.ZMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularXMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularYMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularZMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
+			configurableConstraint.minAngularLimit = new Vector3(0, 0, -1);
+			configurableConstraint.maxAngularLimit = new Vector3(0, 0, 1);
+			configurableConstraint.XMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.YMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.ZMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularXMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularYMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularZMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
 			boxBRigid.angularVelocity = new Vector3(0.0, 0, 0.5);
 
 		}
@@ -213,19 +213,19 @@
 			boxB.meshRenderer.material.albedoColor = new Vector4(1, 0, 0, 1);
 			var boxBRigid:Rigidbody3D = boxB.getComponent(Rigidbody3D);
 			
-			var configurableJoint:ConfigurableJoint = boxA.addComponent(ConfigurableJoint); 
-			configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-			configurableJoint.anchor = new Vector3(0, -2, 0);
-			configurableJoint.connectAnchor = new Vector3(0,0,0);
+			var configurableConstraint:ConfigurableConstraint = boxA.addComponent(ConfigurableConstraint); 
+			configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+			configurableConstraint.anchor = new Vector3(0, -2, 0);
+			configurableConstraint.connectAnchor = new Vector3(0,0,0);
 
-			configurableJoint.minAngularLimit = new Vector3(0, -1, 0);
-			configurableJoint.maxAngularLimit = new Vector3(0, 1, 0);
-			configurableJoint.XMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.YMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.ZMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularXMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularYMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-			configurableJoint.angularZMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.minAngularLimit = new Vector3(0, -1, 0);
+			configurableConstraint.maxAngularLimit = new Vector3(0, 1, 0);
+			configurableConstraint.XMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.YMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.ZMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularXMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularYMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+			configurableConstraint.angularZMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 			boxBRigid.angularVelocity = new Vector3(0.0, 0.5, 0);
 
 		}
@@ -238,17 +238,17 @@
 			boxB.meshRenderer.material.albedoColor = new Vector4(1, 0, 0, 1);
 			var boxBRigid:Rigidbody3D = boxB.getComponent(Rigidbody3D);
 			
-			var configurableJoint:ConfigurableJoint = boxA.addComponent(ConfigurableJoint); 
-			configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-			configurableJoint.anchor = new Vector3(0, -1, 0);
-			configurableJoint.connectAnchor = new Vector3(0,1,0);
+			var configurableConstraint:ConfigurableConstraint = boxA.addComponent(ConfigurableConstraint); 
+			configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+			configurableConstraint.anchor = new Vector3(0, -1, 0);
+			configurableConstraint.connectAnchor = new Vector3(0,1,0);
 
-			configurableJoint.XMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.YMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.ZMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularXMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_FREE;
-			configurableJoint.angularYMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_FREE;
-			configurableJoint.angularZMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_FREE;
+			configurableConstraint.XMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.YMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.ZMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularXMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_FREE;
+			configurableConstraint.angularYMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_FREE;
+			configurableConstraint.angularZMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_FREE;
 			boxBRigid.angularVelocity = new Vector3(20, 2, 10);
 		}
 
@@ -260,17 +260,17 @@
 			boxB.meshRenderer.material.albedoColor = new Vector4(1, 0, 0, 1);
 			var boxBRigid:Rigidbody3D = boxB.getComponent(Rigidbody3D);
 		
-			var configurableJoint:ConfigurableJoint = boxA.addComponent(ConfigurableJoint); 
-			configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-			configurableJoint.anchor = new Vector3(0, 0, 0);
-			configurableJoint.connectAnchor = new Vector3(-6,0,0);
+			var configurableConstraint:ConfigurableConstraint = boxA.addComponent(ConfigurableConstraint); 
+			configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+			configurableConstraint.anchor = new Vector3(0, 0, 0);
+			configurableConstraint.connectAnchor = new Vector3(-6,0,0);
 
-			configurableJoint.XMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.YMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.ZMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularXMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularYMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularZMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_FREE;
+			configurableConstraint.XMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.YMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.ZMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularXMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularYMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularZMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_FREE;
 		
 		}
 
@@ -281,19 +281,19 @@
 			var boxB:MeshSprite3D = this.addRigidBodyBox(new Vector3(5, 0, -4),1);
 			boxB.meshRenderer.material.albedoColor = new Vector4(1, 0, 0, 1);
 			var boxBRigid:Rigidbody3D = boxB.getComponent(Rigidbody3D);
-			var configurableJoint:ConfigurableJoint = boxA.addComponent(ConfigurableJoint); 
-			configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-			configurableJoint.anchor = new Vector3(0,0,0);
-			configurableJoint.connectAnchor = new Vector3(-5,0,0);
+			var configurableConstraint:ConfigurableConstraint = boxA.addComponent(ConfigurableConstraint); 
+			configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+			configurableConstraint.anchor = new Vector3(0,0,0);
+			configurableConstraint.connectAnchor = new Vector3(-5,0,0);
 			
-			configurableJoint.minLinearLimit = new Vector3(-2,0,0);
-			configurableJoint.maxLinearLimit = new Vector3(2,0,0);
-			configurableJoint.XMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-			configurableJoint.YMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.ZMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularXMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularYMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularZMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.minLinearLimit = new Vector3(-2,0,0);
+			configurableConstraint.maxLinearLimit = new Vector3(2,0,0);
+			configurableConstraint.XMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+			configurableConstraint.YMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.ZMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularXMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularYMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularZMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 
 			boxBRigid.linearVelocity = new Vector3(1.0, 0.0, 0);
 
@@ -307,19 +307,19 @@
 			var boxB:MeshSprite3D = this.addRigidBodyBox(new Vector3(5, 0, 0),1);
 			boxB.meshRenderer.material.albedoColor = new Vector4(1, 0, 0, 1);
 			var boxBRigid:Rigidbody3D = boxB.getComponent(Rigidbody3D);
-			var configurableJoint:ConfigurableJoint = boxA.addComponent(ConfigurableJoint); 
-			configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-			configurableJoint.anchor = new Vector3(0,0,0);
-			configurableJoint.connectAnchor = new Vector3(-5,0,0);
+			var configurableConstraint:ConfigurableConstraint = boxA.addComponent(ConfigurableConstraint); 
+			configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+			configurableConstraint.anchor = new Vector3(0,0,0);
+			configurableConstraint.connectAnchor = new Vector3(-5,0,0);
 			
-			configurableJoint.minLinearLimit = new Vector3(0,-3,0);
-			configurableJoint.maxLinearLimit = new Vector3(0,3,0);
-			configurableJoint.XMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.YMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-			configurableJoint.ZMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularXMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularYMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularZMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.minLinearLimit = new Vector3(0,-3,0);
+			configurableConstraint.maxLinearLimit = new Vector3(0,3,0);
+			configurableConstraint.XMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.YMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+			configurableConstraint.ZMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularXMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularYMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularZMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 
 			boxBRigid.linearVelocity = new Vector3(0.0, 1.0, 0);
 
@@ -333,19 +333,19 @@
 			boxB.meshRenderer.material.albedoColor = new Vector4(1, 0, 0, 1);
 			var boxBRigid:Rigidbody3D = boxB.getComponent(Rigidbody3D);
 
-			var configurableJoint:ConfigurableJoint = boxA.addComponent(ConfigurableJoint); 
-			configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-			configurableJoint.anchor = new Vector3(0,0,0);
-			configurableJoint.connectAnchor = new Vector3(0,3,0);
+			var configurableConstraint:ConfigurableConstraint = boxA.addComponent(ConfigurableConstraint); 
+			configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+			configurableConstraint.anchor = new Vector3(0,0,0);
+			configurableConstraint.connectAnchor = new Vector3(0,3,0);
 			
-			configurableJoint.minLinearLimit = new Vector3(0,0,-4);
-			configurableJoint.maxLinearLimit = new Vector3(0,0,4);
-			configurableJoint.XMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.YMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.ZMotion = ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-			configurableJoint.angularXMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularYMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-			configurableJoint.angularZMotion= ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.minLinearLimit = new Vector3(0,0,-4);
+			configurableConstraint.maxLinearLimit = new Vector3(0,0,4);
+			configurableConstraint.XMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.YMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.ZMotion = ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+			configurableConstraint.angularXMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularYMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+			configurableConstraint.angularZMotion= ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 
 			boxBRigid.linearVelocity = new Vector3(0.0, 0.0, 4);
 

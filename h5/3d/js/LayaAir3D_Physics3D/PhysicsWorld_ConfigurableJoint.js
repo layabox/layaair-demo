@@ -50,21 +50,21 @@ class PhysicsWorld_ConfigurableJoint{
 		var boxB = this.addRigidBodyBox(new Laya.Vector3(10, 0, 0),1);
 		boxB.meshRenderer.material.albedoColor = new Laya.Vector4(1, 0, 0, 1);
 		var boxBRigid = boxB.getComponent(Laya.Rigidbody3D);
-		var configurableJoint = boxA.addComponent(Laya.ConfigurableJoint); 
-		configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-	    configurableJoint.anchor = new Laya.Vector3(0, -3, 0);
-		configurableJoint.connectAnchor = new Laya.Vector3(0,0,0);
+		var configurableConstraint = boxA.addComponent(Laya.ConfigurableConstraint); 
+		configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+	    configurableConstraint.anchor = new Laya.Vector3(0, -3, 0);
+		configurableConstraint.connectAnchor = new Laya.Vector3(0,0,0);
 
-		configurableJoint.minLinearLimit = new Laya.Vector3(-3,0,0);
-		configurableJoint.maxLinearLimit = new Laya.Vector3(3,0,0);
-		configurableJoint.XMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-		configurableJoint.YMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.ZMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularXMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularYMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularZMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.linearLimitSpring = new Laya.Vector3(100,0,0);
-		configurableJoint.linearDamp = new Laya.Vector3(0,0,0);
+		configurableConstraint.minLinearLimit = new Laya.Vector3(-3,0,0);
+		configurableConstraint.maxLinearLimit = new Laya.Vector3(3,0,0);
+		configurableConstraint.XMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+		configurableConstraint.YMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.ZMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularXMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularYMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularZMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.linearLimitSpring = new Laya.Vector3(100,0,0);
+		configurableConstraint.linearDamp = new Laya.Vector3(0,0,0);
 	}
 
 
@@ -77,21 +77,21 @@ class PhysicsWorld_ConfigurableJoint{
 		boxB.meshRenderer.material.albedoColor = new Laya.Vector4(1, 0, 0, 1);
 		var boxBRigid = boxB.getComponent(Laya.Rigidbody3D);
 		
-		var configurableJoint = boxA.addComponent(Laya.ConfigurableJoint); 
-		configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-	    configurableJoint.anchor = new Laya.Vector3(0, -3, 0);
-		configurableJoint.connectAnchor = new Laya.Vector3(0,0,0);
+		var configurableConstraint = boxA.addComponent(Laya.ConfigurableConstraint); 
+		configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+	    configurableConstraint.anchor = new Laya.Vector3(0, -3, 0);
+		configurableConstraint.connectAnchor = new Laya.Vector3(0,0,0);
 		
-		configurableJoint.minLinearLimit = new Laya.Vector3(-2,0,0);
-		configurableJoint.maxLinearLimit = new Laya.Vector3(2,0,0);
-		configurableJoint.XMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-		configurableJoint.YMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.ZMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularXMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularYMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularZMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.minLinearLimit = new Laya.Vector3(-2,0,0);
+		configurableConstraint.maxLinearLimit = new Laya.Vector3(2,0,0);
+		configurableConstraint.XMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+		configurableConstraint.YMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.ZMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularXMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularYMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularZMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 
-		configurableJoint.linearBounce = new Laya.Vector3(0.8, 0, 0);
+		configurableConstraint.linearBounce = new Laya.Vector3(0.8, 0, 0);
 		boxBRigid.applyImpulse(new Laya.Vector3(50, 0, 0));
 
 	}
@@ -104,19 +104,19 @@ class PhysicsWorld_ConfigurableJoint{
 		boxB.meshRenderer.material.albedoColor = new Laya.Vector4(1, 0, 0, 1);
 		var boxBRigid = boxB.getComponent(Laya.Rigidbody3D);
 		
-		var configurableJoint = boxA.addComponent(Laya.ConfigurableJoint); 
-		configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-	    configurableJoint.anchor = new Laya.Vector3(0, -2, 0);
-		configurableJoint.connectAnchor = new Laya.Vector3(0,0,0);
+		var configurableConstraint = boxA.addComponent(Laya.ConfigurableConstraint); 
+		configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+	    configurableConstraint.anchor = new Laya.Vector3(0, -2, 0);
+		configurableConstraint.connectAnchor = new Laya.Vector3(0,0,0);
 		
-		configurableJoint.minLinearLimit = new Laya.Vector3(0,-2,0);
-		configurableJoint.maxLinearLimit = new Laya.Vector3(0,10,0);
-		configurableJoint.XMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.YMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-		configurableJoint.ZMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularXMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularYMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularZMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.minLinearLimit = new Laya.Vector3(0,-2,0);
+		configurableConstraint.maxLinearLimit = new Laya.Vector3(0,10,0);
+		configurableConstraint.XMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.YMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+		configurableConstraint.ZMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularXMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularYMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularZMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 	}
 
 	rotateAngularX(){
@@ -127,19 +127,19 @@ class PhysicsWorld_ConfigurableJoint{
 		boxB.meshRenderer.material.albedoColor = new Laya.Vector4(1, 0, 0, 1);
 		var boxBRigid = boxB.getComponent(Laya.Rigidbody3D);
 		
-		var configurableJoint = boxA.addComponent(Laya.ConfigurableJoint); 
-		configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-	    configurableJoint.anchor = new Laya.Vector3(0, -2, 0);
-		configurableJoint.connectAnchor = new Laya.Vector3(0,0,0);
+		var configurableConstraint = boxA.addComponent(Laya.ConfigurableConstraint); 
+		configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+	    configurableConstraint.anchor = new Laya.Vector3(0, -2, 0);
+		configurableConstraint.connectAnchor = new Laya.Vector3(0,0,0);
 
-		configurableJoint.minAngularLimit = new Laya.Vector3(-2, 0,0);
-		configurableJoint.maxAngularLimit = new Laya.Vector3(2, 0,0);
-		configurableJoint.XMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.YMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.ZMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularXMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_FREE;
-		configurableJoint.angularYMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularZMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.minAngularLimit = new Laya.Vector3(-2, 0,0);
+		configurableConstraint.maxAngularLimit = new Laya.Vector3(2, 0,0);
+		configurableConstraint.XMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.YMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.ZMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularXMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_FREE;
+		configurableConstraint.angularYMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularZMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 		boxBRigid.angularVelocity = new Laya.Vector3(5, 0, 0);
 
 	}
@@ -152,19 +152,19 @@ class PhysicsWorld_ConfigurableJoint{
 		boxB.meshRenderer.material.albedoColor = new Laya.Vector4(1, 0, 0, 1);
 		var boxBRigid = boxB.getComponent(Laya.Rigidbody3D);
 		
-		var configurableJoint = boxA.addComponent(Laya.ConfigurableJoint); 
-		configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-	    configurableJoint.anchor = new Laya.Vector3(0, -2, 0);
-		configurableJoint.connectAnchor = new Laya.Vector3(0,0,0);
+		var configurableConstraint = boxA.addComponent(Laya.ConfigurableConstraint); 
+		configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+	    configurableConstraint.anchor = new Laya.Vector3(0, -2, 0);
+		configurableConstraint.connectAnchor = new Laya.Vector3(0,0,0);
 
-		configurableJoint.minAngularLimit = new Laya.Vector3(0, 0, -1);
-		configurableJoint.maxAngularLimit = new Laya.Vector3(0, 0, 1);
-		configurableJoint.XMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.YMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.ZMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularXMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularYMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularZMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
+		configurableConstraint.minAngularLimit = new Laya.Vector3(0, 0, -1);
+		configurableConstraint.maxAngularLimit = new Laya.Vector3(0, 0, 1);
+		configurableConstraint.XMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.YMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.ZMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularXMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularYMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularZMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
 		boxBRigid.angularVelocity = new Laya.Vector3(0.0, 0, 0.5);
 
 	}
@@ -177,19 +177,19 @@ class PhysicsWorld_ConfigurableJoint{
 	    boxB.meshRenderer.material.albedoColor = new Laya.Vector4(1, 0, 0, 1);
 		var boxBRigid = boxB.getComponent(Laya.Rigidbody3D);
 		
-		var configurableJoint = boxA.addComponent(Laya.ConfigurableJoint); 
-		configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-	    configurableJoint.anchor = new Laya.Vector3(0, -2, 0);
-		configurableJoint.connectAnchor = new Laya.Vector3(0,0,0);
+		var configurableConstraint = boxA.addComponent(Laya.ConfigurableConstraint); 
+		configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+	    configurableConstraint.anchor = new Laya.Vector3(0, -2, 0);
+		configurableConstraint.connectAnchor = new Laya.Vector3(0,0,0);
 
-		configurableJoint.minAngularLimit = new Laya.Vector3(0, -1, 0);
-		configurableJoint.maxAngularLimit = new Laya.Vector3(0, 1, 0);
-		configurableJoint.XMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.YMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.ZMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularXMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularYMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-		configurableJoint.angularZMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.minAngularLimit = new Laya.Vector3(0, -1, 0);
+		configurableConstraint.maxAngularLimit = new Laya.Vector3(0, 1, 0);
+		configurableConstraint.XMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.YMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.ZMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularXMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularYMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+		configurableConstraint.angularZMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 		boxBRigid.angularVelocity = new Laya.Vector3(0.0, 0.5, 0);
 
 	}
@@ -202,17 +202,17 @@ class PhysicsWorld_ConfigurableJoint{
 		boxB.meshRenderer.material.albedoColor = new Laya.Vector4(1, 0, 0, 1);
 		var boxBRigid = boxB.getComponent(Laya.Rigidbody3D);
 		
-		var configurableJoint = boxA.addComponent(Laya.ConfigurableJoint); 
-		configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-	    configurableJoint.anchor = new Laya.Vector3(0, -1, 0);
-		configurableJoint.connectAnchor = new Laya.Vector3(0,1,0);
+		var configurableConstraint = boxA.addComponent(Laya.ConfigurableConstraint); 
+		configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+	    configurableConstraint.anchor = new Laya.Vector3(0, -1, 0);
+		configurableConstraint.connectAnchor = new Laya.Vector3(0,1,0);
 
-		configurableJoint.XMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.YMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.ZMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularXMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_FREE;
-		configurableJoint.angularYMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_FREE;
-		configurableJoint.angularZMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_FREE;
+		configurableConstraint.XMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.YMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.ZMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularXMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_FREE;
+		configurableConstraint.angularYMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_FREE;
+		configurableConstraint.angularZMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_FREE;
 		boxBRigid.angularVelocity = new Laya.Vector3(20, 2, 10);
 	}
 
@@ -224,17 +224,17 @@ class PhysicsWorld_ConfigurableJoint{
 		boxB.meshRenderer.material.albedoColor = new Laya.Vector4(1, 0, 0, 1);
 		var boxBRigid = boxB.getComponent(Laya.Rigidbody3D);
 	
-		var configurableJoint = boxA.addComponent(Laya.ConfigurableJoint); 
-		configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-	    configurableJoint.anchor = new Laya.Vector3(0, 0, 0);
-		configurableJoint.connectAnchor = new Laya.Vector3(-6,0,0);
+		var configurableConstraint = boxA.addComponent(Laya.ConfigurableConstraint); 
+		configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+	    configurableConstraint.anchor = new Laya.Vector3(0, 0, 0);
+		configurableConstraint.connectAnchor = new Laya.Vector3(-6,0,0);
 
-		configurableJoint.XMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.YMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.ZMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularXMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularYMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularZMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_FREE;
+		configurableConstraint.XMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.YMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.ZMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularXMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularYMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularZMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_FREE;
 	
 	}
 
@@ -245,19 +245,19 @@ class PhysicsWorld_ConfigurableJoint{
 		var boxB = this.addRigidBodyBox(new Laya.Vector3(5, 0, -4),1);
 		boxB.meshRenderer.material.albedoColor = new Laya.Vector4(1, 0, 0, 1);
 		var boxBRigid = boxB.getComponent(Laya.Rigidbody3D);
-		var configurableJoint = boxA.addComponent(Laya.ConfigurableJoint); 
-		configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-	    configurableJoint.anchor = new Laya.Vector3(0,0,0);
-		configurableJoint.connectAnchor = new Laya.Vector3(-5,0,0);
+		var configurableConstraint = boxA.addComponent(Laya.ConfigurableConstraint); 
+		configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+	    configurableConstraint.anchor = new Laya.Vector3(0,0,0);
+		configurableConstraint.connectAnchor = new Laya.Vector3(-5,0,0);
 		
-		configurableJoint.minLinearLimit = new Laya.Vector3(-2,0,0);
-		configurableJoint.maxLinearLimit = new Laya.Vector3(2,0,0);
-		configurableJoint.XMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-		configurableJoint.YMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.ZMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularXMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularYMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularZMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.minLinearLimit = new Laya.Vector3(-2,0,0);
+		configurableConstraint.maxLinearLimit = new Laya.Vector3(2,0,0);
+		configurableConstraint.XMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+		configurableConstraint.YMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.ZMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularXMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularYMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularZMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 
 		boxBRigid.linearVelocity = new Laya.Vector3(1.0, 0.0, 0);
 
@@ -271,19 +271,19 @@ class PhysicsWorld_ConfigurableJoint{
 		var boxB = this.addRigidBodyBox(new Laya.Vector3(5, 0, 0),1);
 		boxB.meshRenderer.material.albedoColor = new Laya.Vector4(1, 0, 0, 1);
 		var boxBRigid = boxB.getComponent(Laya.Rigidbody3D);
-		var configurableJoint = boxA.addComponent(Laya.ConfigurableJoint); 
-		configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-	    configurableJoint.anchor = new Laya.Vector3(0,0,0);
-		configurableJoint.connectAnchor = new Laya.Vector3(-5,0,0);
+		var configurableConstraint = boxA.addComponent(Laya.ConfigurableConstraint); 
+		configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+	    configurableConstraint.anchor = new Laya.Vector3(0,0,0);
+		configurableConstraint.connectAnchor = new Laya.Vector3(-5,0,0);
 		
-		configurableJoint.minLinearLimit = new Laya.Vector3(0,-3,0);
-		configurableJoint.maxLinearLimit = new Laya.Vector3(0,3,0);
-		configurableJoint.XMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.YMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-		configurableJoint.ZMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularXMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularYMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularZMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.minLinearLimit = new Laya.Vector3(0,-3,0);
+		configurableConstraint.maxLinearLimit = new Laya.Vector3(0,3,0);
+		configurableConstraint.XMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.YMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+		configurableConstraint.ZMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularXMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularYMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularZMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 
 		boxBRigid.linearVelocity = new Laya.Vector3(0.0, 1.0, 0);
 
@@ -297,19 +297,19 @@ class PhysicsWorld_ConfigurableJoint{
 		boxB.meshRenderer.material.albedoColor = new Laya.Vector4(1, 0, 0, 1);
 		var boxBRigid = boxB.getComponent(Laya.Rigidbody3D);
 
-		var configurableJoint = boxA.addComponent(Laya.ConfigurableJoint); 
-		configurableJoint.setConnectRigidBody(boxARigid,boxBRigid);
-	    configurableJoint.anchor = new Laya.Vector3(0,0,0);
-		configurableJoint.connectAnchor = new Laya.Vector3(0,3,0);
+		var configurableConstraint = boxA.addComponent(Laya.ConfigurableConstraint); 
+		configurableConstraint.setConnectRigidBody(boxARigid,boxBRigid);
+	    configurableConstraint.anchor = new Laya.Vector3(0,0,0);
+		configurableConstraint.connectAnchor = new Laya.Vector3(0,3,0);
 		
-		configurableJoint.minLinearLimit = new Laya.Vector3(0,0,-4);
-		configurableJoint.maxLinearLimit = new Laya.Vector3(0,0,4);
-		configurableJoint.XMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.YMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.ZMotion = Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LIMITED;
-		configurableJoint.angularXMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularYMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
-		configurableJoint.angularZMotion= Laya.ConfigurableJoint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.minLinearLimit = new Laya.Vector3(0,0,-4);
+		configurableConstraint.maxLinearLimit = new Laya.Vector3(0,0,4);
+		configurableConstraint.XMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.YMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.ZMotion = Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LIMITED;
+		configurableConstraint.angularXMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularYMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
+		configurableConstraint.angularZMotion= Laya.ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED;
 
 		boxBRigid.linearVelocity = new Laya.Vector3(0.0, 0.0, 4);
 
