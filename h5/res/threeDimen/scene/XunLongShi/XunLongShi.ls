@@ -41,6 +41,49 @@
 		},
 		"child":[
 			{
+				"type":"Camera",
+				"props":{
+					"isStatic":false,
+					"name":"Main Camera",
+					"layer":0,
+					"position":[
+						-1.912066,
+						17.07926,
+						-25.11014
+					],
+					"rotation":[
+						-0.01462472,
+						-0.9652351,
+						-0.2550373,
+						0.05534753
+					],
+					"scale":[
+						1,
+						1,
+						1
+					],
+					"clearFlag":0,
+					"orthographic":false,
+					"fieldOfView":60,
+					"nearPlane":0.3,
+					"farPlane":1000,
+					"viewport":[
+						0,
+						0,
+						1,
+						1
+					],
+					"clearColor":[
+						0,
+						0,
+						0,
+						0
+					]
+				},
+				"components":[],
+				"child":[]
+			},
+			{
 				"type":"Sprite3D",
 				"props":{
 					"isStatic":false,
