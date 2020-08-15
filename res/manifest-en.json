@@ -356,7 +356,8 @@
 					["BoneLinkSprite3D", "BoneLinkSprite3D", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 					["MaterialAnimation", "MaterialAnimation", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 					["RigidbodyAnimationDemo", "RigidbodyAnimation", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["CameraAnimation", "CameraAnimation", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ]
+					["CameraAnimation", "CameraAnimation", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+					["SimpleSkinAnimationInstance", "SimpleSkinAnimationInstance", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D"]
 		  		]
 			},
 			{
@@ -454,7 +455,8 @@
 					["Scene2DPlayer3D", "Scene2DPlayer3D", "", "core,ani,d3,ui,CameraMoveScript.js" ],
 					["Secne3DPlayer2D", "Secne3DPlayer2D", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
 					[ "PostProcessBloom", "PostProcessBloom", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
-					[ "DrawTextTexture", "3D文字纹理", "", "core,ani,d3,ui,CameraMoveScript.js" ]
+					[ "DrawTextTexture", "3D文字纹理", "", "core,ani,d3,ui,CameraMoveScript.js" ],
+					[ "VideoPlayIn3DWorld", "视频纹理", "", "core,ani,d3,device,ui,CameraMoveScript.js"]
 		  		]
 			},
 			{

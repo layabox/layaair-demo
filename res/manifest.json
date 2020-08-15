@@ -340,7 +340,8 @@
         		["BoneLinkSprite3D", "蒙皮动画挂点", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 				["MaterialAnimation", "材质动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 				["RigidbodyAnimationDemo", "刚体动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-        		["CameraAnimation", "摄像机动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ]
+				["CameraAnimation", "摄像机动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
+				["SimpleSkinAnimationInstance", "蒙皮动画示例", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D"]
       ]
 		},
 		{
@@ -439,7 +440,8 @@
 				[ "Scene2DPlayer3D", "2D场景加3D人物", "", "core,ani,d3,ui,CameraMoveScript.js" ],
 				[ "Secne3DPlayer2D", "3D场景加2D人物", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
 				[ "PostProcessBloom", "后期处理Bloom", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
-				[ "DrawTextTexture", "3D文字纹理", "", "core,ani,d3,ui,CameraMoveScript.js" ]
+				[ "DrawTextTexture", "3D文字纹理", "", "core,ani,d3,ui,CameraMoveScript.js" ],
+				[ "VideoPlayIn3DWorld", "视频纹理", "", "core,ani,d3,device,ui,CameraMoveScript.js,physics3D"]
 			]
 		},
 		{
