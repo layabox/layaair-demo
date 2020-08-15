@@ -654,7 +654,7 @@
 	        this.skin = skin;
 	    }
 	    destroy(destroyChild = true) {
-	        super.destroy(true);
+	        super.destroy(destroyChild);
 	        this._bitmap && this._bitmap.destroy();
 	        this._bitmap = null;
 	    }
@@ -1577,8 +1577,8 @@
 	Laya.ClassUtils.regClass("Laya.Clip", Clip);
 
 	class ColorPicker extends UIComponent {
-	    constructor() {
-	        super(...arguments);
+	    constructor(createChildren = true) {
+	        super(false);
 	        this._gridSize = 11;
 	        this._bgColor = "#ffffff";
 	        this._borderColor = "#000000";
@@ -1586,8 +1586,14 @@
 	        this._inputBgColor = "#efefef";
 	        this._colors = [];
 	        this._selectedColor = "#000000";
+	        if (createChildren) {
+	            this.preinitialize();
+	            this.createChildren();
+	            this.initialize();
+	        }
 	    }
 	    destroy(destroyChild = true) {
+	        Laya.ILaya.stage.off(Laya.Event.MOUSE_DOWN, this, this.removeColorBox);
 	        super.destroy(destroyChild);
 	        this._colorPanel && this._colorPanel.destroy(destroyChild);
 	        this._colorButton && this._colorButton.destroy(destroyChild);
@@ -5972,7 +5978,10 @@
 	        Laya.Laya.timer.clear(this, this._onLoop);
 	    }
 	    _onLoop() {
-	        this.texture.bitmap.loadImageSource(window.sharedCanvas);
+	        let _canvas = window.sharedCanvas;
+	        this.texture.sourceWidth = _canvas.width;
+	        this.texture.sourceHeight = _canvas.height;
+	        this.texture.bitmap.loadImageSource(_canvas);
 	    }
 	    set width(value) {
 	        super.width = value;

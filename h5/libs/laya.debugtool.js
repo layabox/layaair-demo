@@ -4637,7 +4637,6 @@
 	        if (this[SpriteRenderHook.ShowBorderSign]) {
 	            DebugTool.showDisBoundToSprite(this, DebugInfoLayer.I.cacheViewLayer, DebugConsts.SPRITE_REC_COLOR, DebugConsts.SPRITE_REC_LINEWIDTH);
 	        }
-	        Laya.RenderSprite.renders[this._renderType]._fun(this, context, x + this._x, y + this._y);
 	        this._repaint = 0;
 	        RenderAnalyser.I.render(this, Laya.Browser.now() - preTime);
 	    }
@@ -5325,7 +5324,6 @@
 	        return null;
 	    }
 	    static renderSpriteToCanvas(sprite, canvas, offsetX, offsetY) {
-	        Laya.RenderSprite.renders[sprite._renderType]._fun(sprite, canvas.context, offsetX, offsetY);
 	    }
 	    static getImageDataFromCanvas(canvas, x = 0, y = 0, width = 0, height = 0) {
 	        if (width <= 0)
