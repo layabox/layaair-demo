@@ -341,7 +341,7 @@
 				["MaterialAnimation", "材质动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 				["RigidbodyAnimationDemo", "刚体动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
 				["CameraAnimation", "摄像机动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-				["SimpleSkinAnimationInstance", "蒙皮动画示例", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D"]
+				["SimpleSkinAnimationInstance", "预烘培动画", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D"]
       ]
 		},
 		{
