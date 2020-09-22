@@ -31,9 +31,9 @@ class AStarFindPath{
     //初始化3D场景
     this.scene = Laya.stage.addChild(Laya.Loader.getRes("res/threeDimen/scene/TerrainScene/XunLongShi.ls"));
     //删除原始资源中包含的默认相机
-    let camera = this.scene.getChildByName("Main Camera");
+    //let camera = this.scene.getChildByName("Main Camera");
     //删除自身
-    camera.removeSelf();
+    //camera.removeSelf();
     //根据场景中方块生成路径点
     this.initPath(this.scene);
     //获取可行走区域模型
@@ -84,10 +84,10 @@ class AStarFindPath{
     this.layaMonkey.transform.position.cloneTo(this.finalPosition);
     //初始化相机
     let moveCamera = this.moveSprite3D.addChild(new Laya.Camera());
-    camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
-    Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox3/skyBox3.lmat", Laya.Handler.create(null, function (mat) {
-        camera.skyboxMaterial = mat;
-    }));
+    // camera.clearFlag = Laya.BaseCamera.CLEARFLAG_SKY;
+    // Laya.BaseMaterial.load("res/threeDimen/skyBox/skyBox3/skyBox3.lmat", Laya.Handler.create(null, function (mat) {
+    //     camera.skyboxMaterial = mat;
+    // }));
     moveCamera.addComponent(CameraMoveScript);
     moveCamera.transform.localPosition = new Laya.Vector3(0, 7, -7);
     moveCamera.transform.rotate(this.rotation, true, false);
