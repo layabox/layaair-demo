@@ -1343,7 +1343,7 @@
 						"TrailRender",
 						"拖尾示例",
 						"",
-						"core,ani,d3"
+						"core,ani,d3,physics3D"
 					]
 				]
 			},
