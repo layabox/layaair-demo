@@ -1777,6 +1777,7 @@ window.box2d=box2d;
                 this.accessGetSetFunc(sp, "rotation", "set")(Laya.Utils.toAngle(ang) - sp.parent.globalRotation);
                 if (ang == 0) {
                     var point = sp.parent.globalToLocal(Laya.Point.TEMP.setTo(pos.x * IPhysics.Physics.PIXEL_RATIO + sp.pivotX, pos.y * IPhysics.Physics.PIXEL_RATIO + sp.pivotY), false, IPhysics.Physics.I.worldRoot);
+                    sp.parent.fromParentPoint(point);
                     this.accessGetSetFunc(sp, "x", "set")(point.x);
                     this.accessGetSetFunc(sp, "y", "set")(point.y);
                 }
@@ -2144,7 +2145,13 @@ window.box2d=box2d;
             this._worldRoot = value;
             if (value) {
                 var p = value.localToGlobal(Laya.Point.TEMP.setTo(0, 0));
-                this.world.ShiftOrigin({ x: p.x / Physics.PIXEL_RATIO, y: p.y / Physics.PIXEL_RATIO });
+                this.world.ShiftOrigin({ x: -p.x / Physics.PIXEL_RATIO, y: -p.y / Physics.PIXEL_RATIO });
+            }
+        }
+        updatePhysicsByWorldRoot() {
+            if (!!this.worldRoot) {
+                var p = this.worldRoot.localToGlobal(Laya.Point.TEMP.setTo(0, 0));
+                this.world.ShiftOrigin({ x: -p.x / Physics.PIXEL_RATIO, y: -p.y / Physics.PIXEL_RATIO });
             }
         }
     }

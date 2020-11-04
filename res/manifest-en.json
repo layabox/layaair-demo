@@ -1,472 +1,1508 @@
 {
-	"manifest":
-	{
+	"manifest": {
 		"2d": [
-		{
-			"prefix": "Sprite",
-			"tr_zhCN": "Sprite",
-			"manifest": [
-				["DisplayImage", "Display image", "Sprite.loadImage can be loaded directly，or readable also from buffer。Graphics.drawTexture display texture. If you use Sprite.loadImage to display content，data texture should be loaded before", "core"],
-				["ScreenShot", "ScreenShot", "ScreenShot", "core,ui"],
-				["Container", "Container", "Sprite serve as a container for other display objects", "core"],
-				["RoateAndScale", "Rotate and scale", "Set the Sprite's rotation angle and scale factor", "core"],
-				["DrawPath", "DrawPath", "drawPath can draw path points", "core"],
-				["MagnifyingGlass", "Glass Magnifier", "Move the mouse to see the magnified effect", "core"],
-				["DrawShapes", "Draw shapes", "Use Vector to draw vectorial graphics", "core"],
-				["Cache", "Bitmap cache", "By caching multiple display objects into static images, you can significantly improve rendering efficiency. See the documentation for details.", "core"],
-				["NodeControl", "Node control", "By controlling the container to change itself and the appearance of the child", "core"],
-				["Pivot", "Pivot", "Changing the pivot can control the center of rotation and zoom", "core"],
-				["SwitchTexture", "Switch texture", "Click on monkey to switch the texture. Use graphics.drawTexture function or loadImage as well", "core"],
-				["Guide", "Guide message", "Simulate the game to start the process guide", "core"]
-			]
-		},
-		{
-			"prefix": "Animation",
-			"tr_zhCN": "Animation",
-			"manifest": [
-				["SWF", "Load SWF", "MovieClip can load and play SWF animations. <br/>SWFs are created by Flash IDE, which can not contain code", "core,ani"],
-				["Altas", "Altas spritesheet", "Animation can load and play animations.  <br/>Assets data can be exported using the LayaAir IDE or TexturePacker", "core"]
-			]
-		},
-		{
-			"prefix": "Skeleton",
-			"tr_zhCN": "Skeletal motion",
-			"manifest": [
-				["MultiTexture", "MultiTexture", "", "core,ani"],
-				["SpineEvent", "Spine event", "", "core,ani"],
-				["SpineStretchyman", "Spine stretchyman", "", "core,ani"],
-				["SpineVine", "Spine vine", "", "core,ani"],
-				["ChangeSkin", "Change skin", "", "core,ani"]
-			]
-		},
-		{
-			"prefix": "BlendMode",
-			"tr_zhCN": "Blend",
-			"manifest": [
-				["Lighter", "Lighter", "Set blendMode to specify blending mode", "core"]
-			]
-		},
-		{
-			"prefix": "TiledMap",
-			"tr_zhCN": "TiledMap",
-			"manifest": [
-				["AnimationTile", "AnimationTile", "", "core,tiledmap"],
-				["IsometricWorld", "IsometricWorld", "", "core,tiledmap"],
-				["PerspectiveWall", "PerspectiveWall", "", "core,tiledmap"],
-				["ScrollMap", "ScrollMap", "", "core,tiledmap"]
-			]
-		},
-		{
-			"prefix": "Filters",
-			"tr_zhCN": "Filters",
-			"manifest": [
-				["Glow", "Glow", "", "core"],
-				["Blur", "Blur", "", "core"],
-				["Color", "Color", "", "core"]
-			]
-		},
-		{
-			"prefix": "Particle",
-			"tr_zhCN": "Particle",
-			"manifest": [
-				["T1", "T1", "", "core,particle"],
-				["T2", "T2", "", "core,particle"],
-				["T3", "T3", "", "core,particle"]
-			]
-		},
-		{
-			"prefix": "Sound",
-			"tr_zhCN": "Audio",
-			"manifest": [
-				["SimpleDemo", "Broadcast Demo", "", "core"]
-			]
-		},
-		{
-			"prefix": "Text",
-			"tr_zhCN": "Text",
-			"manifest": [
-				["AutoSize", "Format Setting", "Autosize can be adapted size according to the text content", "core"],
-				["BitmapFont", "Bitmap Font", "Use BitmapFont to load the display bitmap font", "core"],
-				["ComplexStyle", "Style Font", "Alignment, font size, font, bold, line spacing, strokes, borders and so on", "core"],
-				["Editable", "Editable", "Only run on PC, so that the file can not be edited, only allowed to copy", "core"],
-				["Overflow", "Mask area", "Set overflow to define the behavior of the text beyond. Visible does not make any change.<br>scroll do not display character pixels outside the text field，and support scroll interface。<br>hidden not show characters beyond the text field.<br>Performance from high to low：hidden > visible > scroll", "core"],
-				["Underline", "Underline", "Set underline and underlineColor", "core"],
-				["HTML", "HTML", "", "core,html"],
-				["InputSingleline", "InputSingleline", "", "core"],
-				["InputMultiline", "TextArea editable", "Multi-line input box can use Enter key", "core"],
-				["MaxChars", "Max characters", "Set maxChars to limit the number of characters", "core"],
-				["Restrict", "Form restriction input", "Set the restrict limit character", "core"],
-				["Scroll", "Drag scroll", "Set the overflow to scroll, and scroll the text using the scroll interface", "core"],
-				["WordWrap", "WordWrap", "Set wordWrap to true will be applied on text", "core"]
-			]
-		},
-		{
-			"prefix": "UI",
-			"tr_zhCN": "UI",
-			"manifest": [
-				["Label", "Label", "", "core,ui"],
-				["Button", "Button", "", "core,ui"],
-				["RadioGroup", "RadioGroup", "", "core,ui"],
-				["CheckBox", "CheckBox", "", "core,ui"],
-				["Clip", "Clip", "", "core,ui"],
-				["ColorPicker", "ColorPicker", "", "core,ui"],
-				["ComboBox", "ComboBox", "", "core,ui"],
-				["Dialog", "Dialog", "", "core,ui"],
-				["ScrollBar", "ScrollBar", "", "core,ui"],
-				["Slider", "Slider", "", "core,ui"],
-				["Image", "Image", "", "core,ui"],
-				["List", "List", "", "core,ui"],
-				["ProgressBar", "ProgressBar", "", "core,ui"],
-				["Tab", "Tab", "", "core,ui"],
-				["Input", "Input", "", "core,ui"],
-				["TextArea", "TextArea", "", "core,ui"],
-				["Tree", "Tree", "", "core,ui"]
-			]
-		},
-		{
-			"prefix": "Timer",
-			"tr_zhCN": "Timer",
-			"manifest": [
-				["CallLater", "Set timeout", "", "core"],
-				["DelayExcute", "Delay event", "", "core"],
-				["Interval", "Time interval", "", "core"]
-			]
-		},
-		{
-			"prefix": "Tween",
-			"tr_zhCN": "Tween",
-			"manifest": [
-				["SimpleSample", "Basic case", "", "core"],
-				["Letters", "Letters", "", "core"],
-				["EaseFunctionsDemo", "Motion transition", "", "core,ui"],
-				["TimeLine", "Timeline", "", "core"]
-			]
-		},
-		{
-			"prefix": "Interaction",
-			"tr_zhCN": "Event handler",
-			"manifest": [
-				["Hold", "Mouse hold", "keep drag on monkey after two seconds to interact", "core"],
-				["Drag", "Mouse drag", "Drag the display object to see the rebound effect beyond the boundary", "core"],
-				["Rotate", "ScreenTouch Rotation (mobile)", "Rotate the rectangle with the rotation gesture. Please check in multi-touch devices.", "core"],
-				["Scale", "ScreenTouch Scale (mobile)", "Zoom the rectangle with expanded and squeezed gestures. Please check in multi-touch devices.", "core"],
-				["Swipe", "Slide", "", "core"],
-				["CustomEvent", "Custom event", "Click the rectangle to trigger a custom rotation event", "core"],
-				["Keyboard", "Keyboard", "Tap the keypad to see the corresponding key code. You need to view this example in a new tab", "core"],
-				["Mouse", "Mouse", "", "core"],
-				["FixInteractiveRegion", "Mouse region detection", "API mouseThrough naming is misleading. The interface is used to correct the interaction area. After setting, the interactive response area becomes non-blank content boundary area. Click any display object to view the interaction target", "core"]
-			]
-		},
-		{
-			"prefix": "Loader",
-			"tr_zhCN": "Loader",
-			"manifest": [
-				["ClearTextureRes", "Erase texture by using the picture resources", "Erase texture by using the picture resources, and keeping texture shell.If next time rendering, we find texture image resource does not exist, it will automatically recover; Compared to clearRes, clearTextureRes just clean texture inside the image resources, it does not destroy the texture.When it used again, image resources are automatically restored, and clearRes will completely destroy the texture, resulting to no longer use;clearTextureRes to ensure immediately the image resources destruction, and do not have to worry about the errors feedback,clearRes use a reference counting method to process;[Note] Whether picture itself is automatically collected inside (the default picture size is less than 512 * 512),then memory can not be destroyed, this picture is managed into atlas resource manager.", "core,ani"],
-				["SingleType", "Classic version", "Contains only code", "core"],
-				["MultipleType", "Multiple type", "Contains only code", "core"],
-				["Sequence", "Sequence", "Load the resource sequence and load the resource according to the load priority. In this case, just look at the code", "core"],
-				["ProgressAndErrorHandle", "Progress bar with error handle", "Note that the Handler parameter once of the Progress event must be set to false, and even if an error occurs, the COMPLETE event or its corresponding callback is triggered. In this case, just look at the code", "core"]
-			]
-		},
-		{
-			"prefix": "SmartScale",
-			"tr_zhCN": "Windows render",
-			"manifest": [
-				["Align_Contral", "Align method", "The horizontal alignment is divided into the left and right vertical alignment is divided into", "core"],
-				["Landscape", "Landscape mode", "Changing the screen orientation of the LayaAir does not affect the screen orientation of the OS and is not affected by the direction of the OS screen. After setting the automatic screen, the direction of the game will always be vertical to the larger side of the stage. This example uses a new window to open, as long as the size can drag to change the browser to see the effect", "core"],
-				["Portrait", "Portrait mode", "Changing the screen orientation of the LayaAir does not affect the screen orientation of the OS and is not affected by the direction of the OS screen. After setting the automatic screen, the direction of the game will always be vertical to the smaller side of the stage. This example uses a new window to open, as long as the size can drag to change the browser to see the effect", "core"],
-				["Scale_EXTRACT_FIT", "Stage ExactFit", "The entire application is visible in the specified area, but does not attempt to maintain the original aspect ratio. Distortions may occur and applications may stretch or compress the display", "core"],
-				["Scale_NOBORDER", " Stage NoBorder", "The entire application fills the specified area without distortion, but there may be some cropping, while maintaining the original aspect ratio of the application", "core"],
-				["Scale_NOSCALE", "Stage NoScale", "The size of the entire application is fixed, so that even if the size of the player window changes, it will remain the same. If the player window is smaller than the content, there may be some cropping", "core"],
-				["Scale_SHOW_ALL", "Stage ShowAll", "The entire application is visible in the specified area and does not distort, while maintaining the original aspect ratio of the application. The borders may be displayed on both sides of the application", "core"],
-				["T", "Stage all mode", "Click the text switch adaptation mode", "core,ui"]
-			]
-		},
-		{
-			"prefix": "InputDevice",
-			"tr_zhCN": "Input device",
-			"manifest": [
-				["Map", "Localisation", "Please look at the equipment that can be located geographically. Automatically updates the current location when the device is moved", "core,device,BaiduMap"],
-				["Compass", "Gyroscope sensor", "Please watch on the device that supports gyroscopes. A browser that can acquire the earth coordinate system can correctly recognize the orientation, otherwise, when the device coordinate system is used, the initial orientation of the device is north. The compass center crosshair represents the current orientation", "core,device"],
-				["Shake", "Shake", "Please enjoy it on the equipment that supports gravity induction. Shake three times and no longer listen for device shake", "core,device"],
-				["GluttonousSnake", "GluttonousSnake", "Move the snake through the tilt device, increasing the length of the hunt. The snake does not bite himself", "core,device"]
-			]
-		},
-		{
-			"prefix": "Network",
-			"tr_zhCN": "Network",
-			"manifest": [
-				["POST", "POST", "", "core"],
-				["GET", "GET", "", "core"],
-				["XML", "XML", "Using DOMParser to parse XML, open the console to see the results", "core"],
-				["Socket", "Socket", "Because the server is the WS protocol, the HTTPS protocol will make a mistake", "core"],
-				["ProtocolBuffer", "ProtocolBuffer", "Use the protobuf.js (demo version of decodeIO) to see the results in the console", "core,protobuf"]
-			]
-		},
-		{
-			"prefix": "Physics",
-			"tr_zhCN": "Dynamic physic",
-			"manifest": [
-				["Cloth", "Cloth", "Demo comes from official matter.js. Demonstrates using LayaAir to render matter.js", "core,matter.js,LayaRender.js"],
-				["NewtonsCradle", "NewtonsCradle", "Demo comes from official matter.js. Demonstrates using LayaAir to render matter.js", "core,matter.js,LayaRender.js"],
-				["Slingshot", "Slingshot", "Demo comes from official matter.js. Demonstrates using LayaAir to render matter.js", "core,matter.js,LayaRender.js"]
-			]
-		},
-		{
-			"prefix": "DOM",
-			"tr_zhCN": "DOM element",
-			"manifest": [
-				["Video", "Video", "Using H5 video API, you can get a better performance advantage than canvas rendering", "core"],
-				["Form", "Form input", "Use the H5 to express input API and feel the native input experience", "core"]
-			]
-		},
-		{
-			"prefix": "Debug",
-			"tr_zhCN": "Debug",
-			"manifest": [
-				["FPSStats", "FPSStats", "", "core"]
-			]
-		},
-		{
-			"prefix": "PerformanceTest",
-			"tr_zhCN": "Benchmark test",
-			"manifest": [
-				["Maggots", "Maggots", "5000 worms perform displacement, rotation, and scaling each frame", "core"],
-				["Cartoon", "Cartoon", "The 500 bodies rotate and shift", "core"],
-				["Cartoon2", "Cartoon2", "500 animations move in disorder", "core"],
-				["Skeleton", "Skeleton", "100 skeleton animations. Click to toggle action", "core,ani"]
-			]
-		},
-		{
-			"prefix": "PIXI",
-			"tr_zhCN": " implement 3rd party demo",
-			"manifest": [
-				["Example_04", "Example_04", "原Pixi.js Demo", "core"],
-				["Example_05", "Example_05", "原Pixi.js Demo", "core"],
-				["Example_21", "Example_21", "原Pixi.js Demo", "core"],
-				["Example_23", "Example_23", "原Pixi.js Demo", "core"]
-			]
-		},
-		{
-			"prefix": "IDE",
-			"tr_zhCN": "IDE",
-			"manifest": [
-				["Project", "Project", "Display generated from IDE", "core,ui,UI code"]
-			]
-		}],
+			{
+				"prefix": "Sprite",
+				"tr_zhCN": "Sprite",
+				"manifest": [
+					[
+						"DisplayImage",
+						"Display image",
+						"Sprite.loadImage can be loaded directly，or readable also from buffer。Graphics.drawTexture display texture. If you use Sprite.loadImage to display content，data texture should be loaded before",
+						"core"
+					],
+					[
+						"ScreenShot",
+						"ScreenShot",
+						"ScreenShot",
+						"core,ui"
+					],
+					[
+						"Container",
+						"Container",
+						"Sprite serve as a container for other display objects",
+						"core"
+					],
+					[
+						"RoateAndScale",
+						"Rotate and scale",
+						"Set the Sprite's rotation angle and scale factor",
+						"core"
+					],
+					[
+						"DrawPath",
+						"DrawPath",
+						"drawPath can draw path points",
+						"core"
+					],
+					[
+						"MagnifyingGlass",
+						"Glass Magnifier",
+						"Move the mouse to see the magnified effect",
+						"core"
+					],
+					[
+						"DrawShapes",
+						"Draw shapes",
+						"Use Vector to draw vectorial graphics",
+						"core"
+					],
+					[
+						"Cache",
+						"Bitmap cache",
+						"By caching multiple display objects into static images, you can significantly improve rendering efficiency. See the documentation for details.",
+						"core"
+					],
+					[
+						"NodeControl",
+						"Node control",
+						"By controlling the container to change itself and the appearance of the child",
+						"core"
+					],
+					[
+						"Pivot",
+						"Pivot",
+						"Changing the pivot can control the center of rotation and zoom",
+						"core"
+					],
+					[
+						"SwitchTexture",
+						"Switch texture",
+						"Click on monkey to switch the texture. Use graphics.drawTexture function or loadImage as well",
+						"core"
+					],
+					[
+						"Guide",
+						"Guide message",
+						"Simulate the game to start the process guide",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "Animation",
+				"tr_zhCN": "Animation",
+				"manifest": [
+					[
+						"SWF",
+						"Load SWF",
+						"MovieClip can load and play SWF animations. <br/>SWFs are created by Flash IDE, which can not contain code",
+						"core,ani"
+					],
+					[
+						"Altas",
+						"Altas spritesheet",
+						"Animation can load and play animations.  <br/>Assets data can be exported using the LayaAir IDE or TexturePacker",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "Skeleton",
+				"tr_zhCN": "Skeletal motion",
+				"manifest": [
+					[
+						"MultiTexture",
+						"MultiTexture",
+						"",
+						"core,ani"
+					],
+					[
+						"SpineEvent",
+						"Spine event",
+						"",
+						"core,ani"
+					],
+					[
+						"SpineStretchyman",
+						"Spine stretchyman",
+						"",
+						"core,ani"
+					],
+					[
+						"SpineVine",
+						"Spine vine",
+						"",
+						"core,ani"
+					],
+					[
+						"ChangeSkin",
+						"Change skin",
+						"",
+						"core,ani"
+					]
+				]
+			},
+			{
+				"prefix": "BlendMode",
+				"tr_zhCN": "Blend",
+				"manifest": [
+					[
+						"Lighter",
+						"Lighter",
+						"Set blendMode to specify blending mode",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "TiledMap",
+				"tr_zhCN": "TiledMap",
+				"manifest": [
+					[
+						"AnimationTile",
+						"AnimationTile",
+						"",
+						"core,tiledmap"
+					],
+					[
+						"IsometricWorld",
+						"IsometricWorld",
+						"",
+						"core,tiledmap"
+					],
+					[
+						"PerspectiveWall",
+						"PerspectiveWall",
+						"",
+						"core,tiledmap"
+					],
+					[
+						"ScrollMap",
+						"ScrollMap",
+						"",
+						"core,tiledmap"
+					]
+				]
+			},
+			{
+				"prefix": "Filters",
+				"tr_zhCN": "Filters",
+				"manifest": [
+					[
+						"Glow",
+						"Glow",
+						"",
+						"core"
+					],
+					[
+						"Blur",
+						"Blur",
+						"",
+						"core"
+					],
+					[
+						"Color",
+						"Color",
+						"",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "Particle",
+				"tr_zhCN": "Particle",
+				"manifest": [
+					[
+						"T1",
+						"T1",
+						"",
+						"core,particle"
+					],
+					[
+						"T2",
+						"T2",
+						"",
+						"core,particle"
+					],
+					[
+						"T3",
+						"T3",
+						"",
+						"core,particle"
+					]
+				]
+			},
+			{
+				"prefix": "Sound",
+				"tr_zhCN": "Audio",
+				"manifest": [
+					[
+						"SimpleDemo",
+						"Broadcast Demo",
+						"",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "Text",
+				"tr_zhCN": "Text",
+				"manifest": [
+					[
+						"AutoSize",
+						"Format Setting",
+						"Autosize can be adapted size according to the text content",
+						"core"
+					],
+					[
+						"BitmapFont",
+						"Bitmap Font",
+						"Use BitmapFont to load the display bitmap font",
+						"core"
+					],
+					[
+						"ComplexStyle",
+						"Style Font",
+						"Alignment, font size, font, bold, line spacing, strokes, borders and so on",
+						"core"
+					],
+					[
+						"Editable",
+						"Editable",
+						"Only run on PC, so that the file can not be edited, only allowed to copy",
+						"core"
+					],
+					[
+						"Overflow",
+						"Mask area",
+						"Set overflow to define the behavior of the text beyond. Visible does not make any change.<br>scroll do not display character pixels outside the text field，and support scroll interface。<br>hidden not show characters beyond the text field.<br>Performance from high to low：hidden > visible > scroll",
+						"core"
+					],
+					[
+						"Underline",
+						"Underline",
+						"Set underline and underlineColor",
+						"core"
+					],
+					[
+						"HTML",
+						"HTML",
+						"",
+						"core,html"
+					],
+					[
+						"InputSingleline",
+						"InputSingleline",
+						"",
+						"core"
+					],
+					[
+						"InputMultiline",
+						"TextArea editable",
+						"Multi-line input box can use Enter key",
+						"core"
+					],
+					[
+						"MaxChars",
+						"Max characters",
+						"Set maxChars to limit the number of characters",
+						"core"
+					],
+					[
+						"Restrict",
+						"Form restriction input",
+						"Set the restrict limit character",
+						"core"
+					],
+					[
+						"Scroll",
+						"Drag scroll",
+						"Set the overflow to scroll, and scroll the text using the scroll interface",
+						"core"
+					],
+					[
+						"WordWrap",
+						"WordWrap",
+						"Set wordWrap to true will be applied on text",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "UI",
+				"tr_zhCN": "UI",
+				"manifest": [
+					[
+						"Label",
+						"Label",
+						"",
+						"core,ui"
+					],
+					[
+						"Button",
+						"Button",
+						"",
+						"core,ui"
+					],
+					[
+						"RadioGroup",
+						"RadioGroup",
+						"",
+						"core,ui"
+					],
+					[
+						"CheckBox",
+						"CheckBox",
+						"",
+						"core,ui"
+					],
+					[
+						"Clip",
+						"Clip",
+						"",
+						"core,ui"
+					],
+					[
+						"ColorPicker",
+						"ColorPicker",
+						"",
+						"core,ui"
+					],
+					[
+						"ComboBox",
+						"ComboBox",
+						"",
+						"core,ui"
+					],
+					[
+						"Dialog",
+						"Dialog",
+						"",
+						"core,ui"
+					],
+					[
+						"ScrollBar",
+						"ScrollBar",
+						"",
+						"core,ui"
+					],
+					[
+						"Slider",
+						"Slider",
+						"",
+						"core,ui"
+					],
+					[
+						"Image",
+						"Image",
+						"",
+						"core,ui"
+					],
+					[
+						"List",
+						"List",
+						"",
+						"core,ui"
+					],
+					[
+						"ProgressBar",
+						"ProgressBar",
+						"",
+						"core,ui"
+					],
+					[
+						"Tab",
+						"Tab",
+						"",
+						"core,ui"
+					],
+					[
+						"Input",
+						"Input",
+						"",
+						"core,ui"
+					],
+					[
+						"TextArea",
+						"TextArea",
+						"",
+						"core,ui"
+					],
+					[
+						"Tree",
+						"Tree",
+						"",
+						"core,ui"
+					]
+				]
+			},
+			{
+				"prefix": "Timer",
+				"tr_zhCN": "Timer",
+				"manifest": [
+					[
+						"CallLater",
+						"Set timeout",
+						"",
+						"core"
+					],
+					[
+						"DelayExcute",
+						"Delay event",
+						"",
+						"core"
+					],
+					[
+						"Interval",
+						"Time interval",
+						"",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "Tween",
+				"tr_zhCN": "Tween",
+				"manifest": [
+					[
+						"SimpleSample",
+						"Basic case",
+						"",
+						"core"
+					],
+					[
+						"Letters",
+						"Letters",
+						"",
+						"core"
+					],
+					[
+						"EaseFunctionsDemo",
+						"Motion transition",
+						"",
+						"core,ui"
+					],
+					[
+						"TimeLine",
+						"Timeline",
+						"",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "Interaction",
+				"tr_zhCN": "Event handler",
+				"manifest": [
+					[
+						"Hold",
+						"Mouse hold",
+						"keep drag on monkey after two seconds to interact",
+						"core"
+					],
+					[
+						"Drag",
+						"Mouse drag",
+						"Drag the display object to see the rebound effect beyond the boundary",
+						"core"
+					],
+					[
+						"Rotate",
+						"ScreenTouch Rotation (mobile)",
+						"Rotate the rectangle with the rotation gesture. Please check in multi-touch devices.",
+						"core"
+					],
+					[
+						"Scale",
+						"ScreenTouch Scale (mobile)",
+						"Zoom the rectangle with expanded and squeezed gestures. Please check in multi-touch devices.",
+						"core"
+					],
+					[
+						"Swipe",
+						"Slide",
+						"",
+						"core"
+					],
+					[
+						"CustomEvent",
+						"Custom event",
+						"Click the rectangle to trigger a custom rotation event",
+						"core"
+					],
+					[
+						"Keyboard",
+						"Keyboard",
+						"Tap the keypad to see the corresponding key code. You need to view this example in a new tab",
+						"core"
+					],
+					[
+						"Mouse",
+						"Mouse",
+						"",
+						"core"
+					],
+					[
+						"FixInteractiveRegion",
+						"Mouse region detection",
+						"API mouseThrough naming is misleading. The interface is used to correct the interaction area. After setting, the interactive response area becomes non-blank content boundary area. Click any display object to view the interaction target",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "Loader",
+				"tr_zhCN": "Loader",
+				"manifest": [
+					[
+						"ClearTextureRes",
+						"Erase texture by using the picture resources",
+						"Erase texture by using the picture resources, and keeping texture shell.If next time rendering, we find texture image resource does not exist, it will automatically recover; Compared to clearRes, clearTextureRes just clean texture inside the image resources, it does not destroy the texture.When it used again, image resources are automatically restored, and clearRes will completely destroy the texture, resulting to no longer use;clearTextureRes to ensure immediately the image resources destruction, and do not have to worry about the errors feedback,clearRes use a reference counting method to process;[Note] Whether picture itself is automatically collected inside (the default picture size is less than 512 * 512),then memory can not be destroyed, this picture is managed into atlas resource manager.",
+						"core,ani"
+					],
+					[
+						"SingleType",
+						"Classic version",
+						"Contains only code",
+						"core"
+					],
+					[
+						"MultipleType",
+						"Multiple type",
+						"Contains only code",
+						"core"
+					],
+					[
+						"Sequence",
+						"Sequence",
+						"Load the resource sequence and load the resource according to the load priority. In this case, just look at the code",
+						"core"
+					],
+					[
+						"ProgressAndErrorHandle",
+						"Progress bar with error handle",
+						"Note that the Handler parameter once of the Progress event must be set to false, and even if an error occurs, the COMPLETE event or its corresponding callback is triggered. In this case, just look at the code",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "SmartScale",
+				"tr_zhCN": "Windows render",
+				"manifest": [
+					[
+						"Align_Contral",
+						"Align method",
+						"The horizontal alignment is divided into the left and right vertical alignment is divided into",
+						"core"
+					],
+					[
+						"Landscape",
+						"Landscape mode",
+						"Changing the screen orientation of the LayaAir does not affect the screen orientation of the OS and is not affected by the direction of the OS screen. After setting the automatic screen, the direction of the game will always be vertical to the larger side of the stage. This example uses a new window to open, as long as the size can drag to change the browser to see the effect",
+						"core"
+					],
+					[
+						"Portrait",
+						"Portrait mode",
+						"Changing the screen orientation of the LayaAir does not affect the screen orientation of the OS and is not affected by the direction of the OS screen. After setting the automatic screen, the direction of the game will always be vertical to the smaller side of the stage. This example uses a new window to open, as long as the size can drag to change the browser to see the effect",
+						"core"
+					],
+					[
+						"Scale_EXTRACT_FIT",
+						"Stage ExactFit",
+						"The entire application is visible in the specified area, but does not attempt to maintain the original aspect ratio. Distortions may occur and applications may stretch or compress the display",
+						"core"
+					],
+					[
+						"Scale_NOBORDER",
+						" Stage NoBorder",
+						"The entire application fills the specified area without distortion, but there may be some cropping, while maintaining the original aspect ratio of the application",
+						"core"
+					],
+					[
+						"Scale_NOSCALE",
+						"Stage NoScale",
+						"The size of the entire application is fixed, so that even if the size of the player window changes, it will remain the same. If the player window is smaller than the content, there may be some cropping",
+						"core"
+					],
+					[
+						"Scale_SHOW_ALL",
+						"Stage ShowAll",
+						"The entire application is visible in the specified area and does not distort, while maintaining the original aspect ratio of the application. The borders may be displayed on both sides of the application",
+						"core"
+					],
+					[
+						"T",
+						"Stage all mode",
+						"Click the text switch adaptation mode",
+						"core,ui"
+					]
+				]
+			},
+			{
+				"prefix": "InputDevice",
+				"tr_zhCN": "Input device",
+				"manifest": [
+					[
+						"Map",
+						"Localisation",
+						"Please look at the equipment that can be located geographically. Automatically updates the current location when the device is moved",
+						"core,device,BaiduMap"
+					],
+					[
+						"Compass",
+						"Gyroscope sensor",
+						"Please watch on the device that supports gyroscopes. A browser that can acquire the earth coordinate system can correctly recognize the orientation, otherwise, when the device coordinate system is used, the initial orientation of the device is north. The compass center crosshair represents the current orientation",
+						"core,device"
+					],
+					[
+						"Shake",
+						"Shake",
+						"Please enjoy it on the equipment that supports gravity induction. Shake three times and no longer listen for device shake",
+						"core,device"
+					],
+					[
+						"GluttonousSnake",
+						"GluttonousSnake",
+						"Move the snake through the tilt device, increasing the length of the hunt. The snake does not bite himself",
+						"core,device"
+					]
+				]
+			},
+			{
+				"prefix": "Network",
+				"tr_zhCN": "Network",
+				"manifest": [
+					[
+						"POST",
+						"POST",
+						"",
+						"core"
+					],
+					[
+						"GET",
+						"GET",
+						"",
+						"core"
+					],
+					[
+						"XML",
+						"XML",
+						"Using DOMParser to parse XML, open the console to see the results",
+						"core"
+					],
+					[
+						"Socket",
+						"Socket",
+						"Because the server is the WS protocol, the HTTPS protocol will make a mistake",
+						"core"
+					],
+					[
+						"ProtocolBuffer",
+						"ProtocolBuffer",
+						"Use the protobuf.js (demo version of decodeIO) to see the results in the console",
+						"core,protobuf"
+					]
+				]
+			},
+			{
+				"prefix": "Physics",
+				"tr_zhCN": "Dynamic physic",
+				"manifest": [
+					[
+						"Cloth",
+						"Cloth",
+						"Demo comes from official matter.js. Demonstrates using LayaAir to render matter.js",
+						"core,matter.js,LayaRender.js"
+					],
+					[
+						"NewtonsCradle",
+						"NewtonsCradle",
+						"Demo comes from official matter.js. Demonstrates using LayaAir to render matter.js",
+						"core,matter.js,LayaRender.js"
+					],
+					[
+						"Slingshot",
+						"Slingshot",
+						"Demo comes from official matter.js. Demonstrates using LayaAir to render matter.js",
+						"core,matter.js,LayaRender.js"
+					]
+				]
+			},
+			{
+				"prefix": "DOM",
+				"tr_zhCN": "DOM element",
+				"manifest": [
+					[
+						"Video",
+						"Video",
+						"Using H5 video API, you can get a better performance advantage than canvas rendering",
+						"core"
+					],
+					[
+						"Form",
+						"Form input",
+						"Use the H5 to express input API and feel the native input experience",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "Debug",
+				"tr_zhCN": "Debug",
+				"manifest": [
+					[
+						"FPSStats",
+						"FPSStats",
+						"",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "PerformanceTest",
+				"tr_zhCN": "Benchmark test",
+				"manifest": [
+					[
+						"Maggots",
+						"Maggots",
+						"5000 worms perform displacement, rotation, and scaling each frame",
+						"core"
+					],
+					[
+						"Cartoon",
+						"Cartoon",
+						"The 500 bodies rotate and shift",
+						"core"
+					],
+					[
+						"Cartoon2",
+						"Cartoon2",
+						"500 animations move in disorder",
+						"core"
+					],
+					[
+						"Skeleton",
+						"Skeleton",
+						"100 skeleton animations. Click to toggle action",
+						"core,ani"
+					]
+				]
+			},
+			{
+				"prefix": "PIXI",
+				"tr_zhCN": " implement 3rd party demo",
+				"manifest": [
+					[
+						"Example_04",
+						"Example_04",
+						"原Pixi.js Demo",
+						"core"
+					],
+					[
+						"Example_05",
+						"Example_05",
+						"原Pixi.js Demo",
+						"core"
+					],
+					[
+						"Example_21",
+						"Example_21",
+						"原Pixi.js Demo",
+						"core"
+					],
+					[
+						"Example_23",
+						"Example_23",
+						"原Pixi.js Demo",
+						"core"
+					]
+				]
+			},
+			{
+				"prefix": "IDE",
+				"tr_zhCN": "IDE",
+				"manifest": [
+					[
+						"Project",
+						"Project",
+						"Display generated from IDE",
+						"core,ui,UI code"
+					]
+				]
+			}
+		],
 		"3d": [
 			{
 				"prefix": "Resource",
-		  		"tr_zhCN": "Resource",
-		  		"manifest": [
-					[ "LoadResourceDemo", "LoadResourceDemo", "", "core,ani,d3,CameraMoveScript.js" ],
-					[ "GarbageCollection", "GarbageCollection", "", "core,ani,d3,ui,CameraMoveScript.js" ]
-		  		]
+				"tr_zhCN": "Resource",
+				"manifest": [
+					[
+						"LoadResourceDemo",
+						"LoadResourceDemo",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"GarbageCollection",
+						"GarbageCollection",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js"
+					]
+				]
 			},
 			{
 				"prefix": "Scene3D",
 				"tr_zhCN": "Scene3D",
 				"manifest": [
-					[ "SceneLoad1", "SceneLoad1", "", "core,ani,d3,physics3D,CameraMoveScript.js" ],
-					[ "SceneLoad2", "SceneLoad2", "", "core,ani,d3,CameraMoveScript.js" ],
-					[ "EnvironmentalReflection", "EnvironmentalReflection", "", "core,ani,d3,CameraMoveScript.js" ],
-					[ "LightmapScene", "LightmapScene", "", "core,ani,d3,CameraMoveScript.js" ]
+					[
+						"SceneLoad1",
+						"SceneLoad1",
+						"",
+						"core,ani,d3,physics3D,CameraMoveScript.js"
+					],
+					[
+						"SceneLoad2",
+						"SceneLoad2",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"EnvironmentalReflection",
+						"EnvironmentalReflection",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"LightmapScene",
+						"LightmapScene",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					]
 				]
 			},
 			{
 				"prefix": "Camera",
 				"tr_zhCN": "Camera",
 				"manifest": [
-					["CameraDemo", "CameraDemo", "", "core,ani,d3,ui,CameraMoveScript.js"],
-					["CameraLookAt", "CameraLookAt", "", "core,ani,d3,ui,CameraMoveScript.js"],
-					["MultiCamera", "MultiCamera", "", "core,ani,d3,CameraMoveScript.js"],
-					["CameraRay", "CameraRay", "", "core,ani,d3,physics3D,CameraMoveScript.js"],
-					["CameraLayer", "CameraLayer", "", "core,ani,d3,ui,CameraMoveScript.js"],
-					["OrthographicCamera", "OrthographicCamera", "", "core,ui,ani,d3"],
-					["D3SpaceToD2Space", "D3SpaceToD2Space", "", "core,ui,ani,d3"],
-					["RenderTargetCamera", "RenderTargetCamera", "", "core,ui,ani,d3,ui,CameraMoveScript.js"],
-					["RenderTargetTo2DSprite", "RenderTargetTo2DSprite", "", "core,ui,ani,d3,CameraMoveScript.js"],
-					["PickPixel", "PickPixel", "", "core,ui,ani,d3,CameraMoveScript.js"]
+					[
+						"CameraDemo",
+						"CameraDemo",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js"
+					],
+					[
+						"CameraLookAt",
+						"CameraLookAt",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js"
+					],
+					[
+						"MultiCamera",
+						"MultiCamera",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"CameraRay",
+						"CameraRay",
+						"",
+						"core,ani,d3,physics3D,CameraMoveScript.js"
+					],
+					[
+						"CameraLayer",
+						"CameraLayer",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js"
+					],
+					[
+						"OrthographicCamera",
+						"OrthographicCamera",
+						"",
+						"core,ui,ani,d3"
+					],
+					[
+						"D3SpaceToD2Space",
+						"D3SpaceToD2Space",
+						"",
+						"core,ui,ani,d3"
+					],
+					[
+						"RenderTargetCamera",
+						"RenderTargetCamera",
+						"",
+						"core,ui,ani,d3,ui,CameraMoveScript.js"
+					],
+					[
+						"RenderTargetTo2DSprite",
+						"RenderTargetTo2DSprite",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"PickPixel",
+						"PickPixel",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js"
+					]
 				]
 			},
 			{
 				"prefix": "Lighting",
 				"tr_zhCN": "Lighting",
 				"manifest": [
-					["DirectionLightDemo", "DirectionLight", "", "core,ani,d3,CameraMoveScript.js"],
-					["PointLightDemo", "PointLight", "", "core,ani,d3,CameraMoveScript.js"],
-					["SpotLightDemo", "SpotLight", "", "core,ani,d3,CameraMoveScript.js" ],
-					["RealTimeShadow", "RealTimeShadow", "", "core,ani,d3,ui,CameraMoveScript.js" ],
-					["SpotLightShadowMap", "SpotLightShadowMap", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
-					["MultiLight", "MultiLight", "", "core,ani,d3,CameraMoveScript.js,physics3D"]
+					[
+						"DirectionLightDemo",
+						"DirectionLight",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"PointLightDemo",
+						"PointLight",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"SpotLightDemo",
+						"SpotLight",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"RealTimeShadow",
+						"RealTimeShadow",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js"
+					],
+					[
+						"SpotLightShadowMap",
+						"SpotLightShadowMap",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
+					],
+					[
+						"MultiLight",
+						"MultiLight",
+						"",
+						"core,ani,d3,CameraMoveScript.js,physics3D"
+					]
 				]
 			},
-	
 			{
 				"prefix": "Sprite3D",
 				"tr_zhCN": "Sprite3D",
 				"manifest": [
-					["SkinnedMeshSprite3DDemo", "SkinnedMeshSprite3DDemo", "", "core,ani,d3,ui,CameraMoveScript.js"],
-					["Sprite3DParent", "Sprite3DParent", "", "core,ani,d3,ui,CameraMoveScript.js"],
-					["TransformDemo", "TransformDemo", "", "core,ani,d3,CameraMoveScript.js"],
-					["Sprite3DClone", "Sprite3DClone", "", "core,ani,d3,CameraMoveScript.js" ],
-					["PixelLineSprite3DDemo", "PixelLineSprite3DDemo", "", "core,ani,d3,Tool.js,CameraMoveScript.js" ]
+					[
+						"SkinnedMeshSprite3DDemo",
+						"SkinnedMeshSprite3DDemo",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js"
+					],
+					[
+						"Sprite3DParent",
+						"Sprite3DParent",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js"
+					],
+					[
+						"TransformDemo",
+						"TransformDemo",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"Sprite3DClone",
+						"Sprite3DClone",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"PixelLineSprite3DDemo",
+						"PixelLineSprite3DDemo",
+						"",
+						"core,ani,d3,Tool.js,CameraMoveScript.js"
+					]
 				]
 			},
 			{
 				"prefix": "Mesh",
 				"tr_zhCN": "Mesh",
 				"manifest": [
-					["MeshLoad", "MeshLoad", "", "core,ui,ani,d3,Tool.js"],
-					["CustomMesh", "CustomMesh", "", "core,ui,ani,d3,Tool.js,CameraMoveScript.js" ],
-					["ChangeMesh", "ChangeMesh", "", "core,ui,ani,d3,Tool.js,physics3D,CameraMoveScript.js" ]
+					[
+						"MeshLoad",
+						"MeshLoad",
+						"",
+						"core,ui,ani,d3,Tool.js"
+					],
+					[
+						"CustomMesh",
+						"CustomMesh",
+						"",
+						"core,ui,ani,d3,Tool.js,CameraMoveScript.js"
+					],
+					[
+						"ChangeMesh",
+						"ChangeMesh",
+						"",
+						"core,ui,ani,d3,Tool.js,physics3D,CameraMoveScript.js"
+					]
 				]
 			},
-			
 			{
 				"prefix": "Material",
 				"tr_zhCN": "Material",
 				"manifest": [
-					["MaterialDemo", "MaterialDemo", "", "core,ani,d3,physics3D,ui,CameraMoveScript.js" ],
-					["BlinnPhongMaterialLoad", "BlinnPhongMaterialLoad", "", "core,ani,d3" ],
-					["BlinnPhong_DiffuseMap", "BlinnPhong_DiffuseMap", "", "core,ani,d3" ],
-					["BlinnPhong_NormalMap", "BlinnPhong_NormalMap", "", "core,ani,d3" ],
-					["BlinnPhong_SpecularMap", "BlinnPhong_SpecularMap", "", "core,ani,d3,CameraMoveScript.js"],
-					["PBRMaterialDemo", "PBRMaterialDemo", "", "core,ani,d3,CameraMoveScript.js" ],
-					["EffectMaterialDemo", "EffectMaterial", "", "core,ani,d3,CameraMoveScript.js" ],
-					["UnlitMaterialDemo", "UnlitMaterial", "", "core,ani,d3,CameraMoveScript.js" ],
-					["WaterPrimaryMaterialDemo", "WaterPrimaryMaterial", "", "core,ani,d3,physics3D,CameraMoveScript.js" ]
+					[
+						"MaterialDemo",
+						"MaterialDemo",
+						"",
+						"core,ani,d3,physics3D,ui,CameraMoveScript.js"
+					],
+					[
+						"BlinnPhongMaterialLoad",
+						"BlinnPhongMaterialLoad",
+						"",
+						"core,ani,d3"
+					],
+					[
+						"BlinnPhong_DiffuseMap",
+						"BlinnPhong_DiffuseMap",
+						"",
+						"core,ani,d3"
+					],
+					[
+						"BlinnPhong_NormalMap",
+						"BlinnPhong_NormalMap",
+						"",
+						"core,ani,d3"
+					],
+					[
+						"BlinnPhong_SpecularMap",
+						"BlinnPhong_SpecularMap",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"PBRMaterialDemo",
+						"PBRMaterialDemo",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"EffectMaterialDemo",
+						"EffectMaterial",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"UnlitMaterialDemo",
+						"UnlitMaterial",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"WaterPrimaryMaterialDemo",
+						"WaterPrimaryMaterial",
+						"",
+						"core,ani,d3,physics3D,CameraMoveScript.js"
+					]
 				]
 			},
 			{
 				"prefix": "Texture",
 				"tr_zhCN": "Texture",
 				"manifest": [
-					["TextureDemo", "TextureDemo", "", "core,ani,d3,CameraMoveScript.js"],
-					["TextureGPUCompression", "TextureGPUCompression", "", "core,ani,d3,physics3D,CameraMoveScript.js"]
+					[
+						"TextureDemo",
+						"TextureDemo",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"TextureGPUCompression",
+						"TextureGPUCompression",
+						"",
+						"core,ani,d3,physics3D,CameraMoveScript.js"
+					],
+					[
+						"HalfFloatTexture",
+						"HalfFloatTexture",
+						"",
+						"core,ani,d3,physics3D"
+					]
 				]
 			},
 			{
 				"prefix": "Animation3D",
 				"tr_zhCN": "Animation3D",
-		  		"manifest": [
-					["AnimatorDemo", "AnimatorDemo", "", "core,ui,ani,d3,CameraMoveScript.js,AnimatorStateScriptTest.js,physics3D" ],
-					["AnimationLayerBlend", "AnimationLayerBlend", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["AnimatorStateScriptDemo", "AnimatorStateScript", "", "core,ui,ani,d3,CameraMoveScript.js,CustomAnimatorStateScript.js,physics3D" ],
-					["BoneLinkSprite3D", "BoneLinkSprite3D", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["MaterialAnimation", "MaterialAnimation", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["RigidbodyAnimationDemo", "RigidbodyAnimation", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["CameraAnimation", "CameraAnimation", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["SimpleSkinAnimationInstance", "SimpleSkinAnimationInstance", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D"]
-		  		]
+				"manifest": [
+					[
+						"AnimatorDemo",
+						"AnimatorDemo",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,AnimatorStateScriptTest.js,physics3D"
+					],
+					[
+						"AnimationLayerBlend",
+						"AnimationLayerBlend",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"AnimatorStateScriptDemo",
+						"AnimatorStateScript",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,CustomAnimatorStateScript.js,physics3D"
+					],
+					[
+						"BoneLinkSprite3D",
+						"BoneLinkSprite3D",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"MaterialAnimation",
+						"MaterialAnimation",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"RigidbodyAnimationDemo",
+						"RigidbodyAnimation",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"CameraAnimation",
+						"CameraAnimation",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"SimpleSkinAnimationInstance",
+						"SimpleSkinAnimationInstance",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					]
+				]
 			},
 			{
 				"prefix": "Physics3D",
 				"tr_zhCN": "Physics3D",
-		  		"manifest": [
-					["PhysicsWorld_BaseCollider", "BaseCollider", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["PhysicsWorld_BuildingBlocks", "BuildingBlocks", "", "core,ui,ani,d3,physics3D" ],
-					["PhysicsWorld_Character", "Character", "", "core,ui,ani,d3,physics3D" ],
-					["PhysicsWorld_CollisionFiflter", "CollisionFiflter", "", "core,ui,ani,d3,physics3D" ],
-					["PhysicsWorld_CompoundCollider", "CompoundCollider", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["PhysicsWorld_ContinueCollisionDetection", "ContinueCollisionDetection", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["PhysicsWorld_Kinematic", "Kinematic", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["PhysicsWorld_MeshCollider", "MeshCollider", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["PhysicsWorld_RayShapeCast", "RayShapeCast", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["PhysicsWorld_TriggerAndCollisionEvent", "TriggerAndCollisionEvent", "","core,ui,ani,d3,CameraMoveScript.js,TriggerCollisionScript.js,physics3D" ],
-					["PhysicsWorld_ConstraintFixedJoint", "ConstraintFixedJoint", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ],
-					["PhysicsWorld_ConfigurableJoint", "ConfigurableJoint", "", "core,ui,ani,d3,CameraMoveScript.js,physics3D" ]
-		  		]
+				"manifest": [
+					[
+						"PhysicsWorld_BaseCollider",
+						"BaseCollider",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PhysicsWorld_BuildingBlocks",
+						"BuildingBlocks",
+						"",
+						"core,ui,ani,d3,physics3D"
+					],
+					[
+						"PhysicsWorld_Character",
+						"Character",
+						"",
+						"core,ui,ani,d3,physics3D"
+					],
+					[
+						"PhysicsWorld_CollisionFiflter",
+						"CollisionFiflter",
+						"",
+						"core,ui,ani,d3,physics3D"
+					],
+					[
+						"PhysicsWorld_CompoundCollider",
+						"CompoundCollider",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PhysicsWorld_ContinueCollisionDetection",
+						"ContinueCollisionDetection",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PhysicsWorld_Kinematic",
+						"Kinematic",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PhysicsWorld_MeshCollider",
+						"MeshCollider",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PhysicsWorld_RayShapeCast",
+						"RayShapeCast",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PhysicsWorld_TriggerAndCollisionEvent",
+						"TriggerAndCollisionEvent",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,TriggerCollisionScript.js,physics3D"
+					],
+					[
+						"PhysicsWorld_ConstraintFixedJoint",
+						"ConstraintFixedJoint",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PhysicsWorld_ConfigurableJoint",
+						"ConfigurableJoint",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					]
+				]
 			},
 			{
 				"prefix": "CannonPhysics3D",
 				"tr_zhCN": "CannonPhysics3D",
-				  "manifest": [
-					["CannonPhysicsWorld_BaseCollider", "BaseCollider", "", "core,d3,CameraMoveScript.js,cannon.js,cannonPhysics" ],
-					["CannonPhysicsWorld_ColliderEvent", "ColliderEvent", "", "core,d3,CameraMoveScript.js,physics3D,cannon.js,cannonPhysics" ],
-					["CannonPhysicsWorld_PhysicsProperty", "PhysicsProperty", "", "core,d3,CameraMoveScript.js,physics3D,cannon.js,cannonPhysics" ],
-					["CannonPhysicsWorld_RayCheck", "RayCheck", "", "core,d3,physics3D,CameraMoveScript.js,cannon.js,cannonPhysics" ]
-				  ]
+				"manifest": [
+					[
+						"CannonPhysicsWorld_BaseCollider",
+						"BaseCollider",
+						"",
+						"core,d3,CameraMoveScript.js,cannon.js,cannonPhysics"
+					],
+					[
+						"CannonPhysicsWorld_ColliderEvent",
+						"ColliderEvent",
+						"",
+						"core,d3,CameraMoveScript.js,physics3D,cannon.js,cannonPhysics"
+					],
+					[
+						"CannonPhysicsWorld_PhysicsProperty",
+						"PhysicsProperty",
+						"",
+						"core,d3,CameraMoveScript.js,physics3D,cannon.js,cannonPhysics"
+					],
+					[
+						"CannonPhysicsWorld_RayCheck",
+						"RayCheck",
+						"",
+						"core,d3,physics3D,CameraMoveScript.js,cannon.js,cannonPhysics"
+					]
+				]
 			},
 			{
 				"prefix": "MouseInteraction",
 				"tr_zhCN": "MouseInteraction",
 				"manifest": [
-					["MouseInteraction", "MouseInteraction", "", "core,ani,d3,ui,physics3D,CameraMoveScript.js"],
-					["MultiTouch", "MultiTouch", "", "core,ani,d3,CameraMoveScript.js,physics3D"]
+					[
+						"MouseInteraction",
+						"MouseInteraction",
+						"",
+						"core,ani,d3,ui,physics3D,CameraMoveScript.js"
+					],
+					[
+						"MultiTouch",
+						"MultiTouch",
+						"",
+						"core,ani,d3,CameraMoveScript.js,physics3D"
+					]
 				]
 			},
 			{
 				"prefix": "Script",
 				"tr_zhCN": "Script",
 				"manifest": [
-					["ScriptDemo", "ScriptDemo", "", "core,ani,d3,CameraMoveScript.js"]
+					[
+						"ScriptDemo",
+						"ScriptDemo",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					]
 				]
 			},
 			{
 				"prefix": "Sky",
 				"tr_zhCN": "Sky",
 				"manifest": [
-					["Sky_SkyBox", "SkyBox", "", "core,ani,d3,CameraMoveScript.js"],
-					["Sky_Procedural", "Sky_Procedural", "", "core,ani,d3,CameraMoveScript.js"]		
+					[
+						"Sky_SkyBox",
+						"SkyBox",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"Sky_Procedural",
+						"Sky_Procedural",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					]
 				]
 			},
-		
 			{
 				"prefix": "Particle3D",
 				"tr_zhCN": "Particle3D",
 				"manifest": [
-					[ "Particle_EternalLight", "EternalLight", "", "core,ani,d3" ],
-					[ "Particle_BurningGround", "BurningGround", "", "core,ani,d3" ]
+					[
+						"Particle_EternalLight",
+						"EternalLight",
+						"",
+						"core,ani,d3"
+					],
+					[
+						"Particle_BurningGround",
+						"BurningGround",
+						"",
+						"core,ani,d3"
+					]
 				]
 			},
 			{
 				"prefix": "Trail",
 				"tr_zhCN": "Trail",
 				"manifest": [
-					[ "TrailRender", "TrailRender", "", "core,ani,d3"]
+					[
+						"TrailRender",
+						"TrailRender",
+						"",
+						"core,ani,d3"
+					]
 				]
 			},
 			{
 				"prefix": "Shader",
 				"tr_zhCN": "Customizeshader",
 				"manifest": [
-					["Shader_Simple", "Shader_Simple", "", "core,ani,d3,CameraMoveScript.js,CustomMaterial.js"],
-					["Shader_GlowingEdge", "GlowingEdge", "", "core,ani,d3,CustomMaterial.js,CameraMoveScript.js"],
-					["Shader_Terrain", "Shader_Terrain", "", "core,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js"],
-					["Shader_MultiplePassOutline", "Outline(Multiple Pass)", "", "core,ani,d3,CameraMoveScript.js"]
+					[
+						"Shader_Simple",
+						"Shader_Simple",
+						"",
+						"core,ani,d3,CameraMoveScript.js,CustomMaterial.js"
+					],
+					[
+						"Shader_GlowingEdge",
+						"GlowingEdge",
+						"",
+						"core,ani,d3,CustomMaterial.js,CameraMoveScript.js"
+					],
+					[
+						"Shader_Terrain",
+						"Shader_Terrain",
+						"",
+						"core,ani,d3,CustomTerrainMaterial.js,CameraMoveScript.js"
+					],
+					[
+						"Shader_MultiplePassOutline",
+						"Outline(Multiple Pass)",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					]
 				]
 			},
 			{
 				"prefix": "Performance",
 				"tr_zhCN": "Performance",
 				"manifest": [
-					["StaticBatchingTest", "StaticBatchingTest", "", "core,d3,ui,CameraMoveScript.js,physics3D"],
-					["DynamicBatchTest", "DynamicBatchTest", "", "core,d3,ui,CameraMoveScript.js,physics3D"]
+					[
+						"StaticBatchingTest",
+						"StaticBatchingTest",
+						"",
+						"core,d3,ui,CameraMoveScript.js,physics3D"
+					],
+					[
+						"DynamicBatchTest",
+						"DynamicBatchTest",
+						"",
+						"core,d3,ui,CameraMoveScript.js,physics3D"
+					]
 				]
-	
 			},
 			{
 				"prefix": "Advance",
 				"tr_zhCN": "Advance",
-		  		"manifest": [
-					["Laya3DCombineHtml", "Laya3DCombineHtml", "", "core,ani,d3" ],
-					["AStarFindPath", "AStarFindPath", "", "core,ani,d3,astar.js,CameraMoveScript.js" ],
-					["Scene2DPlayer3D", "Scene2DPlayer3D", "", "core,ani,d3,ui,CameraMoveScript.js" ],
-					["Secne3DPlayer2D", "Secne3DPlayer2D", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
-					[ "PostProcessBloom", "PostProcessBloom", "", "core,ani,d3,ui,CameraMoveScript.js,physics3D" ],
-					[ "DrawTextTexture", "3D文字纹理", "", "core,ani,d3,ui,CameraMoveScript.js" ],
-					[ "VideoPlayIn3DWorld", "视频纹理", "", "core,ani,d3,device,ui,CameraMoveScript.js"]
-		  		]
+				"manifest": [
+					[
+						"Laya3DCombineHtml",
+						"Laya3DCombineHtml",
+						"",
+						"core,ani,d3"
+					],
+					[
+						"AStarFindPath",
+						"AStarFindPath",
+						"",
+						"core,ani,d3,astar.js,CameraMoveScript.js"
+					],
+					[
+						"Scene2DPlayer3D",
+						"Scene2DPlayer3D",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js"
+					],
+					[
+						"Secne3DPlayer2D",
+						"Secne3DPlayer2D",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PostProcessBloom",
+						"PostProcessBloom",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
+					],
+					[
+						"DrawTextTexture",
+						"3D文字纹理",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js"
+					],
+					[
+						"VideoPlayIn3DWorld",
+						"视频纹理",
+						"",
+						"core,ani,d3,device,ui,CameraMoveScript.js"
+					],
+					[
+						"CommandBuffer_BlurryGlass",
+						"CommandBuffer_BlurryGlass",
+						"",
+						"core,ani,d3,device,ui"
+					],
+					[
+						"CommandBuffer_Outline",
+						"CommandBuffer_Outline",
+						"",
+						"core,ani,d3,device,ui"
+					],
+					[
+						"ReflectionProbeDemo",
+						"ReflectionProbeDemo",
+						"",
+						"core,ani,d3,device,ui,physics3D"
+					]
+				]
 			},
 			{
 				"prefix": "Demo",
 				"tr_zhCN": "Demo",
 				"manifest": [
-					[ "GhostModelShow", "GhostModelShow", "", "core,ani,d3" ],
-					[ "DamagedHelmetModelShow", "DamagedHelmetModelShow", "", "core,ani,d3,CameraMoveScript.js" ],
-					[ "CerberusModelShow", "CerberusModelShow", "", "core,ani,d3,CameraMoveScript.js" ]
+					[
+						"GhostModelShow",
+						"GhostModelShow",
+						"",
+						"core,ani,d3"
+					],
+					[
+						"DamagedHelmetModelShow",
+						"DamagedHelmetModelShow",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"CerberusModelShow",
+						"CerberusModelShow",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					]
 				]
-			}]
+			}
+		]
 	}
 }

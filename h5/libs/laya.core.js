@@ -1428,7 +1428,7 @@ window.Laya= (function (exports) {
         TextureFormat[TextureFormat["PVRTCRGB_4BPPV"] = 11] = "PVRTCRGB_4BPPV";
         TextureFormat[TextureFormat["PVRTCRGBA_4BPPV"] = 12] = "PVRTCRGBA_4BPPV";
         TextureFormat[TextureFormat["R32G32B32A32"] = 15] = "R32G32B32A32";
-        TextureFormat[TextureFormat["R16G16B16A16"] = 16] = "R16G16B16A16";
+        TextureFormat[TextureFormat["R16G16B16A16"] = 17] = "R16G16B16A16";
     })(exports.TextureFormat || (exports.TextureFormat = {}));
 
     (function (WarpMode) {
@@ -1508,6 +1508,8 @@ window.Laya= (function (exports) {
                     return 1;
                 case exports.TextureFormat.Alpha8:
                     return 1;
+                case exports.TextureFormat.R16G16B16A16:
+                    return 2;
                 case exports.TextureFormat.R32G32B32A32:
                     return 4;
                 default:
@@ -2084,6 +2086,147 @@ window.Laya= (function (exports) {
     Byte.LITTLE_ENDIAN = "littleEndian";
     Byte._sysEndian = null;
 
+    (function (RenderTextureFormat) {
+        RenderTextureFormat[RenderTextureFormat["R8G8B8"] = 0] = "R8G8B8";
+        RenderTextureFormat[RenderTextureFormat["R8G8B8A8"] = 1] = "R8G8B8A8";
+        RenderTextureFormat[RenderTextureFormat["Alpha8"] = 2] = "Alpha8";
+        RenderTextureFormat[RenderTextureFormat["R16G16B16A16"] = 14] = "R16G16B16A16";
+        RenderTextureFormat[RenderTextureFormat["Depth"] = 15] = "Depth";
+        RenderTextureFormat[RenderTextureFormat["ShadowMap"] = 16] = "ShadowMap";
+    })(exports.RenderTextureFormat || (exports.RenderTextureFormat = {}));
+    (function (RenderTextureDepthFormat) {
+        RenderTextureDepthFormat[RenderTextureDepthFormat["DEPTH_16"] = 0] = "DEPTH_16";
+        RenderTextureDepthFormat[RenderTextureDepthFormat["STENCIL_8"] = 1] = "STENCIL_8";
+        RenderTextureDepthFormat[RenderTextureDepthFormat["DEPTHSTENCIL_24_8"] = 2] = "DEPTHSTENCIL_24_8";
+        RenderTextureDepthFormat[RenderTextureDepthFormat["DEPTHSTENCIL_NONE"] = 3] = "DEPTHSTENCIL_NONE";
+        RenderTextureDepthFormat[RenderTextureDepthFormat["DEPTHSTENCIL_16_8"] = 2] = "DEPTHSTENCIL_16_8";
+    })(exports.RenderTextureDepthFormat || (exports.RenderTextureDepthFormat = {}));
+
+    class SystemUtils {
+        static get maxTextureCount() {
+            return this._maxTextureCount;
+        }
+        static get maxTextureSize() {
+            return this._maxTextureSize;
+        }
+        static get shaderCapailityLevel() {
+            return this._shaderCapailityLevel;
+        }
+        static supportTextureFormat(format) {
+            switch (format) {
+                case exports.TextureFormat.R32G32B32A32:
+                    return (!LayaGL.layaGPUInstance._isWebGL2 && !LayaGL.layaGPUInstance._oesTextureFloat) ? false : true;
+                case exports.TextureFormat.R16G16B16A16:
+                    return (!LayaGL.layaGPUInstance._isWebGL2 && !LayaGL.layaGPUInstance._oesTextureHalfFloat) ? false : true;
+                default:
+                    return true;
+            }
+        }
+        static supportRenderTextureFormat(format) {
+            switch (format) {
+                case exports.RenderTextureFormat.R16G16B16A16:
+                    return (((!!LayaGL.layaGPUInstance._isWebGL2) && (!!LayaGL.layaGPUInstance._extColorBufferFloat)) || LayaGL.layaGPUInstance._oesTextureHalfFloat && LayaGL.layaGPUInstance._oesTextureHalfFloatLinear) ? true : false;
+                case exports.RenderTextureFormat.Depth:
+                    return (LayaGL.layaGPUInstance._isWebGL2 || LayaGL.layaGPUInstance._webgl_depth_texture) ? true : false;
+                case exports.RenderTextureFormat.ShadowMap:
+                    return LayaGL.layaGPUInstance._isWebGL2 ? true : false;
+                default:
+                    return true;
+            }
+        }
+    }
+
+    class HalfFloatUtils {
+        static __init__() {
+            for (var i = 0; i < 256; ++i) {
+                var e = i - 127;
+                if (e < -27) {
+                    HalfFloatUtils._baseTable[i | 0x000] = 0x0000;
+                    HalfFloatUtils._baseTable[i | 0x100] = 0x8000;
+                    HalfFloatUtils._shiftTable[i | 0x000] = 24;
+                    HalfFloatUtils._shiftTable[i | 0x100] = 24;
+                }
+                else if (e < -14) {
+                    HalfFloatUtils._baseTable[i | 0x000] = 0x0400 >> (-e - 14);
+                    HalfFloatUtils._baseTable[i | 0x100] = (0x0400 >> (-e - 14)) | 0x8000;
+                    HalfFloatUtils._shiftTable[i | 0x000] = -e - 1;
+                    HalfFloatUtils._shiftTable[i | 0x100] = -e - 1;
+                }
+                else if (e <= 15) {
+                    HalfFloatUtils._baseTable[i | 0x000] = (e + 15) << 10;
+                    HalfFloatUtils._baseTable[i | 0x100] = ((e + 15) << 10) | 0x8000;
+                    HalfFloatUtils._shiftTable[i | 0x000] = 13;
+                    HalfFloatUtils._shiftTable[i | 0x100] = 13;
+                }
+                else if (e < 128) {
+                    HalfFloatUtils._baseTable[i | 0x000] = 0x7c00;
+                    HalfFloatUtils._baseTable[i | 0x100] = 0xfc00;
+                    HalfFloatUtils._shiftTable[i | 0x000] = 24;
+                    HalfFloatUtils._shiftTable[i | 0x100] = 24;
+                }
+                else {
+                    HalfFloatUtils._baseTable[i | 0x000] = 0x7c00;
+                    HalfFloatUtils._baseTable[i | 0x100] = 0xfc00;
+                    HalfFloatUtils._shiftTable[i | 0x000] = 13;
+                    HalfFloatUtils._shiftTable[i | 0x100] = 13;
+                }
+            }
+            HalfFloatUtils._mantissaTable[0] = 0;
+            for (i = 1; i < 1024; ++i) {
+                var m = i << 13;
+                e = 0;
+                while ((m & 0x00800000) === 0) {
+                    e -= 0x00800000;
+                    m <<= 1;
+                }
+                m &= ~0x00800000;
+                e += 0x38800000;
+                HalfFloatUtils._mantissaTable[i] = m | e;
+            }
+            for (i = 1024; i < 2048; ++i) {
+                HalfFloatUtils._mantissaTable[i] = 0x38000000 + ((i - 1024) << 13);
+            }
+            HalfFloatUtils._exponentTable[0] = 0;
+            for (i = 1; i < 31; ++i) {
+                HalfFloatUtils._exponentTable[i] = i << 23;
+            }
+            HalfFloatUtils._exponentTable[31] = 0x47800000;
+            HalfFloatUtils._exponentTable[32] = 0x80000000;
+            for (i = 33; i < 63; ++i) {
+                HalfFloatUtils._exponentTable[i] = 0x80000000 + ((i - 32) << 23);
+            }
+            HalfFloatUtils._exponentTable[63] = 0xc7800000;
+            HalfFloatUtils._offsetTable[0] = 0;
+            for (i = 1; i < 64; ++i) {
+                if (i === 32) {
+                    HalfFloatUtils._offsetTable[i] = 0;
+                }
+                else {
+                    HalfFloatUtils._offsetTable[i] = 1024;
+                }
+            }
+        }
+        static roundToFloat16Bits(num) {
+            HalfFloatUtils._floatView[0] = num;
+            var f = HalfFloatUtils._uint32View[0];
+            var e = (f >> 23) & 0x1ff;
+            return HalfFloatUtils._baseTable[e] + ((f & 0x007fffff) >> HalfFloatUtils._shiftTable[e]);
+        }
+        static convertToNumber(float16bits) {
+            var m = float16bits >> 10;
+            HalfFloatUtils._uint32View[0] = HalfFloatUtils._mantissaTable[HalfFloatUtils._offsetTable[m] + (float16bits & 0x3ff)] + HalfFloatUtils._exponentTable[m];
+            return HalfFloatUtils._floatView[0];
+        }
+    }
+    HalfFloatUtils._buffer = new ArrayBuffer(4);
+    HalfFloatUtils._floatView = new Float32Array(HalfFloatUtils._buffer);
+    HalfFloatUtils._uint32View = new Uint32Array(HalfFloatUtils._buffer);
+    HalfFloatUtils._baseTable = new Uint32Array(512);
+    HalfFloatUtils._shiftTable = new Uint32Array(512);
+    HalfFloatUtils._mantissaTable = new Uint32Array(2048);
+    HalfFloatUtils._exponentTable = new Uint32Array(64);
+    HalfFloatUtils._offsetTable = new Uint32Array(64);
+
     class Texture2D extends BaseTexture {
         constructor(width = 0, height = 0, format = exports.TextureFormat.R8G8B8A8, mipmap = true, canRead = false) {
             super(format, mipmap);
@@ -2164,16 +2307,47 @@ window.Laya= (function (exports) {
         static _SimpleAnimatorTextureParse(data, propertyParams = null, constructParams = null) {
             var byte = new Byte(data);
             var version = byte.readUTFString();
-            if (version != "LAYAANIMATORTEXTURE:0000")
-                throw "Laya3D:unknow version.";
-            var textureWidth = byte.readInt32();
-            var pixelDataLength = byte.readInt32();
-            var pixelDataArrays = new Float32Array(textureWidth * textureWidth * 4);
-            var usePixelData = new Float32Array(byte.readArrayBuffer(pixelDataLength * 4));
-            pixelDataArrays.set(usePixelData, 0);
-            var texture = new Texture2D(textureWidth, textureWidth, exports.TextureFormat.R32G32B32A32, false, false);
-            texture.setPixels(pixelDataArrays, 0);
-            texture.filterMode = exports.FilterMode.Point;
+            var texture;
+            var pixelDataArrays;
+            var usePixelData;
+            switch (version) {
+                case "LAYAANIMATORTEXTURE:0000":
+                    var textureWidth = byte.readInt32();
+                    var pixelDataLength = byte.readInt32();
+                    pixelDataArrays = new Float32Array(textureWidth * textureWidth * 4);
+                    usePixelData = new Float32Array(byte.readArrayBuffer(pixelDataLength * 4));
+                    pixelDataArrays.set(usePixelData, 0);
+                    var texture = new Texture2D(textureWidth, textureWidth, exports.TextureFormat.R32G32B32A32, false, false);
+                    texture.setPixels(pixelDataArrays, 0);
+                    texture.filterMode = exports.FilterMode.Point;
+                    break;
+                case "LAYACOMPRESSANIMATORTEXTURE:0000":
+                    var textureWidth = byte.readInt32();
+                    var pixelDataLength = byte.readInt32();
+                    pixelDataArrays = new Uint16Array(byte.readArrayBuffer(pixelDataLength * 2));
+                    if (!SystemUtils.supportTextureFormat(exports.TextureFormat.R16G16B16A16)) {
+                        console.log("The platform does not support 16-bit floating-point textures");
+                        if (!SystemUtils.supportTextureFormat(exports.TextureFormat.R32G32B32A32))
+                            console.error("The platform does not support 32-bit floating-point textures");
+                        usePixelData = new Float32Array(textureWidth * textureWidth * 4);
+                        for (var i = 0, n = pixelDataArrays.length; i < n; i++) {
+                            usePixelData[i] = HalfFloatUtils.convertToNumber(pixelDataArrays[i]);
+                        }
+                        texture = new Texture2D(textureWidth, textureWidth, exports.TextureFormat.R32G32B32A32, false, false);
+                        texture.setPixels(usePixelData, 0);
+                        texture.filterMode = exports.FilterMode.Point;
+                    }
+                    else {
+                        usePixelData = new Uint16Array(textureWidth * textureWidth * 4);
+                        usePixelData.set(pixelDataArrays, 0);
+                        texture = new Texture2D(textureWidth, textureWidth, exports.TextureFormat.R16G16B16A16, false, false);
+                        texture.setPixels(usePixelData, 0);
+                        texture.filterMode = exports.FilterMode.Point;
+                    }
+                    break;
+                default:
+                    throw "Laya3D:unknow version.";
+            }
             return texture;
         }
         static load(url, complete) {
@@ -2214,7 +2388,8 @@ window.Laya= (function (exports) {
                     if (LayaGL.layaGPUInstance._isWebGL2)
                         gl.texImage2D(textureType, miplevel, gl.RGBA16F, width, height, 0, glFormat, gl.HALF_FLOAT, pixels);
                     else
-                        gl.texImage2D(textureType, miplevel, gl.RGBA16F, width, height, 0, glFormat, LayaGL.layaGPUInstance._oesTextureHalfFloat.HALF_FLOAT_OES, pixels);
+                        gl.texImage2D(textureType, miplevel, gl.RGBA, width, height, 0, glFormat, LayaGL.layaGPUInstance._oesTextureHalfFloat.HALF_FLOAT_OES, pixels);
+                    break;
                 default:
                     gl.texImage2D(textureType, miplevel, glFormat, width, height, 0, glFormat, gl.UNSIGNED_BYTE, pixels);
             }
@@ -2550,22 +2725,6 @@ window.Laya= (function (exports) {
     RenderState2D.width = 0;
     RenderState2D.height = 0;
 
-    (function (RenderTextureFormat) {
-        RenderTextureFormat[RenderTextureFormat["R8G8B8"] = 0] = "R8G8B8";
-        RenderTextureFormat[RenderTextureFormat["R8G8B8A8"] = 1] = "R8G8B8A8";
-        RenderTextureFormat[RenderTextureFormat["Alpha8"] = 2] = "Alpha8";
-        RenderTextureFormat[RenderTextureFormat["R16G16B16A16"] = 14] = "R16G16B16A16";
-        RenderTextureFormat[RenderTextureFormat["Depth"] = 15] = "Depth";
-        RenderTextureFormat[RenderTextureFormat["ShadowMap"] = 16] = "ShadowMap";
-    })(exports.RenderTextureFormat || (exports.RenderTextureFormat = {}));
-    (function (RenderTextureDepthFormat) {
-        RenderTextureDepthFormat[RenderTextureDepthFormat["DEPTH_16"] = 0] = "DEPTH_16";
-        RenderTextureDepthFormat[RenderTextureDepthFormat["STENCIL_8"] = 1] = "STENCIL_8";
-        RenderTextureDepthFormat[RenderTextureDepthFormat["DEPTHSTENCIL_24_8"] = 2] = "DEPTHSTENCIL_24_8";
-        RenderTextureDepthFormat[RenderTextureDepthFormat["DEPTHSTENCIL_NONE"] = 3] = "DEPTHSTENCIL_NONE";
-        RenderTextureDepthFormat[RenderTextureDepthFormat["DEPTHSTENCIL_16_8"] = 2] = "DEPTHSTENCIL_16_8";
-    })(exports.RenderTextureDepthFormat || (exports.RenderTextureDepthFormat = {}));
-
     class RenderTexture2D extends BaseTexture {
         constructor(width, height, format = exports.RenderTextureFormat.R8G8B8, depthStencilFormat = exports.RenderTextureDepthFormat.DEPTH_16) {
             super(format, false);
@@ -2779,14 +2938,37 @@ window.Laya= (function (exports) {
 
     class BlendMode {
         static _init_(gl) {
-            BlendMode.fns = [BlendMode.BlendNormal, BlendMode.BlendAdd, BlendMode.BlendMultiply, BlendMode.BlendScreen, BlendMode.BlendOverlay, BlendMode.BlendLight, BlendMode.BlendMask, BlendMode.BlendDestinationOut];
-            BlendMode.targetFns = [BlendMode.BlendNormalTarget, BlendMode.BlendAddTarget, BlendMode.BlendMultiplyTarget, BlendMode.BlendScreenTarget, BlendMode.BlendOverlayTarget, BlendMode.BlendLightTarget, BlendMode.BlendMask, BlendMode.BlendDestinationOut];
+            BlendMode.fns = [
+                BlendMode.BlendNormal,
+                BlendMode.BlendAdd,
+                BlendMode.BlendMultiply,
+                BlendMode.BlendScreen,
+                BlendMode.BlendOverlay,
+                BlendMode.BlendLight,
+                BlendMode.BlendMask,
+                BlendMode.BlendDestinationOut,
+                BlendMode.BlendAddOld
+            ];
+            BlendMode.targetFns = [
+                BlendMode.BlendNormalTarget,
+                BlendMode.BlendAddTarget,
+                BlendMode.BlendMultiplyTarget,
+                BlendMode.BlendScreenTarget,
+                BlendMode.BlendOverlayTarget,
+                BlendMode.BlendLightTarget,
+                BlendMode.BlendMask,
+                BlendMode.BlendDestinationOut,
+                BlendMode.BlendAddTargetOld
+            ];
         }
         static BlendNormal(gl) {
             WebGLContext.setBlendFunc(gl, gl.ONE, gl.ONE_MINUS_SRC_ALPHA, true);
         }
-        static BlendAdd(gl) {
+        static BlendAddOld(gl) {
             WebGLContext.setBlendFunc(gl, gl.ONE, gl.DST_ALPHA, true);
+        }
+        static BlendAdd(gl) {
+            WebGLContext.setBlendFunc(gl, gl.ONE, gl.ONE, true);
         }
         static BlendMultiply(gl) {
             WebGLContext.setBlendFunc(gl, gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA, true);
@@ -2803,8 +2985,11 @@ window.Laya= (function (exports) {
         static BlendNormalTarget(gl) {
             WebGLContext.setBlendFunc(gl, gl.ONE, gl.ONE_MINUS_SRC_ALPHA, true);
         }
-        static BlendAddTarget(gl) {
+        static BlendAddTargetOld(gl) {
             WebGLContext.setBlendFunc(gl, gl.ONE, gl.DST_ALPHA, true);
+        }
+        static BlendAddTarget(gl) {
+            WebGLContext.setBlendFunc(gl, gl.ONE, gl.ONE, true);
         }
         static BlendMultiplyTarget(gl) {
             WebGLContext.setBlendFunc(gl, gl.DST_COLOR, gl.ONE_MINUS_SRC_ALPHA, true);
@@ -2826,19 +3011,33 @@ window.Laya= (function (exports) {
         }
     }
     BlendMode.activeBlendFunction = null;
-    BlendMode.NAMES = ["normal", "add", "multiply", "screen", "overlay", "light", "mask", "destination-out"];
-    BlendMode.TOINT = { "normal": 0, "add": 1, "multiply": 2, "screen": 3, "overlay": 4, "light": 5, "mask": 6, "destination-out": 7, "lighter": 1 };
+    BlendMode.NAMES = [
+        "normal",
+        "add",
+        "multiply",
+        "screen",
+        "overlay",
+        "light",
+        "mask",
+        "destination-out",
+        "add_old"
+    ];
+    BlendMode.TOINT = {
+        "normal": 0,
+        "add": 1,
+        "multiply": 2,
+        "screen": 3,
+        "overlay": 4,
+        "light": 5,
+        "mask": 6,
+        "destination-out": 7,
+        "lighter": 1,
+        "lighter_old": 8,
+        "add_old": 8
+    };
     BlendMode.NORMAL = "normal";
-    BlendMode.ADD = "add";
-    BlendMode.MULTIPLY = "multiply";
-    BlendMode.SCREEN = "screen";
-    BlendMode.OVERLAY = "overlay";
-    BlendMode.LIGHT = "light";
     BlendMode.MASK = "mask";
-    BlendMode.DESTINATIONOUT = "destination-out";
     BlendMode.LIGHTER = "lighter";
-    BlendMode.fns = [];
-    BlendMode.targetFns = [];
 
     class ShaderDefinesBase {
         constructor(name2int, int2name, int2nameMap) {
@@ -3961,7 +4160,7 @@ window.Laya= (function (exports) {
     class ColorUtils {
         constructor(value) {
             this.arrColor = [];
-            if (value == null) {
+            if (value == null || value == 'none') {
                 this.strColor = "#00000000";
                 this.numColor = 0;
                 this.arrColor = [0, 0, 0, 0];
@@ -5649,7 +5848,7 @@ window.Laya= (function (exports) {
 
     var texture_vs = "/*\r\n\ttexture和fillrect使用的。\r\n*/\r\nattribute vec4 posuv;\r\nattribute vec4 attribColor;\r\nattribute vec4 attribFlags;\r\n//attribute vec4 clipDir;\r\n//attribute vec2 clipRect;\r\nuniform vec4 clipMatDir;\r\nuniform vec2 clipMatPos;\t\t// 这个是全局的，不用再应用矩阵了。\r\nvarying vec2 cliped;\r\nuniform vec2 size;\r\nuniform vec2 clipOff;\t\t\t// 使用要把clip偏移。cacheas normal用. 只用了[0]\r\n#ifdef WORLDMAT\r\n\tuniform mat4 mmat;\r\n#endif\r\n#ifdef MVP3D\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\nvarying vec4 v_texcoordAlpha;\r\nvarying vec4 v_color;\r\nvarying float v_useTex;\r\n\r\nvoid main() {\r\n\r\n\tvec4 pos = vec4(posuv.xy,0.,1.);\r\n#ifdef WORLDMAT\r\n\tpos=mmat*pos;\r\n#endif\r\n\tvec4 pos1  =vec4((pos.x/size.x-0.5)*2.0,(0.5-pos.y/size.y)*2.0,0.,1.0);\r\n#ifdef MVP3D\r\n\tgl_Position=u_MvpMatrix*pos1;\r\n#else\r\n\tgl_Position=pos1;\r\n#endif\r\n\tv_texcoordAlpha.xy = posuv.zw;\r\n\t//v_texcoordAlpha.z = attribColor.a/255.0;\r\n\tv_color = attribColor/255.0;\r\n\tv_color.xyz*=v_color.w;//反正后面也要预乘\r\n\t\r\n\tv_useTex = attribFlags.r/255.0;\r\n\tfloat clipw = length(clipMatDir.xy);\r\n\tfloat cliph = length(clipMatDir.zw);\r\n\t\r\n\tvec2 clpos = clipMatPos.xy;\r\n\t#ifdef WORLDMAT\r\n\t\t// 如果有mmat，需要修改clipMatPos,因为 这是cacheas normal （如果不是就错了）， clipMatPos被去掉了偏移\r\n\t\tif(clipOff[0]>0.0){\r\n\t\t\tclpos.x+=mmat[3].x;\t//tx\t最简单处理\r\n\t\t\tclpos.y+=mmat[3].y;\t//ty\r\n\t\t}\r\n\t#endif\r\n\tvec2 clippos = pos.xy - clpos;\t//pos已经应用矩阵了，为了减的有意义，clip的位置也要缩放\r\n\tif(clipw>20000. && cliph>20000.)\r\n\t\tcliped = vec2(0.5,0.5);\r\n\telse {\r\n\t\t//转成0到1之间。/clipw/clipw 表示clippos与normalize之后的clip朝向点积之后，再除以clipw\r\n\t\tcliped=vec2( dot(clippos,clipMatDir.xy)/clipw/clipw, dot(clippos,clipMatDir.zw)/cliph/cliph);\r\n\t}\r\n\r\n}";
 
-    var texture_ps = "/*\r\n\ttexture和fillrect使用的。\r\n*/\r\n#ifdef GL_FRAGMENT_PRECISION_HIGH\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\nvarying vec4 v_texcoordAlpha;\r\nvarying vec4 v_color;\r\nvarying float v_useTex;\r\nuniform sampler2D texture;\r\nvarying vec2 cliped;\r\n\r\n#ifdef BLUR_FILTER\r\nuniform vec4 strength_sig2_2sig2_gauss1;\r\nuniform vec2 blurInfo;\r\n\r\n#define PI 3.141593\r\n\r\nfloat getGaussian(float x, float y){\r\n    return strength_sig2_2sig2_gauss1.w*exp(-(x*x+y*y)/strength_sig2_2sig2_gauss1.z);\r\n}\r\n\r\nvec4 blur(){\r\n    const float blurw = 9.0;\r\n    vec4 vec4Color = vec4(0.0,0.0,0.0,0.0);\r\n    vec2 halfsz=vec2(blurw,blurw)/2.0/blurInfo;    \r\n    vec2 startpos=v_texcoordAlpha.xy-halfsz;\r\n    vec2 ctexcoord = startpos;\r\n    vec2 step = 1.0/blurInfo;  //每个像素      \r\n    \r\n    for(float y = 0.0;y<=blurw; ++y){\r\n        ctexcoord.x=startpos.x;\r\n        for(float x = 0.0;x<=blurw; ++x){\r\n            //TODO 纹理坐标的固定偏移应该在vs中处理\r\n            vec4Color += texture2D(texture, ctexcoord)*getGaussian(x-blurw/2.0,y-blurw/2.0);\r\n            ctexcoord.x+=step.x;\r\n        }\r\n        ctexcoord.y+=step.y;\r\n    }\r\n    return vec4Color;\r\n}\r\n#endif\r\n\r\n#ifdef COLOR_FILTER\r\nuniform vec4 colorAlpha;\r\nuniform mat4 colorMat;\r\n#endif\r\n\r\n#ifdef GLOW_FILTER\r\nuniform vec4 u_color;\r\nuniform vec4 u_blurInfo1;\r\nuniform vec4 u_blurInfo2;\r\n#endif\r\n\r\n#ifdef COLOR_ADD\r\nuniform vec4 colorAdd;\r\n#endif\r\n\r\n#ifdef FILLTEXTURE\t\r\nuniform vec4 u_TexRange;//startu,startv,urange, vrange\r\n#endif\r\nvoid main() {\r\n\tif(cliped.x<0.) discard;\r\n\tif(cliped.x>1.) discard;\r\n\tif(cliped.y<0.) discard;\r\n\tif(cliped.y>1.) discard;\r\n\t\r\n#ifdef FILLTEXTURE\t\r\n   vec4 color= texture2D(texture, fract(v_texcoordAlpha.xy)*u_TexRange.zw + u_TexRange.xy);\r\n#else\r\n   vec4 color= texture2D(texture, v_texcoordAlpha.xy);\r\n#endif\r\n\r\n   if(v_useTex<=0.)color = vec4(1.,1.,1.,1.);\r\n   color.a*=v_color.w;\r\n   //color.rgb*=v_color.w;\r\n   color.rgb*=v_color.rgb;\r\n   gl_FragColor=color;\r\n   \r\n   #ifdef COLOR_ADD\r\n\tgl_FragColor = vec4(colorAdd.rgb,colorAdd.a*gl_FragColor.a);\r\n\tgl_FragColor.xyz *= colorAdd.a;\r\n   #endif\r\n   \r\n   #ifdef BLUR_FILTER\r\n\tgl_FragColor =   blur();\r\n\tgl_FragColor.w*=v_color.w;   \r\n   #endif\r\n   \r\n   #ifdef COLOR_FILTER\r\n\tmat4 alphaMat =colorMat;\r\n\r\n\talphaMat[0][3] *= gl_FragColor.a;\r\n\talphaMat[1][3] *= gl_FragColor.a;\r\n\talphaMat[2][3] *= gl_FragColor.a;\r\n\r\n\tgl_FragColor = gl_FragColor * alphaMat;\r\n\tgl_FragColor += colorAlpha/255.0*gl_FragColor.a;\r\n   #endif\r\n   \r\n   #ifdef GLOW_FILTER\r\n\tconst float c_IterationTime = 10.0;\r\n\tfloat floatIterationTotalTime = c_IterationTime * c_IterationTime;\r\n\tvec4 vec4Color = vec4(0.0,0.0,0.0,0.0);\r\n\tvec2 vec2FilterDir = vec2(-(u_blurInfo1.z)/u_blurInfo2.x,-(u_blurInfo1.w)/u_blurInfo2.y);\r\n\tvec2 vec2FilterOff = vec2(u_blurInfo1.x/u_blurInfo2.x/c_IterationTime * 2.0,u_blurInfo1.y/u_blurInfo2.y/c_IterationTime * 2.0);\r\n\tfloat maxNum = u_blurInfo1.x * u_blurInfo1.y;\r\n\tvec2 vec2Off = vec2(0.0,0.0);\r\n\tfloat floatOff = c_IterationTime/2.0;\r\n\tfor(float i = 0.0;i<=c_IterationTime; ++i){\r\n\t\tfor(float j = 0.0;j<=c_IterationTime; ++j){\r\n\t\t\tvec2Off = vec2(vec2FilterOff.x * (i - floatOff),vec2FilterOff.y * (j - floatOff));\r\n\t\t\tvec4Color += texture2D(texture, v_texcoordAlpha.xy + vec2FilterDir + vec2Off)/floatIterationTotalTime;\r\n\t\t}\r\n\t}\r\n\tgl_FragColor = vec4(u_color.rgb,vec4Color.a * u_blurInfo2.z);\r\n\tgl_FragColor.rgb *= gl_FragColor.a;   \r\n   #endif\r\n   \r\n}";
+    var texture_ps = "/*\r\n\ttexture和fillrect使用的。\r\n*/\r\n#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\nvarying vec4 v_texcoordAlpha;\r\nvarying vec4 v_color;\r\nvarying float v_useTex;\r\nuniform sampler2D texture;\r\nvarying vec2 cliped;\r\n\r\n#ifdef BLUR_FILTER\r\nuniform vec4 strength_sig2_2sig2_gauss1;\r\nuniform vec2 blurInfo;\r\n\r\n#define PI 3.141593\r\n\r\nfloat getGaussian(float x, float y){\r\n    return strength_sig2_2sig2_gauss1.w*exp(-(x*x+y*y)/strength_sig2_2sig2_gauss1.z);\r\n}\r\n\r\nvec4 blur(){\r\n    const float blurw = 9.0;\r\n    vec4 vec4Color = vec4(0.0,0.0,0.0,0.0);\r\n    vec2 halfsz=vec2(blurw,blurw)/2.0/blurInfo;    \r\n    vec2 startpos=v_texcoordAlpha.xy-halfsz;\r\n    vec2 ctexcoord = startpos;\r\n    vec2 step = 1.0/blurInfo;  //每个像素      \r\n    \r\n    for(float y = 0.0;y<=blurw; ++y){\r\n        ctexcoord.x=startpos.x;\r\n        for(float x = 0.0;x<=blurw; ++x){\r\n            //TODO 纹理坐标的固定偏移应该在vs中处理\r\n            vec4Color += texture2D(texture, ctexcoord)*getGaussian(x-blurw/2.0,y-blurw/2.0);\r\n            ctexcoord.x+=step.x;\r\n        }\r\n        ctexcoord.y+=step.y;\r\n    }\r\n    return vec4Color;\r\n}\r\n#endif\r\n\r\n#ifdef COLOR_FILTER\r\nuniform vec4 colorAlpha;\r\nuniform mat4 colorMat;\r\n#endif\r\n\r\n#ifdef GLOW_FILTER\r\nuniform vec4 u_color;\r\nuniform vec4 u_blurInfo1;\r\nuniform vec4 u_blurInfo2;\r\n#endif\r\n\r\n#ifdef COLOR_ADD\r\nuniform vec4 colorAdd;\r\n#endif\r\n\r\n#ifdef FILLTEXTURE\t\r\nuniform vec4 u_TexRange;//startu,startv,urange, vrange\r\n#endif\r\nvoid main() {\r\n\tif(cliped.x<0.) discard;\r\n\tif(cliped.x>1.) discard;\r\n\tif(cliped.y<0.) discard;\r\n\tif(cliped.y>1.) discard;\r\n\t\r\n#ifdef FILLTEXTURE\t\r\n   vec4 color= texture2D(texture, fract(v_texcoordAlpha.xy)*u_TexRange.zw + u_TexRange.xy);\r\n#else\r\n   vec4 color= texture2D(texture, v_texcoordAlpha.xy);\r\n#endif\r\n\r\n   if(v_useTex<=0.)color = vec4(1.,1.,1.,1.);\r\n   color.a*=v_color.w;\r\n   //color.rgb*=v_color.w;\r\n   color.rgb*=v_color.rgb;\r\n   gl_FragColor=color;\r\n   \r\n   #ifdef COLOR_ADD\r\n\tgl_FragColor = vec4(colorAdd.rgb,colorAdd.a*gl_FragColor.a);\r\n\tgl_FragColor.xyz *= colorAdd.a;\r\n   #endif\r\n   \r\n   #ifdef BLUR_FILTER\r\n\tgl_FragColor =   blur();\r\n\tgl_FragColor.w*=v_color.w;   \r\n   #endif\r\n   \r\n   #ifdef COLOR_FILTER\r\n\tmat4 alphaMat =colorMat;\r\n\r\n\talphaMat[0][3] *= gl_FragColor.a;\r\n\talphaMat[1][3] *= gl_FragColor.a;\r\n\talphaMat[2][3] *= gl_FragColor.a;\r\n\r\n\tgl_FragColor = gl_FragColor * alphaMat;\r\n\tgl_FragColor += colorAlpha/255.0*gl_FragColor.a;\r\n   #endif\r\n   \r\n   #ifdef GLOW_FILTER\r\n\tconst float c_IterationTime = 10.0;\r\n\tfloat floatIterationTotalTime = c_IterationTime * c_IterationTime;\r\n\tvec4 vec4Color = vec4(0.0,0.0,0.0,0.0);\r\n\tvec2 vec2FilterDir = vec2(-(u_blurInfo1.z)/u_blurInfo2.x,-(u_blurInfo1.w)/u_blurInfo2.y);\r\n\tvec2 vec2FilterOff = vec2(u_blurInfo1.x/u_blurInfo2.x/c_IterationTime * 2.0,u_blurInfo1.y/u_blurInfo2.y/c_IterationTime * 2.0);\r\n\tfloat maxNum = u_blurInfo1.x * u_blurInfo1.y;\r\n\tvec2 vec2Off = vec2(0.0,0.0);\r\n\tfloat floatOff = c_IterationTime/2.0;\r\n\tfor(float i = 0.0;i<=c_IterationTime; ++i){\r\n\t\tfor(float j = 0.0;j<=c_IterationTime; ++j){\r\n\t\t\tvec2Off = vec2(vec2FilterOff.x * (i - floatOff),vec2FilterOff.y * (j - floatOff));\r\n\t\t\tvec4Color += texture2D(texture, v_texcoordAlpha.xy + vec2FilterDir + vec2Off)/floatIterationTotalTime;\r\n\t\t}\r\n\t}\r\n\tgl_FragColor = vec4(u_color.rgb,vec4Color.a * u_blurInfo2.z);\r\n\tgl_FragColor.rgb *= gl_FragColor.a;   \r\n   #endif\r\n   \r\n}";
 
     var prime_vs = "attribute vec4 position;\r\nattribute vec4 attribColor;\r\n//attribute vec4 clipDir;\r\n//attribute vec2 clipRect;\r\nuniform vec4 clipMatDir;\r\nuniform vec2 clipMatPos;\r\n#ifdef WORLDMAT\r\n\tuniform mat4 mmat;\r\n#endif\r\nuniform mat4 u_mmat2;\r\n//uniform vec2 u_pos;\r\nuniform vec2 size;\r\nvarying vec4 color;\r\n//vec4 dirxy=vec4(0.9,0.1, -0.1,0.9);\r\n//vec4 clip=vec4(100.,30.,300.,600.);\r\nvarying vec2 cliped;\r\nvoid main(){\r\n\t\r\n#ifdef WORLDMAT\r\n\tvec4 pos=mmat*vec4(position.xy,0.,1.);\r\n\tgl_Position =vec4((pos.x/size.x-0.5)*2.0,(0.5-pos.y/size.y)*2.0,pos.z,1.0);\r\n#else\r\n\tgl_Position =vec4((position.x/size.x-0.5)*2.0,(0.5-position.y/size.y)*2.0,position.z,1.0);\r\n#endif\t\r\n\tfloat clipw = length(clipMatDir.xy);\r\n\tfloat cliph = length(clipMatDir.zw);\r\n\tvec2 clippos = position.xy - clipMatPos.xy;\t//pos已经应用矩阵了，为了减的有意义，clip的位置也要缩放\r\n\tif(clipw>20000. && cliph>20000.)\r\n\t\tcliped = vec2(0.5,0.5);\r\n\telse {\r\n\t\t//clipdir是带缩放的方向，由于上面clippos是在缩放后的空间计算的，所以需要把方向先normalize一下\r\n\t\tcliped=vec2( dot(clippos,clipMatDir.xy)/clipw/clipw, dot(clippos,clipMatDir.zw)/cliph/cliph);\r\n\t}\r\n  //pos2d.x = dot(clippos,dirx);\r\n  color=attribColor/255.;\r\n}";
 
@@ -7364,10 +7563,17 @@ window.Laya= (function (exports) {
         recoverBitmap(onok = null) {
             var url = this._bitmap.url;
             if (!this._destroyed && (!this._bitmap || this._bitmap.destroyed) && url) {
-                ILaya.loader.load(url, Handler.create(this, function (bit) {
-                    this.bitmap = bit;
+                let tex = ILaya.Loader.loadedMap[url];
+                if (tex) {
+                    this.bitmap = tex;
                     onok && onok();
-                }), null, "htmlimage", 1, true);
+                }
+                else {
+                    ILaya.loader.load(url, Handler.create(this, function (bit) {
+                        this.bitmap = bit;
+                        onok && onok();
+                    }), null, "htmlimage", 1, true);
+                }
             }
         }
         disposeBitmap() {
@@ -7490,13 +7696,15 @@ window.Laya= (function (exports) {
             return this._text ? this._text.charAt(i) : null;
         }
         cleanCache() {
-            this.pageChars.forEach(function (p) {
+            let pagecharse = this.pageChars;
+            for (var i in pagecharse) {
+                let p = pagecharse[i];
                 var tex = p.tex;
                 var words = p.words;
-                if (p.words.length == 1 && tex && tex.ri) {
+                if (words.length == 1 && tex && tex.ri) {
                     tex.destroy();
                 }
-            });
+            }
             this.pageChars = [];
             this.startID = 0;
             this.scalex = 1;
@@ -7551,13 +7759,24 @@ window.Laya= (function (exports) {
             var u = Browser.userAgent = win.navigator.userAgent;
             var maxTouchPoints = win.navigator.maxTouchPoints || 0;
             var platform = win.navigator.platform;
-            if (u.indexOf('AlipayMiniGame') > -1 && "my" in Browser.window) {
-                window.aliPayMiniGame(Laya, Laya);
-                if (!Laya["ALIMiniAdapter"]) {
-                    console.error("请先添加阿里小游戏适配库,详细教程：https://ldc2.layabox.com/doc/?language=zh&nav=zh-ts-5-6-0");
+            if ("my" in Browser.window) {
+                if ("tb" in Browser.window.my) {
+                    window.tbMiniGame(Laya, Laya);
+                    if (!Laya["TBMiniAdapter"]) {
+                        console.error("请先添加淘宝适配库,详细教程：https://ldc2.layabox.com/doc/?language=zh&nav=zh-ts-5-6-0");
+                    }
+                    else {
+                        Laya["TBMiniAdapter"].enable();
+                    }
                 }
-                else {
-                    Laya["ALIMiniAdapter"].enable();
+                else if (u.indexOf('AlipayMiniGame') > -1) {
+                    window.aliPayMiniGame(Laya, Laya);
+                    if (!Laya["ALIMiniAdapter"]) {
+                        console.error("请先添加阿里小游戏适配库,详细教程：https://ldc2.layabox.com/doc/?language=zh&nav=zh-ts-5-6-0");
+                    }
+                    else {
+                        Laya["ALIMiniAdapter"].enable();
+                    }
                 }
             }
             if (u.indexOf('OPPO') == -1 && u.indexOf("MiniGame") > -1 && "wx" in Browser.window) {
@@ -7706,6 +7925,9 @@ window.Laya= (function (exports) {
             if (u.indexOf('AlipayMiniGame') > -1) {
                 Browser.onAlipayMiniGame = true;
                 Browser.onMiniGame = false;
+            }
+            if (u.indexOf('TB/') > -1 || u.indexOf('Taobao/') > -1 || u.indexOf('TM/') > -1) {
+                Browser.onTBMiniGame = true;
             }
             return win;
         }
@@ -8025,7 +8247,7 @@ window.Laya= (function (exports) {
             if (miniadp && miniadp.systemInfo && miniadp.systemInfo.system) {
                 bugIOS = miniadp.systemInfo.system.toLowerCase() === 'ios 10.1.1';
             }
-            if ((ILaya.Browser.onMiniGame || ILaya.Browser.onTTMiniGame || ILaya.Browser.onBLMiniGame || ILaya.Browser.onAlipayMiniGame) && !bugIOS)
+            if ((ILaya.Browser.onMiniGame || ILaya.Browser.onTTMiniGame || ILaya.Browser.onBLMiniGame || ILaya.Browser.onAlipayMiniGame || ILaya.Browser.onTBMiniGame) && !bugIOS)
                 TextRender.isWan1Wan = true;
             this.charRender = ILaya.Render.isConchApp ? (new CharRender_Native()) : (new CharRender_Canvas(2048, 2048, TextRender.scaleFontWithCtx, !TextRender.isWan1Wan, false));
             TextRender.textRenderInst = this;
@@ -8056,6 +8278,8 @@ window.Laya= (function (exports) {
         getNextChar(str) {
             var len = str.length;
             var start = this._curStrPos;
+            if (!str.substring)
+                return null;
             if (start >= len)
                 return null;
             var i = start;
@@ -8106,7 +8330,7 @@ window.Laya= (function (exports) {
             this._fast_filltext(ctx, null, data, x, y, font, color, strokeColor, lineWidth, 0, 0);
         }
         _fast_filltext(ctx, data, htmlchars, x, y, font, color, strokeColor, lineWidth, textAlign, underLine = 0) {
-            if (data && data.length < 1)
+            if (data && !(data.length >= 1))
                 return;
             if (htmlchars && htmlchars.length < 1)
                 return;
@@ -8131,7 +8355,7 @@ window.Laya= (function (exports) {
             font._italic && (ctx._italicDeg = 13);
             var wt = data;
             var isWT = !htmlchars && (data instanceof WordText);
-            var str = data;
+            var str = data && data.toString();
             var isHtmlChar = !!htmlchars;
             var sameTexData = isWT ? wt.pageChars : [];
             var strWidth = 0;
@@ -8251,8 +8475,7 @@ window.Laya= (function (exports) {
             }
         }
         hasFreedText(txts) {
-            var sz = txts.length;
-            for (var i = 0; i < sz; i++) {
+            for (let i in txts) {
                 var pri = txts[i];
                 if (!pri)
                     continue;
@@ -10810,38 +11033,6 @@ window.Laya= (function (exports) {
         };
     }());
 
-    class SystemUtils {
-        static get maxTextureCount() {
-            return this._maxTextureCount;
-        }
-        static get maxTextureSize() {
-            return this._maxTextureSize;
-        }
-        static get shaderCapailityLevel() {
-            return this._shaderCapailityLevel;
-        }
-        static supportTextureFormat(format) {
-            switch (format) {
-                case exports.TextureFormat.R32G32B32A32:
-                    return (!LayaGL.layaGPUInstance._oesTextureFloat) ? false : true;
-                default:
-                    return true;
-            }
-        }
-        static supportRenderTextureFormat(format) {
-            switch (format) {
-                case exports.RenderTextureFormat.R16G16B16A16:
-                    return (((!!LayaGL.layaGPUInstance._isWebGL2) && (!!LayaGL.layaGPUInstance._oesTextureFloat)) || LayaGL.layaGPUInstance._oesTextureHalfFloat && LayaGL.layaGPUInstance._oesTextureHalfFloatLinear) ? true : false;
-                case exports.RenderTextureFormat.Depth:
-                    return (LayaGL.layaGPUInstance._isWebGL2 || LayaGL.layaGPUInstance._webgl_depth_texture) ? true : false;
-                case exports.RenderTextureFormat.ShadowMap:
-                    return LayaGL.layaGPUInstance._isWebGL2 ? true : false;
-                default:
-                    return true;
-            }
-        }
-    }
-
     class LayaGPU {
         constructor(gl, isWebGL2) {
             this._gl = null;
@@ -10858,6 +11049,7 @@ window.Laya= (function (exports) {
             this._compressedTexturePvrtc = null;
             this._compressedTextureEtc1 = null;
             this._webgl_depth_texture = null;
+            this._extColorBufferFloat = null;
             this._gl = gl;
             this._isWebGL2 = isWebGL2;
             var maxTextureFS = gl.getParameter(gl.MAX_TEXTURE_IMAGE_UNITS);
@@ -10878,7 +11070,7 @@ window.Laya= (function (exports) {
                 SystemUtils._shaderCapailityLevel = 30;
             }
             else {
-                this._oesTextureFloat = this._getExtension("EXT_color_buffer_float");
+                this._extColorBufferFloat = this._getExtension("EXT_color_buffer_float");
                 SystemUtils._shaderCapailityLevel = 35;
             }
             this._extTextureFilterAnisotropic = this._getExtension("EXT_texture_filter_anisotropic");
@@ -11027,20 +11219,15 @@ window.Laya= (function (exports) {
             return Render._mainCanvas.source;
         }
     }
-    Render.supportWebGLPlusCulling = false;
     Render.supportWebGLPlusAnimation = false;
     Render.supportWebGLPlusRendering = false;
     Render.isConchApp = false;
     {
         Render.isConchApp = (window.conch != null);
         if (Render.isConchApp) {
-            Render.supportWebGLPlusCulling = false;
-            Render.supportWebGLPlusAnimation = false;
             Render.supportWebGLPlusRendering = false;
         }
         else if (window.qq != null && window.qq.webglPlus != null) {
-            Render.supportWebGLPlusCulling = false;
-            Render.supportWebGLPlusAnimation = false;
             Render.supportWebGLPlusRendering = false;
         }
     }
@@ -12581,7 +12768,8 @@ window.Laya= (function (exports) {
                     ctx.breakNextMerge();
                     ctx.popRT();
                     ctx.save();
-                    ctx.clipRect(x + tRect.x - sprite.getStyle().pivotX, y + tRect.y - sprite.getStyle().pivotY, w, h);
+                    let shrink = 0.1;
+                    ctx.clipRect(x + tRect.x - sprite.getStyle().pivotX + shrink, y + tRect.y - sprite.getStyle().pivotY + shrink, w - shrink * 2, h - shrink * 2);
                     next._fun.call(next, sprite, ctx, x, y);
                     ctx.restore();
                     preBlendMode = ctx.globalCompositeOperation;
@@ -15398,8 +15586,12 @@ window.Laya= (function (exports) {
             nw = Math.max.apply(this, this._lineWidths);
             if (this._style.currBitmapFont)
                 nh = this._lines.length * (this._style.currBitmapFont.getMaxHeight() + this.leading) + this.padding[0] + this.padding[2];
-            else
+            else {
                 nh = this._lines.length * (this._charSize.height + this.leading) + this.padding[0] + this.padding[2];
+                if (this._lines.length) {
+                    nh -= this.leading;
+                }
+            }
             if (nw != this._textWidth || nh != this._textHeight) {
                 this._textWidth = nw;
                 this._textHeight = nh;
@@ -15654,7 +15846,7 @@ window.Laya= (function (exports) {
             Input._createInputElement();
             if (ILaya.Browser.onMobile) {
                 var isTrue = false;
-                if (ILaya.Browser.onMiniGame || ILaya.Browser.onBDMiniGame || ILaya.Browser.onQGMiniGame || ILaya.Browser.onKGMiniGame || ILaya.Browser.onVVMiniGame || ILaya.Browser.onAlipayMiniGame || ILaya.Browser.onQQMiniGame || ILaya.Browser.onBLMiniGame || ILaya.Browser.onTTMiniGame || ILaya.Browser.onHWMiniGame) {
+                if (ILaya.Browser.onMiniGame || ILaya.Browser.onBDMiniGame || ILaya.Browser.onQGMiniGame || ILaya.Browser.onKGMiniGame || ILaya.Browser.onVVMiniGame || ILaya.Browser.onAlipayMiniGame || ILaya.Browser.onQQMiniGame || ILaya.Browser.onBLMiniGame || ILaya.Browser.onTTMiniGame || ILaya.Browser.onHWMiniGame || ILaya.Browser.onTBMiniGame) {
                     isTrue = true;
                 }
                 ILaya.Render.canvas.addEventListener(Input.IOS_IFRAME ? (isTrue ? "touchend" : "click") : "touchend", Input._popupInputMethod);
@@ -15798,6 +15990,7 @@ window.Laya= (function (exports) {
         _focusIn() {
             Input.isInputting = true;
             var input = this.nativeInput;
+            Input.input && (Input.input.type = this._type);
             this._focus = true;
             var cssStyle = input.style;
             cssStyle.whiteSpace = (this.wordWrap ? "pre-wrap" : "nowrap");
@@ -15817,7 +16010,7 @@ window.Laya= (function (exports) {
             this.event(Event.FOCUS);
             if (ILaya.Browser.onPC)
                 input.focus();
-            if (!ILaya.Browser.onMiniGame && !ILaya.Browser.onBDMiniGame && !ILaya.Browser.onQGMiniGame && !ILaya.Browser.onKGMiniGame && !ILaya.Browser.onVVMiniGame && !ILaya.Browser.onAlipayMiniGame && !ILaya.Browser.onQQMiniGame && !ILaya.Browser.onBLMiniGame && !ILaya.Browser.onTTMiniGame && !ILaya.Browser.onHWMiniGame) {
+            if (!ILaya.Browser.onMiniGame && !ILaya.Browser.onBDMiniGame && !ILaya.Browser.onQGMiniGame && !ILaya.Browser.onKGMiniGame && !ILaya.Browser.onVVMiniGame && !ILaya.Browser.onAlipayMiniGame && !ILaya.Browser.onQQMiniGame && !ILaya.Browser.onBLMiniGame && !ILaya.Browser.onTTMiniGame && !ILaya.Browser.onHWMiniGame && !ILaya.Browser.onTBMiniGame) {
                 var temp = this._text;
                 this._text = null;
             }
@@ -16967,6 +17160,8 @@ window.Laya= (function (exports) {
             super.set_transform(this.transform);
             canvasStyle.transformOrigin = canvasStyle.webkitTransformOrigin = canvasStyle.msTransformOrigin = canvasStyle.mozTransformOrigin = canvasStyle.oTransformOrigin = "0px 0px 0px";
             canvasStyle.transform = canvasStyle.webkitTransform = canvasStyle.msTransform = canvasStyle.mozTransform = canvasStyle.oTransform = "matrix(" + mat.toString() + ")";
+            canvasStyle.width = canvasWidth;
+            canvasStyle.height = canvasHeight;
             if (this._safariOffsetY)
                 mat.translate(0, -this._safariOffsetY);
             mat.translate(parseInt(canvasStyle.left) || 0, parseInt(canvasStyle.top) || 0);
@@ -18137,7 +18332,7 @@ window.Laya= (function (exports) {
                     return null;
             }
             var tSound;
-            if (!ILaya.Browser.onBDMiniGame && !ILaya.Browser.onMiniGame && !ILaya.Browser.onKGMiniGame && !ILaya.Browser.onQGMiniGame && !ILaya.Browser.onVVMiniGame && !ILaya.Browser.onAlipayMiniGame && !ILaya.Browser.onQQMiniGame && !ILaya.Browser.onBLMiniGame && !ILaya.Browser.onTTMiniGame && !ILaya.Browser.onHWMiniGame) {
+            if (!ILaya.Browser.onBDMiniGame && !ILaya.Browser.onMiniGame && !ILaya.Browser.onKGMiniGame && !ILaya.Browser.onQGMiniGame && !ILaya.Browser.onVVMiniGame && !ILaya.Browser.onAlipayMiniGame && !ILaya.Browser.onQQMiniGame && !ILaya.Browser.onBLMiniGame && !ILaya.Browser.onTTMiniGame && !ILaya.Browser.onHWMiniGame && !ILaya.Browser.onTBMiniGame) {
                 tSound = ILaya.loader.getRes(url);
             }
             if (!soundClass)
@@ -18145,7 +18340,7 @@ window.Laya= (function (exports) {
             if (!tSound) {
                 tSound = new soundClass();
                 tSound.load(url);
-                if (!ILaya.Browser.onBDMiniGame && !ILaya.Browser.onMiniGame && !ILaya.Browser.onKGMiniGame && !ILaya.Browser.onQGMiniGame && !ILaya.Browser.onVVMiniGame && !ILaya.Browser.onAlipayMiniGame && !ILaya.Browser.onQQMiniGame && !ILaya.Browser.onBLMiniGame && !ILaya.Browser.onTTMiniGame && !ILaya.Browser.onHWMiniGame) {
+                if (!ILaya.Browser.onBDMiniGame && !ILaya.Browser.onMiniGame && !ILaya.Browser.onKGMiniGame && !ILaya.Browser.onQGMiniGame && !ILaya.Browser.onVVMiniGame && !ILaya.Browser.onAlipayMiniGame && !ILaya.Browser.onQQMiniGame && !ILaya.Browser.onBLMiniGame && !ILaya.Browser.onTTMiniGame && !ILaya.Browser.onHWMiniGame && !ILaya.Browser.onTBMiniGame) {
                     ILaya.Loader.cacheRes(url, tSound);
                 }
             }
@@ -18417,7 +18612,7 @@ window.Laya= (function (exports) {
         send(url, data = null, method = "get", responseType = "text", headers = null) {
             this._responseType = responseType;
             this._data = null;
-            if (Browser.onVVMiniGame || Browser.onQGMiniGame || Browser.onQQMiniGame || Browser.onAlipayMiniGame || Browser.onBLMiniGame || Browser.onHWMiniGame || Browser.onTTMiniGame) {
+            if (Browser.onVVMiniGame || Browser.onQGMiniGame || Browser.onQQMiniGame || Browser.onAlipayMiniGame || Browser.onBLMiniGame || Browser.onHWMiniGame || Browser.onTTMiniGame || Browser.onTBMiniGame) {
                 url = HttpRequest._urlEncode(url);
             }
             this._url = url;
@@ -18792,16 +18987,41 @@ window.Laya= (function (exports) {
                         data.pics = [];
                     }
                     this.event(Event.PROGRESS, 0.3 + 1 / toloadPics.length * 0.6);
-                    return this._loadResourceFilter(Loader.IMAGE, toloadPics.pop());
+                    return this._loadResourceFilter(Loader.IMAGE, URL.formatURL(toloadPics.pop()));
                 }
                 else {
                     if (!(data instanceof Texture2D)) {
-                        let tex = new Texture2D(data.width, data.height, 1, false, false);
-                        tex.wrapModeU = BaseTexture.WARPMODE_CLAMP;
-                        tex.wrapModeV = BaseTexture.WARPMODE_CLAMP;
-                        tex.loadImageSource(data, true);
-                        tex._setCreateURL(data.src);
-                        data = tex;
+                        if (data instanceof ArrayBuffer) {
+                            let url = this._http.url;
+                            var ext = Utils.getFileExtension(url);
+                            let format;
+                            switch (ext) {
+                                case "ktx":
+                                    format = exports.TextureFormat.ETC1RGB;
+                                    break;
+                                case "pvr":
+                                    format = exports.TextureFormat.PVRTCRGBA_4BPPV;
+                                    break;
+                                default: {
+                                    console.error('unknown format', ext);
+                                    return;
+                                }
+                            }
+                            let tex = new Texture2D(0, 0, format, false, false);
+                            tex.wrapModeU = exports.WarpMode.Clamp;
+                            tex.wrapModeV = exports.WarpMode.Clamp;
+                            tex.setCompressData(data);
+                            tex._setCreateURL(url);
+                            data = tex;
+                        }
+                        else {
+                            let tex = new Texture2D(data.width, data.height, 1, false, false);
+                            tex.wrapModeU = BaseTexture.WARPMODE_CLAMP;
+                            tex.wrapModeV = BaseTexture.WARPMODE_CLAMP;
+                            tex.loadImageSource(data, true);
+                            tex._setCreateURL(data.src);
+                            data = tex;
+                        }
                     }
                     this._data.pics.push(data);
                     if (this._data.toLoads.length > 0) {
@@ -19600,7 +19820,7 @@ window.Laya= (function (exports) {
     class TTFLoader {
         load(fontPath) {
             this._url = fontPath;
-            var tArr = fontPath.split(".ttf")[0].split("/");
+            var tArr = fontPath.toLowerCase().split(".ttf")[0].split("/");
             this.fontName = tArr[tArr.length - 1];
             if (ILaya.Render.isConchApp) {
                 this._loadConch();
@@ -21270,7 +21490,7 @@ window.Laya= (function (exports) {
             this._view = [];
         }
         show(x = 0, y = 0) {
-            if (!Browser.onMiniGame && !ILaya.Render.isConchApp && !Browser.onBDMiniGame && !Browser.onKGMiniGame && !Browser.onQGMiniGame && !Browser.onQQMiniGame && !Browser.onAlipayMiniGame && !Browser.onBLMiniGame && !Browser.onTTMiniGame && !Browser.onHWMiniGame)
+            if (!Browser.onMiniGame && !ILaya.Render.isConchApp && !Browser.onBDMiniGame && !Browser.onKGMiniGame && !Browser.onQGMiniGame && !Browser.onQQMiniGame && !Browser.onAlipayMiniGame && !Browser.onBLMiniGame && !Browser.onTTMiniGame && !Browser.onHWMiniGame && !Browser.onTBMiniGame)
                 this._useCanvas = true;
             this._show = true;
             Stat._fpsData.length = 60;
@@ -21783,7 +22003,8 @@ window.Laya= (function (exports) {
                 if (!ifdef)
                     return out;
             }
-            this.text && out.push(this.text);
+            if (this.noCompile)
+                this.text && out.push(this.text);
             this.childs.length > 0 && this.childs.forEach(function (o, index, arr) {
                 o._toscript(def, out, id);
             });
@@ -22460,7 +22681,7 @@ window.Laya= (function (exports) {
     Laya.lateTimer = null;
     Laya.timer = null;
     Laya.loader = null;
-    Laya.version = "2.8.0beta";
+    Laya.version = "2.9.0beta";
     Laya._isinit = false;
     Laya.isWXOpenDataContext = false;
     Laya.isWXPosMsg = false;
@@ -23630,7 +23851,6 @@ window.Laya= (function (exports) {
             this.url = null;
             this._viewCreated = false;
             this._$componentType = "Scene";
-            this._setBit(Const.NOT_READY, true);
             Scene.unDestroyedScenes.push(this);
             this._scene = this;
             if (createChildren)
@@ -23656,6 +23876,7 @@ window.Laya= (function (exports) {
                 this.createView(view);
             }
             else {
+                this._setBit(Const.NOT_READY, true);
                 ILaya.loader.resetProgress();
                 var loader = new SceneLoader();
                 loader.on(Event.COMPLETE, this, this._onSceneLoaded, [url]);
@@ -23808,7 +24029,7 @@ window.Laya= (function (exports) {
                 }
                 if (scene && scene instanceof Node) {
                     scene.url = url;
-                    if (!scene._getBit(Const.NOT_READY)) {
+                    if (scene._viewCreated) {
                         complete && complete.runWith(scene);
                     }
                     else {
@@ -25839,6 +26060,7 @@ window.Laya= (function (exports) {
     exports.HTMLCanvas = HTMLCanvas;
     exports.HTMLChar = HTMLChar;
     exports.HTMLImage = HTMLImage;
+    exports.HalfFloatUtils = HalfFloatUtils;
     exports.Handler = Handler;
     exports.HitArea = HitArea;
     exports.HttpRequest = HttpRequest;
