@@ -354,6 +354,12 @@
 						"core,ui"
 					],
 					[
+						"FontClip",
+						"FontClip",
+						"",
+						"core,ui"
+					],
+					[
 						"ColorPicker",
 						"ColorPicker",
 						"",
