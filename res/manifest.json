@@ -890,6 +890,12 @@
 						"core,ui,ani,d3"
 					],
 					[
+						"RenderTarget3DTo2DSprite",
+						"渲染3D到2DSprite",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js"
+					],
+					[
 						"RenderTargetCamera",
 						"渲染到纹理",
 						"",

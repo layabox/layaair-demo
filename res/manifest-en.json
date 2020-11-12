@@ -926,6 +926,12 @@
 						"core,ui,ani,d3"
 					],
 					[
+						"RenderTarget3DTo2DSprite",
+						"RenderTarget3DTo2DSprite",
+						"",
+						"core,ui,ani,d3,CameraMoveScript.js"
+					],
+					[
 						"RenderTargetCamera",
 						"RenderTargetCamera",
 						"",
