@@ -1475,7 +1475,7 @@
 						"CommandBuffer_BlurryGlass",
 						"CommandBuffer_BlurryGlass",
 						"",
-						"core,ani,d3,device,ui"
+						"core,d3,physics3D"
 					],
 					[
 						"CommandBuffer_Outline",
