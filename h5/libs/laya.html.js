@@ -561,6 +561,8 @@
                 }
                 else if (oneLayout._isChar()) {
                     htmlWord = oneLayout;
+                    w = htmlWord.width + htmlWord.style.letterSpacing;
+                    h = htmlWord.height;
                     if (!htmlWord.isWord) {
                         if (lines.length > 0 && (x + w) > width && curLine.wordStartIndex > 0) {
                             var tLineWord = 0;
@@ -577,8 +579,6 @@
                         newLine = nextNewline || (htmlWord.char === '\n');
                         curLine.wordStartIndex = curLine.elements.length;
                     }
-                    w = htmlWord.width + htmlWord.style.letterSpacing;
-                    h = htmlWord.height;
                     nextNewline = false;
                     newLine = newLine || ((x + w) > width);
                     newLine && addLine();

@@ -641,7 +641,7 @@
 	        var b21 = a21 * a10 - a11 * a20;
 	        var det = a00 * b01 + a01 * b11 + a02 * b21;
 	        if (!det) {
-	            out = null;
+	            return;
 	        }
 	        det = 1.0 / det;
 	        e[0] = b01 * det;
@@ -4682,6 +4682,9 @@
 	        }
 	    }
 	    get gravity() {
+	        var bt = ILaya3D.Physics3D._bullet;
+	        Rigidbody3D._btGravity = bt.btRigidBody_getGravity(this._btColliderObject);
+	        Utils3D._convertToLayaVec3(Rigidbody3D._btGravity, this._gravity, true);
 	        return this._gravity;
 	    }
 	    set gravity(value) {
@@ -5264,7 +5267,6 @@
 	    static parse(clip, reader) {
 	        AnimationClipParser03._animationClip = clip;
 	        AnimationClipParser03._reader = reader;
-	        var arrayBuffer = reader.__getBuffer();
 	        AnimationClipParser03.READ_DATA();
 	        AnimationClipParser03.READ_BLOCK();
 	        AnimationClipParser03.READ_STRINGS();
@@ -5282,7 +5284,6 @@
 	        var i, j;
 	        var node;
 	        var reader = AnimationClipParser03._reader;
-	        var buffer = reader.__getBuffer();
 	        var startTimeTypes = [];
 	        var startTimeTypeCount = reader.getUint16();
 	        startTimeTypes.length = startTimeTypeCount;
@@ -5381,7 +5382,7 @@
 	            var event = new AnimationEvent();
 	            event.time = Math.min(clipDur, reader.getFloat32());
 	            event.eventName = AnimationClipParser03._strings[reader.getUint16()];
-	            var params;
+	            var params = [];
 	            var paramCount = reader.getUint16();
 	            (paramCount > 0) && (event.params = params = []);
 	            for (j = 0; j < paramCount; j++) {
@@ -5458,7 +5459,6 @@
 	        var i, j;
 	        var node;
 	        var reader = AnimationClipParser04._reader;
-	        var buffer = reader.__getBuffer();
 	        var startTimeTypes = [];
 	        var startTimeTypeCount = reader.getUint16();
 	        startTimeTypes.length = startTimeTypeCount;
@@ -5497,7 +5497,6 @@
 	            node.fullPath = fullPath;
 	            var keyframeCount = reader.getUint16();
 	            node._setKeyframeCount(keyframeCount);
-	            var startTime;
 	            switch (AnimationClipParser04._version) {
 	                case "LAYAANIMATION:04":
 	                    for (j = 0; j < keyframeCount; j++) {
@@ -5505,7 +5504,7 @@
 	                            case 0:
 	                                var floatKeyframe = new FloatKeyframe();
 	                                node._setKeyframeByIndex(j, floatKeyframe);
-	                                startTime = floatKeyframe.time = startTimeTypes[reader.getUint16()];
+	                                floatKeyframe.time = startTimeTypes[reader.getUint16()];
 	                                floatKeyframe.inTangent = reader.getFloat32();
 	                                floatKeyframe.outTangent = reader.getFloat32();
 	                                floatKeyframe.value = reader.getFloat32();
@@ -5515,7 +5514,7 @@
 	                            case 4:
 	                                var floatArrayKeyframe = new Vector3Keyframe();
 	                                node._setKeyframeByIndex(j, floatArrayKeyframe);
-	                                startTime = floatArrayKeyframe.time = startTimeTypes[reader.getUint16()];
+	                                floatArrayKeyframe.time = startTimeTypes[reader.getUint16()];
 	                                var inTangent = floatArrayKeyframe.inTangent;
 	                                var outTangent = floatArrayKeyframe.outTangent;
 	                                var value = floatArrayKeyframe.value;
@@ -5532,7 +5531,7 @@
 	                            case 2:
 	                                var quaternionKeyframe = new QuaternionKeyframe();
 	                                node._setKeyframeByIndex(j, quaternionKeyframe);
-	                                startTime = quaternionKeyframe.time = startTimeTypes[reader.getUint16()];
+	                                quaternionKeyframe.time = startTimeTypes[reader.getUint16()];
 	                                var inTangentQua = quaternionKeyframe.inTangent;
 	                                var outTangentQua = quaternionKeyframe.outTangent;
 	                                var valueQua = quaternionKeyframe.value;
@@ -5560,7 +5559,7 @@
 	                            case 0:
 	                                floatKeyframe = new FloatKeyframe();
 	                                node._setKeyframeByIndex(j, floatKeyframe);
-	                                startTime = floatKeyframe.time = startTimeTypes[reader.getUint16()];
+	                                floatKeyframe.time = startTimeTypes[reader.getUint16()];
 	                                floatKeyframe.inTangent = Laya.HalfFloatUtils.convertToNumber(reader.getUint16());
 	                                floatKeyframe.outTangent = Laya.HalfFloatUtils.convertToNumber(reader.getUint16());
 	                                floatKeyframe.value = Laya.HalfFloatUtils.convertToNumber(reader.getUint16());
@@ -5570,7 +5569,7 @@
 	                            case 4:
 	                                floatArrayKeyframe = new Vector3Keyframe();
 	                                node._setKeyframeByIndex(j, floatArrayKeyframe);
-	                                startTime = floatArrayKeyframe.time = startTimeTypes[reader.getUint16()];
+	                                floatArrayKeyframe.time = startTimeTypes[reader.getUint16()];
 	                                inTangent = floatArrayKeyframe.inTangent;
 	                                outTangent = floatArrayKeyframe.outTangent;
 	                                value = floatArrayKeyframe.value;
@@ -5587,7 +5586,7 @@
 	                            case 2:
 	                                quaternionKeyframe = new QuaternionKeyframe();
 	                                node._setKeyframeByIndex(j, quaternionKeyframe);
-	                                startTime = quaternionKeyframe.time = startTimeTypes[reader.getUint16()];
+	                                quaternionKeyframe.time = startTimeTypes[reader.getUint16()];
 	                                inTangentQua = quaternionKeyframe.inTangent;
 	                                outTangentQua = quaternionKeyframe.outTangent;
 	                                valueQua = quaternionKeyframe.value;
@@ -5616,7 +5615,7 @@
 	            var event = new AnimationEvent();
 	            event.time = Math.min(clipDur, reader.getFloat32());
 	            event.eventName = AnimationClipParser04._strings[reader.getUint16()];
-	            var params;
+	            var params = [];
 	            var paramCount = reader.getUint16();
 	            (paramCount > 0) && (event.params = params = []);
 	            for (j = 0; j < paramCount; j++) {
@@ -5667,10 +5666,13 @@
 	class AnimationClip extends Laya.Resource {
 	    constructor() {
 	        super();
+	        this._duration = 0;
+	        this._frameRate = 0;
 	        this._nodes = new KeyframeNodeList();
+	        this.islooping = false;
 	        this._animationEvents = [];
 	    }
-	    static _parse(data, propertyParams = null, constructParams = null) {
+	    static _parse(data) {
 	        var clip = new AnimationClip();
 	        var reader = new Laya.Byte(data);
 	        var version = reader.readUTFString();
@@ -7325,9 +7327,7 @@
 	        Laya.LayaGL.instance.updateAnimationNodeWorldMatix(localPositions, localRotations, localScales, parentIndices, worldMatrixs);
 	    }
 	}
-	Animator._tempVector30 = new Vector3();
 	Animator._tempVector31 = new Vector3();
-	Animator._tempQuaternion0 = new Quaternion();
 	Animator._tempQuaternion1 = new Quaternion();
 	Animator.CULLINGMODE_ALWAYSANIMATE = 0;
 	Animator.CULLINGMODE_CULLCOMPLETELY = 2;
@@ -7335,6 +7335,7 @@
 	class RenderContext3D {
 	    constructor() {
 	        this.invertY = false;
+	        this.configPipeLineMode = "Forward";
 	    }
 	}
 	RenderContext3D._instance = new RenderContext3D();
@@ -7425,8 +7426,9 @@
 	            Laya.WebGLContext.bindTexture(gl, glTextureType, this._glTexture);
 	            switch (this._depthStencilFormat) {
 	                case Laya.RenderTextureDepthFormat.DEPTH_16:
-	                    if (isWebGL2)
+	                    if (isWebGL2) {
 	                        gl2.texStorage2D(glTextureType, this._mipmapCount, gl2.DEPTH_COMPONENT16, width, height);
+	                    }
 	                    else
 	                        gl.texImage2D(glTextureType, 0, gl.DEPTH_COMPONENT, width, height, 0, gl.DEPTH_COMPONENT, gl.UNSIGNED_SHORT, null);
 	                    gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.DEPTH_ATTACHMENT, gl.TEXTURE_2D, this._glTexture, 0);
@@ -7557,13 +7559,7 @@
 	            this._length = size;
 	        }
 	        else {
-	            if (size > this._length) {
-	                mask[index] = define._value;
-	                this._length = size;
-	            }
-	            else {
-	                mask[index] |= define._value;
-	            }
+	            mask[index] |= define._value;
 	        }
 	    }
 	    remove(define) {
@@ -7593,21 +7589,16 @@
 	        }
 	        else {
 	            for (var i = 0; i < size; i++) {
-	                if (i < this._length)
-	                    mask[i] |= addMask[i];
-	                else
-	                    mask[i] = addMask[i];
+	                mask[i] |= addMask[i];
 	            }
-	            this._length = Math.max(this._length, size);
 	        }
 	    }
 	    removeDefineDatas(define) {
 	        var removeMask = define._mask;
 	        var mask = this._mask;
 	        var endIndex = this._length - 1;
-	        for (var i = define._length - 1; i >= 0; i--) {
-	            if (i > endIndex)
-	                continue;
+	        var i = Math.min(define._length, endIndex);
+	        for (; i >= 0; i--) {
 	            var newValue = mask[i] & ~removeMask[i];
 	            if (i == endIndex && newValue === 0) {
 	                endIndex--;
@@ -8836,7 +8827,7 @@
 	    ShaderDataType[ShaderDataType["Number"] = 2] = "Number";
 	    ShaderDataType[ShaderDataType["Vector2"] = 3] = "Vector2";
 	    ShaderDataType[ShaderDataType["Vector3"] = 4] = "Vector3";
-	    ShaderDataType[ShaderDataType["Vector"] = 5] = "Vector";
+	    ShaderDataType[ShaderDataType["Vector4"] = 5] = "Vector4";
 	    ShaderDataType[ShaderDataType["Quaternion"] = 6] = "Quaternion";
 	    ShaderDataType[ShaderDataType["Matrix4x4"] = 7] = "Matrix4x4";
 	    ShaderDataType[ShaderDataType["Buffer"] = 8] = "Buffer";
@@ -8880,7 +8871,7 @@
 	            case exports.ShaderDataType.Texture:
 	                this._shaderData.setTexture(this._nameID, this._value);
 	                break;
-	            case exports.ShaderDataType.Vector:
+	            case exports.ShaderDataType.Vector4:
 	                this._shaderData.setVector(this._nameID, this._value);
 	                break;
 	            case exports.ShaderDataType.Vector2:
@@ -11418,6 +11409,11 @@
 	BaseCamera.CAMERAUP = Shader3D.propertyNameToID("u_CameraUp");
 	BaseCamera.VIEWPORT = Shader3D.propertyNameToID("u_Viewport");
 	BaseCamera.PROJECTION_PARAMS = Shader3D.propertyNameToID("u_ProjectionParams");
+	BaseCamera.DEPTHTEXTURE = Shader3D.propertyNameToID("u_CameraDepthTexture");
+	BaseCamera.DEPTHNORMALSTEXTURE = Shader3D.propertyNameToID("u_CameraDepthNormalsTexture");
+	BaseCamera.DEPTHZBUFFERPARAMS = Shader3D.propertyNameToID("u_ZBufferParams");
+	BaseCamera.SHADERDEFINE_DEPTH = Shader3D.getDefineByName("DEPTHMAP");
+	BaseCamera.SHADERDEFINE_DEPTHNORMALS = Shader3D.getDefineByName("DEPTHNORMALSMAP");
 	BaseCamera.RENDERINGTYPE_DEFERREDLIGHTING = "DEFERREDLIGHTING";
 	BaseCamera.RENDERINGTYPE_FORWARDRENDERING = "FORWARDRENDERING";
 	BaseCamera._invertYScaleMatrix = new Matrix4x4(1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
@@ -11534,6 +11530,13 @@
 	        this.color.fromArray(colorData);
 	        this.intensity = data.intensity;
 	        this.lightmapBakedType = data.lightmapBakedType;
+	    }
+	    _cloneTo(destObject, rootSprite, dstSprite) {
+	        super._cloneTo(destObject, rootSprite, dstSprite);
+	        var spriteLight = destObject;
+	        spriteLight.color = this.color.clone();
+	        spriteLight.intensity = this.intensity;
+	        spriteLight.lightmapBakedType = this.lightmapBakedType;
 	    }
 	    _addToScene() {
 	        var scene = this._scene;
@@ -11881,6 +11884,111 @@
 	];
 	ShadowUtils.atlasBorderSize = 4.0;
 
+	(function (DepthTextureMode) {
+	    DepthTextureMode[DepthTextureMode["None"] = 0] = "None";
+	    DepthTextureMode[DepthTextureMode["Depth"] = 1] = "Depth";
+	    DepthTextureMode[DepthTextureMode["DepthNormals"] = 2] = "DepthNormals";
+	    DepthTextureMode[DepthTextureMode["MotionVectors"] = 4] = "MotionVectors";
+	})(exports.DepthTextureMode || (exports.DepthTextureMode = {}));
+	class DepthPass {
+	    constructor() {
+	        this._zBufferParams = new Vector4();
+	    }
+	    update(camera, depthType) {
+	        this._viewPort = camera.viewport;
+	        this._camera = camera;
+	        switch (depthType) {
+	            case exports.DepthTextureMode.Depth:
+	                camera.depthTexture = this._depthTexture = RenderTexture.createFromPool(this._viewPort.width, this._viewPort.height, Laya.RenderTextureFormat.Depth, Laya.RenderTextureDepthFormat.DEPTH_16);
+	                break;
+	            case exports.DepthTextureMode.DepthNormals:
+	                camera.depthNormalTexture = this._depthNormalsTexture = RenderTexture.createFromPool(this._viewPort.width, this._viewPort.height, Laya.RenderTextureFormat.R8G8B8A8, Laya.RenderTextureDepthFormat.DEPTH_16);
+	                break;
+	            case exports.DepthTextureMode.MotionVectors:
+	                break;
+	            default:
+	                throw ("there is UnDefined type of DepthTextureMode");
+	        }
+	    }
+	    render(context, depthType) {
+	        var scene = context.scene;
+	        switch (depthType) {
+	            case exports.DepthTextureMode.Depth:
+	                var shaderValues = scene._shaderValues;
+	                context.pipelineMode = "ShadowCaster";
+	                ShaderData.setRuntimeValueMode(false);
+	                this._depthTexture._start();
+	                shaderValues.setVector(DepthPass.DEFINE_SHADOW_BIAS, DepthPass.SHADOW_BIAS);
+	                var gl = Laya.LayaGL.instance;
+	                var offsetX = this._viewPort.x;
+	                var offsetY = this._viewPort.y;
+	                gl.enable(gl.SCISSOR_TEST);
+	                gl.viewport(offsetX, offsetY, this._viewPort.width, this._viewPort.height);
+	                gl.scissor(offsetX, offsetY, this._viewPort.width, this._viewPort.height);
+	                gl.clear(gl.DEPTH_BUFFER_BIT);
+	                scene._opaqueQueue._render(context);
+	                this._depthTexture._end();
+	                ShaderData.setRuntimeValueMode(true);
+	                this._setupDepthModeShaderValue(depthType, this._camera);
+	                context.pipelineMode = context.configPipeLineMode;
+	                break;
+	            case exports.DepthTextureMode.DepthNormals:
+	                var shaderValues = scene._shaderValues;
+	                context.pipelineMode = "DepthNormal";
+	                ShaderData.setRuntimeValueMode(false);
+	                this._depthNormalsTexture._start();
+	                var gl = Laya.LayaGL.instance;
+	                var offsetX = this._viewPort.x;
+	                var offsetY = this._viewPort.y;
+	                gl.enable(gl.SCISSOR_TEST);
+	                gl.viewport(offsetX, offsetY, this._viewPort.width, this._viewPort.height);
+	                gl.scissor(offsetX, offsetY, this._viewPort.width, this._viewPort.height);
+	                gl.clearColor(0.0, 0.0, 1.0, 0.0);
+	                gl.clear(gl.DEPTH_BUFFER_BIT | gl.COLOR_BUFFER_BIT);
+	                scene._opaqueQueue._render(context);
+	                this._depthNormalsTexture._end();
+	                ShaderData.setRuntimeValueMode(true);
+	                this._setupDepthModeShaderValue(depthType, this._camera);
+	                context.pipelineMode = context.configPipeLineMode;
+	                break;
+	            case exports.DepthTextureMode.MotionVectors:
+	                break;
+	            default:
+	                throw ("there is UnDefined type of DepthTextureMode");
+	        }
+	    }
+	    _setupDepthModeShaderValue(depthType, camera) {
+	        switch (depthType) {
+	            case exports.DepthTextureMode.Depth:
+	                var far = camera.farPlane;
+	                var near = camera.nearPlane;
+	                this._zBufferParams.setValue(1.0 - far / near, far / near, (near - far) / (near * far), 1 / near);
+	                camera._shaderValues.setVector(DepthPass.DEFINE_SHADOW_BIAS, DepthPass.SHADOW_BIAS);
+	                camera._shaderValues.setTexture(DepthPass.DEPTHTEXTURE, this._depthTexture);
+	                camera._shaderValues.setVector(DepthPass.DEPTHZBUFFERPARAMS, this._zBufferParams);
+	                break;
+	            case exports.DepthTextureMode.DepthNormals:
+	                camera._shaderValues.setTexture(DepthPass.DEPTHNORMALSTEXTURE, this._depthNormalsTexture);
+	                break;
+	            case exports.DepthTextureMode.MotionVectors:
+	                break;
+	            default:
+	                throw ("there is UnDefined type of DepthTextureMode");
+	        }
+	    }
+	    cleanUp() {
+	        this._depthTexture && RenderTexture.recoverToPool(this._depthTexture);
+	        this._depthNormalsTexture && RenderTexture.recoverToPool(this._depthNormalsTexture);
+	        this._depthTexture = null;
+	        this._depthNormalsTexture = null;
+	    }
+	}
+	DepthPass.SHADOW_BIAS = new Vector4();
+	DepthPass.DEFINE_SHADOW_BIAS = Shader3D.propertyNameToID("u_ShadowBias");
+	DepthPass.DEPTHTEXTURE = Shader3D.propertyNameToID("u_CameraDepthTexture");
+	DepthPass.DEPTHNORMALSTEXTURE = Shader3D.propertyNameToID("u_CameraDepthNormalsTexture");
+	DepthPass.DEPTHZBUFFERPARAMS = Shader3D.propertyNameToID("u_ZBufferParams");
+
 	(function (CameraClearFlags) {
 	    CameraClearFlags[CameraClearFlags["SolidColor"] = 0] = "SolidColor";
 	    CameraClearFlags[CameraClearFlags["Sky"] = 1] = "Sky";
@@ -11920,6 +12028,30 @@
 	        this._calculateProjectionMatrix();
 	        Laya.Laya.stage.on(Laya.Event.RESIZE, this, this._onScreenSizeChanged);
 	        this.transform.on(Laya.Event.TRANSFORM_CHANGED, this, this._onTransformChanged);
+	    }
+	    static drawRenderTextureByScene(camera, scene, renderTexture) {
+	        if (camera.renderTarget != renderTexture) {
+	            camera.renderTarget && RenderTexture.recoverToPool(camera.renderTarget);
+	            camera.renderTarget = renderTexture;
+	        }
+	        var viewport = camera.viewport;
+	        var needInternalRT = camera._needInternalRenderTexture();
+	        var gl = Laya.LayaGL.instance;
+	        var context = RenderContext3D._instance;
+	        var scene = context.scene = scene;
+	        context.pipelineMode = context.configPipeLineMode;
+	        if (needInternalRT) {
+	            camera._internalRenderTexture = RenderTexture.createFromPool(viewport.width, viewport.height, camera._getRenderTextureFormat(), Laya.RenderTextureDepthFormat.DEPTH_16);
+	            camera._internalRenderTexture.filterMode = Laya.FilterMode.Bilinear;
+	        }
+	        else {
+	            camera._internalRenderTexture = null;
+	        }
+	        var needShadowCasterPass = camera._renderShadowMap(scene, context);
+	        camera._preRenderMainPass(context, scene, needInternalRT, viewport);
+	        camera._renderMainPass(context, viewport, scene, null, null, needInternalRT);
+	        camera._aftRenderMainPass(needShadowCasterPass);
+	        return camera.renderTarget;
 	    }
 	    get aspectRatio() {
 	        if (this._aspectRatio === 0) {
@@ -12052,6 +12184,12 @@
 	    set enableBuiltInRenderTexture(value) {
 	        this._needBuiltInRenderTexture = value;
 	    }
+	    get depthTextureMode() {
+	        return this._depthTextureMode;
+	    }
+	    set depthTextureMode(value) {
+	        this._depthTextureMode = value;
+	    }
 	    _calculationViewport(normalizedViewport, width, height) {
 	        var lx = normalizedViewport.x * width;
 	        var ly = normalizedViewport.y * height;
@@ -12114,7 +12252,7 @@
 	        return this._internalRenderTexture || this._offScreenRenderTexture;
 	    }
 	    _needInternalRenderTexture() {
-	        return this._postProcess || this._enableHDR || this._needBuiltInRenderTexture ? true : false;
+	        return (this._postProcess && this._postProcess.enable) || this._enableHDR || this._needBuiltInRenderTexture ? true : false;
 	    }
 	    _getRenderTextureFormat() {
 	        if (this._enableHDR)
@@ -12126,7 +12264,7 @@
 	        super._prepareCameraToRender();
 	        var vp = this.viewport;
 	        this._viewportParams.setValue(vp.x, vp.y, vp.width, vp.height);
-	        this._projectionParams.setValue(this._nearPlane, this._farPlane, RenderContext3D._instance.invertY ? -1 : 1, 0);
+	        this._projectionParams.setValue(this._nearPlane, this._farPlane, RenderContext3D._instance.invertY ? -1 : 1, 1 / this.farPlane);
 	        this._shaderValues.setVector(BaseCamera.VIEWPORT, this._viewportParams);
 	        this._shaderValues.setVector(BaseCamera.PROJECTION_PARAMS, this._projectionParams);
 	    }
@@ -12207,22 +12345,7 @@
 	        }
 	        gl.viewport(0, 0, context.viewport.width, context.viewport.height);
 	    }
-	    render(shader = null, replacementTag = null) {
-	        if (!this.activeInHierarchy)
-	            return;
-	        var viewport = this.viewport;
-	        var needInternalRT = this._needInternalRenderTexture();
-	        var gl = Laya.LayaGL.instance;
-	        var context = RenderContext3D._instance;
-	        var scene = context.scene = this._scene;
-	        context.pipelineMode = "Forward";
-	        if (needInternalRT) {
-	            this._internalRenderTexture = RenderTexture.createFromPool(viewport.width, viewport.height, this._getRenderTextureFormat(), Laya.RenderTextureDepthFormat.DEPTH_16);
-	            this._internalRenderTexture.filterMode = Laya.FilterMode.Bilinear;
-	        }
-	        else {
-	            this._internalRenderTexture = null;
-	        }
+	    _renderShadowMap(scene, context) {
 	        var shadowCasterPass;
 	        var mainDirectLight = scene._mainDirectionLight;
 	        var needShadowCasterPass = mainDirectLight && mainDirectLight.shadowMode !== exports.ShadowMode.None && ShadowUtils.supportShadow();
@@ -12252,10 +12375,14 @@
 	            scene._shaderValues.addDefine(Scene3DShaderDeclaration.SHADERDEFINE_SHADOW);
 	        if (spotneedShadowCasterPass)
 	            scene._shaderValues.addDefine(Scene3DShaderDeclaration.SHADERDEFINE_SHADOW_SPOT);
+	        return needShadowCasterPass || spotneedShadowCasterPass;
+	    }
+	    _preRenderMainPass(context, scene, needInternalRT, viewport) {
 	        context.camera = this;
 	        context.cameraShaderValue = this._shaderValues;
 	        Camera._updateMark++;
 	        scene._preRenderScript();
+	        var gl = Laya.LayaGL.instance;
 	        if (needInternalRT && !this._offScreenRenderTexture && (this.clearFlag == exports.CameraClearFlags.DepthOnly || this.clearFlag == exports.CameraClearFlags.Nothing)) {
 	            if (this._enableHDR) {
 	                var grabTexture = RenderTexture.createFromPool(viewport.width, viewport.height, Laya.RenderTextureFormat.R8G8B8, Laya.RenderTextureDepthFormat.DEPTH_16);
@@ -12272,14 +12399,21 @@
 	                gl.copyTexSubImage2D(gl.TEXTURE_2D, 0, 0, 0, viewport.x, RenderContext3D.clientHeight - (viewport.y + viewport.height), viewport.width, viewport.height);
 	            }
 	        }
+	    }
+	    _renderMainPass(context, viewport, scene, shader, replacementTag, needInternalRT) {
+	        var gl = Laya.LayaGL.instance;
 	        var renderTex = this._getRenderTexture();
-	        (renderTex) && (renderTex._start());
 	        context.viewport = viewport;
 	        this._prepareCameraToRender();
 	        var multiLighting = Config3D._config._multiLighting;
-	        (multiLighting) && (Cluster.instance.update(this, (this._scene)));
-	        this._applyViewProject(context, this.viewMatrix, this._projectionMatrix);
+	        (multiLighting) && (Cluster.instance.update(this, (scene)));
 	        scene._preCulling(context, this, shader, replacementTag);
+	        if (this.depthTextureMode != 0) {
+	            this._applyViewProject(context, this.viewMatrix, this._projectionMatrix);
+	            this._renderDepthMode(context);
+	        }
+	        (renderTex) && (renderTex._start());
+	        this._applyViewProject(context, this.viewMatrix, this._projectionMatrix);
 	        scene._clear(gl, context);
 	        this._applyCommandBuffer(exports.CameraEventFlags.BeforeForwardOpaque, context);
 	        scene._renderScene(context, ILaya3D.Scene3D.SCENERENDERFLAG_RENDERQPAQUE);
@@ -12291,7 +12425,7 @@
 	        this._applyCommandBuffer(exports.CameraEventFlags.BeforeImageEffect, context);
 	        (renderTex) && (renderTex._end());
 	        if (needInternalRT) {
-	            if (this._postProcess) {
+	            if (this._postProcess && this._postProcess.enable) {
 	                this._postProcess._render();
 	                this._postProcess._applyPostProcessCommandBuffers();
 	            }
@@ -12305,8 +12439,55 @@
 	            RenderTexture.recoverToPool(this._internalRenderTexture);
 	        }
 	        this._applyCommandBuffer(exports.CameraEventFlags.AfterEveryThing, context);
-	        if (needShadowCasterPass || spotneedShadowCasterPass)
-	            shadowCasterPass.cleanUp();
+	    }
+	    _renderDepthMode(context) {
+	        var cameraDepthMode = this._depthTextureMode;
+	        if ((cameraDepthMode & exports.DepthTextureMode.Depth) != 0) {
+	            Camera.depthPass.update(this, exports.DepthTextureMode.Depth);
+	            Camera.depthPass.render(context, exports.DepthTextureMode.Depth);
+	        }
+	        if ((cameraDepthMode & exports.DepthTextureMode.DepthNormals) != 0) {
+	            Camera.depthPass.update(this, exports.DepthTextureMode.DepthNormals);
+	            Camera.depthPass.render(context, exports.DepthTextureMode.DepthNormals);
+	        }
+	    }
+	    get depthTexture() {
+	        return this._depthTexture;
+	    }
+	    set depthTexture(value) {
+	        this._depthTexture = value;
+	    }
+	    get depthNormalTexture() {
+	        return this._depthNormalsTexture;
+	    }
+	    set depthNormalTexture(value) {
+	        this._depthNormalsTexture = value;
+	    }
+	    _aftRenderMainPass(needShadowPass) {
+	        if (needShadowPass)
+	            ILaya3D.Scene3D._shadowCasterPass.cleanUp();
+	        Camera.depthPass.cleanUp();
+	    }
+	    render(shader = null, replacementTag = null) {
+	        if (!this.activeInHierarchy)
+	            return;
+	        var viewport = this.viewport;
+	        var needInternalRT = this._needInternalRenderTexture();
+	        var gl = Laya.LayaGL.instance;
+	        var context = RenderContext3D._instance;
+	        var scene = context.scene = this._scene;
+	        context.pipelineMode = context.configPipeLineMode;
+	        if (needInternalRT) {
+	            this._internalRenderTexture = RenderTexture.createFromPool(viewport.width, viewport.height, this._getRenderTextureFormat(), Laya.RenderTextureDepthFormat.DEPTH_16);
+	            this._internalRenderTexture.filterMode = Laya.FilterMode.Bilinear;
+	        }
+	        else {
+	            this._internalRenderTexture = null;
+	        }
+	        var needShadowCasterPass = this._renderShadowMap(scene, context);
+	        this._preRenderMainPass(context, scene, needInternalRT, viewport);
+	        this._renderMainPass(context, viewport, scene, shader, replacementTag, needInternalRT);
+	        this._aftRenderMainPass(needShadowCasterPass);
 	    }
 	    viewportPointToRay(point, out) {
 	        Picker.calculateCursorRay(point, this.viewport, this._projectionMatrix, this.viewMatrix, null, out);
@@ -12379,6 +12560,7 @@
 	}
 	Camera._tempVector20 = new Vector2();
 	Camera._updateMark = 0;
+	Camera.depthPass = new DepthPass();
 
 	class RenderElement {
 	    constructor() {
@@ -12675,7 +12857,7 @@
 	            case exports.ShaderDataType.Texture:
 	                shaderData.setTexture(this._nameID, this._value);
 	                break;
-	            case exports.ShaderDataType.Vector:
+	            case exports.ShaderDataType.Vector4:
 	                shaderData.setVector(this._nameID, this._value);
 	                break;
 	            case exports.ShaderDataType.Vector2:
@@ -12716,10 +12898,10 @@
 	        this._commands.push(SetGlobalShaderDataCMD.create(nameID, source, exports.ShaderDataType.Texture, this));
 	    }
 	    setShaderDataVector(shaderData, nameID, value) {
-	        this._commands.push(SetShaderDataCMD.create(shaderData, nameID, value, exports.ShaderDataType.Vector, this));
+	        this._commands.push(SetShaderDataCMD.create(shaderData, nameID, value, exports.ShaderDataType.Vector4, this));
 	    }
 	    setGlobalVector(nameID, source) {
-	        this._commands.push(SetGlobalShaderDataCMD.create(nameID, source, exports.ShaderDataType.Vector, this));
+	        this._commands.push(SetGlobalShaderDataCMD.create(nameID, source, exports.ShaderDataType.Vector4, this));
 	    }
 	    setShaderDataVector3(shaderData, nameID, value) {
 	        this._commands.push(SetShaderDataCMD.create(shaderData, nameID, value, exports.ShaderDataType.Vector3, this));
@@ -12801,6 +12983,7 @@
 	        this._compositeShader = Shader3D.find("PostProcessComposite");
 	        this._compositeShaderData = new ShaderData();
 	        this._effects = [];
+	        this._enable = true;
 	        this._context = null;
 	        this._context = new PostProcessRenderContext();
 	        this._context.compositeShaderData = this._compositeShaderData;
@@ -12810,6 +12993,12 @@
 	        PostProcess.SHADERDEFINE_BLOOM_LOW = Shader3D.getDefineByName("BLOOM_LOW");
 	        PostProcess.SHADERDEFINE_BLOOM = Shader3D.getDefineByName("BLOOM");
 	        PostProcess.SHADERDEFINE_FINALPASS = Shader3D.getDefineByName("FINALPASS");
+	    }
+	    get enable() {
+	        return this._enable;
+	    }
+	    set enable(value) {
+	        this._enable = value;
 	    }
 	    _init(camera) {
 	        this._context.camera = camera;
@@ -12865,7 +13054,7 @@
 	PostProcess.SHADERVALUE_BLOOM_COLOR = Shader3D.propertyNameToID("u_Bloom_Color");
 
 	class AnimationTransform3D extends Laya.EventDispatcher {
-	    constructor(owner, localPosition = null, localRotation = null, localScale = null, worldMatrix = null) {
+	    constructor(owner) {
 	        super();
 	        this._owner = owner;
 	        this._children = [];
@@ -12977,9 +13166,12 @@
 	AnimationTransform3D._angleToRandin = 180 / Math.PI;
 
 	class AnimationNode {
-	    constructor(localPosition = null, localRotation = null, localScale = null, worldMatrix = null) {
+	    constructor() {
+	        this._parent = null;
+	        this.name = null;
+	        this._worldMatrixIndex = 0;
 	        this._children = [];
-	        this.transform = new AnimationTransform3D(this, localPosition, localRotation, localScale, worldMatrix);
+	        this.transform = new AnimationTransform3D(this);
 	    }
 	    addChild(child) {
 	        child._parent = this;
@@ -13032,11 +13224,7 @@
 	    _cloneNative(localPositions, localRotations, localScales, animationNodeWorldMatrixs, animationNodeParentIndices, parentIndex, avatar) {
 	        var curID = avatar._nativeCurCloneCount;
 	        animationNodeParentIndices[curID] = parentIndex;
-	        var localPosition = new Float32Array(localPositions.buffer, curID * 3 * 4, 3);
-	        var localRotation = new Float32Array(localRotations.buffer, curID * 4 * 4, 4);
-	        var localScale = new Float32Array(localScales.buffer, curID * 3 * 4, 3);
-	        var worldMatrix = new Float32Array(animationNodeWorldMatrixs.buffer, curID * 16 * 4, 16);
-	        var dest = new AnimationNode(localPosition, localRotation, localScale, worldMatrix);
+	        var dest = new AnimationNode();
 	        dest._worldMatrixIndex = curID;
 	        this._cloneToNative(dest, localPositions, localRotations, localScales, animationNodeWorldMatrixs, animationNodeParentIndices, curID, avatar);
 	        return dest;
@@ -13072,7 +13260,7 @@
 	    }
 	    static _parse(data, propertyParams = null, constructParams = null) {
 	        var avatar = new Avatar();
-	        avatar._rootNode = new AnimationNode(new Float32Array(3), new Float32Array(4), new Float32Array(3), new Float32Array(16));
+	        avatar._rootNode = new AnimationNode();
 	        if (data.version) {
 	            var rootNode = data.rootNode;
 	            (rootNode) && (avatar._parseNode(rootNode, avatar._rootNode));
@@ -13104,7 +13292,7 @@
 	        var childrenData = nodaData.child;
 	        for (var j = 0, n = childrenData.length; j < n; j++) {
 	            var childData = childrenData[j];
-	            var childBone = new AnimationNode(new Float32Array(3), new Float32Array(4), new Float32Array(3), new Float32Array(16));
+	            var childBone = new AnimationNode();
 	            node.addChild(childBone);
 	            this._parseNode(childData, childBone);
 	        }
@@ -13288,6 +13476,42 @@
 	        else
 	            this._shaderValues.removeDefine(Material.SHADERDEFINE_ALPHATEST);
 	    }
+	    get depthWrite() {
+	        return this._shaderValues.getBool(Material.DEPTH_WRITE);
+	    }
+	    set depthWrite(value) {
+	        this._shaderValues.setBool(Material.DEPTH_WRITE, value);
+	    }
+	    get cull() {
+	        return this._shaderValues.getInt(Material.CULL);
+	    }
+	    set cull(value) {
+	        this._shaderValues.setInt(Material.CULL, value);
+	    }
+	    get blend() {
+	        return this._shaderValues.getInt(Material.BLEND);
+	    }
+	    set blend(value) {
+	        this._shaderValues.setInt(Material.BLEND, value);
+	    }
+	    get blendSrc() {
+	        return this._shaderValues.getInt(Material.BLEND_SRC);
+	    }
+	    set blendSrc(value) {
+	        this._shaderValues.setInt(Material.BLEND_SRC, value);
+	    }
+	    get blendDst() {
+	        return this._shaderValues.getInt(Material.BLEND_DST);
+	    }
+	    set blendDst(value) {
+	        this._shaderValues.setInt(Material.BLEND_DST, value);
+	    }
+	    get depthTest() {
+	        return this._shaderValues.getInt(Material.DEPTH_TEST);
+	    }
+	    set depthTest(value) {
+	        this._shaderValues.setInt(Material.DEPTH_TEST, value);
+	    }
 	    _removeTetxureReference() {
 	        var data = this._shaderValues.getData();
 	        for (var k in data) {
@@ -13339,6 +13563,12 @@
 	Material.RENDERQUEUE_ALPHATEST = 2450;
 	Material.RENDERQUEUE_TRANSPARENT = 3000;
 	Material.ALPHATESTVALUE = Shader3D.propertyNameToID("u_AlphaTestValue");
+	Material.CULL = Shader3D.propertyNameToID("s_Cull");
+	Material.BLEND = Shader3D.propertyNameToID("s_Blend");
+	Material.BLEND_SRC = Shader3D.propertyNameToID("s_BlendSrc");
+	Material.BLEND_DST = Shader3D.propertyNameToID("s_BlendDst");
+	Material.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
+	Material.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 	Material.SHADERDEFINE_ALPHATEST = null;
 
 	class BaseMaterial {
@@ -13761,42 +13991,6 @@
 	            this._shaderValues.removeDefine(BlinnPhongMaterial.SHADERDEFINE_SPECULARMAP);
 	        this._shaderValues.setTexture(BlinnPhongMaterial.SPECULARTEXTURE, value);
 	    }
-	    get depthWrite() {
-	        return this._shaderValues.getBool(BlinnPhongMaterial.DEPTH_WRITE);
-	    }
-	    set depthWrite(value) {
-	        this._shaderValues.setBool(BlinnPhongMaterial.DEPTH_WRITE, value);
-	    }
-	    get cull() {
-	        return this._shaderValues.getInt(BlinnPhongMaterial.CULL);
-	    }
-	    set cull(value) {
-	        this._shaderValues.setInt(BlinnPhongMaterial.CULL, value);
-	    }
-	    get blend() {
-	        return this._shaderValues.getInt(BlinnPhongMaterial.BLEND);
-	    }
-	    set blend(value) {
-	        this._shaderValues.setInt(BlinnPhongMaterial.BLEND, value);
-	    }
-	    get blendSrc() {
-	        return this._shaderValues.getInt(BlinnPhongMaterial.BLEND_SRC);
-	    }
-	    set blendSrc(value) {
-	        this._shaderValues.setInt(BlinnPhongMaterial.BLEND_SRC, value);
-	    }
-	    get blendDst() {
-	        return this._shaderValues.getInt(BlinnPhongMaterial.BLEND_DST);
-	    }
-	    set blendDst(value) {
-	        this._shaderValues.setInt(BlinnPhongMaterial.BLEND_DST, value);
-	    }
-	    get depthTest() {
-	        return this._shaderValues.getInt(BlinnPhongMaterial.DEPTH_TEST);
-	    }
-	    set depthTest(value) {
-	        this._shaderValues.setInt(BlinnPhongMaterial.DEPTH_TEST, value);
-	    }
 	    clone() {
 	        var dest = new BlinnPhongMaterial();
 	        this.cloneTo(dest);
@@ -13821,12 +14015,6 @@
 	BlinnPhongMaterial.MATERIALSPECULAR = Shader3D.propertyNameToID("u_MaterialSpecular");
 	BlinnPhongMaterial.SHININESS = Shader3D.propertyNameToID("u_Shininess");
 	BlinnPhongMaterial.TILINGOFFSET = Shader3D.propertyNameToID("u_TilingOffset");
-	BlinnPhongMaterial.CULL = Shader3D.propertyNameToID("s_Cull");
-	BlinnPhongMaterial.BLEND = Shader3D.propertyNameToID("s_Blend");
-	BlinnPhongMaterial.BLEND_SRC = Shader3D.propertyNameToID("s_BlendSrc");
-	BlinnPhongMaterial.BLEND_DST = Shader3D.propertyNameToID("s_BlendDst");
-	BlinnPhongMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
-	BlinnPhongMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
 	class EffectMaterial extends Material {
 	    constructor() {
@@ -14020,42 +14208,6 @@
 	        }
 	        this._shaderValues.setVector(EffectMaterial.TILINGOFFSET, value);
 	    }
-	    get depthWrite() {
-	        return this._shaderValues.getBool(EffectMaterial.DEPTH_WRITE);
-	    }
-	    set depthWrite(value) {
-	        this._shaderValues.setBool(EffectMaterial.DEPTH_WRITE, value);
-	    }
-	    get cull() {
-	        return this._shaderValues.getInt(EffectMaterial.CULL);
-	    }
-	    set cull(value) {
-	        this._shaderValues.setInt(EffectMaterial.CULL, value);
-	    }
-	    get blend() {
-	        return this._shaderValues.getInt(EffectMaterial.BLEND);
-	    }
-	    set blend(value) {
-	        this._shaderValues.setInt(EffectMaterial.BLEND, value);
-	    }
-	    get blendSrc() {
-	        return this._shaderValues.getInt(EffectMaterial.BLEND_SRC);
-	    }
-	    set blendSrc(value) {
-	        this._shaderValues.setInt(EffectMaterial.BLEND_SRC, value);
-	    }
-	    get blendDst() {
-	        return this._shaderValues.getInt(EffectMaterial.BLEND_DST);
-	    }
-	    set blendDst(value) {
-	        this._shaderValues.setInt(EffectMaterial.BLEND_DST, value);
-	    }
-	    get depthTest() {
-	        return this._shaderValues.getInt(EffectMaterial.DEPTH_TEST);
-	    }
-	    set depthTest(value) {
-	        this._shaderValues.setInt(EffectMaterial.DEPTH_TEST, value);
-	    }
 	    clone() {
 	        var dest = new EffectMaterial();
 	        this.cloneTo(dest);
@@ -14067,12 +14219,6 @@
 	EffectMaterial.MAINTEXTURE = Shader3D.propertyNameToID("u_AlbedoTexture");
 	EffectMaterial.TINTCOLOR = Shader3D.propertyNameToID("u_AlbedoColor");
 	EffectMaterial.TILINGOFFSET = Shader3D.propertyNameToID("u_TilingOffset");
-	EffectMaterial.CULL = Shader3D.propertyNameToID("s_Cull");
-	EffectMaterial.BLEND = Shader3D.propertyNameToID("s_Blend");
-	EffectMaterial.BLEND_SRC = Shader3D.propertyNameToID("s_BlendSrc");
-	EffectMaterial.BLEND_DST = Shader3D.propertyNameToID("s_BlendDst");
-	EffectMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
-	EffectMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
 	class ExtendTerrainMaterial extends Material {
 	    constructor() {
@@ -14166,42 +14312,6 @@
 	                throw new Error("ExtendTerrainMaterial:renderMode value error.");
 	        }
 	    }
-	    get depthWrite() {
-	        return this._shaderValues.getBool(ExtendTerrainMaterial.DEPTH_WRITE);
-	    }
-	    set depthWrite(value) {
-	        this._shaderValues.setBool(ExtendTerrainMaterial.DEPTH_WRITE, value);
-	    }
-	    get cull() {
-	        return this._shaderValues.getInt(ExtendTerrainMaterial.CULL);
-	    }
-	    set cull(value) {
-	        this._shaderValues.setInt(ExtendTerrainMaterial.CULL, value);
-	    }
-	    get blend() {
-	        return this._shaderValues.getInt(ExtendTerrainMaterial.BLEND);
-	    }
-	    set blend(value) {
-	        this._shaderValues.setInt(ExtendTerrainMaterial.BLEND, value);
-	    }
-	    get blendSrc() {
-	        return this._shaderValues.getInt(ExtendTerrainMaterial.BLEND_SRC);
-	    }
-	    set blendSrc(value) {
-	        this._shaderValues.setInt(ExtendTerrainMaterial.BLEND_SRC, value);
-	    }
-	    get blendDst() {
-	        return this._shaderValues.getInt(ExtendTerrainMaterial.BLEND_DST);
-	    }
-	    set blendDst(value) {
-	        this._shaderValues.setInt(ExtendTerrainMaterial.BLEND_DST, value);
-	    }
-	    get depthTest() {
-	        return this._shaderValues.getInt(ExtendTerrainMaterial.DEPTH_TEST);
-	    }
-	    set depthTest(value) {
-	        this._shaderValues.setInt(ExtendTerrainMaterial.DEPTH_TEST, value);
-	    }
 	    _setDetailNum(value) {
 	        switch (value) {
 	            case 1:
@@ -14260,12 +14370,6 @@
 	ExtendTerrainMaterial.DIFFUSESCALEOFFSET3 = Shader3D.propertyNameToID("u_DiffuseScaleOffset3");
 	ExtendTerrainMaterial.DIFFUSESCALEOFFSET4 = Shader3D.propertyNameToID("u_DiffuseScaleOffset4");
 	ExtendTerrainMaterial.DIFFUSESCALEOFFSET5 = Shader3D.propertyNameToID("u_DiffuseScaleOffset5");
-	ExtendTerrainMaterial.CULL = Shader3D.propertyNameToID("s_Cull");
-	ExtendTerrainMaterial.BLEND = Shader3D.propertyNameToID("s_Blend");
-	ExtendTerrainMaterial.BLEND_SRC = Shader3D.propertyNameToID("s_BlendSrc");
-	ExtendTerrainMaterial.BLEND_DST = Shader3D.propertyNameToID("s_BlendDst");
-	ExtendTerrainMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
-	ExtendTerrainMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
 	(function (PBRRenderMode) {
 	    PBRRenderMode[PBRRenderMode["Opaque"] = 0] = "Opaque";
@@ -14418,42 +14522,6 @@
 	        }
 	        this._shaderValues.setVector(PBRMaterial.TILINGOFFSET, value);
 	    }
-	    get depthWrite() {
-	        return this._shaderValues.getBool(PBRMaterial.DEPTH_WRITE);
-	    }
-	    set depthWrite(value) {
-	        this._shaderValues.setBool(PBRMaterial.DEPTH_WRITE, value);
-	    }
-	    get cull() {
-	        return this._shaderValues.getInt(PBRMaterial.CULL);
-	    }
-	    set cull(value) {
-	        this._shaderValues.setInt(PBRMaterial.CULL, value);
-	    }
-	    get blend() {
-	        return this._shaderValues.getInt(PBRMaterial.BLEND);
-	    }
-	    set blend(value) {
-	        this._shaderValues.setInt(PBRMaterial.BLEND, value);
-	    }
-	    get blendSrc() {
-	        return this._shaderValues.getInt(PBRMaterial.BLEND_SRC);
-	    }
-	    set blendSrc(value) {
-	        this._shaderValues.setInt(PBRMaterial.BLEND_SRC, value);
-	    }
-	    get blendDst() {
-	        return this._shaderValues.getInt(PBRMaterial.BLEND_DST);
-	    }
-	    set blendDst(value) {
-	        this._shaderValues.setInt(PBRMaterial.BLEND_DST, value);
-	    }
-	    get depthTest() {
-	        return this._shaderValues.getInt(PBRMaterial.DEPTH_TEST);
-	    }
-	    set depthTest(value) {
-	        this._shaderValues.setInt(PBRMaterial.DEPTH_TEST, value);
-	    }
 	    set renderMode(value) {
 	        switch (value) {
 	            case exports.PBRRenderMode.Opaque:
@@ -14519,12 +14587,6 @@
 	PBRMaterial.PARALLAXSCALE = Shader3D.propertyNameToID("u_ParallaxScale");
 	PBRMaterial.EMISSIONTEXTURE = Shader3D.propertyNameToID("u_EmissionTexture");
 	PBRMaterial.EMISSIONCOLOR = Shader3D.propertyNameToID("u_EmissionColor");
-	PBRMaterial.CULL = Shader3D.propertyNameToID("s_Cull");
-	PBRMaterial.BLEND = Shader3D.propertyNameToID("s_Blend");
-	PBRMaterial.BLEND_SRC = Shader3D.propertyNameToID("s_BlendSrc");
-	PBRMaterial.BLEND_DST = Shader3D.propertyNameToID("s_BlendDst");
-	PBRMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
-	PBRMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 	PBRMaterial.renderQuality = exports.PBRRenderQuality.High;
 
 	var PBRPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n\r\n#define SETUP_BRDF_INPUT specularSetup\r\n\r\n#include \"Lighting.glsl\";\r\n#include \"PBRFSInput.glsl\";\r\n#include \"LayaPBRBRDF.glsl\";\r\n#include \"GlobalIllumination.glsl\";\r\n#include \"Shadow.glsl\"\r\n#include \"PBRCore.glsl\";\r\n\r\nvoid main()\r\n{\r\n\tfragmentForward();\r\n}";
@@ -14534,6 +14596,10 @@
 	var PBRShadowCasterPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n\r\n#include \"ShadowCasterFS.glsl\"\r\n\r\nvoid main()\r\n{\r\n\tgl_FragColor=shadowCasterFragment();\r\n}";
 
 	var PBRShadowCasterVS = "#include \"ShadowCasterVS.glsl\"\r\n\r\nvoid main()\r\n{\r\n\tvec4 positionCS =  shadowCasterVertex();\r\n\tgl_Position=remapGLPositionZ(positionCS);\r\n}";
+
+	var DepthNormalsTextureVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nattribute vec3 a_Normal;\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_WorldMat;\r\n#endif\r\n\r\nuniform mat4 u_ViewProjection;\r\nuniform vec4 u_ProjectionParams;\r\n\r\n//传入法线\r\nvarying vec4 depthNormals;\r\n\r\n\r\nvec4 depthNormalsVertex()\r\n{\r\n\tmat4 worldMat;\r\n\t#ifdef GPU_INSTANCE\r\n\t\tworldMat = a_WorldMat;\r\n\t#else\r\n\t\tworldMat = u_WorldMat;\r\n\t#endif\r\n\t\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tworldMat = worldMat * skinTransform;\r\n\t#endif\r\n\r\n\tvec4 positionWS = worldMat * a_Position;\r\n\r\n\tmat3 worldInvMat;\r\n\t#ifdef BONE\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat*skinTransform));\r\n\t#else\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat));\r\n\t#endif  \r\n\r\n\tvec3 normalWS = normalize(a_Normal*worldInvMat);//if no normalize will cause precision problem\r\n\r\n\tdepthNormals.xyz = normalWS;\r\n\tvec4 positionCS = u_ViewProjection * positionWS;\r\n\tdepthNormals.w = (positionCS.z * 2.0 - positionCS.w)*u_ProjectionParams.w;\r\n\t\r\n    return positionCS;\r\n}\r\n\r\nvoid main()\r\n{\r\n\tvec4 positionCS =  depthNormalsVertex();\r\n\tgl_Position=remapGLPositionZ(positionCS);\r\n}";
+
+	var DepthNormalsTextureFS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n#include \"DepthNormalUtil.glsl\";\r\n\r\nvarying vec4 depthNormals;\r\n\r\nvoid main()\r\n{\r\n\tgl_FragColor=depthNormalsFragment(depthNormals);\r\n}";
 
 	class ShaderVariable {
 	    constructor() {
@@ -15766,7 +15832,9 @@
 	        return texture;
 	    }
 	    static load(url, complete) {
-	        Laya.ILaya.loader.create(url, complete, null, TextureCube.TEXTURECUBE);
+	        var extension = (Laya.LoaderManager.createMap[Laya.Utils.getFilecompatibleExtension(url)]) ? Laya.Utils.getFilecompatibleExtension(url) : Laya.Utils.getFileExtension(url);
+	        var type = Laya.LoaderManager.createMap[extension] ? Laya.LoaderManager.createMap[extension][0] : null;
+	        Laya.ILaya.loader.create(url, complete, null, type);
 	    }
 	    get defaulteTexture() {
 	        return TextureCube.grayTexture;
@@ -15921,6 +15989,7 @@
 	    }
 	}
 	TextureCube.TEXTURECUBE = "TEXTURECUBE";
+	TextureCube.TEXTURECUBEBIN = "TEXTURECUBEBIN";
 
 	class LightQueue {
 	    constructor() {
@@ -15988,42 +16057,6 @@
 	    set color(value) {
 	        this._shaderValues.setVector(PixelLineMaterial.COLOR, value);
 	    }
-	    set depthWrite(value) {
-	        this._shaderValues.setBool(PixelLineMaterial.DEPTH_WRITE, value);
-	    }
-	    get depthWrite() {
-	        return this._shaderValues.getBool(PixelLineMaterial.DEPTH_WRITE);
-	    }
-	    set cull(value) {
-	        this._shaderValues.setInt(PixelLineMaterial.CULL, value);
-	    }
-	    get cull() {
-	        return this._shaderValues.getInt(PixelLineMaterial.CULL);
-	    }
-	    set blend(value) {
-	        this._shaderValues.setInt(PixelLineMaterial.BLEND, value);
-	    }
-	    get blend() {
-	        return this._shaderValues.getInt(PixelLineMaterial.BLEND);
-	    }
-	    set blendSrc(value) {
-	        this._shaderValues.setInt(PixelLineMaterial.BLEND_SRC, value);
-	    }
-	    get blendSrc() {
-	        return this._shaderValues.getInt(PixelLineMaterial.BLEND_SRC);
-	    }
-	    set blendDst(value) {
-	        this._shaderValues.setInt(PixelLineMaterial.BLEND_DST, value);
-	    }
-	    get blendDst() {
-	        return this._shaderValues.getInt(PixelLineMaterial.BLEND_DST);
-	    }
-	    set depthTest(value) {
-	        this._shaderValues.setInt(PixelLineMaterial.DEPTH_TEST, value);
-	    }
-	    get depthTest() {
-	        return this._shaderValues.getInt(PixelLineMaterial.DEPTH_TEST);
-	    }
 	    clone() {
 	        var dest = new PixelLineMaterial();
 	        this.cloneTo(dest);
@@ -16031,12 +16064,6 @@
 	    }
 	}
 	PixelLineMaterial.COLOR = Shader3D.propertyNameToID("u_Color");
-	PixelLineMaterial.CULL = Shader3D.propertyNameToID("s_Cull");
-	PixelLineMaterial.BLEND = Shader3D.propertyNameToID("s_Blend");
-	PixelLineMaterial.BLEND_SRC = Shader3D.propertyNameToID("s_BlendSrc");
-	PixelLineMaterial.BLEND_DST = Shader3D.propertyNameToID("s_BlendDst");
-	PixelLineMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
-	PixelLineMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
 	class BoundBox {
 	    constructor(min, max) {
@@ -17127,9 +17154,7 @@
 	            }
 	            if (sTangentOffset !== -1) {
 	                var absSTanegntOffset = oriOffset + sTangentOffset;
-	                batchVertices[bakeOffset + 14] = oriVertexes[absSTanegntOffset];
-	                batchVertices[bakeOffset + 15] = oriVertexes[absSTanegntOffset + 1];
-	                batchVertices[bakeOffset + 16] = oriVertexes[absSTanegntOffset + 2];
+	                Utils3D.transformVector3ArrayToVector3ArrayNormal(oriVertexes, absSTanegntOffset, normalMat, batchVertices, bakeOffset + 14);
 	                batchVertices[bakeOffset + 17] = oriVertexes[absSTanegntOffset + 3];
 	            }
 	        }
@@ -17708,6 +17733,9 @@
 	        return this._octreeNode;
 	    }
 	    _setOctreeNode(value) {
+	        if (!value) {
+	            (this._indexInOctreeMotionList !== -1) && (this._octreeNode._octree.removeMotionObject(this));
+	        }
 	        this._octreeNode = value;
 	    }
 	    _getIndexInMotionList() {
@@ -17849,6 +17877,8 @@
 	class PixelLineSprite3D extends RenderableSprite3D {
 	    constructor(maxCount = 2, name = null) {
 	        super(name);
+	        this._isRenderActive = false;
+	        this._isInRenders = false;
 	        this._geometryFilter = new PixelLineFilter(this, maxCount);
 	        this._render = new PixelLineRenderer(this);
 	        this._changeRenderObjects(this._render, 0, PixelLineMaterial.defaultMaterial);
@@ -17872,6 +17902,22 @@
 	    get pixelLineRenderer() {
 	        return this._render;
 	    }
+	    _onInActive() {
+	        Laya.Stat.spriteCount--;
+	        if (this._geometryFilter._lineCount != 0 && this._isRenderActive) {
+	            this._scene._removeRenderObject(this._render);
+	            this._isInRenders = false;
+	        }
+	        this._isRenderActive = false;
+	    }
+	    _onActive() {
+	        Laya.Stat.spriteCount++;
+	        this._isRenderActive = true;
+	        if (this._geometryFilter._lineCount != 0) {
+	            this._scene._addRenderObject(this._render);
+	            this._isInRenders = true;
+	        }
+	    }
 	    _changeRenderObjects(sender, index, material) {
 	        var renderObjects = this._render._renderElements;
 	        (material) || (material = PixelLineMaterial.defaultMaterial);
@@ -17887,6 +17933,10 @@
 	            this._geometryFilter._updateLineData(this._geometryFilter._lineCount++, startPosition, endPosition, startColor, endColor);
 	        else
 	            throw "PixelLineSprite3D: lineCount has equal with maxLineCount.";
+	        if (this._isRenderActive && !this._isInRenders && this._geometryFilter._lineCount > 0) {
+	            this._scene._addRenderObject(this._render);
+	            this._isInRenders = true;
+	        }
 	    }
 	    addLines(lines) {
 	        var lineCount = this._geometryFilter._lineCount;
@@ -17898,12 +17948,20 @@
 	            this._geometryFilter._updateLineDatas(lineCount, lines);
 	            this._geometryFilter._lineCount += addCount;
 	        }
+	        if (this._isRenderActive && !this._isInRenders && this._geometryFilter._lineCount > 0) {
+	            this._scene._addRenderObject(this._render);
+	            this._isInRenders = true;
+	        }
 	    }
 	    removeLine(index) {
 	        if (index < this._geometryFilter._lineCount)
 	            this._geometryFilter._removeLineData(index);
 	        else
 	            throw "PixelLineSprite3D: index must less than lineCount.";
+	        if (this._isRenderActive && this._isInRenders && this._geometryFilter._lineCount == 0) {
+	            this._scene._removeRenderObject(this._render);
+	            this._isInRenders = false;
+	        }
 	    }
 	    setLine(index, startPosition, endPosition, startColor, endColor) {
 	        if (index < this._geometryFilter._lineCount)
@@ -17919,6 +17977,10 @@
 	    }
 	    clear() {
 	        this._geometryFilter._lineCount = 0;
+	        if (this._isRenderActive && this._isInRenders) {
+	            this._scene._removeRenderObject(this._render);
+	            this._isInRenders = false;
+	        }
 	    }
 	    _create() {
 	        return new PixelLineSprite3D();
@@ -18977,7 +19039,7 @@
 	                shadowMap._end();
 	                this._setupShadowReceiverShaderValues(shaderValues);
 	                ShaderData.setRuntimeValueMode(true);
-	                context.pipelineMode = "Forward";
+	                context.pipelineMode = context.configPipeLineMode;
 	                break;
 	            case exports.ShadowLightType.SpotLight:
 	                var shaderValues = scene._shaderValues;
@@ -19004,7 +19066,7 @@
 	                shadowMap._end();
 	                this._setupSpotShadowReceiverShaderValues(shaderValues);
 	                ShaderData.setRuntimeValueMode(true);
-	                context.pipelineMode = "Forward";
+	                context.pipelineMode = context.configPipeLineMode;
 	                break;
 	            case exports.ShadowLightType.PointLight:
 	                break;
@@ -19091,6 +19153,10 @@
 	        this._sceneReflectionProbe.reflectionHDRParams = value;
 	    }
 	    _updateMotionObjects(baseRender) {
+	        if (this._reflectionProbes.length == 0) {
+	            baseRender._probReflection = this._sceneReflectionProbe;
+	            return;
+	        }
 	        var elements = this._reflectionProbes.elements;
 	        var maxOverlap = 0;
 	        var mainProbe;
@@ -19129,8 +19195,6 @@
 	        this._motionObjects.add(renderObject);
 	    }
 	    update() {
-	        if (this._reflectionProbes.length == 0)
-	            return;
 	        var elements = this._motionObjects.elements;
 	        for (var i = 0, n = this._motionObjects.length; i < n; i++) {
 	            this._updateMotionObjects(elements[i]);
@@ -19357,10 +19421,11 @@
 	        return this._reflection;
 	    }
 	    set reflection(value) {
+	        value = value ? value : TextureCube.blackTexture;
 	        if (this._reflection != value) {
 	            value._addReference();
 	            this._reflectionProbeManager.sceneReflectionProbe = value;
-	            this._reflection = value || TextureCube.blackTexture;
+	            this._reflection = value;
 	            this._reflectionProbeManager._needUpdateAllRender = true;
 	        }
 	    }
@@ -20042,7 +20107,7 @@
 	            case exports.ShaderDataType.Texture:
 	                this._shaderValues.setTexture(shaderOffset, value);
 	                break;
-	            case exports.ShaderDataType.Vector:
+	            case exports.ShaderDataType.Vector4:
 	                this._shaderValues.setVector(shaderOffset, value);
 	                break;
 	            case exports.ShaderDataType.Vector2:
@@ -20575,6 +20640,7 @@
 	        shader.addSubShader(subShader);
 	        subShader.addShaderPass(PBRVS, PBRPS, stateMap, "Forward");
 	        subShader.addShaderPass(PBRShadowCasterVS, PBRShadowCasterPS, stateMap, "ShadowCaster");
+	        subShader.addShaderPass(DepthNormalsTextureVS, DepthNormalsTextureFS, stateMap, "DepthNormal");
 	    }
 	    get specularTexture() {
 	        return this._shaderValues.getTexture(PBRSpecularMaterial.SPECULARTEXTURE);
@@ -20718,6 +20784,7 @@
 	        shader.addSubShader(subShader);
 	        subShader.addShaderPass(PBRVS$1, PBRPS$1, stateMap, "Forward");
 	        subShader.addShaderPass(PBRShadowCasterVS$1, PBRShadowCasterPS$1, stateMap, "ShadowCaster");
+	        subShader.addShaderPass(DepthNormalsTextureVS, DepthNormalsTextureFS, stateMap, "DepthNormal");
 	    }
 	    get metallicGlossTexture() {
 	        return this._shaderValues.getTexture(PBRStandardMaterial.METALLICGLOSSTEXTURE);
@@ -21127,42 +21194,6 @@
 	                throw new Error("UnlitMaterial : renderMode value error.");
 	        }
 	    }
-	    get depthWrite() {
-	        return this._shaderValues.getBool(UnlitMaterial.DEPTH_WRITE);
-	    }
-	    set depthWrite(value) {
-	        this._shaderValues.setBool(UnlitMaterial.DEPTH_WRITE, value);
-	    }
-	    get cull() {
-	        return this._shaderValues.getInt(UnlitMaterial.CULL);
-	    }
-	    set cull(value) {
-	        this._shaderValues.setInt(UnlitMaterial.CULL, value);
-	    }
-	    get blend() {
-	        return this._shaderValues.getInt(UnlitMaterial.BLEND);
-	    }
-	    set blend(value) {
-	        this._shaderValues.setInt(UnlitMaterial.BLEND, value);
-	    }
-	    get blendSrc() {
-	        return this._shaderValues.getInt(UnlitMaterial.BLEND_SRC);
-	    }
-	    set blendSrc(value) {
-	        this._shaderValues.setInt(UnlitMaterial.BLEND_SRC, value);
-	    }
-	    get blendDst() {
-	        return this._shaderValues.getInt(UnlitMaterial.BLEND_DST);
-	    }
-	    set blendDst(value) {
-	        this._shaderValues.setInt(UnlitMaterial.BLEND_DST, value);
-	    }
-	    get depthTest() {
-	        return this._shaderValues.getInt(UnlitMaterial.DEPTH_TEST);
-	    }
-	    set depthTest(value) {
-	        this._shaderValues.setInt(UnlitMaterial.DEPTH_TEST, value);
-	    }
 	    clone() {
 	        var dest = new UnlitMaterial();
 	        this.cloneTo(dest);
@@ -21176,12 +21207,6 @@
 	UnlitMaterial.ALBEDOTEXTURE = Shader3D.propertyNameToID("u_AlbedoTexture");
 	UnlitMaterial.ALBEDOCOLOR = Shader3D.propertyNameToID("u_AlbedoColor");
 	UnlitMaterial.TILINGOFFSET = Shader3D.propertyNameToID("u_TilingOffset");
-	UnlitMaterial.CULL = Shader3D.propertyNameToID("s_Cull");
-	UnlitMaterial.BLEND = Shader3D.propertyNameToID("s_Blend");
-	UnlitMaterial.BLEND_SRC = Shader3D.propertyNameToID("s_BlendSrc");
-	UnlitMaterial.BLEND_DST = Shader3D.propertyNameToID("s_BlendDst");
-	UnlitMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
-	UnlitMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
 	class WaterPrimaryMaterial extends Material {
 	    constructor() {
@@ -23708,7 +23733,7 @@
 	                destVelocity = GradientVelocity.createByRandomTwoConstant(this._velocity.constantMin.clone(), this._velocity.constantMax.clone());
 	                break;
 	            case 3:
-	                destVelocity = GradientVelocity.createByRandomTwoGradient(this._velocity.gradientXMin.clone(), this._velocity.gradientYMin.clone(), this._velocity.gradientZMin.clone(), this._velocity.gradientXMax.clone(), this._velocity.gradientYMax.clone(), this._velocity.gradientZMax.clone());
+	                destVelocity = GradientVelocity.createByRandomTwoGradient(this._velocity.gradientXMin.clone(), this._velocity.gradientXMax.clone(), this._velocity.gradientYMin.clone(), this._velocity.gradientYMax.clone(), this._velocity.gradientZMin.clone(), this._velocity.gradientZMax.clone());
 	                break;
 	        }
 	        var destVelocityOverLifetime = new VelocityOverLifetime(destVelocity);
@@ -23966,42 +23991,6 @@
 	            this._shaderValues.removeDefine(ShurikenParticleMaterial.SHADERDEFINE_DIFFUSEMAP);
 	        this._shaderValues.setTexture(ShurikenParticleMaterial.DIFFUSETEXTURE, value);
 	    }
-	    get depthWrite() {
-	        return this._shaderValues.getBool(ShurikenParticleMaterial.DEPTH_WRITE);
-	    }
-	    set depthWrite(value) {
-	        this._shaderValues.setBool(ShurikenParticleMaterial.DEPTH_WRITE, value);
-	    }
-	    get cull() {
-	        return this._shaderValues.getInt(ShurikenParticleMaterial.CULL);
-	    }
-	    set cull(value) {
-	        this._shaderValues.setInt(ShurikenParticleMaterial.CULL, value);
-	    }
-	    get blend() {
-	        return this._shaderValues.getInt(ShurikenParticleMaterial.BLEND);
-	    }
-	    set blend(value) {
-	        this._shaderValues.setInt(ShurikenParticleMaterial.BLEND, value);
-	    }
-	    get blendSrc() {
-	        return this._shaderValues.getInt(ShurikenParticleMaterial.BLEND_SRC);
-	    }
-	    set blendSrc(value) {
-	        this._shaderValues.setInt(ShurikenParticleMaterial.BLEND_SRC, value);
-	    }
-	    get blendDst() {
-	        return this._shaderValues.getInt(ShurikenParticleMaterial.BLEND_DST);
-	    }
-	    set blendDst(value) {
-	        this._shaderValues.setInt(ShurikenParticleMaterial.BLEND_DST, value);
-	    }
-	    get depthTest() {
-	        return this._shaderValues.getInt(ShurikenParticleMaterial.DEPTH_TEST);
-	    }
-	    set depthTest(value) {
-	        this._shaderValues.setInt(ShurikenParticleMaterial.DEPTH_TEST, value);
-	    }
 	    clone() {
 	        var dest = new ShurikenParticleMaterial();
 	        this.cloneTo(dest);
@@ -24013,12 +24002,6 @@
 	ShurikenParticleMaterial.DIFFUSETEXTURE = Shader3D.propertyNameToID("u_texture");
 	ShurikenParticleMaterial.TINTCOLOR = Shader3D.propertyNameToID("u_Tintcolor");
 	ShurikenParticleMaterial.TILINGOFFSET = Shader3D.propertyNameToID("u_TilingOffset");
-	ShurikenParticleMaterial.CULL = Shader3D.propertyNameToID("s_Cull");
-	ShurikenParticleMaterial.BLEND = Shader3D.propertyNameToID("s_Blend");
-	ShurikenParticleMaterial.BLEND_SRC = Shader3D.propertyNameToID("s_BlendSrc");
-	ShurikenParticleMaterial.BLEND_DST = Shader3D.propertyNameToID("s_BlendDst");
-	ShurikenParticleMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
-	ShurikenParticleMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
 	class ShurikenParticleRenderer extends BaseRender {
 	    constructor(owner) {
@@ -25984,9 +25967,6 @@
 	    _freeRetiredParticles() {
 	        while (this._firstRetiredElement != this._firstActiveElement) {
 	            var age = this._drawCounter - this._vertices[this._firstRetiredElement * this._floatCountPerVertex * this._vertexStride + this._timeIndex];
-	            if (this.isPerformanceMode)
-	                if (age < 3)
-	                    break;
 	            this._firstRetiredElement++;
 	            if (this._firstRetiredElement >= this._bufferMaxParticles)
 	                this._firstRetiredElement = 0;
@@ -28033,42 +28013,6 @@
 	        }
 	        this._shaderValues.setVector(TrailMaterial.TILINGOFFSET, value);
 	    }
-	    set depthWrite(value) {
-	        this._shaderValues.setBool(TrailMaterial.DEPTH_WRITE, value);
-	    }
-	    get depthWrite() {
-	        return this._shaderValues.getBool(TrailMaterial.DEPTH_WRITE);
-	    }
-	    set cull(value) {
-	        this._shaderValues.setInt(TrailMaterial.CULL, value);
-	    }
-	    get cull() {
-	        return this._shaderValues.getInt(TrailMaterial.CULL);
-	    }
-	    set blend(value) {
-	        this._shaderValues.setInt(TrailMaterial.BLEND, value);
-	    }
-	    get blend() {
-	        return this._shaderValues.getInt(TrailMaterial.BLEND);
-	    }
-	    set blendSrc(value) {
-	        this._shaderValues.setInt(TrailMaterial.BLEND_SRC, value);
-	    }
-	    get blendSrc() {
-	        return this._shaderValues.getInt(TrailMaterial.BLEND_SRC);
-	    }
-	    set blendDst(value) {
-	        this._shaderValues.setInt(TrailMaterial.BLEND_DST, value);
-	    }
-	    get blendDst() {
-	        return this._shaderValues.getInt(TrailMaterial.BLEND_DST);
-	    }
-	    set depthTest(value) {
-	        this._shaderValues.setInt(TrailMaterial.DEPTH_TEST, value);
-	    }
-	    get depthTest() {
-	        return this._shaderValues.getInt(TrailMaterial.DEPTH_TEST);
-	    }
 	    clone() {
 	        var dest = new TrailMaterial();
 	        this.cloneTo(dest);
@@ -28080,12 +28024,6 @@
 	TrailMaterial.MAINTEXTURE = Shader3D.propertyNameToID("u_MainTexture");
 	TrailMaterial.TINTCOLOR = Shader3D.propertyNameToID("u_MainColor");
 	TrailMaterial.TILINGOFFSET = Shader3D.propertyNameToID("u_TilingOffset");
-	TrailMaterial.CULL = Shader3D.propertyNameToID("s_Cull");
-	TrailMaterial.BLEND = Shader3D.propertyNameToID("s_Blend");
-	TrailMaterial.BLEND_SRC = Shader3D.propertyNameToID("s_BlendSrc");
-	TrailMaterial.BLEND_DST = Shader3D.propertyNameToID("s_BlendDst");
-	TrailMaterial.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
-	TrailMaterial.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
 
 	class TextureMode {
 	}
@@ -28178,10 +28116,10 @@
 	        var oldSubDistance = new Float64Array(this._subDistance.buffer, this._activeIndex * 8, count);
 	        var oldSubBirthTime = new Float32Array(this._subBirthTime.buffer, this._activeIndex * 4, count);
 	        if (count === this._segementCount) {
-	            this._vertexBuffer1.destroy();
-	            this._vertexBuffer2.destroy();
 	            var memorySize = this._vertexBuffer1._byteLength + this._vertexBuffer2._byteLength;
 	            Laya.Resource._addMemory(-memorySize, -memorySize);
+	            this._vertexBuffer1.destroy();
+	            this._vertexBuffer2.destroy();
 	            this._segementCount += this._increaseSegementCount;
 	            this._resizeData(this._segementCount, this._bufferState);
 	        }
@@ -28818,10 +28756,15 @@
 	    get indexCount() {
 	        return this._indexCount;
 	    }
-	    _setIndexRange(indexStart, indexCount) {
+	    _setIndexRange(indexStart, indexCount, indexFormat = exports.IndexFormat.UInt16) {
 	        this._indexStart = indexStart;
 	        this._indexCount = indexCount;
-	        this._indices = new Uint16Array(this._indexBuffer.getData().buffer, indexStart * 2, indexCount);
+	        if (indexFormat == exports.IndexFormat.UInt16) {
+	            this._indices = new Uint16Array(this._indexBuffer.getData().buffer, indexStart * 2, indexCount);
+	        }
+	        else {
+	            this._indices = new Uint32Array(this._indexBuffer.getData().buffer, indexStart * 4, indexCount);
+	        }
 	    }
 	    _getType() {
 	        return SubMesh._type;
@@ -29908,7 +29851,7 @@
 
 	var lineVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nuniform mat4 u_MvpMatrix;\r\nuniform vec4 u_Color;\r\nattribute vec4 a_Color;\r\nvarying vec4 v_Color;\r\n\r\n\r\nvoid main()\r\n{\r\n\tgl_Position = u_MvpMatrix * a_Position;\r\n\tv_Color=a_Color*u_Color;\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
 
-	var MeshBlinnPhongPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n#include \"Shadow.glsl\"\r\n\r\nuniform vec4 u_DiffuseColor;\r\n\r\n#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef ALPHATEST\r\n\tuniform float u_AlphaTestValue;\r\n#endif\r\n\r\n#ifdef DIFFUSEMAP\r\n\tuniform sampler2D u_DiffuseTexture;\r\n#endif\r\n\r\n\r\n#if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tvarying vec2 v_LightMapUV;\r\n\tuniform sampler2D u_LightMap;\r\n#endif\r\n\r\nvarying vec3 v_Normal;\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\tvarying vec3 v_ViewDir; \r\n\r\n\tuniform vec3 u_MaterialSpecular;\r\n\tuniform float u_Shininess;\r\n\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tuniform DirectionLight u_DirectionLight;\r\n\t\t#endif\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tuniform PointLight u_PointLight;\r\n\t\t#endif\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tuniform SpotLight u_SpotLight;\r\n\t\t#endif\r\n\t#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n\t#endif\r\n\r\n\t#ifdef SPECULARMAP \r\n\t\tuniform sampler2D u_SpecularTexture;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef NORMALMAP \r\n\tuniform sampler2D u_NormalTexture;\r\n\tvarying vec3 v_Tangent;\r\n\tvarying vec3 v_Binormal;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\n#if defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n\r\n#include \"GlobalIllumination.glsl\";//\"GlobalIllumination.glsl use uniform should at front of this\r\n\r\n#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\tvarying vec4 v_ShadowCoord;\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tvarying vec4 v_SpotShadowCoord;\r\n#endif\r\n\r\n\r\nvoid main()\r\n{\r\n\tvec3 normal;//light and SH maybe use normal\r\n\t#if defined(NORMALMAP)\r\n\t\tvec3 normalMapSample = texture2D(u_NormalTexture, v_Texcoord0).rgb;\r\n\t\tnormal = normalize(NormalSampleToWorldSpace(normalMapSample, v_Normal, v_Tangent,v_Binormal));\r\n\t#else\r\n\t\tnormal = normalize(v_Normal);\r\n\t#endif\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 viewDir= normalize(v_ViewDir);\r\n\t#endif\r\n\r\n\tLayaGIInput giInput;\r\n\t#ifdef LIGHTMAP\t\r\n\t\tgiInput.lightmapUV=v_LightMapUV;\r\n\t#endif\r\n\tvec3 globalDiffuse=layaGIBase(giInput,1.0,normal);\r\n\t\r\n\tvec4 mainColor=u_DiffuseColor;\r\n\t#ifdef DIFFUSEMAP\r\n\t\tvec4 difTexColor=texture2D(u_DiffuseTexture, v_Texcoord0);\r\n\t\tmainColor=mainColor*difTexColor;\r\n\t#endif \r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tmainColor=mainColor*v_Color;\r\n\t#endif \r\n    \r\n\t#ifdef ALPHATEST\r\n\t\tif(mainColor.a<u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n  \r\n\t\r\n\tvec3 diffuse = vec3(0.0);\r\n\tvec3 specular= vec3(0.0);\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 dif,spe;\r\n\t\t#ifdef SPECULARMAP\r\n\t\t\tvec3 gloss=texture2D(u_SpecularTexture, v_Texcoord0).rgb;\r\n\t\t#else\r\n\t\t\t#ifdef DIFFUSEMAP\r\n\t\t\t\tvec3 gloss=vec3(difTexColor.a);\r\n\t\t\t#else\r\n\t\t\t\tvec3 gloss=vec3(1.0);\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t\r\n\t\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tLayaAirBlinnPhongDiectionLight(u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_DirectionLight,dif,spe);\r\n\t\t\t#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t#ifdef SHADOW_CASCADE\r\n\t\t\t\t\tvec4 shadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t\t\t\t#else\r\n\t\t\t\t\tvec4 shadowCoord = v_ShadowCoord;\r\n\t\t\t\t#endif\r\n\t\t\t\tfloat shadowAttenuation=sampleShadowmap(shadowCoord);\r\n\t\t\t\tdif *= shadowAttenuation;\r\n\t\t\t\tspe *= shadowAttenuation;\r\n\t\t\t#endif\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_PointLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_SpotLight,dif,spe);\r\n\t\t\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\tvec4 spotShadowcoord = v_SpotShadowCoord;\r\n\t\t\t\tfloat spotShadowAttenuation = sampleSpotShadowmap(spotShadowcoord);\r\n\t\t\t\tdif *= spotShadowAttenuation;\r\n\t\t\t\tspe *= spotShadowAttenuation;\r\n\t\t\t#endif\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\t#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t\tif(i == 0)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\t#ifdef SHADOW_CASCADE\r\n\t\t\t\t\t\t\tvec4 shadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\tvec4 shadowCoord = v_ShadowCoord;\r\n\t\t\t\t\t\t#endif\r\n\t\t\t\t\t\tdirectionLight.color *= sampleShadowmap(shadowCoord);\r\n\t\t\t\t\t}\r\n\t\t\t\t#endif\r\n\t\t\t\tLayaAirBlinnPhongDiectionLight(u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,directionLight,dif,spe);\r\n\t\t\t\tdiffuse+=dif;\r\n\t\t\t\tspecular+=spe;\r\n\t\t\t}\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,pointLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t\t\tif(i == 0)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tvec4 spotShadowcoord = v_SpotShadowCoord;\r\n\t\t\t\t\t\t\tspotLight.color *= sampleSpotShadowmap(spotShadowcoord);\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t#endif\r\n\t\t\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,spotLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\tgl_FragColor =vec4(mainColor.rgb*(globalDiffuse + diffuse),mainColor.a);\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tgl_FragColor.rgb+=specular;\r\n\t#endif\r\n\t  \r\n\t#ifdef FOG\r\n\t\tfloat lerpFact=clamp((1.0/gl_FragCoord.w-u_FogStart)/u_FogRange,0.0,1.0);\r\n\t\tgl_FragColor.rgb=mix(gl_FragColor.rgb,u_FogColor,lerpFact);\r\n\t#endif\r\n}\r\n\r\n";
+	var MeshBlinnPhongPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n#include \"Shadow.glsl\"\r\n\r\nuniform vec4 u_DiffuseColor;\r\n\r\n#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef ALPHATEST\r\n\tuniform float u_AlphaTestValue;\r\n#endif\r\n\r\n#ifdef DIFFUSEMAP\r\n\tuniform sampler2D u_DiffuseTexture;\r\n#endif\r\n\r\n\r\n#if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tvarying vec2 v_LightMapUV;\r\n\tuniform sampler2D u_LightMap;\r\n\t#ifdef LIGHTMAP_DIRECTIONAL\r\n\t\tuniform sampler2D u_LightMapDirection;\r\n\t#endif\r\n#endif\r\n\r\nvarying vec3 v_Normal;\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\tvarying vec3 v_ViewDir; \r\n\r\n\tuniform vec3 u_MaterialSpecular;\r\n\tuniform float u_Shininess;\r\n\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tuniform DirectionLight u_DirectionLight;\r\n\t\t#endif\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tuniform PointLight u_PointLight;\r\n\t\t#endif\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tuniform SpotLight u_SpotLight;\r\n\t\t#endif\r\n\t#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n\t#endif\r\n\r\n\t#ifdef SPECULARMAP \r\n\t\tuniform sampler2D u_SpecularTexture;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef NORMALMAP \r\n\tuniform sampler2D u_NormalTexture;\r\n\tvarying vec3 v_Tangent;\r\n\tvarying vec3 v_Binormal;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\n#if defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n\r\n#include \"GlobalIllumination.glsl\";//\"GlobalIllumination.glsl use uniform should at front of this\r\n\r\n#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\tvarying vec4 v_ShadowCoord;\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tvarying vec4 v_SpotShadowCoord;\r\n#endif\r\n\r\n\r\nvoid main()\r\n{\r\n\tvec3 normal;//light and SH maybe use normal\r\n\t#if defined(NORMALMAP)\r\n\t\tvec3 normalMapSample = texture2D(u_NormalTexture, v_Texcoord0).rgb;\r\n\t\tnormal = normalize(NormalSampleToWorldSpace(normalMapSample, v_Normal, v_Tangent,v_Binormal));\r\n\t#else\r\n\t\tnormal = normalize(v_Normal);\r\n\t#endif\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 viewDir= normalize(v_ViewDir);\r\n\t#endif\r\n\r\n\tLayaGIInput giInput;\r\n\t#ifdef LIGHTMAP\t\r\n\t\tgiInput.lightmapUV=v_LightMapUV;\r\n\t#endif\r\n\tvec3 globalDiffuse=layaGIBase(giInput,1.0,normal);\r\n\t\r\n\tvec4 mainColor=u_DiffuseColor;\r\n\t#ifdef DIFFUSEMAP\r\n\t\tvec4 difTexColor=texture2D(u_DiffuseTexture, v_Texcoord0);\r\n\t\tmainColor=mainColor*difTexColor;\r\n\t#endif \r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tmainColor=mainColor*v_Color;\r\n\t#endif \r\n    \r\n\t#ifdef ALPHATEST\r\n\t\tif(mainColor.a<u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n  \r\n\t\r\n\tvec3 diffuse = vec3(0.0);\r\n\tvec3 specular= vec3(0.0);\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 dif,spe;\r\n\t\t#ifdef SPECULARMAP\r\n\t\t\tvec3 gloss=texture2D(u_SpecularTexture, v_Texcoord0).rgb;\r\n\t\t#else\r\n\t\t\t#ifdef DIFFUSEMAP\r\n\t\t\t\tvec3 gloss=vec3(difTexColor.a);\r\n\t\t\t#else\r\n\t\t\t\tvec3 gloss=vec3(1.0);\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t\r\n\t\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tLayaAirBlinnPhongDiectionLight(u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_DirectionLight,dif,spe);\r\n\t\t\t#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t#ifdef SHADOW_CASCADE\r\n\t\t\t\t\tvec4 shadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t\t\t\t#else\r\n\t\t\t\t\tvec4 shadowCoord = v_ShadowCoord;\r\n\t\t\t\t#endif\r\n\t\t\t\tfloat shadowAttenuation=sampleShadowmap(shadowCoord);\r\n\t\t\t\tdif *= shadowAttenuation;\r\n\t\t\t\tspe *= shadowAttenuation;\r\n\t\t\t#endif\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_PointLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_SpotLight,dif,spe);\r\n\t\t\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\tvec4 spotShadowcoord = v_SpotShadowCoord;\r\n\t\t\t\tfloat spotShadowAttenuation = sampleSpotShadowmap(spotShadowcoord);\r\n\t\t\t\tdif *= spotShadowAttenuation;\r\n\t\t\t\tspe *= spotShadowAttenuation;\r\n\t\t\t#endif\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\t#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t\tif(i == 0)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\t#ifdef SHADOW_CASCADE\r\n\t\t\t\t\t\t\tvec4 shadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\tvec4 shadowCoord = v_ShadowCoord;\r\n\t\t\t\t\t\t#endif\r\n\t\t\t\t\t\tdirectionLight.color *= sampleShadowmap(shadowCoord);\r\n\t\t\t\t\t}\r\n\t\t\t\t#endif\r\n\t\t\t\tLayaAirBlinnPhongDiectionLight(u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,directionLight,dif,spe);\r\n\t\t\t\tdiffuse+=dif;\r\n\t\t\t\tspecular+=spe;\r\n\t\t\t}\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,pointLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t\t\tif(i == 0)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tvec4 spotShadowcoord = v_SpotShadowCoord;\r\n\t\t\t\t\t\t\tspotLight.color *= sampleSpotShadowmap(spotShadowcoord);\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t#endif\r\n\t\t\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,spotLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\tgl_FragColor =vec4(mainColor.rgb*(globalDiffuse + diffuse),mainColor.a);\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tgl_FragColor.rgb+=specular;\r\n\t#endif\r\n\t  \r\n\t#ifdef FOG\r\n\t\tfloat lerpFact=clamp((1.0/gl_FragCoord.w-u_FogStart)/u_FogRange,0.0,1.0);\r\n\t\tgl_FragColor.rgb=mix(gl_FragColor.rgb,u_FogColor,lerpFact);\r\n\t#endif\r\n}\r\n\r\n";
 
 	var MeshBlinnPhongVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n#include \"Lighting.glsl\";\r\n#include \"LayaUtile.glsl\"\r\n#include \"Shadow.glsl\";\r\n\r\n\r\nattribute vec4 a_Position;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_MvpMatrix;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\n\r\n#if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))||(defined(LIGHTMAP)&&defined(UV))\r\n\tattribute vec2 a_Texcoord0;\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#if defined(LIGHTMAP)&&defined(UV1)\r\n\tattribute vec2 a_Texcoord1;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tuniform vec4 u_LightmapScaleOffset;\r\n\tvarying vec2 v_LightMapUV;\r\n#endif\r\n\r\n#ifdef COLOR\r\n\tattribute vec4 a_Color;\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\nattribute vec3 a_Normal;\r\nvarying vec3 v_Normal; \r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\tuniform vec3 u_CameraPos;\r\n\tvarying vec3 v_ViewDir; \r\n#endif\r\n\r\n#if defined(NORMALMAP)\r\n\tattribute vec4 a_Tangent0;\r\n\tvarying vec3 v_Tangent;\r\n\tvarying vec3 v_Binormal;\r\n#endif\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_WorldMat;\r\n#endif\r\n\r\n#if defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\tvarying vec4 v_ShadowCoord;\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tvarying vec4 v_SpotShadowCoord;\r\n#endif\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif\r\n\r\n\r\n\r\nvoid main()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tposition=skinTransform*a_Position;\r\n\t #else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\t\r\n\tmat4 worldMat;\r\n\t#ifdef GPU_INSTANCE\r\n\t\tworldMat = a_WorldMat;\r\n\t#else\r\n\t\tworldMat = u_WorldMat;\r\n\t#endif\r\n\r\n\tmat3 worldInvMat;\r\n\t#ifdef BONE\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat*skinTransform));\r\n\t#else\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat));\r\n\t#endif  \r\n\tv_Normal=normalize(a_Normal*worldInvMat);\r\n\t#if defined(NORMALMAP)\r\n\t\tv_Tangent=normalize(a_Tangent0.xyz*worldInvMat);\r\n\t\tv_Binormal=cross(v_Normal,v_Tangent)*a_Tangent0.w;\r\n\t#endif\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\t\tvec3 positionWS=(worldMat*position).xyz;\r\n\t\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tv_ViewDir = u_CameraPos-positionWS;\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\t\t\tv_PositionWorld = positionWS;\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))\r\n\t\t#ifdef TILINGOFFSET\r\n\t\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t\t#else\r\n\t\t\tv_Texcoord0=a_Texcoord0;\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#ifdef LIGHTMAP\r\n\t\t#ifdef UV1\r\n\t\t\tv_LightMapUV=vec2(a_Texcoord1.x,1.0-a_Texcoord1.y)*u_LightmapScaleOffset.xy+u_LightmapScaleOffset.zw;\r\n\t\t#else\r\n\t\t\tv_LightMapUV=vec2(a_Texcoord0.x,1.0-a_Texcoord0.y)*u_LightmapScaleOffset.xy+u_LightmapScaleOffset.zw;\r\n\t\t#endif \r\n\t\tv_LightMapUV.y=1.0-v_LightMapUV.y;\r\n\t#endif\r\n\r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tv_Color=a_Color;\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\t\tv_ShadowCoord =getShadowCoord(vec4(positionWS,1.0));\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\tv_SpotShadowCoord = u_SpotViewProjectMatrix*vec4(positionWS,1.0);\r\n\t#endif\r\n\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
 
@@ -29928,7 +29871,7 @@
 
 	var PBRFSInput = "#ifdef ALPHATEST\r\n\tuniform float u_AlphaTestValue;\r\n#endif\r\n\r\nuniform vec4 u_AlbedoColor;\r\n\r\n#ifdef NORMALTEXTURE\r\n\tuniform sampler2D u_NormalTexture;\r\n\tuniform float u_NormalScale;\r\n#endif\r\n\r\n#ifdef ALBEDOTEXTURE\r\n\tuniform sampler2D u_AlbedoTexture;\r\n#endif\r\n\r\n#ifdef METALLICGLOSSTEXTURE\r\n\tuniform sampler2D u_MetallicGlossTexture;\r\n#endif\r\nuniform float u_Metallic;\r\n\r\n#ifdef SPECULARGLOSSTEXTURE\r\n\tuniform sampler2D u_SpecGlossTexture;\r\n#endif\r\nuniform vec3 u_SpecularColor;\r\n\r\nuniform float u_Smoothness;\r\nuniform float u_SmoothnessScale;\r\n\r\n#ifdef PARALLAXTEXTURE\r\n\tuniform sampler2D u_ParallaxTexture;\r\n\tuniform float u_ParallaxScale;\r\n\tvarying vec3 v_ViewDirForParallax;\r\n#endif\r\n\r\n#ifdef OCCLUSIONTEXTURE\r\n\tuniform sampler2D u_OcclusionTexture;\r\n\tuniform float u_occlusionStrength;\r\n#endif\r\n\r\n#ifdef EMISSION \r\n\t#ifdef EMISSIONTEXTURE\r\n\t\tuniform sampler2D u_EmissionTexture;\r\n\t#endif\r\n\tuniform vec4 u_EmissionColor;\r\n#endif\r\n\r\n#if defined(ALBEDOTEXTURE)||defined(METALLICGLOSSTEXTURE)||defined(NORMALTEXTURE)||defined(EMISSIONTEXTURE)||defined(OCCLUSIONTEXTURE)||defined(PARALLAXTEXTURE)\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tvarying vec2 v_LightMapUV;\r\n\tuniform sampler2D u_LightMap;\r\n\t#ifdef LIGHTMAP_DIRECTIONAL\r\n\t\tuniform sampler2D u_LightMapDirection;\r\n\t#endif\r\n#endif\r\n\r\nvarying vec3 v_Normal; \r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tuniform DirectionLight u_DirectionLight;\r\n\t\t#endif\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tuniform PointLight u_PointLight;\r\n\t\t#endif\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tuniform SpotLight u_SpotLight;\r\n\t\t#endif\r\n\t#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n\t#endif\r\n#endif\r\n\r\nvarying vec3 v_EyeVec;\r\n\r\n#ifdef NORMALTEXTURE\r\n\tvarying vec3 v_Tangent;\r\n\tvarying vec3 v_Binormal;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\n\r\n//后面考虑宏TODO\r\nvarying vec3 v_PositionWorld;\r\n\r\n#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\tvarying vec4 v_ShadowCoord;\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tvarying vec4 v_SpotShadowCoord;\r\n#endif\r\n\r\nmediump float lerpOneTo(mediump float b, mediump float t)\r\n{\r\n    mediump float oneMinusT = 1.0 - t;\r\n    return oneMinusT + b * t;\r\n}\r\n\r\n#ifdef EMISSION \r\n\tvec3 emission(vec2 uv)\r\n\t{\r\n\t\t#ifdef EMISSIONTEXTURE\r\n\t\t\treturn texture2D(u_EmissionTexture, uv).rgb * u_EmissionColor.rgb;\r\n\t\t#else\r\n\t\t\treturn u_EmissionColor.rgb;\r\n\t\t#endif\r\n\t}\r\n#endif\r\n\r\nmediump float getAlpha(vec2 uv)\r\n{\r\n\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\treturn u_AlbedoColor.a;\r\n\t#else\r\n\t\t#ifdef ALBEDOTEXTURE\r\n\t\t\treturn texture2D(u_AlbedoTexture, uv).a * u_AlbedoColor.a;\r\n\t\t#else\r\n\t\t\treturn u_AlbedoColor.a;\r\n\t\t#endif\r\n\t#endif\r\n}\r\n\r\nmediump float getOcclusion(vec2 uv)\r\n{\r\n\t#ifdef OCCLUSIONTEXTURE\r\n\t\tmediump float occ = texture2D(u_OcclusionTexture, uv).g;\r\n\t\treturn lerpOneTo(occ, u_occlusionStrength);\r\n\t#else\r\n\t\treturn 1.0;\r\n\t#endif\r\n}\r\n\r\nmediump vec3 albedo(vec2 uv)\r\n{\r\n\t#ifdef ALBEDOTEXTURE\r\n\t\treturn u_AlbedoColor.rgb * texture2D(u_AlbedoTexture, uv).rgb;\r\n\t#else\r\n\t\treturn u_AlbedoColor.rgb;\r\n\t#endif\r\n\t//TODO:Detail Texture\r\n}\r\n\r\nmediump vec2 getMetallicGloss(vec2 uv)\r\n{\r\n\tmediump vec2 ms;//x is metallic,y is smoothness\r\n\t#ifdef METALLICGLOSSTEXTURE\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\tms.x = texture2D(u_MetallicGlossTexture, uv).r;\r\n\t\t\t#ifdef ALBEDOTEXTURE\r\n\t\t\t\tms.y = texture2D(u_AlbedoTexture, uv).a*u_SmoothnessScale;\r\n\t\t\t#else\r\n\t\t\t\tms.y = u_SmoothnessScale;\r\n\t\t\t#endif\r\n\t\t#else\r\n\t\t\tms = texture2D(u_MetallicGlossTexture, uv).ra;\r\n\t\t\tms.y *= u_SmoothnessScale;\r\n\t\t#endif\r\n\t#else\r\n\t\tms.x = u_Metallic;\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\t#ifdef ALBEDOTEXTURE\r\n\t\t\t\tms.y = texture2D(u_AlbedoTexture, uv).a * u_SmoothnessScale;\r\n\t\t\t#else\r\n\t\t\t\tms.y = u_SmoothnessScale;\r\n\t\t\t#endif\r\n\t\t#else\r\n\t\t\tms.y = u_Smoothness;\r\n\t\t#endif\r\n\t#endif\r\n\treturn ms;\r\n}\r\n\r\nmediump vec4 specularGloss(vec2 uv)\r\n{\r\n\tmediump vec4 sg;\r\n\t#ifdef SPECULARGLOSSTEXTURE\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\tsg.rgb = texture2D(u_SpecGlossTexture, uv).rgb;\r\n\t\t\t#ifdef ALBEDOTEXTURE\r\n\t\t\t\tsg.a = texture2D(u_AlbedoTexture, uv).a*u_SmoothnessScale;\r\n\t\t\t#else\r\n\t\t\t\tsg.a = u_SmoothnessScale;\r\n\t\t\t#endif\r\n\t\t#else\r\n\t\t\tsg = texture2D(u_SpecGlossTexture, uv);\r\n\t\t\tsg.a *= u_SmoothnessScale;\r\n\t\t#endif\r\n\t#else\r\n\t\tsg.rgb = u_SpecularColor.rgb;\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\t#ifdef ALBEDOTEXTURE\r\n\t\t\t\tsg.a = texture2D(u_AlbedoTexture, uv).a * u_SmoothnessScale;\r\n\t\t\t#else\r\n\t\t\t\tsg.a = u_SmoothnessScale;\r\n\t\t\t#endif\r\n\t\t#else\r\n\t\t\tsg.a = u_Smoothness;\r\n\t\t#endif\r\n\t#endif\r\n\t\treturn sg;\r\n}\r\n\r\n\r\n#ifdef NORMALTEXTURE\r\n\tmediump vec3 unpackScaleNormal(mediump vec3 packednormal, mediump float bumpScale)\r\n\t{\r\n\t\tmediump vec3 normal = packednormal.xyz * 2.0 - 1.0;\r\n\t\tnormal.y=-normal.y;//NOTE:because unity to LayaAir coordSystem.\r\n\t\tnormal.xy *= bumpScale;\r\n\t\treturn normal;\r\n\t}\r\n\t\r\n\tmediump vec3 normalInTangentSpace(vec2 texcoords)\r\n\t{\r\n\t\tmediump vec3 normalTangent = unpackScaleNormal(texture2D(u_NormalTexture, texcoords).rgb,u_NormalScale);\r\n\t\treturn normalTangent;\r\n\t}\r\n#endif\r\n\r\n#ifdef PARALLAXTEXTURE\r\n\tmediump vec2 parallaxOffset1Step(mediump float h, mediump float height, mediump vec3 viewDir)\r\n\t{\r\n\t\th = h * height - height / 2.0;\r\n\t\tviewDir.z += 0.42;\r\n\t\treturn h * (viewDir.xy / viewDir.z);\r\n\t}\r\n\r\n\tvec2 parallax(vec2 texcoords, mediump vec3 viewDir)\r\n\t{\r\n\t\tmediump float h = texture2D(u_ParallaxTexture, texcoords.xy).g;\r\n\t\tvec2 offset = parallaxOffset1Step(h, u_ParallaxScale, viewDir);\r\n\t\treturn texcoords+offset;\r\n\t}\r\n#endif\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n";
 
-	var PBRVertex = "vec2 transformLightMapUV(in vec2 texcoord,in vec4 lightmapScaleOffset)\r\n{\r\n\tvec2 lightMapUV=vec2(texcoord.x,1.0-texcoord.y)*lightmapScaleOffset.xy+lightmapScaleOffset.zw;\r\n\tlightMapUV.y=1.0-lightMapUV.y;\r\n\treturn lightMapUV; \r\n}\r\n\r\nvoid vertexForward()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tposition=skinTransform*a_Position;\r\n\t #else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\r\n\tmat4 worldMat;\r\n\t#ifdef GPU_INSTANCE\r\n\t\tworldMat = a_WorldMat;\r\n\t#else\r\n\t\tworldMat = u_WorldMat;\r\n\t#endif\r\n\r\n\tv_PositionWorld=(worldMat*position).xyz;\r\n\r\n\t#if defined(ALBEDOTEXTURE)||defined(METALLICGLOSSTEXTURE)||defined(NORMALTEXTURE)||defined(EMISSIONTEXTURE)||defined(OCCLUSIONTEXTURE)||defined(PARALLAXTEXTURE)\r\n\t\t#ifdef TILINGOFFSET\r\n\t\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t\t#else\r\n\t\t\tv_Texcoord0=a_Texcoord0;\r\n\t\t#endif\r\n\t#endif\r\n\r\n\tv_EyeVec =u_CameraPos-v_PositionWorld;//will normalize per-pixel\r\n\r\n\t#ifdef LIGHTMAP\r\n\t\tvec2 texcoord;\r\n\t\t#ifdef UV1\r\n\t\t\ttexcoord=a_Texcoord1;\r\n\t\t#else\r\n\t\t\ttexcoord=a_Texcoord0;\r\n\t\t#endif\r\n\t\tv_LightMapUV=transformLightMapUV(texcoord,u_LightmapScaleOffset);\r\n\t#endif\r\n\r\n\tmat3 worldInvMat;\r\n\t#ifdef BONE\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat*skinTransform));\r\n\t#else\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat));\r\n\t#endif\r\n\r\n\tv_Normal=normalize(a_Normal*worldInvMat);//if no normalize will cause precision problem.\r\n\r\n\t#ifdef NORMALTEXTURE\r\n\t\tv_Tangent=normalize(a_Tangent0.xyz*worldInvMat);\r\n\t\tv_Binormal=cross(v_Normal,v_Tangent)*a_Tangent0.w;\r\n\t#endif\r\n\r\n\t#ifdef PARALLAXTEXTURE\r\n\t\tvec3 binormal = cross(a_Normal, a_Tangent0.xyz)*a_Tangent0.w;\r\n\t\tmat3 objectTBN = mat3(a_Tangent0.xyz, binormal, a_Normal);\r\n\t\tv_ViewDirForParallax=(worldInvMat*u_CameraPos-position.xyz)*objectTBN;\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\t\tv_ShadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SPOTSHADOWS)//shader���Զ���ĺ겻����ifdef ����ĳ�if defined\r\n\t\tv_SpotShadowCoord = u_SpotViewProjectMatrix*vec4(v_PositionWorld,1.0);\r\n\t#endif\r\n}";
+	var PBRVertex = "vec2 transformLightMapUV(in vec2 texcoord,in vec4 lightmapScaleOffset)\r\n{\r\n\tvec2 lightMapUV=vec2(texcoord.x,1.0-texcoord.y)*lightmapScaleOffset.xy+lightmapScaleOffset.zw;\r\n\tlightMapUV.y=1.0-lightMapUV.y;\r\n\treturn lightMapUV; \r\n}\r\n\r\nvoid vertexForward()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tposition=skinTransform*a_Position;\r\n\t #else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\r\n\tmat4 worldMat;\r\n\t#ifdef GPU_INSTANCE\r\n\t\tworldMat = a_WorldMat;\r\n\t#else\r\n\t\tworldMat = u_WorldMat;\r\n\t#endif\r\n\r\n\tv_PositionWorld=(worldMat*position).xyz;\r\n\r\n\t#if defined(ALBEDOTEXTURE)||defined(METALLICGLOSSTEXTURE)||defined(NORMALTEXTURE)||defined(EMISSIONTEXTURE)||defined(OCCLUSIONTEXTURE)||defined(PARALLAXTEXTURE)\r\n\t\t#ifdef TILINGOFFSET\r\n\t\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t\t#else\r\n\t\t\tv_Texcoord0=a_Texcoord0;\r\n\t\t#endif\r\n\t#endif\r\n\r\n\tv_EyeVec =u_CameraPos-v_PositionWorld;//will normalize per-pixel\r\n\r\n\t#ifdef LIGHTMAP\r\n\t\tvec2 texcoord;\r\n\t\t#ifdef UV1\r\n\t\t\ttexcoord=a_Texcoord1;\r\n\t\t#else\r\n\t\t\ttexcoord=a_Texcoord0;\r\n\t\t#endif\r\n\t\tv_LightMapUV=transformLightMapUV(texcoord,u_LightmapScaleOffset);\r\n\t#endif\r\n\r\n\tmat3 worldInvMat;\r\n\t#ifdef BONE\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat*skinTransform));\r\n\t#else\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat));\r\n\t#endif\r\n\r\n\tv_Normal=normalize(a_Normal*worldInvMat);//if no normalize will cause precision problem.\r\n\r\n\t#ifdef NORMALTEXTURE\r\n\t\tv_Tangent=normalize(a_Tangent0.xyz*worldInvMat);\r\n\t\tv_Binormal=cross(v_Normal,v_Tangent)*a_Tangent0.w;\r\n\t#endif\r\n\r\n\t#ifdef PARALLAXTEXTURE\r\n\t\tvec3 binormal = cross(a_Normal, a_Tangent0.xyz)*a_Tangent0.w;\r\n\t\tmat3 objectTBN = mat3(a_Tangent0.xyz, binormal, a_Normal);\r\n\t\tv_ViewDirForParallax =(u_CameraPos*worldInvMat-position.xyz)*objectTBN;\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\t\tv_ShadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\tv_SpotShadowCoord = u_SpotViewProjectMatrix*vec4(v_PositionWorld,1.0);\r\n\t#endif\r\n}";
 
 	var BloomVS = "#include \"Lighting.glsl\";\r\n#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\nattribute vec4 a_PositionTexcoord;\r\nvarying vec2 v_Texcoord0;\r\n\r\nvoid main() {\r\n\tgl_Position = vec4(a_PositionTexcoord.xy, 0.0, 1.0);\r\n\tv_Texcoord0 = a_PositionTexcoord.zw;\r\n\tgl_Position = remapGLPositionZ(gl_Position);\r\n}";
 
@@ -29956,9 +29899,9 @@
 
 	var ShadowGLSL = "#ifndef GRAPHICS_API_GLES3\r\n\t#define NO_NATIVE_SHADOWMAP\r\n#endif\r\n\r\n#if defined(NO_NATIVE_SHADOWMAP)\r\n\t#define TEXTURE2D_SHADOW(textureName) uniform mediump sampler2D textureName\r\n\t#define SAMPLE_TEXTURE2D_SHADOW(textureName, coord3) (texture2D(textureName,coord3.xy).r<coord3.z?0.0:1.0)\r\n\t#define TEXTURE2D_SHADOW_PARAM(shadowMap) mediump sampler2D shadowMap\r\n#else\r\n\t#define TEXTURE2D_SHADOW(textureName) uniform mediump sampler2DShadow textureName\r\n\t#define SAMPLE_TEXTURE2D_SHADOW(textureName, coord3) textureLod(textureName,coord3,0.0)\r\n\t#define TEXTURE2D_SHADOW_PARAM(shadowMap) mediump sampler2DShadow shadowMap\r\n#endif\r\n\r\n#if defined(RECEIVESHADOW)&&defined(SHADOW)\r\n    #define CALCULATE_SHADOWS\r\n#endif\r\n\r\n#if defined(RECEIVESHADOW)&&defined(SHADOW_SPOT)\r\n\t#define CALCULATE_SPOTSHADOWS\r\n#endif\r\n\r\nuniform vec4 u_ShadowBias; // x: depth bias, y: normal bias\r\n\r\n#if defined(CALCULATE_SHADOWS)||defined(CALCULATE_SPOTSHADOWS)\r\n\t#include \"ShadowSampleTent.glsl\"\r\n\tuniform vec4 u_ShadowMapSize;\r\n\tuniform vec4 u_ShadowParams; // x: shadowStrength y: ShadowSpotLightStrength\r\n\r\n\t\r\n\tfloat sampleShdowMapFiltered4(TEXTURE2D_SHADOW_PARAM(shadowMap),vec3 shadowCoord,vec4 shadowMapSize)\r\n\t{\r\n\t\tfloat attenuation;\r\n\t\tvec4 attenuation4;\r\n\t\tvec2 offset=shadowMapSize.xy/2.0;\r\n\t\tvec3 shadowCoord0=shadowCoord + vec3(-offset,0.0);\r\n\t\tvec3 shadowCoord1=shadowCoord + vec3(offset.x,-offset.y,0.0);\r\n\t\tvec3 shadowCoord2=shadowCoord + vec3(-offset.x,offset.y,0.0);\r\n\t\tvec3 shadowCoord3=shadowCoord + vec3(offset,0.0);\r\n\t\tattenuation4.x = SAMPLE_TEXTURE2D_SHADOW(shadowMap, shadowCoord0);\r\n\t\tattenuation4.y = SAMPLE_TEXTURE2D_SHADOW(shadowMap, shadowCoord1);\r\n\t\tattenuation4.z = SAMPLE_TEXTURE2D_SHADOW(shadowMap, shadowCoord2);\r\n\t\tattenuation4.w = SAMPLE_TEXTURE2D_SHADOW(shadowMap, shadowCoord3);\r\n\t\tattenuation = dot(attenuation4, vec4(0.25));\r\n\t\treturn attenuation;\r\n\t}\r\n\r\n\tfloat sampleShdowMapFiltered9(TEXTURE2D_SHADOW_PARAM(shadowMap),vec3 shadowCoord,vec4 shadowmapSize)\r\n\t{\r\n\t\tfloat attenuation;\r\n\t\tfloat fetchesWeights[9];\r\n\t\tvec2 fetchesUV[9];\r\n\t\tsampleShadowComputeSamplesTent5x5(shadowmapSize, shadowCoord.xy, fetchesWeights, fetchesUV);\r\n\t\tattenuation = fetchesWeights[0] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[0].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[1] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[1].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[2] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[2].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[3] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[3].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[4] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[4].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[5] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[5].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[6] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[6].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[7] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[7].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[8] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[8].xy, shadowCoord.z));\r\n\t\treturn attenuation;\r\n\t}\r\n\r\n#endif\r\n\r\n\r\n\r\n\r\n#if defined(CALCULATE_SHADOWS)\r\n\r\n\tTEXTURE2D_SHADOW(u_ShadowMap);\r\n\r\n\tuniform mat4 u_ShadowMatrices[4];\r\n\tuniform vec4 u_ShadowSplitSpheres[4];// max cascade is 4\r\n\r\n\tmediump int computeCascadeIndex(vec3 positionWS)\r\n\t{\r\n\t\tvec3 fromCenter0 = positionWS - u_ShadowSplitSpheres[0].xyz;\r\n\t\tvec3 fromCenter1 = positionWS - u_ShadowSplitSpheres[1].xyz;\r\n\t\tvec3 fromCenter2 = positionWS - u_ShadowSplitSpheres[2].xyz;\r\n\t\tvec3 fromCenter3 = positionWS - u_ShadowSplitSpheres[3].xyz;\r\n\r\n\t\tmediump vec4 comparison = vec4(\r\n\t\t\tdot(fromCenter0, fromCenter0)<u_ShadowSplitSpheres[0].w,\r\n\t\t\tdot(fromCenter1, fromCenter1)<u_ShadowSplitSpheres[1].w,\r\n\t\t\tdot(fromCenter2, fromCenter2)<u_ShadowSplitSpheres[2].w,\r\n\t\t\tdot(fromCenter3, fromCenter3)<u_ShadowSplitSpheres[3].w);\r\n\t\tcomparison.yzw = clamp(comparison.yzw - comparison.xyz,0.0,1.0);//keep the nearest\r\n\t\tmediump vec4 indexCoefficient = vec4(4.0,3.0,2.0,1.0);\r\n\t\tmediump int index = 4 - int(dot(comparison, indexCoefficient));\r\n\t\treturn index;\r\n\t}\r\n\r\n\tvec4 getShadowCoord(vec4 positionWS)\r\n\t{\r\n\t\t#ifdef SHADOW_CASCADE\r\n\t\t\tmediump int cascadeIndex = computeCascadeIndex(positionWS.xyz);\r\n\t\t\tif(cascadeIndex > 3)// out of shadow range cascadeIndex is 4.\r\n\t\t\t\treturn vec4(0.0);\r\n\t\t\t\r\n\t\t\t#ifdef GRAPHICS_API_GLES3\r\n\t\t\t\treturn u_ShadowMatrices[cascadeIndex] * positionWS;\r\n\t\t\t#else\r\n\t\t\t\tmat4 shadowMat;\r\n\t\t\t\tif(cascadeIndex == 0)\r\n\t\t\t\t\tshadowMat = u_ShadowMatrices[0];\r\n\t\t\t\telse if(cascadeIndex == 1)\r\n\t\t\t\t\tshadowMat = u_ShadowMatrices[1];\r\n\t\t\t\telse if(cascadeIndex == 2)\r\n\t\t\t\t\tshadowMat = u_ShadowMatrices[2];\r\n\t\t\t\telse\r\n\t\t\t\t\tshadowMat = u_ShadowMatrices[3];\r\n\t\t\t\treturn shadowMat * positionWS;\r\n\t\t\t#endif\r\n\t\t#else\r\n\t\t\treturn u_ShadowMatrices[0] * positionWS;\r\n\t\t#endif\r\n\t}\r\n\r\n\tfloat sampleShadowmap(vec4 shadowCoord)\r\n\t{\r\n\t\tshadowCoord.xyz /= shadowCoord.w;\r\n\t\tfloat attenuation = 1.0;\r\n\t\tif(shadowCoord.z > 0.0 && shadowCoord.z < 1.0)\r\n\t\t{\r\n\t\t\t#if defined(SHADOW_SOFT_SHADOW_HIGH)\r\n\t\t\t\tattenuation = sampleShdowMapFiltered9(u_ShadowMap,shadowCoord.xyz,u_ShadowMapSize);\r\n\t\t\t#elif defined(SHADOW_SOFT_SHADOW_LOW)\r\n\t\t\t\tattenuation = sampleShdowMapFiltered4(u_ShadowMap,shadowCoord.xyz,u_ShadowMapSize);\r\n\t\t\t#else\r\n\t\t\t\tattenuation = SAMPLE_TEXTURE2D_SHADOW(u_ShadowMap,shadowCoord.xyz);\r\n\t\t\t#endif\r\n\t\t\tattenuation = mix(1.0,attenuation,u_ShadowParams.x);//shadowParams.x:shadow strength\r\n\t\t}\r\n\t\treturn attenuation;\r\n\t}\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader���Զ���ĺ겻����ifdef ����ĳ�if defined\r\n\tTEXTURE2D_SHADOW(u_SpotShadowMap);\r\n\tuniform mat4 u_SpotViewProjectMatrix;\r\n\tfloat sampleSpotShadowmap(vec4 shadowCoord)\r\n\t{\r\n\t\tshadowCoord.xyz /= shadowCoord.w;\r\n\t\tfloat attenuation = 1.0;\r\n\t\tshadowCoord.xy +=1.0;\r\n\t\tshadowCoord.xy/=2.0; \r\n\t\tif(shadowCoord.z > 0.0 && shadowCoord.z < 1.0)\r\n\t\t{\r\n\t\t\t#if defined(SHADOW_SPOT_SOFT_SHADOW_HIGH)\r\n\t\t\t\tattenuation = sampleShdowMapFiltered9(u_SpotShadowMap,shadowCoord.xyz,u_ShadowMapSize);\r\n\t\t\t#elif defined(SHADOW_SPOT_SOFT_SHADOW_LOW)\r\n\t\t\t\tattenuation = sampleShdowMapFiltered4(u_SpotShadowMap,shadowCoord.xyz,u_ShadowMapSize);\r\n\t\t\t#else\r\n\t\t\t\tattenuation = SAMPLE_TEXTURE2D_SHADOW(u_SpotShadowMap,shadowCoord.xyz);\r\n\t\t\t#endif\r\n\t\t\tattenuation = mix(1.0,attenuation,u_ShadowParams.y);//shadowParams.y:shadow strength\r\n\t\t}\r\n\t\treturn attenuation;\r\n\t}\r\n#endif\r\n\r\nvec3 applyShadowBias(vec3 positionWS, vec3 normalWS, vec3 lightDirection)\r\n{\r\n    float invNdotL = 1.0 - clamp(dot(-lightDirection, normalWS),0.0,1.0);\r\n    float scale = invNdotL * u_ShadowBias.y;\r\n\r\n    // normal bias is negative since we want to apply an inset normal offset\r\n    positionWS += -lightDirection * u_ShadowBias.xxx;\r\n    positionWS += normalWS * vec3(scale);\r\n    return positionWS;\r\n}\r\n";
 
-	var ShadowCasterVSGLSL = "#include \"Lighting.glsl\";\r\n#include \"Shadow.glsl\"\r\n\r\nattribute vec4 a_Position;\r\nattribute vec3 a_Normal;\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_WorldMat;\r\n#endif\r\n\r\nuniform mat4 u_ViewProjection;\r\n\r\n#ifdef SHADOW\r\n\tuniform vec3 u_ShadowLightDirection;\r\n#endif\r\n\r\n\r\n\r\n#if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))||(defined(LIGHTMAP)&&defined(UV))\r\n\tattribute vec2 a_Texcoord0;\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\nvec4 shadowCasterVertex()\r\n{\r\n\tmat4 worldMat;\r\n\t#ifdef GPU_INSTANCE\r\n\t\tworldMat = a_WorldMat;\r\n\t#else\r\n\t\tworldMat = u_WorldMat;\r\n\t#endif\r\n\t\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tworldMat = worldMat * skinTransform;\r\n\t#endif\r\n\r\n\tvec4 positionWS = worldMat * a_Position;\r\n\tvec3 normalWS = normalize(a_Normal*INVERSE_MAT(mat3(worldMat)));//if no normalize will cause precision problem\r\n\r\n\t#ifdef SHADOW\r\n\t\tpositionWS.xyz = applyShadowBias(positionWS.xyz,normalWS,u_ShadowLightDirection);\r\n\t#endif\r\n\r\n\tvec4 positionCS = u_ViewProjection * positionWS;\r\n\t#ifdef SHADOW_SPOT\r\n\t\tpositionCS.z = positionCS.z-u_ShadowBias.x/positionCS.w;\r\n\t#endif\r\n\tpositionCS.z = max(positionCS.z, 0.0);//min ndc z is 0.0\r\n\t\r\n\t// //TODO没考虑UV动画呢\r\n\t// #if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t// \tv_Texcoord0=a_Texcoord0;\r\n\t// #endif\r\n    return positionCS;\r\n}\r\n";
+	var ShadowCasterVSGLSL = "#include \"Lighting.glsl\";\r\n#include \"Shadow.glsl\"\r\n\r\nattribute vec4 a_Position;\r\nattribute vec3 a_Normal;\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_WorldMat;\r\n#endif\r\n\r\nuniform mat4 u_ViewProjection;\r\n\r\n#ifdef SHADOW\r\n\tuniform vec3 u_ShadowLightDirection;\r\n#endif\r\n\r\n\r\nvec4 shadowCasterVertex()\r\n{\r\n\tmat4 worldMat;\r\n\t#ifdef GPU_INSTANCE\r\n\t\tworldMat = a_WorldMat;\r\n\t#else\r\n\t\tworldMat = u_WorldMat;\r\n\t#endif\r\n\t\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tworldMat = worldMat * skinTransform;\r\n\t#endif\r\n\r\n\tvec4 positionWS = worldMat * a_Position;\r\n\tmat3 worldInvMat;\r\n\t#ifdef BONE\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat*skinTransform));\r\n\t#else\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat));\r\n\t#endif  \r\n\r\n\tvec3 normalWS = normalize(a_Normal*worldInvMat);//if no normalize will cause precision problem\r\n\t#ifdef SHADOW\r\n\t\tpositionWS.xyz = applyShadowBias(positionWS.xyz,normalWS,u_ShadowLightDirection);\r\n\t#endif\r\n\r\n\tvec4 positionCS = u_ViewProjection * positionWS;\r\n\t#ifdef SHADOW_SPOT\r\n\t\tpositionCS.z = positionCS.z-u_ShadowBias.x/positionCS.w;\r\n\t#endif\r\n\tpositionCS.z = max(positionCS.z, 0.0);//min ndc z is 0.0\r\n\t\r\n\t// //TODO没考虑UV动画呢\r\n\t// #if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t// \tv_Texcoord0=a_Texcoord0;\r\n\t// #endif\r\n    return positionCS;\r\n}\r\n";
 
-	var ShadowCasterFSGLSL = "// #ifdef ALPHATEST\r\n// \tuniform float u_AlphaTestValue;\r\n// #endif\r\n\r\n// #ifdef DIFFUSEMAP\r\n// \tuniform sampler2D u_DiffuseTexture;\r\n// #endif\r\n\r\n// #if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))\r\n// \tvarying vec2 v_Texcoord0;\r\n// #endif\r\n\r\nvec4 shadowCasterFragment()\r\n{\r\n    return vec4(0.0);\r\n    // #if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t// \tfloat alpha = texture2D(u_DiffuseTexture,v_Texcoord0).w;\r\n\t// \tif( alpha < u_AlphaTestValue )\r\n\t// \t{\r\n\t// \t\tdiscard;\r\n\t// \t}\r\n\t// #endif\r\n}\r\n";
+	var ShadowCasterFSGLSL = "vec4 shadowCasterFragment()\r\n{\r\n    return vec4(0.0);\r\n}\r\n";
 
 	var SkyBoxPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\nvarying vec3 v_Texcoord;\r\n\r\nuniform samplerCube u_CubeTexture;\r\nuniform float u_Exposure;\r\nuniform vec4 u_TintColor;\r\n\r\n\r\nvoid main()\r\n{\t\r\n\tvec3 color=textureCube(u_CubeTexture, v_Texcoord).rgb*u_TintColor.rgb*u_Exposure*2.0;\r\n\tgl_FragColor=vec4(color,1.0);\r\n}\r\n\r\n";
 
@@ -29979,6 +29922,8 @@
 	var WaterPrimaryPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#ifdef MAINTEXTURE\r\n\tuniform sampler2D u_MainTexture;\r\n#endif\r\n\r\n#ifdef NORMALTEXTURE\r\n\tuniform sampler2D u_NormalTexture;\r\n#endif\r\n\r\nuniform vec4 u_HorizonColor;\r\n\r\nvarying vec3 v_Normal;\r\nvarying vec3 v_Tangent;\r\nvarying vec3 v_Binormal;\r\nvarying vec3 v_ViewDir;\r\nvarying vec2 v_Texcoord0;\r\nvarying vec2 v_Texcoord1;\r\n\r\n\r\n#include \"Lighting.glsl\"\r\n\r\n\r\n\r\nvec3 NormalSampleToWorldSpace(vec4 normalMapSample) {\r\n\tvec3 normalT;\r\n\tnormalT.x = 2.0 * normalMapSample.x - 1.0;\r\n\tnormalT.y = 1.0 - 2.0 * normalMapSample.y;\r\n\tnormalT.z = sqrt(1.0 - clamp(dot(normalT.xy, normalT.xy), 0.0, 1.0));\r\n\r\n\tvec3 bumpedNormal = normalize(normalT);\r\n\r\n\treturn bumpedNormal;\r\n}\r\n\r\n\r\nvoid main()\r\n{\r\n\tvec4 bumpColor1 = texture2D(u_NormalTexture, v_Texcoord0);\r\n\tvec4 bumpColor2 = texture2D(u_NormalTexture, v_Texcoord1);\r\n\r\n\tvec3 normal1 = NormalSampleToWorldSpace(bumpColor1);\r\n\tvec3 normal2 = NormalSampleToWorldSpace(bumpColor2);\r\n\t\r\n\tvec3 normal = normalize((normal1 + normal2) * 0.5);\r\n\tvec3 viewDir = normalize(v_ViewDir);\r\n\tfloat fresnel = dot(viewDir, normal);\r\n\t\r\n\tvec4 waterColor = texture2D(u_MainTexture, vec2(fresnel, fresnel));\r\n\t\r\n\tvec4 color;\r\n\tcolor.rgb = mix(waterColor.rgb, u_HorizonColor.rgb, vec3(waterColor.a));\r\n\tcolor.a = u_HorizonColor.a;\r\n\t\r\n\tgl_FragColor = color;\r\n}\r\n\r\n\r\n";
 
 	var WaterPrimaryVS = "#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nattribute vec3 a_Normal;\r\nattribute vec4 a_Tangent0;\r\n\r\nuniform mat4 u_MvpMatrix;\r\nuniform mat4 u_WorldMat;\r\nuniform vec3 u_CameraPos;\r\nuniform float u_WaveScale;\r\nuniform vec4 u_WaveSpeed;\r\nuniform float u_Time;\r\n\r\nvarying vec3 v_Normal;\r\nvarying vec3 v_Tangent;\r\nvarying vec3 v_Binormal;\r\nvarying vec3 v_ViewDir;\r\nvarying vec2 v_Texcoord0;\r\nvarying vec2 v_Texcoord1;\r\n\r\nvoid main()\r\n{\r\n\tvec4 positionWorld = u_WorldMat * a_Position;\r\n\tvec4 position = u_MvpMatrix * a_Position;\r\n\t\r\n\tvec4 temp = vec4(positionWorld.x, positionWorld.z, positionWorld.x, positionWorld.z) * u_WaveScale + u_WaveSpeed * u_WaveScale * u_Time;\r\n\t\r\n\tv_Texcoord0 = temp.xy * vec2(0.4, 0.45);\r\n\tv_Texcoord1 = temp.wz;\r\n\t\r\n\tmat3 worldMat = mat3(u_WorldMat);\r\n\tv_Normal = worldMat * a_Normal;\r\n\tv_Tangent = worldMat * a_Tangent0.xyz;\r\n\tv_Binormal = cross(v_Normal, v_Tangent) * a_Tangent0.w;\r\n\t\r\n\tv_ViewDir = u_CameraPos - positionWorld.xyz;\r\n\tgl_Position = position;\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
+
+	var DepthNormalUtil = "#define SAMPLE_DEPTH_TEXTURE(textureName,coord2) (texture2D(textureName,coord2).r)\r\n//此方法库用来压缩解析深度贴图，法线深度贴图\r\n\r\n/*camera 传入的Texture以及*/\r\nuniform sampler2D u_CameraDepthTexture;\r\nuniform vec4 u_ZBufferParams;\r\nuniform sampler2D u_CameraDepthNormalsTexture;\r\n\r\n// Encoding/decoding view space normals into 2D 0..1 vector\r\nvec2 EncodeViewNormalStereo( vec3 n )\r\n{\r\n    n.z = abs(n.z);\r\n    float kScale = 1.7777;\r\n    vec2 enc;\r\n    enc = n.xy / (n.z+1.0);\r\n    enc /= kScale;\r\n    enc = enc*0.5+0.5;\r\n    return enc;\r\n}\r\n\r\nvec3 DecodeViewNormalStereo( vec4 enc4 )\r\n{\r\n    float kScale = 1.7777;\r\n    vec3 nn = enc4.xyz*vec3(2.0*kScale,2.0*kScale,0.0) + vec3(-kScale,-kScale,1.0);\r\n    float g = 2.0 / dot(nn.xyz,nn.xyz);\r\n    vec3 n;\r\n    n.xy = g*nn.xy;\r\n    n.z = g-1.0;\r\n    return n;\r\n}\r\n\r\n\r\n// Encoding/decoding [0..1) floats into 8 bit/channel RG. Note that 1.0 will not be encoded properly.\r\nvec2 EncodeFloatRG( float v )\r\n{\r\n    vec2 kEncodeMul = vec2(1.0, 255.0);\r\n    float kEncodeBit = 1.0/255.0;\r\n    vec2 enc = kEncodeMul * v;\r\n    enc = fract(enc);\r\n    enc.x -= enc.y * kEncodeBit;\r\n    return enc;\r\n}\r\n\r\n\r\n\r\nfloat DecodeFloatRG( vec2 enc )\r\n{\r\n    vec2 kDecodeDot = vec2(1.0, 1.0/255.0);\r\n    return dot( enc, kDecodeDot );\r\n}\r\n\r\nvec4 EncodeDepthNormal(float depth,vec3 normals){\r\n\tvec4 encode;\r\n\tencode.xy = EncodeViewNormalStereo(normals);\r\n\tencode.zw = EncodeFloatRG(depth);\r\n    return encode;\r\n}\r\n\r\nvoid DecodeDepthNormal( vec4 enc, out float depth, out vec3 normal )\r\n{\r\n    depth = DecodeFloatRG (enc.zw);\r\n    normal = DecodeViewNormalStereo (enc);\r\n}\r\n\r\n\r\n\r\nvec4 depthNormalsFragment(vec4 depthNormal)\r\n{\r\n    return EncodeDepthNormal(depthNormal.w,depthNormal.xyz);\r\n}\r\n\r\n\r\n// Z buffer to linear 0..1 depth\r\nfloat Linear01Depth(float z,vec4 zbufferParams)\r\n{\r\n    return 1.0 / (zbufferParams.x * z + zbufferParams.y);\r\n}\r\n// Z buffer to linear depth\r\nfloat LinearEyeDepth(float z,vec4 zbufferParams)\r\n{\r\n    return 1.0 / (zbufferParams.z * z + zbufferParams.w);\r\n}\r\n";
 
 	class ShaderInit3D {
 	    constructor() {
@@ -30002,6 +29947,7 @@
 	        Shader3D.addInclude("PBRCore.glsl", PBRCore);
 	        Shader3D.addInclude("PBRVertex.glsl", PBRVertex);
 	        Shader3D.addInclude("LayaUtile.glsl", LayaUtile);
+	        Shader3D.addInclude("DepthNormalUtil.glsl", DepthNormalUtil);
 	        var attributeMap = {
 	            'a_Position': VertexMesh.MESH_POSITION0,
 	            'a_Color': VertexMesh.MESH_COLOR0,
@@ -30086,6 +30032,7 @@
 	        shader.addSubShader(subShader);
 	        subShader.addShaderPass(MeshBlinnPhongVS, MeshBlinnPhongPS, stateMap, "Forward");
 	        var shaderPass = subShader.addShaderPass(MeshBlinnPhongShadowCasterVS, MeshBlinnPhongShadowCasterPS, stateMap, "ShadowCaster");
+	        shaderPass = subShader.addShaderPass(DepthNormalsTextureVS, DepthNormalsTextureFS, stateMap, "DepthNormal");
 	        attributeMap = {
 	            'a_Position': VertexMesh.MESH_POSITION0,
 	            'a_Color': VertexMesh.MESH_COLOR0
@@ -30548,6 +30495,9 @@
 	    _removeFromLightQueue() {
 	        this._scene._directionLights.remove(this);
 	    }
+	    _create() {
+	        return new DirectionLight();
+	    }
 	}
 
 	class PointLight extends LightSprite {
@@ -30571,6 +30521,15 @@
 	    _parse(data, spriteMap) {
 	        super._parse(data, spriteMap);
 	        this.range = data.range;
+	    }
+	    _cloneTo(destObject, rootSprite, dstSprite) {
+	        super._cloneTo(destObject, rootSprite, dstSprite);
+	        var pointlight = destObject;
+	        pointlight.range = this.range;
+	        pointlight._lightType = exports.LightType.Point;
+	    }
+	    _create() {
+	        return new PointLight();
 	    }
 	}
 
@@ -30604,6 +30563,15 @@
 	        super._parse(data, spriteMap);
 	        this.range = data.range;
 	        this.spotAngle = data.spotAngle;
+	    }
+	    _cloneTo(destObject, rootSprite, dstSprite) {
+	        super._cloneTo(destObject, rootSprite, dstSprite);
+	        var spotLight = destObject;
+	        spotLight.range = this.range;
+	        spotLight.spotAngle = this.spotAngle;
+	    }
+	    _create() {
+	        return new SpotLight();
 	    }
 	}
 
@@ -31624,7 +31592,7 @@
 	    }
 	    set connectedBody(value) {
 	        this._connectedBody = value;
-	        value.constaintRigidbodyB = this;
+	        value && (value.constaintRigidbodyB = this);
 	    }
 	    get connectedBody() {
 	        return this._connectedBody;
@@ -31734,7 +31702,7 @@
 	    }
 	    _onDestroy() {
 	        var physics3D = Physics3D._bullet;
-	        this._removeFromSimulation();
+	        this._simulation && this._removeFromSimulation();
 	        if (this._btConstraint && this._btJointFeedBackObj && this._simulation) {
 	            physics3D.btTypedConstraint_destroy(this._btConstraint);
 	            physics3D.btJointFeedback_destroy(this._btJointFeedBackObj);
@@ -31771,7 +31739,7 @@
 	    }
 	    _breakConstrained() {
 	        this.ownBody.constaintRigidbodyA = null;
-	        this.connectedBody.constaintRigidbodyB = null;
+	        this.connectedBody && (this.connectedBody.constaintRigidbodyB = null);
 	        this.destroy();
 	    }
 	}
@@ -32189,7 +32157,7 @@
 	    }
 	    _onDisable() {
 	        super._onDisable();
-	        if (!this.connectedBody)
+	        if (!this.connectedBody && this._simulation)
 	            this._removeFromSimulation();
 	        if (this._btConstraint)
 	            Physics3D._bullet.btTypedConstraint_setEnabled(this._btConstraint, false);
@@ -32769,7 +32737,7 @@
 	    static _loadAnimationClip(loader) {
 	        loader.on(Laya.Event.LOADED, null, function (data) {
 	            loader._cache = loader._createCache;
-	            var clip = AnimationClip._parse(data, loader._propertyParams, loader._constructParams);
+	            var clip = AnimationClip._parse(data);
 	            Laya3D._endLoad(loader, clip);
 	        });
 	        loader.load(loader.url, Laya.Loader.BUFFER, false, null, true);
@@ -33550,11 +33518,6 @@
 	BloomEffect.SUBSHADER_UPSAMPLETENT = 4;
 	BloomEffect.SUBSHADER_UPSAMPLEBOX = 5;
 	BloomEffect.MAXPYRAMIDSIZE = 16;
-
-	class SceneManager {
-	    constructor() {
-	    }
-	}
 
 	class ConchVector4 {
 	    constructor(x = 0, y = 0, z = 0, w = 0) {
@@ -34563,48 +34526,6 @@
 	    }
 	}
 
-	class Point2PointConstraint {
-	    constructor() {
-	        this._pivotInA = new Vector3();
-	        this._pivotInB = new Vector3();
-	    }
-	    get pivotInA() {
-	        return this._pivotInA;
-	    }
-	    set pivotInA(value) {
-	        this._pivotInA = value;
-	    }
-	    get pivotInB() {
-	        return this._pivotInB;
-	    }
-	    set pivotInB(value) {
-	        this._pivotInB = value;
-	    }
-	    get damping() {
-	        return this._damping;
-	    }
-	    set damping(value) {
-	        this._damping = value;
-	    }
-	    get impulseClamp() {
-	        return this._impulseClamp;
-	    }
-	    set impulseClamp(value) {
-	        this._impulseClamp = value;
-	    }
-	    get tau() {
-	        return this._tau;
-	    }
-	    set tau(value) {
-	        this._tau = value;
-	    }
-	}
-
-	class HeightfieldColliderShape {
-	    constructor() {
-	    }
-	}
-
 	class TextMesh {
 	    constructor() {
 	    }
@@ -34718,6 +34639,7 @@
 	exports.ContainmentType = ContainmentType;
 	exports.CylinderColliderShape = CylinderColliderShape;
 	exports.DefineDatas = DefineDatas;
+	exports.DepthPass = DepthPass;
 	exports.DirectionLight = DirectionLight;
 	exports.DrawMeshCMD = DrawMeshCMD;
 	exports.DrawRenderCMD = DrawRenderCMD;
@@ -34740,7 +34662,6 @@
 	exports.GradientSize = GradientSize;
 	exports.GradientVelocity = GradientVelocity;
 	exports.HeightMap = HeightMap;
-	exports.HeightfieldColliderShape = HeightfieldColliderShape;
 	exports.HemisphereShape = HemisphereShape;
 	exports.HitResult = HitResult;
 	exports.ILaya3D = ILaya3D;
@@ -34791,7 +34712,6 @@
 	exports.PixelLineSprite3D = PixelLineSprite3D;
 	exports.PixelLineVertex = PixelLineVertex;
 	exports.Plane = Plane;
-	exports.Point2PointConstraint = Point2PointConstraint;
 	exports.PointLight = PointLight;
 	exports.PostProcess = PostProcess;
 	exports.PostProcessEffect = PostProcessEffect;
@@ -34816,7 +34736,6 @@
 	exports.Scene3D = Scene3D;
 	exports.Scene3DShaderDeclaration = Scene3DShaderDeclaration;
 	exports.Scene3DUtils = Scene3DUtils;
-	exports.SceneManager = SceneManager;
 	exports.ScreenQuad = ScreenQuad;
 	exports.ScreenTriangle = ScreenTriangle;
 	exports.Script3D = Script3D;
