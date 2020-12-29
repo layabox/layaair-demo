@@ -810,12 +810,6 @@
 						"释放显存",
 						"",
 						"core,ani,ui,d3,CameraMoveScript.js"
-					],
-					[
-						"LoadGltfResource",
-						"加载Gltf资源",
-						"",
-						"core,ani,ui,d3,CameraMoveScript.js"
 					]
 				]
 			},
@@ -934,12 +928,6 @@
 					[
 						"PostProcessBloom",
 						"后处理Bloom",
-						"",
-						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
-					],
-					[
-						"PostProcess_Edge",
-						"后处理边缘",
 						"",
 						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
 					]
@@ -1474,12 +1462,6 @@
 					[
 						"ReflectionProbeDemo",
 						"反射探针",
-						"",
-						"core,ani,d3,device,ui,physics3D"
-					],
-					[
-						"CameraDepthModeTextureDemo",
-						"相机深度模式纹理演示",
 						"",
 						"core,ani,d3,device,ui,physics3D"
 					]
