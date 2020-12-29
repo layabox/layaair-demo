@@ -846,6 +846,12 @@
 						"GarbageCollection",
 						"",
 						"core,ani,d3,ui,CameraMoveScript.js"
+					],
+					[
+						"LoadGltfResource",
+						"LoadGltfResource",
+						"",
+						"core,ani,d3,ui,CameraMoveScript.js"
 					]
 				]
 			},
@@ -1460,6 +1466,12 @@
 						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
+						"PostProcess_Edge",
+						"PostProcess_Edge",
+						"",
+						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
+					],
+					[
 						"DrawTextTexture",
 						"3D文字纹理",
 						"",
@@ -1488,7 +1500,14 @@
 						"ReflectionProbeDemo",
 						"",
 						"core,ani,d3,device,ui,physics3D"
+					],
+					[
+						"CameraDepthModeTextureDemo",
+						"CameraDepthModeTextureDemo",
+						"",
+						"core,ani,d3,devi"
 					]
+					
 				]
 			},
 			{
