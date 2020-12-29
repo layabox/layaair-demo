@@ -1,79 +1,79 @@
-class CameraMoveScript extends Laya.Script3D {
-	constructor() {
-		super();
-		this._tempVector3 = new Laya.Vector3();
-		this.yawPitchRoll = new Laya.Vector3();
-		this.resultRotation = new Laya.Quaternion();
-		this.tempRotationZ = new Laya.Quaternion();
-		this.tempRotationX = new Laya.Quaternion();
-		this.tempRotationY = new Laya.Quaternion();
-		this.rotaionSpeed = 0.00006;
-		this.speed = 0.01;
-	}
-	_updateRotation() {
-		if (Math.abs(this.yawPitchRoll.y) < 1.50) {
-			Laya.Quaternion.createFromYawPitchRoll(this.yawPitchRoll.x, this.yawPitchRoll.y, this.yawPitchRoll.z, this.tempRotationZ);
-			this.tempRotationZ.cloneTo(this.camera.transform.localRotation);
-			this.camera.transform.localRotation = this.camera.transform.localRotation;
-		}
-	}
-	onAwake() {
-		Laya.Laya.stage.on(Laya.Event.RIGHT_MOUSE_DOWN, this, this.mouseDown);
-		Laya.Laya.stage.on(Laya.Event.RIGHT_MOUSE_UP, this, this.mouseUp);
-		this.camera = this.owner;
-	}
-	onUpdate() {
-		var elapsedTime = Laya.Laya.timer.delta;
-		if (!isNaN(this.lastMouseX) && !isNaN(this.lastMouseY) && this.isMouseDown) {
-			var scene = this.owner.scene;
-			Laya.KeyBoardManager.hasKeyDown(87) && this.moveForward(-this.speed * elapsedTime);
-			Laya.KeyBoardManager.hasKeyDown(83) && this.moveForward(this.speed * elapsedTime);
-			Laya.KeyBoardManager.hasKeyDown(65) && this.moveRight(-this.speed * elapsedTime);
-			Laya.KeyBoardManager.hasKeyDown(68) && this.moveRight(this.speed * elapsedTime);
-			Laya.KeyBoardManager.hasKeyDown(81) && this.moveVertical(this.speed * elapsedTime);
-			Laya.KeyBoardManager.hasKeyDown(69) && this.moveVertical(-this.speed * elapsedTime);
-			var offsetX = Laya.Laya.stage.mouseX - this.lastMouseX;
-			var offsetY = Laya.Laya.stage.mouseY - this.lastMouseY;
-			var yprElem = this.yawPitchRoll;
-			yprElem.x -= offsetX * this.rotaionSpeed * elapsedTime;
-			yprElem.y -= offsetY * this.rotaionSpeed * elapsedTime;
-			this._updateRotation();
-		}
-		this.lastMouseX = Laya.Laya.stage.mouseX;
-		this.lastMouseY = Laya.Laya.stage.mouseY;
-	}
-	onDestroy() {
-		Laya.Laya.stage.off(Laya.Event.RIGHT_MOUSE_DOWN, this, this.mouseDown);
-		Laya.Laya.stage.off(Laya.Event.RIGHT_MOUSE_UP, this, this.mouseUp);
-	}
-	mouseDown(e) {
-		this.camera.transform.localRotation.getYawPitchRoll(this.yawPitchRoll);
-		this.lastMouseX = Laya.Laya.stage.mouseX;
-		this.lastMouseY = Laya.Laya.stage.mouseY;
-		this.isMouseDown = true;
-	}
-	mouseUp(e) {
-		this.isMouseDown = false;
-	}
-	mouseOut(e) {
-		this.isMouseDown = false;
-	}
-	moveForward(distance) {
-		this._tempVector3.x = this._tempVector3.y = 0;
-		this._tempVector3.z = distance;
-		this.camera.transform.translate(this._tempVector3);
-	}
-	moveRight(distance) {
-		this._tempVector3.y = this._tempVector3.z = 0;
-		this._tempVector3.x = distance;
-		this.camera.transform.translate(this._tempVector3);
-	}
-	moveVertical(distance) {
-		this._tempVector3.x = this._tempVector3.z = 0;
-		this._tempVector3.y = distance;
-		this.camera.transform.translate(this._tempVector3, false);
-	}
-}
+// class CameraMoveScript extends Laya.Script3D {
+// 	constructor() {
+// 		super();
+// 		this._tempVector3 = new Laya.Vector3();
+// 		this.yawPitchRoll = new Laya.Vector3();
+// 		this.resultRotation = new Laya.Quaternion();
+// 		this.tempRotationZ = new Laya.Quaternion();
+// 		this.tempRotationX = new Laya.Quaternion();
+// 		this.tempRotationY = new Laya.Quaternion();
+// 		this.rotaionSpeed = 0.00006;
+// 		this.speed = 0.01;
+// 	}
+// 	_updateRotation() {
+// 		if (Math.abs(this.yawPitchRoll.y) < 1.50) {
+// 			Laya.Quaternion.createFromYawPitchRoll(this.yawPitchRoll.x, this.yawPitchRoll.y, this.yawPitchRoll.z, this.tempRotationZ);
+// 			this.tempRotationZ.cloneTo(this.camera.transform.localRotation);
+// 			this.camera.transform.localRotation = this.camera.transform.localRotation;
+// 		}
+// 	}
+// 	onAwake() {
+// 		Laya.Laya.stage.on(Laya.Event.RIGHT_MOUSE_DOWN, this, this.mouseDown);
+// 		Laya.Laya.stage.on(Laya.Event.RIGHT_MOUSE_UP, this, this.mouseUp);
+// 		this.camera = this.owner;
+// 	}
+// 	onUpdate() {
+// 		var elapsedTime = Laya.Laya.timer.delta;
+// 		if (!isNaN(this.lastMouseX) && !isNaN(this.lastMouseY) && this.isMouseDown) {
+// 			var scene = this.owner.scene;
+// 			Laya.KeyBoardManager.hasKeyDown(87) && this.moveForward(-this.speed * elapsedTime);
+// 			Laya.KeyBoardManager.hasKeyDown(83) && this.moveForward(this.speed * elapsedTime);
+// 			Laya.KeyBoardManager.hasKeyDown(65) && this.moveRight(-this.speed * elapsedTime);
+// 			Laya.KeyBoardManager.hasKeyDown(68) && this.moveRight(this.speed * elapsedTime);
+// 			Laya.KeyBoardManager.hasKeyDown(81) && this.moveVertical(this.speed * elapsedTime);
+// 			Laya.KeyBoardManager.hasKeyDown(69) && this.moveVertical(-this.speed * elapsedTime);
+// 			var offsetX = Laya.Laya.stage.mouseX - this.lastMouseX;
+// 			var offsetY = Laya.Laya.stage.mouseY - this.lastMouseY;
+// 			var yprElem = this.yawPitchRoll;
+// 			yprElem.x -= offsetX * this.rotaionSpeed * elapsedTime;
+// 			yprElem.y -= offsetY * this.rotaionSpeed * elapsedTime;
+// 			this._updateRotation();
+// 		}
+// 		this.lastMouseX = Laya.Laya.stage.mouseX;
+// 		this.lastMouseY = Laya.Laya.stage.mouseY;
+// 	}
+// 	onDestroy() {
+// 		Laya.Laya.stage.off(Laya.Event.RIGHT_MOUSE_DOWN, this, this.mouseDown);
+// 		Laya.Laya.stage.off(Laya.Event.RIGHT_MOUSE_UP, this, this.mouseUp);
+// 	}
+// 	mouseDown(e) {
+// 		this.camera.transform.localRotation.getYawPitchRoll(this.yawPitchRoll);
+// 		this.lastMouseX = Laya.Laya.stage.mouseX;
+// 		this.lastMouseY = Laya.Laya.stage.mouseY;
+// 		this.isMouseDown = true;
+// 	}
+// 	mouseUp(e) {
+// 		this.isMouseDown = false;
+// 	}
+// 	mouseOut(e) {
+// 		this.isMouseDown = false;
+// 	}
+// 	moveForward(distance) {
+// 		this._tempVector3.x = this._tempVector3.y = 0;
+// 		this._tempVector3.z = distance;
+// 		this.camera.transform.translate(this._tempVector3);
+// 	}
+// 	moveRight(distance) {
+// 		this._tempVector3.y = this._tempVector3.z = 0;
+// 		this._tempVector3.x = distance;
+// 		this.camera.transform.translate(this._tempVector3);
+// 	}
+// 	moveVertical(distance) {
+// 		this._tempVector3.x = this._tempVector3.z = 0;
+// 		this._tempVector3.y = distance;
+// 		this.camera.transform.translate(this._tempVector3, false);
+// 	}
+// }
 
 var EdgeEffectVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_PositionTexcoord;\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\nvoid main() {\r\n\tgl_Position = vec4(a_PositionTexcoord.xy, 0.0, 1.0);\r\n\tv_Texcoord0 = a_PositionTexcoord.zw;\r\n\tgl_Position = remapGLPositionZ(gl_Position);\r\n}\r\n";
 
@@ -237,7 +237,7 @@ class PostProcess_Edge {
 		Laya.Shader3D.debugMode = true;
 		this.scene = Laya.Laya.stage.addChild(new Laya.Scene3D);
 		this.camera = this.scene.addChild(new Laya.Camera(0, 0.2, 50));
-		this.camera.addComponent(CameraMoveScript);
+		//this.camera.addComponent(CameraMoveScript);
 		this.camera.transform.position = new Laya.Vector3(0, 4, 10);
 		this.camera.transform.rotation = new Laya.Quaternion(-0.2, 0, 0, 0.97);
 		this.addLight();
