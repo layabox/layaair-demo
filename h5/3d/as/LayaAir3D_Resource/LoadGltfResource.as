@@ -1,24 +1,23 @@
-package {
-
+package LayaAir3D_Resource{
     import laya.utils.Stat;
     import  laya.d3.shader.Shader3D;
     import laya.d3.core.scene.Scene3D;
     import laya.utils.Handler;
     import laya.d3.core.Camera;
     import laya.d3.math.Vector3;
-    import  laya.d3.core.light.DirectionLight;
-    import  laya.d3.math.Matrix4x4;
-    import  laya.gltf.GLTFLoader;
-    import  laya.d3.core.Sprite3D;
-    //import  ...common.CameraMoveScript;
-    import  laya.net.Loader; 
-    import  laya.d3.resource.TextureCube;
-    import  laya.d3.math.Quaternion;
-	import  laya.display.Stage;
-	
-	public class Main {
-		public function Main() {
-			Laya3D.init(0, 0);
+    import laya.d3.core.light.DirectionLight;
+    import laya.d3.math.Matrix4x4;
+    import laya.gltf.GLTFLoader;
+    import laya.d3.core.Sprite3D;
+    import laya.net.Loader; 
+	import laya.net.URL;
+    import laya.d3.resource.TextureCube;
+    import laya.d3.math.Quaternion;
+	import laya.display.Stage;
+
+    public class LoadGltfResource {
+        public function LoadGltfResource() {
+            Laya3D.init(0, 0);
 			Laya.stage.scaleMode = Stage.SCALE_FULL;
 			Laya.stage.screenMode = Stage.SCREEN_NONE;
 
@@ -26,15 +25,15 @@ package {
 
 			Shader3D.debugMode = true;
 
-			this.scene = <Scene3D>Laya.stage.addChild(new Scene3D);
-			this.camera = <Camera>this.scene.addChild(new Camera);
+			this.scene = Laya.stage.addChild(new Scene3D);
+			this.camera = this.scene.addChild(new Camera);
 			//this.camera.addComponent(CameraMoveScript);
 
 			this.camera.transform.position = new Vector3(0, 1, 7);
 			// this.camera.transform.rotation = new Quaternion();
 
 			//light
-			var directionLight: DirectionLight = (<DirectionLight>this.scene.addChild(new DirectionLight()));
+			var directionLight: DirectionLight = this.scene.addChild(new DirectionLight());
 			directionLight.color = new Vector3(0.6, 0.6, 0.6);
 			//设置平行光的方向
 			var mat: Matrix4x4 = directionLight.transform.worldMatrix;
@@ -58,26 +57,25 @@ package {
 			// 创建 gltf loader
 			var gltfLoader: GLTFLoader = new GLTFLoader();
 			gltfLoader.loadGLTF(gltfResource, Handler.create(this, this.onGLTFComplate));
-		}
-		
-	public function onGLTFComplate(success: boolean): void {
-        if (!success) {
-            // 加载失败
-            console.log("gltf load failed");
-            return;
         }
-        var RiggedFigure: Sprite3D = GLTFLoader.getRes("res/threeDimen/gltf/RiggedFigure/RiggedFigure.gltf");
-        this.scene.addChild(RiggedFigure);
-        RiggedFigure.transform.position = new Vector3(-2, 0, 0);
-        console.log("RiggedFigure: This model is licensed under a Creative Commons Attribution 4.0 International License.");
+        public function onGLTFComplate(success: Boolean): void {
+			if (!success) {
+				// 加载失败
+				console.log("gltf load failed");
+				return;
+			}
+			var RiggedFigure: Sprite3D = GLTFLoader.getRes("res/threeDimen/gltf/RiggedFigure/RiggedFigure.gltf");
+			this.scene.addChild(RiggedFigure);
+			RiggedFigure.transform.position = new Vector3(-2, 0, 0);
+			console.log("RiggedFigure: This model is licensed under a Creative Commons Attribution 4.0 International License.");
 
-        var duck: Sprite3D = GLTFLoader.getRes("res/threeDimen/gltf/Duck/Duck.gltf");
-        this.scene.addChild(duck);
+			var duck: Sprite3D = GLTFLoader.getRes("res/threeDimen/gltf/Duck/Duck.gltf");
+			this.scene.addChild(duck);
 
-        var cube: Sprite3D = GLTFLoader.getRes("res/threeDimen/gltf/AnimatedCube/AnimatedCube.gltf");
-        this.scene.addChild(cube);
-        cube.transform.position = new Vector3(2.5, 0.6, 0);
-        cube.transform.setWorldLossyScale(new Vector3(0.6, 0.6, 0.6));
+			var cube: Sprite3D = GLTFLoader.getRes("res/threeDimen/gltf/AnimatedCube/AnimatedCube.gltf");
+			this.scene.addChild(cube);
+			cube.transform.position = new Vector3(2.5, 0.6, 0);
+			cube.transform.setWorldLossyScale(new Vector3(0.6, 0.6, 0.6));
+        }
     }
-	}
 }
