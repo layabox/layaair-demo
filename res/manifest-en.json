@@ -1506,6 +1506,12 @@
 						"CameraDepthModeTextureDemo",
 						"",
 						"core,ani,d3,devi"
+					],
+					[
+						"CameraDepthModeTextureDemo",
+						"CameraDepthModeTextureDemo",
+						"",
+						"core,ani,d3,device,ui,physics3D"
 					]
 					
 				]
