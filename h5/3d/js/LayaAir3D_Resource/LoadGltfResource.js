@@ -1,15 +1,14 @@
-import CameraMoveScript from "./script/CameraMoveScript"
+// import CameraMoveScript from "./script/CameraMoveScript"
 class LoadGltfRosource {
 	constructor() {
 		Laya.Laya3D.init(0, 0);
-		Laya.URL.basePath ="https://layaair2.ldc2.layabox.com/demo2/h5/";
 		Laya.Laya.stage.scaleMode = Laya.Stage.SCALE_FULL;
 		Laya.Laya.stage.screenMode = Laya.Stage.SCREEN_NONE;
 		Laya.Stat.show();
 		Laya.Shader3D.debugMode = true;
 		this.scene = Laya.Laya.stage.addChild(new Laya.Scene3D());
 		this.camera = this.scene.addChild(new Laya.Camera());
-		this.camera.addComponent(CameraMoveScript);
+		//this.camera.addComponent(CameraMoveScript);
 		this.camera.transform.position = new Laya.Vector3(0, 1, 7);
 		var directionLight = this.scene.addChild(new Laya.DirectionLight());
 		directionLight.color = new Laya.Vector3(0.6, 0.6, 0.6);

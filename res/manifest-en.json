@@ -851,7 +851,7 @@
 						"LoadGltfResource",
 						"LoadGltfResource",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js"
+						"core,ani,d3,ui"
 					]
 				]
 			},

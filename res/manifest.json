@@ -810,6 +810,12 @@
 						"释放显存",
 						"",
 						"core,ani,ui,d3,CameraMoveScript.js"
+					],
+					[
+						"LoadGltfResource",
+						"加载Gltf资源",
+						"",
+						"core,ani,ui,d3,gltf"
 					]
 				]
 			},
