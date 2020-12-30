@@ -930,6 +930,12 @@
 						"后处理Bloom",
 						"",
 						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PostProcess_Edge",
+						"后处理边缘",
+						"",
+						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
 					]
 				]
 			},
