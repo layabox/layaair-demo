@@ -1083,7 +1083,7 @@
 					],
 					[
 						"Blinnphong_Transmission",
-						"Blinnphong_厚度贴图",
+						"Blinnphong_透射",
 						"",
 						"core,ani,d3,CameraMoveScript.js"
 					],
