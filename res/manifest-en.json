@@ -851,7 +851,7 @@
 						"LoadGltfResource",
 						"LoadGltfResource",
 						"",
-						"core,ani,d3,ui"
+						"core,ani,ui,d3,gltf,CameraMoveScript.js"
 					]
 				]
 			},
@@ -1090,6 +1090,12 @@
 					[
 						"BlinnPhong_SpecularMap",
 						"BlinnPhong_SpecularMap",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"Blinnphong_Transmission",
+						"Blinnphong_Transmission",
 						"",
 						"core,ani,d3,CameraMoveScript.js"
 					],
@@ -1487,13 +1493,25 @@
 						"CommandBuffer_BlurryGlass",
 						"CommandBuffer_BlurryGlass",
 						"",
-						"core,d3,physics3D"
+						"core,d3,physics3D,ui"
 					],
 					[
 						"CommandBuffer_Outline",
 						"CommandBuffer_Outline",
 						"",
 						"core,ani,d3,device,ui"
+					],
+					[
+						"CommandBuffer_DrawCustomInstance",
+						"CommandBuffer_DrawCustomInstance",
+						"",
+						"core,ani,d3,CameraMoveScript.js,ui"
+					],
+					[
+						"GrassDemo",
+						"GrassDemo",
+						"",
+						"core,ani,d3,physics3D,CameraMoveScript.js"
 					],
 					[
 						"ReflectionProbeDemo",

@@ -633,7 +633,7 @@
 	        if (super.get_scaleX() == value)
 	            return;
 	        super.set_scaleX(value);
-	        this.event(Laya.Event.RESIZE);
+	        this.callLater(this._sizeChanged);
 	    }
 	    get scaleX() {
 	        return super.scaleX;
@@ -645,7 +645,7 @@
 	        if (super.get_scaleY() == value)
 	            return;
 	        super.set_scaleY(value);
-	        this.event(Laya.Event.RESIZE);
+	        this.callLater(this._sizeChanged);
 	    }
 	    get scaleY() {
 	        return super.scaleY;
@@ -878,16 +878,16 @@
 	                    path: "",
 	                    extraData: "",
 	                    envVersion: "release",
-	                    success: function success() {
+	                    success: () => {
 	                        console.log("-------------跳转成功--------------");
 	                    },
-	                    fail: function fail() {
+	                    fail: () => {
 	                        console.log("-------------跳转失败--------------");
 	                    },
-	                    complete: function complete() {
+	                    complete: () => {
 	                        console.log("-------------跳转接口调用成功--------------");
 	                        this.updateAdvsInfo();
-	                    }.bind(this)
+	                    }
 	                });
 	            }
 	        }

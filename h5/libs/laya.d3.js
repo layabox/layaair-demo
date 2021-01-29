@@ -40,6 +40,10 @@
 	        this.x = array[offset + 0];
 	        this.y = array[offset + 1];
 	    }
+	    toArray(array, offset = 0) {
+	        array[offset + 0] = this.x;
+	        array[offset + 1] = this.y;
+	    }
 	    cloneTo(destObject) {
 	        var destVector2 = destObject;
 	        destVector2.x = this.x;
@@ -110,6 +114,12 @@
 	        this.y = array[offset + 1];
 	        this.z = array[offset + 2];
 	        this.w = array[offset + 3];
+	    }
+	    toArray(array, offset = 0) {
+	        array[offset + 0] = this.x;
+	        array[offset + 1] = this.y;
+	        array[offset + 2] = this.z;
+	        array[offset + 3] = this.w;
 	    }
 	    cloneTo(destObject) {
 	        var destVector4 = destObject;
@@ -264,7 +274,7 @@
 	Vector4.UnitW = new Vector4(0.0, 0.0, 0.0, 1.0);
 
 	class Vector3 {
-	    constructor(x = 0, y = 0, z = 0, nativeElements = null) {
+	    constructor(x = 0, y = 0, z = 0) {
 	        this.x = x;
 	        this.y = y;
 	        this.z = z;
@@ -418,6 +428,11 @@
 	        this.x = array[offset + 0];
 	        this.y = array[offset + 1];
 	        this.z = array[offset + 2];
+	    }
+	    toArray(array, offset = 0) {
+	        array[offset + 0] = this.x;
+	        array[offset + 1] = this.y;
+	        array[offset + 2] = this.z;
 	    }
 	    cloneTo(destObject) {
 	        var destVector3 = destObject;
@@ -745,7 +760,7 @@
 	ILaya3D.ShadowLightType = null;
 
 	class Quaternion {
-	    constructor(x = 0, y = 0, z = 0, w = 1, nativeElements = null) {
+	    constructor(x = 0, y = 0, z = 0, w = 1) {
 	        this.x = x;
 	        this.y = y;
 	        this.z = z;
@@ -1558,7 +1573,7 @@
 	        oe[14] = (a31 * b01 - a30 * b03 - a32 * b00) * det;
 	        oe[15] = (a20 * b03 - a21 * b01 + a22 * b00) * det;
 	    }
-	    static billboard(objectPosition, cameraPosition, cameraRight, cameraUp, cameraForward, mat) {
+	    static billboard(objectPosition, cameraPosition, cameraUp, cameraForward, mat) {
 	        Vector3.subtract(objectPosition, cameraPosition, Matrix4x4._tempVector0);
 	        var lengthSq = Vector3.scalarLengthSquared(Matrix4x4._tempVector0);
 	        if (MathUtils3D.isZero(lengthSq)) {
@@ -2898,7 +2913,7 @@
 	    }
 	    _onEnable() {
 	        this._simulation = this.owner._scene.physicsSimulation;
-	        ILaya3D.Physics3D._bullet.btCollisionObject_setContactProcessingThreshold(this._btColliderObject, 1e30);
+	        ILaya3D.Physics3D._bullet.btCollisionObject_setContactProcessingThreshold(this._btColliderObject, 0);
 	        if (this._colliderShape) {
 	            this._derivePhysicsTransformation(true);
 	            this._addToSimulation();
@@ -3254,7 +3269,7 @@
 	}
 
 	class PhysicsSimulation {
-	    constructor(configuration, flags = 0) {
+	    constructor(configuration) {
 	        this._gravity = new Vector3(0, -10, 0);
 	        this._btVector3Zero = ILaya3D.Physics3D._bullet.btVector3_create(0, 0, 0);
 	        this._btDefaultQuaternion = ILaya3D.Physics3D._bullet.btQuaternion_create(0, 0, 0, -1);
@@ -5322,13 +5337,12 @@
 	            node.fullPath = fullPath;
 	            var keyframeCount = reader.getUint16();
 	            node._setKeyframeCount(keyframeCount);
-	            var startTime;
 	            for (j = 0; j < keyframeCount; j++) {
 	                switch (type) {
 	                    case 0:
 	                        var floatKeyframe = new FloatKeyframe();
 	                        node._setKeyframeByIndex(j, floatKeyframe);
-	                        startTime = floatKeyframe.time = startTimeTypes[reader.getUint16()];
+	                        floatKeyframe.time = startTimeTypes[reader.getUint16()];
 	                        floatKeyframe.inTangent = reader.getFloat32();
 	                        floatKeyframe.outTangent = reader.getFloat32();
 	                        floatKeyframe.value = reader.getFloat32();
@@ -5338,7 +5352,7 @@
 	                    case 4:
 	                        var floatArrayKeyframe = new Vector3Keyframe();
 	                        node._setKeyframeByIndex(j, floatArrayKeyframe);
-	                        startTime = floatArrayKeyframe.time = startTimeTypes[reader.getUint16()];
+	                        floatArrayKeyframe.time = startTimeTypes[reader.getUint16()];
 	                        var inTangent = floatArrayKeyframe.inTangent;
 	                        var outTangent = floatArrayKeyframe.outTangent;
 	                        var value = floatArrayKeyframe.value;
@@ -5355,7 +5369,7 @@
 	                    case 2:
 	                        var quaArrayKeyframe = new QuaternionKeyframe();
 	                        node._setKeyframeByIndex(j, quaArrayKeyframe);
-	                        startTime = quaArrayKeyframe.time = startTimeTypes[reader.getUint16()];
+	                        quaArrayKeyframe.time = startTimeTypes[reader.getUint16()];
 	                        var inTangentQua = quaArrayKeyframe.inTangent;
 	                        var outTangentQua = quaArrayKeyframe.outTangent;
 	                        var valueQua = quaArrayKeyframe.value;
@@ -5968,12 +5982,15 @@
 	    get animatorState() {
 	        return this._currentState;
 	    }
-	    _resetPlayState(startTime) {
+	    _resetPlayState(startTime, clipDuration) {
 	        this._finish = false;
 	        this._startPlayTime = startTime;
 	        this._elapsedTime = startTime;
 	        this._playEventIndex = 0;
 	        this._lastIsFront = true;
+	        this._normalizedTime = this._elapsedTime / clipDuration;
+	        var playTime = this._normalizedTime % 1.0;
+	        this._normalizedPlayTime = playTime < 0 ? playTime + 1.0 : playTime;
 	    }
 	    _cloneTo(dest) {
 	        dest._finish = this._finish;
@@ -5988,7 +6005,6 @@
 
 	class AnimatorControllerLayer {
 	    constructor(name) {
-	        this._defaultState = null;
 	        this._referenceCount = 0;
 	        this._playType = -1;
 	        this._crossDuration = -1;
@@ -6079,7 +6095,7 @@
 	    destroy() {
 	        this._clearReference();
 	        this._statesMap = null;
-	        this._states = null;
+	        this._states = [];
 	        this._playStateInfo = null;
 	        this._crossPlayStateInfo = null;
 	        this._defaultState = null;
@@ -6182,7 +6198,7 @@
 	        return null;
 	    }
 	    getScripts(type) {
-	        var coms;
+	        var coms = null;
 	        if (this._scripts) {
 	            for (var i = 0, n = this._scripts.length; i < n; i++) {
 	                var script = this._scripts[i];
@@ -6465,7 +6481,7 @@
 	            }
 	        }
 	    }
-	    _updateClipDatas(animatorState, addtive, playStateInfo, scale) {
+	    _updateClipDatas(animatorState, addtive, playStateInfo) {
 	        var clip = animatorState._clip;
 	        var clipDuration = clip._duration;
 	        var curPlayTime = animatorState.clipStart * clipDuration + playStateInfo._normalizedPlayTime * playStateInfo._duration;
@@ -6644,7 +6660,7 @@
 	                    }
 	                    var crossValue = srcValue + crossWeight * (desValue - srcValue);
 	                    nodeOwner.value = crossValue;
-	                    this._applyFloat(pro, proPat[m], nodeOwner, additive, weight, isFirstLayer, crossValue);
+	                    pro && this._applyFloat(pro, proPat[m], nodeOwner, additive, weight, isFirstLayer, crossValue);
 	                    break;
 	                case 1:
 	                    var localPos = pro.localPosition;
@@ -6702,7 +6718,7 @@
 	                                if (!pro)
 	                                    break;
 	                            }
-	                            this._applyFloat(pro, proPat[m], nodeOwner, additive, weight, isFirstLayer, realtimeDatas[i]);
+	                            pro && this._applyFloat(pro, proPat[m], nodeOwner, additive, weight, isFirstLayer, realtimeDatas[i]);
 	                            break;
 	                        case 1:
 	                            var localPos = pro.localPosition;
@@ -6878,7 +6894,6 @@
 	            this._linkSprites = linkSprites;
 	            this._linkToSprites(linkSprites);
 	        }
-	        var clipPaths = data.clipPaths;
 	        var play = data.playOnWake;
 	        var layersData = data.layers;
 	        for (var i = 0; i < layersData.length; i++) {
@@ -6932,7 +6947,6 @@
 	            needRender = true;
 	        }
 	        this._updateMark++;
-	        var timerScale = timer.scale;
 	        for (i = 0, n = this._controllerLayers.length; i < n; i++) {
 	            var controllerLayer = this._controllerLayers[i];
 	            var playStateInfo = controllerLayer._playStateInfo;
@@ -6947,7 +6961,7 @@
 	                    finish || this._updatePlayer(animatorState, playStateInfo, delta * speed, clip.islooping);
 	                    if (needRender) {
 	                        var addtive = controllerLayer.blendingMode !== AnimatorControllerLayer.BLENDINGMODE_OVERRIDE;
-	                        this._updateClipDatas(animatorState, addtive, playStateInfo, timerScale * speed);
+	                        this._updateClipDatas(animatorState, addtive, playStateInfo);
 	                        this._setClipDatasToNode(animatorState, addtive, controllerLayer.defaultWeight, i === 0);
 	                        finish || this._updateEventScript(animatorState, playStateInfo);
 	                    }
@@ -6966,7 +6980,7 @@
 	                    var crossWeight = ((crossPlayStateInfo._elapsedTime - startPlayTime) / crossScale) / crossDuratuion;
 	                    if (crossWeight >= 1.0) {
 	                        if (needRender) {
-	                            this._updateClipDatas(crossState, addtive, crossPlayStateInfo, timerScale * crossSpeed);
+	                            this._updateClipDatas(crossState, addtive, crossPlayStateInfo);
 	                            this._setClipDatasToNode(crossState, addtive, controllerLayer.defaultWeight, i === 0);
 	                            controllerLayer._playType = 0;
 	                            playStateInfo._currentState = crossState;
@@ -6978,10 +6992,10 @@
 	                            speed = this._speed * animatorState.speed;
 	                            this._updatePlayer(animatorState, playStateInfo, delta * speed, clip.islooping);
 	                            if (needRender)
-	                                this._updateClipDatas(animatorState, addtive, playStateInfo, timerScale * speed);
+	                                this._updateClipDatas(animatorState, addtive, playStateInfo);
 	                        }
 	                        if (needRender) {
-	                            this._updateClipDatas(crossState, addtive, crossPlayStateInfo, timerScale * crossScale * crossSpeed);
+	                            this._updateClipDatas(crossState, addtive, crossPlayStateInfo);
 	                            this._setCrossClipDatasToNode(controllerLayer, animatorState, crossState, crossWeight, i === 0);
 	                        }
 	                    }
@@ -7002,14 +7016,14 @@
 	                    if (needRender) {
 	                        crossWeight = ((crossPlayStateInfo._elapsedTime - startPlayTime) / crossScale) / crossDuratuion;
 	                        if (crossWeight >= 1.0) {
-	                            this._updateClipDatas(crossState, addtive, crossPlayStateInfo, timerScale * crossSpeed);
+	                            this._updateClipDatas(crossState, addtive, crossPlayStateInfo);
 	                            this._setClipDatasToNode(crossState, addtive, 1.0, i === 0);
 	                            controllerLayer._playType = 0;
 	                            playStateInfo._currentState = crossState;
 	                            crossPlayStateInfo._cloneTo(playStateInfo);
 	                        }
 	                        else {
-	                            this._updateClipDatas(crossState, addtive, crossPlayStateInfo, timerScale * crossScale * crossSpeed);
+	                            this._updateClipDatas(crossState, addtive, crossPlayStateInfo);
 	                            this._setFixedCrossClipDatasToNode(controllerLayer, crossState, crossWeight, i === 0);
 	                        }
 	                        this._updateEventScript(crossState, crossPlayStateInfo);
@@ -7076,18 +7090,19 @@
 	            var curPlayState = playStateInfo._currentState;
 	            var animatorState = name ? controllerLayer._statesMap[name] : defaultState;
 	            var clipDuration = animatorState._clip._duration;
+	            var calclipduration = animatorState._clip._duration * (animatorState.clipEnd - animatorState.clipStart);
 	            if (curPlayState !== animatorState) {
 	                if (normalizedTime !== Number.NEGATIVE_INFINITY)
-	                    playStateInfo._resetPlayState(clipDuration * normalizedTime);
+	                    playStateInfo._resetPlayState(clipDuration * normalizedTime, calclipduration);
 	                else
-	                    playStateInfo._resetPlayState(0.0);
+	                    playStateInfo._resetPlayState(0.0, calclipduration);
 	                (curPlayState !== null && curPlayState !== animatorState) && (this._revertDefaultKeyframeNodes(curPlayState));
 	                controllerLayer._playType = 0;
 	                playStateInfo._currentState = animatorState;
 	            }
 	            else {
 	                if (normalizedTime !== Number.NEGATIVE_INFINITY) {
-	                    playStateInfo._resetPlayState(clipDuration * normalizedTime);
+	                    playStateInfo._resetPlayState(clipDuration * normalizedTime, calclipduration);
 	                    controllerLayer._playType = 0;
 	                }
 	            }
@@ -7120,6 +7135,7 @@
 	                var destClip = destAnimatorState._clip;
 	                var destNodes = destClip._nodes;
 	                var destNodesMap = destClip._nodesDic;
+	                var crossCount = 0;
 	                switch (playType) {
 	                    case 0:
 	                        var srcNodeOwners = srcAnimatorState._nodeOwners;
@@ -7129,7 +7145,7 @@
 	                        var srcNodesMap = srcClip._nodesDic;
 	                        controllerLayer._playType = 1;
 	                        var crossMark = ++controllerLayer._crossMark;
-	                        var crossCount = controllerLayer._crossNodesOwnersCount = 0;
+	                        crossCount = controllerLayer._crossNodesOwnersCount = 0;
 	                        for (var i = 0, n = srcNodes.count; i < n; i++) {
 	                            var srcNode = srcNodes.getNodeByIndex(i);
 	                            var srcIndex = srcNode._indexInList;
@@ -7200,9 +7216,9 @@
 	                controllerLayer._crossPlayState = destAnimatorState;
 	                controllerLayer._crossDuration = srcAnimatorState._clip._duration * transitionDuration;
 	                if (normalizedTime !== Number.NEGATIVE_INFINITY)
-	                    crossPlayStateInfo._resetPlayState(destClip._duration * normalizedTime);
+	                    crossPlayStateInfo._resetPlayState(destClip._duration * normalizedTime, controllerLayer._crossDuration);
 	                else
-	                    crossPlayStateInfo._resetPlayState(0.0);
+	                    crossPlayStateInfo._resetPlayState(0.0, controllerLayer._crossDuration);
 	                var scripts = destAnimatorState._scripts;
 	                if (scripts) {
 	                    for (i = 0, n = scripts.length; i < n; i++)
@@ -7768,7 +7784,7 @@
 	        this._initData();
 	    }
 	    _initData() {
-	        this._data = new Object();
+	        this._data = {};
 	    }
 	    getData() {
 	        return this._data;
@@ -8567,25 +8583,6 @@
 	            return id;
 	        }
 	    }
-	    static getAttributeMapByDefine(defineString, attributeMap) {
-	        var newAttributeMap = {};
-	        for (var value in attributeMap) {
-	            newAttributeMap[value] = attributeMap[value];
-	        }
-	        for (var i = 0, n = defineString.length; i < n; i++) {
-	            var def = defineString[i];
-	            switch (def) {
-	                case "SIMPLEBONE":
-	                    if (attributeMap["a_Texcoord1"]) {
-	                        newAttributeMap["a_SimpleTextureParams"] = attributeMap["a_Texcoord1"];
-	                        delete newAttributeMap["a_Texcoord1"];
-	                    }
-	                    newAttributeMap["a_SimpleTextureParams"] = 7;
-	                    break;
-	            }
-	        }
-	        return newAttributeMap;
-	    }
 	    static addInclude(fileName, txt) {
 	        txt = txt.replace(Laya.ShaderCompile._clearCR, "");
 	        Laya.ShaderCompile.addInclude(fileName, txt);
@@ -9115,14 +9112,14 @@
 	        this._renderShaderValue = new ShaderData();
 	        this._renderShaderValue = new ShaderData(null);
 	    }
-	    static create(mesh, matrix, material, subMeshIndex, _subShaderIndex, commandBuffer) {
+	    static create(mesh, matrix, material, subMeshIndex, subShaderIndex, commandBuffer) {
 	        var cmd;
 	        cmd = DrawMeshCMD._pool.length > 0 ? DrawMeshCMD._pool.pop() : new DrawMeshCMD();
 	        cmd._mesh = mesh;
 	        cmd._matrix = matrix;
 	        cmd._material = material;
 	        cmd._subMeshIndex = subMeshIndex;
-	        cmd._subShaderIndex = _subShaderIndex;
+	        cmd._subShaderIndex = subShaderIndex;
 	        cmd._commandBuffer = commandBuffer;
 	        return cmd;
 	    }
@@ -9148,7 +9145,7 @@
 	            comDef.addDefineDatas(this._renderShaderValue._defineDatas);
 	            comDef.addDefineDatas(this._material._shaderValues._defineDatas);
 	            var shaderIns = context.shader = pass.withCompile(comDef);
-	            var switchShader = shaderIns.bind();
+	            shaderIns.bind();
 	            shaderIns.uploadUniforms(shaderIns._sceneUniformParamsMap, scene._shaderValues, true);
 	            shaderIns.uploadUniforms(shaderIns._spriteUniformParamsMap, this._renderShaderValue, true);
 	            shaderIns.uploadUniforms(shaderIns._cameraUniformParamsMap, cameraShaderValue, true);
@@ -9255,23 +9252,6 @@
 	            }
 	        }
 	        this._clusterDatas = clusterDatas;
-	    }
-	    _insertSpotLightSphere(origin, forward, size, angle, testSphere) {
-	        var V = Cluster._tempVector35;
-	        V.x = testSphere.x - origin.x;
-	        V.y = testSphere.y - origin.y;
-	        V.z = testSphere.z - origin.z;
-	        var VlenSq = Vector3.dot(V, V);
-	        var sphereRadius = testSphere.w;
-	        var rangeCull = VlenSq > sphereRadius * sphereRadius;
-	        if (!rangeCull)
-	            return false;
-	        var V1len = Vector3.dot(V, forward);
-	        var distanceClosestPoint = Math.cos(angle) * Math.sqrt(VlenSq - V1len * V1len) - V1len * Math.sin(angle);
-	        var angleCull = distanceClosestPoint > sphereRadius;
-	        var frontCull = V1len > sphereRadius + size;
-	        var backCull = V1len < -sphereRadius;
-	        return !(angleCull || frontCull || backCull);
 	    }
 	    _placePointLightToClusters(lightIndex, lightBound) {
 	        var clusterDatas = this._clusterDatas;
@@ -11039,10 +11019,6 @@
 	            new VertexElement(16, VertexElementFormat.Vector4, VertexMesh.MESH_WORLDMATRIX_ROW1),
 	            new VertexElement(32, VertexElementFormat.Vector4, VertexMesh.MESH_WORLDMATRIX_ROW2),
 	            new VertexElement(48, VertexElementFormat.Vector4, VertexMesh.MESH_WORLDMATRIX_ROW3)]);
-	        VertexMesh.instanceMVPMatrixDeclaration = new VertexDeclaration(64, [new VertexElement(0, VertexElementFormat.Vector4, VertexMesh.MESH_MVPMATRIX_ROW0),
-	            new VertexElement(16, VertexElementFormat.Vector4, VertexMesh.MESH_MVPMATRIX_ROW1),
-	            new VertexElement(32, VertexElementFormat.Vector4, VertexMesh.MESH_MVPMATRIX_ROW2),
-	            new VertexElement(48, VertexElementFormat.Vector4, VertexMesh.MESH_MVPMATRIX_ROW3)]);
 	        VertexMesh.instanceSimpleAnimatorDeclaration = new VertexDeclaration(16, [new VertexElement(0, VertexElementFormat.Vector4, VertexMesh.MESH_SIMPLEANIMATOR)]);
 	    }
 	    static getVertexDeclaration(vertexFlag, compatible = true) {
@@ -11115,11 +11091,11 @@
 	VertexMesh.MESH_WORLDMATRIX_ROW1 = 9;
 	VertexMesh.MESH_WORLDMATRIX_ROW2 = 10;
 	VertexMesh.MESH_WORLDMATRIX_ROW3 = 11;
-	VertexMesh.MESH_MVPMATRIX_ROW0 = 12;
-	VertexMesh.MESH_MVPMATRIX_ROW1 = 13;
-	VertexMesh.MESH_MVPMATRIX_ROW2 = 14;
-	VertexMesh.MESH_MVPMATRIX_ROW3 = 15;
-	VertexMesh.MESH_SIMPLEANIMATOR = 7;
+	VertexMesh.MESH_SIMPLEANIMATOR = 12;
+	VertexMesh.MESH_CUSTOME0 = 12;
+	VertexMesh.MESH_CUSTOME1 = 13;
+	VertexMesh.MESH_CUSTOME2 = 14;
+	VertexMesh.MESH_CUSTOME3 = 15;
 	VertexMesh._vertexDeclarationMap = {};
 
 	class SkyMesh {
@@ -11216,7 +11192,6 @@
 	                shader.uploadUniforms(shader._sceneUniformParamsMap, scene._shaderValues, uploadScene);
 	                shader._uploadScene = scene;
 	            }
-	            var renderTex = camera._getRenderTexture();
 	            var uploadCamera = (shader._uploadCameraShaderValue !== cameraShaderValue) || switchShaderLoop;
 	            if (uploadCamera || switchShader) {
 	                var viewMatrix = SkyRenderer._tempMatrix0;
@@ -12036,7 +12011,6 @@
 	        }
 	        var viewport = camera.viewport;
 	        var needInternalRT = camera._needInternalRenderTexture();
-	        var gl = Laya.LayaGL.instance;
 	        var context = RenderContext3D._instance;
 	        var scene = context.scene = scene;
 	        context.pipelineMode = context.configPipeLineMode;
@@ -12331,8 +12305,6 @@
 	        var commandBufferArray = this._cameraEventCommandBuffer[event];
 	        if (!commandBufferArray || commandBufferArray.length == 0)
 	            return;
-	        if (this._internalRenderTexture)
-	            this._internalRenderTexture._end();
 	        commandBufferArray.forEach(function (value) {
 	            value._context = context;
 	            value._apply();
@@ -12473,7 +12445,6 @@
 	            return;
 	        var viewport = this.viewport;
 	        var needInternalRT = this._needInternalRenderTexture();
-	        var gl = Laya.LayaGL.instance;
 	        var context = RenderContext3D._instance;
 	        var scene = context.scene = this._scene;
 	        context.pipelineMode = context.configPipeLineMode;
@@ -12727,6 +12698,7 @@
 	        var lastStateMaterial, lastStateShaderInstance, lastStateRender;
 	        var updateMark = Camera._updateMark;
 	        var scene = context.scene;
+	        this._render._scene = context.scene;
 	        var cameraShaderValue = context.cameraShaderValue;
 	        var transform = renderElement._transform;
 	        var geometry = renderElement._geometry;
@@ -12809,8 +12781,13 @@
 	        var renderElements = this._render._renderElements;
 	        for (var i = 0, n = renderElements.length; i < n; i++) {
 	            var renderelement = renderElements[i];
-	            renderelement._update(scene, context, this._material._shader, null, this._subShaderIndex);
+	            this._renderElementUpdate(renderelement);
 	            this._elementRender(renderelement, context);
+	        }
+	    }
+	    _renderElementUpdate(renderelement) {
+	        if (this._material) {
+	            renderelement.renderSubShader = this._material._shader.getSubShaderAt(this._subShaderIndex);
 	        }
 	    }
 	    recover() {
@@ -12881,6 +12858,141 @@
 	    }
 	}
 	SetGlobalShaderDataCMD._pool = [];
+
+	class MeshSprite3DShaderDeclaration {
+	}
+
+	class DrawMeshInstancedCMD extends Command {
+	    constructor() {
+	        super();
+	        this._renderShaderValue = new ShaderData(null);
+	        let gl = Laya.LayaGL.instance;
+	        this._instanceWorldMatrixData = new Float32Array(DrawMeshInstancedCMD.maxInstanceCount * 16);
+	        this._instanceWorldMatrixBuffer = new VertexBuffer3D(this._instanceWorldMatrixData.length * 4, gl.DYNAMIC_DRAW);
+	        this._instanceWorldMatrixBuffer.vertexDeclaration = VertexMesh.instanceWorldMatrixDeclaration;
+	    }
+	    static create(mesh, subMeshIndex, matrixs, material, subShaderIndex, instanceProperty, drawnums, commandBuffer) {
+	        var cmd;
+	        if ((matrixs && matrixs.length > 1024) || drawnums > DrawMeshInstancedCMD.maxInstanceCount) {
+	            throw "the number of renderings exceeds the maximum number of merges";
+	        }
+	        cmd = DrawMeshInstancedCMD._pool.length > 0 ? DrawMeshInstancedCMD._pool.pop() : new DrawMeshInstancedCMD();
+	        cmd._mesh = mesh;
+	        cmd._matrixs = matrixs;
+	        cmd._material = material;
+	        cmd._subMeshIndex = subMeshIndex;
+	        cmd._subShaderIndex = subShaderIndex;
+	        cmd._commandBuffer = commandBuffer;
+	        cmd._instanceProperty = instanceProperty;
+	        cmd._drawnums = drawnums;
+	        matrixs || cmd._updateWorldMatrixBuffer();
+	        cmd._setInstanceBuffer();
+	        return cmd;
+	    }
+	    _setInstanceBuffer() {
+	        let instanceBufferState = this._instanceBufferState = new BufferState();
+	        instanceBufferState.bind();
+	        instanceBufferState.applyVertexBuffer(this._mesh._vertexBuffer);
+	        instanceBufferState.applyInstanceVertexBuffer(this._instanceWorldMatrixBuffer);
+	        let propertyMap = this._instanceProperty._propertyMap;
+	        for (let i in propertyMap) {
+	            instanceBufferState.applyInstanceVertexBuffer(propertyMap[i]._vertexBuffer);
+	        }
+	        instanceBufferState.applyIndexBuffer(this._mesh._indexBuffer);
+	        instanceBufferState.unBind();
+	    }
+	    _updateWorldMatrixBuffer() {
+	        let worldMatrixData = this._instanceWorldMatrixData;
+	        let count = this._drawnums;
+	        for (let i = 0; i < count; i++) {
+	            worldMatrixData.set(this._matrixs[i].elements, i * 16);
+	        }
+	        let worldBuffer = this._instanceWorldMatrixBuffer;
+	        worldBuffer.orphanStorage();
+	        worldBuffer.setData(worldMatrixData.buffer, 0, 0, count * 64);
+	    }
+	    _render(subMesh) {
+	        let gl = Laya.LayaGL.instance;
+	        var count = this._drawnums;
+	        var indexCount = subMesh._indexCount;
+	        this._instanceBufferState.bind();
+	        Laya.LayaGL.layaGPUInstance.drawElementsInstanced(gl.TRIANGLES, indexCount, gl.UNSIGNED_SHORT, subMesh._indexStart * 2, count);
+	        Laya.Stat.renderBatches++;
+	        Laya.Stat.trianglesFaces += indexCount * count / 3;
+	    }
+	    run() {
+	        let renderSubShader = this._material._shader.getSubShaderAt(this._subShaderIndex);
+	        this.setContext(this._commandBuffer._context);
+	        let context = this._context;
+	        let forceInvertFace = context.invertY;
+	        let scene = context.scene;
+	        let cameraShaderValue = context.cameraShaderValue;
+	        let currentPipelineMode = context.pipelineMode;
+	        this._renderShaderValue.addDefine(MeshSprite3DShaderDeclaration.SHADERDEFINE_GPU_INSTANCE);
+	        let passes = renderSubShader._passes;
+	        for (let j = 0, m = passes.length; j < m; j++) {
+	            let pass = passes[j];
+	            if (pass._pipelineMode !== currentPipelineMode)
+	                continue;
+	            let comDef = DrawMeshInstancedCMD._compileDefine;
+	            scene._shaderValues._defineDatas.cloneTo(comDef);
+	            comDef.addDefineDatas(this._renderShaderValue._defineDatas);
+	            comDef.addDefineDatas(this._material._shaderValues._defineDatas);
+	            let shaderIns = context.shader = pass.withCompile(comDef);
+	            shaderIns.bind();
+	            shaderIns.uploadUniforms(shaderIns._sceneUniformParamsMap, scene._shaderValues, true);
+	            shaderIns.uploadUniforms(shaderIns._spriteUniformParamsMap, this._renderShaderValue, true);
+	            shaderIns.uploadUniforms(shaderIns._cameraUniformParamsMap, cameraShaderValue, true);
+	            let matValues = this._material._shaderValues;
+	            shaderIns.uploadUniforms(shaderIns._materialUniformParamsMap, matValues, true);
+	            shaderIns.uploadRenderStateBlendDepth(matValues);
+	            shaderIns.uploadRenderStateFrontFace(matValues, forceInvertFace, false);
+	        }
+	        let propertyMap = this._instanceProperty._propertyMap;
+	        for (let i in propertyMap) {
+	            propertyMap[i].updateVertexBufferData(this._drawnums);
+	        }
+	        let subGeometryElement = this._mesh._subMeshes;
+	        let subMeshRender;
+	        if (this._subMeshIndex == -1) {
+	            for (let i = 0, n = subGeometryElement.length; i < n; i++) {
+	                subMeshRender = subGeometryElement[i];
+	                if (subMeshRender._prepareRender(context)) {
+	                    this._render(subMeshRender);
+	                }
+	            }
+	        }
+	        else {
+	            let subGeometryElement = this._mesh._subMeshes;
+	            subMeshRender = subGeometryElement[this._subMeshIndex];
+	            if (subMeshRender._prepareRender(context)) {
+	                this._render(subMeshRender);
+	            }
+	        }
+	    }
+	    setWorldMatrix(worldMatrixArray) {
+	        if (worldMatrixArray.length < this._drawnums)
+	            throw "worldMatrixArray length is less then drawnums";
+	        this._matrixs = worldMatrixArray;
+	        this._matrixs && this._updateWorldMatrixBuffer();
+	    }
+	    setDrawNums(drawNums) {
+	        if (this._matrixs && this._matrixs.length < drawNums)
+	            throw "worldMatrixArray length is less then drawnums";
+	        this._drawnums = drawNums;
+	        this._matrixs && this._updateWorldMatrixBuffer();
+	    }
+	    recover() {
+	        DrawMeshInstancedCMD._pool.push(this);
+	        this._renderShaderValue.clearDefine();
+	        this._renderShaderValue._initData();
+	        this._instanceBufferState.destroy();
+	        this._instanceBufferState = null;
+	    }
+	}
+	DrawMeshInstancedCMD._pool = [];
+	DrawMeshInstancedCMD._compileDefine = new DefineDatas();
+	DrawMeshInstancedCMD.maxInstanceCount = 1024;
 
 	class CommandBuffer {
 	    constructor() {
@@ -12959,6 +13071,13 @@
 	    }
 	    drawRender(render, material, subShaderIndex) {
 	        this._commands.push(DrawRenderCMD.create(render, material, subShaderIndex, this));
+	    }
+	    drawMeshInstance(mesh, subMeshIndex, matrixs, material, subShaderIndex, instanceProperty, drawnums) {
+	        if (!Laya.LayaGL.layaGPUInstance.supportInstance())
+	            return null;
+	        var drawMeshInstancedCMD = DrawMeshInstancedCMD.create(mesh, subMeshIndex, matrixs, material, subShaderIndex, instanceProperty, drawnums, this);
+	        this._commands.push(drawMeshInstancedCMD);
+	        return drawMeshInstancedCMD;
 	    }
 	    clear() {
 	        for (var i = 0, n = this._commands.length; i < n; i++)
@@ -13357,7 +13476,6 @@
 	class Material extends Laya.Resource {
 	    constructor() {
 	        super();
-	        this._shaderValues = null;
 	        this._shaderValues = new ShaderData(this);
 	        this.renderQueue = Material.RENDERQUEUE_OPAQUE;
 	        this._alphaTest = false;
@@ -13569,7 +13687,6 @@
 	Material.BLEND_DST = Shader3D.propertyNameToID("s_BlendDst");
 	Material.DEPTH_TEST = Shader3D.propertyNameToID("s_DepthTest");
 	Material.DEPTH_WRITE = Shader3D.propertyNameToID("s_DepthWrite");
-	Material.SHADERDEFINE_ALPHATEST = null;
 
 	class BaseMaterial {
 	    static load(url, complete) {
@@ -13584,7 +13701,6 @@
 	BaseMaterial.RENDERQUEUE_ALPHATEST = 2450;
 	BaseMaterial.RENDERQUEUE_TRANSPARENT = 3000;
 	BaseMaterial.ALPHATESTVALUE = Shader3D.propertyNameToID("u_AlphaTestValue");
-	BaseMaterial.SHADERDEFINE_ALPHATEST = null;
 
 	class RenderState {
 	    constructor() {
@@ -13660,6 +13776,7 @@
 	    constructor() {
 	        super();
 	        this._enableVertexColor = false;
+	        this._enableTransmission = false;
 	        this.setShaderName("BLINNPHONG");
 	        this._albedoIntensity = 1.0;
 	        this._albedoColor = new Vector4(1.0, 1.0, 1.0, 1.0);
@@ -13676,8 +13793,9 @@
 	        BlinnPhongMaterial.SHADERDEFINE_DIFFUSEMAP = Shader3D.getDefineByName("DIFFUSEMAP");
 	        BlinnPhongMaterial.SHADERDEFINE_NORMALMAP = Shader3D.getDefineByName("NORMALMAP");
 	        BlinnPhongMaterial.SHADERDEFINE_SPECULARMAP = Shader3D.getDefineByName("SPECULARMAP");
-	        BlinnPhongMaterial.SHADERDEFINE_TILINGOFFSET = Shader3D.getDefineByName("TILINGOFFSET");
 	        BlinnPhongMaterial.SHADERDEFINE_ENABLEVERTEXCOLOR = Shader3D.getDefineByName("ENABLEVERTEXCOLOR");
+	        BlinnPhongMaterial.SHADERDEFINE_ENABLETRANSMISSION = Shader3D.getDefineByName("ENABLETRANSMISSION");
+	        BlinnPhongMaterial.SHADERDEFINE_THICKNESSMAP = Shader3D.getDefineByName("THICKNESSMAP");
 	    }
 	    get _ColorR() {
 	        return this._albedoColor.x;
@@ -13876,15 +13994,11 @@
 	    }
 	    set tilingOffset(value) {
 	        if (value) {
-	            if (value.x != 1 || value.y != 1 || value.z != 0 || value.w != 0)
-	                this._shaderValues.addDefine(BlinnPhongMaterial.SHADERDEFINE_TILINGOFFSET);
-	            else
-	                this._shaderValues.removeDefine(BlinnPhongMaterial.SHADERDEFINE_TILINGOFFSET);
+	            this._shaderValues.setVector(BlinnPhongMaterial.TILINGOFFSET, value);
 	        }
 	        else {
-	            this._shaderValues.removeDefine(BlinnPhongMaterial.SHADERDEFINE_TILINGOFFSET);
+	            this._shaderValues.getVector(BlinnPhongMaterial.TILINGOFFSET).setValue(1.0, 1.0, 0.0, 0.0);
 	        }
-	        this._shaderValues.setVector(BlinnPhongMaterial.TILINGOFFSET, value);
 	    }
 	    get albedoColorR() {
 	        return this._ColorR;
@@ -13991,6 +14105,50 @@
 	            this._shaderValues.removeDefine(BlinnPhongMaterial.SHADERDEFINE_SPECULARMAP);
 	        this._shaderValues.setTexture(BlinnPhongMaterial.SPECULARTEXTURE, value);
 	    }
+	    get enableTransmission() {
+	        return this._enableTransmission;
+	    }
+	    set enableTransmission(value) {
+	        this._enableTransmission = value;
+	        if (value)
+	            this._shaderValues.addDefine(BlinnPhongMaterial.SHADERDEFINE_ENABLETRANSMISSION);
+	        else
+	            this._shaderValues.removeDefine(BlinnPhongMaterial.SHADERDEFINE_ENABLETRANSMISSION);
+	    }
+	    get transmissionRate() {
+	        return this._shaderValues.getNumber(BlinnPhongMaterial.TRANSMISSIONRATE);
+	    }
+	    set transmissionRata(value) {
+	        this._shaderValues.setNumber(BlinnPhongMaterial.TRANSMISSIONRATE, value);
+	    }
+	    get backDiffuse() {
+	        return this._shaderValues.getNumber(BlinnPhongMaterial.IBACKDIFFUSE);
+	    }
+	    set backDiffuse(value) {
+	        this._shaderValues.setNumber(BlinnPhongMaterial.IBACKDIFFUSE, Math.max(value, 1.0));
+	    }
+	    get backScale() {
+	        return this._shaderValues.getNumber(BlinnPhongMaterial.IBACKSCALE);
+	    }
+	    set backScale(value) {
+	        this._shaderValues.setNumber(BlinnPhongMaterial.IBACKSCALE, value);
+	    }
+	    get thinknessTexture() {
+	        return this._shaderValues.getTexture(BlinnPhongMaterial.THINKNESSTEXTURE);
+	    }
+	    set thinknessTexture(value) {
+	        if (value)
+	            this._shaderValues.addDefine(BlinnPhongMaterial.SHADERDEFINE_THICKNESSMAP);
+	        else
+	            this._shaderValues.removeDefine(BlinnPhongMaterial.SHADERDEFINE_THICKNESSMAP);
+	        this._shaderValues.setTexture(BlinnPhongMaterial.THINKNESSTEXTURE, value);
+	    }
+	    get transmissionColor() {
+	        return this._shaderValues.getVector(BlinnPhongMaterial.TRANSMISSIONCOLOR);
+	    }
+	    set transmissionColor(value) {
+	        this._shaderValues.setVector(BlinnPhongMaterial.TRANSMISSIONCOLOR, value);
+	    }
 	    clone() {
 	        var dest = new BlinnPhongMaterial();
 	        this.cloneTo(dest);
@@ -14015,18 +14173,23 @@
 	BlinnPhongMaterial.MATERIALSPECULAR = Shader3D.propertyNameToID("u_MaterialSpecular");
 	BlinnPhongMaterial.SHININESS = Shader3D.propertyNameToID("u_Shininess");
 	BlinnPhongMaterial.TILINGOFFSET = Shader3D.propertyNameToID("u_TilingOffset");
+	BlinnPhongMaterial.TRANSMISSIONRATE = Shader3D.propertyNameToID("u_TransmissionRate");
+	BlinnPhongMaterial.IBACKDIFFUSE = Shader3D.propertyNameToID("u_BackDiffuse");
+	BlinnPhongMaterial.IBACKSCALE = Shader3D.propertyNameToID("u_BackScale");
+	BlinnPhongMaterial.THINKNESSTEXTURE = Shader3D.propertyNameToID("u_ThinknessTexture");
+	BlinnPhongMaterial.TRANSMISSIONCOLOR = Shader3D.propertyNameToID("u_TransmissionColor");
 
 	class EffectMaterial extends Material {
 	    constructor() {
 	        super();
 	        this.setShaderName("Effect");
 	        this._color = new Vector4(1.0, 1.0, 1.0, 1.0);
+	        this._shaderValues.setVector(EffectMaterial.TILINGOFFSET, new Vector4(1.0, 1.0, 0.0, 0.0));
 	        this._shaderValues.setVector(EffectMaterial.TINTCOLOR, new Vector4(1.0, 1.0, 1.0, 1.0));
 	        this.renderMode = EffectMaterial.RENDERMODE_ADDTIVE;
 	    }
 	    static __initDefine__() {
 	        EffectMaterial.SHADERDEFINE_MAINTEXTURE = Shader3D.getDefineByName("MAINTEXTURE");
-	        EffectMaterial.SHADERDEFINE_TILINGOFFSET = Shader3D.getDefineByName("TILINGOFFSET");
 	        EffectMaterial.SHADERDEFINE_ADDTIVEFOG = Shader3D.getDefineByName("ADDTIVEFOG");
 	    }
 	    get _TintColorR() {
@@ -14198,15 +14361,11 @@
 	    }
 	    set tilingOffset(value) {
 	        if (value) {
-	            if (value.x != 1 || value.y != 1 || value.z != 0 || value.w != 0)
-	                this._shaderValues.addDefine(EffectMaterial.SHADERDEFINE_TILINGOFFSET);
-	            else
-	                this._shaderValues.removeDefine(EffectMaterial.SHADERDEFINE_TILINGOFFSET);
+	            this._shaderValues.setVector(EffectMaterial.TILINGOFFSET, value);
 	        }
 	        else {
-	            this._shaderValues.removeDefine(EffectMaterial.SHADERDEFINE_TILINGOFFSET);
+	            this._shaderValues.getVector(EffectMaterial.TILINGOFFSET).setValue(1.0, 1.0, 0.0, 0.0);
 	        }
-	        this._shaderValues.setVector(EffectMaterial.TILINGOFFSET, value);
 	    }
 	    clone() {
 	        var dest = new EffectMaterial();
@@ -14223,7 +14382,6 @@
 	class ExtendTerrainMaterial extends Material {
 	    constructor() {
 	        super();
-	        this._enableLighting = true;
 	        this.setShaderName("ExtendTerrain");
 	        this.renderMode = ExtendTerrainMaterial.RENDERMODE_OPAQUE;
 	    }
@@ -14383,6 +14541,7 @@
 	        this._enableEmission = false;
 	        this._shaderValues.setVector(PBRMaterial.ALBEDOCOLOR, new Vector4(1.0, 1.0, 1.0, 1.0));
 	        this._shaderValues.setVector(PBRMaterial.EMISSIONCOLOR, new Vector4(1.0, 1.0, 1.0, 1.0));
+	        this._shaderValues.setVector(PBRMaterial.TILINGOFFSET, new Vector4(1.0, 1.0, 0.0, 0.0));
 	        this._shaderValues.setNumber(PBRMaterial.SMOOTHNESS, 0.5);
 	        this._shaderValues.setNumber(PBRMaterial.SMOOTHNESSSCALE, 1.0);
 	        this._shaderValues.setNumber(PBRMaterial.OCCLUSIONSTRENGTH, 1.0);
@@ -14398,7 +14557,6 @@
 	        PBRMaterial.SHADERDEFINE_OCCLUSIONTEXTURE = Shader3D.getDefineByName("OCCLUSIONTEXTURE");
 	        PBRMaterial.SHADERDEFINE_EMISSION = Shader3D.getDefineByName("EMISSION");
 	        PBRMaterial.SHADERDEFINE_EMISSIONTEXTURE = Shader3D.getDefineByName("EMISSIONTEXTURE");
-	        PBRMaterial.SHADERDEFINE_TILINGOFFSET = Shader3D.getDefineByName("TILINGOFFSET");
 	        PBRMaterial.SHADERDEFINE_TRANSPARENTBLEND = Shader3D.getDefineByName("TRANSPARENTBLEND");
 	        PBRMaterial.SHADERDEFINE_LAYA_PBR_BRDF_HIGH = Shader3D.getDefineByName("LAYA_PBR_BRDF_HIGH");
 	        PBRMaterial.SHADERDEFINE_LAYA_PBR_BRDF_LOW = Shader3D.getDefineByName("LAYA_PBR_BRDF_LOW");
@@ -14512,15 +14670,11 @@
 	    }
 	    set tilingOffset(value) {
 	        if (value) {
-	            if (value.x != 1 || value.y != 1 || value.z != 0 || value.w != 0)
-	                this._shaderValues.addDefine(PBRMaterial.SHADERDEFINE_TILINGOFFSET);
-	            else
-	                this._shaderValues.removeDefine(PBRMaterial.SHADERDEFINE_TILINGOFFSET);
+	            this._shaderValues.setVector(PBRMaterial.TILINGOFFSET, value);
 	        }
 	        else {
-	            this._shaderValues.removeDefine(PBRMaterial.SHADERDEFINE_TILINGOFFSET);
+	            this._shaderValues.getVector(PBRMaterial.TILINGOFFSET).setValue(1.0, 1.0, 0.0, 0.0);
 	        }
-	        this._shaderValues.setVector(PBRMaterial.TILINGOFFSET, value);
 	    }
 	    set renderMode(value) {
 	        switch (value) {
@@ -14568,11 +14722,6 @@
 	                throw new Error("PBRMaterial:unknown renderMode value.");
 	        }
 	    }
-	    get enableReflection() {
-	        return true;
-	    }
-	    set enableReflection(value) {
-	    }
 	}
 	PBRMaterial.ALBEDOTEXTURE = Shader3D.propertyNameToID("u_AlbedoTexture");
 	PBRMaterial.ALBEDOCOLOR = Shader3D.propertyNameToID("u_AlbedoColor");
@@ -14618,7 +14767,7 @@
 	        this._attributeMap = attributeMap;
 	        this._uniformMap = uniformMap;
 	        this._shaderPass = shaderPass;
-	        this._globaluniformMap = [];
+	        this._globaluniformMap = {};
 	        this._create();
 	        this.lock = true;
 	    }
@@ -15237,8 +15386,6 @@
 	        var position = cullInfo.position;
 	        var cullPlaneCount = cullInfo.cullPlaneCount;
 	        var cullPlanes = cullInfo.cullPlanes;
-	        var cullSphere = cullInfo.cullSphere;
-	        var direction = cullInfo.direction;
 	        var renders = renderList.elements;
 	        var loopCount = Laya.Stat.loopCount;
 	        for (var i = 0, n = renderList.length; i < n; i++) {
@@ -15308,7 +15455,6 @@
 	            renders[i].bounds;
 	            renders[i]._updateForNative && renders[i]._updateForNative(context);
 	        }
-	        var boundFrustum = camera.boundFrustum;
 	        FrustumCulling.cullingNative(camera._boundFrustumBuffer, FrustumCulling._cullingBuffer, scene._cullingBufferIndices, validCount, scene._cullingBufferResult);
 	        var loopCount = Laya.Stat.loopCount;
 	        var camPos = context.camera._transform.position;
@@ -15334,7 +15480,6 @@
 	    }
 	}
 	FrustumCulling._tempColor0 = new Color();
-	FrustumCulling._tempVector0 = new Vector3();
 	FrustumCulling._cameraCullInfo = new CameraCullInfo();
 	FrustumCulling._shadowCullInfo = new ShadowCullInfo();
 	FrustumCulling.debugFrustumCulling = false;
@@ -15548,9 +15693,11 @@
 	        for (var j = 0, m = changedTouches.length; j < m; j++) {
 	            var nativeTouch = changedTouches[j];
 	            var identifier = nativeTouch.identifier;
-	            if (!this._multiTouchEnabled && identifier !== 0)
+	            if (!this._multiTouchEnabled && this._touches.length !== 0 && flag == 0)
 	                continue;
 	            var touch = this._getTouch(identifier, flag);
+	            if (flag == 1 && !touch)
+	                continue;
 	            var pos = this._touchPool[identifier]._position;
 	            var mousePoint = Input3D._tempPoint;
 	            mousePoint.setTo(nativeTouch.pageX, nativeTouch.pageY);
@@ -16029,7 +16176,6 @@
 	        return maxIntIndex;
 	    }
 	    normalLightOrdering(brightestIndex) {
-	        var slements = this._elements;
 	        var firstLight = this._elements[0];
 	        this._elements[0] = this._elements[brightestIndex];
 	        this._elements[brightestIndex] = firstLight;
@@ -16625,15 +16771,11 @@
 	class SubMeshInstanceBatch extends GeometryElement {
 	    constructor() {
 	        super();
-	        this.maxInstanceCount = 1024;
-	        this.instanceWorldMatrixData = new Float32Array(this.maxInstanceCount * 16);
-	        this.instanceMVPMatrixData = new Float32Array(this.maxInstanceCount * 16);
-	        this.instanceSimpleAnimatorData = new Float32Array(this.maxInstanceCount * 4);
+	        this.instanceWorldMatrixData = new Float32Array(SubMeshInstanceBatch.maxInstanceCount * 16);
+	        this.instanceSimpleAnimatorData = new Float32Array(SubMeshInstanceBatch.maxInstanceCount * 4);
 	        var gl = Laya.LayaGL.instance;
 	        this.instanceWorldMatrixBuffer = new VertexBuffer3D(this.instanceWorldMatrixData.length * 4, gl.DYNAMIC_DRAW);
-	        this.instanceMVPMatrixBuffer = new VertexBuffer3D(this.instanceMVPMatrixData.length * 4, gl.DYNAMIC_DRAW);
 	        this.instanceWorldMatrixBuffer.vertexDeclaration = VertexMesh.instanceWorldMatrixDeclaration;
-	        this.instanceMVPMatrixBuffer.vertexDeclaration = VertexMesh.instanceMVPMatrixDeclaration;
 	        this.instanceSimpleAnimatorBuffer = new VertexBuffer3D(this.instanceSimpleAnimatorData.length * 4, gl.DYNAMIC_DRAW);
 	        this.instanceSimpleAnimatorBuffer.vertexDeclaration = VertexMesh.instanceSimpleAnimatorDeclaration;
 	    }
@@ -16653,6 +16795,7 @@
 	        Laya.Stat.trianglesFaces += indexCount * count / 3;
 	    }
 	}
+	SubMeshInstanceBatch.maxInstanceCount = 1024;
 
 	class SubMeshRenderElement extends RenderElement {
 	    constructor() {
@@ -16758,7 +16901,7 @@
 	                var insBatchIndex = insBatchMarks.indexInList;
 	                if (insBatchMarks.batched) {
 	                    var instanceBatchElementList = elements[insBatchIndex].instanceBatchElementList;
-	                    if (instanceBatchElementList.length === SubMeshInstanceBatch.instance.maxInstanceCount) {
+	                    if (instanceBatchElementList.length === SubMeshInstanceBatch.maxInstanceCount) {
 	                        insBatchMarks.updateMark = insManager._updateCountMark;
 	                        insBatchMarks.indexInList = queueElements.length;
 	                        insBatchMarks.batched = false;
@@ -16887,7 +17030,7 @@
 	                else {
 	                    if (queue.lastTransparentBatched) {
 	                        var instanceBatchElementList = elements[queueElements.length - 1].instanceBatchElementList;
-	                        if (instanceBatchElementList.length === SubMeshInstanceBatch.instance.maxInstanceCount) {
+	                        if (instanceBatchElementList.length === SubMeshInstanceBatch.maxInstanceCount) {
 	                            queueElements.add(this);
 	                            queue.lastTransparentBatched = false;
 	                        }
@@ -17816,6 +17959,8 @@
 	    _needRender(boundFrustum, context) {
 	        return true;
 	    }
+	    _OctreeNoRender() {
+	    }
 	    _renderUpdate(context, transform) {
 	    }
 	    _renderUpdateWithCamera(context, transform) {
@@ -17881,7 +18026,7 @@
 	        this._isInRenders = false;
 	        this._geometryFilter = new PixelLineFilter(this, maxCount);
 	        this._render = new PixelLineRenderer(this);
-	        this._changeRenderObjects(this._render, 0, PixelLineMaterial.defaultMaterial);
+	        this._changeRenderObjects(0, PixelLineMaterial.defaultMaterial);
 	    }
 	    get maxLineCount() {
 	        return this._geometryFilter._maxLineCount;
@@ -17918,7 +18063,7 @@
 	            this._isInRenders = true;
 	        }
 	    }
-	    _changeRenderObjects(sender, index, material) {
+	    _changeRenderObjects(index, material) {
 	        var renderObjects = this._render._renderElements;
 	        (material) || (material = PixelLineMaterial.defaultMaterial);
 	        var renderElement = renderObjects[index];
@@ -18315,8 +18460,12 @@
 	        if (testVisible) {
 	            var type = frustum.containsBoundBox(this._bounds);
 	            Laya.Stat.octreeNodeCulling++;
-	            if (type === ContainmentType.Disjoint)
+	            if (type === ContainmentType.Disjoint) {
+	                for (var i = 0, n = this._objects.length; i < n; i++) {
+	                    this._objects[i]._OctreeNoRender();
+	                }
 	                return;
+	            }
 	            testVisible = (type === ContainmentType.Intersects);
 	        }
 	        this._isContaion = !testVisible;
@@ -18592,9 +18741,7 @@
 	        }
 	    }
 	}
-	BoundsOctreeNode._tempVector3 = new Vector3();
 	BoundsOctreeNode._tempVector30 = new Vector3();
-	BoundsOctreeNode._tempVector31 = new Vector3();
 	BoundsOctreeNode._tempColor0 = new Color();
 	BoundsOctreeNode._tempBoundBox = new BoundBox(new Vector3(), new Vector3());
 	BoundsOctreeNode._NUM_OBJECTS_ALLOWED = 8;
@@ -18850,6 +18997,7 @@
 	        this._shadowBias = new Vector4();
 	        this._shadowParams = new Vector4();
 	        this._shadowMapSize = new Vector4();
+	        this._shadowSpotMapSize = new Vector4();
 	        this._shadowMatrices = new Float32Array(16 * (ShadowCasterPass._maxCascades));
 	        this._shadowSpotMatrices = new Matrix4x4();
 	        this._splitBoundSpheres = new Float32Array(ShadowCasterPass._maxCascades * 4);
@@ -18927,7 +19075,7 @@
 	        }
 	        shaderValues.setTexture(ShadowCasterPass.SHADOW_SPOTMAP, this._shadowSpotLightMap);
 	        shaderValues.setMatrix4x4(ShadowCasterPass.SHADOW_SPOTMATRICES, this._shadowSpotMatrices);
-	        shaderValues.setVector(ShadowCasterPass.SHADOW_MAP_SIZE, this._shadowMapSize);
+	        shaderValues.setVector(ShadowCasterPass.SHADOW_SPOTMAP_SIZE, this._shadowSpotMapSize);
 	        shaderValues.setVector(ShadowCasterPass.SHADOW_PARAMS, this._shadowParams);
 	    }
 	    update(camera, light, lightType) {
@@ -18992,7 +19140,7 @@
 	                this._shadowMapWidth = shadowResolution;
 	                this._shadowMapHeight = shadowResolution;
 	                var shadowSpotData = this._shadowSpotData;
-	                ShadowUtils.getSpotLightShadowData(shadowSpotData, this._light, shadowResolution, this._shadowParams, this._shadowSpotMatrices, this._shadowMapSize);
+	                ShadowUtils.getSpotLightShadowData(shadowSpotData, this._light, shadowResolution, this._shadowParams, this._shadowSpotMatrices, this._shadowSpotMapSize);
 	                break;
 	            case exports.ShadowLightType.PointLight:
 	                break;
@@ -19092,6 +19240,7 @@
 	ShadowCasterPass.SHADOW_MAP_SIZE = Shader3D.propertyNameToID("u_ShadowMapSize");
 	ShadowCasterPass.SHADOW_MAP = Shader3D.propertyNameToID("u_ShadowMap");
 	ShadowCasterPass.SHADOW_PARAMS = Shader3D.propertyNameToID("u_ShadowParams");
+	ShadowCasterPass.SHADOW_SPOTMAP_SIZE = Shader3D.propertyNameToID("u_SpotShadowMapSize");
 	ShadowCasterPass.SHADOW_SPOTMAP = Shader3D.propertyNameToID("u_SpotShadowMap");
 	ShadowCasterPass.SHADOW_SPOTMATRICES = Shader3D.propertyNameToID("u_SpotViewProjectMatrix");
 	ShadowCasterPass._maxCascades = 4;
@@ -20061,12 +20210,11 @@
 	        this._reflectionProbeManager.destroy();
 	        Laya.Loader.clearRes(this.url);
 	    }
-	    render(ctx, x, y) {
+	    render(ctx) {
 	        ctx._curSubmit = Laya.SubmitBase.RENDERBASE;
 	        this._children.length > 0 && ctx.addRenderObject(this);
 	    }
 	    renderSubmit() {
-	        var gl = Laya.LayaGL.instance;
 	        this._prepareSceneToRender();
 	        var i, n, n1;
 	        for (i = 0, n = this._cameraPool.length, n1 = n - 1; i < n; i++) {
@@ -20480,8 +20628,7 @@
 	            psVersion = ps[0] + '\n';
 	            ps.shift();
 	        }
-	        var attibuteMap = Shader3D.getAttributeMapByDefine(defineString, this._owner._attributeMap);
-	        shader = new ShaderInstance(vsVersion + vertexHead + defineStr + vs.join('\n'), psVersion + fragmentHead + defineStr + ps.join('\n'), attibuteMap, this._owner._uniformMap || this._owner._owner._uniformMap, this);
+	        shader = new ShaderInstance(vsVersion + vertexHead + defineStr + vs.join('\n'), psVersion + fragmentHead + defineStr + ps.join('\n'), this._owner._attributeMap, this._owner._uniformMap || this._owner._owner._uniformMap, this);
 	        cacheShaders[cacheKey] = shader;
 	        if (Shader3D.debugMode) {
 	            var defStr = "";
@@ -20553,7 +20700,6 @@
 	            'a_Texcoord1': VertexMesh.MESH_TEXTURECOORDINATE1,
 	            'a_BoneWeights': VertexMesh.MESH_BLENDWEIGHT0,
 	            'a_BoneIndices': VertexMesh.MESH_BLENDINDICES0,
-	            'a_MvpMatrix': VertexMesh.MESH_MVPMATRIX_ROW0,
 	            'a_WorldMat': VertexMesh.MESH_WORLDMATRIX_ROW0
 	        };
 	        var uniformMap = {
@@ -20697,7 +20843,6 @@
 	            'a_Texcoord1': VertexMesh.MESH_TEXTURECOORDINATE1,
 	            'a_BoneWeights': VertexMesh.MESH_BLENDWEIGHT0,
 	            'a_BoneIndices': VertexMesh.MESH_BLENDINDICES0,
-	            'a_MvpMatrix': VertexMesh.MESH_MVPMATRIX_ROW0,
 	            'a_WorldMat': VertexMesh.MESH_WORLDMATRIX_ROW0
 	        };
 	        var uniformMap = {
@@ -20968,11 +21113,11 @@
 	        this._enableVertexColor = false;
 	        this.setShaderName("Unlit");
 	        this._shaderValues.setVector(UnlitMaterial.ALBEDOCOLOR, new Vector4(1.0, 1.0, 1.0, 1.0));
+	        this._shaderValues.setVector(UnlitMaterial.TILINGOFFSET, new Vector4(1.0, 1.0, 0.0, 0.0));
 	        this.renderMode = UnlitMaterial.RENDERMODE_OPAQUE;
 	    }
 	    static __initDefine__() {
 	        UnlitMaterial.SHADERDEFINE_ALBEDOTEXTURE = Shader3D.getDefineByName("ALBEDOTEXTURE");
-	        UnlitMaterial.SHADERDEFINE_TILINGOFFSET = Shader3D.getDefineByName("TILINGOFFSET");
 	        UnlitMaterial.SHADERDEFINE_ENABLEVERTEXCOLOR = Shader3D.getDefineByName("ENABLEVERTEXCOLOR");
 	    }
 	    get _ColorR() {
@@ -21142,15 +21287,11 @@
 	    }
 	    set tilingOffset(value) {
 	        if (value) {
-	            if (value.x != 1 || value.y != 1 || value.z != 0 || value.w != 0)
-	                this._shaderValues.addDefine(UnlitMaterial.SHADERDEFINE_TILINGOFFSET);
-	            else
-	                this._shaderValues.removeDefine(UnlitMaterial.SHADERDEFINE_TILINGOFFSET);
+	            this._shaderValues.setVector(UnlitMaterial.TILINGOFFSET, value);
 	        }
 	        else {
-	            this._shaderValues.removeDefine(UnlitMaterial.SHADERDEFINE_TILINGOFFSET);
+	            this._shaderValues.getVector(UnlitMaterial.TILINGOFFSET).setValue(1.0, 1.0, 0.0, 0.0);
 	        }
-	        this._shaderValues.setVector(UnlitMaterial.TILINGOFFSET, value);
 	    }
 	    get enableVertexColor() {
 	        return this._enableVertexColor;
@@ -21270,9 +21411,6 @@
 	WaterPrimaryMaterial.WAVESCALE = Shader3D.propertyNameToID("u_WaveScale");
 	WaterPrimaryMaterial.WAVESPEED = Shader3D.propertyNameToID("u_WaveSpeed");
 
-	class MeshSprite3DShaderDeclaration {
-	}
-
 	class MeshRenderer extends BaseRender {
 	    constructor(owner) {
 	        super(owner);
@@ -21390,19 +21528,6 @@
 	                        this._shaderValues.setMatrix4x4(Sprite3D.MVPMATRIX, projectionView);
 	                    }
 	                    break;
-	                case RenderElement.RENDERTYPE_INSTANCEBATCH:
-	                    var mvpMatrixData = SubMeshInstanceBatch.instance.instanceMVPMatrixData;
-	                    var insBatches = element.instanceBatchElementList;
-	                    var elements = insBatches.elements;
-	                    var count = insBatches.length;
-	                    for (var i = 0; i < count; i++) {
-	                        var worldMat = elements[i]._transform.worldMatrix;
-	                        Utils3D.mulMatrixByArray(projectionView.elements, 0, worldMat.elements, 0, mvpMatrixData, i * 16);
-	                    }
-	                    var mvpBuffer = SubMeshInstanceBatch.instance.instanceMVPMatrixBuffer;
-	                    mvpBuffer.orphanStorage();
-	                    mvpBuffer.setData(mvpMatrixData.buffer, 0, 0, count * 16 * 4);
-	                    break;
 	            }
 	        }
 	    }
@@ -21500,10 +21625,9 @@
 	    static __init__() {
 	        SubMeshDynamicBatch.instance = new SubMeshDynamicBatch();
 	    }
-	    _getBatchVertices(vertexDeclaration, batchVertices, batchOffset, transform, element, subMesh) {
+	    _getBatchVertices(vertexDeclaration, batchVertices, batchOffset, element, subMesh) {
 	        var vertexFloatCount = vertexDeclaration.vertexStride / 4;
 	        var oriVertexes = subMesh._vertexBuffer.getFloat32Data();
-	        var lightmapScaleOffset = element.render.lightmapScaleOffset;
 	        var multiSubMesh = element._dynamicMultiSubMesh;
 	        var vertexCount = element._dynamicVertexCount;
 	        element._computeWorldPositionsAndNormals(this._positionOffset, this._normalOffset, multiSubMesh, vertexCount);
@@ -21628,7 +21752,6 @@
 	        var batchElements = element.vertexBatchElementList;
 	        var batchVertexCount = 0;
 	        var batchIndexCount = 0;
-	        var floatStride = vertexDeclaration.vertexStride / 4;
 	        var renderBatchCount = 0;
 	        var elementCount = batchElements.length;
 	        var elements = batchElements.elements;
@@ -21643,7 +21766,7 @@
 	                batchVertexCount = batchIndexCount = 0;
 	            }
 	            var transform = subElement._transform;
-	            this._getBatchVertices(vertexDeclaration, this._vertices, batchVertexCount, transform, subElement, subMesh);
+	            this._getBatchVertices(vertexDeclaration, this._vertices, batchVertexCount, subElement, subMesh);
 	            this._getBatchIndices(this._indices, batchIndexCount, batchVertexCount, transform, subMesh, subElement._dynamicMultiSubMesh);
 	            batchVertexCount += subElement._dynamicVertexCount;
 	            batchIndexCount += indexCount;
@@ -23800,13 +23923,13 @@
 	        super();
 	        this.setShaderName("PARTICLESHURIKEN");
 	        this._color = new Vector4(1.0, 1.0, 1.0, 1.0);
+	        this._shaderValues.setVector(ShurikenParticleMaterial.TILINGOFFSET, new Vector4(1.0, 1.0, 0.0, 0.0));
 	        this.renderMode = ShurikenParticleMaterial.RENDERMODE_ALPHABLENDED;
 	    }
 	    static __initDefine__() {
 	        ShurikenParticleMaterial.SHADERDEFINE_DIFFUSEMAP = Shader3D.getDefineByName("DIFFUSEMAP");
 	        ShurikenParticleMaterial.SHADERDEFINE_TINTCOLOR = Shader3D.getDefineByName("TINTCOLOR");
 	        ShurikenParticleMaterial.SHADERDEFINE_ADDTIVEFOG = Shader3D.getDefineByName("ADDTIVEFOG");
-	        ShurikenParticleMaterial.SHADERDEFINE_TILINGOFFSET = Shader3D.getDefineByName("TILINGOFFSET");
 	    }
 	    get _TintColor() {
 	        return this.color;
@@ -23971,15 +24094,11 @@
 	    }
 	    set tilingOffset(value) {
 	        if (value) {
-	            if (value.x != 1 || value.y != 1 || value.z != 0 || value.w != 0)
-	                this._shaderValues.addDefine(ShurikenParticleMaterial.SHADERDEFINE_TILINGOFFSET);
-	            else
-	                this._shaderValues.removeDefine(ShurikenParticleMaterial.SHADERDEFINE_TILINGOFFSET);
+	            this._shaderValues.setVector(ShurikenParticleMaterial.TILINGOFFSET, value);
 	        }
 	        else {
-	            this._shaderValues.removeDefine(ShurikenParticleMaterial.SHADERDEFINE_TILINGOFFSET);
+	            this._shaderValues.getVector(ShurikenParticleMaterial.TILINGOFFSET).setValue(1.0, 1.0, 0.0, 0.0);
 	        }
-	        this._shaderValues.setVector(ShurikenParticleMaterial.TILINGOFFSET, value);
 	    }
 	    get texture() {
 	        return this._shaderValues.getTexture(ShurikenParticleMaterial.DIFFUSETEXTURE);
@@ -24007,12 +24126,10 @@
 	    constructor(owner) {
 	        super(owner);
 	        this._finalGravity = new Vector3();
-	        this._tempRotationMatrix = new Matrix4x4();
 	        this._mesh = null;
 	        this.stretchedBillboardCameraSpeedScale = 0;
 	        this.stretchedBillboardSpeedScale = 0;
 	        this.stretchedBillboardLengthScale = 2;
-	        this._defaultBoundBox = new BoundBox(new Vector3(), new Vector3());
 	        this.renderMode = 0;
 	        this._supportOctree = false;
 	    }
@@ -24206,8 +24323,8 @@
 	        this._startLifeTime = ageAddScale;
 	        this._time = time;
 	        this._startSpeed = startSpeed;
-	        this._randoms0 = this.random0;
-	        this._randoms1 = this.random1;
+	        this._randoms0 = randoms0;
+	        this._randoms1 = randoms1;
 	        this._simulationWorldPostion = simulationWorldPostion;
 	    }
 	    static get vertexDeclaration() {
@@ -24284,8 +24401,8 @@
 	        this._startLifeTime = ageAddScale;
 	        this._time = time;
 	        this._startSpeed = startSpeed;
-	        this._randoms0 = this.random0;
-	        this._randoms1 = this.random1;
+	        this._randoms0 = randoms0;
+	        this._randoms1 = randoms1;
 	        this._simulationWorldPostion = simulationWorldPostion;
 	    }
 	    static __init__() {
@@ -24509,7 +24626,7 @@
 	            rotaton = -rotaton;
 	        return rotaton;
 	    }
-	    static create(particleSystem, particleRender, transform) {
+	    static create(particleSystem, particleRender) {
 	        var autoRandomSeed = particleSystem.autoRandomSeed;
 	        var rand = particleSystem._rand;
 	        var randomSeeds = particleSystem._randomSeeds;
@@ -25446,234 +25563,6 @@
 	        centerE.z = 0;
 	        this._boundingSphere.radius = Number.MAX_VALUE;
 	    }
-	    _generateBoundingBox() {
-	        var particle = this._owner;
-	        var particleRender = particle.particleRenderer;
-	        var boundMin = this._boundingBox.min;
-	        var boundMax = this._boundingBox.max;
-	        var i, n;
-	        var maxStartLifeTime;
-	        switch (this.startLifetimeType) {
-	            case 0:
-	                maxStartLifeTime = this.startLifetimeConstant;
-	                break;
-	            case 1:
-	                maxStartLifeTime = -Number.MAX_VALUE;
-	                var startLifeTimeGradient = startLifeTimeGradient;
-	                for (i = 0, n = startLifeTimeGradient.gradientCount; i < n; i++)
-	                    maxStartLifeTime = Math.max(maxStartLifeTime, startLifeTimeGradient.getValueByIndex(i));
-	                break;
-	            case 2:
-	                maxStartLifeTime = Math.max(this.startLifetimeConstantMin, this.startLifetimeConstantMax);
-	                break;
-	            case 3:
-	                maxStartLifeTime = -Number.MAX_VALUE;
-	                var startLifeTimeGradientMin = startLifeTimeGradientMin;
-	                for (i = 0, n = startLifeTimeGradientMin.gradientCount; i < n; i++)
-	                    maxStartLifeTime = Math.max(maxStartLifeTime, startLifeTimeGradientMin.getValueByIndex(i));
-	                var startLifeTimeGradientMax = startLifeTimeGradientMax;
-	                for (i = 0, n = startLifeTimeGradientMax.gradientCount; i < n; i++)
-	                    maxStartLifeTime = Math.max(maxStartLifeTime, startLifeTimeGradientMax.getValueByIndex(i));
-	                break;
-	        }
-	        var minStartSpeed, maxStartSpeed;
-	        switch (this.startSpeedType) {
-	            case 0:
-	                minStartSpeed = maxStartSpeed = this.startSpeedConstant;
-	                break;
-	            case 1:
-	                break;
-	            case 2:
-	                minStartSpeed = this.startLifetimeConstantMin;
-	                maxStartSpeed = this.startLifetimeConstantMax;
-	                break;
-	            case 3:
-	                break;
-	        }
-	        var minPosition, maxPosition, minDirection, maxDirection;
-	        if (this._shape && this._shape.enable) ;
-	        else {
-	            minPosition = maxPosition = Vector3._ZERO;
-	            minDirection = Vector3._ZERO;
-	            maxDirection = Vector3._UnitZ;
-	        }
-	        var startMinVelocity = new Vector3(minDirection.x * minStartSpeed, minDirection.y * minStartSpeed, minDirection.z * minStartSpeed);
-	        var startMaxVelocity = new Vector3(maxDirection.x * maxStartSpeed, maxDirection.y * maxStartSpeed, maxDirection.z * maxStartSpeed);
-	        if (this._velocityOverLifetime && this._velocityOverLifetime.enable) {
-	            var lifeMinVelocity;
-	            var lifeMaxVelocity;
-	            var velocity = this._velocityOverLifetime.velocity;
-	            switch (velocity.type) {
-	                case 0:
-	                    lifeMinVelocity = lifeMaxVelocity = velocity.constant;
-	                    break;
-	                case 1:
-	                    lifeMinVelocity = lifeMaxVelocity = new Vector3(velocity.gradientX.getAverageValue(), velocity.gradientY.getAverageValue(), velocity.gradientZ.getAverageValue());
-	                    break;
-	                case 2:
-	                    lifeMinVelocity = velocity.constantMin;
-	                    lifeMaxVelocity = velocity.constantMax;
-	                    break;
-	                case 3:
-	                    lifeMinVelocity = new Vector3(velocity.gradientXMin.getAverageValue(), velocity.gradientYMin.getAverageValue(), velocity.gradientZMin.getAverageValue());
-	                    lifeMaxVelocity = new Vector3(velocity.gradientXMax.getAverageValue(), velocity.gradientYMax.getAverageValue(), velocity.gradientZMax.getAverageValue());
-	                    break;
-	            }
-	        }
-	        var positionScale, velocityScale;
-	        var transform = this._owner.transform;
-	        var worldPosition = transform.position;
-	        var sizeScale = ShurikenParticleSystem._tempVector39;
-	        var renderMode = particleRender.renderMode;
-	        switch (this.scaleMode) {
-	            case 0:
-	                var scale = transform.getWorldLossyScale();
-	                positionScale = scale;
-	                sizeScale.x = scale.x;
-	                sizeScale.y = scale.z;
-	                sizeScale.z = scale.y;
-	                (renderMode === 1) && (velocityScale = scale);
-	                break;
-	            case 1:
-	                var localScale = transform.localScale;
-	                positionScale = localScale;
-	                sizeScale.x = localScale.x;
-	                sizeScale.y = localScale.z;
-	                sizeScale.z = localScale.y;
-	                (renderMode === 1) && (velocityScale = localScale);
-	                break;
-	            case 2:
-	                positionScale = transform.getWorldLossyScale();
-	                sizeScale.x = sizeScale.y = sizeScale.z = 1;
-	                (renderMode === 1) && (velocityScale = Vector3._ONE);
-	                break;
-	        }
-	        var minStratPosition, maxStratPosition;
-	        if (this._velocityOverLifetime && this._velocityOverLifetime.enable) ;
-	        else {
-	            minStratPosition = new Vector3(startMinVelocity.x * maxStartLifeTime, startMinVelocity.y * maxStartLifeTime, startMinVelocity.z * maxStartLifeTime);
-	            maxStratPosition = new Vector3(startMaxVelocity.x * maxStartLifeTime, startMaxVelocity.y * maxStartLifeTime, startMaxVelocity.z * maxStartLifeTime);
-	            if (this.scaleMode != 2) {
-	                Vector3.add(minPosition, minStratPosition, boundMin);
-	                Vector3.multiply(positionScale, boundMin, boundMin);
-	                Vector3.add(maxPosition, maxStratPosition, boundMax);
-	                Vector3.multiply(positionScale, boundMax, boundMax);
-	            }
-	            else {
-	                Vector3.multiply(positionScale, minPosition, boundMin);
-	                Vector3.add(boundMin, minStratPosition, boundMin);
-	                Vector3.multiply(positionScale, maxPosition, boundMax);
-	                Vector3.add(boundMax, maxStratPosition, boundMax);
-	            }
-	        }
-	        switch (this.simulationSpace) {
-	            case 0:
-	                break;
-	            case 1:
-	                Vector3.add(boundMin, worldPosition, boundMin);
-	                Vector3.add(boundMax, worldPosition, boundMax);
-	                break;
-	        }
-	        var maxSize, maxSizeY;
-	        switch (this.startSizeType) {
-	            case 0:
-	                if (this.threeDStartSize) {
-	                    var startSizeConstantSeparate = startSizeConstantSeparate;
-	                    maxSize = Math.max(startSizeConstantSeparate.x, startSizeConstantSeparate.y);
-	                    if (renderMode === 1)
-	                        maxSizeY = startSizeConstantSeparate.y;
-	                }
-	                else {
-	                    maxSize = this.startSizeConstant;
-	                    if (renderMode === 1)
-	                        maxSizeY = this.startSizeConstant;
-	                }
-	                break;
-	            case 1:
-	                break;
-	            case 2:
-	                if (this.threeDStartSize) {
-	                    var startSizeConstantMaxSeparate = startSizeConstantMaxSeparate;
-	                    maxSize = Math.max(startSizeConstantMaxSeparate.x, startSizeConstantMaxSeparate.y);
-	                    if (renderMode === 1)
-	                        maxSizeY = startSizeConstantMaxSeparate.y;
-	                }
-	                else {
-	                    maxSize = this.startSizeConstantMax;
-	                    if (renderMode === 1)
-	                        maxSizeY = this.startSizeConstantMax;
-	                }
-	                break;
-	            case 3:
-	                break;
-	        }
-	        if (this._sizeOverLifetime && this._sizeOverLifetime.enable) {
-	            var size = this._sizeOverLifetime.size;
-	            maxSize *= this._sizeOverLifetime.size.getMaxSizeInGradient();
-	        }
-	        var threeDMaxSize = ShurikenParticleSystem._tempVector30;
-	        var rotSize, nonRotSize;
-	        switch (renderMode) {
-	            case 0:
-	                rotSize = maxSize * ShurikenParticleSystem.halfKSqrtOf2;
-	                Vector3.scale(sizeScale, maxSize, threeDMaxSize);
-	                Vector3.subtract(boundMin, threeDMaxSize, boundMin);
-	                Vector3.add(boundMax, threeDMaxSize, boundMax);
-	                break;
-	            case 1:
-	                var maxStretchPosition = ShurikenParticleSystem._tempVector31;
-	                var maxStretchVelocity = ShurikenParticleSystem._tempVector32;
-	                var minStretchVelocity = ShurikenParticleSystem._tempVector33;
-	                var minStretchPosition = ShurikenParticleSystem._tempVector34;
-	                if (this._velocityOverLifetime && this._velocityOverLifetime.enable) ;
-	                else {
-	                    Vector3.multiply(velocityScale, startMaxVelocity, maxStretchVelocity);
-	                    Vector3.multiply(velocityScale, startMinVelocity, minStretchVelocity);
-	                }
-	                var sizeStretch = maxSizeY * particleRender.stretchedBillboardLengthScale;
-	                var maxStretchLength = Vector3.scalarLength(maxStretchVelocity) * particleRender.stretchedBillboardSpeedScale + sizeStretch;
-	                var minStretchLength = Vector3.scalarLength(minStretchVelocity) * particleRender.stretchedBillboardSpeedScale + sizeStretch;
-	                var norMaxStretchVelocity = ShurikenParticleSystem._tempVector35;
-	                var norMinStretchVelocity = ShurikenParticleSystem._tempVector36;
-	                Vector3.normalize(maxStretchVelocity, norMaxStretchVelocity);
-	                Vector3.scale(norMaxStretchVelocity, maxStretchLength, minStretchPosition);
-	                Vector3.subtract(maxStratPosition, minStretchPosition, minStretchPosition);
-	                Vector3.normalize(minStretchVelocity, norMinStretchVelocity);
-	                Vector3.scale(norMinStretchVelocity, minStretchLength, maxStretchPosition);
-	                Vector3.add(minStratPosition, maxStretchPosition, maxStretchPosition);
-	                rotSize = maxSize * ShurikenParticleSystem.halfKSqrtOf2;
-	                Vector3.scale(sizeScale, rotSize, threeDMaxSize);
-	                var halfNorMaxStretchVelocity = ShurikenParticleSystem._tempVector37;
-	                var halfNorMinStretchVelocity = ShurikenParticleSystem._tempVector38;
-	                Vector3.scale(norMaxStretchVelocity, 0.5, halfNorMaxStretchVelocity);
-	                Vector3.scale(norMinStretchVelocity, 0.5, halfNorMinStretchVelocity);
-	                Vector3.multiply(halfNorMaxStretchVelocity, sizeScale, halfNorMaxStretchVelocity);
-	                Vector3.multiply(halfNorMinStretchVelocity, sizeScale, halfNorMinStretchVelocity);
-	                Vector3.add(boundMin, halfNorMinStretchVelocity, boundMin);
-	                Vector3.min(boundMin, minStretchPosition, boundMin);
-	                Vector3.subtract(boundMin, threeDMaxSize, boundMin);
-	                Vector3.subtract(boundMax, halfNorMaxStretchVelocity, boundMax);
-	                Vector3.max(boundMax, maxStretchPosition, boundMax);
-	                Vector3.add(boundMax, threeDMaxSize, boundMax);
-	                break;
-	            case 2:
-	                maxSize *= Math.cos(0.78539816339744830961566084581988);
-	                nonRotSize = maxSize * 0.5;
-	                threeDMaxSize.x = sizeScale.x * nonRotSize;
-	                threeDMaxSize.y = sizeScale.z * nonRotSize;
-	                Vector3.subtract(boundMin, threeDMaxSize, boundMin);
-	                Vector3.add(boundMax, threeDMaxSize, boundMax);
-	                break;
-	            case 3:
-	                maxSize *= Math.cos(0.78539816339744830961566084581988);
-	                nonRotSize = maxSize * 0.5;
-	                Vector3.scale(sizeScale, nonRotSize, threeDMaxSize);
-	                Vector3.subtract(boundMin, threeDMaxSize, boundMin);
-	                Vector3.add(boundMax, threeDMaxSize, boundMax);
-	                break;
-	        }
-	        this._boundingBox.getCorners(this._boundingBoxCorners);
-	    }
 	    _generateBounds() {
 	        var particle = this._owner;
 	        var particleRender = particle.particleRenderer;
@@ -26205,7 +26094,7 @@
 	        if (nextFreeParticle === this._firstRetiredElement)
 	            return false;
 	        var transform = this._owner.transform;
-	        ShurikenParticleData.create(this, this._ownerRender, transform);
+	        ShurikenParticleData.create(this, this._ownerRender);
 	        var particleAge = this._currentTime - time;
 	        if (particleAge >= ShurikenParticleData.startLifeTime)
 	            return true;
@@ -26641,8 +26530,6 @@
 	ShurikenParticleSystem._tempVector35 = new Vector3();
 	ShurikenParticleSystem._tempVector36 = new Vector3();
 	ShurikenParticleSystem._tempVector37 = new Vector3();
-	ShurikenParticleSystem._tempVector38 = new Vector3();
-	ShurikenParticleSystem._tempVector39 = new Vector3();
 	ShurikenParticleSystem._tempPosition = new Vector3();
 	ShurikenParticleSystem._tempDirection = new Vector3();
 	ShurikenParticleSystem._type = GeometryElement._typeCounter++;
@@ -27694,23 +27581,6 @@
 	            this._setRootNode();
 	        }
 	    }
-	    _computeSubSkinnedDataNative(worldMatrixs, cacheAnimationNodeIndices, inverseBindPosesBuffer, boneIndices, data) {
-	        Laya.LayaGL.instance.computeSubSkinnedData(worldMatrixs, cacheAnimationNodeIndices, inverseBindPosesBuffer, boneIndices, data);
-	    }
-	    _computeSkinnedDataForNative() {
-	        if (this._cacheMesh && this._cacheAvatar || this._cacheMesh && !this._cacheAvatar) {
-	            var bindPoses = this._cacheMesh._inverseBindPoses;
-	            var pathMarks = this._cacheMesh._skinnedMatrixCaches;
-	            for (var i = 0, n = this._cacheMesh.subMeshCount; i < n; i++) {
-	                var subMeshBoneIndices = this._cacheMesh.getSubMesh(i)._boneIndicesList;
-	                var subData = this._skinnedData[i];
-	                for (var j = 0, m = subMeshBoneIndices.length; j < m; j++) {
-	                    var boneIndices = subMeshBoneIndices[j];
-	                    this._computeSubSkinnedData(bindPoses, boneIndices, subData[j], pathMarks);
-	                }
-	            }
-	        }
-	    }
 	}
 	SkinnedMeshRenderer._tempMatrix4x4 = new Matrix4x4();
 
@@ -27838,12 +27708,12 @@
 	        super();
 	        this.setShaderName("Trail");
 	        this._color = new Vector4(1.0, 1.0, 1.0, 1.0);
+	        this._shaderValues.setVector(TrailMaterial.TILINGOFFSET, new Vector4(1.0, 1.0, 0.0, 0.0));
 	        this._shaderValues.setVector(TrailMaterial.TINTCOLOR, new Vector4(1.0, 1.0, 1.0, 1.0));
 	        this.renderMode = TrailMaterial.RENDERMODE_ALPHABLENDED;
 	    }
 	    static __initDefine__() {
 	        TrailMaterial.SHADERDEFINE_MAINTEXTURE = Shader3D.getDefineByName("MAINTEXTURE");
-	        TrailMaterial.SHADERDEFINE_TILINGOFFSET = Shader3D.getDefineByName("TILINGOFFSET");
 	        TrailMaterial.SHADERDEFINE_ADDTIVEFOG = Shader3D.getDefineByName("ADDTIVEFOG");
 	    }
 	    get _TintColorR() {
@@ -28003,15 +27873,11 @@
 	    }
 	    set tilingOffset(value) {
 	        if (value) {
-	            if (value.x != 1 || value.y != 1 || value.z != 0 || value.w != 0)
-	                this._shaderValues.addDefine(TrailMaterial.SHADERDEFINE_TILINGOFFSET);
-	            else
-	                this._shaderValues.removeDefine(TrailMaterial.SHADERDEFINE_TILINGOFFSET);
+	            this._shaderValues.setVector(TrailMaterial.TILINGOFFSET, value);
 	        }
 	        else {
-	            this._shaderValues.removeDefine(TrailMaterial.SHADERDEFINE_TILINGOFFSET);
+	            this._shaderValues.getVector(TrailMaterial.TILINGOFFSET).setValue(1.0, 1.0, 0.0, 0.0);
 	        }
-	        this._shaderValues.setVector(TrailMaterial.TILINGOFFSET, value);
 	    }
 	    clone() {
 	        var dest = new TrailMaterial();
@@ -28322,7 +28188,6 @@
 	                if (nextIndex !== count)
 	                    this._owner._totalLength -= this._subDistance[nextIndex];
 	                if (this._isTempEndVertex && (nextIndex === count - 1)) {
-	                    var offset = this._floatCountPerVertices1 * i * 2;
 	                    var fixedPos = this._lastFixedVertexPosition;
 	                    fixedPos.x = this._vertices1[0];
 	                    fixedPos.y = this._vertices1[1];
@@ -28780,7 +28645,7 @@
 	            return;
 	        }
 	        var gl = Laya.LayaGL.instance;
-	        var skinnedDatas = state.renderElement.render._skinnedData;
+	        var skinnedDatas = state.renderElement ? state.renderElement.render._skinnedData : null;
 	        var glIndexFormat;
 	        var byteCount;
 	        switch (mesh.indexFormat) {
@@ -29064,7 +28929,6 @@
 	        instanceBufferState.bind();
 	        instanceBufferState.applyVertexBuffer(this._vertexBuffer);
 	        instanceBufferState.applyInstanceVertexBuffer(SubMeshInstanceBatch.instance.instanceWorldMatrixBuffer);
-	        instanceBufferState.applyInstanceVertexBuffer(SubMeshInstanceBatch.instance.instanceMVPMatrixBuffer);
 	        switch (instanceBufferStateType) {
 	            case Mesh.MESH_INSTANCEBUFFER_TYPE_SIMPLEANIMATOR:
 	                instanceBufferState.applyInstanceVertexBuffer(SubMeshInstanceBatch.instance.instanceSimpleAnimatorBuffer);
@@ -29833,7 +29697,7 @@
 
 	var EffectPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#ifdef COLOR\r\n\tvarying vec4 v_Color;\r\n#endif\r\nvarying vec2 v_Texcoord0;\r\n\r\n#ifdef MAINTEXTURE\r\n\tuniform sampler2D u_AlbedoTexture;\r\n#endif\r\n\r\nuniform vec4 u_AlbedoColor;\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\t#ifdef ADDTIVEFOG\r\n\t#else\r\n\t\tuniform vec3 u_FogColor;\r\n\t#endif\r\n#endif\r\n\r\nvoid main()\r\n{\r\n\tvec4 color =  2.0 * u_AlbedoColor;\r\n\t#ifdef COLOR\r\n\t\tcolor *= v_Color;\r\n\t#endif\r\n\t#ifdef MAINTEXTURE\r\n\t\tcolor *= texture2D(u_AlbedoTexture, v_Texcoord0);\r\n\t#endif\r\n\t\r\n\tgl_FragColor = color;\r\n\t\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact = clamp((1.0 / gl_FragCoord.w - u_FogStart) / u_FogRange, 0.0, 1.0);\r\n\t\t#ifdef ADDTIVEFOG\r\n\t\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0), lerpFact);\r\n\t\t#else\r\n\t\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, u_FogColor, lerpFact);\r\n\t\t#endif\r\n\t#endif\r\n}\r\n\r\n";
 
-	var EffectVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n#include \"Lighting.glsl\";\r\n#include \"LayaUtile.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nattribute vec4 a_Color;\r\nattribute vec2 a_Texcoord0;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_MvpMatrix;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\n\r\n#ifdef COLOR\r\n\tvarying vec4 v_Color;\r\n#endif\r\nvarying vec2 v_Texcoord0;\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\n\r\nvoid main()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tposition=skinTransform*a_Position;\r\n\t #else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\t\r\n\t#ifdef TILINGOFFSET\r\n\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t#else\r\n\t\tv_Texcoord0=a_Texcoord0;\r\n\t#endif\r\n\t\t\r\n\t#ifdef COLOR\r\n\t\tv_Color = a_Color;\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
+	var EffectVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n#include \"Lighting.glsl\";\r\n#include \"LayaUtile.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nattribute vec4 a_Color;\r\nattribute vec2 a_Texcoord0;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tuniform mat4 u_ViewProjection;\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\n\r\n#ifdef COLOR\r\n\tvarying vec4 v_Color;\r\n#endif\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform vec4 u_TilingOffset;\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\n\r\nvoid main()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tposition=skinTransform*a_Position;\r\n\t #else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = u_ViewProjection * a_WorldMat * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\t\r\n\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t\t\r\n\t#ifdef COLOR\r\n\t\tv_Color = a_Color;\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
 
 	var extendTerrainPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(FOG)\r\n\tuniform vec3 u_CameraPos;\r\n\tvarying vec3 v_Normal;\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tuniform DirectionLight u_DirectionLight;\r\n\t\t#endif\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tuniform PointLight u_PointLight;\r\n\t\t#endif\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tuniform SpotLight u_SpotLight;\r\n\t\t#endif\r\n\t#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n\t#endif\r\n#endif\r\n\r\n#include \"Shadow.glsl\"\r\n#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tvarying vec4 v_ShadowCoord;\r\n#endif\r\nvarying float v_posViewZ;\r\n\r\nuniform vec3 u_AmbientColor;\r\n\r\nuniform sampler2D u_SplatAlphaTexture;\r\n\r\nuniform sampler2D u_DiffuseTexture1;\r\nuniform sampler2D u_DiffuseTexture2;\r\nuniform sampler2D u_DiffuseTexture3;\r\nuniform sampler2D u_DiffuseTexture4;\r\nuniform sampler2D u_DiffuseTexture5;\r\n\r\nuniform vec4 u_DiffuseScaleOffset1;\r\nuniform vec4 u_DiffuseScaleOffset2;\r\nuniform vec4 u_DiffuseScaleOffset3;\r\nuniform vec4 u_DiffuseScaleOffset4;\r\nuniform vec4 u_DiffuseScaleOffset5;\r\n\r\nvarying vec2 v_Texcoord0;\r\n\r\n#ifdef LIGHTMAP\r\n\tuniform sampler2D u_LightMap;\r\n\tvarying vec2 v_LightMapUV;\r\n#endif\r\n\r\nvoid main()\r\n{\r\n\tvec4 splatAlpha = vec4(1.0);\r\n\t#ifdef ExtendTerrain_DETAIL_NUM1\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r;\r\n\t#endif\r\n\t#ifdef ExtendTerrain_DETAIL_NUM2\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tvec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScaleOffset2.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r + color2.xyz * (1.0 - splatAlpha.r);\r\n\t#endif\r\n\t#ifdef ExtendTerrain_DETAIL_NUM3\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tvec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScaleOffset2.xy);\r\n\t\tvec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScaleOffset3.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * (1.0 - splatAlpha.r - splatAlpha.g);\r\n\t#endif\r\n\t#ifdef ExtendTerrain_DETAIL_NUM4\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tvec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScaleOffset2.xy);\r\n\t\tvec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScaleOffset3.xy);\r\n\t\tvec4 color4 = texture2D(u_DiffuseTexture4, v_Texcoord0 * u_DiffuseScaleOffset4.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * splatAlpha.b + color4.xyz * (1.0 - splatAlpha.r - splatAlpha.g - splatAlpha.b);\r\n\t#endif\r\n\t#ifdef ExtendTerrain_DETAIL_NUM5\r\n\t\tsplatAlpha = texture2D(u_SplatAlphaTexture, v_Texcoord0);\r\n\t\tvec4 color1 = texture2D(u_DiffuseTexture1, v_Texcoord0 * u_DiffuseScaleOffset1.xy);\r\n\t\tvec4 color2 = texture2D(u_DiffuseTexture2, v_Texcoord0 * u_DiffuseScaleOffset2.xy);\r\n\t\tvec4 color3 = texture2D(u_DiffuseTexture3, v_Texcoord0 * u_DiffuseScaleOffset3.xy);\r\n\t\tvec4 color4 = texture2D(u_DiffuseTexture4, v_Texcoord0 * u_DiffuseScaleOffset4.xy);\r\n\t\tvec4 color5 = texture2D(u_DiffuseTexture5, v_Texcoord0 * u_DiffuseScaleOffset5.xy);\r\n\t\tgl_FragColor.xyz = color1.xyz * splatAlpha.r  + color2.xyz * splatAlpha.g + color3.xyz * splatAlpha.b + color4.xyz * splatAlpha.a + color5.xyz * (1.0 - splatAlpha.r - splatAlpha.g - splatAlpha.b - splatAlpha.a);\r\n\t#endif\r\n\t\tgl_FragColor.w = splatAlpha.a;\r\n\t\t\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 normal = v_Normal;\r\n\t\tvec3 dif, spe;\r\n\t#endif\r\n\r\n\tvec3 diffuse = vec3(0.0);\r\n\tvec3 specular= vec3(0.0);\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||defined(FOG)\r\n\t\tvec3 toEye;\r\n\t\t#ifdef FOG\r\n\t\t\ttoEye=u_CameraPos-v_PositionWorld;\r\n\t\t\tfloat toEyeLength=length(toEye);\r\n\t\t\ttoEye/=toEyeLength;\r\n\t\t#else\r\n\t\t\ttoEye=normalize(u_CameraPos-v_PositionWorld);\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tLayaAirBlinnPhongDiectionLight(vec3(0.0),1.0,normal,vec3(1.0),toEye,u_DirectionLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,vec3(0.0),1.0,normal,vec3(1.0),toEye,u_PointLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,vec3(0.0),1.0,normal,vec3(1.0),toEye,u_SpotLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\tLayaAirBlinnPhongDiectionLight(vec3(0.0),1.0,normal,vec3(1.0),toEye,directionLight,dif,spe);\r\n\t\t\t\tdiffuse+=dif;\r\n\t\t\t\tspecular+=spe;\r\n\t\t\t}\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,vec3(0.0),1.0,normal,vec3(1.0),toEye,pointLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,vec3(0.0),1.0,normal,vec3(1.0),toEye\t,spotLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\nvec3 globalDiffuse = u_AmbientColor;\r\n#ifdef LIGHTMAP\r\n\tglobalDiffuse += decodeHDR(texture2D(u_LightMap, v_LightMapUV),5.0);\r\n#endif\r\n\r\n#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tfloat shadowValue = shadowValue = sampleShadowmap(v_ShadowCoord);\r\n\tgl_FragColor = vec4(gl_FragColor.rgb * (globalDiffuse + diffuse) * shadowValue, gl_FragColor.a);\r\n#else\r\n\tgl_FragColor = vec4(gl_FragColor.rgb * (globalDiffuse + diffuse), gl_FragColor.a);\r\n#endif\r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\tgl_FragColor.rgb += specular * shadowValue;\r\n\t#else\r\n\t\tgl_FragColor.rgb += specular;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef FOG\r\n\tfloat lerpFact=clamp((toEyeLength-u_FogStart)/u_FogRange,0.0,1.0);\r\n\tgl_FragColor.rgb=mix(gl_FragColor.rgb,u_FogColor,lerpFact);\r\n#endif\r\n}\r\n\r\n\r\n\r\n\r\n\r\n";
 
@@ -29841,7 +29705,7 @@
 
 	var GlobalIllumination = "struct LayaGIInput\r\n{\r\n\tvec2 lightmapUV;\r\n\tvec3 worldPos;\r\n};\r\n\r\n#define LAYA_SPECCUBE_LOD_STEPS 6.0\r\n\r\nuniform vec3 u_AmbientColor;\r\n\r\n#if defined(GI_AMBIENT_SH)\r\n\tuniform vec4 u_AmbientSHAr;\r\n\tuniform vec4 u_AmbientSHAg;\r\n\tuniform vec4 u_AmbientSHAb;\r\n\tuniform vec4 u_AmbientSHBr;\r\n\tuniform vec4 u_AmbientSHBg;\r\n\tuniform vec4 u_AmbientSHBb;\r\n\tuniform vec4 u_AmbientSHC;\r\n#endif\r\n\r\nuniform samplerCube u_ReflectTexture;\r\nuniform vec4 u_ReflectCubeHDRParams;\r\n\r\n#ifdef SPECCUBE_BOX_PROJECTION\r\n\tuniform vec3 u_SpecCubeProbePosition;\r\n\tuniform vec3 u_SpecCubeBoxMax;\r\n\tuniform vec3 u_SpecCubeBoxMin;\r\n#endif\r\n\r\n\r\n#ifdef GI_AMBIENT_SH\r\n\tmediump vec3 shEvalLinearL0L1(mediump vec4 normal)\r\n\t{\r\n\t\tmediump vec3 x;\r\n\t\t// Linear (L1) + constant (L0) polynomial terms\r\n\t\tx.r = dot(u_AmbientSHAr, normal);\r\n\t\tx.g = dot(u_AmbientSHAg, normal);\r\n\t\tx.b = dot(u_AmbientSHAb, normal);\r\n\t\treturn x;\r\n\t}\r\n\r\n\tmediump vec3 shEvalLinearL2(mediump vec4 normal)\r\n\t{\r\n\t\tmediump vec3 x1,x2;\r\n\t\t// 4 of the quadratic (L2) polynomials\r\n\t\tmediump vec4 vB = normal.xyzz * normal.yzzx;\r\n\t\tx1.r = dot(u_AmbientSHBr, vB);\r\n\t\tx1.g = dot(u_AmbientSHBg, vB);\r\n\t\tx1.b = dot(u_AmbientSHBb, vB);\r\n\r\n\t\t// Final (5th) quadratic (L2) polynomial\r\n\t\tmediump float vC = normal.x*normal.x - normal.y*normal.y;\r\n\t\tx2 = u_AmbientSHC.rgb * vC;\r\n\r\n\t\treturn x1 + x2;\r\n\t}\r\n\t\r\n\tmediump vec3 shadeSHPerPixel(mediump vec3 normal)\r\n\t{\r\n\t\tmediump vec3 ambientContrib;\r\n\t\tmediump vec4 normalV4=vec4(-normal.x,normal.yz, 1.0);//Note:SH Data is left-hand,so x need inverse\r\n\t\tambientContrib = shEvalLinearL0L1(normalV4);\r\n\t\tambientContrib += shEvalLinearL2(normalV4);\r\n\t\tmediump vec3 ambient = max(vec3(0.0), ambientContrib);\r\n\t\tambient = layaLinearToGammaSpace(ambient);\r\n\t\treturn ambient;\r\n\t}\r\n#endif\r\n\r\n\r\n\r\n mediump vec3 BoxProjectedCubemapDirection(mediump vec3 worldRefl,mediump vec3 worldPos,mediump vec3 cubemapCenter,mediump vec3 boxMin,mediump vec3 boxMax){\r\n\t mediump vec3 nrdir = normalize(worldRefl);\r\n\t mediump vec3 rbmax = (boxMax - worldPos);\r\n\t mediump vec3 rbmin = (boxMin - worldPos);\r\n\t mediump vec3 select = step(vec3(0.0), worldRefl);\r\n\t mediump vec3 rbminmax = mix(rbmin, rbmax, select);\r\n\trbminmax = rbminmax / nrdir;\r\n\tmediump float scalar = min(min(rbminmax.x, rbminmax.y), rbminmax.z);\r\n\t mediump vec3 worldChangeRefl = nrdir * scalar + (worldPos - cubemapCenter);\r\n\treturn worldChangeRefl;\r\n}\r\n\r\n\r\nmediump vec3 layaDecodeDirectionalLightmap (mediump vec3 color, lowp vec4 dirTex, mediump vec3 normalWorld)\r\n{\r\n    // In directional (non-specular) mode Enlighten bakes dominant light direction\r\n    // in a way, that using it for half Lambert and then dividing by a \"rebalancing coefficient\"\r\n    // gives a result close to plain diffuse response lightmaps, but normalmapped.\r\n\r\n    // Note that dir is not unit length on purpose. Its length is \"directionality\", like\r\n    // for the directional specular lightmaps.\r\n\tlowp vec3 directional=dirTex.xyz - 0.5;\r\n\tdirectional.x=-directional.x;//NOTE:because coord System\r\n    mediump float halfLambert = dot(normalWorld,directional) + 0.5;\r\n\r\n    return color * halfLambert / max(1e-4, dirTex.w);\r\n}\r\n\r\nvec3 layaGIBase(LayaGIInput giInput,mediump float occlusion, mediump vec3 normalWorld)\r\n{\r\n\tvec3 indirectDiffuse;\r\n\t#ifdef LIGHTMAP\t\r\n\t\tmediump vec3 bakedColor =decodeHDR(texture2D(u_LightMap, giInput.lightmapUV),5.0);\r\n\t\t#ifdef LIGHTMAP_DIRECTIONAL\r\n\t\t\tlowp vec4 bakedDirTex = texture2D (u_LightMapDirection, giInput.lightmapUV);\r\n            indirectDiffuse = layaDecodeDirectionalLightmap (bakedColor, bakedDirTex, normalWorld);\r\n\t\t#else //unDirectional lightmap\r\n\t\t\tindirectDiffuse = bakedColor;\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef GI_AMBIENT_SH\r\n\t\t\tindirectDiffuse = shadeSHPerPixel(normalWorld);\r\n\t\t#else\r\n\t\t\tindirectDiffuse = u_AmbientColor; //already in gamma space\r\n\t\t#endif\r\n\t#endif\r\n\r\n\tindirectDiffuse*=occlusion;\r\n\treturn indirectDiffuse;\r\n}\r\n\r\nmediump vec3 layaGlossyEnvironment(mediump vec4 glossIn)\r\n{\r\n\tmediump float perceptualRoughness = glossIn.a;\r\n\r\n\t// use approximation to solve,below is more reasonable,but maybe slow. \r\n\t// float m = perceptualRoughnessToRoughness(perceptualRoughness); // m is the real roughness parameter\r\n    // const float fEps = 1.192092896e-07F;        // smallest such that 1.0+FLT_EPSILON != 1.0  (+1e-4h is NOT good here. is visibly very wrong)\r\n    // float n =  (2.0/max(fEps, m*m))-2.0;        // remap to spec power. See eq. 21 in --> https://dl.dropboxusercontent.com/u/55891920/papers/mm_brdf.pdf\r\n    // n /= 4;                                     // remap from n_dot_h formulatino to n_dot_r. See section \"Pre-convolved Cube Maps vs Path Tracers\" --> https://s3.amazonaws.com/docs.knaldtech.com/knald/1.0.0/lys_power_drops.html\r\n    // perceptualRoughness = pow( 2/(n+2), 0.25);  // remap back to square root of real roughness (0.25 include both the sqrt root of the conversion and sqrt for going from roughness to perceptualRoughness)\r\n\tperceptualRoughness = perceptualRoughness * (1.7 - 0.7*perceptualRoughness);//just a approximation,but fast.\r\n \r\n\tmediump float mip = perceptualRoughness * LAYA_SPECCUBE_LOD_STEPS;\r\n\tmediump vec3 uvw = glossIn.rgb;\r\n\tuvw.x=-uvw.x;//Note:reflectCube is left-hand,so x need inverse\r\n\tmediump vec4 rgbm=textureCubeLodEXT(u_ReflectTexture,uvw,mip);\r\n\treturn decodeHDR(rgbm,u_ReflectCubeHDRParams.x);\r\n}\r\n\r\nmediump vec3 layaGIIndirectSpecular(LayaGIInput giInput,mediump float occlusion, vec4 glossIn)\r\n{\r\n\t#ifdef SPECCUBE_BOX_PROJECTION\r\n\t\tvec3 originalReflUVW = glossIn.xyz;\r\n\t\tglossIn.xyz =BoxProjectedCubemapDirection(originalReflUVW,giInput.worldPos,u_SpecCubeProbePosition,u_SpecCubeBoxMin,u_SpecCubeBoxMax);\r\n\t#endif\r\n\tmediump vec3 specular = layaGlossyEnvironment(glossIn);\r\n\treturn specular * occlusion;\r\n}\r\n\r\n\r\nLayaGI layaGlobalIllumination(LayaGIInput giInput,mediump float occlusion, mediump vec3 normalWorld,mediump vec4 uvwRoughness)\r\n{\r\n\tLayaGI gi;\r\n\tgi.diffuse = layaGIBase(giInput,occlusion, normalWorld);\r\n\tgi.specular = layaGIIndirectSpecular(giInput,occlusion, uvwRoughness);\r\n\treturn gi;\r\n}\r\n\r\n\r\n";
 
-	var LightingGLSL = "#ifdef GRAPHICS_API_GLES3\r\n\t#define INVERSE_MAT(mat) inverse(mat)\r\n#else\r\n\t#define INVERSE_MAT(mat) inverseMat(mat)\r\n#endif\r\n\r\nstruct DirectionLight {\r\n\tvec3 color;\r\n\tvec3 direction;\r\n};\r\n\r\nstruct PointLight {\r\n\tvec3 color;\r\n\tvec3 position;\r\n\tfloat range;\r\n};\r\n\r\nstruct SpotLight {\r\n\tvec3 color;\r\n\tvec3 position;\r\n\tfloat range;\r\n\tvec3 direction;\r\n\tfloat spot;\r\n};\r\n\r\nstruct LayaGI{\r\n\tvec3 diffuse;\r\n\tvec3 specular;\r\n};\r\n\r\nstruct LayaLight{\r\n\tvec3 color;\r\n\tvec3 dir;\r\n};\r\n\r\nconst int c_ClusterBufferWidth = CLUSTER_X_COUNT*CLUSTER_Y_COUNT;\r\nconst int c_ClusterBufferHeight = CLUSTER_Z_COUNT*(1+int(ceil(float(MAX_LIGHT_COUNT_PER_CLUSTER)/4.0)));\r\nconst int c_ClusterBufferFloatWidth = c_ClusterBufferWidth*4;\r\n\r\n#ifndef GRAPHICS_API_GLES3\r\n\tmat3 inverseMat(mat3 m) {\r\n\t\tfloat a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];\r\n\t\tfloat a10 = m[1][0], a11 = m[1][1], a12 = m[1][2];\r\n\t\tfloat a20 = m[2][0], a21 = m[2][1], a22 = m[2][2];\r\n\r\n\t\tfloat b01 = a22 * a11 - a12 * a21;\r\n\t\tfloat b11 = -a22 * a10 + a12 * a20;\r\n\t\tfloat b21 = a21 * a10 - a11 * a20;\r\n\r\n\t\tfloat det = a00 * b01 + a01 * b11 + a02 * b21;\r\n\r\n\t\treturn mat3(b01, (-a22 * a01 + a02 * a21), (a12 * a01 - a02 * a11),\r\n\t\t\t\t\tb11, (a22 * a00 - a02 * a20), (-a12 * a00 + a02 * a10),\r\n\t\t\t\t\tb21, (-a21 * a00 + a01 * a20), (a11 * a00 - a01 * a10)) / det;\r\n\t}\r\n#endif\r\n\r\nivec4 getClusterInfo(sampler2D clusterBuffer,mat4 viewMatrix,vec4 viewport,vec3 position,vec4 fragCoord,vec4 projectParams)\r\n{\r\n\tvec3 viewPos = vec3(viewMatrix*vec4(position, 1.0)); //position in viewspace\r\n\r\n\tint clusterXIndex = int(floor(fragCoord.x/ (float(viewport.z)/float(CLUSTER_X_COUNT))));\r\n    int clusterYIndex = int(floor((viewport.w * (projectParams.z <0.0? 0.0 : 1.0) - fragCoord.y * projectParams.z)/ (float(viewport.w)/float(CLUSTER_Y_COUNT))));//Maybe Flipped ProjectMatrix\r\n\tfloat zSliceParam =float(CLUSTER_Z_COUNT)/log2(projectParams.y / projectParams.x);\r\n \tint clusterZIndex = int(floor(log2(-viewPos.z) * zSliceParam- log2(projectParams.x) * zSliceParam));//projectParams x:cameraNear y:cameraFar\r\n\r\n\tvec2 uv= vec2((float(clusterXIndex + clusterYIndex * CLUSTER_X_COUNT)+0.5)/float(c_ClusterBufferWidth),\r\n\t\t\t\t(float(clusterZIndex)+0.5)/float(c_ClusterBufferHeight));\r\n\tvec4 clusterPixel=texture2D(clusterBuffer, uv);\r\n\treturn ivec4(clusterPixel);//X:Point Count Y:Spot Count Z、W:Light Offset\r\n}\r\n\r\n\r\nint getLightIndex(sampler2D clusterBuffer,int offset,int index) \r\n{\r\n\tint totalOffset=offset+index;\r\n\tint row=totalOffset/c_ClusterBufferFloatWidth;\r\n\tint lastRowFloat=totalOffset-row*c_ClusterBufferFloatWidth;\r\n\tint col=lastRowFloat/4;\r\n\tvec2 uv=vec2((float(col)+0.5)/float(c_ClusterBufferWidth),\r\n\t\t\t\t(float(row)+0.5)/float(c_ClusterBufferHeight));\r\n\tvec4 texel = texture2D(clusterBuffer, uv);\r\n    int pixelComponent = lastRowFloat-col*4;\r\n    if (pixelComponent == 0) \r\n      return int(texel.x);\r\n    else if (pixelComponent == 1) \r\n      return int(texel.y);\r\n    else if (pixelComponent == 2) \r\n      return int(texel.z);\r\n    else //pixelComponent==3\r\n      return int(texel.w);\r\n}\r\n\r\nDirectionLight getDirectionLight(sampler2D lightBuffer,int index) \r\n{\r\n    DirectionLight light;\r\n    float v = (float(index)+0.5)/ float(MAX_LIGHT_COUNT);\r\n    vec4 p1 = texture2D(lightBuffer, vec2(0.125,v));\r\n    vec4 p2 = texture2D(lightBuffer, vec2(0.375,v));\r\n\tlight.color=p1.rgb;\r\n    light.direction = p2.rgb;\r\n    return light;\r\n}\r\n\r\nPointLight getPointLight(sampler2D lightBuffer,sampler2D clusterBuffer,ivec4 clusterInfo,int index) \r\n{\r\n    PointLight light;\r\n\tint pointIndex=getLightIndex(clusterBuffer,clusterInfo.z*c_ClusterBufferFloatWidth+clusterInfo.w,index);\r\n    float v = (float(pointIndex)+0.5)/ float(MAX_LIGHT_COUNT);\r\n    vec4 p1 = texture2D(lightBuffer, vec2(0.125,v));\r\n    vec4 p2 = texture2D(lightBuffer, vec2(0.375,v));\r\n\tlight.color=p1.rgb;\r\n\tlight.range = p1.a;\r\n    light.position = p2.rgb;\r\n    return light;\r\n}\r\n\r\nSpotLight getSpotLight(sampler2D lightBuffer,sampler2D clusterBuffer,ivec4 clusterInfo,int index) \r\n{\r\n    SpotLight light;\r\n\tint spoIndex=getLightIndex(clusterBuffer,clusterInfo.z*c_ClusterBufferFloatWidth+clusterInfo.w,clusterInfo.x+index);\r\n    float v = (float(spoIndex)+0.5)/ float(MAX_LIGHT_COUNT);\r\n    vec4 p1 = texture2D(lightBuffer, vec2(0.125,v));\r\n    vec4 p2 = texture2D(lightBuffer, vec2(0.375,v));\r\n\tvec4 p3 = texture2D(lightBuffer, vec2(0.625,v));\r\n    light.color = p1.rgb;\r\n\tlight.range=p1.a;\r\n    light.position = p2.rgb;\r\n\tlight.spot = p2.a;\r\n\tlight.direction = p3.rgb;\r\n    return light;\r\n}\r\n\r\n// Laya中使用衰减纹理\r\nfloat LayaAttenuation(in vec3 L,in float invLightRadius) {\r\n\tfloat fRatio = clamp(length(L) * invLightRadius,0.0,1.0);\r\n\tfRatio *= fRatio;\r\n\treturn 1.0 / (1.0 + 25.0 * fRatio)* clamp(4.0*(1.0 - fRatio),0.0,1.0); //fade to black as if 4 pixel texture\r\n}\r\n\r\n// Same as Just Cause 2 and Crysis 2 (you can read GPU Pro 1 book for more information)\r\nfloat BasicAttenuation(in vec3 L,in float invLightRadius) {\r\n\tvec3 distance = L * invLightRadius;\r\n\tfloat attenuation = clamp(1.0 - dot(distance, distance),0.0,1.0); // Equals float attenuation = saturate(1.0f - dot(L, L) / (lightRadius *  lightRadius));\r\n\treturn attenuation * attenuation;\r\n}\r\n\r\n// Inspired on http://fools.slindev.com/viewtopic.php?f=11&t=21&view=unread#unread\r\nfloat NaturalAttenuation(in vec3 L,in float invLightRadius) {\r\n\tfloat attenuationFactor = 30.0;\r\n\tvec3 distance = L * invLightRadius;\r\n\tfloat attenuation = dot(distance, distance); // Equals float attenuation = dot(L, L) / (lightRadius *  lightRadius);\r\n\tattenuation = 1.0 / (attenuation * attenuationFactor + 1.0);\r\n\t// Second we move down the function therewith it reaches zero at abscissa 1:\r\n\tattenuationFactor = 1.0 / (attenuationFactor + 1.0); //attenuationFactor contains now the value we have to subtract\r\n\tattenuation = max(attenuation - attenuationFactor, 0.0); // The max fixes a bug.\r\n\t// Finally we expand the equation along the y-axis so that it starts with a function value of 1 again.\r\n\tattenuation /= 1.0 - attenuationFactor;\r\n\treturn attenuation;\r\n}\r\n\r\nvoid LayaAirBlinnPhongLight (in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir,in vec3 lightColor, in vec3 lightVec,out vec3 diffuseColor,out vec3 specularColor) {\r\n\tmediump vec3 h = normalize(viewDir-lightVec);\r\n\tlowp float ln = max (0.0, dot (-lightVec,normal));\r\n\tfloat nh = max (0.0, dot (h,normal));\r\n\tdiffuseColor=lightColor * ln;\r\n\tspecularColor=lightColor *specColor*pow (nh, specColorIntensity*128.0) * gloss;\r\n}\r\n\r\nvoid LayaAirBlinnPhongDiectionLight (in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir, in DirectionLight light,out vec3 diffuseColor,out vec3 specularColor) {\r\n\tvec3 lightVec=normalize(light.direction);\r\n\tLayaAirBlinnPhongLight(specColor,specColorIntensity,normal,gloss,viewDir,light.color,lightVec,diffuseColor,specularColor);\r\n}\r\n\r\nvoid LayaAirBlinnPhongPointLight (in vec3 pos,in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir, in PointLight light,out vec3 diffuseColor,out vec3 specularColor) {\r\n\tvec3 lightVec =  pos-light.position;\r\n\tLayaAirBlinnPhongLight(specColor,specColorIntensity,normal,gloss,viewDir,light.color,lightVec/length(lightVec),diffuseColor,specularColor);\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range);\r\n\tdiffuseColor *= attenuate;\r\n\tspecularColor*= attenuate;\r\n}\r\n\r\nvoid LayaAirBlinnPhongSpotLight (in vec3 pos,in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir, in SpotLight light,out vec3 diffuseColor,out vec3 specularColor) {\r\n\tvec3 lightVec =  pos-light.position;\r\n\tvec3 normalLightVec=lightVec/length(lightVec);\r\n\tLayaAirBlinnPhongLight(specColor,specColorIntensity,normal,gloss,viewDir,light.color,normalLightVec,diffuseColor,specularColor);\r\n\tvec2 cosAngles=cos(vec2(light.spot,light.spot*0.5)*0.5);//ConeAttenuation\r\n\tfloat dl=dot(normalize(light.direction),normalLightVec);\r\n\tdl*=smoothstep(cosAngles[0],cosAngles[1],dl);\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range)*dl;\r\n\tdiffuseColor *=attenuate;\r\n\tspecularColor *=attenuate;\r\n}\r\n\r\nvec3 NormalSampleToWorldSpace(vec3 normalMapSample, vec3 unitNormal, vec3 tangent,vec3 binormal) {\r\n\tvec3 normalT =vec3(2.0*normalMapSample.x - 1.0,1.0-2.0*normalMapSample.y,2.0*normalMapSample.z - 1.0);\r\n\tmediump vec3 N = unitNormal;\r\n\tmediump vec3 T = tangent;\r\n\tmediump vec3 B = binormal;\r\n\tmat3 TBN = mat3(T, B, N);\r\n\r\n\t// Transform from tangent space to world space.\r\n\tvec3 bumpedNormal =normalize(TBN*normalT);\r\n\treturn bumpedNormal;\r\n}\r\n\r\nvec3 NormalSampleToWorldSpace1(vec4 normalMapSample, vec3 tangent, vec3 binormal, vec3 unitNormal) {\r\n\tvec3 normalT;\r\n\tnormalT.x = 2.0 * normalMapSample.x - 1.0;\r\n\tnormalT.y = 1.0 - 2.0 * normalMapSample.y;\r\n\tnormalT.z = sqrt(1.0 - clamp(dot(normalT.xy, normalT.xy), 0.0, 1.0));\r\n\r\n\tvec3 T = normalize(tangent);\r\n\tvec3 B = normalize(binormal);\r\n\tvec3 N = normalize(unitNormal);\r\n\tmat3 TBN = mat3(T, B, N);\r\n\r\n\t// Transform from tangent space to world space.\r\n\tvec3 bumpedNormal = TBN * normalize(normalT);\r\n\r\n\treturn bumpedNormal;\r\n}\r\n\r\nvec3 DecodeLightmap(vec4 color) {\r\n\treturn color.rgb*color.a*5.0;\r\n}\r\n\r\nvec3 decodeHDR(vec4 color,float range) {\r\n\treturn color.rgb*color.a*range;\r\n}\r\n\r\nvec2 TransformUV(vec2 texcoord,vec4 tilingOffset) {\r\n\tvec2 transTexcoord=vec2(texcoord.x,texcoord.y-1.0)*tilingOffset.xy+vec2(tilingOffset.z,-tilingOffset.w);\r\n\ttransTexcoord.y+=1.0;\r\n\treturn transTexcoord;\r\n}\r\n\r\nvec4 remapGLPositionZ(vec4 position) {\r\n\tposition.z=position.z * 2.0 - position.w;\r\n\treturn position;\r\n}\r\n\r\nmediump vec3 layaLinearToGammaSpace (mediump vec3 linRGB)\r\n{\r\n    linRGB = max(linRGB, vec3(0.0));\r\n    // An almost-perfect approximation from http://chilliant.blogspot.com.au/2012/08/srgb-approximations-for-hlsl.html?m=1\r\n    return max(1.055 * pow(linRGB,vec3(0.416666667)) - 0.055, 0.0);   \r\n}\r\n\r\nLayaLight layaDirectionLightToLight(in DirectionLight light,in float attenuate)\r\n{\r\n\tLayaLight relight;\r\n\trelight.color = light.color*attenuate;\r\n\trelight.dir = light.direction;\r\n\treturn relight;\r\n}\r\n\r\nLayaLight layaPointLightToLight(in vec3 pos,in vec3 normal, in PointLight light,in float attenuate)\r\n{\r\n\tLayaLight relight;\r\n\tvec3 lightVec =  pos-light.position;\r\n\tattenuate *= LayaAttenuation(lightVec, 1.0/light.range);\r\n\trelight.color = light.color*attenuate;\r\n\trelight.dir = normalize(lightVec);\r\n\treturn relight;\r\n}\r\n\r\nLayaLight layaSpotLightToLight(in vec3 pos,in vec3 normal, in SpotLight light,in float attenuate)\r\n{\r\n\tLayaLight relight;\r\n\tvec3 lightVec =  pos-light.position;\r\n\tvec3 normalLightVec=lightVec/length(lightVec);\r\n\tvec2 cosAngles=cos(vec2(light.spot,light.spot*0.5)*0.5);//ConeAttenuation\r\n\tfloat dl=dot(normalize(light.direction),normalLightVec);\r\n\tdl*=smoothstep(cosAngles[0],cosAngles[1],dl);\r\n\tattenuate *= LayaAttenuation(lightVec, 1.0/light.range)*dl;\r\n\trelight.dir = normalLightVec;\r\n\trelight.color = light.color*attenuate;\r\n\treturn relight;\r\n}\r\n\r\n\r\n\r\n\r\n";
+	var LightingGLSL = "#ifdef GRAPHICS_API_GLES3\r\n\t#define INVERSE_MAT(mat) inverse(mat)\r\n#else\r\n\t#define INVERSE_MAT(mat) inverseMat(mat)\r\n#endif\r\n\r\nstruct DirectionLight {\r\n\tvec3 color;\r\n\tvec3 direction;\r\n};\r\n\r\nstruct PointLight {\r\n\tvec3 color;\r\n\tvec3 position;\r\n\tfloat range;\r\n};\r\n\r\nstruct SpotLight {\r\n\tvec3 color;\r\n\tvec3 position;\r\n\tfloat range;\r\n\tvec3 direction;\r\n\tfloat spot;\r\n};\r\n\r\nstruct LayaGI{\r\n\tvec3 diffuse;\r\n\tvec3 specular;\r\n};\r\n\r\nstruct LayaLight{\r\n\tvec3 color;\r\n\tvec3 dir;\r\n};\r\n\r\nconst int c_ClusterBufferWidth = CLUSTER_X_COUNT*CLUSTER_Y_COUNT;\r\nconst int c_ClusterBufferHeight = CLUSTER_Z_COUNT*(1+int(ceil(float(MAX_LIGHT_COUNT_PER_CLUSTER)/4.0)));\r\nconst int c_ClusterBufferFloatWidth = c_ClusterBufferWidth*4;\r\n\r\n#ifndef GRAPHICS_API_GLES3\r\n\tmat3 inverseMat(mat3 m) {\r\n\t\tfloat a00 = m[0][0], a01 = m[0][1], a02 = m[0][2];\r\n\t\tfloat a10 = m[1][0], a11 = m[1][1], a12 = m[1][2];\r\n\t\tfloat a20 = m[2][0], a21 = m[2][1], a22 = m[2][2];\r\n\r\n\t\tfloat b01 = a22 * a11 - a12 * a21;\r\n\t\tfloat b11 = -a22 * a10 + a12 * a20;\r\n\t\tfloat b21 = a21 * a10 - a11 * a20;\r\n\r\n\t\tfloat det = a00 * b01 + a01 * b11 + a02 * b21;\r\n\r\n\t\treturn mat3(b01, (-a22 * a01 + a02 * a21), (a12 * a01 - a02 * a11),\r\n\t\t\t\t\tb11, (a22 * a00 - a02 * a20), (-a12 * a00 + a02 * a10),\r\n\t\t\t\t\tb21, (-a21 * a00 + a01 * a20), (a11 * a00 - a01 * a10)) / det;\r\n\t}\r\n#endif\r\n\r\n\t#ifdef THICKNESSMAP\r\n\t\tuniform sampler2D u_ThinknessTexture;\r\n\t#endif\r\n#ifdef ENABLETRANSMISSION\r\n\tuniform float u_TransmissionRate;\r\n\tuniform float u_BackDiffuse;\r\n\tuniform float u_BackScale;\r\n\tuniform vec4 u_TransmissionColor;\r\n\r\n\r\n\tvec3 SubSurfaceIBack(vec3 lightDir,vec3 viewDir,float thinknessFactor){\r\n\t\tvec3 H = normalize(lightDir);\r\n\t\tfloat VdotH = pow(clamp(dot(viewDir,H),0.0,1.0),u_BackDiffuse)*u_BackScale;\r\n\t\tvec3 I;\r\n\t\t#ifdef THICKNESSMAP\r\n\t\t\tI = u_TransmissionColor.rgb*VdotH*thinknessFactor;\r\n\t\t#else\r\n\t\t\tI = u_TransmissionColor.rgb*VdotH;\r\n\t\t#endif\r\n\t\treturn I;\r\n\t}\r\n#endif\r\n\r\nivec4 getClusterInfo(sampler2D clusterBuffer,mat4 viewMatrix,vec4 viewport,vec3 position,vec4 fragCoord,vec4 projectParams)\r\n{\r\n\tvec3 viewPos = vec3(viewMatrix*vec4(position, 1.0)); //position in viewspace\r\n\r\n\tint clusterXIndex = int(floor(fragCoord.x/ (float(viewport.z)/float(CLUSTER_X_COUNT))));\r\n    int clusterYIndex = int(floor((viewport.w * (projectParams.z <0.0? 0.0 : 1.0) - fragCoord.y * projectParams.z)/ (float(viewport.w)/float(CLUSTER_Y_COUNT))));//Maybe Flipped ProjectMatrix\r\n\tfloat zSliceParam =float(CLUSTER_Z_COUNT)/log2(projectParams.y / projectParams.x);\r\n \tint clusterZIndex = int(floor(log2(-viewPos.z) * zSliceParam- log2(projectParams.x) * zSliceParam));//projectParams x:cameraNear y:cameraFar\r\n\r\n\tvec2 uv= vec2((float(clusterXIndex + clusterYIndex * CLUSTER_X_COUNT)+0.5)/float(c_ClusterBufferWidth),\r\n\t\t\t\t(float(clusterZIndex)+0.5)/float(c_ClusterBufferHeight));\r\n\tvec4 clusterPixel=texture2D(clusterBuffer, uv);\r\n\treturn ivec4(clusterPixel);//X:Point Count Y:Spot Count Z、W:Light Offset\r\n}\r\n\r\n\r\nint getLightIndex(sampler2D clusterBuffer,int offset,int index) \r\n{\r\n\tint totalOffset=offset+index;\r\n\tint row=totalOffset/c_ClusterBufferFloatWidth;\r\n\tint lastRowFloat=totalOffset-row*c_ClusterBufferFloatWidth;\r\n\tint col=lastRowFloat/4;\r\n\tvec2 uv=vec2((float(col)+0.5)/float(c_ClusterBufferWidth),\r\n\t\t\t\t(float(row)+0.5)/float(c_ClusterBufferHeight));\r\n\tvec4 texel = texture2D(clusterBuffer, uv);\r\n    int pixelComponent = lastRowFloat-col*4;\r\n    if (pixelComponent == 0) \r\n      return int(texel.x);\r\n    else if (pixelComponent == 1) \r\n      return int(texel.y);\r\n    else if (pixelComponent == 2) \r\n      return int(texel.z);\r\n    else //pixelComponent==3\r\n      return int(texel.w);\r\n}\r\n\r\nDirectionLight getDirectionLight(sampler2D lightBuffer,int index) \r\n{\r\n    DirectionLight light;\r\n    float v = (float(index)+0.5)/ float(MAX_LIGHT_COUNT);\r\n    vec4 p1 = texture2D(lightBuffer, vec2(0.125,v));\r\n    vec4 p2 = texture2D(lightBuffer, vec2(0.375,v));\r\n\tlight.color=p1.rgb;\r\n    light.direction = p2.rgb;\r\n    return light;\r\n}\r\n\r\nPointLight getPointLight(sampler2D lightBuffer,sampler2D clusterBuffer,ivec4 clusterInfo,int index) \r\n{\r\n    PointLight light;\r\n\tint pointIndex=getLightIndex(clusterBuffer,clusterInfo.z*c_ClusterBufferFloatWidth+clusterInfo.w,index);\r\n    float v = (float(pointIndex)+0.5)/ float(MAX_LIGHT_COUNT);\r\n    vec4 p1 = texture2D(lightBuffer, vec2(0.125,v));\r\n    vec4 p2 = texture2D(lightBuffer, vec2(0.375,v));\r\n\tlight.color=p1.rgb;\r\n\tlight.range = p1.a;\r\n    light.position = p2.rgb;\r\n    return light;\r\n}\r\n\r\nSpotLight getSpotLight(sampler2D lightBuffer,sampler2D clusterBuffer,ivec4 clusterInfo,int index) \r\n{\r\n    SpotLight light;\r\n\tint spoIndex=getLightIndex(clusterBuffer,clusterInfo.z*c_ClusterBufferFloatWidth+clusterInfo.w,clusterInfo.x+index);\r\n    float v = (float(spoIndex)+0.5)/ float(MAX_LIGHT_COUNT);\r\n    vec4 p1 = texture2D(lightBuffer, vec2(0.125,v));\r\n    vec4 p2 = texture2D(lightBuffer, vec2(0.375,v));\r\n\tvec4 p3 = texture2D(lightBuffer, vec2(0.625,v));\r\n    light.color = p1.rgb;\r\n\tlight.range=p1.a;\r\n    light.position = p2.rgb;\r\n\tlight.spot = p2.a;\r\n\tlight.direction = p3.rgb;\r\n    return light;\r\n}\r\n\r\n// Laya中使用衰减纹理\r\nfloat LayaAttenuation(in vec3 L,in float invLightRadius) {\r\n\tfloat fRatio = clamp(length(L) * invLightRadius,0.0,1.0);\r\n\tfRatio *= fRatio;\r\n\treturn 1.0 / (1.0 + 25.0 * fRatio)* clamp(4.0*(1.0 - fRatio),0.0,1.0); //fade to black as if 4 pixel texture\r\n}\r\n\r\n// Same as Just Cause 2 and Crysis 2 (you can read GPU Pro 1 book for more information)\r\nfloat BasicAttenuation(in vec3 L,in float invLightRadius) {\r\n\tvec3 distance = L * invLightRadius;\r\n\tfloat attenuation = clamp(1.0 - dot(distance, distance),0.0,1.0); // Equals float attenuation = saturate(1.0f - dot(L, L) / (lightRadius *  lightRadius));\r\n\treturn attenuation * attenuation;\r\n}\r\n\r\n// Inspired on http://fools.slindev.com/viewtopic.php?f=11&t=21&view=unread#unread\r\nfloat NaturalAttenuation(in vec3 L,in float invLightRadius) {\r\n\tfloat attenuationFactor = 30.0;\r\n\tvec3 distance = L * invLightRadius;\r\n\tfloat attenuation = dot(distance, distance); // Equals float attenuation = dot(L, L) / (lightRadius *  lightRadius);\r\n\tattenuation = 1.0 / (attenuation * attenuationFactor + 1.0);\r\n\t// Second we move down the function therewith it reaches zero at abscissa 1:\r\n\tattenuationFactor = 1.0 / (attenuationFactor + 1.0); //attenuationFactor contains now the value we have to subtract\r\n\tattenuation = max(attenuation - attenuationFactor, 0.0); // The max fixes a bug.\r\n\t// Finally we expand the equation along the y-axis so that it starts with a function value of 1 again.\r\n\tattenuation /= 1.0 - attenuationFactor;\r\n\treturn attenuation;\r\n}\r\n\r\nvoid LayaAirBlinnPhongLight (in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir,in vec3 lightColor, in vec3 lightVec,out vec3 diffuseColor,out vec3 specularColor) {\r\n\tmediump vec3 h = normalize(viewDir-lightVec);\r\n\tlowp float ln = max (0.0, dot (-lightVec,normal));\r\n\tfloat nh = max (0.0, dot (h,normal));\r\n\tdiffuseColor=lightColor * ln;\r\n\tspecularColor=lightColor *specColor*pow (nh, specColorIntensity*128.0) * gloss;\r\n}\r\n\r\nvoid LayaAirBlinnPhongDiectionLight (in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir, in DirectionLight light,float thinknessFactor,out vec3 diffuseColor,out vec3 specularColor,out vec3 transmisColor) {\r\n\tvec3 lightVec=normalize(light.direction);\r\n\tLayaAirBlinnPhongLight(specColor,specColorIntensity,normal,gloss,viewDir,light.color,lightVec,diffuseColor,specularColor);\r\n\t#ifdef ENABLETRANSMISSION\r\n\t\tdiffuseColor *= u_TransmissionRate;\r\n\t\ttransmisColor = SubSurfaceIBack(lightVec, viewDir,thinknessFactor)*light.color.rgb*(1.0-u_TransmissionRate);\r\n\t#endif\r\n}\r\n\r\n\r\nvoid LayaAirBlinnPhongDiectionLight (in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir, in DirectionLight light,out vec3 diffuseColor,out vec3 specularColor) {\r\n\tvec3 lightVec=normalize(light.direction);\r\n\tLayaAirBlinnPhongLight(specColor,specColorIntensity,normal,gloss,viewDir,light.color,lightVec,diffuseColor,specularColor);\r\n}\r\n\r\n\r\nvoid LayaAirBlinnPhongPointLight (in vec3 pos,in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir, in PointLight light,float thinknessFactor,out vec3 diffuseColor,out vec3 specularColor,out vec3 transmisColor) {\r\n\tvec3 lightVec =  pos-light.position;\r\n\tLayaAirBlinnPhongLight(specColor,specColorIntensity,normal,gloss,viewDir,light.color,lightVec/length(lightVec),diffuseColor,specularColor);\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range);\r\n\tdiffuseColor *= attenuate;\r\n\tspecularColor*= attenuate;\r\n\t#ifdef ENABLETRANSMISSION\r\n\t\tdiffuseColor *= u_TransmissionRate;\r\n\t\ttransmisColor = SubSurfaceIBack(lightVec, viewDir,thinknessFactor)*light.color.rgb*(1.0-u_TransmissionRate)*attenuate;\r\n\t#endif\r\n}\r\n\r\nvoid LayaAirBlinnPhongPointLight (in vec3 pos,in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir, in PointLight light,out vec3 diffuseColor,out vec3 specularColor) {\r\n\tvec3 lightVec =  pos-light.position;\r\n\tLayaAirBlinnPhongLight(specColor,specColorIntensity,normal,gloss,viewDir,light.color,lightVec/length(lightVec),diffuseColor,specularColor);\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range);\r\n\tdiffuseColor *= attenuate;\r\n\tspecularColor*= attenuate;\r\n}\r\n\r\nvoid LayaAirBlinnPhongSpotLight (in vec3 pos,in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir, in SpotLight light,float thinknessFactor,out vec3 diffuseColor,out vec3 specularColor,out vec3 transmisColor) {\r\n\tvec3 lightVec =  pos-light.position;\r\n\tvec3 normalLightVec=lightVec/length(lightVec);\r\n\tLayaAirBlinnPhongLight(specColor,specColorIntensity,normal,gloss,viewDir,light.color,normalLightVec,diffuseColor,specularColor);\r\n\tvec2 cosAngles=cos(vec2(light.spot,light.spot*0.5)*0.5);//ConeAttenuation\r\n\tfloat dl=dot(normalize(light.direction),normalLightVec);\r\n\tdl*=smoothstep(cosAngles[0],cosAngles[1],dl);\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range)*dl;\r\n\tdiffuseColor *=attenuate;\r\n\tspecularColor *=attenuate;\r\n\t#ifdef ENABLETRANSMISSION\r\n\t\tdiffuseColor *= u_TransmissionRate;\r\n\t\ttransmisColor = SubSurfaceIBack(lightVec, viewDir,thinknessFactor)*light.color.rgb*(1.0-u_TransmissionRate)*attenuate;\r\n\t#endif\r\n}\r\n\r\nvoid LayaAirBlinnPhongSpotLight (in vec3 pos,in vec3 specColor,in float specColorIntensity,in vec3 normal,in vec3 gloss, in vec3 viewDir, in SpotLight light,out vec3 diffuseColor,out vec3 specularColor) {\r\n\tvec3 lightVec =  pos-light.position;\r\n\tvec3 normalLightVec=lightVec/length(lightVec);\r\n\tLayaAirBlinnPhongLight(specColor,specColorIntensity,normal,gloss,viewDir,light.color,normalLightVec,diffuseColor,specularColor);\r\n\tvec2 cosAngles=cos(vec2(light.spot,light.spot*0.5)*0.5);//ConeAttenuation\r\n\tfloat dl=dot(normalize(light.direction),normalLightVec);\r\n\tdl*=smoothstep(cosAngles[0],cosAngles[1],dl);\r\n\tfloat attenuate = LayaAttenuation(lightVec, 1.0/light.range)*dl;\r\n\tdiffuseColor *=attenuate;\r\n\tspecularColor *=attenuate;\r\n}\r\n\r\n\r\n\r\n\r\nvec3 NormalSampleToWorldSpace(vec3 normalMapSample, vec3 unitNormal, vec3 tangent,vec3 binormal) {\r\n\tvec3 normalT =vec3(2.0*normalMapSample.x - 1.0,1.0-2.0*normalMapSample.y,2.0*normalMapSample.z - 1.0);\r\n\tmediump vec3 N = unitNormal;\r\n\tmediump vec3 T = tangent;\r\n\tmediump vec3 B = binormal;\r\n\tmat3 TBN = mat3(T, B, N);\r\n\r\n\t// Transform from tangent space to world space.\r\n\tvec3 bumpedNormal =normalize(TBN*normalT);\r\n\treturn bumpedNormal;\r\n}\r\n\r\nvec3 NormalSampleToWorldSpace1(vec4 normalMapSample, vec3 tangent, vec3 binormal, vec3 unitNormal) {\r\n\tvec3 normalT;\r\n\tnormalT.x = 2.0 * normalMapSample.x - 1.0;\r\n\tnormalT.y = 1.0 - 2.0 * normalMapSample.y;\r\n\tnormalT.z = sqrt(1.0 - clamp(dot(normalT.xy, normalT.xy), 0.0, 1.0));\r\n\r\n\tvec3 T = normalize(tangent);\r\n\tvec3 B = normalize(binormal);\r\n\tvec3 N = normalize(unitNormal);\r\n\tmat3 TBN = mat3(T, B, N);\r\n\r\n\t// Transform from tangent space to world space.\r\n\tvec3 bumpedNormal = TBN * normalize(normalT);\r\n\r\n\treturn bumpedNormal;\r\n}\r\n\r\nvec3 DecodeLightmap(vec4 color) {\r\n\treturn color.rgb*color.a*5.0;\r\n}\r\n\r\nvec3 decodeHDR(vec4 color,float range) {\r\n\treturn color.rgb*color.a*range;\r\n}\r\n\r\nvec2 TransformUV(vec2 texcoord,vec4 tilingOffset) {\r\n\tvec2 transTexcoord=vec2(texcoord.x,texcoord.y-1.0)*tilingOffset.xy+vec2(tilingOffset.z,-tilingOffset.w);\r\n\ttransTexcoord.y+=1.0;\r\n\treturn transTexcoord;\r\n}\r\n\r\nvec4 remapGLPositionZ(vec4 position) {\r\n\tposition.z=position.z * 2.0 - position.w;\r\n\treturn position;\r\n}\r\n\r\nmediump vec3 layaLinearToGammaSpace (mediump vec3 linRGB)\r\n{\r\n    linRGB = max(linRGB, vec3(0.0));\r\n    // An almost-perfect approximation from http://chilliant.blogspot.com.au/2012/08/srgb-approximations-for-hlsl.html?m=1\r\n    return max(1.055 * pow(linRGB,vec3(0.416666667)) - 0.055, 0.0);   \r\n}\r\n\r\nLayaLight layaDirectionLightToLight(in DirectionLight light,in float attenuate)\r\n{\r\n\tLayaLight relight;\r\n\trelight.color = light.color*attenuate;\r\n\trelight.dir = light.direction;\r\n\treturn relight;\r\n}\r\n\r\nLayaLight layaPointLightToLight(in vec3 pos,in vec3 normal, in PointLight light,in float attenuate)\r\n{\r\n\tLayaLight relight;\r\n\tvec3 lightVec =  pos-light.position;\r\n\tattenuate *= LayaAttenuation(lightVec, 1.0/light.range);\r\n\trelight.color = light.color*attenuate;\r\n\trelight.dir = normalize(lightVec);\r\n\treturn relight;\r\n}\r\n\r\nLayaLight layaSpotLightToLight(in vec3 pos,in vec3 normal, in SpotLight light,in float attenuate)\r\n{\r\n\tLayaLight relight;\r\n\tvec3 lightVec =  pos-light.position;\r\n\tvec3 normalLightVec=lightVec/length(lightVec);\r\n\tvec2 cosAngles=cos(vec2(light.spot,light.spot*0.5)*0.5);//ConeAttenuation\r\n\tfloat dl=dot(normalize(light.direction),normalLightVec);\r\n\tdl*=smoothstep(cosAngles[0],cosAngles[1],dl);\r\n\tattenuate *= LayaAttenuation(lightVec, 1.0/light.range)*dl;\r\n\trelight.dir = normalLightVec;\r\n\trelight.color = light.color*attenuate;\r\n\treturn relight;\r\n}\r\n\r\n\r\n\r\n\r\n";
 
 	var ShadowSampleTentGLSL = "// ------------------------------------------------------------------\r\n//  PCF Filtering Tent Functions\r\n// ------------------------------------------------------------------\r\n\r\n// Assuming a isoceles right angled triangle of height \"triangleHeight\" (as drawn below).\r\n// This function return the area of the triangle above the first texel(in Y the first texel).\r\n//\r\n// |\\      <-- 45 degree slop isosceles right angled triangle\r\n// | \\\r\n// ----    <-- length of this side is \"triangleHeight\"\r\n// _ _ _ _ <-- texels\r\nfloat sampleShadowGetIRTriangleTexelArea(float triangleHeight)\r\n{\r\n    return triangleHeight - 0.5;\r\n}\r\n\r\n// Assuming a isoceles triangle of 1.5 texels height and 3 texels wide lying on 4 texels.\r\n// This function return the area of the triangle above each of those texels.\r\n//    |    <-- offset from -0.5 to 0.5, 0 meaning triangle is exactly in the center\r\n//   / \\   <-- 45 degree slop isosceles triangle (ie tent projected in 2D)\r\n//  /   \\\r\n// _ _ _ _ <-- texels\r\n// X Y Z W <-- result indices (in computedArea.xyzw and computedAreaUncut.xyzw)\r\n// Top point at (right,top) in a texel,left bottom point at (middle,middle) in a texel,right bottom point at (middle,middle) in a texel.\r\nvoid sampleShadowGetTexelAreasTent3x3(float offset, out vec4 computedArea, out vec4 computedAreaUncut)\r\n{\r\n    // Compute the exterior areas,a and h is same.\r\n    float a = offset + 0.5;\r\n    float offsetSquaredHalved = a * a * 0.5;\r\n    computedAreaUncut.x = computedArea.x = offsetSquaredHalved - offset;\r\n    computedAreaUncut.w = computedArea.w = offsetSquaredHalved;\r\n\r\n    // Compute the middle areas\r\n    // For Y : We find the area in Y of as if the left section of the isoceles triangle would\r\n    // intersect the axis between Y and Z (ie where offset = 0).\r\n    computedAreaUncut.y = sampleShadowGetIRTriangleTexelArea(1.5 - offset);\r\n    // This area is superior to the one we are looking for if (offset < 0) thus we need to\r\n    // subtract the area of the triangle defined by (0,1.5-offset), (0,1.5+offset), (-offset,1.5).\r\n    float clampedOffsetLeft = min(offset,0.0);\r\n    float areaOfSmallLeftTriangle = clampedOffsetLeft * clampedOffsetLeft;\r\n    computedArea.y = computedAreaUncut.y - areaOfSmallLeftTriangle;\r\n\r\n    // We do the same for the Z but with the right part of the isoceles triangle\r\n    computedAreaUncut.z = sampleShadowGetIRTriangleTexelArea(1.5 + offset);\r\n    float clampedOffsetRight = max(offset,0.0);\r\n    float areaOfSmallRightTriangle = clampedOffsetRight * clampedOffsetRight;\r\n    computedArea.z = computedAreaUncut.z - areaOfSmallRightTriangle;\r\n}\r\n\r\n// Assuming a isoceles triangle of 2.5 texel height and 5 texels wide lying on 6 texels.\r\n// This function return the weight of each texels area relative to the full triangle area.\r\n//  /       \\\r\n// _ _ _ _ _ _ <-- texels\r\n// 0 1 2 3 4 5 <-- computed area indices (in texelsWeights[])\r\n// Top point at (right,top) in a texel,left bottom point at (middle,middle) in a texel,right bottom point at (middle,middle) in a texel.\r\nvoid sampleShadowGetTexelWeightsTent5x5(float offset, out vec3 texelsWeightsA, out vec3 texelsWeightsB)\r\n{\r\n    vec4 areaFrom3texelTriangle;\r\n    vec4 areaUncutFrom3texelTriangle;\r\n    sampleShadowGetTexelAreasTent3x3(offset, areaFrom3texelTriangle, areaUncutFrom3texelTriangle);\r\n\r\n    // Triangle slope is 45 degree thus we can almost reuse the result of the 3 texel wide computation.\r\n    // the 5 texel wide triangle can be seen as the 3 texel wide one but shifted up by one unit/texel.\r\n    // 0.16 is 1/(the triangle area)\r\n    texelsWeightsA.x = 0.16 * (areaFrom3texelTriangle.x);\r\n    texelsWeightsA.y = 0.16 * (areaUncutFrom3texelTriangle.y);\r\n    texelsWeightsA.z = 0.16 * (areaFrom3texelTriangle.y + 1.0);\r\n    texelsWeightsB.x = 0.16 * (areaFrom3texelTriangle.z + 1.0);\r\n    texelsWeightsB.y = 0.16 * (areaUncutFrom3texelTriangle.z);\r\n    texelsWeightsB.z = 0.16 * (areaFrom3texelTriangle.w);\r\n}\r\n\r\n// 5x5 Tent filter (45 degree sloped triangles in U and V)\r\nvoid sampleShadowComputeSamplesTent5x5(vec4 shadowMapTextureTexelSize, vec2 coord, out float fetchesWeights[9], out vec2 fetchesUV[9])\r\n{\r\n    // tent base is 5x5 base thus covering from 25 to 36 texels, thus we need 9 bilinear PCF fetches\r\n    vec2 tentCenterInTexelSpace = coord.xy * shadowMapTextureTexelSize.zw;\r\n    vec2 centerOfFetchesInTexelSpace = floor(tentCenterInTexelSpace + 0.5);\r\n    vec2 offsetFromTentCenterToCenterOfFetches = tentCenterInTexelSpace - centerOfFetchesInTexelSpace;\r\n\r\n    // find the weight of each texel based on the area of a 45 degree slop tent above each of them.\r\n    vec3 texelsWeightsUA, texelsWeightsUB;\r\n    vec3 texelsWeightsVA, texelsWeightsVB;\r\n    sampleShadowGetTexelWeightsTent5x5(offsetFromTentCenterToCenterOfFetches.x, texelsWeightsUA, texelsWeightsUB);\r\n    sampleShadowGetTexelWeightsTent5x5(offsetFromTentCenterToCenterOfFetches.y, texelsWeightsVA, texelsWeightsVB);\r\n\r\n    // each fetch will cover a group of 2x2 texels, the weight of each group is the sum of the weights of the texels\r\n    vec3 fetchesWeightsU = vec3(texelsWeightsUA.xz, texelsWeightsUB.y) + vec3(texelsWeightsUA.y, texelsWeightsUB.xz);\r\n    vec3 fetchesWeightsV = vec3(texelsWeightsVA.xz, texelsWeightsVB.y) + vec3(texelsWeightsVA.y, texelsWeightsVB.xz);\r\n\r\n    // move the PCF bilinear fetches to respect texels weights\r\n    vec3 fetchesOffsetsU = vec3(texelsWeightsUA.y, texelsWeightsUB.xz) / fetchesWeightsU.xyz + vec3(-2.5,-0.5,1.5);\r\n    vec3 fetchesOffsetsV = vec3(texelsWeightsVA.y, texelsWeightsVB.xz) / fetchesWeightsV.xyz + vec3(-2.5,-0.5,1.5);\r\n    fetchesOffsetsU *= shadowMapTextureTexelSize.xxx;\r\n    fetchesOffsetsV *= shadowMapTextureTexelSize.yyy;\r\n\r\n    vec2 bilinearFetchOrigin = centerOfFetchesInTexelSpace * shadowMapTextureTexelSize.xy;\r\n    fetchesUV[0] = bilinearFetchOrigin + vec2(fetchesOffsetsU.x, fetchesOffsetsV.x);\r\n    fetchesUV[1] = bilinearFetchOrigin + vec2(fetchesOffsetsU.y, fetchesOffsetsV.x);\r\n    fetchesUV[2] = bilinearFetchOrigin + vec2(fetchesOffsetsU.z, fetchesOffsetsV.x);\r\n    fetchesUV[3] = bilinearFetchOrigin + vec2(fetchesOffsetsU.x, fetchesOffsetsV.y);\r\n    fetchesUV[4] = bilinearFetchOrigin + vec2(fetchesOffsetsU.y, fetchesOffsetsV.y);\r\n    fetchesUV[5] = bilinearFetchOrigin + vec2(fetchesOffsetsU.z, fetchesOffsetsV.y);\r\n    fetchesUV[6] = bilinearFetchOrigin + vec2(fetchesOffsetsU.x, fetchesOffsetsV.z);\r\n    fetchesUV[7] = bilinearFetchOrigin + vec2(fetchesOffsetsU.y, fetchesOffsetsV.z);\r\n    fetchesUV[8] = bilinearFetchOrigin + vec2(fetchesOffsetsU.z, fetchesOffsetsV.z);\r\n\r\n    fetchesWeights[0] = fetchesWeightsU.x * fetchesWeightsV.x;\r\n    fetchesWeights[1] = fetchesWeightsU.y * fetchesWeightsV.x;\r\n    fetchesWeights[2] = fetchesWeightsU.z * fetchesWeightsV.x;\r\n    fetchesWeights[3] = fetchesWeightsU.x * fetchesWeightsV.y;\r\n    fetchesWeights[4] = fetchesWeightsU.y * fetchesWeightsV.y;\r\n    fetchesWeights[5] = fetchesWeightsU.z * fetchesWeightsV.y;\r\n    fetchesWeights[6] = fetchesWeightsU.x * fetchesWeightsV.z;\r\n    fetchesWeights[7] = fetchesWeightsU.y * fetchesWeightsV.z;\r\n    fetchesWeights[8] = fetchesWeightsU.z * fetchesWeightsV.z;\r\n}";
 
@@ -29851,9 +29715,9 @@
 
 	var lineVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\nprecision highp float;\r\n#else\r\nprecision mediump float;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n\r\nattribute vec4 a_Position;\r\nuniform mat4 u_MvpMatrix;\r\nuniform vec4 u_Color;\r\nattribute vec4 a_Color;\r\nvarying vec4 v_Color;\r\n\r\n\r\nvoid main()\r\n{\r\n\tgl_Position = u_MvpMatrix * a_Position;\r\n\tv_Color=a_Color*u_Color;\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
 
-	var MeshBlinnPhongPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n\r\n#include \"Lighting.glsl\";\r\n#include \"Shadow.glsl\"\r\n\r\nuniform vec4 u_DiffuseColor;\r\n\r\n#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef ALPHATEST\r\n\tuniform float u_AlphaTestValue;\r\n#endif\r\n\r\n#ifdef DIFFUSEMAP\r\n\tuniform sampler2D u_DiffuseTexture;\r\n#endif\r\n\r\n\r\n#if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tvarying vec2 v_LightMapUV;\r\n\tuniform sampler2D u_LightMap;\r\n\t#ifdef LIGHTMAP_DIRECTIONAL\r\n\t\tuniform sampler2D u_LightMapDirection;\r\n\t#endif\r\n#endif\r\n\r\nvarying vec3 v_Normal;\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\tvarying vec3 v_ViewDir; \r\n\r\n\tuniform vec3 u_MaterialSpecular;\r\n\tuniform float u_Shininess;\r\n\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tuniform DirectionLight u_DirectionLight;\r\n\t\t#endif\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tuniform PointLight u_PointLight;\r\n\t\t#endif\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tuniform SpotLight u_SpotLight;\r\n\t\t#endif\r\n\t#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n\t#endif\r\n\r\n\t#ifdef SPECULARMAP \r\n\t\tuniform sampler2D u_SpecularTexture;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef NORMALMAP \r\n\tuniform sampler2D u_NormalTexture;\r\n\tvarying vec3 v_Tangent;\r\n\tvarying vec3 v_Binormal;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\n#if defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n\r\n#include \"GlobalIllumination.glsl\";//\"GlobalIllumination.glsl use uniform should at front of this\r\n\r\n#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\tvarying vec4 v_ShadowCoord;\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tvarying vec4 v_SpotShadowCoord;\r\n#endif\r\n\r\n\r\nvoid main()\r\n{\r\n\tvec3 normal;//light and SH maybe use normal\r\n\t#if defined(NORMALMAP)\r\n\t\tvec3 normalMapSample = texture2D(u_NormalTexture, v_Texcoord0).rgb;\r\n\t\tnormal = normalize(NormalSampleToWorldSpace(normalMapSample, v_Normal, v_Tangent,v_Binormal));\r\n\t#else\r\n\t\tnormal = normalize(v_Normal);\r\n\t#endif\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 viewDir= normalize(v_ViewDir);\r\n\t#endif\r\n\r\n\tLayaGIInput giInput;\r\n\t#ifdef LIGHTMAP\t\r\n\t\tgiInput.lightmapUV=v_LightMapUV;\r\n\t#endif\r\n\tvec3 globalDiffuse=layaGIBase(giInput,1.0,normal);\r\n\t\r\n\tvec4 mainColor=u_DiffuseColor;\r\n\t#ifdef DIFFUSEMAP\r\n\t\tvec4 difTexColor=texture2D(u_DiffuseTexture, v_Texcoord0);\r\n\t\tmainColor=mainColor*difTexColor;\r\n\t#endif \r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tmainColor=mainColor*v_Color;\r\n\t#endif \r\n    \r\n\t#ifdef ALPHATEST\r\n\t\tif(mainColor.a<u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n  \r\n\t\r\n\tvec3 diffuse = vec3(0.0);\r\n\tvec3 specular= vec3(0.0);\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 dif,spe;\r\n\t\t#ifdef SPECULARMAP\r\n\t\t\tvec3 gloss=texture2D(u_SpecularTexture, v_Texcoord0).rgb;\r\n\t\t#else\r\n\t\t\t#ifdef DIFFUSEMAP\r\n\t\t\t\tvec3 gloss=vec3(difTexColor.a);\r\n\t\t\t#else\r\n\t\t\t\tvec3 gloss=vec3(1.0);\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t\r\n\t\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tLayaAirBlinnPhongDiectionLight(u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_DirectionLight,dif,spe);\r\n\t\t\t#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t#ifdef SHADOW_CASCADE\r\n\t\t\t\t\tvec4 shadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t\t\t\t#else\r\n\t\t\t\t\tvec4 shadowCoord = v_ShadowCoord;\r\n\t\t\t\t#endif\r\n\t\t\t\tfloat shadowAttenuation=sampleShadowmap(shadowCoord);\r\n\t\t\t\tdif *= shadowAttenuation;\r\n\t\t\t\tspe *= shadowAttenuation;\r\n\t\t\t#endif\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_PointLight,dif,spe);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_SpotLight,dif,spe);\r\n\t\t\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\tvec4 spotShadowcoord = v_SpotShadowCoord;\r\n\t\t\t\tfloat spotShadowAttenuation = sampleSpotShadowmap(spotShadowcoord);\r\n\t\t\t\tdif *= spotShadowAttenuation;\r\n\t\t\t\tspe *= spotShadowAttenuation;\r\n\t\t\t#endif\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\t#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t\tif(i == 0)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\t#ifdef SHADOW_CASCADE\r\n\t\t\t\t\t\t\tvec4 shadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\tvec4 shadowCoord = v_ShadowCoord;\r\n\t\t\t\t\t\t#endif\r\n\t\t\t\t\t\tdirectionLight.color *= sampleShadowmap(shadowCoord);\r\n\t\t\t\t\t}\r\n\t\t\t\t#endif\r\n\t\t\t\tLayaAirBlinnPhongDiectionLight(u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,directionLight,dif,spe);\r\n\t\t\t\tdiffuse+=dif;\r\n\t\t\t\tspecular+=spe;\r\n\t\t\t}\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,pointLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t\t\tif(i == 0)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tvec4 spotShadowcoord = v_SpotShadowCoord;\r\n\t\t\t\t\t\t\tspotLight.color *= sampleSpotShadowmap(spotShadowcoord);\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t#endif\r\n\t\t\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,spotLight,dif,spe);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\tgl_FragColor =vec4(mainColor.rgb*(globalDiffuse + diffuse),mainColor.a);\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tgl_FragColor.rgb+=specular;\r\n\t#endif\r\n\t  \r\n\t#ifdef FOG\r\n\t\tfloat lerpFact=clamp((1.0/gl_FragCoord.w-u_FogStart)/u_FogRange,0.0,1.0);\r\n\t\tgl_FragColor.rgb=mix(gl_FragColor.rgb,u_FogColor,lerpFact);\r\n\t#endif\r\n}\r\n\r\n";
+	var MeshBlinnPhongPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n\r\n\r\n#include \"Lighting.glsl\";\r\n#include \"Shadow.glsl\"\r\n\r\nuniform vec4 u_DiffuseColor;\r\n\r\n#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef ALPHATEST\r\n\tuniform float u_AlphaTestValue;\r\n#endif\r\n\r\n#ifdef DIFFUSEMAP\r\n\tuniform sampler2D u_DiffuseTexture;\r\n#endif\r\n\r\n\r\n#if defined(DIFFUSEMAP)||defined(THICKNESSMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tvarying vec2 v_LightMapUV;\r\n\tuniform sampler2D u_LightMap;\r\n\t#ifdef LIGHTMAP_DIRECTIONAL\r\n\t\tuniform sampler2D u_LightMapDirection;\r\n\t#endif\r\n#endif\r\n\r\nvarying vec3 v_Normal;\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\tvarying vec3 v_ViewDir; \r\n\r\n\tuniform vec3 u_MaterialSpecular;\r\n\tuniform float u_Shininess;\r\n\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tuniform DirectionLight u_DirectionLight;\r\n\t\t#endif\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tuniform PointLight u_PointLight;\r\n\t\t#endif\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tuniform SpotLight u_SpotLight;\r\n\t\t#endif\r\n\t#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n\t#endif\r\n\r\n\t#ifdef SPECULARMAP \r\n\t\tuniform sampler2D u_SpecularTexture;\r\n\t#endif\r\n#endif\r\n\r\n#ifdef NORMALMAP \r\n\tuniform sampler2D u_NormalTexture;\r\n\tvarying vec3 v_Tangent;\r\n\tvarying vec3 v_Binormal;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\n#if defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n\r\n#include \"GlobalIllumination.glsl\";//\"GlobalIllumination.glsl use uniform should at front of this\r\n\r\n#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\tvarying vec4 v_ShadowCoord;\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tvarying vec4 v_SpotShadowCoord;\r\n#endif\r\n\r\n\r\nvoid main()\r\n{\r\n\tvec3 normal;//light and SH maybe use normal\r\n\t#if defined(NORMALMAP)\r\n\t\tvec3 normalMapSample = texture2D(u_NormalTexture, v_Texcoord0).rgb;\r\n\t\tnormal = normalize(NormalSampleToWorldSpace(normalMapSample, v_Normal, v_Tangent,v_Binormal));\r\n\t#else\r\n\t\tnormal = normalize(v_Normal);\r\n\t#endif\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 viewDir= normalize(v_ViewDir);\r\n\t#endif\r\n\r\n\tLayaGIInput giInput;\r\n\t#ifdef LIGHTMAP\t\r\n\t\tgiInput.lightmapUV=v_LightMapUV;\r\n\t#endif\r\n\tvec3 globalDiffuse=layaGIBase(giInput,1.0,normal);\r\n\t\r\n\tvec4 mainColor=u_DiffuseColor;\r\n\t#ifdef DIFFUSEMAP\r\n\t\tvec4 difTexColor=texture2D(u_DiffuseTexture, v_Texcoord0);\r\n\t\tmainColor=mainColor*difTexColor;\r\n\t#endif \r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tmainColor=mainColor*v_Color;\r\n\t#endif \r\n    \r\n\t#ifdef ALPHATEST\r\n\t\tif(mainColor.a<u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n  \r\n\t\r\n\tvec3 diffuse = vec3(0.0);\r\n\tvec3 specular= vec3(0.0);\r\n\tvec3 transmissionDiffuse = vec3(0.0);\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tvec3 dif,spe,transmis;\r\n\t\tfloat transmissionFactor;\r\n\t\t#ifdef SPECULARMAP\r\n\t\t\tvec3 gloss=texture2D(u_SpecularTexture, v_Texcoord0).rgb;\r\n\t\t#else\r\n\t\t\t#ifdef DIFFUSEMAP\r\n\t\t\t\tvec3 gloss=vec3(difTexColor.a);\r\n\t\t\t#else\r\n\t\t\t\tvec3 gloss=vec3(1.0);\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t\t#ifdef THICKNESSMAP\r\n\t\t\ttransmissionFactor = texture2D(u_ThinknessTexture, v_Texcoord0).r;\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t\r\n\t\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tLayaAirBlinnPhongDiectionLight(u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_DirectionLight,transmissionFactor,dif,spe,transmis);\r\n\t\t\t#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t#ifdef SHADOW_CASCADE\r\n\t\t\t\t\tvec4 shadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t\t\t\t#else\r\n\t\t\t\t\tvec4 shadowCoord = v_ShadowCoord;\r\n\t\t\t\t#endif\r\n\t\t\t\tfloat shadowAttenuation=sampleShadowmap(shadowCoord);\r\n\t\t\t\tdif *= shadowAttenuation;\r\n\t\t\t\tspe *= shadowAttenuation;\r\n\t\t\t\ttransmis *=shadowAttenuation;\r\n\t\t\t#endif\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t\ttransmissionDiffuse+=transmis;\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_PointLight,transmissionFactor,dif,spe,transmis);\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t\ttransmissionDiffuse+=transmis;\r\n\t\t#endif\r\n\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,u_SpotLight,transmissionFactor,dif,spe,transmis);\r\n\t\t\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\tvec4 spotShadowcoord = v_SpotShadowCoord;\r\n\t\t\t\tfloat spotShadowAttenuation = sampleSpotShadowmap(spotShadowcoord);\r\n\t\t\t\tdif *= spotShadowAttenuation;\r\n\t\t\t\tspe *= spotShadowAttenuation;\r\n\t\t\t\ttransmis *=spotShadowAttenuation;\r\n\t\t\t#endif\r\n\t\t\tdiffuse+=dif;\r\n\t\t\tspecular+=spe;\r\n\t\t\ttransmissionDiffuse+=transmis;\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\t#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t\tif(i == 0)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\t#ifdef SHADOW_CASCADE\r\n\t\t\t\t\t\t\tvec4 shadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\tvec4 shadowCoord = v_ShadowCoord;\r\n\t\t\t\t\t\t#endif\r\n\t\t\t\t\t\tdirectionLight.color *= sampleShadowmap(shadowCoord);\r\n\t\t\t\t\t}\r\n\t\t\t\t#endif\r\n\t\t\t\tLayaAirBlinnPhongDiectionLight(u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,directionLight,transmissionFactor,dif,spe,transmis);\r\n\t\t\t\tdiffuse+=dif;\r\n\t\t\t\tspecular+=spe;\r\n\t\t\t\ttransmissionDiffuse+=transmis;\r\n\t\t\t}\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaAirBlinnPhongPointLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,pointLight,transmissionFactor,dif,spe,transmis);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t\ttransmissionDiffuse+=transmis;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t\t\tif(i == 0)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tvec4 spotShadowcoord = v_SpotShadowCoord;\r\n\t\t\t\t\t\t\tspotLight.color *= sampleSpotShadowmap(spotShadowcoord);\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t#endif\r\n\t\t\t\t\tLayaAirBlinnPhongSpotLight(v_PositionWorld,u_MaterialSpecular,u_Shininess,normal,gloss,viewDir,spotLight,transmissionFactor,dif,spe,transmis);\r\n\t\t\t\t\tdiffuse+=dif;\r\n\t\t\t\t\tspecular+=spe;\r\n\t\t\t\t\ttransmissionDiffuse+=transmis;\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t#endif\r\n\r\n\tgl_FragColor =vec4(mainColor.rgb*(globalDiffuse + diffuse),mainColor.a);\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\tgl_FragColor.rgb+=specular;\r\n\t#endif\r\n\r\n\t#ifdef ENABLETRANSMISSION\r\n\t\tgl_FragColor.rgb+= transmissionDiffuse;\r\n\t#endif\r\n\r\n\t  \r\n\t#ifdef FOG\r\n\t\tfloat lerpFact=clamp((1.0/gl_FragCoord.w-u_FogStart)/u_FogRange,0.0,1.0);\r\n\t\tgl_FragColor.rgb=mix(gl_FragColor.rgb,u_FogColor,lerpFact);\r\n\t#endif\r\n\r\n\t//gl_FragColor.rgb =transmissionDiffuse;\r\n}\r\n\r\n";
 
-	var MeshBlinnPhongVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n#include \"Lighting.glsl\";\r\n#include \"LayaUtile.glsl\"\r\n#include \"Shadow.glsl\";\r\n\r\n\r\nattribute vec4 a_Position;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_MvpMatrix;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\n\r\n#if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))||(defined(LIGHTMAP)&&defined(UV))\r\n\tattribute vec2 a_Texcoord0;\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#if defined(LIGHTMAP)&&defined(UV1)\r\n\tattribute vec2 a_Texcoord1;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tuniform vec4 u_LightmapScaleOffset;\r\n\tvarying vec2 v_LightMapUV;\r\n#endif\r\n\r\n#ifdef COLOR\r\n\tattribute vec4 a_Color;\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\nattribute vec3 a_Normal;\r\nvarying vec3 v_Normal; \r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\tuniform vec3 u_CameraPos;\r\n\tvarying vec3 v_ViewDir; \r\n#endif\r\n\r\n#if defined(NORMALMAP)\r\n\tattribute vec4 a_Tangent0;\r\n\tvarying vec3 v_Tangent;\r\n\tvarying vec3 v_Binormal;\r\n#endif\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_WorldMat;\r\n#endif\r\n\r\n#if defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\tvarying vec4 v_ShadowCoord;\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tvarying vec4 v_SpotShadowCoord;\r\n#endif\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif\r\n\r\n\r\n\r\nvoid main()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tposition=skinTransform*a_Position;\r\n\t #else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\t\r\n\tmat4 worldMat;\r\n\t#ifdef GPU_INSTANCE\r\n\t\tworldMat = a_WorldMat;\r\n\t#else\r\n\t\tworldMat = u_WorldMat;\r\n\t#endif\r\n\r\n\tmat3 worldInvMat;\r\n\t#ifdef BONE\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat*skinTransform));\r\n\t#else\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat));\r\n\t#endif  \r\n\tv_Normal=normalize(a_Normal*worldInvMat);\r\n\t#if defined(NORMALMAP)\r\n\t\tv_Tangent=normalize(a_Tangent0.xyz*worldInvMat);\r\n\t\tv_Binormal=cross(v_Normal,v_Tangent)*a_Tangent0.w;\r\n\t#endif\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\t\tvec3 positionWS=(worldMat*position).xyz;\r\n\t\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tv_ViewDir = u_CameraPos-positionWS;\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\t\t\tv_PositionWorld = positionWS;\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#if defined(DIFFUSEMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))\r\n\t\t#ifdef TILINGOFFSET\r\n\t\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t\t#else\r\n\t\t\tv_Texcoord0=a_Texcoord0;\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#ifdef LIGHTMAP\r\n\t\t#ifdef UV1\r\n\t\t\tv_LightMapUV=vec2(a_Texcoord1.x,1.0-a_Texcoord1.y)*u_LightmapScaleOffset.xy+u_LightmapScaleOffset.zw;\r\n\t\t#else\r\n\t\t\tv_LightMapUV=vec2(a_Texcoord0.x,1.0-a_Texcoord0.y)*u_LightmapScaleOffset.xy+u_LightmapScaleOffset.zw;\r\n\t\t#endif \r\n\t\tv_LightMapUV.y=1.0-v_LightMapUV.y;\r\n\t#endif\r\n\r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tv_Color=a_Color;\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\t\tv_ShadowCoord =getShadowCoord(vec4(positionWS,1.0));\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\tv_SpotShadowCoord = u_SpotViewProjectMatrix*vec4(positionWS,1.0);\r\n\t#endif\r\n\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
+	var MeshBlinnPhongVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n#include \"Lighting.glsl\";\r\n#include \"LayaUtile.glsl\"\r\n#include \"Shadow.glsl\";\r\n\r\n\r\nattribute vec4 a_Position;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tuniform mat4 u_ViewProjection;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\n\r\n#if defined(DIFFUSEMAP)||defined(THICKNESSMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))||(defined(LIGHTMAP)&&defined(UV))\r\n\tattribute vec2 a_Texcoord0;\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#if defined(LIGHTMAP)&&defined(UV1)\r\n\tattribute vec2 a_Texcoord1;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tuniform vec4 u_LightmapScaleOffset;\r\n\tvarying vec2 v_LightMapUV;\r\n#endif\r\n\r\n#ifdef COLOR\r\n\tattribute vec4 a_Color;\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\nattribute vec3 a_Normal;\r\nvarying vec3 v_Normal; \r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\tuniform vec3 u_CameraPos;\r\n\tvarying vec3 v_ViewDir; \r\n#endif\r\n\r\n#if defined(NORMALMAP)\r\n\tattribute vec4 a_Tangent0;\r\n\tvarying vec3 v_Tangent;\r\n\tvarying vec3 v_Binormal;\r\n#endif\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_WorldMat;\r\n#endif\r\n\r\n#if defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\tvarying vec3 v_PositionWorld;\r\n#endif\r\n\r\n#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\tvarying vec4 v_ShadowCoord;\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tvarying vec4 v_SpotShadowCoord;\r\n#endif\r\n\r\nuniform vec4 u_TilingOffset;\r\n\r\nvoid main()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tposition=skinTransform*a_Position;\r\n\t #else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\r\n\r\n\t\r\n\tmat4 worldMat;\r\n\t#ifdef GPU_INSTANCE\r\n\t\tworldMat = a_WorldMat;\r\n\t#else\r\n\t\tworldMat = u_WorldMat;\r\n\t#endif\r\n\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = u_ViewProjection * worldMat * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\r\n\tmat3 worldInvMat;\r\n\t#ifdef BONE\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat*skinTransform));\r\n\t#else\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat));\r\n\t#endif  \r\n\tv_Normal=normalize(a_Normal*worldInvMat);\r\n\t#if defined(NORMALMAP)\r\n\t\tv_Tangent=normalize(a_Tangent0.xyz*worldInvMat);\r\n\t\tv_Binormal=cross(v_Normal,v_Tangent)*a_Tangent0.w;\r\n\t#endif\r\n\r\n\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\t\tvec3 positionWS=(worldMat*position).xyz;\r\n\t\t#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tv_ViewDir = u_CameraPos-positionWS;\r\n\t\t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)||(defined(CALCULATE_SHADOWS)&&defined(SHADOW_CASCADE))||defined(CALCULATE_SPOTSHADOWS)\r\n\t\t\tv_PositionWorld = positionWS;\r\n\t\t#endif\r\n\t#endif\r\n\r\n\t#if defined(DIFFUSEMAP)||defined(THICKNESSMAP)||((defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT))&&(defined(SPECULARMAP)||defined(NORMALMAP)))\r\n\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t#endif\r\n\r\n\t#ifdef LIGHTMAP\r\n\t\t#ifdef UV1\r\n\t\t\tv_LightMapUV=vec2(a_Texcoord1.x,1.0-a_Texcoord1.y)*u_LightmapScaleOffset.xy+u_LightmapScaleOffset.zw;\r\n\t\t#else\r\n\t\t\tv_LightMapUV=vec2(a_Texcoord0.x,1.0-a_Texcoord0.y)*u_LightmapScaleOffset.xy+u_LightmapScaleOffset.zw;\r\n\t\t#endif \r\n\t\tv_LightMapUV.y=1.0-v_LightMapUV.y;\r\n\t#endif\r\n\r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tv_Color=a_Color;\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\t\tv_ShadowCoord =getShadowCoord(vec4(positionWS,1.0));\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\tv_SpotShadowCoord = u_SpotViewProjectMatrix*vec4(positionWS,1.0);\r\n\t#endif\r\n\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
 
 	var MeshBlinnPhongShadowCasterPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n\tprecision highp int;\r\n#else\r\n\tprecision mediump float;\r\n\tprecision mediump int;\r\n#endif\r\n\r\n#include \"ShadowCasterFS.glsl\"\r\n\r\nvoid main()\r\n{\r\n\tgl_FragColor=shadowCasterFragment();\r\n}";
 
@@ -29861,17 +29725,17 @@
 
 	var ParticleShuriKenPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n  precision highp float;\r\n#else\r\n  precision mediump float;\r\n#endif\r\n\r\nvarying vec4 v_Color;\r\nvarying vec2 v_TextureCoordinate;\r\nuniform sampler2D u_texture;\r\nuniform vec4 u_Tintcolor;\r\n\r\n#ifdef RENDERMODE_MESH\r\n\tvarying vec4 v_MeshColor;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\t#ifdef ADDTIVEFOG\r\n\t#else\r\n\t\tuniform vec3 u_FogColor;\r\n\t#endif\r\n#endif\r\n\r\n\r\nvoid main()\r\n{\t\r\n\t#ifdef RENDERMODE_MESH\r\n\t\tgl_FragColor=v_MeshColor;\r\n\t#else\r\n\t\tgl_FragColor=vec4(1.0);\t\r\n\t#endif\r\n\t\t\r\n\t#ifdef DIFFUSEMAP\r\n\t\t#ifdef TINTCOLOR\r\n\t\t\tgl_FragColor*=texture2D(u_texture,v_TextureCoordinate)*u_Tintcolor*2.0*v_Color;\r\n\t\t#else\r\n\t\t\tgl_FragColor*=texture2D(u_texture,v_TextureCoordinate)*v_Color;\r\n\t\t#endif\r\n\t#else\r\n\t\t#ifdef TINTCOLOR\r\n\t\t\tgl_FragColor*=u_Tintcolor*2.0*v_Color;\r\n\t\t#else\r\n\t\t\tgl_FragColor*=v_Color;\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact=clamp((1.0/gl_FragCoord.w-u_FogStart)/u_FogRange,0.0,1.0);\r\n\t\t#ifdef ADDTIVEFOG\r\n\t\t\tgl_FragColor.rgb=mix(gl_FragColor.rgb,vec3(0.0,0.0,0.0),lerpFact);\r\n\t\t#else\r\n\t\t\tgl_FragColor.rgb=mix(gl_FragColor.rgb,u_FogColor,lerpFact);\r\n\t\t#endif\r\n\t#endif\r\n}";
 
-	var ParticleShuriKenVS = "// #include \"Lighting.glsl\";\r\n\r\n//修改这里剔除没有用到的光照函数，增加粒子的编译速度\r\nvec2 TransformUV(vec2 texcoord,vec4 tilingOffset) {\r\n\tvec2 transTexcoord=vec2(texcoord.x,texcoord.y-1.0)*tilingOffset.xy+vec2(tilingOffset.z,-tilingOffset.w);\r\n\ttransTexcoord.y+=1.0;\r\n\treturn transTexcoord;\r\n}\r\n\r\nvec4 remapGLPositionZ(vec4 position) {\r\n\tposition.z=position.z * 2.0 - position.w;\r\n\treturn position;\r\n}\r\n\r\n#if defined(GL_FRAGMENT_PRECISION_HIGH)\r\n  precision highp float;\r\n#else\r\n  precision mediump float;\r\n#endif\r\n\r\n#if defined(SPHERHBILLBOARD)||defined(STRETCHEDBILLBOARD)||defined(HORIZONTALBILLBOARD)||defined(VERTICALBILLBOARD)\r\n\tattribute vec4 a_CornerTextureCoordinate;\r\n#endif\r\n#ifdef RENDERMODE_MESH\r\n\tattribute vec3 a_MeshPosition;\r\n\tattribute vec4 a_MeshColor;\r\n\tattribute vec2 a_MeshTextureCoordinate;\r\n\tvarying vec4 v_MeshColor;\r\n#endif\r\n\r\nattribute vec4 a_ShapePositionStartLifeTime;\r\nattribute vec4 a_DirectionTime;\r\nattribute vec4 a_StartColor;\r\nattribute vec3 a_StartSize;\r\nattribute vec3 a_StartRotation0;\r\nattribute float a_StartSpeed;\r\n#if defined(COLOROVERLIFETIME)||defined(RANDOMCOLOROVERLIFETIME)||defined(SIZEOVERLIFETIMERANDOMCURVES)||defined(SIZEOVERLIFETIMERANDOMCURVESSEPERATE)||defined(ROTATIONOVERLIFETIMERANDOMCONSTANTS)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\n  attribute vec4 a_Random0;\r\n#endif\r\n#if defined(TEXTURESHEETANIMATIONRANDOMCURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n  attribute vec4 a_Random1;\r\n#endif\r\nattribute vec3 a_SimulationWorldPostion;\r\nattribute vec4 a_SimulationWorldRotation;\r\n\r\nvarying vec4 v_Color;\r\n#ifdef DIFFUSEMAP\r\n\tvarying vec2 v_TextureCoordinate;\r\n#endif\r\n\r\nuniform float u_CurrentTime;\r\nuniform vec3 u_Gravity;\r\n\r\nuniform vec3 u_WorldPosition;\r\nuniform vec4 u_WorldRotation;\r\nuniform bool u_ThreeDStartRotation;\r\nuniform int u_ScalingMode;\r\nuniform vec3 u_PositionScale;\r\nuniform vec3 u_SizeScale;\r\nuniform mat4 u_View;\r\nuniform mat4 u_Projection;\r\n\r\n#ifdef STRETCHEDBILLBOARD\r\n\tuniform vec3 u_CameraPos;\r\n#endif\r\nuniform vec3 u_CameraDirection;//TODO:只有几种广告牌模式需要用\r\nuniform vec3 u_CameraUp;\r\n\r\nuniform  float u_StretchedBillboardLengthScale;\r\nuniform  float u_StretchedBillboardSpeedScale;\r\nuniform int u_SimulationSpace;\r\n\r\n#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n  uniform  int  u_VOLSpaceType;\r\n#endif\r\n#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)\r\n  uniform  vec3 u_VOLVelocityConst;\r\n#endif\r\n#if defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n  uniform  vec2 u_VOLVelocityGradientX[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientY[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientZ[4];//x为key,y为速度\r\n#endif\r\n#ifdef VELOCITYOVERLIFETIMERANDOMCONSTANT\r\n  uniform  vec3 u_VOLVelocityConstMax;\r\n#endif\r\n#ifdef VELOCITYOVERLIFETIMERANDOMCURVE\r\n  uniform  vec2 u_VOLVelocityGradientMaxX[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientMaxY[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientMaxZ[4];//x为key,y为速度\r\n#endif\r\n\r\n#ifdef COLOROVERLIFETIME\r\n  uniform  vec4 u_ColorOverLifeGradientColors[4];//x为key,yzw为Color\r\n  uniform  vec2 u_ColorOverLifeGradientAlphas[4];//x为key,y为Alpha\r\n#endif\r\n#ifdef RANDOMCOLOROVERLIFETIME\r\n  uniform  vec4 u_ColorOverLifeGradientColors[4];//x为key,yzw为Color\r\n  uniform  vec2 u_ColorOverLifeGradientAlphas[4];//x为key,y为Alpha\r\n  uniform  vec4 u_MaxColorOverLifeGradientColors[4];//x为key,yzw为Color\r\n  uniform  vec2 u_MaxColorOverLifeGradientAlphas[4];//x为key,y为Alpha\r\n#endif\r\n\r\n\r\n#if defined(SIZEOVERLIFETIMECURVE)||defined(SIZEOVERLIFETIMERANDOMCURVES)\r\n  uniform  vec2 u_SOLSizeGradient[4];//x为key,y为尺寸\r\n#endif\r\n#ifdef SIZEOVERLIFETIMERANDOMCURVES\r\n  uniform  vec2 u_SOLSizeGradientMax[4];//x为key,y为尺寸\r\n#endif\r\n#if defined(SIZEOVERLIFETIMECURVESEPERATE)||defined(SIZEOVERLIFETIMERANDOMCURVESSEPERATE)\r\n  uniform  vec2 u_SOLSizeGradientX[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientY[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientZ[4];//x为key,y为尺寸\r\n#endif\r\n#ifdef SIZEOVERLIFETIMERANDOMCURVESSEPERATE\r\n  uniform  vec2 u_SOLSizeGradientMaxX[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientMaxY[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientMaxZ[4];//x为key,y为尺寸\r\n#endif\r\n\r\n\r\n#ifdef ROTATIONOVERLIFETIME\r\n  #if defined(ROTATIONOVERLIFETIMECONSTANT)||defined(ROTATIONOVERLIFETIMERANDOMCONSTANTS)\r\n    uniform  float u_ROLAngularVelocityConst;\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n    uniform  float u_ROLAngularVelocityConstMax;\r\n  #endif\r\n  #if defined(ROTATIONOVERLIFETIMECURVE)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\n    uniform  vec2 u_ROLAngularVelocityGradient[4];//x为key,y为旋转\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n    uniform  vec2 u_ROLAngularVelocityGradientMax[4];//x为key,y为旋转\r\n  #endif\r\n#endif\r\n#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n  #if defined(ROTATIONOVERLIFETIMECONSTANT)||defined(ROTATIONOVERLIFETIMERANDOMCONSTANTS)\r\n    uniform  vec3 u_ROLAngularVelocityConstSeprarate;\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n    uniform  vec3 u_ROLAngularVelocityConstMaxSeprarate;\r\n  #endif\r\n  #if defined(ROTATIONOVERLIFETIMECURVE)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\n    uniform  vec2 u_ROLAngularVelocityGradientX[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientY[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientZ[4];\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n    uniform  vec2 u_ROLAngularVelocityGradientMaxX[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientMaxY[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientMaxZ[4];\r\n\tuniform  vec2 u_ROLAngularVelocityGradientMaxW[4];\r\n  #endif\r\n#endif\r\n\r\n#if defined(TEXTURESHEETANIMATIONCURVE)||defined(TEXTURESHEETANIMATIONRANDOMCURVE)\r\n  uniform  float u_TSACycles;\r\n  uniform  vec2 u_TSASubUVLength;\r\n  uniform  vec2 u_TSAGradientUVs[4];//x为key,y为frame\r\n#endif\r\n#ifdef TEXTURESHEETANIMATIONRANDOMCURVE\r\n  uniform  vec2 u_TSAMaxGradientUVs[4];//x为key,y为frame\r\n#endif\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif\r\n\r\nvec3 rotationByEuler(in vec3 vector,in vec3 rot)\r\n{\r\n\tfloat halfRoll = rot.z * 0.5;\r\n    float halfPitch = rot.x * 0.5;\r\n\tfloat halfYaw = rot.y * 0.5;\r\n\r\n\tfloat sinRoll = sin(halfRoll);\r\n\tfloat cosRoll = cos(halfRoll);\r\n\tfloat sinPitch = sin(halfPitch);\r\n\tfloat cosPitch = cos(halfPitch);\r\n\tfloat sinYaw = sin(halfYaw);\r\n\tfloat cosYaw = cos(halfYaw);\r\n\r\n\tfloat quaX = (cosYaw * sinPitch * cosRoll) + (sinYaw * cosPitch * sinRoll);\r\n\tfloat quaY = (sinYaw * cosPitch * cosRoll) - (cosYaw * sinPitch * sinRoll);\r\n\tfloat quaZ = (cosYaw * cosPitch * sinRoll) - (sinYaw * sinPitch * cosRoll);\r\n\tfloat quaW = (cosYaw * cosPitch * cosRoll) + (sinYaw * sinPitch * sinRoll);\r\n\t\r\n\t//vec4 q=vec4(quaX,quaY,quaZ,quaW);\r\n\t//vec3 temp = cross(q.xyz, vector) + q.w * vector;\r\n\t//return (cross(temp, -q.xyz) + dot(q.xyz,vector) * q.xyz + q.w * temp);\r\n\t\r\n\tfloat x = quaX + quaX;\r\n    float y = quaY + quaY;\r\n    float z = quaZ + quaZ;\r\n    float wx = quaW * x;\r\n    float wy = quaW * y;\r\n    float wz = quaW * z;\r\n\tfloat xx = quaX * x;\r\n    float xy = quaX * y;\r\n\tfloat xz = quaX * z;\r\n    float yy = quaY * y;\r\n    float yz = quaY * z;\r\n    float zz = quaZ * z;\r\n\r\n    return vec3(((vector.x * ((1.0 - yy) - zz)) + (vector.y * (xy - wz))) + (vector.z * (xz + wy)),\r\n                ((vector.x * (xy + wz)) + (vector.y * ((1.0 - xx) - zz))) + (vector.z * (yz - wx)),\r\n                ((vector.x * (xz - wy)) + (vector.y * (yz + wx))) + (vector.z * ((1.0 - xx) - yy)));\r\n\t\r\n}\r\n\r\n//假定axis已经归一化\r\nvec3 rotationByAxis(in vec3 vector,in vec3 axis, in float angle)\r\n{\r\n\tfloat halfAngle = angle * 0.5;\r\n\tfloat sin = sin(halfAngle);\r\n\t\r\n\tfloat quaX = axis.x * sin;\r\n\tfloat quaY = axis.y * sin;\r\n\tfloat quaZ = axis.z * sin;\r\n\tfloat quaW = cos(halfAngle);\r\n\t\r\n\t//vec4 q=vec4(quaX,quaY,quaZ,quaW);\r\n\t//vec3 temp = cross(q.xyz, vector) + q.w * vector;\r\n\t//return (cross(temp, -q.xyz) + dot(q.xyz,vector) * q.xyz + q.w * temp);\r\n\t\r\n\tfloat x = quaX + quaX;\r\n    float y = quaY + quaY;\r\n    float z = quaZ + quaZ;\r\n    float wx = quaW * x;\r\n    float wy = quaW * y;\r\n    float wz = quaW * z;\r\n\tfloat xx = quaX * x;\r\n    float xy = quaX * y;\r\n\tfloat xz = quaX * z;\r\n    float yy = quaY * y;\r\n    float yz = quaY * z;\r\n    float zz = quaZ * z;\r\n\r\n    return vec3(((vector.x * ((1.0 - yy) - zz)) + (vector.y * (xy - wz))) + (vector.z * (xz + wy)),\r\n                ((vector.x * (xy + wz)) + (vector.y * ((1.0 - xx) - zz))) + (vector.z * (yz - wx)),\r\n                ((vector.x * (xz - wy)) + (vector.y * (yz + wx))) + (vector.z * ((1.0 - xx) - yy)));\r\n\t\r\n}\r\n\r\nvec3 rotationByQuaternions(in vec3 v,in vec4 q) \r\n{\r\n\treturn v + 2.0 * cross(q.xyz, cross(q.xyz, v) + q.w * v);\r\n}\r\n\r\n \r\n#if defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)||defined(SIZEOVERLIFETIMECURVE)||defined(SIZEOVERLIFETIMECURVESEPERATE)||defined(SIZEOVERLIFETIMERANDOMCURVES)||defined(SIZEOVERLIFETIMERANDOMCURVESSEPERATE)\r\nfloat getCurValueFromGradientFloat(in vec2 gradientNumbers[4],in float normalizedAge)\r\n{\r\n\tfloat curValue;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientNumber=gradientNumbers[i];\r\n\t\tfloat key=gradientNumber.x;\r\n\t\tif(key>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec2 lastGradientNumber=gradientNumbers[i-1];\r\n\t\t\tfloat lastKey=lastGradientNumber.x;\r\n\t\t\tfloat age=(normalizedAge-lastKey)/(key-lastKey);\r\n\t\t\tcurValue=mix(lastGradientNumber.y,gradientNumber.y,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\treturn curValue;\r\n}\r\n#endif\r\n\r\n#if defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)||defined(ROTATIONOVERLIFETIMECURVE)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\nfloat getTotalValueFromGradientFloat(in vec2 gradientNumbers[4],in float normalizedAge)\r\n{\r\n\tfloat totalValue=0.0;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientNumber=gradientNumbers[i];\r\n\t\tfloat key=gradientNumber.x;\r\n\t\tvec2 lastGradientNumber=gradientNumbers[i-1];\r\n\t\tfloat lastValue=lastGradientNumber.y;\r\n\t\t\r\n\t\tif(key>=normalizedAge){\r\n\t\t\tfloat lastKey=lastGradientNumber.x;\r\n\t\t\tfloat age=(normalizedAge-lastKey)/(key-lastKey);\r\n\t\t\ttotalValue+=(lastValue+mix(lastValue,gradientNumber.y,age))/2.0*a_ShapePositionStartLifeTime.w*(normalizedAge-lastKey);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t\telse{\r\n\t\t\ttotalValue+=(lastValue+gradientNumber.y)/2.0*a_ShapePositionStartLifeTime.w*(key-lastGradientNumber.x);\r\n\t\t}\r\n\t}\r\n\treturn totalValue;\r\n}\r\n#endif\r\n\r\n#if defined(COLOROVERLIFETIME)||defined(RANDOMCOLOROVERLIFETIME)\r\nvec4 getColorFromGradient(in vec2 gradientAlphas[4],in vec4 gradientColors[4],in float normalizedAge)\r\n{\r\n\tvec4 overTimeColor;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientAlpha=gradientAlphas[i];\r\n\t\tfloat alphaKey=gradientAlpha.x;\r\n\t\tif(alphaKey>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec2 lastGradientAlpha=gradientAlphas[i-1];\r\n\t\t\tfloat lastAlphaKey=lastGradientAlpha.x;\r\n\t\t\tfloat age=(normalizedAge-lastAlphaKey)/(alphaKey-lastAlphaKey);\r\n\t\t\toverTimeColor.a=mix(lastGradientAlpha.y,gradientAlpha.y,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\t\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec4 gradientColor=gradientColors[i];\r\n\t\tfloat colorKey=gradientColor.x;\r\n\t\tif(colorKey>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec4 lastGradientColor=gradientColors[i-1];\r\n\t\t\tfloat lastColorKey=lastGradientColor.x;\r\n\t\t\tfloat age=(normalizedAge-lastColorKey)/(colorKey-lastColorKey);\r\n\t\t\toverTimeColor.rgb=mix(gradientColors[i-1].yzw,gradientColor.yzw,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\treturn overTimeColor;\r\n}\r\n#endif\r\n\r\n\r\n#if defined(TEXTURESHEETANIMATIONCURVE)||defined(TEXTURESHEETANIMATIONRANDOMCURVE)\r\nfloat getFrameFromGradient(in vec2 gradientFrames[4],in float normalizedAge)\r\n{\r\n\tfloat overTimeFrame;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientFrame=gradientFrames[i];\r\n\t\tfloat key=gradientFrame.x;\r\n\t\tif(key>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec2 lastGradientFrame=gradientFrames[i-1];\r\n\t\t\tfloat lastKey=lastGradientFrame.x;\r\n\t\t\tfloat age=(normalizedAge-lastKey)/(key-lastKey);\r\n\t\t\toverTimeFrame=mix(lastGradientFrame.y,gradientFrame.y,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\treturn floor(overTimeFrame);\r\n}\r\n#endif\r\n\r\n#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\nvec3 computeParticleLifeVelocity(in float normalizedAge)\r\n{\r\n  vec3 outLifeVelocity;\r\n  #ifdef VELOCITYOVERLIFETIMECONSTANT\r\n\t outLifeVelocity=u_VOLVelocityConst; \r\n  #endif\r\n  #ifdef VELOCITYOVERLIFETIMECURVE\r\n     outLifeVelocity= vec3(getCurValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge));\r\n  #endif\r\n  #ifdef VELOCITYOVERLIFETIMERANDOMCONSTANT\r\n\t outLifeVelocity=mix(u_VOLVelocityConst,u_VOLVelocityConstMax,vec3(a_Random1.y,a_Random1.z,a_Random1.w)); \r\n  #endif\r\n  #ifdef VELOCITYOVERLIFETIMERANDOMCURVE\r\n     outLifeVelocity=vec3(mix(getCurValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientMaxX,normalizedAge),a_Random1.y),\r\n\t                 mix(getCurValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientMaxY,normalizedAge),a_Random1.z),\r\n\t\t\t\t\t mix(getCurValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientMaxZ,normalizedAge),a_Random1.w));\r\n  #endif\r\n\t\t\t\t\t\r\n  return outLifeVelocity;\r\n} \r\n#endif\r\n\r\nvec3 computeParticlePosition(in vec3 startVelocity, in vec3 lifeVelocity,in float age,in float normalizedAge,vec3 gravityVelocity,vec4 worldRotation)\r\n{\r\n   vec3 startPosition;\r\n   vec3 lifePosition;\r\n   #if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n\t#ifdef VELOCITYOVERLIFETIMECONSTANT\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=lifeVelocity*age;\r\n\t#endif\r\n\t#ifdef VELOCITYOVERLIFETIMECURVE\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=vec3(getTotalValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge));\r\n\t#endif\r\n\t#ifdef VELOCITYOVERLIFETIMERANDOMCONSTANT\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=lifeVelocity*age;\r\n\t#endif\r\n\t#ifdef VELOCITYOVERLIFETIMERANDOMCURVE\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=vec3(mix(getTotalValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientMaxX,normalizedAge),a_Random1.y)\r\n\t      ,mix(getTotalValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientMaxY,normalizedAge),a_Random1.z)\r\n\t      ,mix(getTotalValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientMaxZ,normalizedAge),a_Random1.w));\r\n\t#endif\r\n\t\r\n\tvec3 finalPosition;\r\n\tif(u_VOLSpaceType==0){\r\n\t  if(u_ScalingMode!=2)\r\n\t   finalPosition =rotationByQuaternions(u_PositionScale*(a_ShapePositionStartLifeTime.xyz+startPosition+lifePosition),worldRotation);\r\n\t  else\r\n\t   finalPosition =rotationByQuaternions(u_PositionScale*a_ShapePositionStartLifeTime.xyz+startPosition+lifePosition,worldRotation);\r\n\t}\r\n\telse{\r\n\t  if(u_ScalingMode!=2)\r\n\t    finalPosition = rotationByQuaternions(u_PositionScale*(a_ShapePositionStartLifeTime.xyz+startPosition),worldRotation)+lifePosition;\r\n\t  else\r\n\t    finalPosition = rotationByQuaternions(u_PositionScale*a_ShapePositionStartLifeTime.xyz+startPosition,worldRotation)+lifePosition;\r\n\t}\r\n  #else\r\n\t startPosition=startVelocity*age;\r\n\t vec3 finalPosition;\r\n\t if(u_ScalingMode!=2)\r\n\t\t\tfinalPosition = rotationByQuaternions(u_PositionScale*(a_ShapePositionStartLifeTime.xyz+startPosition),worldRotation);\r\n\t else\r\n\t   \tfinalPosition = rotationByQuaternions(u_PositionScale*a_ShapePositionStartLifeTime.xyz+startPosition,worldRotation);\r\n  #endif\r\n  \r\n  if(u_SimulationSpace==0)\r\n    finalPosition=finalPosition+a_SimulationWorldPostion;\r\n  else if(u_SimulationSpace==1) \r\n    finalPosition=finalPosition+u_WorldPosition;\r\n  \r\n  finalPosition+=0.5*gravityVelocity*age;\r\n \r\n  return  finalPosition;\r\n}\r\n\r\n\r\nvec4 computeParticleColor(in vec4 color,in float normalizedAge)\r\n{\r\n\t#ifdef COLOROVERLIFETIME\r\n\t  color*=getColorFromGradient(u_ColorOverLifeGradientAlphas,u_ColorOverLifeGradientColors,normalizedAge);\r\n\t#endif\r\n\t\r\n\t#ifdef RANDOMCOLOROVERLIFETIME\r\n\t  color*=mix(getColorFromGradient(u_ColorOverLifeGradientAlphas,u_ColorOverLifeGradientColors,normalizedAge),getColorFromGradient(u_MaxColorOverLifeGradientAlphas,u_MaxColorOverLifeGradientColors,normalizedAge),a_Random0.y);\r\n\t#endif\r\n\r\n    return color;\r\n}\r\n\r\nvec2 computeParticleSizeBillbard(in vec2 size,in float normalizedAge)\r\n{\r\n\t#ifdef SIZEOVERLIFETIMECURVE\r\n\t\tsize*=getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge);\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVES\r\n\t    size*=mix(getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMax,normalizedAge),a_Random0.z); \r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMECURVESEPERATE\r\n\t\tsize*=vec2(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge));\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVESSEPERATE\r\n\t    size*=vec2(mix(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxX,normalizedAge),a_Random0.z)\r\n\t    ,mix(getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxY,normalizedAge),a_Random0.z));\r\n\t#endif\r\n\treturn size;\r\n}\r\n\r\n#ifdef RENDERMODE_MESH\r\nvec3 computeParticleSizeMesh(in vec3 size,in float normalizedAge)\r\n{\r\n\t#ifdef SIZEOVERLIFETIMECURVE\r\n\t\tsize*=getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge);\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVES\r\n\t    size*=mix(getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMax,normalizedAge),a_Random0.z); \r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMECURVESEPERATE\r\n\t\tsize*=vec3(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientZ,normalizedAge));\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVESSEPERATE\r\n\t    size*=vec3(mix(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxX,normalizedAge),a_Random0.z)\r\n\t    ,mix(getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxY,normalizedAge),a_Random0.z)\r\n\t\t,mix(getCurValueFromGradientFloat(u_SOLSizeGradientZ,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxZ,normalizedAge),a_Random0.z));\r\n\t#endif\r\n\treturn size;\r\n}\r\n#endif\r\n\r\nfloat computeParticleRotationFloat(in float rotation,in float age,in float normalizedAge)\r\n{ \r\n\t#ifdef ROTATIONOVERLIFETIME\r\n\t\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tfloat ageRot=u_ROLAngularVelocityConst*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge);\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tfloat ageRot=mix(u_ROLAngularVelocityConst,u_ROLAngularVelocityConstMax,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMax,normalizedAge),a_Random0.w);\r\n\t\t#endif\r\n\t#endif\r\n\t#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n\t\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tfloat ageRot=u_ROLAngularVelocityConstSeprarate.z*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge);\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tfloat ageRot=mix(u_ROLAngularVelocityConstSeprarate.z,u_ROLAngularVelocityConstMaxSeprarate.z,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxZ,normalizedAge),a_Random0.w));\r\n\t\t#endif\r\n\t#endif\r\n\treturn rotation;\r\n}\r\n\r\n#if defined(RENDERMODE_MESH)&&(defined(ROTATIONOVERLIFETIME)||defined(ROTATIONOVERLIFETIMESEPERATE))\r\nvec3 computeParticleRotationVec3(in vec3 rotation,in float age,in float normalizedAge)\r\n{ \r\n\t#ifdef ROTATIONOVERLIFETIME\r\n\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tfloat ageRot=u_ROLAngularVelocityConst*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge);\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tfloat ageRot=mix(u_ROLAngularVelocityConst,u_ROLAngularVelocityConstMax,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMax,normalizedAge),a_Random0.w);\r\n\t\t#endif\r\n\t#endif\r\n\t#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n\t\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tvec3 ageRot=u_ROLAngularVelocityConstSeprarate*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=vec3(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge));\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tvec3 ageRot=mix(u_ROLAngularVelocityConstSeprarate,u_ROLAngularVelocityConstMaxSeprarate,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=vec3(mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxX,normalizedAge),a_Random0.w)\r\n\t        ,mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxY,normalizedAge),a_Random0.w)\r\n\t        ,mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxZ,normalizedAge),a_Random0.w));\r\n\t\t#endif\r\n\t#endif\r\n\treturn rotation;\r\n}\r\n#endif\r\n\r\nvec2 computeParticleUV(in vec2 uv,in float normalizedAge)\r\n{ \r\n\t#ifdef TEXTURESHEETANIMATIONCURVE\r\n\t\tfloat cycleNormalizedAge=normalizedAge*u_TSACycles;\r\n\t\tfloat frame=getFrameFromGradient(u_TSAGradientUVs,cycleNormalizedAge-floor(cycleNormalizedAge));\r\n\t\tfloat totalULength=frame*u_TSASubUVLength.x;\r\n\t\tfloat floorTotalULength=floor(totalULength);\r\n\t    uv.x+=totalULength-floorTotalULength;\r\n\t\tuv.y+=floorTotalULength*u_TSASubUVLength.y;\r\n    #endif\r\n\t#ifdef TEXTURESHEETANIMATIONRANDOMCURVE\r\n\t\tfloat cycleNormalizedAge=normalizedAge*u_TSACycles;\r\n\t\tfloat uvNormalizedAge=cycleNormalizedAge-floor(cycleNormalizedAge);\r\n\t    float frame=floor(mix(getFrameFromGradient(u_TSAGradientUVs,uvNormalizedAge),getFrameFromGradient(u_TSAMaxGradientUVs,uvNormalizedAge),a_Random1.x));\r\n\t\tfloat totalULength=frame*u_TSASubUVLength.x;\r\n\t\tfloat floorTotalULength=floor(totalULength);\r\n\t    uv.x+=totalULength-floorTotalULength;\r\n\t\tuv.y+=floorTotalULength*u_TSASubUVLength.y;\r\n    #endif\r\n\treturn uv;\r\n}\r\n\r\nvoid main()\r\n{\r\n\tfloat age = u_CurrentTime - a_DirectionTime.w;\r\n\tfloat normalizedAge = age/a_ShapePositionStartLifeTime.w;\r\n\tvec3 lifeVelocity;\r\n\tif(normalizedAge<1.0)\r\n\t{ \r\n\t\tvec3 startVelocity=a_DirectionTime.xyz*a_StartSpeed;\r\n\t\t#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n\t\t\tlifeVelocity= computeParticleLifeVelocity(normalizedAge);//计算粒子生命周期速度\r\n\t\t#endif \r\n\t\tvec3 gravityVelocity=u_Gravity*age;\r\n\t\t\r\n\t\tvec4 worldRotation;\r\n\t\tif(u_SimulationSpace==0)\r\n\t\t\tworldRotation=a_SimulationWorldRotation;\r\n\t\telse\r\n\t\t\tworldRotation=u_WorldRotation;\r\n\t\t\r\n\t\tvec3 center=computeParticlePosition(startVelocity, lifeVelocity, age, normalizedAge,gravityVelocity,worldRotation);//计算粒子位置\r\n\t\r\n\t\r\n\t\t#ifdef SPHERHBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tvec3 cameraUpVector =normalize(u_CameraUp);//TODO:是否外面归一化\r\n\t\t\tvec3 sideVector = normalize(cross(u_CameraDirection,cameraUpVector));\r\n\t\t\tvec3 upVector = normalize(cross(sideVector,u_CameraDirection));\r\n\t\t\tcorner*=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\t#if defined(ROTATIONOVERLIFETIME)||defined(ROTATIONOVERLIFETIMESEPERATE)\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tvec3 rotation=vec3(a_StartRotation0.xy,computeParticleRotationFloat(a_StartRotation0.z,age,normalizedAge));\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*rotationByEuler(corner.x*sideVector+corner.y*upVector,rotation);\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\tfloat rot = computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\t\t\tfloat c = cos(rot);\r\n\t\t\t\t\tfloat s = sin(rot);\r\n\t\t\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\t\t\tcorner=rotation*corner;\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*(corner.x*sideVector+corner.y*upVector);\r\n\t\t\t\t}\r\n\t\t\t#else\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*rotationByEuler(corner.x*sideVector+corner.y*upVector,a_StartRotation0);\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\tfloat c = cos(a_StartRotation0.x);\r\n\t\t\t\t\tfloat s = sin(a_StartRotation0.x);\r\n\t\t\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\t\t\tcorner=rotation*corner;\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*(corner.x*sideVector+corner.y*upVector);\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef STRETCHEDBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tvec3 velocity;\r\n\t\t\t#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n\t\t\t\tif(u_VOLSpaceType==0)\r\n\t\t\t\tvelocity=rotationByQuaternions(u_SizeScale*(startVelocity+lifeVelocity),worldRotation)+gravityVelocity;\r\n\t\t\t\telse\r\n\t\t\t\tvelocity=rotationByQuaternions(u_SizeScale*startVelocity,worldRotation)+lifeVelocity+gravityVelocity;\r\n\t\t\t#else\r\n\t\t\t\tvelocity= rotationByQuaternions(u_SizeScale*startVelocity,worldRotation)+gravityVelocity;\r\n\t\t\t#endif\t\r\n\t\t\tvec3 cameraUpVector = normalize(velocity);\r\n\t\t\tvec3 direction = normalize(center-u_CameraPos);\r\n\t\t\tvec3 sideVector = normalize(cross(direction,normalize(velocity)));\r\n\t\t\t\r\n\t\t\tsideVector=u_SizeScale.xzy*sideVector;\r\n\t\t\tcameraUpVector=length(vec3(u_SizeScale.x,0.0,0.0))*cameraUpVector;\r\n\t\t\t\r\n\t\t\tvec2 size=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\t\r\n\t\t\tconst mat2 rotaionZHalfPI=mat2(0.0, -1.0, 1.0, 0.0);\r\n\t\t\tcorner=rotaionZHalfPI*corner;\r\n\t\t\tcorner.y=corner.y-abs(corner.y);\r\n\t\t\t\r\n\t\t\tfloat speed=length(velocity);//TODO:\r\n\t\t\tcenter +=sign(u_SizeScale.x)*(sign(u_StretchedBillboardLengthScale)*size.x*corner.x*sideVector+(speed*u_StretchedBillboardSpeedScale+size.y*u_StretchedBillboardLengthScale)*corner.y*cameraUpVector);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef HORIZONTALBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tconst vec3 cameraUpVector=vec3(0.0,0.0,1.0);\r\n\t\t\tconst vec3 sideVector = vec3(-1.0,0.0,0.0);\r\n\t\t\t\r\n\t\t\tfloat rot = computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\tfloat c = cos(rot);\r\n\t\t\tfloat s = sin(rot);\r\n\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\tcorner=rotation*corner*cos(0.78539816339744830961566084581988);//TODO:临时缩小cos45,不确定U3D原因\r\n\t\t\tcorner*=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\tcenter +=u_SizeScale.xzy*(corner.x*sideVector+ corner.y*cameraUpVector);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef VERTICALBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tconst vec3 cameraUpVector =vec3(0.0,1.0,0.0);\r\n\t\t\tvec3 sideVector = normalize(cross(u_CameraDirection,cameraUpVector));\r\n\t\t\t\r\n\t\t\tfloat rot = computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\tfloat c = cos(rot);\r\n\t\t\tfloat s = sin(rot);\r\n\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\tcorner=rotation*corner*cos(0.78539816339744830961566084581988);//TODO:临时缩小cos45,不确定U3D原因\r\n\t\t\tcorner*=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\tcenter +=u_SizeScale.xzy*(corner.x*sideVector+ corner.y*cameraUpVector);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef RENDERMODE_MESH\r\n\t\t\tvec3 size=computeParticleSizeMesh(a_StartSize,normalizedAge);\r\n\t\t\t#if defined(ROTATIONOVERLIFETIME)||defined(ROTATIONOVERLIFETIMESEPERATE)\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tvec3 rotation=vec3(a_StartRotation0.xy,computeParticleRotationFloat(a_StartRotation0.z, age,normalizedAge));\r\n\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByEuler(a_MeshPosition*size,rotation),worldRotation);\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\t#ifdef ROTATIONOVERLIFETIME\r\n\t\t\t\t\t\tfloat angle=computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\t\t\t\tif(a_ShapePositionStartLifeTime.x!=0.0||a_ShapePositionStartLifeTime.y!=0.0){\r\n\t\t\t\t\t\t\tcenter+= (rotationByQuaternions(rotationByAxis(u_SizeScale*a_MeshPosition*size,normalize(cross(vec3(0.0,0.0,1.0),vec3(a_ShapePositionStartLifeTime.xy,0.0))),angle),worldRotation));//已验证\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\telse{\r\n\t\t\t\t\t\t\t#ifdef SHAPE\r\n\t\t\t\t\t\t\t\tcenter+= u_SizeScale.xzy*(rotationByQuaternions(rotationByAxis(a_MeshPosition*size,vec3(0.0,-1.0,0.0),angle),worldRotation));\r\n\t\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\t\t\tcenter+=rotationByAxis(u_SizeScale*a_MeshPosition*size,vec3(0.0,0.0,-1.0),angle);//已验证\r\n\t\t\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\t\t\tcenter+=rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,0.0,-1.0),angle),worldRotation);//已验证\r\n\t\t\t\t\t\t\t#endif\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t#endif\r\n\t\t\t\t\t#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n\t\t\t\t\t\t//TODO:是否应合并if(u_ThreeDStartRotation)分支代码,待测试\r\n\t\t\t\t\t\tvec3 angle=computeParticleRotationVec3(vec3(0.0,0.0,-a_StartRotation0.x), age,normalizedAge);\r\n\t\t\t\t\t\tcenter+= (rotationByQuaternions(rotationByEuler(u_SizeScale*a_MeshPosition*size,vec3(angle.x,angle.y,angle.z)),worldRotation));//已验证\r\n\t\t\t\t\t#endif\t\t\r\n\t\t\t\t}\r\n\t\t\t#else\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByEuler(a_MeshPosition*size,a_StartRotation0),worldRotation);//已验证\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\tif(a_ShapePositionStartLifeTime.x!=0.0||a_ShapePositionStartLifeTime.y!=0.0){\r\n\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\tcenter+= rotationByAxis(u_SizeScale*a_MeshPosition*size,normalize(cross(vec3(0.0,0.0,1.0),vec3(a_ShapePositionStartLifeTime.xy,0.0))),a_StartRotation0.x);\r\n\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\tcenter+= (rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,normalize(cross(vec3(0.0,0.0,1.0),vec3(a_ShapePositionStartLifeTime.xy,0.0))),a_StartRotation0.x),worldRotation));//已验证\r\n\t\t\t\t\t}\r\n\t\t\t\t\telse{\r\n\t\t\t\t\t\t#ifdef SHAPE\r\n\t\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\t\tcenter+= u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,-1.0,0.0),a_StartRotation0.x);\r\n\t\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,-1.0,0.0),a_StartRotation0.x),worldRotation);\t\r\n\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\t\tcenter+= rotationByAxis(u_SizeScale*a_MeshPosition*size,vec3(0.0,0.0,-1.0),a_StartRotation0.x);\r\n\t\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,0.0,-1.0),a_StartRotation0.x),worldRotation);//已验证\r\n\t\t\t\t\t\t#endif\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\tv_MeshColor=a_MeshColor;\r\n\t\t#endif\r\n\t\r\n\t\tgl_Position=u_Projection*u_View*vec4(center,1.0);\r\n\t\tv_Color = computeParticleColor(a_StartColor, normalizedAge);\r\n\t\t#ifdef DIFFUSEMAP\r\n\t\t\t#if defined(SPHERHBILLBOARD)||defined(STRETCHEDBILLBOARD)||defined(HORIZONTALBILLBOARD)||defined(VERTICALBILLBOARD)\r\n\t\t\t\tv_TextureCoordinate =computeParticleUV(a_CornerTextureCoordinate.zw, normalizedAge);\r\n\t\t\t#endif\r\n\t\t\t#ifdef RENDERMODE_MESH\r\n\t\t\t\tv_TextureCoordinate =computeParticleUV(a_MeshTextureCoordinate, normalizedAge);\r\n\t\t\t#endif\r\n\t\t\t\r\n\t\t\t#ifdef TILINGOFFSET\r\n\t\t\t\tv_TextureCoordinate=TransformUV(v_TextureCoordinate,u_TilingOffset);\r\n\t\t\t#endif\r\n\t\t#endif\r\n   \t}\r\n   \telse\r\n\t{\r\n\t\tgl_Position=vec4(2.0,2.0,2.0,1.0);//Discard use out of X(-1,1),Y(-1,1),Z(0,1)\r\n\t}\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n\r\n";
+	var ParticleShuriKenVS = "// #include \"Lighting.glsl\";\r\n\r\n//修改这里剔除没有用到的光照函数，增加粒子的编译速度\r\nvec2 TransformUV(vec2 texcoord,vec4 tilingOffset) {\r\n\tvec2 transTexcoord=vec2(texcoord.x,texcoord.y-1.0)*tilingOffset.xy+vec2(tilingOffset.z,-tilingOffset.w);\r\n\ttransTexcoord.y+=1.0;\r\n\treturn transTexcoord;\r\n}\r\n\r\nvec4 remapGLPositionZ(vec4 position) {\r\n\tposition.z=position.z * 2.0 - position.w;\r\n\treturn position;\r\n}\r\n\r\n#if defined(GL_FRAGMENT_PRECISION_HIGH)\r\n  precision highp float;\r\n#else\r\n  precision mediump float;\r\n#endif\r\n\r\n#if defined(SPHERHBILLBOARD)||defined(STRETCHEDBILLBOARD)||defined(HORIZONTALBILLBOARD)||defined(VERTICALBILLBOARD)\r\n\tattribute vec4 a_CornerTextureCoordinate;\r\n#endif\r\n#ifdef RENDERMODE_MESH\r\n\tattribute vec3 a_MeshPosition;\r\n\tattribute vec4 a_MeshColor;\r\n\tattribute vec2 a_MeshTextureCoordinate;\r\n\tvarying vec4 v_MeshColor;\r\n#endif\r\n\r\nattribute vec4 a_ShapePositionStartLifeTime;\r\nattribute vec4 a_DirectionTime;\r\nattribute vec4 a_StartColor;\r\nattribute vec3 a_StartSize;\r\nattribute vec3 a_StartRotation0;\r\nattribute float a_StartSpeed;\r\n#if defined(COLOROVERLIFETIME)||defined(RANDOMCOLOROVERLIFETIME)||defined(SIZEOVERLIFETIMERANDOMCURVES)||defined(SIZEOVERLIFETIMERANDOMCURVESSEPERATE)||defined(ROTATIONOVERLIFETIMERANDOMCONSTANTS)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\n  attribute vec4 a_Random0;\r\n#endif\r\n#if defined(TEXTURESHEETANIMATIONRANDOMCURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n  attribute vec4 a_Random1;\r\n#endif\r\nattribute vec3 a_SimulationWorldPostion;\r\nattribute vec4 a_SimulationWorldRotation;\r\n\r\nvarying vec4 v_Color;\r\n#ifdef DIFFUSEMAP\r\n\tvarying vec2 v_TextureCoordinate;\r\n#endif\r\n\r\nuniform float u_CurrentTime;\r\nuniform vec3 u_Gravity;\r\n\r\nuniform vec3 u_WorldPosition;\r\nuniform vec4 u_WorldRotation;\r\nuniform bool u_ThreeDStartRotation;\r\nuniform int u_ScalingMode;\r\nuniform vec3 u_PositionScale;\r\nuniform vec3 u_SizeScale;\r\nuniform mat4 u_View;\r\nuniform mat4 u_Projection;\r\n\r\n#ifdef STRETCHEDBILLBOARD\r\n\tuniform vec3 u_CameraPos;\r\n#endif\r\nuniform vec3 u_CameraDirection;//TODO:只有几种广告牌模式需要用\r\nuniform vec3 u_CameraUp;\r\n\r\nuniform  float u_StretchedBillboardLengthScale;\r\nuniform  float u_StretchedBillboardSpeedScale;\r\nuniform int u_SimulationSpace;\r\n\r\n#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n  uniform  int  u_VOLSpaceType;\r\n#endif\r\n#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)\r\n  uniform  vec3 u_VOLVelocityConst;\r\n#endif\r\n#if defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n  uniform  vec2 u_VOLVelocityGradientX[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientY[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientZ[4];//x为key,y为速度\r\n#endif\r\n#ifdef VELOCITYOVERLIFETIMERANDOMCONSTANT\r\n  uniform  vec3 u_VOLVelocityConstMax;\r\n#endif\r\n#ifdef VELOCITYOVERLIFETIMERANDOMCURVE\r\n  uniform  vec2 u_VOLVelocityGradientMaxX[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientMaxY[4];//x为key,y为速度\r\n  uniform  vec2 u_VOLVelocityGradientMaxZ[4];//x为key,y为速度\r\n#endif\r\n\r\n#ifdef COLOROVERLIFETIME\r\n  uniform  vec4 u_ColorOverLifeGradientColors[4];//x为key,yzw为Color\r\n  uniform  vec2 u_ColorOverLifeGradientAlphas[4];//x为key,y为Alpha\r\n#endif\r\n#ifdef RANDOMCOLOROVERLIFETIME\r\n  uniform  vec4 u_ColorOverLifeGradientColors[4];//x为key,yzw为Color\r\n  uniform  vec2 u_ColorOverLifeGradientAlphas[4];//x为key,y为Alpha\r\n  uniform  vec4 u_MaxColorOverLifeGradientColors[4];//x为key,yzw为Color\r\n  uniform  vec2 u_MaxColorOverLifeGradientAlphas[4];//x为key,y为Alpha\r\n#endif\r\n\r\n\r\n#if defined(SIZEOVERLIFETIMECURVE)||defined(SIZEOVERLIFETIMERANDOMCURVES)\r\n  uniform  vec2 u_SOLSizeGradient[4];//x为key,y为尺寸\r\n#endif\r\n#ifdef SIZEOVERLIFETIMERANDOMCURVES\r\n  uniform  vec2 u_SOLSizeGradientMax[4];//x为key,y为尺寸\r\n#endif\r\n#if defined(SIZEOVERLIFETIMECURVESEPERATE)||defined(SIZEOVERLIFETIMERANDOMCURVESSEPERATE)\r\n  uniform  vec2 u_SOLSizeGradientX[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientY[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientZ[4];//x为key,y为尺寸\r\n#endif\r\n#ifdef SIZEOVERLIFETIMERANDOMCURVESSEPERATE\r\n  uniform  vec2 u_SOLSizeGradientMaxX[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientMaxY[4];//x为key,y为尺寸\r\n  uniform  vec2 u_SOLSizeGradientMaxZ[4];//x为key,y为尺寸\r\n#endif\r\n\r\n\r\n#ifdef ROTATIONOVERLIFETIME\r\n  #if defined(ROTATIONOVERLIFETIMECONSTANT)||defined(ROTATIONOVERLIFETIMERANDOMCONSTANTS)\r\n    uniform  float u_ROLAngularVelocityConst;\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n    uniform  float u_ROLAngularVelocityConstMax;\r\n  #endif\r\n  #if defined(ROTATIONOVERLIFETIMECURVE)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\n    uniform  vec2 u_ROLAngularVelocityGradient[4];//x为key,y为旋转\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n    uniform  vec2 u_ROLAngularVelocityGradientMax[4];//x为key,y为旋转\r\n  #endif\r\n#endif\r\n#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n  #if defined(ROTATIONOVERLIFETIMECONSTANT)||defined(ROTATIONOVERLIFETIMERANDOMCONSTANTS)\r\n    uniform  vec3 u_ROLAngularVelocityConstSeprarate;\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n    uniform  vec3 u_ROLAngularVelocityConstMaxSeprarate;\r\n  #endif\r\n  #if defined(ROTATIONOVERLIFETIMECURVE)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\n    uniform  vec2 u_ROLAngularVelocityGradientX[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientY[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientZ[4];\r\n  #endif\r\n  #ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n    uniform  vec2 u_ROLAngularVelocityGradientMaxX[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientMaxY[4];\r\n    uniform  vec2 u_ROLAngularVelocityGradientMaxZ[4];\r\n\tuniform  vec2 u_ROLAngularVelocityGradientMaxW[4];\r\n  #endif\r\n#endif\r\n\r\n#if defined(TEXTURESHEETANIMATIONCURVE)||defined(TEXTURESHEETANIMATIONRANDOMCURVE)\r\n  uniform  float u_TSACycles;\r\n  uniform  vec2 u_TSASubUVLength;\r\n  uniform  vec2 u_TSAGradientUVs[4];//x为key,y为frame\r\n#endif\r\n#ifdef TEXTURESHEETANIMATIONRANDOMCURVE\r\n  uniform  vec2 u_TSAMaxGradientUVs[4];//x为key,y为frame\r\n#endif\r\n\r\nuniform vec4 u_TilingOffset;\r\n\r\nvec3 rotationByEuler(in vec3 vector,in vec3 rot)\r\n{\r\n\tfloat halfRoll = rot.z * 0.5;\r\n    float halfPitch = rot.x * 0.5;\r\n\tfloat halfYaw = rot.y * 0.5;\r\n\r\n\tfloat sinRoll = sin(halfRoll);\r\n\tfloat cosRoll = cos(halfRoll);\r\n\tfloat sinPitch = sin(halfPitch);\r\n\tfloat cosPitch = cos(halfPitch);\r\n\tfloat sinYaw = sin(halfYaw);\r\n\tfloat cosYaw = cos(halfYaw);\r\n\r\n\tfloat quaX = (cosYaw * sinPitch * cosRoll) + (sinYaw * cosPitch * sinRoll);\r\n\tfloat quaY = (sinYaw * cosPitch * cosRoll) - (cosYaw * sinPitch * sinRoll);\r\n\tfloat quaZ = (cosYaw * cosPitch * sinRoll) - (sinYaw * sinPitch * cosRoll);\r\n\tfloat quaW = (cosYaw * cosPitch * cosRoll) + (sinYaw * sinPitch * sinRoll);\r\n\t\r\n\t//vec4 q=vec4(quaX,quaY,quaZ,quaW);\r\n\t//vec3 temp = cross(q.xyz, vector) + q.w * vector;\r\n\t//return (cross(temp, -q.xyz) + dot(q.xyz,vector) * q.xyz + q.w * temp);\r\n\t\r\n\tfloat x = quaX + quaX;\r\n    float y = quaY + quaY;\r\n    float z = quaZ + quaZ;\r\n    float wx = quaW * x;\r\n    float wy = quaW * y;\r\n    float wz = quaW * z;\r\n\tfloat xx = quaX * x;\r\n    float xy = quaX * y;\r\n\tfloat xz = quaX * z;\r\n    float yy = quaY * y;\r\n    float yz = quaY * z;\r\n    float zz = quaZ * z;\r\n\r\n    return vec3(((vector.x * ((1.0 - yy) - zz)) + (vector.y * (xy - wz))) + (vector.z * (xz + wy)),\r\n                ((vector.x * (xy + wz)) + (vector.y * ((1.0 - xx) - zz))) + (vector.z * (yz - wx)),\r\n                ((vector.x * (xz - wy)) + (vector.y * (yz + wx))) + (vector.z * ((1.0 - xx) - yy)));\r\n\t\r\n}\r\n\r\n//假定axis已经归一化\r\nvec3 rotationByAxis(in vec3 vector,in vec3 axis, in float angle)\r\n{\r\n\tfloat halfAngle = angle * 0.5;\r\n\tfloat sin = sin(halfAngle);\r\n\t\r\n\tfloat quaX = axis.x * sin;\r\n\tfloat quaY = axis.y * sin;\r\n\tfloat quaZ = axis.z * sin;\r\n\tfloat quaW = cos(halfAngle);\r\n\t\r\n\t//vec4 q=vec4(quaX,quaY,quaZ,quaW);\r\n\t//vec3 temp = cross(q.xyz, vector) + q.w * vector;\r\n\t//return (cross(temp, -q.xyz) + dot(q.xyz,vector) * q.xyz + q.w * temp);\r\n\t\r\n\tfloat x = quaX + quaX;\r\n    float y = quaY + quaY;\r\n    float z = quaZ + quaZ;\r\n    float wx = quaW * x;\r\n    float wy = quaW * y;\r\n    float wz = quaW * z;\r\n\tfloat xx = quaX * x;\r\n    float xy = quaX * y;\r\n\tfloat xz = quaX * z;\r\n    float yy = quaY * y;\r\n    float yz = quaY * z;\r\n    float zz = quaZ * z;\r\n\r\n    return vec3(((vector.x * ((1.0 - yy) - zz)) + (vector.y * (xy - wz))) + (vector.z * (xz + wy)),\r\n                ((vector.x * (xy + wz)) + (vector.y * ((1.0 - xx) - zz))) + (vector.z * (yz - wx)),\r\n                ((vector.x * (xz - wy)) + (vector.y * (yz + wx))) + (vector.z * ((1.0 - xx) - yy)));\r\n\t\r\n}\r\n\r\nvec3 rotationByQuaternions(in vec3 v,in vec4 q) \r\n{\r\n\treturn v + 2.0 * cross(q.xyz, cross(q.xyz, v) + q.w * v);\r\n}\r\n\r\n \r\n#if defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)||defined(SIZEOVERLIFETIMECURVE)||defined(SIZEOVERLIFETIMECURVESEPERATE)||defined(SIZEOVERLIFETIMERANDOMCURVES)||defined(SIZEOVERLIFETIMERANDOMCURVESSEPERATE)\r\nfloat getCurValueFromGradientFloat(in vec2 gradientNumbers[4],in float normalizedAge)\r\n{\r\n\tfloat curValue;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientNumber=gradientNumbers[i];\r\n\t\tfloat key=gradientNumber.x;\r\n\t\tif(key>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec2 lastGradientNumber=gradientNumbers[i-1];\r\n\t\t\tfloat lastKey=lastGradientNumber.x;\r\n\t\t\tfloat age=(normalizedAge-lastKey)/(key-lastKey);\r\n\t\t\tcurValue=mix(lastGradientNumber.y,gradientNumber.y,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\treturn curValue;\r\n}\r\n#endif\r\n\r\n#if defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)||defined(ROTATIONOVERLIFETIMECURVE)||defined(ROTATIONOVERLIFETIMERANDOMCURVES)\r\nfloat getTotalValueFromGradientFloat(in vec2 gradientNumbers[4],in float normalizedAge)\r\n{\r\n\tfloat totalValue=0.0;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientNumber=gradientNumbers[i];\r\n\t\tfloat key=gradientNumber.x;\r\n\t\tvec2 lastGradientNumber=gradientNumbers[i-1];\r\n\t\tfloat lastValue=lastGradientNumber.y;\r\n\t\t\r\n\t\tif(key>=normalizedAge){\r\n\t\t\tfloat lastKey=lastGradientNumber.x;\r\n\t\t\tfloat age=(normalizedAge-lastKey)/(key-lastKey);\r\n\t\t\ttotalValue+=(lastValue+mix(lastValue,gradientNumber.y,age))/2.0*a_ShapePositionStartLifeTime.w*(normalizedAge-lastKey);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t\telse{\r\n\t\t\ttotalValue+=(lastValue+gradientNumber.y)/2.0*a_ShapePositionStartLifeTime.w*(key-lastGradientNumber.x);\r\n\t\t}\r\n\t}\r\n\treturn totalValue;\r\n}\r\n#endif\r\n\r\n#if defined(COLOROVERLIFETIME)||defined(RANDOMCOLOROVERLIFETIME)\r\nvec4 getColorFromGradient(in vec2 gradientAlphas[4],in vec4 gradientColors[4],in float normalizedAge)\r\n{\r\n\tvec4 overTimeColor;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientAlpha=gradientAlphas[i];\r\n\t\tfloat alphaKey=gradientAlpha.x;\r\n\t\tif(alphaKey>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec2 lastGradientAlpha=gradientAlphas[i-1];\r\n\t\t\tfloat lastAlphaKey=lastGradientAlpha.x;\r\n\t\t\tfloat age=(normalizedAge-lastAlphaKey)/(alphaKey-lastAlphaKey);\r\n\t\t\toverTimeColor.a=mix(lastGradientAlpha.y,gradientAlpha.y,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\t\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec4 gradientColor=gradientColors[i];\r\n\t\tfloat colorKey=gradientColor.x;\r\n\t\tif(colorKey>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec4 lastGradientColor=gradientColors[i-1];\r\n\t\t\tfloat lastColorKey=lastGradientColor.x;\r\n\t\t\tfloat age=(normalizedAge-lastColorKey)/(colorKey-lastColorKey);\r\n\t\t\toverTimeColor.rgb=mix(gradientColors[i-1].yzw,gradientColor.yzw,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\treturn overTimeColor;\r\n}\r\n#endif\r\n\r\n\r\n#if defined(TEXTURESHEETANIMATIONCURVE)||defined(TEXTURESHEETANIMATIONRANDOMCURVE)\r\nfloat getFrameFromGradient(in vec2 gradientFrames[4],in float normalizedAge)\r\n{\r\n\tfloat overTimeFrame;\r\n\tfor(int i=1;i<4;i++)\r\n\t{\r\n\t\tvec2 gradientFrame=gradientFrames[i];\r\n\t\tfloat key=gradientFrame.x;\r\n\t\tif(key>=normalizedAge)\r\n\t\t{\r\n\t\t\tvec2 lastGradientFrame=gradientFrames[i-1];\r\n\t\t\tfloat lastKey=lastGradientFrame.x;\r\n\t\t\tfloat age=(normalizedAge-lastKey)/(key-lastKey);\r\n\t\t\toverTimeFrame=mix(lastGradientFrame.y,gradientFrame.y,age);\r\n\t\t\tbreak;\r\n\t\t}\r\n\t}\r\n\treturn floor(overTimeFrame);\r\n}\r\n#endif\r\n\r\n#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\nvec3 computeParticleLifeVelocity(in float normalizedAge)\r\n{\r\n  vec3 outLifeVelocity;\r\n  #ifdef VELOCITYOVERLIFETIMECONSTANT\r\n\t outLifeVelocity=u_VOLVelocityConst; \r\n  #endif\r\n  #ifdef VELOCITYOVERLIFETIMECURVE\r\n     outLifeVelocity= vec3(getCurValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge));\r\n  #endif\r\n  #ifdef VELOCITYOVERLIFETIMERANDOMCONSTANT\r\n\t outLifeVelocity=mix(u_VOLVelocityConst,u_VOLVelocityConstMax,vec3(a_Random1.y,a_Random1.z,a_Random1.w)); \r\n  #endif\r\n  #ifdef VELOCITYOVERLIFETIMERANDOMCURVE\r\n     outLifeVelocity=vec3(mix(getCurValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientMaxX,normalizedAge),a_Random1.y),\r\n\t                 mix(getCurValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientMaxY,normalizedAge),a_Random1.z),\r\n\t\t\t\t\t mix(getCurValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge),getCurValueFromGradientFloat(u_VOLVelocityGradientMaxZ,normalizedAge),a_Random1.w));\r\n  #endif\r\n\t\t\t\t\t\r\n  return outLifeVelocity;\r\n} \r\n#endif\r\n\r\nvec3 computeParticlePosition(in vec3 startVelocity, in vec3 lifeVelocity,in float age,in float normalizedAge,vec3 gravityVelocity,vec4 worldRotation)\r\n{\r\n   vec3 startPosition;\r\n   vec3 lifePosition;\r\n   #if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n\t#ifdef VELOCITYOVERLIFETIMECONSTANT\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=lifeVelocity*age;\r\n\t#endif\r\n\t#ifdef VELOCITYOVERLIFETIMECURVE\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=vec3(getTotalValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge));\r\n\t#endif\r\n\t#ifdef VELOCITYOVERLIFETIMERANDOMCONSTANT\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=lifeVelocity*age;\r\n\t#endif\r\n\t#ifdef VELOCITYOVERLIFETIMERANDOMCURVE\r\n\t\t  startPosition=startVelocity*age;\r\n\t\t  lifePosition=vec3(mix(getTotalValueFromGradientFloat(u_VOLVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientMaxX,normalizedAge),a_Random1.y)\r\n\t      ,mix(getTotalValueFromGradientFloat(u_VOLVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientMaxY,normalizedAge),a_Random1.z)\r\n\t      ,mix(getTotalValueFromGradientFloat(u_VOLVelocityGradientZ,normalizedAge),getTotalValueFromGradientFloat(u_VOLVelocityGradientMaxZ,normalizedAge),a_Random1.w));\r\n\t#endif\r\n\t\r\n\tvec3 finalPosition;\r\n\tif(u_VOLSpaceType==0){\r\n\t  if(u_ScalingMode!=2)\r\n\t   finalPosition =rotationByQuaternions(u_PositionScale*(a_ShapePositionStartLifeTime.xyz+startPosition+lifePosition),worldRotation);\r\n\t  else\r\n\t   finalPosition =rotationByQuaternions(u_PositionScale*a_ShapePositionStartLifeTime.xyz+startPosition+lifePosition,worldRotation);\r\n\t}\r\n\telse{\r\n\t  if(u_ScalingMode!=2)\r\n\t    finalPosition = rotationByQuaternions(u_PositionScale*(a_ShapePositionStartLifeTime.xyz+startPosition),worldRotation)+lifePosition;\r\n\t  else\r\n\t    finalPosition = rotationByQuaternions(u_PositionScale*a_ShapePositionStartLifeTime.xyz+startPosition,worldRotation)+lifePosition;\r\n\t}\r\n  #else\r\n\t startPosition=startVelocity*age;\r\n\t vec3 finalPosition;\r\n\t if(u_ScalingMode!=2)\r\n\t\t\tfinalPosition = rotationByQuaternions(u_PositionScale*(a_ShapePositionStartLifeTime.xyz+startPosition),worldRotation);\r\n\t else\r\n\t   \tfinalPosition = rotationByQuaternions(u_PositionScale*a_ShapePositionStartLifeTime.xyz+startPosition,worldRotation);\r\n  #endif\r\n  \r\n  if(u_SimulationSpace==0)\r\n    finalPosition=finalPosition+a_SimulationWorldPostion;\r\n  else if(u_SimulationSpace==1) \r\n    finalPosition=finalPosition+u_WorldPosition;\r\n  \r\n  finalPosition+=0.5*gravityVelocity*age;\r\n \r\n  return  finalPosition;\r\n}\r\n\r\n\r\nvec4 computeParticleColor(in vec4 color,in float normalizedAge)\r\n{\r\n\t#ifdef COLOROVERLIFETIME\r\n\t  color*=getColorFromGradient(u_ColorOverLifeGradientAlphas,u_ColorOverLifeGradientColors,normalizedAge);\r\n\t#endif\r\n\t\r\n\t#ifdef RANDOMCOLOROVERLIFETIME\r\n\t  color*=mix(getColorFromGradient(u_ColorOverLifeGradientAlphas,u_ColorOverLifeGradientColors,normalizedAge),getColorFromGradient(u_MaxColorOverLifeGradientAlphas,u_MaxColorOverLifeGradientColors,normalizedAge),a_Random0.y);\r\n\t#endif\r\n\r\n    return color;\r\n}\r\n\r\nvec2 computeParticleSizeBillbard(in vec2 size,in float normalizedAge)\r\n{\r\n\t#ifdef SIZEOVERLIFETIMECURVE\r\n\t\tsize*=getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge);\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVES\r\n\t    size*=mix(getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMax,normalizedAge),a_Random0.z); \r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMECURVESEPERATE\r\n\t\tsize*=vec2(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge));\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVESSEPERATE\r\n\t    size*=vec2(mix(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxX,normalizedAge),a_Random0.z)\r\n\t    ,mix(getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxY,normalizedAge),a_Random0.z));\r\n\t#endif\r\n\treturn size;\r\n}\r\n\r\n#ifdef RENDERMODE_MESH\r\nvec3 computeParticleSizeMesh(in vec3 size,in float normalizedAge)\r\n{\r\n\t#ifdef SIZEOVERLIFETIMECURVE\r\n\t\tsize*=getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge);\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVES\r\n\t    size*=mix(getCurValueFromGradientFloat(u_SOLSizeGradient,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMax,normalizedAge),a_Random0.z); \r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMECURVESEPERATE\r\n\t\tsize*=vec3(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientZ,normalizedAge));\r\n\t#endif\r\n\t#ifdef SIZEOVERLIFETIMERANDOMCURVESSEPERATE\r\n\t    size*=vec3(mix(getCurValueFromGradientFloat(u_SOLSizeGradientX,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxX,normalizedAge),a_Random0.z)\r\n\t    ,mix(getCurValueFromGradientFloat(u_SOLSizeGradientY,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxY,normalizedAge),a_Random0.z)\r\n\t\t,mix(getCurValueFromGradientFloat(u_SOLSizeGradientZ,normalizedAge),getCurValueFromGradientFloat(u_SOLSizeGradientMaxZ,normalizedAge),a_Random0.z));\r\n\t#endif\r\n\treturn size;\r\n}\r\n#endif\r\n\r\nfloat computeParticleRotationFloat(in float rotation,in float age,in float normalizedAge)\r\n{ \r\n\t#ifdef ROTATIONOVERLIFETIME\r\n\t\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tfloat ageRot=u_ROLAngularVelocityConst*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge);\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tfloat ageRot=mix(u_ROLAngularVelocityConst,u_ROLAngularVelocityConstMax,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMax,normalizedAge),a_Random0.w);\r\n\t\t#endif\r\n\t#endif\r\n\t#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n\t\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tfloat ageRot=u_ROLAngularVelocityConstSeprarate.z*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge);\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tfloat ageRot=mix(u_ROLAngularVelocityConstSeprarate.z,u_ROLAngularVelocityConstMaxSeprarate.z,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxZ,normalizedAge),a_Random0.w));\r\n\t\t#endif\r\n\t#endif\r\n\treturn rotation;\r\n}\r\n\r\n#if defined(RENDERMODE_MESH)&&(defined(ROTATIONOVERLIFETIME)||defined(ROTATIONOVERLIFETIMESEPERATE))\r\nvec3 computeParticleRotationVec3(in vec3 rotation,in float age,in float normalizedAge)\r\n{ \r\n\t#ifdef ROTATIONOVERLIFETIME\r\n\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tfloat ageRot=u_ROLAngularVelocityConst*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge);\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tfloat ageRot=mix(u_ROLAngularVelocityConst,u_ROLAngularVelocityConstMax,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradient,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMax,normalizedAge),a_Random0.w);\r\n\t\t#endif\r\n\t#endif\r\n\t#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n\t\t#ifdef ROTATIONOVERLIFETIMECONSTANT\r\n\t\t\tvec3 ageRot=u_ROLAngularVelocityConstSeprarate*age;\r\n\t        rotation+=ageRot;\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMECURVE\r\n\t\t\trotation+=vec3(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge));\r\n\t\t#endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCONSTANTS\r\n\t\t\tvec3 ageRot=mix(u_ROLAngularVelocityConstSeprarate,u_ROLAngularVelocityConstMaxSeprarate,a_Random0.w)*age;\r\n\t        rotation+=ageRot;\r\n\t    #endif\r\n\t\t#ifdef ROTATIONOVERLIFETIMERANDOMCURVES\r\n\t\t\trotation+=vec3(mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientX,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxX,normalizedAge),a_Random0.w)\r\n\t        ,mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientY,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxY,normalizedAge),a_Random0.w)\r\n\t        ,mix(getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientZ,normalizedAge),getTotalValueFromGradientFloat(u_ROLAngularVelocityGradientMaxZ,normalizedAge),a_Random0.w));\r\n\t\t#endif\r\n\t#endif\r\n\treturn rotation;\r\n}\r\n#endif\r\n\r\nvec2 computeParticleUV(in vec2 uv,in float normalizedAge)\r\n{ \r\n\t#ifdef TEXTURESHEETANIMATIONCURVE\r\n\t\tfloat cycleNormalizedAge=normalizedAge*u_TSACycles;\r\n\t\tfloat frame=getFrameFromGradient(u_TSAGradientUVs,cycleNormalizedAge-floor(cycleNormalizedAge));\r\n\t\tfloat totalULength=frame*u_TSASubUVLength.x;\r\n\t\tfloat floorTotalULength=floor(totalULength);\r\n\t    uv.x+=totalULength-floorTotalULength;\r\n\t\tuv.y+=floorTotalULength*u_TSASubUVLength.y;\r\n    #endif\r\n\t#ifdef TEXTURESHEETANIMATIONRANDOMCURVE\r\n\t\tfloat cycleNormalizedAge=normalizedAge*u_TSACycles;\r\n\t\tfloat uvNormalizedAge=cycleNormalizedAge-floor(cycleNormalizedAge);\r\n\t    float frame=floor(mix(getFrameFromGradient(u_TSAGradientUVs,uvNormalizedAge),getFrameFromGradient(u_TSAMaxGradientUVs,uvNormalizedAge),a_Random1.x));\r\n\t\tfloat totalULength=frame*u_TSASubUVLength.x;\r\n\t\tfloat floorTotalULength=floor(totalULength);\r\n\t    uv.x+=totalULength-floorTotalULength;\r\n\t\tuv.y+=floorTotalULength*u_TSASubUVLength.y;\r\n    #endif\r\n\treturn uv;\r\n}\r\n\r\nvoid main()\r\n{\r\n\tfloat age = u_CurrentTime - a_DirectionTime.w;\r\n\tfloat normalizedAge = age/a_ShapePositionStartLifeTime.w;\r\n\tvec3 lifeVelocity;\r\n\tif(normalizedAge<1.0)\r\n\t{ \r\n\t\tvec3 startVelocity=a_DirectionTime.xyz*a_StartSpeed;\r\n\t\t#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n\t\t\tlifeVelocity= computeParticleLifeVelocity(normalizedAge);//计算粒子生命周期速度\r\n\t\t#endif \r\n\t\tvec3 gravityVelocity=u_Gravity*age;\r\n\t\t\r\n\t\tvec4 worldRotation;\r\n\t\tif(u_SimulationSpace==0)\r\n\t\t\tworldRotation=a_SimulationWorldRotation;\r\n\t\telse\r\n\t\t\tworldRotation=u_WorldRotation;\r\n\t\t\r\n\t\tvec3 center=computeParticlePosition(startVelocity, lifeVelocity, age, normalizedAge,gravityVelocity,worldRotation);//计算粒子位置\r\n\t\r\n\t\r\n\t\t#ifdef SPHERHBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tvec3 cameraUpVector =normalize(u_CameraUp);//TODO:是否外面归一化\r\n\t\t\tvec3 sideVector = normalize(cross(u_CameraDirection,cameraUpVector));\r\n\t\t\tvec3 upVector = normalize(cross(sideVector,u_CameraDirection));\r\n\t\t\tcorner*=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\t#if defined(ROTATIONOVERLIFETIME)||defined(ROTATIONOVERLIFETIMESEPERATE)\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tvec3 rotation=vec3(a_StartRotation0.xy,computeParticleRotationFloat(a_StartRotation0.z,age,normalizedAge));\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*rotationByEuler(corner.x*sideVector+corner.y*upVector,rotation);\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\tfloat rot = computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\t\t\tfloat c = cos(rot);\r\n\t\t\t\t\tfloat s = sin(rot);\r\n\t\t\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\t\t\tcorner=rotation*corner;\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*(corner.x*sideVector+corner.y*upVector);\r\n\t\t\t\t}\r\n\t\t\t#else\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*rotationByEuler(corner.x*sideVector+corner.y*upVector,a_StartRotation0);\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\tfloat c = cos(a_StartRotation0.x);\r\n\t\t\t\t\tfloat s = sin(a_StartRotation0.x);\r\n\t\t\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\t\t\tcorner=rotation*corner;\r\n\t\t\t\t\tcenter += u_SizeScale.xzy*(corner.x*sideVector+corner.y*upVector);\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef STRETCHEDBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tvec3 velocity;\r\n\t\t\t#if defined(VELOCITYOVERLIFETIMECONSTANT)||defined(VELOCITYOVERLIFETIMECURVE)||defined(VELOCITYOVERLIFETIMERANDOMCONSTANT)||defined(VELOCITYOVERLIFETIMERANDOMCURVE)\r\n\t\t\t\tif(u_VOLSpaceType==0)\r\n\t\t\t\tvelocity=rotationByQuaternions(u_SizeScale*(startVelocity+lifeVelocity),worldRotation)+gravityVelocity;\r\n\t\t\t\telse\r\n\t\t\t\tvelocity=rotationByQuaternions(u_SizeScale*startVelocity,worldRotation)+lifeVelocity+gravityVelocity;\r\n\t\t\t#else\r\n\t\t\t\tvelocity= rotationByQuaternions(u_SizeScale*startVelocity,worldRotation)+gravityVelocity;\r\n\t\t\t#endif\t\r\n\t\t\tvec3 cameraUpVector = normalize(velocity);\r\n\t\t\tvec3 direction = normalize(center-u_CameraPos);\r\n\t\t\tvec3 sideVector = normalize(cross(direction,normalize(velocity)));\r\n\t\t\t\r\n\t\t\tsideVector=u_SizeScale.xzy*sideVector;\r\n\t\t\tcameraUpVector=length(vec3(u_SizeScale.x,0.0,0.0))*cameraUpVector;\r\n\t\t\t\r\n\t\t\tvec2 size=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\t\r\n\t\t\tconst mat2 rotaionZHalfPI=mat2(0.0, -1.0, 1.0, 0.0);\r\n\t\t\tcorner=rotaionZHalfPI*corner;\r\n\t\t\tcorner.y=corner.y-abs(corner.y);\r\n\t\t\t\r\n\t\t\tfloat speed=length(velocity);//TODO:\r\n\t\t\tcenter +=sign(u_SizeScale.x)*(sign(u_StretchedBillboardLengthScale)*size.x*corner.x*sideVector+(speed*u_StretchedBillboardSpeedScale+size.y*u_StretchedBillboardLengthScale)*corner.y*cameraUpVector);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef HORIZONTALBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tconst vec3 cameraUpVector=vec3(0.0,0.0,1.0);\r\n\t\t\tconst vec3 sideVector = vec3(-1.0,0.0,0.0);\r\n\t\t\t\r\n\t\t\tfloat rot = computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\tfloat c = cos(rot);\r\n\t\t\tfloat s = sin(rot);\r\n\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\tcorner=rotation*corner*cos(0.78539816339744830961566084581988);//TODO:临时缩小cos45,不确定U3D原因\r\n\t\t\tcorner*=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\tcenter +=u_SizeScale.xzy*(corner.x*sideVector+ corner.y*cameraUpVector);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef VERTICALBILLBOARD\r\n\t\t\tvec2 corner=a_CornerTextureCoordinate.xy;//Billboard模式z轴无效\r\n\t\t\tconst vec3 cameraUpVector =vec3(0.0,1.0,0.0);\r\n\t\t\tvec3 sideVector = normalize(cross(u_CameraDirection,cameraUpVector));\r\n\t\t\t\r\n\t\t\tfloat rot = computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\tfloat c = cos(rot);\r\n\t\t\tfloat s = sin(rot);\r\n\t\t\tmat2 rotation= mat2(c, -s, s, c);\r\n\t\t\tcorner=rotation*corner*cos(0.78539816339744830961566084581988);//TODO:临时缩小cos45,不确定U3D原因\r\n\t\t\tcorner*=computeParticleSizeBillbard(a_StartSize.xy,normalizedAge);\r\n\t\t\tcenter +=u_SizeScale.xzy*(corner.x*sideVector+ corner.y*cameraUpVector);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef RENDERMODE_MESH\r\n\t\t\tvec3 size=computeParticleSizeMesh(a_StartSize,normalizedAge);\r\n\t\t\t#if defined(ROTATIONOVERLIFETIME)||defined(ROTATIONOVERLIFETIMESEPERATE)\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tvec3 rotation=vec3(a_StartRotation0.xy,computeParticleRotationFloat(a_StartRotation0.z, age,normalizedAge));\r\n\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByEuler(a_MeshPosition*size,rotation),worldRotation);\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\t#ifdef ROTATIONOVERLIFETIME\r\n\t\t\t\t\t\tfloat angle=computeParticleRotationFloat(a_StartRotation0.x, age,normalizedAge);\r\n\t\t\t\t\t\tif(a_ShapePositionStartLifeTime.x!=0.0||a_ShapePositionStartLifeTime.y!=0.0){\r\n\t\t\t\t\t\t\tcenter+= (rotationByQuaternions(rotationByAxis(u_SizeScale*a_MeshPosition*size,normalize(cross(vec3(0.0,0.0,1.0),vec3(a_ShapePositionStartLifeTime.xy,0.0))),angle),worldRotation));//已验证\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t\telse{\r\n\t\t\t\t\t\t\t#ifdef SHAPE\r\n\t\t\t\t\t\t\t\tcenter+= u_SizeScale.xzy*(rotationByQuaternions(rotationByAxis(a_MeshPosition*size,vec3(0.0,-1.0,0.0),angle),worldRotation));\r\n\t\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\t\t\tcenter+=rotationByAxis(u_SizeScale*a_MeshPosition*size,vec3(0.0,0.0,-1.0),angle);//已验证\r\n\t\t\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\t\t\tcenter+=rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,0.0,-1.0),angle),worldRotation);//已验证\r\n\t\t\t\t\t\t\t#endif\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t#endif\r\n\t\t\t\t\t#ifdef ROTATIONOVERLIFETIMESEPERATE\r\n\t\t\t\t\t\t//TODO:是否应合并if(u_ThreeDStartRotation)分支代码,待测试\r\n\t\t\t\t\t\tvec3 angle=computeParticleRotationVec3(vec3(0.0,0.0,-a_StartRotation0.x), age,normalizedAge);\r\n\t\t\t\t\t\tcenter+= (rotationByQuaternions(rotationByEuler(u_SizeScale*a_MeshPosition*size,vec3(angle.x,angle.y,angle.z)),worldRotation));//已验证\r\n\t\t\t\t\t#endif\t\t\r\n\t\t\t\t}\r\n\t\t\t#else\r\n\t\t\t\tif(u_ThreeDStartRotation){\r\n\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByEuler(a_MeshPosition*size,a_StartRotation0),worldRotation);//已验证\r\n\t\t\t\t}\r\n\t\t\t\telse{\r\n\t\t\t\t\tif(a_ShapePositionStartLifeTime.x!=0.0||a_ShapePositionStartLifeTime.y!=0.0){\r\n\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\tcenter+= rotationByAxis(u_SizeScale*a_MeshPosition*size,normalize(cross(vec3(0.0,0.0,1.0),vec3(a_ShapePositionStartLifeTime.xy,0.0))),a_StartRotation0.x);\r\n\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\tcenter+= (rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,normalize(cross(vec3(0.0,0.0,1.0),vec3(a_ShapePositionStartLifeTime.xy,0.0))),a_StartRotation0.x),worldRotation));//已验证\r\n\t\t\t\t\t}\r\n\t\t\t\t\telse{\r\n\t\t\t\t\t\t#ifdef SHAPE\r\n\t\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\t\tcenter+= u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,-1.0,0.0),a_StartRotation0.x);\r\n\t\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,-1.0,0.0),a_StartRotation0.x),worldRotation);\t\r\n\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\tif(u_SimulationSpace==0)\r\n\t\t\t\t\t\t\t\tcenter+= rotationByAxis(u_SizeScale*a_MeshPosition*size,vec3(0.0,0.0,-1.0),a_StartRotation0.x);\r\n\t\t\t\t\t\t\telse if(u_SimulationSpace==1)\r\n\t\t\t\t\t\t\t\tcenter+= rotationByQuaternions(u_SizeScale*rotationByAxis(a_MeshPosition*size,vec3(0.0,0.0,-1.0),a_StartRotation0.x),worldRotation);//已验证\r\n\t\t\t\t\t\t#endif\r\n\t\t\t\t\t}\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\tv_MeshColor=a_MeshColor;\r\n\t\t#endif\r\n\t\r\n\t\tgl_Position=u_Projection*u_View*vec4(center,1.0);\r\n\t\tv_Color = computeParticleColor(a_StartColor, normalizedAge);\r\n\t\t#ifdef DIFFUSEMAP\r\n\t\t\t#if defined(SPHERHBILLBOARD)||defined(STRETCHEDBILLBOARD)||defined(HORIZONTALBILLBOARD)||defined(VERTICALBILLBOARD)\r\n\t\t\t\tv_TextureCoordinate =computeParticleUV(a_CornerTextureCoordinate.zw, normalizedAge);\r\n\t\t\t#endif\r\n\t\t\t#ifdef RENDERMODE_MESH\r\n\t\t\t\tv_TextureCoordinate =computeParticleUV(a_MeshTextureCoordinate, normalizedAge);\r\n\t\t\t#endif\r\n\t\t\t\r\n\t\t\tv_TextureCoordinate=TransformUV(v_TextureCoordinate,u_TilingOffset);\r\n\t\t#endif\r\n   \t}\r\n   \telse\r\n\t{\r\n\t\tgl_Position=vec4(2.0,2.0,2.0,1.0);//Discard use out of X(-1,1),Y(-1,1),Z(0,1)\r\n\t}\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n\r\n";
 
 	var LayaPBRBRDF = "// allow to explicitly override LAYA_BRDF_GI and LAYA_BRDF_LIGHT in custom shader,default is layaBRDFHighGI and layaBRDFHighLight\r\n#if !defined (LAYA_BRDF_GI) \r\n\t#if defined(LAYA_PBR_BRDF_LOW)\r\n\t\t#define LAYA_BRDF_GI layaBRDFLowGI\r\n\t#elif defined(LAYA_PBR_BRDF_HIGH)\r\n\t\t#define LAYA_BRDF_GI layaBRDFHighGI\r\n\t#endif\r\n#endif\r\n#if !defined (LAYA_BRDF_LIGHT)\r\n\t#if defined(LAYA_PBR_BRDF_LOW)\r\n\t\t#define LAYA_BRDF_LIGHT layaBRDFLowLight\r\n\t#elif defined(LAYA_PBR_BRDF_HIGH)\r\n\t\t#define LAYA_BRDF_LIGHT layaBRDFHighLight\r\n\t#endif\r\n#endif\r\n\r\n#define PI 3.14159265359\r\n#define INV_PI 0.31830988618\r\n\r\nmediump float pow4(mediump float x)\r\n{\r\n\treturn x * x * x * x;\r\n}\r\n\r\nmediump float pow5(mediump float x)\r\n{\r\n\treturn x * x * x * x * x;\r\n}\r\n\r\nmediump vec3 fresnelLerp(mediump vec3 F0,mediump vec3 F90,mediump float cosA)\r\n{\r\n\tfloat t = pow5(1.0 - cosA);   // ala Schlick interpoliation\r\n\treturn mix(F0, F90, t);\r\n}\r\n\r\nmediump vec3 fresnelTerm(mediump vec3 F0,mediump float cosA)\r\n{\r\n\tfloat t = pow5(1.0 - cosA);   // ala Schlick interpoliation\r\n\treturn F0 + (vec3(1.0) - F0) * t;\r\n}\r\n\r\n// approximage Schlick with ^4 instead of ^5\r\nmediump vec3 fresnelLerpFast (mediump vec3 F0, mediump vec3 F90,mediump float cosA)\r\n{\r\n    mediump float t = pow4 (1.0 - cosA);\r\n    return mix (F0, F90, t);\r\n}\r\n\r\nfloat smoothnessToPerceptualRoughness(float smoothness)\r\n{\r\n    return 1.0 - smoothness;\r\n}\r\n\r\nfloat perceptualRoughnessToRoughness(float perceptualRoughness)\r\n{\r\n    return perceptualRoughness * perceptualRoughness;\r\n}\r\n\r\nvec3 safeNormalize(vec3 inVec)\r\n{\r\n\tfloat dp3 = max(0.001,dot(inVec,inVec));\r\n\treturn inVec * inversesqrt(dp3);\r\n}\r\n\r\n// Note: Disney diffuse must be multiply by diffuseAlbedo / PI. This is done outside of this function.\r\nmediump float disneyDiffuse(mediump float NdotV,mediump float NdotL,mediump float LdotH,mediump float perceptualRoughness)\r\n{\r\n\t//https://www.cnblogs.com/herenzhiming/articles/5790389.html\r\n\tmediump float fd90 = 0.5 + 2.0 * LdotH * LdotH * perceptualRoughness;\r\n\t// Two schlick fresnel term\r\n\tmediump float lightScatter = (1.0 + (fd90 - 1.0) * pow5(1.0 - NdotL));\r\n\tmediump float viewScatter = (1.0 + (fd90 - 1.0) * pow5(1.0 - NdotV));\r\n\r\n\treturn lightScatter * viewScatter;\r\n}\r\n\r\n// Ref: http://jcgt.org/published/0003/02/03/paper.pdf\r\nfloat smithJointGGXVisibilityTerm(float NdotL, float NdotV, float roughness)\r\n{\r\n\t// Original formulation:\r\n    // lambda_v    = (-1 + sqrt(a2 * (1 - NdotL2) / NdotL2 + 1)) * 0.5f;\r\n    // lambda_l    = (-1 + sqrt(a2 * (1 - NdotV2) / NdotV2 + 1)) * 0.5f;\r\n    // G           = 1 / (1 + lambda_v + lambda_l);\r\n\r\n\t// scientific code implement:\r\n\t// Reorder code to be more optimal\r\n    // half a          = roughness;\r\n    // half a2         = a * a;\r\n\r\n    // half lambdaV    = NdotL * sqrt((-NdotV * a2 + NdotV) * NdotV + a2);\r\n    // half lambdaL    = NdotV * sqrt((-NdotL * a2 + NdotL) * NdotL + a2);\r\n\r\n    // Simplify visibility term: (2.0f * NdotL * NdotV) /  ((4.0f * NdotL * NdotV) * (lambda_v + lambda_l + 1e-5f));\r\n    // return 0.5f / (lambdaV + lambdaL + 1e-5f);  \r\n\t// This function is not intended to be running on Mobile,therefore epsilon is smaller than can be represented by half\r\n\r\n\t// Approximation of the above formulation (simplify the sqrt, not mathematically correct but close enough)\r\n\tfloat a = roughness;\r\n\tfloat lambdaV = NdotL * (NdotV * (1.0 - a) + a);\r\n\tfloat lambdaL = NdotV * (NdotL * (1.0 - a) + a);\r\n\treturn 0.5 / (lambdaV + lambdaL + 1e-5);\r\n}\r\n\r\nfloat ggxTerm(float NdotH, float roughness)\r\n{\r\n\tfloat a2 = roughness * roughness;\r\n\tfloat d = (NdotH * a2 - NdotH) * NdotH + 1.0; // 2 mad\r\n\treturn INV_PI * a2 / (d * d + 1e-7); // This function is not intended to be running on Mobile,therefore epsilon is smaller than what can be represented by half//返回值小用half来返回\r\n}\r\n\r\n// BRDF1-------------------------------------------------------------------------------------\r\n\r\n// Note: BRDF entry points use smoothness and oneMinusReflectivity for optimization purposes,\r\n// mostly for DX9 SM2.0 level. Most of the math is being done on these (1-x) values, and that saves a few precious ALU slots.\r\n\r\n// Main Physically Based BRDF\r\n// Derived from Disney work and based on Torrance-Sparrow micro-facet model\r\n//\r\n// BRDF = kD / pi + kS * (D * V * F) / 4\r\n// I = BRDF * NdotL\r\n//\r\n// *NDF GGX:\r\n// *Smith for Visiblity term\r\n// *Schlick approximation for Fresnel\r\nmediump vec4 layaBRDFHighLight(mediump vec3 diffColor, mediump vec3 specColor, mediump float oneMinusReflectivity, float perceptualRoughness,float roughness,mediump float nv,vec3 normal, vec3 viewDir,LayaLight light)\r\n{\r\n\tvec3 halfDir = safeNormalize(viewDir-light.dir);\r\n\r\n\tfloat nl = clamp(dot(normal, -light.dir),0.0,1.0);\r\n\tfloat nh = clamp(dot(normal, halfDir),0.0,1.0);\r\n\tmediump float lv = clamp(dot(light.dir, viewDir),0.0,1.0);\r\n\tmediump float lh = clamp(dot(light.dir, -halfDir),0.0,1.0);\r\n\r\n\t// Diffuse term\r\n\tmediump float diffuseTerm = disneyDiffuse(nv, nl, lh, perceptualRoughness) * nl;\r\n\r\n\t// Specular term\r\n    // HACK: theoretically we should divide diffuseTerm by Pi and not multiply specularTerm!\r\n    // BUT that will make shader look significantly darker than Legacy ones\r\n\r\n\t// GGX with roughtness to 0 would mean no specular at all, using max(roughness, 0.002) here to match HDrenderloop roughtness remapping.\r\n\troughness = max(roughness, 0.002);\r\n\tfloat V = smithJointGGXVisibilityTerm(nl, nv, roughness);\r\n\tfloat D = ggxTerm(nh, roughness);\r\n\r\n\tfloat specularTerm = V * D * PI; // Torrance-Sparrow model, Fresnel is applied later\r\n\r\n\t//#ifdef LAYA_COLORSPACE_GAMMA\r\n\tspecularTerm = sqrt(max(1e-4, specularTerm));\r\n\t//#endif\r\n\tspecularTerm = max(0.0, specularTerm * nl);\r\n\t\t\r\n\tmediump vec3 color = diffColor * light.color * diffuseTerm + specularTerm * light.color * fresnelTerm(specColor, lh);\r\n\treturn vec4(color, 1.0);\r\n}\r\n\r\nvec4 layaBRDFHighGI(mediump vec3 diffColor,mediump vec3 specColor,mediump float oneMinusReflectivity,float smoothness ,float perceptualRoughness,float roughness,mediump float nv,vec3 normal, vec3 viewDir,LayaGI gi)\r\n{\r\n\t// surfaceReduction = Int D(NdotH) * NdotH * Id(NdotL>0) dH = 1/(roughness^2+1)\r\n\tfloat surfaceReduction;\r\n\tsurfaceReduction = 1.0 - 0.28*roughness*perceptualRoughness;// 1-0.28*x^3 as approximation for (1/(x^4+1))^(1/2.2) on the domain [0;1]\r\n\tfloat grazingTerm = clamp(smoothness + (1.0 - oneMinusReflectivity),0.0,1.0);\r\n\tmediump vec3 color =diffColor * gi.diffuse + surfaceReduction * gi.specular * fresnelLerp(specColor,vec3(grazingTerm), nv);\r\n\treturn vec4(color,1.0);\r\n}\r\n// BRDF1-------------------------------------------------------------------------------------\r\n\r\n\r\n// BRDF2-------------------------------------------------------------------------------------\r\n// Based on Minimalist CookTorrance BRDF\r\n// Implementation is slightly different from original derivation: http://www.thetenthplanet.de/archives/255\r\n//\r\n// *NDF [Modified] GGX:\r\n// *Modified Kelemen and Szirmay-​Kalos for Visibility term\r\n// *Fresnel approximated with 1/LdotH\r\nmediump vec4 layaBRDFLowLight (mediump vec3 diffColor, mediump vec3 specColor,mediump float oneMinusReflectivity,float perceptualRoughness,float roughness,mediump float nv,vec3 normal,vec3 viewDir,LayaLight light)\r\n{\r\n    vec3 halfDir = safeNormalize (viewDir-light.dir);\r\n    mediump float nl = clamp(dot(normal, -light.dir),0.0,1.0);\r\n    float nh = clamp(dot(normal, halfDir),0.0,1.0);\r\n    float lh = clamp(dot(-light.dir, halfDir),0.0,1.0);\r\n\r\n    // GGX Distribution multiplied by combined approximation of Visibility and Fresnel\r\n    // See \"Optimizing PBR for Mobile\" from Siggraph 2015 moving mobile graphics course\r\n    // https://community.arm.com/events/1155\r\n    mediump float a = roughness;\r\n    float a2 = a*a;\r\n\r\n    float d = nh * nh * (a2 - 1.0) + 1.00001;\r\n\t// #ifdef LAYA_COLORSPACE_GAMMA\r\n\t\t// Tighter approximation for Gamma only rendering mode!\r\n\t\t// DVF = sqrt(DVF);\r\n\t\t// DVF = (a * sqrt(.25)) / (max(sqrt(0.1), lh)*sqrt(roughness + .5) * d);\r\n\t\tfloat specularTerm = a / (max(0.32, lh) * (1.5 + roughness) * d);\r\n\t// #else\r\n\t// \tfloat specularTerm = a2 / (max(0.1f, lh*lh) * (roughness + 0.5f) * (d * d) * 4);\r\n\t// #endif\r\n\r\n    // on mobiles (where half actually means something) denominator have risk of overflow\r\n    // clamp below was added specifically to \"fix\" that, but dx compiler (we convert bytecode to metal/gles)\r\n    // sees that specularTerm have only non-negative terms, so it skips max(0,..) in clamp (leaving only min(100,...))\r\n\r\n\t//#if defined (SHADER_API_MOBILE)\r\n    specularTerm = specularTerm - 1e-4;\r\n\t//#endif\r\n\r\n\t// #else\r\n\t\t// // Legacy\r\n\t\t// half specularPower = PerceptualRoughnessToSpecPower(perceptualRoughness);\r\n\t\t// // Modified with approximate Visibility function that takes roughness into account\r\n\t\t// // Original ((n+1)*N.H^n) / (8*Pi * L.H^3) didn't take into account roughness\r\n\t\t// // and produced extremely bright specular at grazing angles\r\n\r\n\t\t// half invV = lh * lh * smoothness + perceptualRoughness * perceptualRoughness; // approx ModifiedKelemenVisibilityTerm(lh, perceptualRoughness);\r\n\t\t// half invF = lh;\r\n\r\n\t\t// half specularTerm = ((specularPower + 1) * pow (nh, specularPower)) / (8 * invV * invF + 1e-4h);\r\n\r\n\t\t// #ifdef LAYA_COLORSPACE_GAMMA\r\n\t\t// \tspecularTerm = sqrt(max(1e-4f, specularTerm));\r\n\t\t// #endif\r\n\t// #endif\r\n\r\n\t// #if defined (SHADER_API_MOBILE)\r\n\t\tspecularTerm = clamp(specularTerm, 0.0, 100.0); // Prevent FP16 overflow on mobiles\r\n\t// #endif\r\n    \r\n    mediump vec3 color = (diffColor + specularTerm * specColor) * light.color * nl;\r\n\r\n    return vec4(color, 1.0);\r\n}\r\n\r\nmediump vec4 layaBRDFLowGI (mediump vec3 diffColor, mediump vec3 specColor,mediump float oneMinusReflectivity,mediump float smoothness,float perceptualRoughness,float roughness,mediump float nv,vec3 normal,vec3 viewDir,LayaGI gi)\r\n{\r\n\t// surfaceReduction = Int D(NdotH) * NdotH * Id(NdotL>0) dH = 1/(realRoughness^2+1)\r\n\r\n    // 1-0.28*x^3 as approximation for (1/(x^4+1))^(1/2.2) on the domain [0;1]\r\n    // 1-x^3*(0.6-0.08*x)   approximation for 1/(x^4+1)\r\n\t// #ifdef LAYA_COLORSPACE_GAMMA\r\n\t\tmediump float surfaceReduction = 0.28;\r\n\t// #else\r\n\t\t// mediump float surfaceReduction = (0.6-0.08*perceptualRoughness);\r\n\t// #endif\r\n\r\n    surfaceReduction = 1.0 - roughness*perceptualRoughness*surfaceReduction;\r\n\r\n\tmediump float grazingTerm = clamp(smoothness + (1.0-oneMinusReflectivity),0.0,1.0);\r\n\tmediump vec3 color =gi.diffuse * diffColor+ surfaceReduction * gi.specular * fresnelLerpFast (specColor, vec3(grazingTerm), nv);\r\n\r\n    return vec4(color, 1.0);\r\n}\r\n// BRDF2-------------------------------------------------------------------------------------";
 
 	var PBRCore = "struct FragmentCommonData{\r\n\tvec3 diffColor;\r\n\tvec3 specColor;\r\n\tfloat oneMinusReflectivity;\r\n\tfloat smoothness;\r\n\t//vec3 eyeVec;TODO:maybe can remove\r\n\t//float alpha;\r\n\t//vec3 reflUVW;\r\n};\r\n\r\n#if !defined(SETUP_BRDF_INPUT)//shader内部的宏需要将改成#ifdef改成#if类型 不然会被Laya的shader分析器优化掉\r\n    #define SETUP_BRDF_INPUT metallicSetup//default is metallicSetup,also can be other. \r\n#endif\r\n\r\nconst mediump vec4 dielectricSpecularColor = vec4(0.220916301, 0.220916301, 0.220916301, 1.0 - 0.220916301);\r\n\r\nmediump vec3 diffuseAndSpecularFromMetallic(mediump vec3 albedo,mediump float metallic, out mediump vec3 specColor, out mediump float oneMinusReflectivity)\r\n{\r\n\tspecColor = mix(dielectricSpecularColor.rgb, albedo, metallic);\r\n\toneMinusReflectivity= dielectricSpecularColor.a*(1.0-metallic);//diffuse proportion\r\n\treturn albedo * oneMinusReflectivity;\r\n}\r\n\r\nmediump float specularStrength(mediump vec3 specular)\r\n{\r\n    return max (max (specular.r, specular.g), specular.b);\r\n}\r\n\r\n// Diffuse/Spec Energy conservation\r\nmediump vec3 energyConservationBetweenDiffuseAndSpecular (mediump vec3 albedo, mediump vec3 specColor, out mediump float oneMinusReflectivity)\r\n{\r\n\toneMinusReflectivity = 1.0 - specularStrength(specColor);\r\n    return albedo * (vec3(1.0) - specColor);\r\n}\r\n\r\n#ifdef TRANSPARENTBLEND\r\n\tmediump vec3 preMultiplyAlpha (mediump vec3 diffColor, mediump float alpha, mediump float oneMinusReflectivity,out mediump float modifiedAlpha)\r\n\t{\r\n\t\t// Transparency 'removes' from Diffuse component\r\n\t\tdiffColor *= alpha;\r\n\t\t// Reflectivity 'removes' from the rest of components, including Transparency\r\n\t\t// modifiedAlpha = 1.0-(1.0-alpha)*(1.0-reflectivity) = 1.0-(oneMinusReflectivity - alpha*oneMinusReflectivity) = 1.0-oneMinusReflectivity + alpha*oneMinusReflectivity\r\n\t\tmodifiedAlpha = 1.0 - oneMinusReflectivity + alpha*oneMinusReflectivity;\r\n\t\treturn diffColor;\r\n\t}\r\n#endif\r\n\r\nFragmentCommonData metallicSetup(vec2 uv)\r\n{\r\n\tmediump vec2 metallicGloss = getMetallicGloss(uv);\r\n\tmediump float metallic = metallicGloss.x;\r\n\tmediump float smoothness = metallicGloss.y; // this is 1 minus the square root of real roughness m.\r\n\tmediump float oneMinusReflectivity;\r\n\tmediump vec3 specColor;\r\n\tmediump vec3 diffColor = diffuseAndSpecularFromMetallic(albedo(uv), metallic,/*out*/specColor,/*out*/oneMinusReflectivity);\r\n\r\n\tFragmentCommonData o;\r\n\to.diffColor = diffColor;\r\n\to.specColor = specColor;\r\n\to.oneMinusReflectivity = oneMinusReflectivity;\r\n\to.smoothness = smoothness;\r\n\treturn o;\r\n}\r\n\r\nFragmentCommonData specularSetup(vec2 uv)\r\n{\r\n    mediump vec4 specGloss = specularGloss(uv);\r\n    mediump vec3 specColor = specGloss.rgb;\r\n    mediump float smoothness = specGloss.a;\r\n\r\n    mediump float oneMinusReflectivity;\r\n    mediump vec3 diffColor = energyConservationBetweenDiffuseAndSpecular (albedo(uv), specColor, /*out*/ oneMinusReflectivity);\r\n\r\n    FragmentCommonData o;\r\n    o.diffColor = diffColor;\r\n    o.specColor = specColor;\r\n    o.oneMinusReflectivity = oneMinusReflectivity;\r\n    o.smoothness = smoothness;\r\n    return o;\r\n}\r\n\r\nLayaGI fragmentGI(float smoothness,vec3 eyeVec,mediump float occlusion,mediump vec2 lightmapUV,vec3 worldnormal,vec3 worldPos)\r\n{\r\n\tLayaGIInput giInput;\r\n\t#ifdef LIGHTMAP\r\n\t\tgiInput.lightmapUV=lightmapUV;\r\n\t#endif\r\n\tgiInput.worldPos = worldPos;\r\n\r\n\tvec3 worldViewDir = -eyeVec;\r\n\tmediump vec4 uvwRoughness;\r\n\tuvwRoughness.rgb = reflect(worldViewDir, worldnormal);//reflectUVW\r\n\tuvwRoughness.a= smoothnessToPerceptualRoughness(smoothness);//perceptualRoughness\r\n\r\n\treturn layaGlobalIllumination(giInput,occlusion, worldnormal, uvwRoughness);\r\n}\r\n\r\n\r\nvec3 perPixelWorldNormal(vec2 uv,vec3 normal,vec3 binormal,vec3 tangent)\r\n{\r\n\t#ifdef NORMALTEXTURE\r\n\t\tmediump vec3 normalTangent=normalInTangentSpace(uv);\r\n\t\tvec3 normalWorld = normalize(tangent * normalTangent.x + binormal * normalTangent.y + normal * normalTangent.z);\r\n\t#else\r\n\t\tvec3 normalWorld = normalize(normal);\r\n\t#endif\r\n\t\treturn normalWorld;\r\n}\r\n\r\nvoid fragmentForward()\r\n{\r\n\tvec2 uv;\r\n\t#if defined(ALBEDOTEXTURE)||defined(METALLICGLOSSTEXTURE)||defined(NORMALTEXTURE)||defined(EMISSIONTEXTURE)||defined(OCCLUSIONTEXTURE)||defined(PARALLAXTEXTURE)\r\n\t\t#ifdef PARALLAXTEXTURE\r\n\t\t\tuv = parallax(v_Texcoord0,normalize(v_ViewDirForParallax));\r\n\t\t#else\r\n\t\t\tuv = v_Texcoord0;\r\n\t\t#endif\r\n\t#endif\r\n\r\n\tmediump float alpha = getAlpha(uv);\r\n\t#ifdef ALPHATEST\r\n\t\tif(alpha<u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n\r\n\tFragmentCommonData o = SETUP_BRDF_INPUT(uv);\r\n\t\r\n\tvec3 binormal;\r\n\tvec3 tangent;\r\n\t#ifdef NORMALTEXTURE\r\n\t\ttangent = v_Tangent;\r\n\t\tbinormal = v_Binormal;\r\n\t#endif\r\n\r\n\tvec3 normal = v_Normal;\r\n\tvec3 normalWorld = perPixelWorldNormal(uv,normal,binormal,tangent);//In FS if the normal use mediump before normalize will cause precision prolem in mobile device.\r\n\tvec3 eyeVec = normalize(v_EyeVec);\r\n\tvec3 posworld = v_PositionWorld;\r\n\r\n\t#ifdef TRANSPARENTBLEND\r\n\t\to.diffColor=preMultiplyAlpha(o.diffColor,alpha,o.oneMinusReflectivity,/*out*/alpha);// shader relies on pre-multiply alpha-blend (srcBlend = One, dstBlend = OneMinusSrcAlpha)\r\n\t#endif\r\n\r\n\tmediump float occlusion = getOcclusion(uv);\r\n\tmediump vec2 lightMapUV;\r\n\t#ifdef LIGHTMAP\r\n\t\tlightMapUV=v_LightMapUV;\r\n\t#endif\r\n\tfloat perceptualRoughness = smoothnessToPerceptualRoughness(o.smoothness);\r\n\tfloat roughness = perceptualRoughnessToRoughness(perceptualRoughness);\r\n\tfloat nv = abs(dot(normalWorld, eyeVec));\r\n\tLayaGI gi =fragmentGI(o.smoothness,eyeVec,occlusion,lightMapUV,normalWorld,posworld);\r\n\tvec4 color = LAYA_BRDF_GI(o.diffColor,o.specColor,o.oneMinusReflectivity,o.smoothness,perceptualRoughness,roughness,nv,normalWorld,eyeVec,gi);\r\n\t\r\n\tfloat shadowAttenuation = 1.0;\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\t#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t#ifdef SHADOW_CASCADE\r\n\t\t\t\t\tvec4 shadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t\t\t\t#else\r\n\t\t\t\t\tvec4 shadowCoord = v_ShadowCoord;\r\n\t\t\t\t#endif\r\n\t\t\t\tshadowAttenuation=sampleShadowmap(shadowCoord);\r\n\t\t\t#endif\r\n\t\t\tLayaLight dirLight = layaDirectionLightToLight(u_DirectionLight,shadowAttenuation);\r\n\t\t\tcolor+= LAYA_BRDF_LIGHT(o.diffColor,o.specColor,o.oneMinusReflectivity,perceptualRoughness,roughness,nv,normalWorld,eyeVec,dirLight);\r\n\t\t#endif\r\n\t\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tshadowAttenuation = 1.0;\r\n\t\t\tLayaLight poiLight = layaPointLightToLight(posworld,normalWorld,u_PointLight,shadowAttenuation);\r\n\t\t\tcolor+= LAYA_BRDF_LIGHT(o.diffColor,o.specColor,o.oneMinusReflectivity,perceptualRoughness,roughness,nv,normalWorld,eyeVec,poiLight);\r\n\t\t#endif\r\n\t\t\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tshadowAttenuation = 1.0;\r\n\t\t\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\tvec4 spotShadowcoord = v_SpotShadowCoord;\r\n\t\t\t\tshadowAttenuation = sampleSpotShadowmap(spotShadowcoord);\r\n\t\t\t#endif\r\n\t\t    LayaLight spoLight = layaSpotLightToLight(posworld,normalWorld,u_SpotLight,shadowAttenuation);\r\n\t\t\tcolor+= LAYA_BRDF_LIGHT(o.diffColor,o.specColor,o.oneMinusReflectivity,perceptualRoughness,roughness,nv,normalWorld,eyeVec,spoLight);\r\n\t\t#endif\r\n\t#else\r\n\t \t#ifdef DIRECTIONLIGHT\r\n\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t{\r\n\t\t\t\tshadowAttenuation = 1.0;\r\n\t\t\t\tif(i >= u_DirationLightCount)\r\n\t\t\t\t\tbreak;\r\n\t\t\t\t#if defined(CALCULATE_SHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t\tif(i == 0)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\t#ifdef SHADOW_CASCADE\r\n\t\t\t\t\t\t\tvec4 shadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t\t\t\t\t\t#else\r\n\t\t\t\t\t\t\tvec4 shadowCoord = v_ShadowCoord;\r\n\t\t\t\t\t\t#endif\r\n\t\t\t\t\t\tshadowAttenuation *= sampleShadowmap(shadowCoord);\r\n\t\t\t\t\t}\r\n\t\t\t\t#endif\r\n\t\t\t\tDirectionLight directionLight = getDirectionLight(u_LightBuffer,i);\r\n\t\t\t\tLayaLight dirLight = layaDirectionLightToLight(directionLight,shadowAttenuation);\r\n\t\t\t \tcolor+=LAYA_BRDF_LIGHT(o.diffColor,o.specColor,o.oneMinusReflectivity,perceptualRoughness,roughness,nv,normalWorld,eyeVec,dirLight);\r\n\t\t\t}\r\n\t \t#endif\r\n\t\t#if defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t\t\tivec4 clusterInfo =getClusterInfo(u_LightClusterBuffer,u_View,u_Viewport, v_PositionWorld,gl_FragCoord,u_ProjectionParams);\r\n\t\t\t#ifdef POINTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tshadowAttenuation = 1.0;\r\n\t\t\t\t\tif(i >= clusterInfo.x)//PointLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\tPointLight pointLight = getPointLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaLight poiLight = layaPointLightToLight(posworld,normalWorld,pointLight,shadowAttenuation);\r\n\t\t\t\t\tcolor+= LAYA_BRDF_LIGHT(o.diffColor,o.specColor,o.oneMinusReflectivity,perceptualRoughness,roughness,nv,normalWorld,eyeVec,poiLight);\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t\t#ifdef SPOTLIGHT\r\n\t\t\t\tfor (int i = 0; i < MAX_LIGHT_COUNT; i++) \r\n\t\t\t\t{\r\n\t\t\t\t\tshadowAttenuation = 1.0;\r\n\t\t\t\t\tif(i >= clusterInfo.y)//SpotLightCount\r\n\t\t\t\t\t\tbreak;\r\n\t\t\t\t\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\t\t\t\t\tif(i == 0)\r\n\t\t\t\t\t\t{\r\n\t\t\t\t\t\t\tvec4 spotShadowcoord = v_SpotShadowCoord;\r\n\t\t\t\t\t\t\tshadowAttenuation= sampleSpotShadowmap(spotShadowcoord);\r\n\t\t\t\t\t\t}\r\n\t\t\t\t\t#endif\r\n\t\t\t\t\tSpotLight spotLight = getSpotLight(u_LightBuffer,u_LightClusterBuffer,clusterInfo,i);\r\n\t\t\t\t\tLayaLight spoLight = layaSpotLightToLight(posworld,normalWorld,spotLight,shadowAttenuation);\r\n\t\t\t\t\tcolor+= LAYA_BRDF_LIGHT(o.diffColor,o.specColor,o.oneMinusReflectivity,perceptualRoughness,roughness,nv,normalWorld,eyeVec,spoLight);\r\n\t\t\t\t}\r\n\t\t\t#endif\r\n\t\t#endif\r\n\t #endif\r\n\r\n\t#ifdef EMISSION\r\n\t\tcolor.rgb += emission(uv);\r\n\t#endif\r\n\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact=clamp((1.0/gl_FragCoord.w-u_FogStart)/u_FogRange,0.0,1.0);\r\n\t\tcolor.rgb=mix(color.rgb,u_FogColor,lerpFact);\r\n\t#endif\r\n\t\r\n\tgl_FragColor=vec4(color.rgb,alpha);\r\n}\r\n\r\n\r\n\r\n";
 
-	var PBRVSInput = "attribute vec4 a_Position;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_MvpMatrix;\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n\tuniform mat4 u_WorldMat;\r\n#endif\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\nattribute vec3 a_Normal;\r\nvarying vec3 v_Normal; \r\n\r\n#if defined(NORMALTEXTURE)||defined(PARALLAXTEXTURE)\r\n\tattribute vec4 a_Tangent0;\r\n\tvarying vec3 v_Tangent;\r\n\tvarying vec3 v_Binormal;\r\n    #ifdef PARALLAXTEXTURE\r\n\t    varying vec3 v_ViewDirForParallax;\r\n    #endif\r\n#endif\r\n\r\n#if defined(ALBEDOTEXTURE)||defined(METALLICGLOSSTEXTURE)||defined(NORMALTEXTURE)||defined(EMISSIONTEXTURE)||defined(OCCLUSIONTEXTURE)||defined(PARALLAXTEXTURE)||(defined(LIGHTMAP)&&defined(UV))\r\n\tattribute vec2 a_Texcoord0;\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#if defined(LIGHTMAP)&&defined(UV1)\r\n\tattribute vec2 a_Texcoord1;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tuniform vec4 u_LightmapScaleOffset;\r\n\tvarying vec2 v_LightMapUV;\r\n#endif\r\n\r\nuniform vec3 u_CameraPos;\r\nvarying vec3 v_EyeVec;\r\nvarying vec3 v_PositionWorld;\r\nvarying float v_posViewZ;\r\n\r\n#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\tvarying vec4 v_ShadowCoord;\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tvarying vec4 v_SpotShadowCoord;\r\n#endif\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif";
+	var PBRVSInput = "attribute vec4 a_Position;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tuniform mat4 u_ViewProjection;\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n\tuniform mat4 u_WorldMat;\r\n#endif\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\nattribute vec3 a_Normal;\r\nvarying vec3 v_Normal; \r\n\r\n#if defined(NORMALTEXTURE)||defined(PARALLAXTEXTURE)\r\n\tattribute vec4 a_Tangent0;\r\n\tvarying vec3 v_Tangent;\r\n\tvarying vec3 v_Binormal;\r\n    #ifdef PARALLAXTEXTURE\r\n\t    varying vec3 v_ViewDirForParallax;\r\n    #endif\r\n#endif\r\n\r\n#if defined(ALBEDOTEXTURE)||defined(METALLICGLOSSTEXTURE)||defined(NORMALTEXTURE)||defined(EMISSIONTEXTURE)||defined(OCCLUSIONTEXTURE)||defined(PARALLAXTEXTURE)||(defined(LIGHTMAP)&&defined(UV))\r\n\tattribute vec2 a_Texcoord0;\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#if defined(LIGHTMAP)&&defined(UV1)\r\n\tattribute vec2 a_Texcoord1;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tuniform vec4 u_LightmapScaleOffset;\r\n\tvarying vec2 v_LightMapUV;\r\n#endif\r\n\r\nuniform vec3 u_CameraPos;\r\nvarying vec3 v_EyeVec;\r\nvarying vec3 v_PositionWorld;\r\nvarying float v_posViewZ;\r\n\r\n#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\tvarying vec4 v_ShadowCoord;\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tvarying vec4 v_SpotShadowCoord;\r\n#endif\r\n\r\nuniform vec4 u_TilingOffset;\r\n";
 
 	var PBRFSInput = "#ifdef ALPHATEST\r\n\tuniform float u_AlphaTestValue;\r\n#endif\r\n\r\nuniform vec4 u_AlbedoColor;\r\n\r\n#ifdef NORMALTEXTURE\r\n\tuniform sampler2D u_NormalTexture;\r\n\tuniform float u_NormalScale;\r\n#endif\r\n\r\n#ifdef ALBEDOTEXTURE\r\n\tuniform sampler2D u_AlbedoTexture;\r\n#endif\r\n\r\n#ifdef METALLICGLOSSTEXTURE\r\n\tuniform sampler2D u_MetallicGlossTexture;\r\n#endif\r\nuniform float u_Metallic;\r\n\r\n#ifdef SPECULARGLOSSTEXTURE\r\n\tuniform sampler2D u_SpecGlossTexture;\r\n#endif\r\nuniform vec3 u_SpecularColor;\r\n\r\nuniform float u_Smoothness;\r\nuniform float u_SmoothnessScale;\r\n\r\n#ifdef PARALLAXTEXTURE\r\n\tuniform sampler2D u_ParallaxTexture;\r\n\tuniform float u_ParallaxScale;\r\n\tvarying vec3 v_ViewDirForParallax;\r\n#endif\r\n\r\n#ifdef OCCLUSIONTEXTURE\r\n\tuniform sampler2D u_OcclusionTexture;\r\n\tuniform float u_occlusionStrength;\r\n#endif\r\n\r\n#ifdef EMISSION \r\n\t#ifdef EMISSIONTEXTURE\r\n\t\tuniform sampler2D u_EmissionTexture;\r\n\t#endif\r\n\tuniform vec4 u_EmissionColor;\r\n#endif\r\n\r\n#if defined(ALBEDOTEXTURE)||defined(METALLICGLOSSTEXTURE)||defined(NORMALTEXTURE)||defined(EMISSIONTEXTURE)||defined(OCCLUSIONTEXTURE)||defined(PARALLAXTEXTURE)\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\n#ifdef LIGHTMAP\r\n\tvarying vec2 v_LightMapUV;\r\n\tuniform sampler2D u_LightMap;\r\n\t#ifdef LIGHTMAP_DIRECTIONAL\r\n\t\tuniform sampler2D u_LightMapDirection;\r\n\t#endif\r\n#endif\r\n\r\nvarying vec3 v_Normal; \r\n\r\n#if defined(DIRECTIONLIGHT)||defined(POINTLIGHT)||defined(SPOTLIGHT)\r\n\t#ifdef LEGACYSINGLELIGHTING\r\n\t\t#ifdef DIRECTIONLIGHT\r\n\t\t\tuniform DirectionLight u_DirectionLight;\r\n\t\t#endif\r\n\t\t#ifdef POINTLIGHT\r\n\t\t\tuniform PointLight u_PointLight;\r\n\t\t#endif\r\n\t\t#ifdef SPOTLIGHT\r\n\t\t\tuniform SpotLight u_SpotLight;\r\n\t\t#endif\r\n\t#else\r\n\t\tuniform mat4 u_View;\r\n\t\tuniform vec4 u_ProjectionParams;\r\n\t\tuniform vec4 u_Viewport;\r\n\t\tuniform int u_DirationLightCount;\r\n\t\tuniform sampler2D u_LightBuffer;\r\n\t\tuniform sampler2D u_LightClusterBuffer;\r\n\t#endif\r\n#endif\r\n\r\nvarying vec3 v_EyeVec;\r\n\r\n#ifdef NORMALTEXTURE\r\n\tvarying vec3 v_Tangent;\r\n\tvarying vec3 v_Binormal;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\tuniform vec3 u_FogColor;\r\n#endif\r\n\r\n\r\n//后面考虑宏TODO\r\nvarying vec3 v_PositionWorld;\r\n\r\n#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\tvarying vec4 v_ShadowCoord;\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\tvarying vec4 v_SpotShadowCoord;\r\n#endif\r\n\r\nmediump float lerpOneTo(mediump float b, mediump float t)\r\n{\r\n    mediump float oneMinusT = 1.0 - t;\r\n    return oneMinusT + b * t;\r\n}\r\n\r\n#ifdef EMISSION \r\n\tvec3 emission(vec2 uv)\r\n\t{\r\n\t\t#ifdef EMISSIONTEXTURE\r\n\t\t\treturn texture2D(u_EmissionTexture, uv).rgb * u_EmissionColor.rgb;\r\n\t\t#else\r\n\t\t\treturn u_EmissionColor.rgb;\r\n\t\t#endif\r\n\t}\r\n#endif\r\n\r\nmediump float getAlpha(vec2 uv)\r\n{\r\n\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\treturn u_AlbedoColor.a;\r\n\t#else\r\n\t\t#ifdef ALBEDOTEXTURE\r\n\t\t\treturn texture2D(u_AlbedoTexture, uv).a * u_AlbedoColor.a;\r\n\t\t#else\r\n\t\t\treturn u_AlbedoColor.a;\r\n\t\t#endif\r\n\t#endif\r\n}\r\n\r\nmediump float getOcclusion(vec2 uv)\r\n{\r\n\t#ifdef OCCLUSIONTEXTURE\r\n\t\tmediump float occ = texture2D(u_OcclusionTexture, uv).g;\r\n\t\treturn lerpOneTo(occ, u_occlusionStrength);\r\n\t#else\r\n\t\treturn 1.0;\r\n\t#endif\r\n}\r\n\r\nmediump vec3 albedo(vec2 uv)\r\n{\r\n\t#ifdef ALBEDOTEXTURE\r\n\t\treturn u_AlbedoColor.rgb * texture2D(u_AlbedoTexture, uv).rgb;\r\n\t#else\r\n\t\treturn u_AlbedoColor.rgb;\r\n\t#endif\r\n\t//TODO:Detail Texture\r\n}\r\n\r\nmediump vec2 getMetallicGloss(vec2 uv)\r\n{\r\n\tmediump vec2 ms;//x is metallic,y is smoothness\r\n\t#ifdef METALLICGLOSSTEXTURE\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\tms.x = texture2D(u_MetallicGlossTexture, uv).r;\r\n\t\t\t#ifdef ALBEDOTEXTURE\r\n\t\t\t\tms.y = texture2D(u_AlbedoTexture, uv).a*u_SmoothnessScale;\r\n\t\t\t#else\r\n\t\t\t\tms.y = u_SmoothnessScale;\r\n\t\t\t#endif\r\n\t\t#else\r\n\t\t\tms = texture2D(u_MetallicGlossTexture, uv).ra;\r\n\t\t\tms.y *= u_SmoothnessScale;\r\n\t\t#endif\r\n\t#else\r\n\t\tms.x = u_Metallic;\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\t#ifdef ALBEDOTEXTURE\r\n\t\t\t\tms.y = texture2D(u_AlbedoTexture, uv).a * u_SmoothnessScale;\r\n\t\t\t#else\r\n\t\t\t\tms.y = u_SmoothnessScale;\r\n\t\t\t#endif\r\n\t\t#else\r\n\t\t\tms.y = u_Smoothness;\r\n\t\t#endif\r\n\t#endif\r\n\treturn ms;\r\n}\r\n\r\nmediump vec4 specularGloss(vec2 uv)\r\n{\r\n\tmediump vec4 sg;\r\n\t#ifdef SPECULARGLOSSTEXTURE\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\tsg.rgb = texture2D(u_SpecGlossTexture, uv).rgb;\r\n\t\t\t#ifdef ALBEDOTEXTURE\r\n\t\t\t\tsg.a = texture2D(u_AlbedoTexture, uv).a*u_SmoothnessScale;\r\n\t\t\t#else\r\n\t\t\t\tsg.a = u_SmoothnessScale;\r\n\t\t\t#endif\r\n\t\t#else\r\n\t\t\tsg = texture2D(u_SpecGlossTexture, uv);\r\n\t\t\tsg.a *= u_SmoothnessScale;\r\n\t\t#endif\r\n\t#else\r\n\t\tsg.rgb = u_SpecularColor.rgb;\r\n\t\t#ifdef SMOOTHNESSSOURCE_ALBEDOTEXTURE_ALPHA\r\n\t\t\t#ifdef ALBEDOTEXTURE\r\n\t\t\t\tsg.a = texture2D(u_AlbedoTexture, uv).a * u_SmoothnessScale;\r\n\t\t\t#else\r\n\t\t\t\tsg.a = u_SmoothnessScale;\r\n\t\t\t#endif\r\n\t\t#else\r\n\t\t\tsg.a = u_Smoothness;\r\n\t\t#endif\r\n\t#endif\r\n\t\treturn sg;\r\n}\r\n\r\n\r\n#ifdef NORMALTEXTURE\r\n\tmediump vec3 unpackScaleNormal(mediump vec3 packednormal, mediump float bumpScale)\r\n\t{\r\n\t\tmediump vec3 normal = packednormal.xyz * 2.0 - 1.0;\r\n\t\tnormal.y=-normal.y;//NOTE:because unity to LayaAir coordSystem.\r\n\t\tnormal.xy *= bumpScale;\r\n\t\treturn normal;\r\n\t}\r\n\t\r\n\tmediump vec3 normalInTangentSpace(vec2 texcoords)\r\n\t{\r\n\t\tmediump vec3 normalTangent = unpackScaleNormal(texture2D(u_NormalTexture, texcoords).rgb,u_NormalScale);\r\n\t\treturn normalTangent;\r\n\t}\r\n#endif\r\n\r\n#ifdef PARALLAXTEXTURE\r\n\tmediump vec2 parallaxOffset1Step(mediump float h, mediump float height, mediump vec3 viewDir)\r\n\t{\r\n\t\th = h * height - height / 2.0;\r\n\t\tviewDir.z += 0.42;\r\n\t\treturn h * (viewDir.xy / viewDir.z);\r\n\t}\r\n\r\n\tvec2 parallax(vec2 texcoords, mediump vec3 viewDir)\r\n\t{\r\n\t\tmediump float h = texture2D(u_ParallaxTexture, texcoords.xy).g;\r\n\t\tvec2 offset = parallaxOffset1Step(h, u_ParallaxScale, viewDir);\r\n\t\treturn texcoords+offset;\r\n\t}\r\n#endif\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n";
 
-	var PBRVertex = "vec2 transformLightMapUV(in vec2 texcoord,in vec4 lightmapScaleOffset)\r\n{\r\n\tvec2 lightMapUV=vec2(texcoord.x,1.0-texcoord.y)*lightmapScaleOffset.xy+lightmapScaleOffset.zw;\r\n\tlightMapUV.y=1.0-lightMapUV.y;\r\n\treturn lightMapUV; \r\n}\r\n\r\nvoid vertexForward()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tposition=skinTransform*a_Position;\r\n\t #else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\r\n\tmat4 worldMat;\r\n\t#ifdef GPU_INSTANCE\r\n\t\tworldMat = a_WorldMat;\r\n\t#else\r\n\t\tworldMat = u_WorldMat;\r\n\t#endif\r\n\r\n\tv_PositionWorld=(worldMat*position).xyz;\r\n\r\n\t#if defined(ALBEDOTEXTURE)||defined(METALLICGLOSSTEXTURE)||defined(NORMALTEXTURE)||defined(EMISSIONTEXTURE)||defined(OCCLUSIONTEXTURE)||defined(PARALLAXTEXTURE)\r\n\t\t#ifdef TILINGOFFSET\r\n\t\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t\t#else\r\n\t\t\tv_Texcoord0=a_Texcoord0;\r\n\t\t#endif\r\n\t#endif\r\n\r\n\tv_EyeVec =u_CameraPos-v_PositionWorld;//will normalize per-pixel\r\n\r\n\t#ifdef LIGHTMAP\r\n\t\tvec2 texcoord;\r\n\t\t#ifdef UV1\r\n\t\t\ttexcoord=a_Texcoord1;\r\n\t\t#else\r\n\t\t\ttexcoord=a_Texcoord0;\r\n\t\t#endif\r\n\t\tv_LightMapUV=transformLightMapUV(texcoord,u_LightmapScaleOffset);\r\n\t#endif\r\n\r\n\tmat3 worldInvMat;\r\n\t#ifdef BONE\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat*skinTransform));\r\n\t#else\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat));\r\n\t#endif\r\n\r\n\tv_Normal=normalize(a_Normal*worldInvMat);//if no normalize will cause precision problem.\r\n\r\n\t#ifdef NORMALTEXTURE\r\n\t\tv_Tangent=normalize(a_Tangent0.xyz*worldInvMat);\r\n\t\tv_Binormal=cross(v_Normal,v_Tangent)*a_Tangent0.w;\r\n\t#endif\r\n\r\n\t#ifdef PARALLAXTEXTURE\r\n\t\tvec3 binormal = cross(a_Normal, a_Tangent0.xyz)*a_Tangent0.w;\r\n\t\tmat3 objectTBN = mat3(a_Tangent0.xyz, binormal, a_Normal);\r\n\t\tv_ViewDirForParallax =(u_CameraPos*worldInvMat-position.xyz)*objectTBN;\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\t\tv_ShadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\tv_SpotShadowCoord = u_SpotViewProjectMatrix*vec4(v_PositionWorld,1.0);\r\n\t#endif\r\n}";
+	var PBRVertex = "vec2 transformLightMapUV(in vec2 texcoord,in vec4 lightmapScaleOffset)\r\n{\r\n\tvec2 lightMapUV=vec2(texcoord.x,1.0-texcoord.y)*lightmapScaleOffset.xy+lightmapScaleOffset.zw;\r\n\tlightMapUV.y=1.0-lightMapUV.y;\r\n\treturn lightMapUV; \r\n}\r\n\r\nvoid vertexForward()\r\n{\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tposition=skinTransform*a_Position;\r\n\t #else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\r\n\tmat4 worldMat;\r\n\t#ifdef GPU_INSTANCE\r\n\t\tworldMat = a_WorldMat;\r\n\t#else\r\n\t\tworldMat = u_WorldMat;\r\n\t#endif\r\n\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = u_ViewProjection * worldMat * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\r\n\t\r\n\r\n\tv_PositionWorld=(worldMat*position).xyz;\r\n\r\n\t#if defined(ALBEDOTEXTURE)||defined(METALLICGLOSSTEXTURE)||defined(NORMALTEXTURE)||defined(EMISSIONTEXTURE)||defined(OCCLUSIONTEXTURE)||defined(PARALLAXTEXTURE)\r\n\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t#endif\r\n\r\n\tv_EyeVec =u_CameraPos-v_PositionWorld;//will normalize per-pixel\r\n\r\n\t#ifdef LIGHTMAP\r\n\t\tvec2 texcoord;\r\n\t\t#ifdef UV1\r\n\t\t\ttexcoord=a_Texcoord1;\r\n\t\t#else\r\n\t\t\ttexcoord=a_Texcoord0;\r\n\t\t#endif\r\n\t\tv_LightMapUV=transformLightMapUV(texcoord,u_LightmapScaleOffset);\r\n\t#endif\r\n\r\n\tmat3 worldInvMat;\r\n\t#ifdef BONE\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat*skinTransform));\r\n\t#else\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat));\r\n\t#endif\r\n\r\n\tv_Normal=normalize(a_Normal*worldInvMat);//if no normalize will cause precision problem.\r\n\r\n\t#ifdef NORMALTEXTURE\r\n\t\tv_Tangent=normalize(a_Tangent0.xyz*worldInvMat);\r\n\t\tv_Binormal=cross(v_Normal,v_Tangent)*a_Tangent0.w;\r\n\t#endif\r\n\r\n\t#ifdef PARALLAXTEXTURE\r\n\t\tvec3 binormal = cross(a_Normal, a_Tangent0.xyz)*a_Tangent0.w;\r\n\t\tmat3 objectTBN = mat3(a_Tangent0.xyz, binormal, a_Normal);\r\n\t\tv_ViewDirForParallax =(u_CameraPos*worldInvMat-position.xyz)*objectTBN;\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SHADOWS)&&!defined(SHADOW_CASCADE)\r\n\t\tv_ShadowCoord = getShadowCoord(vec4(v_PositionWorld,1.0));\r\n\t#endif\r\n\r\n\t#if defined(CALCULATE_SPOTSHADOWS)//shader中自定义的宏不可用ifdef 必须改成if defined\r\n\t\tv_SpotShadowCoord = u_SpotViewProjectMatrix*vec4(v_PositionWorld,1.0);\r\n\t#endif\r\n}";
 
 	var BloomVS = "#include \"Lighting.glsl\";\r\n#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\nattribute vec4 a_PositionTexcoord;\r\nvarying vec2 v_Texcoord0;\r\n\r\nvoid main() {\r\n\tgl_Position = vec4(a_PositionTexcoord.xy, 0.0, 1.0);\r\n\tv_Texcoord0 = a_PositionTexcoord.zw;\r\n\tgl_Position = remapGLPositionZ(gl_Position);\r\n}";
 
@@ -29897,7 +29761,7 @@
 
 	var StdLibGLSL = "#define HALF_MAX       65504.0 // (2 - 2^-10) * 2^15\r\n\r\n#define FLT_EPSILON    1.192092896e-07 // Smallest positive number, such that 1.0 + FLT_EPSILON != 1.0\r\n\r\nmediump vec4 safeHDR(mediump vec4 c)\r\n{\r\n    return min(c, HALF_MAX);\r\n}\r\n\r\nfloat max3(float a, float b, float c)\r\n{\r\n    return max(max(a, b), c);\r\n}\r\n\r\nvec3 positivePow(vec3 base, vec3 power)\r\n{\r\n    return pow(max(abs(base), vec3(FLT_EPSILON, FLT_EPSILON, FLT_EPSILON)), power);\r\n}";
 
-	var ShadowGLSL = "#ifndef GRAPHICS_API_GLES3\r\n\t#define NO_NATIVE_SHADOWMAP\r\n#endif\r\n\r\n#if defined(NO_NATIVE_SHADOWMAP)\r\n\t#define TEXTURE2D_SHADOW(textureName) uniform mediump sampler2D textureName\r\n\t#define SAMPLE_TEXTURE2D_SHADOW(textureName, coord3) (texture2D(textureName,coord3.xy).r<coord3.z?0.0:1.0)\r\n\t#define TEXTURE2D_SHADOW_PARAM(shadowMap) mediump sampler2D shadowMap\r\n#else\r\n\t#define TEXTURE2D_SHADOW(textureName) uniform mediump sampler2DShadow textureName\r\n\t#define SAMPLE_TEXTURE2D_SHADOW(textureName, coord3) textureLod(textureName,coord3,0.0)\r\n\t#define TEXTURE2D_SHADOW_PARAM(shadowMap) mediump sampler2DShadow shadowMap\r\n#endif\r\n\r\n#if defined(RECEIVESHADOW)&&defined(SHADOW)\r\n    #define CALCULATE_SHADOWS\r\n#endif\r\n\r\n#if defined(RECEIVESHADOW)&&defined(SHADOW_SPOT)\r\n\t#define CALCULATE_SPOTSHADOWS\r\n#endif\r\n\r\nuniform vec4 u_ShadowBias; // x: depth bias, y: normal bias\r\n\r\n#if defined(CALCULATE_SHADOWS)||defined(CALCULATE_SPOTSHADOWS)\r\n\t#include \"ShadowSampleTent.glsl\"\r\n\tuniform vec4 u_ShadowMapSize;\r\n\tuniform vec4 u_ShadowParams; // x: shadowStrength y: ShadowSpotLightStrength\r\n\r\n\t\r\n\tfloat sampleShdowMapFiltered4(TEXTURE2D_SHADOW_PARAM(shadowMap),vec3 shadowCoord,vec4 shadowMapSize)\r\n\t{\r\n\t\tfloat attenuation;\r\n\t\tvec4 attenuation4;\r\n\t\tvec2 offset=shadowMapSize.xy/2.0;\r\n\t\tvec3 shadowCoord0=shadowCoord + vec3(-offset,0.0);\r\n\t\tvec3 shadowCoord1=shadowCoord + vec3(offset.x,-offset.y,0.0);\r\n\t\tvec3 shadowCoord2=shadowCoord + vec3(-offset.x,offset.y,0.0);\r\n\t\tvec3 shadowCoord3=shadowCoord + vec3(offset,0.0);\r\n\t\tattenuation4.x = SAMPLE_TEXTURE2D_SHADOW(shadowMap, shadowCoord0);\r\n\t\tattenuation4.y = SAMPLE_TEXTURE2D_SHADOW(shadowMap, shadowCoord1);\r\n\t\tattenuation4.z = SAMPLE_TEXTURE2D_SHADOW(shadowMap, shadowCoord2);\r\n\t\tattenuation4.w = SAMPLE_TEXTURE2D_SHADOW(shadowMap, shadowCoord3);\r\n\t\tattenuation = dot(attenuation4, vec4(0.25));\r\n\t\treturn attenuation;\r\n\t}\r\n\r\n\tfloat sampleShdowMapFiltered9(TEXTURE2D_SHADOW_PARAM(shadowMap),vec3 shadowCoord,vec4 shadowmapSize)\r\n\t{\r\n\t\tfloat attenuation;\r\n\t\tfloat fetchesWeights[9];\r\n\t\tvec2 fetchesUV[9];\r\n\t\tsampleShadowComputeSamplesTent5x5(shadowmapSize, shadowCoord.xy, fetchesWeights, fetchesUV);\r\n\t\tattenuation = fetchesWeights[0] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[0].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[1] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[1].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[2] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[2].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[3] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[3].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[4] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[4].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[5] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[5].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[6] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[6].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[7] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[7].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[8] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[8].xy, shadowCoord.z));\r\n\t\treturn attenuation;\r\n\t}\r\n\r\n#endif\r\n\r\n\r\n\r\n\r\n#if defined(CALCULATE_SHADOWS)\r\n\r\n\tTEXTURE2D_SHADOW(u_ShadowMap);\r\n\r\n\tuniform mat4 u_ShadowMatrices[4];\r\n\tuniform vec4 u_ShadowSplitSpheres[4];// max cascade is 4\r\n\r\n\tmediump int computeCascadeIndex(vec3 positionWS)\r\n\t{\r\n\t\tvec3 fromCenter0 = positionWS - u_ShadowSplitSpheres[0].xyz;\r\n\t\tvec3 fromCenter1 = positionWS - u_ShadowSplitSpheres[1].xyz;\r\n\t\tvec3 fromCenter2 = positionWS - u_ShadowSplitSpheres[2].xyz;\r\n\t\tvec3 fromCenter3 = positionWS - u_ShadowSplitSpheres[3].xyz;\r\n\r\n\t\tmediump vec4 comparison = vec4(\r\n\t\t\tdot(fromCenter0, fromCenter0)<u_ShadowSplitSpheres[0].w,\r\n\t\t\tdot(fromCenter1, fromCenter1)<u_ShadowSplitSpheres[1].w,\r\n\t\t\tdot(fromCenter2, fromCenter2)<u_ShadowSplitSpheres[2].w,\r\n\t\t\tdot(fromCenter3, fromCenter3)<u_ShadowSplitSpheres[3].w);\r\n\t\tcomparison.yzw = clamp(comparison.yzw - comparison.xyz,0.0,1.0);//keep the nearest\r\n\t\tmediump vec4 indexCoefficient = vec4(4.0,3.0,2.0,1.0);\r\n\t\tmediump int index = 4 - int(dot(comparison, indexCoefficient));\r\n\t\treturn index;\r\n\t}\r\n\r\n\tvec4 getShadowCoord(vec4 positionWS)\r\n\t{\r\n\t\t#ifdef SHADOW_CASCADE\r\n\t\t\tmediump int cascadeIndex = computeCascadeIndex(positionWS.xyz);\r\n\t\t\tif(cascadeIndex > 3)// out of shadow range cascadeIndex is 4.\r\n\t\t\t\treturn vec4(0.0);\r\n\t\t\t\r\n\t\t\t#ifdef GRAPHICS_API_GLES3\r\n\t\t\t\treturn u_ShadowMatrices[cascadeIndex] * positionWS;\r\n\t\t\t#else\r\n\t\t\t\tmat4 shadowMat;\r\n\t\t\t\tif(cascadeIndex == 0)\r\n\t\t\t\t\tshadowMat = u_ShadowMatrices[0];\r\n\t\t\t\telse if(cascadeIndex == 1)\r\n\t\t\t\t\tshadowMat = u_ShadowMatrices[1];\r\n\t\t\t\telse if(cascadeIndex == 2)\r\n\t\t\t\t\tshadowMat = u_ShadowMatrices[2];\r\n\t\t\t\telse\r\n\t\t\t\t\tshadowMat = u_ShadowMatrices[3];\r\n\t\t\t\treturn shadowMat * positionWS;\r\n\t\t\t#endif\r\n\t\t#else\r\n\t\t\treturn u_ShadowMatrices[0] * positionWS;\r\n\t\t#endif\r\n\t}\r\n\r\n\tfloat sampleShadowmap(vec4 shadowCoord)\r\n\t{\r\n\t\tshadowCoord.xyz /= shadowCoord.w;\r\n\t\tfloat attenuation = 1.0;\r\n\t\tif(shadowCoord.z > 0.0 && shadowCoord.z < 1.0)\r\n\t\t{\r\n\t\t\t#if defined(SHADOW_SOFT_SHADOW_HIGH)\r\n\t\t\t\tattenuation = sampleShdowMapFiltered9(u_ShadowMap,shadowCoord.xyz,u_ShadowMapSize);\r\n\t\t\t#elif defined(SHADOW_SOFT_SHADOW_LOW)\r\n\t\t\t\tattenuation = sampleShdowMapFiltered4(u_ShadowMap,shadowCoord.xyz,u_ShadowMapSize);\r\n\t\t\t#else\r\n\t\t\t\tattenuation = SAMPLE_TEXTURE2D_SHADOW(u_ShadowMap,shadowCoord.xyz);\r\n\t\t\t#endif\r\n\t\t\tattenuation = mix(1.0,attenuation,u_ShadowParams.x);//shadowParams.x:shadow strength\r\n\t\t}\r\n\t\treturn attenuation;\r\n\t}\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader���Զ���ĺ겻����ifdef ����ĳ�if defined\r\n\tTEXTURE2D_SHADOW(u_SpotShadowMap);\r\n\tuniform mat4 u_SpotViewProjectMatrix;\r\n\tfloat sampleSpotShadowmap(vec4 shadowCoord)\r\n\t{\r\n\t\tshadowCoord.xyz /= shadowCoord.w;\r\n\t\tfloat attenuation = 1.0;\r\n\t\tshadowCoord.xy +=1.0;\r\n\t\tshadowCoord.xy/=2.0; \r\n\t\tif(shadowCoord.z > 0.0 && shadowCoord.z < 1.0)\r\n\t\t{\r\n\t\t\t#if defined(SHADOW_SPOT_SOFT_SHADOW_HIGH)\r\n\t\t\t\tattenuation = sampleShdowMapFiltered9(u_SpotShadowMap,shadowCoord.xyz,u_ShadowMapSize);\r\n\t\t\t#elif defined(SHADOW_SPOT_SOFT_SHADOW_LOW)\r\n\t\t\t\tattenuation = sampleShdowMapFiltered4(u_SpotShadowMap,shadowCoord.xyz,u_ShadowMapSize);\r\n\t\t\t#else\r\n\t\t\t\tattenuation = SAMPLE_TEXTURE2D_SHADOW(u_SpotShadowMap,shadowCoord.xyz);\r\n\t\t\t#endif\r\n\t\t\tattenuation = mix(1.0,attenuation,u_ShadowParams.y);//shadowParams.y:shadow strength\r\n\t\t}\r\n\t\treturn attenuation;\r\n\t}\r\n#endif\r\n\r\nvec3 applyShadowBias(vec3 positionWS, vec3 normalWS, vec3 lightDirection)\r\n{\r\n    float invNdotL = 1.0 - clamp(dot(-lightDirection, normalWS),0.0,1.0);\r\n    float scale = invNdotL * u_ShadowBias.y;\r\n\r\n    // normal bias is negative since we want to apply an inset normal offset\r\n    positionWS += -lightDirection * u_ShadowBias.xxx;\r\n    positionWS += normalWS * vec3(scale);\r\n    return positionWS;\r\n}\r\n";
+	var ShadowGLSL = "#ifndef GRAPHICS_API_GLES3\r\n\t#define NO_NATIVE_SHADOWMAP\r\n#endif\r\n\r\n#if defined(NO_NATIVE_SHADOWMAP)\r\n\t#define TEXTURE2D_SHADOW(textureName) uniform mediump sampler2D textureName\r\n\t#define SAMPLE_TEXTURE2D_SHADOW(textureName, coord3) (texture2D(textureName,coord3.xy).r<coord3.z?0.0:1.0)\r\n\t#define TEXTURE2D_SHADOW_PARAM(shadowMap) mediump sampler2D shadowMap\r\n#else\r\n\t#define TEXTURE2D_SHADOW(textureName) uniform mediump sampler2DShadow textureName\r\n\t#define SAMPLE_TEXTURE2D_SHADOW(textureName, coord3) textureLod(textureName,coord3,0.0)\r\n\t#define TEXTURE2D_SHADOW_PARAM(shadowMap) mediump sampler2DShadow shadowMap\r\n#endif\r\n\r\n#if defined(RECEIVESHADOW)&&defined(SHADOW)\r\n    #define CALCULATE_SHADOWS\r\n#endif\r\n\r\n#if defined(RECEIVESHADOW)&&defined(SHADOW_SPOT)\r\n\t#define CALCULATE_SPOTSHADOWS\r\n#endif\r\n\r\nuniform vec4 u_ShadowBias; // x: depth bias, y: normal bias\r\n\r\n#if defined(CALCULATE_SHADOWS)||defined(CALCULATE_SPOTSHADOWS)\r\n\t#include \"ShadowSampleTent.glsl\"\r\n\tuniform vec4 u_ShadowMapSize;\r\n\tuniform vec4 u_SpotShadowMapSize;\r\n\tuniform vec4 u_ShadowParams; // x: shadowStrength y: ShadowSpotLightStrength\r\n\t\r\n\tfloat sampleShdowMapFiltered4(TEXTURE2D_SHADOW_PARAM(shadowMap),vec3 shadowCoord,vec4 shadowMapSize)\r\n\t{\r\n\t\tfloat attenuation;\r\n\t\tvec4 attenuation4;\r\n\t\tvec2 offset=shadowMapSize.xy/2.0;\r\n\t\tvec3 shadowCoord0=shadowCoord + vec3(-offset,0.0);\r\n\t\tvec3 shadowCoord1=shadowCoord + vec3(offset.x,-offset.y,0.0);\r\n\t\tvec3 shadowCoord2=shadowCoord + vec3(-offset.x,offset.y,0.0);\r\n\t\tvec3 shadowCoord3=shadowCoord + vec3(offset,0.0);\r\n\t\tattenuation4.x = SAMPLE_TEXTURE2D_SHADOW(shadowMap, shadowCoord0);\r\n\t\tattenuation4.y = SAMPLE_TEXTURE2D_SHADOW(shadowMap, shadowCoord1);\r\n\t\tattenuation4.z = SAMPLE_TEXTURE2D_SHADOW(shadowMap, shadowCoord2);\r\n\t\tattenuation4.w = SAMPLE_TEXTURE2D_SHADOW(shadowMap, shadowCoord3);\r\n\t\tattenuation = dot(attenuation4, vec4(0.25));\r\n\t\treturn attenuation;\r\n\t}\r\n\r\n\tfloat sampleShdowMapFiltered9(TEXTURE2D_SHADOW_PARAM(shadowMap),vec3 shadowCoord,vec4 shadowmapSize)\r\n\t{\r\n\t\tfloat attenuation;\r\n\t\tfloat fetchesWeights[9];\r\n\t\tvec2 fetchesUV[9];\r\n\t\tsampleShadowComputeSamplesTent5x5(shadowmapSize, shadowCoord.xy, fetchesWeights, fetchesUV);\r\n\t\tattenuation = fetchesWeights[0] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[0].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[1] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[1].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[2] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[2].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[3] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[3].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[4] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[4].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[5] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[5].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[6] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[6].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[7] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[7].xy, shadowCoord.z));\r\n\t\tattenuation += fetchesWeights[8] * SAMPLE_TEXTURE2D_SHADOW(shadowMap, vec3(fetchesUV[8].xy, shadowCoord.z));\r\n\t\treturn attenuation;\r\n\t}\r\n\r\n#endif\r\n\r\n\r\n\r\n\r\n#if defined(CALCULATE_SHADOWS)\r\n\r\n\tTEXTURE2D_SHADOW(u_ShadowMap);\r\n\r\n\tuniform mat4 u_ShadowMatrices[4];\r\n\tuniform vec4 u_ShadowSplitSpheres[4];// max cascade is 4\r\n\r\n\tmediump int computeCascadeIndex(vec3 positionWS)\r\n\t{\r\n\t\tvec3 fromCenter0 = positionWS - u_ShadowSplitSpheres[0].xyz;\r\n\t\tvec3 fromCenter1 = positionWS - u_ShadowSplitSpheres[1].xyz;\r\n\t\tvec3 fromCenter2 = positionWS - u_ShadowSplitSpheres[2].xyz;\r\n\t\tvec3 fromCenter3 = positionWS - u_ShadowSplitSpheres[3].xyz;\r\n\r\n\t\tmediump vec4 comparison = vec4(\r\n\t\t\tdot(fromCenter0, fromCenter0)<u_ShadowSplitSpheres[0].w,\r\n\t\t\tdot(fromCenter1, fromCenter1)<u_ShadowSplitSpheres[1].w,\r\n\t\t\tdot(fromCenter2, fromCenter2)<u_ShadowSplitSpheres[2].w,\r\n\t\t\tdot(fromCenter3, fromCenter3)<u_ShadowSplitSpheres[3].w);\r\n\t\tcomparison.yzw = clamp(comparison.yzw - comparison.xyz,0.0,1.0);//keep the nearest\r\n\t\tmediump vec4 indexCoefficient = vec4(4.0,3.0,2.0,1.0);\r\n\t\tmediump int index = 4 - int(dot(comparison, indexCoefficient));\r\n\t\treturn index;\r\n\t}\r\n\r\n\tvec4 getShadowCoord(vec4 positionWS)\r\n\t{\r\n\t\t#ifdef SHADOW_CASCADE\r\n\t\t\tmediump int cascadeIndex = computeCascadeIndex(positionWS.xyz);\r\n\t\t\tif(cascadeIndex > 3)// out of shadow range cascadeIndex is 4.\r\n\t\t\t\treturn vec4(0.0);\r\n\t\t\t\r\n\t\t\t#ifdef GRAPHICS_API_GLES3\r\n\t\t\t\treturn u_ShadowMatrices[cascadeIndex] * positionWS;\r\n\t\t\t#else\r\n\t\t\t\tmat4 shadowMat;\r\n\t\t\t\tif(cascadeIndex == 0)\r\n\t\t\t\t\tshadowMat = u_ShadowMatrices[0];\r\n\t\t\t\telse if(cascadeIndex == 1)\r\n\t\t\t\t\tshadowMat = u_ShadowMatrices[1];\r\n\t\t\t\telse if(cascadeIndex == 2)\r\n\t\t\t\t\tshadowMat = u_ShadowMatrices[2];\r\n\t\t\t\telse\r\n\t\t\t\t\tshadowMat = u_ShadowMatrices[3];\r\n\t\t\t\treturn shadowMat * positionWS;\r\n\t\t\t#endif\r\n\t\t#else\r\n\t\t\treturn u_ShadowMatrices[0] * positionWS;\r\n\t\t#endif\r\n\t}\r\n\r\n\tfloat sampleShadowmap(vec4 shadowCoord)\r\n\t{\r\n\t\tshadowCoord.xyz /= shadowCoord.w;\r\n\t\tfloat attenuation = 1.0;\r\n\t\tif(shadowCoord.z > 0.0 && shadowCoord.z < 1.0)\r\n\t\t{\r\n\t\t\t#if defined(SHADOW_SOFT_SHADOW_HIGH)\r\n\t\t\t\tattenuation = sampleShdowMapFiltered9(u_ShadowMap,shadowCoord.xyz,u_ShadowMapSize);\r\n\t\t\t#elif defined(SHADOW_SOFT_SHADOW_LOW)\r\n\t\t\t\tattenuation = sampleShdowMapFiltered4(u_ShadowMap,shadowCoord.xyz,u_ShadowMapSize);\r\n\t\t\t#else\r\n\t\t\t\tattenuation = SAMPLE_TEXTURE2D_SHADOW(u_ShadowMap,shadowCoord.xyz);\r\n\t\t\t#endif\r\n\t\t\tattenuation = mix(1.0,attenuation,u_ShadowParams.x);//shadowParams.x:shadow strength\r\n\t\t}\r\n\t\treturn attenuation;\r\n\t}\r\n#endif\r\n\r\n#if defined(CALCULATE_SPOTSHADOWS)//shader���Զ���ĺ겻����ifdef ����ĳ�if defined\r\n\tTEXTURE2D_SHADOW(u_SpotShadowMap);\r\n\tuniform mat4 u_SpotViewProjectMatrix;\r\n\tfloat sampleSpotShadowmap(vec4 shadowCoord)\r\n\t{\r\n\t\tshadowCoord.xyz /= shadowCoord.w;\r\n\t\tfloat attenuation = 1.0;\r\n\t\tshadowCoord.xy +=1.0;\r\n\t\tshadowCoord.xy/=2.0; \r\n\t\tif(shadowCoord.z > 0.0 && shadowCoord.z < 1.0)\r\n\t\t{\r\n\t\t\t#if defined(SHADOW_SPOT_SOFT_SHADOW_HIGH)\r\n\t\t\t\tattenuation = sampleShdowMapFiltered9(u_SpotShadowMap,shadowCoord.xyz,u_SpotShadowMapSize);\r\n\t\t\t#elif defined(SHADOW_SPOT_SOFT_SHADOW_LOW)\r\n\t\t\t\tattenuation = sampleShdowMapFiltered4(u_SpotShadowMap,shadowCoord.xyz,u_SpotShadowMapSize);\r\n\t\t\t#else\r\n\t\t\t\tattenuation = SAMPLE_TEXTURE2D_SHADOW(u_SpotShadowMap,shadowCoord.xyz);\r\n\t\t\t#endif\r\n\t\t\tattenuation = mix(1.0,attenuation,u_ShadowParams.y);//shadowParams.y:shadow strength\r\n\t\t}\r\n\t\treturn attenuation;\r\n\t}\r\n#endif\r\n\r\nvec3 applyShadowBias(vec3 positionWS, vec3 normalWS, vec3 lightDirection)\r\n{\r\n    float invNdotL = 1.0 - clamp(dot(-lightDirection, normalWS),0.0,1.0);\r\n    float scale = invNdotL * u_ShadowBias.y;\r\n\r\n    // normal bias is negative since we want to apply an inset normal offset\r\n    positionWS += -lightDirection * u_ShadowBias.xxx;\r\n    positionWS += normalWS * vec3(scale);\r\n    return positionWS;\r\n}\r\n";
 
 	var ShadowCasterVSGLSL = "#include \"Lighting.glsl\";\r\n#include \"Shadow.glsl\"\r\n\r\nattribute vec4 a_Position;\r\nattribute vec3 a_Normal;\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_WorldMat;\r\n#endif\r\n\r\nuniform mat4 u_ViewProjection;\r\n\r\n#ifdef SHADOW\r\n\tuniform vec3 u_ShadowLightDirection;\r\n#endif\r\n\r\n\r\nvec4 shadowCasterVertex()\r\n{\r\n\tmat4 worldMat;\r\n\t#ifdef GPU_INSTANCE\r\n\t\tworldMat = a_WorldMat;\r\n\t#else\r\n\t\tworldMat = u_WorldMat;\r\n\t#endif\r\n\t\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tworldMat = worldMat * skinTransform;\r\n\t#endif\r\n\r\n\tvec4 positionWS = worldMat * a_Position;\r\n\tmat3 worldInvMat;\r\n\t#ifdef BONE\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat*skinTransform));\r\n\t#else\r\n\t\tworldInvMat=INVERSE_MAT(mat3(worldMat));\r\n\t#endif  \r\n\r\n\tvec3 normalWS = normalize(a_Normal*worldInvMat);//if no normalize will cause precision problem\r\n\t#ifdef SHADOW\r\n\t\tpositionWS.xyz = applyShadowBias(positionWS.xyz,normalWS,u_ShadowLightDirection);\r\n\t#endif\r\n\r\n\tvec4 positionCS = u_ViewProjection * positionWS;\r\n\t#ifdef SHADOW_SPOT\r\n\t\tpositionCS.z = positionCS.z-u_ShadowBias.x/positionCS.w;\r\n\t#endif\r\n\tpositionCS.z = max(positionCS.z, 0.0);//min ndc z is 0.0\r\n\t\r\n\t// //TODO没考虑UV动画呢\r\n\t// #if defined(DIFFUSEMAP)&&defined(ALPHATEST)\r\n\t// \tv_Texcoord0=a_Texcoord0;\r\n\t// #endif\r\n    return positionCS;\r\n}\r\n";
 
@@ -29913,11 +29777,11 @@
 
 	var TrailPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\nuniform sampler2D u_MainTexture;\r\nuniform vec4 u_MainColor;\r\n\r\nvarying vec2 v_Texcoord0;\r\nvarying vec4 v_Color;\r\n\r\nvoid main()\r\n{\r\n\tvec4 color = 2.0 * u_MainColor * v_Color;\r\n\t#ifdef MAINTEXTURE\r\n\t\tvec4 mainTextureColor = texture2D(u_MainTexture, v_Texcoord0);\r\n\t\tcolor *= mainTextureColor;\r\n\t#endif\r\n\tgl_FragColor = color;\r\n}\r\n\r\n     ";
 
-	var TrailVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n#include \"Lighting.glsl\";\r\n\r\nattribute vec3 a_Position;\r\nattribute vec3 a_OffsetVector;\r\nattribute vec4 a_Color;\r\nattribute float a_Texcoord0X;\r\nattribute float a_Texcoord0Y;\r\nattribute float a_BirthTime;\r\n\r\nuniform mat4 u_View;\r\nuniform mat4 u_Projection;\r\n\r\nuniform vec4 u_TilingOffset;\r\n\r\nuniform float u_CurTime;\r\nuniform float u_LifeTime;\r\nuniform vec4 u_WidthCurve[10];\r\nuniform int u_WidthCurveKeyLength;\r\n\r\nvarying vec2 v_Texcoord0;\r\nvarying vec4 v_Color;\r\n\r\nfloat hermiteInterpolate(float t, float outTangent, float inTangent, float duration, float value1, float value2)\r\n{\r\n\tfloat t2 = t * t;\r\n\tfloat t3 = t2 * t;\r\n\tfloat a = 2.0 * t3 - 3.0 * t2 + 1.0;\r\n\tfloat b = t3 - 2.0 * t2 + t;\r\n\tfloat c = t3 - t2;\r\n\tfloat d = -2.0 * t3 + 3.0 * t2;\r\n\treturn a * value1 + b * outTangent * duration + c * inTangent * duration + d * value2;\r\n}\r\n\r\nfloat getCurWidth(in float normalizeTime)\r\n{\r\n\tfloat width;\r\n\tif(normalizeTime == 0.0){\r\n\t\twidth=u_WidthCurve[0].w;\r\n\t}\r\n\telse if(normalizeTime >= 1.0){\r\n\t\twidth=u_WidthCurve[u_WidthCurveKeyLength - 1].w;\r\n\t}\r\n\telse{\r\n\t\tfor(int i = 0; i < 10; i ++ )\r\n\t\t{\r\n\t\t\tif(normalizeTime == u_WidthCurve[i].x){\r\n\t\t\t\twidth=u_WidthCurve[i].w;\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\tvec4 lastFrame = u_WidthCurve[i];\r\n\t\t\tvec4 nextFrame = u_WidthCurve[i + 1];\r\n\t\t\tif(normalizeTime > lastFrame.x && normalizeTime < nextFrame.x)\r\n\t\t\t{\r\n\t\t\t\tfloat duration = nextFrame.x - lastFrame.x;\r\n\t\t\t\tfloat t = (normalizeTime - lastFrame.x) / duration;\r\n\t\t\t\tfloat outTangent = lastFrame.z;\r\n\t\t\t\tfloat inTangent = nextFrame.y;\r\n\t\t\t\tfloat value1 = lastFrame.w;\r\n\t\t\t\tfloat value2 = nextFrame.w;\r\n\t\t\t\twidth=hermiteInterpolate(t, outTangent, inTangent, duration, value1, value2);\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n\treturn width;\r\n}\t\r\n\r\nvoid main()\r\n{\r\n\tfloat normalizeTime = (u_CurTime - a_BirthTime) / u_LifeTime;\r\n\t\r\n\t#ifdef TILINGOFFSET\r\n\t\tv_Texcoord0 = vec2(a_Texcoord0X, 1.0 - a_Texcoord0Y) * u_TilingOffset.xy + u_TilingOffset.zw;\r\n\t#else\r\n\t\tv_Texcoord0 = vec2(a_Texcoord0X, a_Texcoord0Y);\r\n\t#endif\r\n\t\r\n\tv_Color = a_Color;\r\n\t\r\n\tgl_Position = u_Projection * u_View * vec4(a_Position + a_OffsetVector * getCurWidth(normalizeTime),1.0);\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n";
+	var TrailVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n#include \"Lighting.glsl\";\r\n\r\nattribute vec3 a_Position;\r\nattribute vec3 a_OffsetVector;\r\nattribute vec4 a_Color;\r\nattribute float a_Texcoord0X;\r\nattribute float a_Texcoord0Y;\r\nattribute float a_BirthTime;\r\n\r\nuniform mat4 u_View;\r\nuniform mat4 u_Projection;\r\n\r\nuniform vec4 u_TilingOffset;\r\n\r\nuniform float u_CurTime;\r\nuniform float u_LifeTime;\r\nuniform vec4 u_WidthCurve[10];\r\nuniform int u_WidthCurveKeyLength;\r\n\r\nvarying vec2 v_Texcoord0;\r\nvarying vec4 v_Color;\r\n\r\nfloat hermiteInterpolate(float t, float outTangent, float inTangent, float duration, float value1, float value2)\r\n{\r\n\tfloat t2 = t * t;\r\n\tfloat t3 = t2 * t;\r\n\tfloat a = 2.0 * t3 - 3.0 * t2 + 1.0;\r\n\tfloat b = t3 - 2.0 * t2 + t;\r\n\tfloat c = t3 - t2;\r\n\tfloat d = -2.0 * t3 + 3.0 * t2;\r\n\treturn a * value1 + b * outTangent * duration + c * inTangent * duration + d * value2;\r\n}\r\n\r\nfloat getCurWidth(in float normalizeTime)\r\n{\r\n\tfloat width;\r\n\tif(normalizeTime == 0.0){\r\n\t\twidth=u_WidthCurve[0].w;\r\n\t}\r\n\telse if(normalizeTime >= 1.0){\r\n\t\twidth=u_WidthCurve[u_WidthCurveKeyLength - 1].w;\r\n\t}\r\n\telse{\r\n\t\tfor(int i = 0; i < 10; i ++ )\r\n\t\t{\r\n\t\t\tif(normalizeTime == u_WidthCurve[i].x){\r\n\t\t\t\twidth=u_WidthCurve[i].w;\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\t\r\n\t\t\tvec4 lastFrame = u_WidthCurve[i];\r\n\t\t\tvec4 nextFrame = u_WidthCurve[i + 1];\r\n\t\t\tif(normalizeTime > lastFrame.x && normalizeTime < nextFrame.x)\r\n\t\t\t{\r\n\t\t\t\tfloat duration = nextFrame.x - lastFrame.x;\r\n\t\t\t\tfloat t = (normalizeTime - lastFrame.x) / duration;\r\n\t\t\t\tfloat outTangent = lastFrame.z;\r\n\t\t\t\tfloat inTangent = nextFrame.y;\r\n\t\t\t\tfloat value1 = lastFrame.w;\r\n\t\t\t\tfloat value2 = nextFrame.w;\r\n\t\t\t\twidth=hermiteInterpolate(t, outTangent, inTangent, duration, value1, value2);\r\n\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t}\r\n\t}\r\n\treturn width;\r\n}\t\r\n\r\nvoid main()\r\n{\r\n\tfloat normalizeTime = (u_CurTime - a_BirthTime) / u_LifeTime;\r\n\t\r\n\tv_Texcoord0 = vec2(a_Texcoord0X, 1.0 - a_Texcoord0Y) * u_TilingOffset.xy + u_TilingOffset.zw;\r\n\t\r\n\tv_Color = a_Color;\r\n\t\r\n\tvec3 cameraPos = (u_View*vec4(a_Position,1.0)).rgb;\r\n\tgl_Position = u_Projection * vec4(cameraPos+a_OffsetVector * getCurWidth(normalizeTime),1.0);\r\n\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}\r\n";
 
 	var UnlitPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\tvarying vec4 v_Color;\r\n#endif\r\n\r\n#ifdef ALBEDOTEXTURE\r\n\tuniform sampler2D u_AlbedoTexture;\r\n\tvarying vec2 v_Texcoord0;\r\n#endif\r\n\r\nuniform vec4 u_AlbedoColor;\r\n\r\n#ifdef ALPHATEST\r\n\tuniform float u_AlphaTestValue;\r\n#endif\r\n\r\n#ifdef FOG\r\n\tuniform float u_FogStart;\r\n\tuniform float u_FogRange;\r\n\t#ifdef ADDTIVEFOG\r\n\t#else\r\n\t\tuniform vec3 u_FogColor;\r\n\t#endif\r\n#endif\r\n\r\nvoid main()\r\n{\r\n\tvec4 color =  u_AlbedoColor;\r\n\t#ifdef ALBEDOTEXTURE\r\n\t\tcolor *= texture2D(u_AlbedoTexture, v_Texcoord0);\r\n\t#endif\r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tcolor *= v_Color;\r\n\t#endif\r\n\t\r\n\t#ifdef ALPHATEST\r\n\t\tif(color.a < u_AlphaTestValue)\r\n\t\t\tdiscard;\r\n\t#endif\r\n\t\r\n\tgl_FragColor = color;\r\n\t\r\n\t#ifdef FOG\r\n\t\tfloat lerpFact = clamp((1.0 / gl_FragCoord.w - u_FogStart) / u_FogRange, 0.0, 1.0);\r\n\t\t#ifdef ADDTIVEFOG\r\n\t\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, vec3(0.0), lerpFact);\r\n\t\t#else\r\n\t\t\tgl_FragColor.rgb = mix(gl_FragColor.rgb, u_FogColor, lerpFact);\r\n\t\t#endif\r\n\t#endif\r\n\t\r\n}\r\n\r\n";
 
-	var UnlitVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n#include \"Lighting.glsl\";\r\n#include \"LayaUtile.glsl\";\r\n\r\nattribute vec4 a_Position;\r\n\r\nattribute vec2 a_Texcoord0;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tattribute mat4 a_MvpMatrix;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\n\r\nattribute vec4 a_Color;\r\nvarying vec4 v_Color;\r\nvarying vec2 v_Texcoord0;\r\n\r\n#ifdef TILINGOFFSET\r\n\tuniform vec4 u_TilingOffset;\r\n#endif\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\nvoid main() {\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tposition=skinTransform*a_Position;\r\n\t #else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position = a_MvpMatrix * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\r\n\t#ifdef TILINGOFFSET\r\n\t\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\t#else\r\n\t\tv_Texcoord0=a_Texcoord0;\r\n\t#endif\r\n\r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tv_Color = a_Color;\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
+	var UnlitVS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n#include \"Lighting.glsl\";\r\n#include \"LayaUtile.glsl\";\r\n\r\nattribute vec4 a_Position;\r\n\r\nattribute vec2 a_Texcoord0;\r\n\r\n#ifdef GPU_INSTANCE\r\n\tuniform mat4 u_ViewProjection;\r\n\tattribute mat4 a_WorldMat;\r\n#else\r\n\tuniform mat4 u_MvpMatrix;\r\n#endif\r\n\r\nattribute vec4 a_Color;\r\nvarying vec4 v_Color;\r\nvarying vec2 v_Texcoord0;\r\n\r\nuniform vec4 u_TilingOffset;\r\n\r\n#ifdef BONE\r\n\tconst int c_MaxBoneCount = 24;\r\n\tattribute vec4 a_BoneIndices;\r\n\tattribute vec4 a_BoneWeights;\r\n\tuniform mat4 u_Bones[c_MaxBoneCount];\r\n#endif\r\n\r\nvoid main() {\r\n\tvec4 position;\r\n\t#ifdef BONE\r\n\t\tmat4 skinTransform;\r\n\t \t#ifdef SIMPLEBONE\r\n\t\t\tfloat currentPixelPos;\r\n\t\t\t#ifdef GPU_INSTANCE\r\n\t\t\t\tcurrentPixelPos = a_SimpleTextureParams.x+a_SimpleTextureParams.y;\r\n\t\t\t#else\r\n\t\t\t\tcurrentPixelPos = u_SimpleAnimatorParams.x+u_SimpleAnimatorParams.y;\r\n\t\t\t#endif\r\n\t\t\tfloat offset = 1.0/u_SimpleAnimatorTextureSize;\r\n\t\t\tskinTransform =  loadMatFromTexture(currentPixelPos,int(a_BoneIndices.x),offset) * a_BoneWeights.x;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.y),offset) * a_BoneWeights.y;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.z),offset) * a_BoneWeights.z;\r\n\t\t\tskinTransform += loadMatFromTexture(currentPixelPos,int(a_BoneIndices.w),offset) * a_BoneWeights.w;\r\n\t\t#else\r\n\t\t\tskinTransform =  u_Bones[int(a_BoneIndices.x)] * a_BoneWeights.x;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.y)] * a_BoneWeights.y;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.z)] * a_BoneWeights.z;\r\n\t\t\tskinTransform += u_Bones[int(a_BoneIndices.w)] * a_BoneWeights.w;\r\n\t\t#endif\r\n\t\tposition=skinTransform*a_Position;\r\n\t #else\r\n\t\tposition=a_Position;\r\n\t#endif\r\n\t#ifdef GPU_INSTANCE\r\n\t\tgl_Position =u_ViewProjection * a_WorldMat * position;\r\n\t#else\r\n\t\tgl_Position = u_MvpMatrix * position;\r\n\t#endif\r\n\r\n\tv_Texcoord0=TransformUV(a_Texcoord0,u_TilingOffset);\r\n\r\n\t#if defined(COLOR)&&defined(ENABLEVERTEXCOLOR)\r\n\t\tv_Color = a_Color;\r\n\t#endif\r\n\tgl_Position=remapGLPositionZ(gl_Position);\r\n}";
 
 	var WaterPrimaryPS = "#if defined(GL_FRAGMENT_PRECISION_HIGH)// 原来的写法会被我们自己的解析流程处理，而我们的解析是不认内置宏的，导致被删掉，所以改成 if defined 了\r\n\tprecision highp float;\r\n#else\r\n\tprecision mediump float;\r\n#endif\r\n\r\n#ifdef MAINTEXTURE\r\n\tuniform sampler2D u_MainTexture;\r\n#endif\r\n\r\n#ifdef NORMALTEXTURE\r\n\tuniform sampler2D u_NormalTexture;\r\n#endif\r\n\r\nuniform vec4 u_HorizonColor;\r\n\r\nvarying vec3 v_Normal;\r\nvarying vec3 v_Tangent;\r\nvarying vec3 v_Binormal;\r\nvarying vec3 v_ViewDir;\r\nvarying vec2 v_Texcoord0;\r\nvarying vec2 v_Texcoord1;\r\n\r\n\r\n#include \"Lighting.glsl\"\r\n\r\n\r\n\r\nvec3 NormalSampleToWorldSpace(vec4 normalMapSample) {\r\n\tvec3 normalT;\r\n\tnormalT.x = 2.0 * normalMapSample.x - 1.0;\r\n\tnormalT.y = 1.0 - 2.0 * normalMapSample.y;\r\n\tnormalT.z = sqrt(1.0 - clamp(dot(normalT.xy, normalT.xy), 0.0, 1.0));\r\n\r\n\tvec3 bumpedNormal = normalize(normalT);\r\n\r\n\treturn bumpedNormal;\r\n}\r\n\r\n\r\nvoid main()\r\n{\r\n\tvec4 bumpColor1 = texture2D(u_NormalTexture, v_Texcoord0);\r\n\tvec4 bumpColor2 = texture2D(u_NormalTexture, v_Texcoord1);\r\n\r\n\tvec3 normal1 = NormalSampleToWorldSpace(bumpColor1);\r\n\tvec3 normal2 = NormalSampleToWorldSpace(bumpColor2);\r\n\t\r\n\tvec3 normal = normalize((normal1 + normal2) * 0.5);\r\n\tvec3 viewDir = normalize(v_ViewDir);\r\n\tfloat fresnel = dot(viewDir, normal);\r\n\t\r\n\tvec4 waterColor = texture2D(u_MainTexture, vec2(fresnel, fresnel));\r\n\t\r\n\tvec4 color;\r\n\tcolor.rgb = mix(waterColor.rgb, u_HorizonColor.rgb, vec3(waterColor.a));\r\n\tcolor.a = u_HorizonColor.a;\r\n\t\r\n\tgl_FragColor = color;\r\n}\r\n\r\n\r\n";
 
@@ -29957,8 +29821,8 @@
 	            'a_BoneWeights': VertexMesh.MESH_BLENDWEIGHT0,
 	            'a_BoneIndices': VertexMesh.MESH_BLENDINDICES0,
 	            'a_Tangent0': VertexMesh.MESH_TANGENT0,
-	            'a_MvpMatrix': VertexMesh.MESH_MVPMATRIX_ROW0,
-	            'a_WorldMat': VertexMesh.MESH_WORLDMATRIX_ROW0
+	            'a_WorldMat': VertexMesh.MESH_WORLDMATRIX_ROW0,
+	            'a_SimpleTextureParams': VertexMesh.MESH_SIMPLEANIMATOR
 	        };
 	        var uniformMap = {
 	            'u_Bones': Shader3D.PERIOD_CUSTOM,
@@ -29970,6 +29834,11 @@
 	            'u_MaterialSpecular': Shader3D.PERIOD_MATERIAL,
 	            'u_Shininess': Shader3D.PERIOD_MATERIAL,
 	            'u_TilingOffset': Shader3D.PERIOD_MATERIAL,
+	            'u_TransmissionRate': Shader3D.PERIOD_MATERIAL,
+	            'u_BackDiffuse': Shader3D.PERIOD_MATERIAL,
+	            'u_BackScale': Shader3D.PERIOD_MATERIAL,
+	            'u_ThinknessTexture': Shader3D.PERIOD_MATERIAL,
+	            'u_TransmissionColor': Shader3D.PERIOD_MATERIAL,
 	            'u_WorldMat': Shader3D.PERIOD_SPRITE,
 	            'u_MvpMatrix': Shader3D.PERIOD_SPRITE,
 	            'u_LightmapScaleOffset': Shader3D.PERIOD_SPRITE,
@@ -30059,7 +29928,7 @@
 	            'a_Texcoord0': VertexMesh.MESH_TEXTURECOORDINATE0,
 	            'a_BoneWeights': VertexMesh.MESH_BLENDWEIGHT0,
 	            'a_BoneIndices': VertexMesh.MESH_BLENDINDICES0,
-	            'a_MvpMatrix': VertexMesh.MESH_MVPMATRIX_ROW0
+	            'a_WorldMat': VertexMesh.MESH_WORLDMATRIX_ROW0
 	        };
 	        uniformMap = {
 	            'u_Bones': Shader3D.PERIOD_CUSTOM,
@@ -30068,6 +29937,7 @@
 	            'u_TilingOffset': Shader3D.PERIOD_MATERIAL,
 	            'u_AlphaTestValue': Shader3D.PERIOD_MATERIAL,
 	            'u_MvpMatrix': Shader3D.PERIOD_SPRITE,
+	            'u_ViewProjection': Shader3D.PERIOD_CAMERA,
 	            'u_SimpleAnimatorTexture': Shader3D.PERIOD_SPRITE,
 	            'u_SimpleAnimatorParams': Shader3D.PERIOD_SPRITE,
 	            'u_SimpleAnimatorTextureSize': Shader3D.PERIOD_SPRITE,
@@ -30092,7 +29962,7 @@
 	            'a_Texcoord0': VertexMesh.MESH_TEXTURECOORDINATE0,
 	            'a_BoneWeights': VertexMesh.MESH_BLENDWEIGHT0,
 	            'a_BoneIndices': VertexMesh.MESH_BLENDINDICES0,
-	            'a_MvpMatrix': VertexMesh.MESH_MVPMATRIX_ROW0
+	            'a_WorldMat': VertexMesh.MESH_WORLDMATRIX_ROW0
 	        };
 	        uniformMap = {
 	            'u_Bones': Shader3D.PERIOD_CUSTOM,
@@ -30100,6 +29970,7 @@
 	            'u_AlbedoColor': Shader3D.PERIOD_MATERIAL,
 	            'u_TilingOffset': Shader3D.PERIOD_MATERIAL,
 	            'u_AlphaTestValue': Shader3D.PERIOD_MATERIAL,
+	            'u_ViewProjection': Shader3D.PERIOD_CAMERA,
 	            'u_MvpMatrix': Shader3D.PERIOD_SPRITE,
 	            'u_SimpleAnimatorTexture': Shader3D.PERIOD_SPRITE,
 	            'u_SimpleAnimatorParams': Shader3D.PERIOD_SPRITE,
@@ -30687,27 +30558,6 @@
 	                        Matrix4x4.multiply(projectionView, transform.worldMatrix, this._projectionViewWorldMatrix);
 	                        this._shaderValues.setMatrix4x4(Sprite3D.MVPMATRIX, this._projectionViewWorldMatrix);
 	                    }
-	                    break;
-	                case RenderElement.RENDERTYPE_INSTANCEBATCH:
-	                    var mvpMatrixData = SubMeshInstanceBatch.instance.instanceMVPMatrixData;
-	                    var insBatches = element.instanceBatchElementList;
-	                    var elements = insBatches.elements;
-	                    var count = insBatches.length;
-	                    if (this._cacheAnimator) {
-	                        for (var i = 0; i < count; i++) {
-	                            var worldMat = (elements[i].render)._cacheAnimator.owner._transform.worldMatrix;
-	                            Utils3D.mulMatrixByArray(projectionView.elements, 0, worldMat.elements, 0, mvpMatrixData, i * 16);
-	                        }
-	                    }
-	                    else {
-	                        for (var i = 0; i < count; i++) {
-	                            var worldMat = elements[i]._transform.worldMatrix;
-	                            Utils3D.mulMatrixByArray(projectionView.elements, 0, worldMat.elements, 0, mvpMatrixData, i * 16);
-	                        }
-	                    }
-	                    var mvpBuffer = SubMeshInstanceBatch.instance.instanceMVPMatrixBuffer;
-	                    mvpBuffer.orphanStorage();
-	                    mvpBuffer.setData(mvpMatrixData.buffer, 0, 0, count * 16 * 4);
 	                    break;
 	            }
 	        }
@@ -31820,8 +31670,6 @@
 	        this.ownBody = rigidBody;
 	        this.connectedBody = connectRigidbody;
 	    }
-	    _cloneTo(dest) {
-	    }
 	}
 
 	class ConfigurableConstraint extends ConstraintComponent {
@@ -32214,8 +32062,6 @@
 	    }
 	    _onDestroy() {
 	        super._onDestroy();
-	    }
-	    _cloneTo(dest) {
 	    }
 	}
 	ConfigurableConstraint.CONFIG_MOTION_TYPE_LOCKED = 0;
@@ -33222,7 +33068,6 @@
 	        this._heightMap = HeightMap.creatFromMesh(this.meshFilter.sharedMesh, heightMapWidth, heightMapHeight, this._cellSize);
 	        var boundingBox = this.meshFilter.sharedMesh.bounds;
 	        var min = boundingBox.getMin();
-	        var max = boundingBox.getMax();
 	        this._minX = min.x;
 	        this._minZ = min.z;
 	    }
@@ -33231,7 +33076,6 @@
 	        this._heightMap = HeightMap.createFromImage(texture, minHeight, maxHeight);
 	        this._computeCellSize(boundingBox);
 	        var min = boundingBox.getMin();
-	        var max = boundingBox.getMax();
 	        this._minX = min.x;
 	        this._minZ = min.z;
 	    }
@@ -33518,6 +33362,122 @@
 	BloomEffect.SUBSHADER_UPSAMPLETENT = 4;
 	BloomEffect.SUBSHADER_UPSAMPLEBOX = 5;
 	BloomEffect.MAXPYRAMIDSIZE = 16;
+
+	class MaterialInstanceProperty {
+	    constructor() {
+	        this._isNeedUpdate = false;
+	    }
+	    createInstanceVertexBuffer3D() {
+	        var gl = Laya.LayaGL.instance;
+	        this._instanceData = new Float32Array(DrawMeshInstancedCMD.maxInstanceCount * this._vertexStride);
+	        this._vertexBuffer = new VertexBuffer3D(this._instanceData.length * 4, gl.DYNAMIC_DRAW);
+	        this._vertexBuffer.vertexDeclaration = this._vertexDeclaration;
+	    }
+	    updateVertexBufferData(drawNums) {
+	        if (!this._isNeedUpdate)
+	            return;
+	        let instanceData = this._instanceData;
+	        let dataValue = this._value;
+	        let datalength = this._value.length;
+	        let data;
+	        let stride = this._vertexStride;
+	        let updateType = 0;
+	        if (!(this._value instanceof Float32Array)) {
+	            updateType = 1;
+	        }
+	        switch (updateType) {
+	            case 0:
+	                instanceData.set(dataValue, 0);
+	                break;
+	            case 1:
+	                for (let i = 0; i < datalength; i++) {
+	                    data = dataValue[i];
+	                    data.toArray(instanceData, i * stride);
+	                }
+	                break;
+	        }
+	        this._vertexBuffer.orphanStorage();
+	        this._vertexBuffer.setData(instanceData.buffer, 0, 0, drawNums * 4 * (updateType ? stride : 1));
+	    }
+	}
+
+	(function (InstanceLocation) {
+	    InstanceLocation[InstanceLocation["CUSTOME0"] = 12] = "CUSTOME0";
+	    InstanceLocation[InstanceLocation["CUSTOME1"] = 13] = "CUSTOME1";
+	    InstanceLocation[InstanceLocation["CUSTOME2"] = 14] = "CUSTOME2";
+	    InstanceLocation[InstanceLocation["CUSTOME3"] = 15] = "CUSTOME3";
+	})(exports.InstanceLocation || (exports.InstanceLocation = {}));
+	class MaterialInstancePropertyBlock {
+	    constructor() {
+	        this._type = 0;
+	        this._propertyMap = {};
+	    }
+	    _checkPropertyLegal(vertexElementFormat, propertyName, attributeLocation, prob) {
+	        var vecDec = prob._vertexDeclaration;
+	        if (vecDec._vertexElements[0]._elementFormat !== vertexElementFormat)
+	            throw "Data exists and format does not match";
+	        if (prob._name !== propertyName)
+	            throw "You cannot add a new property to an existing attributeLocation,Please use another attributeLocation";
+	    }
+	    _creatProperty(attributeName, arrays, vertexStride, vertexformat, attributeLocation) {
+	        var prob = this._propertyMap[attributeLocation] = new MaterialInstanceProperty();
+	        prob._name = attributeName;
+	        prob._value = arrays;
+	        prob._vertexDeclaration = new VertexDeclaration(vertexStride, [new VertexElement(0, vertexformat, attributeLocation)]);
+	        prob._isNeedUpdate = true;
+	        prob._vertexStride = vertexStride / 4;
+	        prob.createInstanceVertexBuffer3D();
+	    }
+	    setVectorArray(attributeName, arrays, attributeLocation) {
+	        var prob = this._propertyMap[attributeLocation];
+	        if (prob) {
+	            this._checkPropertyLegal(VertexElementFormat.Vector4, attributeName, attributeLocation, prob);
+	            prob._value = arrays;
+	            prob._isNeedUpdate = true;
+	        }
+	        else
+	            this._creatProperty(attributeName, arrays, 16, VertexElementFormat.Vector4, attributeLocation);
+	    }
+	    setVector3Array(attributeName, arrays, attributeLocation) {
+	        var prob = this._propertyMap[attributeLocation];
+	        if (prob) {
+	            this._checkPropertyLegal(VertexElementFormat.Vector3, attributeName, attributeLocation, prob);
+	            prob._value = arrays;
+	            prob._isNeedUpdate = true;
+	        }
+	        else
+	            this._creatProperty(attributeName, arrays, 12, VertexElementFormat.Vector3, attributeLocation);
+	    }
+	    setVector2Array(attributeName, arrays, attributeLocation) {
+	        var prob = this._propertyMap[attributeLocation];
+	        if (prob) {
+	            this._checkPropertyLegal(VertexElementFormat.Vector2, attributeName, attributeLocation, prob);
+	            prob._value = arrays;
+	            prob._isNeedUpdate = true;
+	        }
+	        else
+	            this._creatProperty(attributeName, arrays, 8, VertexElementFormat.Vector2, attributeLocation);
+	    }
+	    setNumberArray(attributeName, arrays, attributeLocation) {
+	        var prob = this._propertyMap[attributeLocation];
+	        if (prob) {
+	            this._checkPropertyLegal(VertexElementFormat.Single, attributeName, attributeLocation, prob);
+	            prob._value = arrays;
+	            prob._isNeedUpdate = true;
+	        }
+	        else
+	            this._creatProperty(attributeName, arrays, 4, VertexElementFormat.Single, attributeLocation);
+	    }
+	    getPropertyArray(attributeLocation) {
+	        var prob = this._propertyMap[attributeLocation];
+	        return prob ? prob._value : null;
+	    }
+	    clear() {
+	        this._propertyMap = {};
+	    }
+	}
+	MaterialInstancePropertyBlock.INSTANCETYPE_ATTRIBUTE = 0;
+	MaterialInstancePropertyBlock.INSTANCETYPE_UNIFORMBUFFER = 1;
 
 	class ConchVector4 {
 	    constructor(x = 0, y = 0, z = 0, w = 0) {
@@ -34547,12 +34507,6 @@
 	    set color(value) {
 	        this._color = value;
 	    }
-	    _createVertexBuffer(charCount) {
-	    }
-	    _resizeVertexBuffer(charCount) {
-	    }
-	    _addChar() {
-	    }
 	}
 
 	class Size {
@@ -34642,6 +34596,7 @@
 	exports.DepthPass = DepthPass;
 	exports.DirectionLight = DirectionLight;
 	exports.DrawMeshCMD = DrawMeshCMD;
+	exports.DrawMeshInstancedCMD = DrawMeshInstancedCMD;
 	exports.DrawRenderCMD = DrawRenderCMD;
 	exports.DynamicBatchManager = DynamicBatchManager;
 	exports.EffectMaterial = EffectMaterial;
@@ -34678,6 +34633,8 @@
 	exports.LoadModelV04 = LoadModelV04;
 	exports.LoadModelV05 = LoadModelV05;
 	exports.Material = Material;
+	exports.MaterialInstanceProperty = MaterialInstanceProperty;
+	exports.MaterialInstancePropertyBlock = MaterialInstancePropertyBlock;
 	exports.MathUtils3D = MathUtils3D;
 	exports.Matrix3x3 = Matrix3x3;
 	exports.Matrix4x4 = Matrix4x4;

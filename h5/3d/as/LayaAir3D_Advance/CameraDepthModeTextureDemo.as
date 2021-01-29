@@ -1,4 +1,4 @@
-package {
+package LayaAir3D_Advance{
 	import DepthNormalShader.DepthMaterial;
 	import DepthNormalShader.DepthNormalsMaterial;
 	import laya.d3.core.Camera;

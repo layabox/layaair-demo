@@ -815,7 +815,7 @@
 						"LoadGltfResource",
 						"加载Gltf资源",
 						"",
-						"core,ani,ui,d3,gltf"
+						"core,ani,ui,d3,gltf,CameraMoveScript.js"
 					]
 				]
 			},
@@ -1078,6 +1078,12 @@
 					[
 						"BlinnPhong_SpecularMap",
 						"BlinnPhong-高光贴图",
+						"",
+						"core,ani,d3,CameraMoveScript.js"
+					],
+					[
+						"Blinnphong_Transmission",
+						"Blinnphong_厚度贴图",
 						"",
 						"core,ani,d3,CameraMoveScript.js"
 					],
@@ -1463,13 +1469,25 @@
 						"CommandBuffer_BlurryGlass",
 						"毛玻璃",
 						"",
-						"core,d3,physics3D"
+						"core,d3,physics3D,ui"
 					],
 					[
 						"CommandBuffer_Outline",
 						"轮廓",
 						"",
 						"core,ani,d3,device,ui"
+					],
+					[
+						"CommandBuffer_DrawCustomInstance",
+						"Instance 渲染",
+						"",
+						"core,ani,d3,CameraMoveScript.js,ui"
+					],
+					[
+						"GrassDemo",
+						"草地",
+						"",
+						"core,ani,d3,physics3D,CameraMoveScript.js"
 					],
 					[
 						"ReflectionProbeDemo",

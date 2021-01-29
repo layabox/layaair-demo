@@ -1,4 +1,4 @@
-package {
+package LayaAir3D_Advance{
 	import laya.display.Scene;
 	import laya.net.AtlasInfoManager;
 	import laya.net.ResourceVersion;
@@ -11,27 +11,19 @@ package {
 	import laya.d3.core.Camera;
 	import common.CameraMoveScript;
 	import laya.d3.core.MeshSprite3D;
-	import common.CameraMoveScript;
-	import laya.d3.core.Camera;
-	import laya.d3.core.MeshSprite3D;
 	import laya.d3.core.material.PBRStandardMaterial;
-	import laya.d3.core.scene.Scene3D;
 	import laya.d3.math.Vector3;
 	import laya.d3.math.Vector4;
 	import laya.d3.resource.models.Mesh;
 	import laya.d3.resource.models.PrimitiveMesh;
 	import laya.d3.shader.Shader3D;
 	import laya.display.Scene;
-	import laya.display.Stage;
-	import laya.utils.Handler;
-	import laya.utils.Stat;
 	import laya.GlassWithoutGrabMaterail;
 	import Laya.d3.CommandBuffer;
 	import Laya.core.RenderTextureFormat;
 	import Laya.core.RenderTexture;
 	import Laya.core.RenderTextureDepthFormat;
 	import Laya.core.ShaderData;
-	import 
 
 	public class Main {
 		private var mat:GlassWithoutGrabMaterail;

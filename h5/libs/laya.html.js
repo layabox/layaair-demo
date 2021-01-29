@@ -376,7 +376,7 @@
 
     class HTMLDocument {
         constructor() {
-            this.all = [];
+            this.all = {};
             this.styleSheets = HTMLStyle.styleSheets;
         }
         getElementById(id) {
