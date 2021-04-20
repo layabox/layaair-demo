@@ -11,10 +11,10 @@ import { Laya3D } from "Laya3D";
 import { Browser } from "laya/utils/Browser"
 import { BitmapFont } from "laya/display/BitmapFont";
 import { Text } from "laya/display/Text";
+import { Event } from "laya/events/Event";
 
 
-
-export class SceneLoad1 {
+export class SkeletonMask {
 	private fontName: string = "fontClip"
 	constructor() {
 		//初始化引擎
@@ -36,50 +36,64 @@ export class SceneLoad1 {
 	private loadFont(): void {
 		var bitmapFont: BitmapFont = new BitmapFont();
 
-		bitmapFont.loadFont("res/fontTest/fontClip.fnt", new Handler(this, this.onFontLoaded, [bitmapFont]));
+		bitmapFont.loadFont("res/threeDimen/LayaScene_MaskModelTest/font/fontClip.fnt", new Handler(this, this.onFontLoaded, [bitmapFont]));
 	}
 	private onFontLoaded(bitmapFont: BitmapFont): void {
 		bitmapFont.setSpaceWidth(10);
 		Text.registerBitmapFont(this.fontName, bitmapFont);
-		//this.createText(txt="上半身",250,true,font,leading=5,zOrder=999999999,pos(Laya.stage.width - txt.width >> 1, Laya.stage.height - txt.height >> 1),   this.fontName);
-
 		this.createText(this.fontName);
 		this.createText1(this.fontName);
 		this.createText2(this.fontName);
 	}
+
+
+
+
 	private createText(font: string): void {
 		var txt: Text = new Text();
 		txt.width = 250;
 		txt.wordWrap = true;
-		txt.text = "上半身";
-		txt.font = font;
+		txt.text = "带有骨骼遮罩的动画";
+		txt.color = "#FFFFFFFF";
 		txt.leading = 5;
-		//txt.pos(Laya.stage.width - txt.width >> 1, Laya.stage.height - txt.height >> 1);
-		txt.pos(Laya.stage.width - txt.width >> 1, Laya.stage.height - txt.height >> 1);
-
+		txt.fontSize = 10;
+		txt.zOrder = 999999999;
+		txt.scale(Browser.pixelRatio, Browser.pixelRatio);
+		txt.pos(Laya.stage.width / 2-50,Laya.stage.height/2);
+		Laya.stage.on(Event.RESIZE,txt,()=>{
+			txt.pos(Laya.stage.width / 2-50,Laya.stage.height/2);
+		});
 		Laya.stage.addChild(txt);
 	}
 	createText1(font) {
 		var txt = new Text();
 		txt.width = 250;
 		txt.wordWrap = true;
-		txt.text = "正常";
-		txt.font = font;
+		txt.text = "正常动画一";
+		txt.color = "#FFFFFFFF";
+		txt.size(200,300);
 		txt.leading = 5;
+		txt.fontSize = 15;
 		txt.zOrder = 999999999;
-		//txt.pos(Laya.stage.width - txt.width >> 1, Laya.stage.height - txt.height >> 1);
-		txt.pos(700, 450);
+		txt.pos(Laya.stage.width / 2 - 240, Laya.stage.height/2);
+		Laya.stage.on(Event.RESIZE,txt,()=>{
+			txt.pos(Laya.stage.width / 2 - 240,Laya.stage.height/2);
+		});
 		Laya.stage.addChild(txt);
-	} createText2(font) {
+	} 
+	createText2(font) {
 		var txt = new Text();
 		txt.width = 250;
 		txt.wordWrap = true;
-		txt.text = "上半身";
-		txt.font = font;
+		txt.text = "正常动画二";
+		txt.color = "#FFFFFFFF";
 		txt.leading = 5;
 		txt.zOrder = 999999999;
-		txt.pos(Laya.stage.width - txt.width >> 1, Laya.stage.height - txt.height >> 1);
-		txt.pos(900, 450);
+		txt.fontSize = 15;
+		txt.pos(Laya.stage.width / 2 + 140, Laya.stage.height/2);
+		Laya.stage.on(Event.RESIZE,txt,()=>{
+			txt.pos(Laya.stage.width / 2 + 140,Laya.stage.height/2);
+		});
 		Laya.stage.addChild(txt);
 	}
 

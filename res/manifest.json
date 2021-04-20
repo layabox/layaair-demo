@@ -1247,7 +1247,7 @@
 						"SkeletonMask",
 						"骨骼动画遮罩",
 						"",
-						"core,ui,ani,d3,,physics3D"
+						"core,ui,ani,d3,physics3D"
 					]
 				]
 			},
