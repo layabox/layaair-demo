@@ -1,4 +1,4 @@
-class Physics_CollisionEvent {
+class Physics_Physics_CollisionEvent {
     constructor() {
         this.count = 7;
         this.bodys = [];
@@ -83,4 +83,4 @@ class Physics_CollisionEvent {
         Laya.Laya.physicsTimer.clearAll(this);
     }
 }
-new Physics_CollisionEvent();
+new Physics_Physics_CollisionEvent();

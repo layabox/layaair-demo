@@ -1,4 +1,4 @@
-class Physics_CollisionFiltering {
+class Physics_Physics_CollisionFiltering {
 	constructor() {
 		this.preMovementX = 0;
 		this.preMovementY = 0;
@@ -114,4 +114,4 @@ class Physics_CollisionFiltering {
 		Laya.Laya.stage.off(Laya.Event.MOUSE_OUT, this, this.destoryJoint);
 	}
 }
-new Physics_CollisionFiltering();
+new Physics_Physics_CollisionFiltering();

@@ -495,30 +495,30 @@
 						"Physics_Bridge",
 						"物理纽带",
 						"",
-						"core,ui,Physics,utils"
+						"core,ui,Physics"
 					],
 					[
 						"Physics_CollisionEvent",
 						"物理碰撞事件",
 						"",
-						"core,ui,Physics,utils"
+						"core,ui,Physics"
 					],
 					[
 						"Physics_CollisionFiltering",
 						"物理碰撞过滤",
 						"",
-						"core,ui,Physics,utils"
+						"core,ui,Physics"
 					],
 					[
 						"Physics_Strandbeests",
 						"物理仿真兽",
 						"",
-						"core,ui,Physics,utils"
+						"core,ui,Physics"
 					],[
 						"Physics_Tumbler",
 						"滚筒模拟",
 						"",
-						"core,ui,Physics,utils"
+						"core,ui,Physics"
 					]
 				]
 			},

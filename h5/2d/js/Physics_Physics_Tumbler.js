@@ -1,4 +1,4 @@
-class Physics_Tumbler {
+class Physics_Physics_Tumbler {
     constructor() {
         this.count = 0;
         this.totalBox = 200;
@@ -83,4 +83,4 @@ class Physics_Tumbler {
         Laya.Laya.stage.removeChild(this.label);
     }
 }
-new Physics_Tumbler();
+new Physics_Physics_Tumbler();

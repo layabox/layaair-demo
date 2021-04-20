@@ -495,30 +495,30 @@
 						"Physics_Bridge",
 						"Bridge",
 						"",
-						"core,ui,Physics,utils"
+						"core,ui,Physics"
 					],
 					[
 						"Physics_CollisionEvent",
 						"CollisionEvent",
 						"",
-						"core,ui,Physics,utils"
+						"core,ui,Physics"
 					],
 					[
 						"Physics_CollisionFiltering",
 						"CollisionFiltering",
 						"",
-						"core,ui,Physics,utils"
+						"core,ui,Physics"
 					],
 					[
 						"Physics_Strandbeests",
 						"Strandbeests",
 						"",
-						"core,ui,Physics,utils"
+						"core,ui,Physics"
 					],[
 						"Physics_Tumbler",
 						"Tumbler",
 						"",
-						"core,ui,Physics,utils"
+						"core,ui,Physics"
 					]
 				]
 			},

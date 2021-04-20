@@ -1,4 +1,4 @@
-class Physics_Strandbeests {
+class Physics_Physics_Strandbeests {
 	constructor() {
 		this.scale = 2.5;
 		this.pos = [500, 400];
@@ -183,4 +183,4 @@ class B2Math {
 		return [a[0] - b[0], a[1] - b[1]];
 	}
 }
-new Physics_Strandbeests();
+new Physics_Physics_Strandbeests();
