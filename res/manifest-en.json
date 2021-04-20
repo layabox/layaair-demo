@@ -1181,6 +1181,18 @@
 						"HalfFloatTexture",
 						"",
 						"core,ani,d3,physics3D"
+					],
+					[
+						"GPUCompression_ASTC",
+						"GPUCompression_ASTC",
+						"",
+						"core,ani,d3,physics3D"
+					],
+					[
+						"GPUCompression_ETC2",
+						"GPUCompression_ETC2",
+						"",
+						"core,ani,d3,physics3D"
 					]
 				]
 			},
@@ -1515,6 +1527,12 @@
 					[
 						"PostProcess_Edge",
 						"PostProcess_Edge",
+						"",
+						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PostProcess_DoF",
+						"PostProcess_DoF",
 						"",
 						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
 					],

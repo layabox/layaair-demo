@@ -514,7 +514,8 @@
 						"物理仿真兽",
 						"",
 						"core,ui,Physics"
-					],[
+					],
+					[
 						"Physics_Tumbler",
 						"滚筒模拟",
 						"",
@@ -977,6 +978,12 @@
 						"后处理边缘",
 						"",
 						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PostProcess_DoF",
+						"后处理景深",
+						"",
+						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
 					]
 				]
 			},
@@ -1167,6 +1174,18 @@
 					[
 						"HalfFloatTexture",
 						"半浮点数纹理",
+						"",
+						"core,ani,d3,physics3D"
+					],
+					[
+						"GPUCompression_ASTC",
+						"GPU压缩ASTC",
+						"",
+						"core,ani,d3,physics3D"
+					],
+					[
+						"GPUCompression_ETC2",
+						"GPU压缩ETC2",
 						"",
 						"core,ani,d3,physics3D"
 					]
