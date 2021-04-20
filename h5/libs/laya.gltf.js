@@ -59,6 +59,59 @@
 	glTFBase64Tool.reghead = /^\s*data:([a-z]+\/[a-z0-9-+.]+(;[a-z-]+=[a-z0-9-]+)?)?(;base64)?,/i;
 	glTFBase64Tool.lookup = null;
 
+	class glTFTextureEditor {
+	    static PixelArrayToBase64(pixelArray, width, height) {
+	        let clampedArray = new Uint8ClampedArray(pixelArray);
+	        let imageData = new ImageData(clampedArray, width, height);
+	        let canvas = new Laya.HTMLCanvas(true);
+	        let ctx = canvas.source.getContext("2d");
+	        canvas.source.width = width;
+	        canvas.source.height = height;
+	        ctx.putImageData(imageData, 0, 0);
+	        let base64 = canvas.source.toDataURL();
+	        return base64;
+	    }
+	    static GenerateTexture2DWithPixel(pixelArray, width, height, format, mipmap) {
+	        let tex = new Laya.Texture2D(width, height, format, mipmap, true);
+	        tex.setPixels(pixelArray);
+	        if (mipmap) {
+	            let gl = Laya.LayaGL.instance;
+	            Laya.WebGLContext.bindTexture(gl, tex._glTextureType, tex._glTexture);
+	            gl.generateMipmap(tex._glTextureType);
+	            Laya.WebGLContext.bindTexture(gl, tex._glTextureType, null);
+	        }
+	        return tex;
+	    }
+	    static glTFOcclusionTrans(glTFOcclusion) {
+	        let gltfTexPixels = glTFOcclusion.getPixels();
+	        let layaTexPixels = new Uint8Array(gltfTexPixels.length);
+	        let pixelCount = gltfTexPixels.length / 4;
+	        let r = 0, g = 1;
+	        for (let index = 0; index < pixelCount; index++) {
+	            let offset = index * 4;
+	            let occlusion = gltfTexPixels[offset + r];
+	            layaTexPixels[offset + g] = occlusion;
+	        }
+	        let layaTex = glTFTextureEditor.GenerateTexture2DWithPixel(layaTexPixels, glTFOcclusion.width, glTFOcclusion.height, Laya.TextureFormat.R8G8B8A8, glTFOcclusion.mipmap);
+	        return layaTex;
+	    }
+	    static glTFMetallicGlossTrans(glTFMetallicGloss, metallicFactor, roughnessFactor) {
+	        let gltfTexPixels = glTFMetallicGloss.getPixels();
+	        let layaTexPixels = new Uint8Array(gltfTexPixels.length);
+	        let pixelCount = glTFMetallicGloss.width * glTFMetallicGloss.height;
+	        let r = 0, g = 1, b = 2, a = 3;
+	        for (let index = 0; index < pixelCount; index++) {
+	            let offset = index * 4;
+	            let metallic = gltfTexPixels[offset + b] * metallicFactor;
+	            let smooth = 255 - (gltfTexPixels[offset + g] * roughnessFactor);
+	            layaTexPixels[offset + r] = metallic;
+	            layaTexPixels[offset + a] = smooth;
+	        }
+	        let layaTex = glTFTextureEditor.GenerateTexture2DWithPixel(layaTexPixels, glTFMetallicGloss.width, glTFMetallicGloss.height, Laya.TextureFormat.R8G8B8A8, glTFMetallicGloss.mipmap);
+	        return layaTex;
+	    }
+	}
+
 	class PrimitiveSubMesh {
 	    constructor() {
 	    }
@@ -196,12 +249,7 @@
 	        if (!images)
 	            return;
 	        images.forEach((image, index) => {
-	            if (image.bufferView) {
-	                console.warn("glTF Loader: Todo: image bufferView data.");
-	            }
-	            else {
-	                glTFUtils._glTFTextures[index] = Laya.Loader.getRes(image.uri);
-	            }
+	            glTFUtils._glTFTextures[index] = Laya.Loader.getRes(image.uri);
 	        });
 	    }
 	    static getTextureMipmap(glTFSampler) {
@@ -245,6 +293,7 @@
 	        constructParams[1] = 0;
 	        constructParams[2] = glTFUtils.getTextureFormat(glTFImage);
 	        constructParams[3] = glTFUtils.getTextureMipmap(glTFSampler);
+	        constructParams[4] = true;
 	        return constructParams;
 	    }
 	    static getTexturePropertyParams(glTFSampler) {
@@ -262,7 +311,8 @@
 	        if (glTFTextureInfo.texCoord) {
 	            console.warn("glTF Loader: non 0 uv channel unsupported.");
 	        }
-	        return glTFUtils._glTFTextures[glTFTextureInfo.index];
+	        let glTFImage = glTFUtils._glTF.textures[glTFTextureInfo.index];
+	        return glTFUtils._glTFTextures[glTFImage.source];
 	    }
 	    static _loadMaterials(glTFMaterials) {
 	        if (!glTFMaterials)
@@ -291,7 +341,8 @@
 	            }
 	        }
 	        if (glTFMaterial.occlusionTexture) {
-	            layaPBRMaterial.occlusionTexture = glTFUtils.getTexturewithInfo(glTFMaterial.occlusionTexture);
+	            let occlusionTexture = glTFUtils.getTexturewithInfo(glTFMaterial.occlusionTexture);
+	            layaPBRMaterial.occlusionTexture = glTFTextureEditor.glTFOcclusionTrans(occlusionTexture);
 	            if (glTFMaterial.occlusionTexture.strength != undefined) {
 	                layaPBRMaterial.occlusionTextureStrength = glTFMaterial.occlusionTexture.strength;
 	            }
@@ -321,7 +372,6 @@
 	                layaPBRMaterial.renderMode = Laya.PBRRenderMode.Cutout;
 	                break;
 	            }
-	            default:
 	        }
 	        if (glTFMaterial.alphaCutoff != undefined) {
 	            layaPBRMaterial.alphaTestValue = glTFMaterial.alphaCutoff;
@@ -338,14 +388,19 @@
 	        if (pbrMetallicRoughness.baseColorTexture) {
 	            layaPBRMaterial.albedoTexture = glTFUtils.getTexturewithInfo(pbrMetallicRoughness.baseColorTexture);
 	        }
+	        let metallicFactor = layaPBRMaterial.metallic = 1.0;
 	        if (pbrMetallicRoughness.metallicFactor != undefined) {
-	            layaPBRMaterial.metallic = pbrMetallicRoughness.metallicFactor;
+	            metallicFactor = layaPBRMaterial.metallic = pbrMetallicRoughness.metallicFactor;
 	        }
+	        let roughnessFactor = 1.0;
+	        layaPBRMaterial.smoothness = 0.0;
 	        if (pbrMetallicRoughness.roughnessFactor != undefined) {
+	            roughnessFactor = pbrMetallicRoughness.roughnessFactor;
 	            layaPBRMaterial.smoothness = 1.0 - pbrMetallicRoughness.roughnessFactor;
 	        }
 	        if (pbrMetallicRoughness.metallicRoughnessTexture) {
-	            layaPBRMaterial.metallicGlossTexture = glTFUtils.getTexturewithInfo(pbrMetallicRoughness.metallicRoughnessTexture);
+	            let metallicGlossTexture = glTFUtils.getTexturewithInfo(pbrMetallicRoughness.metallicRoughnessTexture);
+	            layaPBRMaterial.metallicGlossTexture = glTFTextureEditor.glTFMetallicGlossTrans(metallicGlossTexture, metallicFactor, roughnessFactor);
 	        }
 	    }
 	    static pickMeshMaterials(glTFMesh) {
@@ -506,6 +561,9 @@
 	        if (vertexCount < 65536) {
 	            indexArray = new Uint16Array(indexCount);
 	            ibFormat = Laya.IndexFormat.UInt16;
+	        }
+	        else {
+	            indexArray = new Uint32Array(indexCount);
 	        }
 	        glTFUtils.fillMeshBuffers(subDatas, vertexArray, indexArray, vertexFloatStride);
 	        glTFUtils.generatMesh(vertexArray, indexArray, vertexDeclaration, ibFormat, subDatas, layaMesh);
@@ -993,8 +1051,6 @@
 	                    clipNode.propertise.push("localScale");
 	                    clipNode.type = 3;
 	                    break;
-	                default:
-	                    break;
 	            }
 	            clipNode.duration = clipNode.timeArray[clipNode.timeArray.length - 1];
 	            duration = Math.max(duration, clipNode.duration);
@@ -1143,7 +1199,22 @@
 	        (urlMap) && (urlMap.push(formatUrl));
 	        return formatUrl;
 	    }
-	    static _getglTFInnerUrls(glTFData, bufferUrls, textureUrls, subUrls, urlVersion, glTFBasePath) {
+	    static _getglTFInnerUrlsCount(glTFData) {
+	        let urlCount = 0;
+	        if (glTFData.buffers) {
+	            glTFData.buffers.forEach(buffer => {
+	                if (glTFBase64Tool.isBase64String(buffer.uri)) ;
+	                else {
+	                    urlCount++;
+	                }
+	            });
+	        }
+	        if (glTFData.textures) {
+	            urlCount += glTFData.textures.length;
+	        }
+	        return urlCount;
+	    }
+	    static _getglTFBufferUrls(glTFData, bufferUrls, urlVersion, glTFBasePath) {
 	        if (glTFData.buffers) {
 	            glTFData.buffers.forEach(buffer => {
 	                if (glTFBase64Tool.isBase64String(buffer.uri)) {
@@ -1155,13 +1226,25 @@
 	                }
 	            });
 	        }
+	    }
+	    static _getglTFTextureUrls(glTFData, textureUrls, subUrls, urlVersion, glTFBasePath) {
 	        if (glTFData.textures) {
 	            glTFData.textures.forEach(glTFTexture => {
 	                let glTFImage = glTFData.images[glTFTexture.source];
 	                let glTFSampler = glTFData.samplers ? glTFData.samplers[glTFTexture.sampler] : undefined;
 	                let constructParams = glTFUtils.getTextureConstructParams(glTFImage, glTFSampler);
 	                let propertyParams = glTFUtils.getTexturePropertyParams(glTFSampler);
-	                if (glTFImage.bufferView) ;
+	                if (glTFImage.bufferView != undefined || glTFImage.bufferView != null) {
+	                    let bufferView = glTFData.bufferViews[glTFImage.bufferView];
+	                    let glTFBuffer = glTFData.buffers[bufferView.buffer];
+	                    let buffer = Laya.Loader.getRes(glTFBuffer.uri);
+	                    let byteOffset = (bufferView.byteOffset || 0);
+	                    let byteLength = bufferView.byteLength;
+	                    let arraybuffer = buffer.slice(byteOffset, byteOffset + byteLength);
+	                    let base64 = glTFBase64Tool.encode(arraybuffer);
+	                    let base64url = `data:${glTFImage.mimeType};base64,${base64}`;
+	                    glTFImage.uri = glTFLoader._addglTFInnerUrls(textureUrls, subUrls, urlVersion, "", base64url, glTFLoader.GLTFBASE64TEX, constructParams, propertyParams);
+	                }
 	                else if (glTFBase64Tool.isBase64String(glTFImage.uri)) {
 	                    glTFImage.uri = glTFLoader._addglTFInnerUrls(textureUrls, subUrls, urlVersion, "", glTFImage.uri, glTFLoader.GLTFBASE64TEX, constructParams, propertyParams);
 	                }
@@ -1176,24 +1259,25 @@
 	        let urlVersion = Laya.Utils3D.getURLVerion(url);
 	        let glTFBasePath = Laya.URL.getPath(url);
 	        let bufferUrls = [];
-	        let textureUrls = [];
-	        let subUrls = [];
-	        glTFLoader._getglTFInnerUrls(glTFData, bufferUrls, textureUrls, subUrls, urlVersion, glTFBasePath);
-	        let urlCount = bufferUrls.length + textureUrls.length;
+	        glTFLoader._getglTFBufferUrls(glTFData, bufferUrls, urlVersion, glTFBasePath);
+	        let urlCount = glTFLoader._getglTFInnerUrlsCount(glTFData);
 	        let totalProcessCount = urlCount + 1;
 	        let weight = 1 / totalProcessCount;
 	        glTFLoader._onProcessChange(loader, 0, weight, 1.0);
 	        let processCeil = urlCount / totalProcessCount;
 	        if (bufferUrls.length > 0) {
 	            let processHandler = Laya.Handler.create(null, glTFLoader._onProcessChange, [loader, weight, processCeil], false);
-	            glTFLoader._innerBufferLoaderManager._create(bufferUrls, false, Laya.Handler.create(null, glTFLoader._onglTFBufferResourceLoaded, [loader, processHandler, glTFData, subUrls, textureUrls, weight + processCeil * bufferUrls.length, processCeil]), processHandler, null, null, null, 1, true);
+	            glTFLoader._innerBufferLoaderManager._create(bufferUrls, false, Laya.Handler.create(null, glTFLoader._onglTFBufferResourceLoaded, [loader, processHandler, glTFData, urlVersion, glTFBasePath, weight + processCeil * bufferUrls.length, processCeil]), processHandler, null, null, null, 1, true);
 	        }
 	        else {
-	            glTFLoader._onglTFBufferResourceLoaded(loader, null, glTFData, subUrls, textureUrls, weight, processCeil);
+	            glTFLoader._onglTFBufferResourceLoaded(loader, null, glTFData, urlVersion, glTFBasePath, weight, processCeil);
 	        }
 	    }
-	    static _onglTFBufferResourceLoaded(loader, processHandler, glTFData, subUrls, textureUrls, processOffset, processCeil) {
+	    static _onglTFBufferResourceLoaded(loader, processHandler, glTFData, urlVersion, glTFBasePath, processOffset, processCeil) {
 	        (processHandler) && (processHandler.recover());
+	        let textureUrls = [];
+	        let subUrls = [];
+	        glTFLoader._getglTFTextureUrls(glTFData, textureUrls, subUrls, urlVersion, glTFBasePath);
 	        if (textureUrls.length > 0) {
 	            let process = Laya.Handler.create(null, glTFLoader._onProcessChange, [loader, processOffset, processCeil], false);
 	            glTFLoader._innerTextureLoaderManager._create(textureUrls, false, Laya.Handler.create(null, glTFLoader._onglTFTextureResourceLoaded, [loader, process, glTFData, subUrls]), processHandler, null, null, null, 1, true);
@@ -1232,6 +1316,7 @@
 
 	exports.glTFBase64Tool = glTFBase64Tool;
 	exports.glTFLoader = glTFLoader;
+	exports.glTFTextureEditor = glTFTextureEditor;
 	exports.glTFUtils = glTFUtils;
 
 }(window.Laya = window.Laya || {}, Laya));

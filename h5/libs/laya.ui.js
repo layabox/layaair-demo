@@ -1472,7 +1472,7 @@
 	    }
 	    changeClip() {
 	        this._clipChanged = false;
-	        if (!this._skin)
+	        if (!this._skin || this.destroyed)
 	            return;
 	        var img = Laya.Loader.getRes(this._skin);
 	        if (img) {
@@ -2382,6 +2382,9 @@
 	        }
 	    }
 	    _skinLoaded() {
+	        if (this.destroyed) {
+	            return;
+	        }
 	        this.slider.skin = this._skin;
 	        this.callLater(this.changeScrollBar);
 	        this._sizeChanged();
@@ -3469,6 +3472,8 @@
 	        this.labels = labels;
 	    }
 	    destroy(destroyChild = true) {
+	        Laya.ILaya.stage.off(Laya.Event.MOUSE_DOWN, this, this.removeList);
+	        Laya.ILaya.stage.off(Laya.Event.MOUSE_WHEEL, this, this._onStageMouseWheel);
 	        super.destroy(destroyChild);
 	        this._button && this._button.destroy(destroyChild);
 	        this._list && this._list.destroy(destroyChild);
@@ -3810,6 +3815,9 @@
 	        }
 	    }
 	    _skinLoaded() {
+	        if (this.destroyed) {
+	            return;
+	        }
 	        this._bg.skin = this._skin;
 	        this._bar.skin = this._skin.replace(".png", "$bar.png");
 	        this.callLater(this.changeValue);
@@ -5305,6 +5313,10 @@
 	Laya.ClassUtils.regClass("Laya.HBox", HBox);
 
 	class VBox extends LayoutBox {
+	    constructor() {
+	        super(...arguments);
+	        this.isSortItem = false;
+	    }
 	    set width(value) {
 	        if (this._width != value) {
 	            super.width = value;
@@ -5325,7 +5337,9 @@
 	                maxWidth = this._width ? this._width : Math.max(maxWidth, item.width * item.scaleX);
 	            }
 	        }
-	        this.sortItem(items);
+	        if (this.isSortItem) {
+	            this.sortItem(items);
+	        }
 	        var top = 0;
 	        for (i = 0, n = items.length; i < n; i++) {
 	            item = items[i];
@@ -5680,7 +5694,7 @@
 	    _closeOnSide() {
 	        var dialog = this.getChildAt(this.numChildren - 1);
 	        if (dialog instanceof IUI.Dialog)
-	            dialog.close();
+	            dialog.close("side");
 	    }
 	    setLockView(value) {
 	        if (!this.lockLayer) {

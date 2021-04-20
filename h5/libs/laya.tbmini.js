@@ -9,6 +9,13 @@ window.tbMiniGame = function (exports, Laya) {
 	        }
 	        return false;
 	    }
+	    static isSubNativeFile(url) {
+	        for (var i = 0, sz = TBMiniAdapter.subNativeheads.length; i < sz; i++) {
+	            if (url.indexOf(TBMiniAdapter.subNativeheads[i]) != -1)
+	                return true;
+	        }
+	        return false;
+	    }
 	    static isNetFile(url) {
 	        return (url.indexOf("http://") != -1 || url.indexOf("https://") != -1) && url.indexOf(TBMiniAdapter.window.my.env.USER_DATA_PATH) == -1;
 	    }
@@ -572,7 +579,11 @@ window.tbMiniGame = function (exports, Laya) {
 	                        if (!fileNativeUrl) {
 	                            fileNativeUrl = tempUrl;
 	                        }
-	                        fileNativeUrl = TBMiniAdapter.baseDir + fileNativeUrl;
+	                        if (MiniFileMgr.isSubNativeFile(fileNativeUrl)) {
+	                            fileNativeUrl = fileNativeUrl;
+	                        }
+	                        else
+	                            fileNativeUrl = TBMiniAdapter.baseDir + fileNativeUrl;
 	                    }
 	                    else {
 	                        var fileObj = MiniFileMgr.getFileInfo(sourceUrl);
@@ -601,7 +612,8 @@ window.tbMiniGame = function (exports, Laya) {
 	                if (MiniFileMgr.isLocalNativeFile(sourceUrl) ||
 	                    (sourceUrl.indexOf("http://") == -1
 	                        && sourceUrl.indexOf("https://") == -1
-	                        && sourceUrl.indexOf(TBMiniAdapter.window.my.env.USER_DATA_PATH) == -1)) {
+	                        && sourceUrl.indexOf(TBMiniAdapter.window.my.env.USER_DATA_PATH) == -1
+	                        && !MiniFileMgr.isSubNativeFile(fileNativeUrl))) {
 	                    sourceUrl = TBMiniAdapter.baseDir + sourceUrl;
 	                }
 	                this._sound.src = this.readyUrl = sourceUrl;
@@ -669,43 +681,6 @@ window.tbMiniGame = function (exports, Laya) {
 	    }
 	    static wxinputFocus(e) {
 	        return;
-	        var _inputTarget = Laya.Input['inputElement'].target;
-	        if (_inputTarget && !_inputTarget.editable) {
-	            return;
-	        }
-	        TBMiniAdapter.window.my.showKeyboard({ defaultValue: _inputTarget.text, maxLength: _inputTarget.maxChars, multiple: _inputTarget.multiline, confirmHold: true, confirmType: _inputTarget["confirmType"] || 'done', success: function (res) {
-	            }, fail: function (res) {
-	            } });
-	        TBMiniAdapter.window.my.onKeyboardConfirm(function (res) {
-	            var str = res ? res.value : "";
-	            if (_inputTarget._restrictPattern) {
-	                str = str.replace(/\u2006|\x27/g, "");
-	                if (_inputTarget._restrictPattern.test(str)) {
-	                    str = str.replace(_inputTarget._restrictPattern, "");
-	                }
-	            }
-	            _inputTarget.text = str;
-	            _inputTarget.event(Laya.Event.INPUT);
-	            MiniInput.inputEnter();
-	            _inputTarget.event("confirm");
-	        });
-	        TBMiniAdapter.window.my.onKeyboardInput(function (res) {
-	            var str = res ? res.value : "";
-	            if (!_inputTarget.multiline) {
-	                if (str.indexOf("\n") != -1) {
-	                    MiniInput.inputEnter();
-	                    return;
-	                }
-	            }
-	            if (_inputTarget._restrictPattern) {
-	                str = str.replace(/\u2006|\x27/g, "");
-	                if (_inputTarget._restrictPattern.test(str)) {
-	                    str = str.replace(_inputTarget._restrictPattern, "");
-	                }
-	            }
-	            _inputTarget.text = str;
-	            _inputTarget.event(Laya.Event.INPUT);
-	        });
 	    }
 	    static inputEnter() {
 	        Laya.Input['inputElement'].target.focus = false;
@@ -715,11 +690,6 @@ window.tbMiniGame = function (exports, Laya) {
 	    }
 	    static hideKeyboard() {
 	        return;
-	        TBMiniAdapter.window.my.hideKeyboard({ success: function (res) {
-	                console.log('隐藏键盘');
-	            }, fail: function (res) {
-	                console.log("隐藏键盘出错:" + (res ? res.errMsg : ""));
-	            } });
 	    }
 	}
 
@@ -793,7 +763,7 @@ window.tbMiniGame = function (exports, Laya) {
 	                    }
 	                }
 	                else {
-	                    if (tempurl.indexOf(TBMiniAdapter.window.my.env.USER_DATA_PATH) == -1) {
+	                    if (tempurl.indexOf(TBMiniAdapter.window.my.env.USER_DATA_PATH) == -1 && !MiniFileMgr.isSubNativeFile(url)) {
 	                        MiniLoader.onDownLoadCallBack(TBMiniAdapter.baseDir + url, thisLoader, 0);
 	                    }
 	                    else
@@ -865,7 +835,7 @@ window.tbMiniGame = function (exports, Laya) {
 	            }
 	            else {
 	                if ((tempurl.indexOf("http://") == -1 && tempurl.indexOf("https://") == -1) || MiniFileMgr.isLocalNativeFile(url)) {
-	                    if (tempurl.indexOf(TBMiniAdapter.window.my.env.USER_DATA_PATH) == -1) {
+	                    if (tempurl.indexOf(TBMiniAdapter.window.my.env.USER_DATA_PATH) == -1 && !MiniFileMgr.isSubNativeFile(url)) {
 	                        MiniFileMgr.readFile(TBMiniAdapter.baseDir + url, encoding, new Laya.Handler(MiniLoader, MiniLoader.onReadNativeCallBack, [url, contentType, thisLoader]), url);
 	                    }
 	                    else
@@ -879,17 +849,22 @@ window.tbMiniGame = function (exports, Laya) {
 	    }
 	    static onReadNativeCallBack(url, type = null, thisLoader = null, errorCode = 0, data = null) {
 	        if (!errorCode) {
-	            var tempData;
-	            if (type == Laya.Loader.JSON || type == Laya.Loader.ATLAS || type == Laya.Loader.PREFAB || type == Laya.Loader.PLF) {
-	                tempData = TBMiniAdapter.getJson(data.data);
+	            try {
+	                var tempData;
+	                if (type == Laya.Loader.JSON || type == Laya.Loader.ATLAS || type == Laya.Loader.PREFAB || type == Laya.Loader.PLF) {
+	                    tempData = TBMiniAdapter.getJson(data.data);
+	                }
+	                else if (type == Laya.Loader.XML) {
+	                    tempData = Laya.Utils.parseXMLFromString(data.data);
+	                }
+	                else {
+	                    tempData = data.data;
+	                }
+	                thisLoader.onLoaded(tempData);
 	            }
-	            else if (type == Laya.Loader.XML) {
-	                tempData = Laya.Utils.parseXMLFromString(data.data);
+	            catch (err) {
+	                thisLoader.onError && thisLoader.onError(data);
 	            }
-	            else {
-	                tempData = data.data;
-	            }
-	            thisLoader.onLoaded(tempData);
 	        }
 	        else if (errorCode == 1) {
 	            thisLoader.onError && thisLoader.onError(data);
@@ -918,8 +893,13 @@ window.tbMiniGame = function (exports, Laya) {
 	                fileNativeUrl = sourceUrl;
 	            }
 	        }
-	        else
-	            fileNativeUrl = TBMiniAdapter.baseDir + sourceUrl;
+	        else {
+	            if (!MiniFileMgr.isSubNativeFile(sourceUrl)) {
+	                fileNativeUrl = TBMiniAdapter.baseDir + sourceUrl;
+	            }
+	            else
+	                fileNativeUrl = sourceUrl;
+	        }
 	        thisLoader._loadImage(TBMiniAdapter.safeEncodeURI(fileNativeUrl), false);
 	    }
 	}
@@ -1142,6 +1122,14 @@ window.tbMiniGame = function (exports, Laya) {
 	            var _source;
 	            if (TBMiniAdapter.idx == 1) {
 	                _source = TBMiniAdapter.window.canvas.getRealCanvas();
+	                if (!my.isIDE) {
+	                    var originfun = _source.getContext;
+	                    _source.getContext = function (type) {
+	                        var gl = originfun.apply(_source, [type]);
+	                        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, false);
+	                        return gl;
+	                    };
+	                }
 	            }
 	            else {
 	                _source = TBMiniAdapter._preCreateElement(type);

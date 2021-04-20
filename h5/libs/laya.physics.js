@@ -451,7 +451,7 @@ goog.exportProperty(box2d.b2BodyDef.prototype,"linearDamping",box2d.b2BodyDef.pr
 box2d.b2BodyDef.prototype.fixedRotation=!1;goog.exportProperty(box2d.b2BodyDef.prototype,"fixedRotation",box2d.b2BodyDef.prototype.fixedRotation);box2d.b2BodyDef.prototype.bullet=!1;goog.exportProperty(box2d.b2BodyDef.prototype,"bullet",box2d.b2BodyDef.prototype.bullet);box2d.b2BodyDef.prototype.active=!0;goog.exportProperty(box2d.b2BodyDef.prototype,"active",box2d.b2BodyDef.prototype.active);box2d.b2BodyDef.prototype.userData=null;goog.exportProperty(box2d.b2BodyDef.prototype,"userData",box2d.b2BodyDef.prototype.userData);
 box2d.b2BodyDef.prototype.gravityScale=1;goog.exportProperty(box2d.b2BodyDef.prototype,"gravityScale",box2d.b2BodyDef.prototype.gravityScale);
 box2d.b2Body=function(a,b){this.m_xf=new box2d.b2Transform;this.m_out_xf=new box2d.b2Transform;this.m_xf0=new box2d.b2Transform;this.m_sweep=new box2d.b2Sweep;this.m_out_sweep=new box2d.b2Sweep;this.m_linearVelocity=new box2d.b2Vec2;this.m_out_linearVelocity=new box2d.b2Vec2;this.m_force=new box2d.b2Vec2;box2d.ENABLE_ASSERTS&&box2d.b2Assert(a.position.IsValid());box2d.ENABLE_ASSERTS&&box2d.b2Assert(a.linearVelocity.IsValid());box2d.ENABLE_ASSERTS&&box2d.b2Assert(box2d.b2IsValid(a.angle));box2d.ENABLE_ASSERTS&&
-box2d.b2Assert(box2d.b2IsValid(a.angularVelocity));box2d.ENABLE_ASSERTS&&box2d.b2Assert(box2d.b2IsValid(a.gravityScale)&&0<=a.gravityScale);box2d.ENABLE_ASSERTS&&box2d.b2Assert(box2d.b2IsValid(a.angularDamping)&&0<=a.angularDamping);box2d.ENABLE_ASSERTS&&box2d.b2Assert(box2d.b2IsValid(a.linearDamping)&&0<=a.linearDamping);a.bullet&&(this.m_flag_bulletFlag=!0);a.fixedRotation&&(this.m_flag_fixedRotationFlag=!0);a.allowSleep&&(this.m_flag_autoSleepFlag=!0);a.awake&&(this.m_flag_awakeFlag=!0);a.active&&
+box2d.b2Assert(box2d.b2IsValid(a.angularVelocity));box2d.ENABLE_ASSERTS&&box2d.b2Assert(box2d.b2IsValid(a.gravityScale)/**&&0<=a.gravityScale*/);box2d.ENABLE_ASSERTS&&box2d.b2Assert(box2d.b2IsValid(a.angularDamping)&&0<=a.angularDamping);box2d.ENABLE_ASSERTS&&box2d.b2Assert(box2d.b2IsValid(a.linearDamping)&&0<=a.linearDamping);a.bullet&&(this.m_flag_bulletFlag=!0);a.fixedRotation&&(this.m_flag_fixedRotationFlag=!0);a.allowSleep&&(this.m_flag_autoSleepFlag=!0);a.awake&&(this.m_flag_awakeFlag=!0);a.active&&
 (this.m_flag_activeFlag=!0);this.m_world=b;this.m_xf.p.Copy(a.position);this.m_xf.q.SetAngle(a.angle);this.m_xf0.Copy(this.m_xf);this.m_sweep.localCenter.SetZero();this.m_sweep.c0.Copy(this.m_xf.p);this.m_sweep.c.Copy(this.m_xf.p);this.m_sweep.a0=a.angle;this.m_sweep.a=a.angle;this.m_sweep.alpha0=0;this.m_linearVelocity.Copy(a.linearVelocity);this.m_angularVelocity=a.angularVelocity;this.m_linearDamping=a.linearDamping;this.m_angularDamping=a.angularDamping;this.m_gravityScale=a.gravityScale;this.m_force.SetZero();
 this.m_sleepTime=this.m_torque=0;this.m_type=a.type;this.m_invMass=a.type===box2d.b2BodyType.b2_dynamicBody?this.m_mass=1:this.m_mass=0;this.m_invI=this.m_I=0;this.m_userData=a.userData;this.m_fixtureList=null;this.m_fixtureCount=0;this.m_controllerList=null;this.m_controllerCount=0};goog.exportSymbol("box2d.b2Body",box2d.b2Body);box2d.b2Body.prototype.m_flag_islandFlag=!1;goog.exportProperty(box2d.b2Body.prototype,"m_flag_islandFlag",box2d.b2Body.prototype.m_flag_islandFlag);
 box2d.b2Body.prototype.m_flag_awakeFlag=!1;goog.exportProperty(box2d.b2Body.prototype,"m_flag_awakeFlag",box2d.b2Body.prototype.m_flag_awakeFlag);box2d.b2Body.prototype.m_flag_autoSleepFlag=!1;goog.exportProperty(box2d.b2Body.prototype,"m_flag_autoSleepFlag",box2d.b2Body.prototype.m_flag_autoSleepFlag);box2d.b2Body.prototype.m_flag_bulletFlag=!1;goog.exportProperty(box2d.b2Body.prototype,"m_flag_bulletFlag",box2d.b2Body.prototype.m_flag_bulletFlag);
@@ -1775,20 +1775,12 @@ window.box2d=box2d;
                 var ang = this._body.GetAngle();
                 var sp = this.owner;
                 this.accessGetSetFunc(sp, "rotation", "set")(Laya.Utils.toAngle(ang) - sp.parent.globalRotation);
-                if (ang == 0) {
-                    var point = sp.parent.globalToLocal(Laya.Point.TEMP.setTo(pos.x * IPhysics.Physics.PIXEL_RATIO + sp.pivotX, pos.y * IPhysics.Physics.PIXEL_RATIO + sp.pivotY), false, IPhysics.Physics.I.worldRoot);
-                    sp.parent.fromParentPoint(point);
-                    this.accessGetSetFunc(sp, "x", "set")(point.x);
-                    this.accessGetSetFunc(sp, "y", "set")(point.y);
-                }
-                else {
-                    point = sp.globalToLocal(Laya.Point.TEMP.setTo(pos.x * IPhysics.Physics.PIXEL_RATIO, pos.y * IPhysics.Physics.PIXEL_RATIO), false, IPhysics.Physics.I.worldRoot);
-                    point.x += sp.pivotX;
-                    point.y += sp.pivotY;
-                    point = sp.toParentPoint(point);
-                    this.accessGetSetFunc(sp, "x", "set")(point.x);
-                    this.accessGetSetFunc(sp, "y", "set")(point.y);
-                }
+                var point = sp.globalToLocal(Laya.Point.TEMP.setTo(pos.x * IPhysics.Physics.PIXEL_RATIO, pos.y * IPhysics.Physics.PIXEL_RATIO), false, IPhysics.Physics.I.worldRoot);
+                point.x += sp.pivotX;
+                point.y += sp.pivotY;
+                point = sp.toParentPoint(point);
+                this.accessGetSetFunc(sp, "x", "set")(point.x);
+                this.accessGetSetFunc(sp, "y", "set")(point.y);
             }
         }
         _sysNodeToPhysic() {
@@ -2022,7 +2014,11 @@ window.box2d=box2d;
             }
         }
         _update() {
-            this.world.Step(1 / 60, this.velocityIterations, this.positionIterations, 3);
+            var delta = Laya.Laya.timer.delta / 1000;
+            if (delta > .033) {
+                delta = .033;
+            }
+            this.world.Step(delta, this.velocityIterations, this.positionIterations, 3);
             var len = this._eventList.length;
             if (len > 0) {
                 for (var i = 0; i < len; i += 2) {
@@ -2590,6 +2586,9 @@ window.box2d=box2d;
             }
             this._joint = null;
         }
+        get isSingleton() {
+            return false;
+        }
     }
     Laya.ClassUtils.regClass("laya.physics.joint.JointBase", JointBase);
     Laya.ClassUtils.regClass("Laya.JointBase", JointBase);
@@ -2776,6 +2775,7 @@ window.box2d=box2d;
             this._createJoint();
             Laya.Laya.stage.on(Laya.Event.MOUSE_MOVE, this, this.onMouseMove);
             Laya.Laya.stage.once(Laya.Event.MOUSE_UP, this, this.onStageMouseUp);
+            Laya.Laya.stage.once(Laya.Event.MOUSE_OUT, this, this.onStageMouseUp);
         }
         _createJoint() {
             if (!this._joint) {
@@ -2802,6 +2802,8 @@ window.box2d=box2d;
         }
         onStageMouseUp() {
             Laya.Laya.stage.off(Laya.Event.MOUSE_MOVE, this, this.onMouseMove);
+            Laya.Laya.stage.off(Laya.Event.MOUSE_UP, this, this.onStageMouseUp);
+            Laya.Laya.stage.off(Laya.Event.MOUSE_OUT, this, this.onStageMouseUp);
             super._onDisable();
         }
         onMouseMove() {
