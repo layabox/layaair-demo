@@ -22,7 +22,7 @@ import { Main } from "../Main";
 /**
  * 仿生兽
  */
-export class Physics_Strandbeests {
+export class Physics_Physics_Strandbeests {
     Main: typeof Main = null;
     private scale = 2.5;
     private pos: Array<number> = [500, 400];
@@ -245,3 +245,5 @@ class B2Math {
         return [a[0] - b[0], a[1] - b[1]];
     }
 }
+
+new Physics_Physics_Strandbeests();

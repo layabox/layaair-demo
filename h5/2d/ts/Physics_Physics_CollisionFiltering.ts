@@ -19,7 +19,7 @@ import { Main } from "../Main";
 /**
  * 碰撞过滤器
  */
-export class Physics_CollisionFiltering {
+export class Physics_Physics_CollisionFiltering {
     Main: typeof Main = null;
     public static readonly k_smallGroup = 1;
     public static readonly k_middleGroup = 0;
@@ -28,8 +28,8 @@ export class Physics_CollisionFiltering {
     public static readonly k_boxCategory = 0x4;
     public static readonly k_circleCategory = 0x8;
     public static readonly k_triangleMask = 0xF;
-    public static readonly k_boxMask = 0xF ^ Physics_CollisionFiltering.k_circleCategory;
-    public static readonly k_circleMask = Physics_CollisionFiltering.k_triangleCategory | Physics_CollisionFiltering.k_boxCategory | 0x01; // 0x01为house刚体默认的category，若不设置，则会穿透house
+    public static readonly k_boxMask = 0xF ^ Physics_Physics_CollisionFiltering.k_circleCategory;
+    public static readonly k_circleMask = Physics_Physics_CollisionFiltering.k_triangleCategory | Physics_Physics_CollisionFiltering.k_boxCategory | 0x01; // 0x01为house刚体默认的category，若不设置，则会穿透house
     private curTarget: Sprite;
     private preMovementX: number = 0;
     private preMovementY: number = 0;
@@ -69,8 +69,8 @@ export class Physics_CollisionFiltering {
         this.Main.box2D.addChild(box);
         box.pos(posx, posy).size(width * ratio, height * ratio);
         let rigidbody: RigidBody = box.addComponent(RigidBody);
-        rigidbody.category = Physics_CollisionFiltering.k_boxCategory;
-        rigidbody.mask = Physics_CollisionFiltering.k_boxMask;
+        rigidbody.category = Physics_Physics_CollisionFiltering.k_boxCategory;
+        rigidbody.mask = Physics_Physics_CollisionFiltering.k_boxMask;
         let boxCollider: BoxCollider = box.addComponent(BoxCollider);
         boxCollider.width = width * ratio;
         boxCollider.height = height * ratio;
@@ -83,8 +83,8 @@ export class Physics_CollisionFiltering {
         this.Main.box2D.addChild(triangle);
         triangle.pos(posx, posy).size(side * ratio, side * ratio);
         let rigidbody: RigidBody = triangle.addComponent(RigidBody);
-        rigidbody.category = Physics_CollisionFiltering.k_triangleCategory;
-        rigidbody.mask = Physics_CollisionFiltering.k_triangleMask;
+        rigidbody.category = Physics_Physics_CollisionFiltering.k_triangleCategory;
+        rigidbody.mask = Physics_Physics_CollisionFiltering.k_triangleMask;
         let polygonCollider: PolygonCollider = triangle.addComponent(PolygonCollider);
         polygonCollider.points = `0,0,0,${side * ratio},${side * ratio},0`;
         this.addGroup(rigidbody, ratio);
@@ -96,8 +96,8 @@ export class Physics_CollisionFiltering {
         this.Main.box2D.addChild(circle);
         circle.pos(posx, posy).size(radius * 2 * ratio, radius * 2 * ratio);
         let rigidbody: RigidBody = circle.addComponent(RigidBody);
-        rigidbody.category = Physics_CollisionFiltering.k_circleCategory;
-        rigidbody.mask = Physics_CollisionFiltering.k_circleMask;
+        rigidbody.category = Physics_Physics_CollisionFiltering.k_circleCategory;
+        rigidbody.mask = Physics_Physics_CollisionFiltering.k_circleMask;
         let circleCollider: CircleCollider = circle.addComponent(CircleCollider);
         circleCollider.radius = radius * ratio;
         this.addGroup(rigidbody, ratio);
@@ -106,13 +106,13 @@ export class Physics_CollisionFiltering {
     addGroup(rigidbody, ratio) {
         switch(ratio) {
             case 1:
-                rigidbody.group = Physics_CollisionFiltering.k_smallGroup;
+                rigidbody.group = Physics_Physics_CollisionFiltering.k_smallGroup;
                 break;
             case 2:
-                rigidbody.group = Physics_CollisionFiltering.k_middleGroup;
+                rigidbody.group = Physics_Physics_CollisionFiltering.k_middleGroup;
                 break;
             case 3:
-                rigidbody.group = Physics_CollisionFiltering.k_largeGroup;
+                rigidbody.group = Physics_Physics_CollisionFiltering.k_largeGroup;
                 break;
         }
     }
@@ -166,3 +166,4 @@ export class Physics_CollisionFiltering {
         Laya.stage.off(Event.MOUSE_OUT, this, this.destoryJoint);
     }
 }
+new Physics_Physics_CollisionFiltering();

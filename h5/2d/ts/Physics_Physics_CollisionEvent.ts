@@ -16,7 +16,7 @@ import { Main } from "../Main";
 /**
  * 
  */
-export class Physics_CollisionEvent {
+export class Physics_Physics_CollisionEvent {
     Main: typeof Main = null;
     private count: number = 7;
     private sensorCollider: CircleCollider;
@@ -116,3 +116,4 @@ export class Physics_CollisionEvent {
         Laya.physicsTimer.clearAll(this);
     }
 }
+new Physics_Physics_CollisionEvent();

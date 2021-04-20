@@ -14,7 +14,7 @@ import { Label } from "laya/ui/Label";
 import { Event } from "laya/events/Event";
 
 
-export class Physics_Tumbler {
+export class Physics_Physics_Tumbler {
     private count = 0;
     private box: Sprite;
     private totalBox = 200;
@@ -114,3 +114,5 @@ export class Physics_Tumbler {
         Laya.stage.removeChild(this.label);
     }
 }
+
+new Physics_Physics_Tumbler();

@@ -15,7 +15,7 @@ import { Stat } from "laya/utils/Stat";
 import { WebGL } from "laya/webgl/WebGL";
 import { Main } from "../Main";
 
-export class Physics_Bridge {
+export class Physics_Physics_Bridge {
     Main: typeof Main = null;
     private ecount = 30;
     private label: Label;
@@ -141,3 +141,4 @@ export class Physics_Bridge {
         Laya.stage.removeChild(this.label);
     }
 }
+new Physics_Physics_Bridge();

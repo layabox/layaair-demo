@@ -32,8 +32,8 @@ class Physics_Physics_CollisionFiltering {
 		Laya.Laya.stage.addChild(box);
 		box.pos(posx, posy).size(width * ratio, height * ratio);
 		let rigidbody = box.addComponent(Laya.RigidBody);
-		rigidbody.category = Physics_CollisionFiltering.k_boxCategory;
-		rigidbody.mask = Physics_CollisionFiltering.k_boxMask;
+		rigidbody.category = Physics_Physics_CollisionFiltering.k_boxCategory;
+		rigidbody.mask = Physics_Physics_CollisionFiltering.k_boxMask;
 		let boxCollider = box.addComponent(Laya.BoxCollider);
 		boxCollider.width = width * ratio;
 		boxCollider.height = height * ratio;
@@ -45,8 +45,8 @@ class Physics_Physics_CollisionFiltering {
 		Laya.Laya.stage.addChild(triangle);
 		triangle.pos(posx, posy).size(side * ratio, side * ratio);
 		let rigidbody = triangle.addComponent(Laya.RigidBody);
-		rigidbody.category = Physics_CollisionFiltering.k_triangleCategory;
-		rigidbody.mask = Physics_CollisionFiltering.k_triangleMask;
+		rigidbody.category = Physics_Physics_CollisionFiltering.k_triangleCategory;
+		rigidbody.mask = Physics_Physics_CollisionFiltering.k_triangleMask;
 		let polygonCollider = triangle.addComponent(Laya.PolygonCollider);
 		polygonCollider.points = `0,0,0,${side * ratio},${side * ratio},0`;
 		this.addGroup(rigidbody, ratio);
@@ -57,8 +57,8 @@ class Physics_Physics_CollisionFiltering {
 		Laya.Laya.stage.addChild(circle);
 		circle.pos(posx, posy).size(radius * 2 * ratio, radius * 2 * ratio);
 		let rigidbody = circle.addComponent(Laya.RigidBody);
-		rigidbody.category = Physics_CollisionFiltering.k_circleCategory;
-		rigidbody.mask = Physics_CollisionFiltering.k_circleMask;
+		rigidbody.category = Physics_Physics_CollisionFiltering.k_circleCategory;
+		rigidbody.mask =Physics_Physics_CollisionFiltering.k_circleMask;
 		let circleCollider = circle.addComponent(Laya.CircleCollider);
 		circleCollider.radius = radius * ratio;
 		this.addGroup(rigidbody, ratio);
@@ -66,13 +66,13 @@ class Physics_Physics_CollisionFiltering {
 	addGroup(rigidbody, ratio) {
 		switch (ratio) {
 			case 1:
-				rigidbody.group = Physics_CollisionFiltering.k_smallGroup;
+				rigidbody.group = Physics_Physics_CollisionFiltering.k_smallGroup;
 				break;
 			case 2:
-				rigidbody.group = Physics_CollisionFiltering.k_middleGroup;
+				rigidbody.group = Physics_Physics_CollisionFiltering.k_middleGroup;
 				break;
 			case 3:
-				rigidbody.group = Physics_CollisionFiltering.k_largeGroup;
+				rigidbody.group = Physics_Physics_CollisionFiltering.k_largeGroup;
 				break;
 		}
 	}
