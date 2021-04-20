@@ -14,7 +14,7 @@ package {
 	import laya.utils.Stat;
 	import laya.webgl.WebGL;
 	
-	public class Physics_Bridge {
+	public class Physics_Physics_Bridge {
         private var ecount = 30;
         private var label: Label;
 		public function Physics_Bridge() {

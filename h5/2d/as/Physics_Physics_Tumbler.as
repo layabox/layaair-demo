@@ -13,7 +13,7 @@ package {
 	import laya.utils.Stat;
 	import laya.webgl.WebGL;
 	
-	public class Physics_Tumbler {
+	public class Physics_Physics_Tumbler {
         private var count = 0;
         private var box: Sprite;
         private var totalBox = 200;

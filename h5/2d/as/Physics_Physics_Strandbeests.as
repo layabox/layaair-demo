@@ -15,7 +15,7 @@ package {
 	import laya.utils.Stat;
 	import laya.webgl.WebGL;
 	
-	public class Physics_Strandbeests {
+	public class Physics_Physics_Strandbeests {
 		private var scale = 2.5;
 		private var pos: Array = [500, 400];
 		private var m_offset: Array = [0, -80 * this.scale];

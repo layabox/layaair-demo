@@ -13,7 +13,7 @@ package {
 	import laya.utils.Stat;
 	import laya.webgl.WebGL;
 	
-	public class Physics_CollisionFiltering {
+	public class Physics_Physics_CollisionFiltering {
 		public static const k_smallGroup = 1;
 		public static const k_middleGroup = 0;
 		public static const k_largeGroup = -1;
@@ -21,12 +21,12 @@ package {
 		public static const k_boxCategory = 0x4;
 		public static const k_circleCategory = 0x8;
 		public static const k_triangleMask = 0xF;
-		public static const k_boxMask = 0xF ^ Physics_CollisionFiltering.k_circleCategory;
-		public static const k_circleMask = Physics_CollisionFiltering.k_triangleCategory | Physics_CollisionFiltering.k_boxCategory | 0x01; // 0x01为house刚体默认的category，若不设置，则会穿透house
+		public static const k_boxMask = 0xF ^ Physics_Physics_CollisionFiltering.k_circleCategory;
+		public static const k_circleMask = Physics_Physics_CollisionFiltering.k_triangleCategory | Physics_Physics_CollisionFiltering.k_boxCategory | 0x01; // 0x01为house刚体默认的category，若不设置，则会穿透house
 		private var curTarget: Sprite;
 		private var preMovementX: Number = 0;
 		private var preMovementY: Number = 0;
-		public function Physics_CollisionFiltering() {
+		public function Physics_Physics_CollisionFiltering() {
 			Laya.init(1200, 700, WebGL);
 			Stat.show();
 			Physics.enable();
@@ -59,8 +59,8 @@ package {
 			Laya.stage.addChild(box);
 			box.pos(posx, posy).size(width * ratio, height * ratio);
 			var rigidbody: RigidBody = box.addComponent(RigidBody);
-			rigidbody.category = Physics_CollisionFiltering.k_boxCategory;
-			rigidbody.mask = Physics_CollisionFiltering.k_boxMask;
+			rigidbody.category = Physics_Physics_CollisionFiltering.k_boxCategory;
+			rigidbody.mask = Physics_Physics_CollisionFiltering.k_boxMask;
 			var boxCollider: BoxCollider = box.addComponent(BoxCollider);
 			boxCollider.width = width * ratio;
 			boxCollider.height = height * ratio;
@@ -74,8 +74,8 @@ package {
 			Laya.stage.addChild(triangle);
 			triangle.pos(posx, posy).size(side * ratio, side * ratio);
 			var rigidbody: RigidBody = triangle.addComponent(RigidBody);
-			rigidbody.category = Physics_CollisionFiltering.k_triangleCategory;
-			rigidbody.mask = Physics_CollisionFiltering.k_triangleMask;
+			rigidbody.category = Physics_Physics_CollisionFiltering.k_triangleCategory;
+			rigidbody.mask = Physics_Physics_CollisionFiltering.k_triangleMask;
 			var polygonCollider: PolygonCollider = triangle.addComponent(PolygonCollider);
 			polygonCollider.points = "0,0,0," + total+ "," + total+ ",0";
 			this.addGroup(rigidbody, ratio);
@@ -87,8 +87,8 @@ package {
 			Laya.stage.addChild(circle);
 			circle.pos(posx, posy).size(radius * 2 * ratio, radius * 2 * ratio);
 			var rigidbody: RigidBody = circle.addComponent(RigidBody);
-			rigidbody.category = Physics_CollisionFiltering.k_circleCategory;
-			rigidbody.mask = Physics_CollisionFiltering.k_circleMask;
+			rigidbody.category = Physics_Physics_CollisionFiltering.k_circleCategory;
+			rigidbody.mask = Physics_Physics_CollisionFiltering.k_circleMask;
 			var circleCollider: CircleCollider = circle.addComponent(CircleCollider);
 			circleCollider.radius = radius * ratio;
 			this.addGroup(rigidbody, ratio);
@@ -97,13 +97,13 @@ package {
 		private function addGroup(rigidbody, ratio) {
 			switch(ratio) {
 				case 1:
-					rigidbody.group = Physics_CollisionFiltering.k_smallGroup;
+					rigidbody.group = Physics_Physics_CollisionFiltering.k_smallGroup;
 					break;
 				case 2:
-					rigidbody.group = Physics_CollisionFiltering.k_middleGroup;
+					rigidbody.group = Physics_Physics_CollisionFiltering.k_middleGroup;
 					break;
 				case 3:
-					rigidbody.group = Physics_CollisionFiltering.k_largeGroup;
+					rigidbody.group = Physics_Physics_CollisionFiltering.k_largeGroup;
 					break;
 			}
 		}

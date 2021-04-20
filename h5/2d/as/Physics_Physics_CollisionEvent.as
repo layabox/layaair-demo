@@ -13,7 +13,7 @@ package {
 	import laya.utils.Stat;
 	import laya.webgl.WebGL;
 	
-	public class Physics_CollisionEvent {
+	public class Physics_Physics_CollisionEvent {
         private var count: Number = 7;
         private var sensorCollider: CircleCollider;
         private var bodys: Array = [];
