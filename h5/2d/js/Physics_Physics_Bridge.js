@@ -1,4 +1,4 @@
-class Physics_Bridge {
+class Physics_Physics_Bridge {
     constructor() {
         this.ecount = 30;
         Laya.Laya.init(1200, 700, Laya.WebGL);
@@ -105,4 +105,4 @@ class Physics_Bridge {
         Laya.Laya.stage.removeChild(this.label);
     }
 }
-new Physics_Bridge();
+new Physics_Physics_Bridge();

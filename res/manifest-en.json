@@ -488,6 +488,41 @@
 				]
 			},
 			{
+				"prefix": "Physics",
+				"tr_zhCN": "Physics",
+				"manifest": [
+					[
+						"Physics_Bridge",
+						"Bridge",
+						"",
+						"core,ui,Physics,utils"
+					],
+					[
+						"Physics_CollisionEvent",
+						"CollisionEvent",
+						"",
+						"core,ui,Physics,utils"
+					],
+					[
+						"Physics_CollisionFiltering",
+						"CollisionFiltering",
+						"",
+						"core,ui,Physics,utils"
+					],
+					[
+						"Physics_Strandbeests",
+						"Strandbeests",
+						"",
+						"core,ui,Physics,utils"
+					],[
+						"Physics_Tumbler",
+						"Tumbler",
+						"",
+						"core,ui,Physics,utils"
+					]
+				]
+			},
+			{
 				"prefix": "Interaction",
 				"tr_zhCN": "Event handler",
 				"manifest": [
@@ -1200,6 +1235,12 @@
 						"SimpleSkinAnimationInstance",
 						"",
 						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"SkeletonMask",
+						"SkeletonMask",
+						"",
+						"core,ui,ani,d3,physics3D"
 					]
 				]
 			},

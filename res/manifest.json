@@ -488,6 +488,41 @@
 				]
 			},
 			{
+				"prefix": "Physics",
+				"tr_zhCN": "物理",
+				"manifest": [
+					[
+						"Physics_Bridge",
+						"物理纽带",
+						"",
+						"core,ui,Physics,utils"
+					],
+					[
+						"Physics_CollisionEvent",
+						"物理碰撞事件",
+						"",
+						"core,ui,Physics,utils"
+					],
+					[
+						"Physics_CollisionFiltering",
+						"物理碰撞过滤",
+						"",
+						"core,ui,Physics,utils"
+					],
+					[
+						"Physics_Strandbeests",
+						"物理仿真兽",
+						"",
+						"core,ui,Physics,utils"
+					],[
+						"Physics_Tumbler",
+						"滚筒模拟",
+						"",
+						"core,ui,Physics,utils"
+					]
+				]
+			},
+			{
 				"prefix": "Interaction",
 				"tr_zhCN": "鼠标交互",
 				"manifest": [
@@ -1188,6 +1223,12 @@
 						"预烘培动画",
 						"",
 						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"SkeletonMask",
+						"骨骼动画遮罩",
+						"",
+						"core,ui,ani,d3,,physics3D"
 					]
 				]
 			},
