@@ -488,8 +488,8 @@
 				]
 			},
 			{
-				"prefix": "Physics",
-				"tr_zhCN": "物理",
+				"prefix": "2DPhysics",
+				"tr_zhCN": "2D物理",
 				"manifest": [
 					[
 						"Physics_Bridge",
@@ -1558,6 +1558,12 @@
 					[
 						"CameraDepthModeTextureDemo",
 						"相机深度模式纹理展示",
+						"",
+						"core,ani,d3,device,ui,physics3D"
+					],
+					[
+						"SeparableSSS_RenderDemo",
+						"SeparableSSS演示",
 						"",
 						"core,ani,d3,device,ui,physics3D"
 					]
