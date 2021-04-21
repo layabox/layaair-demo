@@ -1563,7 +1563,7 @@
 					],
 					[
 						"SeparableSSS_RenderDemo",
-						"SeparableSSS演示",
+						"次表面散射",
 						"",
 						"core,ani,d3,device,ui,physics3D"
 					]
