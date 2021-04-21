@@ -874,19 +874,19 @@
 						"LoadResourceDemo",
 						"LoadResourceDemo",
 						"",
-						"core,ani,d3,CameraMoveScript.js"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"GarbageCollection",
 						"GarbageCollection",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"LoadGltfResource",
 						"LoadGltfResource",
 						"",
-						"core,ani,ui,d3,gltf,CameraMoveScript.js"
+						"core,ani,ui,d3,gltf,CameraMoveScript.js,physics3D"
 					]
 				]
 			},
@@ -904,19 +904,19 @@
 						"SceneLoad2",
 						"SceneLoad2",
 						"",
-						"core,ani,d3,CameraMoveScript.js"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"EnvironmentalReflection",
 						"EnvironmentalReflection",
 						"",
-						"core,ani,d3,CameraMoveScript.js"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"LightmapScene",
 						"LightmapScene",
 						"",
-						"core,ani,d3,CameraMoveScript.js"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					]
 				]
 			},
@@ -928,19 +928,19 @@
 						"CameraDemo",
 						"CameraDemo",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"CameraLookAt",
 						"CameraLookAt",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"MultiCamera",
 						"MultiCamera",
 						"",
-						"core,ani,d3,CameraMoveScript.js"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"CameraRay",
@@ -952,43 +952,43 @@
 						"CameraLayer",
 						"CameraLayer",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"OrthographicCamera",
 						"OrthographicCamera",
 						"",
-						"core,ui,ani,d3"
+						"core,ui,ani,d3,physics3D"
 					],
 					[
 						"D3SpaceToD2Space",
 						"D3SpaceToD2Space",
 						"",
-						"core,ui,ani,d3"
+						"core,ui,ani,d3,physics3D"
 					],
 					[
 						"RenderTarget3DTo2DSprite",
 						"RenderTarget3DTo2DSprite",
 						"",
-						"core,ui,ani,d3,CameraMoveScript.js"
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"RenderTargetCamera",
 						"RenderTargetCamera",
 						"",
-						"core,ui,ani,d3,ui,CameraMoveScript.js"
+						"core,ui,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"RenderTargetTo2DSprite",
 						"RenderTargetTo2DSprite",
 						"",
-						"core,ui,ani,d3,CameraMoveScript.js"
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"PickPixel",
 						"PickPixel",
 						"",
-						"core,ui,ani,d3,CameraMoveScript.js"
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
 					]
 				]
 			},
@@ -1000,25 +1000,25 @@
 						"DirectionLightDemo",
 						"DirectionLight",
 						"",
-						"core,ani,d3,CameraMoveScript.js"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"PointLightDemo",
 						"PointLight",
 						"",
-						"core,ani,d3,CameraMoveScript.js"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"SpotLightDemo",
 						"SpotLight",
 						"",
-						"core,ani,d3,CameraMoveScript.js"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"RealTimeShadow",
 						"RealTimeShadow",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"SpotLightShadowMap",
@@ -1042,31 +1042,31 @@
 						"SkinnedMeshSprite3DDemo",
 						"SkinnedMeshSprite3DDemo",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"Sprite3DParent",
 						"Sprite3DParent",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"TransformDemo",
 						"TransformDemo",
 						"",
-						"core,ani,d3,CameraMoveScript.js"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"Sprite3DClone",
 						"Sprite3DClone",
 						"",
-						"core,ani,d3,CameraMoveScript.js"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"PixelLineSprite3DDemo",
 						"PixelLineSprite3DDemo",
 						"",
-						"core,ani,d3,Tool.js,CameraMoveScript.js"
+						"core,ani,d3,Tool.js,CameraMoveScript.js,physics3D"
 					]
 				]
 			},
@@ -1078,13 +1078,13 @@
 						"MeshLoad",
 						"MeshLoad",
 						"",
-						"core,ui,ani,d3,Tool.js"
+						"core,ui,ani,d3,Tool.js,physics3D"
 					],
 					[
 						"CustomMesh",
 						"CustomMesh",
 						"",
-						"core,ui,ani,d3,Tool.js,CameraMoveScript.js"
+						"core,ui,ani,d3,Tool.js,CameraMoveScript.js,physics3D"
 					],
 					[
 						"ChangeMesh",

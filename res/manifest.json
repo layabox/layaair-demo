@@ -1337,7 +1337,7 @@
 						"CannonPhysicsWorld_BaseCollider",
 						"基础碰撞器",
 						"",
-						"core,d3,CameraMoveScript.js,cannonPhysics"
+						"core,d3,CameraMoveScript.js,cannonPhysics,physics3D"
 					],
 					[
 						"CannonPhysicsWorld_ColliderEvent",
