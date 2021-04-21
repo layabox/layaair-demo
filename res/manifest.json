@@ -1499,7 +1499,7 @@
 						"AStarFindPath",
 						"寻路导航",
 						"",
-						"core,ani,d3,astar.js,CameraMoveScript.js"
+						"core,ani,d3,astar.js,CameraMoveScript.js,physics3D"
 					],
 					[
 						"Scene2DPlayer3D",
