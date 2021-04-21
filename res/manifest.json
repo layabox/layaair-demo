@@ -488,36 +488,36 @@
 				]
 			},
 			{
-				"prefix": "2DPhysics",
+				"prefix": "Physics",
 				"tr_zhCN": "2D物理",
 				"manifest": [
 					[
 						"Physics_Bridge",
-						"物理纽带",
+						"桥",
 						"",
 						"core,ui,physics"
 					],
 					[
 						"Physics_CollisionEvent",
-						"物理碰撞事件",
+						"碰撞事件与传感器",
 						"",
 						"core,ui,physics"
 					],
 					[
 						"Physics_CollisionFiltering",
-						"物理碰撞过滤",
+						"碰撞过滤器",
 						"",
 						"core,ui,physics"
 					],
 					[
 						"Physics_Strandbeests",
-						"物理仿真兽",
+						"仿生机器人",
 						"",
 						"core,ui,physics"
 					],
 					[
 						"Physics_Tumbler",
-						"滚筒模拟",
+						"复合碰撞器",
 						"",
 						"core,ui,physics"
 					]

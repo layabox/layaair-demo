@@ -488,8 +488,8 @@
 				]
 			},
 			{
-				"prefix": "2DPhysics",
-				"tr_zhCN": "2DPhysics",
+				"prefix": "Physics",
+				"tr_zhCN": "Physics",
 				"manifest": [
 					[
 						"Physics_Bridge",
