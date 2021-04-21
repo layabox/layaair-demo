@@ -839,19 +839,19 @@
 						"LoadResourceDemo",
 						"资源加载",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"GarbageCollection",
 						"释放显存",
 						"",
-						"core,ani,ui,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"LoadGltfResource",
 						"加载Gltf资源",
 						"",
-						"core,ani,ui,d3,gltf,CameraMoveScript.js,Physics3D"
+						"core,ani,ui,d3,gltf,CameraMoveScript.js,physics3D"
 					]
 				]
 			},
@@ -869,19 +869,19 @@
 						"SceneLoad2",
 						"场景加载二",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"EnvironmentalReflection",
 						"环境反射",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"LightmapScene",
 						"光照贴图",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					]
 				]
 			},
@@ -893,19 +893,19 @@
 						"CameraDemo",
 						"摄像机示例",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"CameraLookAt",
 						"摄像机捕捉目标",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"MultiCamera",
 						"多照相机",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"CameraRay",
@@ -917,43 +917,43 @@
 						"CameraLayer",
 						"可视遮罩层",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"OrthographicCamera",
 						"正交摄像机",
 						"",
-						"core,ui,ani,d3,Physics3D"
+						"core,ui,ani,d3,physics3D"
 					],
 					[
 						"D3SpaceToD2Space",
 						"3D空间转2D空间",
 						"",
-						"core,ui,ani,d3,Physics3D"
+						"core,ui,ani,d3,physics3D"
 					],
 					[
 						"RenderTarget3DTo2DSprite",
 						"渲染3D到2DSprite",
 						"",
-						"core,ui,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"RenderTargetCamera",
 						"渲染到纹理",
 						"",
-						"core,ui,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"RenderTargetTo2DSprite",
 						"渲染到2DSprite",
 						"",
-						"core,ui,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"PickPixel",
 						"拾取像素",
 						"",
-						"core,ui,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ui,ani,d3,CameraMoveScript.js,physics3D"
 					]
 				]
 			},
@@ -995,25 +995,25 @@
 						"DirectionLightDemo",
 						"方向光",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"PointLightDemo",
 						"点光",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"SpotLightDemo",
 						"聚光",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"RealTimeShadow",
 						"实时阴影",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"SpotLightShadowMap",
@@ -1037,31 +1037,31 @@
 						"SkinnedMeshSprite3DDemo",
 						"蒙皮精灵",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"Sprite3DParent",
 						"子父级关系",
 						"",
-						"core,ani,d3,ui,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,ui,CameraMoveScript.js,physics3D"
 					],
 					[
 						"TransformDemo",
 						"变换示例",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"Sprite3DClone",
 						"克隆精灵",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"PixelLineSprite3DDemo",
 						"像素线精灵",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Tool.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,Tool.js,physics3D"
 					]
 				]
 			},
@@ -1073,13 +1073,13 @@
 						"MeshLoad",
 						"网格加载",
 						"",
-						"core,ui,ani,d3,Tool.js,Physics3D"
+						"core,ui,ani,d3,Tool.js,physics3D"
 					],
 					[
 						"CustomMesh",
 						"自定义网格",
 						"",
-						"core,ui,ani,d3,Tool.js,CameraMoveScript.js,Physics3D"
+						"core,ui,ani,d3,Tool.js,CameraMoveScript.js,physics3D"
 					],
 					[
 						"ChangeMesh",
@@ -1103,49 +1103,49 @@
 						"BlinnPhongMaterialLoad",
 						"BlinnPhong材质加载",
 						"",
-						"core,ani,d3,Physics3D"
+						"core,ani,d3,physics3D"
 					],
 					[
 						"BlinnPhong_DiffuseMap",
 						"BlinnPhong-漫反射贴图",
 						"",
-						"core,ani,d3,Physics3D"
+						"core,ani,d3,physics3D"
 					],
 					[
 						"BlinnPhong_NormalMap",
 						"BlinnPhong-法线贴图",
 						"",
-						"core,ani,d3,Physics3D"
+						"core,ani,d3,physics3D"
 					],
 					[
 						"BlinnPhong_SpecularMap",
 						"BlinnPhong-高光贴图",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"Blinnphong_Transmission",
 						"Blinnphong_透射",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"PBRMaterialDemo",
 						"PBR材质",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"EffectMaterialDemo",
 						"Effect材质",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"UnlitMaterialDemo",
 						"Unlit材质",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"WaterPrimaryMaterialDemo",
@@ -1163,7 +1163,7 @@
 						"TextureDemo",
 						"纹理示例",
 						"",
-						"core,ani,d3,CameraMoveScript.js,Physics3D"
+						"core,ani,d3,CameraMoveScript.js,physics3D"
 					],
 					[
 						"TextureGPUCompression",
