@@ -27,6 +27,7 @@ package {
 		private var preMovementX: Number = 0;
 		private var preMovementY: Number = 0;
 		public function Physics_Physics_CollisionFiltering() {
+			Laya.Config.isAntialias = true;
 			Laya.init(1200, 700, WebGL);
 			Stat.show();
 			Physics.enable();

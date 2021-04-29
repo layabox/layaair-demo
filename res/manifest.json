@@ -492,14 +492,8 @@
 				"tr_zhCN": "2D物理",
 				"manifest": [
 					[
-						"Physics_Bridge",
-						"桥",
-						"",
-						"core,ui,physics"
-					],
-					[
-						"Physics_CollisionEvent",
-						"碰撞事件与传感器",
+						"Physics_Tumbler",
+						"复合碰撞器",
 						"",
 						"core,ui,physics"
 					],
@@ -510,14 +504,20 @@
 						"core,ui,physics"
 					],
 					[
-						"Physics_Strandbeests",
-						"仿生机器人",
+						"Physics_CollisionEvent",
+						"碰撞事件与传感器",
 						"",
 						"core,ui,physics"
 					],
 					[
-						"Physics_Tumbler",
-						"复合碰撞器",
+						"Physics_Bridge",
+						"桥",
+						"",
+						"core,ui,physics"
+					],
+					[
+						"Physics_Strandbeests",
+						"仿生机器人",
 						"",
 						"core,ui,physics"
 					]

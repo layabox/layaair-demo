@@ -25,6 +25,7 @@ package {
 		private var motorJoint: RevoluteJoint;
 		private var label: Label;
 		public function Physics_Strandbeests() {
+			Laya.Config.isAntialias = true;
 			Laya.init(1200, 700, WebGL);
 			Stat.show();
 			Physics.enable();

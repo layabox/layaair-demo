@@ -4,6 +4,7 @@ class Physics_Physics_Strandbeests {
 		this.pos = [500, 400];
 		this.m_offset = [0, -80 * this.scale];
 		this.pivot = [0, 8 * this.scale];
+		Laya.Config.isAntialias = true;
 		Laya.Laya.init(1200, 700, Laya.WebGL);
 		Laya.Stat.show();
 		Laya.Physics.enable();

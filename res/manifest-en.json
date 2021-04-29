@@ -492,14 +492,8 @@
 				"tr_zhCN": "Physics",
 				"manifest": [
 					[
-						"Physics_Bridge",
-						"Bridge",
-						"",
-						"core,ui,physics"
-					],
-					[
-						"Physics_CollisionEvent",
-						"CollisionEvent",
+						"Physics_Tumbler",
+						"Tumbler",
 						"",
 						"core,ui,physics"
 					],
@@ -510,13 +504,20 @@
 						"core,ui,physics"
 					],
 					[
-						"Physics_Strandbeests",
-						"Strandbeests",
+						"Physics_CollisionEvent",
+						"CollisionEvent",
 						"",
 						"core,ui,physics"
-					],[
-						"Physics_Tumbler",
-						"Tumbler",
+					],
+					[
+						"Physics_Bridge",
+						"Bridge",
+						"",
+						"core,ui,physics"
+					],
+					[
+						"Physics_Strandbeests",
+						"Strandbeests",
 						"",
 						"core,ui,physics"
 					]

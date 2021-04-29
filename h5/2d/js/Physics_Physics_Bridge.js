@@ -1,6 +1,7 @@
 class Physics_Physics_Bridge {
     constructor() {
         this.ecount = 30;
+        Laya.Config.isAntialias = true;
         Laya.Laya.init(1200, 700, Laya.WebGL);
         Laya.Stat.show();
         Laya.Physics.enable();

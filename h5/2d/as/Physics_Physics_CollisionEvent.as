@@ -19,6 +19,7 @@ package {
         private var bodys: Array = [];
         private var touching: Array = [];
 		public function Physics_CollisionEvent() {
+            Laya.Config.isAntialias = true;
 			Laya.init(1200, 700, WebGL);
 			Stat.show();
 			Physics.enable();

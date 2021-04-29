@@ -3,6 +3,7 @@ class Physics_Physics_CollisionEvent {
         this.count = 7;
         this.bodys = [];
         this.touching = [];
+        Laya.Config.isAntialias = true;
         Laya.Laya.init(1200, 700, Laya.WebGL);
         Laya.Stat.show();
         Laya.Physics.enable();

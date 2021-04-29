@@ -2,6 +2,7 @@ class Physics_Physics_Tumbler {
     constructor() {
         this.count = 0;
         this.totalBox = 200;
+        Laya.Config.isAntialias = true;
         Laya.Laya.init(Laya.Browser.clientWidth, Laya.Browser.clientHeight, Laya.WebGL);
         Laya.Stat.show();
         Laya.Physics.enable({

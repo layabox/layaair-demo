@@ -19,6 +19,7 @@ package {
         private var totalBox = 200;
         private var label: Label;
 		public function Physics_Tumbler() {
+            Laya.Config.isAntialias = true;
 			Laya.init(1200, 700, WebGL);
 			Stat.show();
 			Physics.enable();

@@ -18,6 +18,7 @@ package {
         private var ecount = 30;
         private var label: Label;
 		public function Physics_Bridge() {
+            Laya.Config.isAntialias = true;
 			Laya.init(1200, 700, WebGL);
 			Stat.show();
 			Physics.enable();

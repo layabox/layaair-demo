@@ -7,6 +7,7 @@ window.Laya=window.Laya||{};
         constructor() {
             this.preMovementX = 0;
             this.preMovementY = 0;
+            Laya.Config.isAntialias = true;
             Laya.Laya.init(1200, 700, Laya.WebGL);
             Laya.Stat.show();
             Laya.Physics.enable();
