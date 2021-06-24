@@ -11,7 +11,7 @@ package
 	{
 		public function Sprite_DisplayImage()
 		{
-			Config.isAntialias = true;
+			Laya.Config.isAntialias = true;
 			// 不支持WebGL时自动切换至Canvas
 			Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
