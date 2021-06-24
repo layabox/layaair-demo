@@ -8,12 +8,11 @@ module laya {
 
 	export class Sprite_DisplayImage {
 		constructor() {
+			Config.isAntialias = true;
 			// 不支持WebGL时自动切换至Canvas
 			Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
-
 			Laya.stage.alignV = Stage.ALIGN_MIDDLE;
 			Laya.stage.alignH = Stage.ALIGN_CENTER;
-
 			Laya.stage.scaleMode = "showall";
 			Laya.stage.bgColor = "#232628";
 
