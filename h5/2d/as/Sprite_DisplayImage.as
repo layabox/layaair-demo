@@ -11,7 +11,10 @@ package
 	{
 		public function Sprite_DisplayImage()
 		{
-			Laya.Config.isAntialias = true;
+			// 2D场景不显示时打开
+			 Laya.Config.isAntialias = true;
+			// 2D场景显示错乱时打开
+			 Laya.Config.useWebGL2 = false; 
 			// 不支持WebGL时自动切换至Canvas
 			Laya.init(Browser.clientWidth, Browser.clientHeight, WebGL);
 
