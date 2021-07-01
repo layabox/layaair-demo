@@ -4,14 +4,18 @@ window.Laya= (function (exports) {
     class Config {
     }
     Config.animationInterval = 50;
-    Config.isAntialias = false;
+    Config.isAntialias=true;
+    //ios15测试版黑屏bug（临时）
+    //Config.isAntialias = false;
     Config.isAlpha = false;
     Config.premultipliedAlpha = true;
     Config.isStencil = true;
     Config.preserveDrawingBuffer = false;
     Config.webGL2D_MeshAllocMaxMem = true;
     Config.is2DPixelArtGame = false;
-    Config.useWebGL2 = true;
+    //ios15测试版花屏bug（临时）
+    //Config.useWebGL2 = true;
+    Config.useWebGL2 = false;
     Config.printWebglOrder = false;
     Config.allowGPUInstanceDynamicBatch = true;
     Config.useRetinalCanvas = false;
