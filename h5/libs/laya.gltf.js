@@ -758,6 +758,7 @@
 	        }
 	        layaMesh._setSubMeshes(subMeshes);
 	        layaMesh.calculateBounds();
+	        layaMesh._setInstanceBuffer(Laya.Mesh.MESH_INSTANCEBUFFER_TYPE_NORMAL);
 	        let memorySize = vertexBuffer._byteLength + indexBuffer._byteLength;
 	        layaMesh._setCPUMemory(memorySize);
 	        layaMesh._setGPUMemory(memorySize);
@@ -775,7 +776,6 @@
 	        });
 	        mesh._inverseBindPoses = [];
 	        mesh._inverseBindPosesBuffer = inverseBindMatricesArray.buffer;
-	        mesh._setInstanceBuffer(Laya.Mesh.MESH_INSTANCEBUFFER_TYPE_NORMAL);
 	        for (let index = 0; index < boneCount; index++) {
 	            let bindPosesArrayOffset = 16 * index;
 	            let matElement = inverseBindMatricesArray.slice(bindPosesArrayOffset, bindPosesArrayOffset + 16);
@@ -933,9 +933,13 @@
 	        let resPos = new Laya.Vector3();
 	        let min = new Laya.Vector3(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE);
 	        let max = new Laya.Vector3(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE);
-	        positions.forEach((pos, index) => {
+	        for (let index = 0; index < positions.length; index++) {
+	            let pos = positions[index];
 	            let boneIndex = oriBoneIndeices[index];
 	            let boneWeight = boneWeights[index];
+	            if (!(boneIndex && boneWeight)) {
+	                continue;
+	            }
 	            for (let ei = 0; ei < 16; ei++) {
 	                skinTransform.elements[ei] = ubones[boneIndex.x].elements[ei] * boneWeight.x;
 	                skinTransform.elements[ei] += ubones[boneIndex.y].elements[ei] * boneWeight.y;
@@ -945,7 +949,7 @@
 	            Laya.Vector3.transformV3ToV3(pos, skinTransform, resPos);
 	            Laya.Vector3.min(min, resPos, min);
 	            Laya.Vector3.max(max, resPos, max);
-	        });
+	        }
 	        positions = null;
 	        boneIndices = boneWeights = oriBoneIndeices = null;
 	        indices = null;
@@ -1014,15 +1018,39 @@
 	        return glTFUtils._createAnimator(animation);
 	    }
 	    static _createAnimator(animation) {
-	        let animator = new Laya.Animator();
 	        let channels = animation.channels;
 	        let samplers = animation.samplers;
 	        let animatorRoot = glTFUtils.getAnimationRoot(channels);
 	        if (!animatorRoot) {
-	            return animator;
+	            return null;
 	        }
-	        animatorRoot.addComponentIntance(animator);
+	        let animator = animatorRoot.getComponent(Laya.Animator);
+	        if (!animator) {
+	            animator = animatorRoot.addComponent(Laya.Animator);
+	            let animatorLayer = new Laya.AnimatorControllerLayer("glTF_AnimatorLayer");
+	            animator.addControllerLayer(animatorLayer);
+	            animatorLayer.defaultWeight = 1.0;
+	        }
+	        let clip = glTFUtils._createAnimatorClip(animation, animatorRoot);
+	        let animatorLayer = animator.getControllerLayer();
+	        let animationName = clip.name;
+	        let stateMap = animatorLayer._statesMap;
+	        if (stateMap[animationName]) {
+	            animationName = clip.name = glTFUtils.getNodeRandomName(animationName);
+	        }
+	        let animatorState = new Laya.AnimatorState();
+	        animatorState.name = animationName;
+	        animatorState.clip = clip;
+	        animatorLayer.addState(animatorState);
+	        animatorLayer.defaultState = animatorState;
+	        animatorLayer.playOnWake = true;
+	        return animator;
+	    }
+	    static _createAnimatorClip(animation, animatorRoot) {
+	        let clip = new Laya.AnimationClip();
 	        let duration = 0;
+	        let channels = animation.channels;
+	        let samplers = animation.samplers;
 	        let clipNodes = new Array(channels.length);
 	        channels.forEach((channel, index) => {
 	            let target = channel.target;
@@ -1055,10 +1083,7 @@
 	            clipNode.duration = clipNode.timeArray[clipNode.timeArray.length - 1];
 	            duration = Math.max(duration, clipNode.duration);
 	        });
-	        let layerName = animation.name ? animation.name : "Aniamtor";
-	        let animatorLayer = new Laya.AnimatorControllerLayer(layerName);
-	        let clip = new Laya.AnimationClip();
-	        clip.name = "clip name";
+	        clip.name = animation.name ? animation.name : glTFUtils.getNodeRandomName("glTF_Animation");
 	        clip._duration = duration;
 	        clip.islooping = true;
 	        clip._frameRate = 30;
@@ -1127,15 +1152,7 @@
 	                }
 	            }
 	        }
-	        let animatorState = new Laya.AnimatorState();
-	        animatorState.name = "state name";
-	        animatorState.clip = clip;
-	        animatorLayer.addState(animatorState);
-	        animatorLayer.defaultState = animatorState;
-	        animatorLayer.playOnWake = true;
-	        animator.addControllerLayer(animatorLayer);
-	        animatorLayer.defaultWeight = 1.0;
-	        return animator;
+	        return clip;
 	    }
 	}
 	glTFUtils.NAMEID = 0;

@@ -130,6 +130,12 @@
 						"换装",
 						"",
 						"core,ani"
+					],
+					[
+						"SpineAdapted",
+						"适配版Spine",
+						"",
+						"core,ani,spine-core-3.8.js,spine"
 					]
 				]
 			},
@@ -982,6 +988,12 @@
 					[
 						"PostProcess_DoF",
 						"后处理景深",
+						"",
+						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PostProcess_AO",
+						"后处理AO",
 						"",
 						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
 					]

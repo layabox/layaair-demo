@@ -245,6 +245,8 @@
 	            else if (!isNaN(this.left)) {
 	                owner.x = Math.round(this.left + owner.pivotX * owner.scaleX);
 	                if (!isNaN(this.right)) {
+	                    if (!parent._width)
+	                        return false;
 	                    var temp = (parent._width - this.left - this.right) / (owner.scaleX || 0.01);
 	                    if (temp != owner.width) {
 	                        owner.width = temp;
@@ -270,6 +272,8 @@
 	            else if (!isNaN(this.top)) {
 	                owner.y = Math.round(this.top + owner.pivotY * owner.scaleY);
 	                if (!isNaN(this.bottom)) {
+	                    if (!parent._height)
+	                        return false;
 	                    var temp = (parent._height - this.top - this.bottom) / (owner.scaleY || 0.01);
 	                    if (temp != owner.height) {
 	                        owner.height = temp;
@@ -2212,7 +2216,12 @@
 	            var pow = Math.pow(10, (this._tick + "").length - 1);
 	            this._value = Math.round(Math.round(this._value / this._tick) * this._tick * pow) / pow;
 	        }
-	        this._value = this._value > this._max ? this._max : this._value < this._min ? this._min : this._value;
+	        if (this._max >= this._max) {
+	            this._value = this._value > this._max ? this._max : this._value < this._min ? this._min : this._value;
+	        }
+	        else {
+	            this._value = this._value > this._min ? this._min : this._value < this._max ? this._max : this._value;
+	        }
 	        var num = this._max - this._min;
 	        if (num === 0)
 	            num = 1;

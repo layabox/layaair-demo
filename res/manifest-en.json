@@ -130,6 +130,12 @@
 						"Change skin",
 						"",
 						"core,ani"
+					],
+					[
+						"SpineAdapted",
+						"AdaptedSpine",
+						"",
+						"core,ani,spine-core-3.8.js"
 					]
 				]
 			},
@@ -1534,6 +1540,12 @@
 					[
 						"PostProcess_DoF",
 						"PostProcess_DoF",
+						"",
+						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
+					],
+					[
+						"PostProcess_AO",
+						"PostProcess_AO",
 						"",
 						"core,ani,ui,d3,CameraMoveScript.js,physics3D"
 					],
