@@ -135,7 +135,7 @@
 						"SpineAdapted",
 						"AdaptedSpine",
 						"",
-						"core,ani,spine-core-3.8.js"
+						"core,ani,spine-core-3.8.js,spine"
 					]
 				]
 			},

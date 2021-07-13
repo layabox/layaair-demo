@@ -14053,7 +14053,7 @@
 	        }
 	    }
 	    _mouseTouchRayCast(cameras) {
-	        if (Physics3D._bullet || Physics3D._cannon)
+	        if(!Physics3D._bullet && !Physics3D._cannon)
 	            return;
 	        var touchHitResult = Input3D._tempHitResult0;
 	        var touchPos = Input3D._tempVector20;
