@@ -70,7 +70,7 @@ class RealTimeShadow {
 		// A sphere cast/receive shadow.
 		var sphereSprite = this.addPBRSphere(Laya.PrimitiveMesh.createSphere(0.1), new Laya.Vector3(0, 0.2, 0.5), scene);
 		sphereSprite.meshRenderer.castShadow = true;
-		sphereSprite.meshRenderer.receiveShadow = true;
+		//sphereSprite.meshRenderer.receiveShadow = true;
 
 		// Add Light controll UI.
 		this.loadUI(rotationScript);
